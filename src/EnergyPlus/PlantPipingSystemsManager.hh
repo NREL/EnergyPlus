@@ -1167,9 +1167,20 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
+	Real64
+	CalcAdiabaticMultiplier(
+		int const DomainNum,
+		CartesianCell const & cell,
+		int CurDirection
+	);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
 #ifdef CalcEnergyBalance
 	void
-	UpdateEnergyBalance( int const DomainNum );
+	UpdateMaxEnergyBalance( int const DomainNum );
 #endif
 
 } // PlantPipingSystemsManager

@@ -220,9 +220,10 @@ namespace DataPlantPipingSystems {
 		BaseThermalPropertySet Properties;
 #ifdef CalcEnergyBalance
 		Real64 energyImbalance = 0.0;
-		Array1D< Real64 > energyFromEachSide;
 		Real64 sumEnergyFromAllSides = 0.0;
 		Real64 totalEnergyChange = 0.0;
+		int numberOfSidesCalculated = 0;
+		Real64 tempDiffDueToImbalance = 0.0;
 #endif
 
 		// Default Constructor
@@ -949,11 +950,12 @@ namespace DataPlantPipingSystems {
 		ReportingInformation Reporting;
 		bool HasBasement;
 		// Zone coupled variables
-		Array1D <ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
+		Array1D < ZoneCoupledSurfaceData > ZoneCoupledSurfaces;
 		int ZoneCoupledOSCMIndex;
 		Real64 PerimeterOffset;
 		bool SlabInGradeFlag;
 		int SlabMaterialNum;
+		Real64 SlabArea;
 		Real64 SlabWidth;
 		Real64 SlabLength;
 		Real64 SlabThickness;
@@ -996,6 +998,9 @@ namespace DataPlantPipingSystems {
 		int NumSlabCells;
 		Array2D< Real64 > WeightingFactor;
 		Array2D< Real64 > WeightedHeatFlux;
+		Real64 TotalEnergyUniformHeatFlux = 0.0;
+		Real64 TotalEnergyWeightedHeatFlux = 0.0;
+		Real64 HeatFluxWeightingFactor = 0.0;
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
@@ -1005,6 +1010,20 @@ namespace DataPlantPipingSystems {
 		int MaxEnergyImbalance_XLocation = 0;
 		int MaxEnergyImbalance_YLocation = 0;
 		int MaxEnergyImbalance_ZLocation = 0;
+		bool finalIteration = false;
+		int minNumberOfSidesCalculated = 10;
+		int minNumberOfSidesCalculated_XLocation = 0;
+		int minNumberOfSidesCalculated_YLocation = 0;
+		int minNumberOfSidesCalculated_ZLocation = 0;
+		int maxNumberOfSidesCalculated = 0;
+		int maxNumberOfSidesCalculated_XLocation = 0;
+		int maxNumberOfSidesCalculated_YLocation = 0;
+		int maxNumberOfSidesCalculated_ZLocation = 0;
+		Real64 AvgUnweightedSurfTemp = 0.0;
+		Real64 maxTempDiffDueToImbalance = 0.0;
+		int maxTempDiffDueToImbalance_XLocation = 0;
+		int maxTempDiffDueToImbalance_YLocation = 0;
+		int maxTempDiffDueToImbalance_ZLocation = 0;
 #endif
 
 		// Default Constructor

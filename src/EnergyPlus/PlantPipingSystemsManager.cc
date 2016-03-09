@@ -62,6 +62,7 @@
 #include <memory>
 #include <set>
 #include <utility>
+#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -393,19 +394,8 @@ namespace PlantPipingSystemsManager {
 		static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
 		static gio::Fmt DomainCellsToEIO( "(A,',',I5',',I5',',I5)" );
 
-		int DomainNum( 0 );
-		int X( 0 );
-		int Y( 0 );
-		int Z( 0 );
-		int Xmax( 0 );
-		int Ymax( 0 );
-		int Zmax( 0 );
 		int ZoneNum( 0 );
 		int SurfCtr( 0 );
-		Real64 ZoneTemp( 0.0 );
-		Real64 SlabArea( 0.0 );
-		Real64 WeightingFactorTimesArea( 0.0 );
-		Real64 RunningTemp( 0.0 );
 
 		// Read input if necessary
 		if ( GetInputFlag ) {
@@ -413,7 +403,7 @@ namespace PlantPipingSystemsManager {
 			GetInputFlag = false;
 		}
 
-		for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
+		for ( int DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
 			if ( PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed ) {
 				DevelopMesh( DomainNum );
 			}
@@ -431,9 +421,9 @@ namespace PlantPipingSystemsManager {
 				DoOneTimeInitializations( DomainNum, _ );
 
 				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
-					Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
-					Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
-					Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
+					int Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
+					int Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
+					int Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
 
 					PipingSystemDomains( DomainNum ).WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );
 					PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
@@ -443,7 +433,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).BeginSimEnvrn = false;
 			}
 
-			// Reset the heat fluxs if domain update has been completed
+			// Reset the heat fluxes if domain update has been completed
 			if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
 				PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
@@ -483,43 +473,67 @@ namespace PlantPipingSystemsManager {
 
 				// Zone-coupled slab
 				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
-					Xmax = ubound(PipingSystemDomains(DomainNum).Cells, 1);
-					Ymax = ubound(PipingSystemDomains(DomainNum).Cells, 2);
-					Zmax = ubound(PipingSystemDomains(DomainNum).Cells, 3);
-					Y = Ymax;
-					SlabArea = (PipingSystemDomains(DomainNum).SlabLength / 2) * (PipingSystemDomains(DomainNum).SlabWidth / 2);
+
 					PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+
+					Real64 ZoneTemp = 0.0;
 
 					//Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
 					for ( SurfCtr = 1; SurfCtr <= isize( PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces ); ++SurfCtr ) {
-						ZoneNum = PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces( SurfCtr ).Zone;
-						RunningTemp += ZTAV( ZoneNum );
+						int ZoneNum = PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces( SurfCtr ).Zone;
+						ZoneTemp += ZTAV( ZoneNum );
 					}
 
-					ZoneTemp = RunningTemp / ( SurfCtr - 1 );
+					ZoneTemp = ZoneTemp / ( SurfCtr - 1 );
+					Real64 AvgSlabTemp = GetAverageTempByType( DomainNum, CellType_ZoneGroundInterface );
 
-					for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
-						for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+					int Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
+
+					for ( int Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+						for ( int X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 							// Zone interface cells
-							if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
-								if ( abs( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ) < 0.0001 ){
-									PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep = ZoneTemp - 0.0001;
-								}
-								PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) = abs ( ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ) );
-								WeightingFactorTimesArea += PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
+							if ( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).CellType == CellType_ZoneGroundInterface ){
+								PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) = abs ( ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - AvgSlabTemp ) );
 							}
 						}
 					}
 
-					//Get heat flux for center cell first
-					PipingSystemDomains( DomainNum ).WeightedHeatFlux( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * SlabArea / WeightingFactorTimesArea;
-
-					//Then get temperature weighted heat flux for each cell
-					for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
-						for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+					// Set initial weighted heat flux
+					for ( int Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+						for ( int X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 							// Zone interface cells
-							if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
-								PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) = PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) * PipingSystemDomains( DomainNum ).WeightedHeatFlux( Xmax, Zmax );
+							if ( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).CellType == CellType_ZoneGroundInterface ){
+								PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) = PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) * PipingSystemDomains( DomainNum ).HeatFlux;
+							}
+						}
+					}
+
+					// Weighted heat flux and uniform heat flux balance energy may not balance exactly
+					// Calculate difference and adjust
+					PipingSystemDomains( DomainNum ).TotalEnergyUniformHeatFlux = PipingSystemDomains( DomainNum ).HeatFlux * PipingSystemDomains( DomainNum ).SlabArea * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+					PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux = 0.0;
+
+					for ( int Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+						for ( int X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+							// Zone interface cells
+							if ( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).CellType == CellType_ZoneGroundInterface ){
+								auto & cell( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ) );
+								PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux += PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) * Width( cell ) * Depth( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+							}
+						}
+					}
+
+					PipingSystemDomains( DomainNum ).HeatFluxWeightingFactor = PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux / PipingSystemDomains( DomainNum ).TotalEnergyUniformHeatFlux;
+					PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux = 0.0;
+
+					// Finally, adjust the weighted heat flux so that energy balances
+					for ( int Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+						for ( int X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+							// Zone interface cells
+							if ( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).CellType == CellType_ZoneGroundInterface ) {
+								auto & cell( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ) );
+								PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) = PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) / PipingSystemDomains( DomainNum ).HeatFluxWeightingFactor;
+								PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux += PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) * Width( cell ) * Depth( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
 							}
 						}
 					}
@@ -544,7 +558,7 @@ namespace PlantPipingSystemsManager {
 			gio::write( OutputFileInits, DomainCellsToEIOHeader );
 
 			// Write eio data
-			for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
+			for ( int DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
 				gio::write( OutputFileInits, DomainCellsToEIO ) << PipingSystemDomains( DomainNum ).Name << PipingSystemDomains( DomainNum ).NumDomainCells
 					<< PipingSystemDomains( DomainNum ).NumGroundSurfCells << PipingSystemDomains( DomainNum ).NumInsulationCells;
 			}
@@ -988,7 +1002,7 @@ namespace PlantPipingSystemsManager {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Must enter either yes or no.", ErrorsFound );
 				}
 
-				// get boundary condition model names and indeces --error check
+				// get boundary condition model names and indices --error check
 				CurIndex = 9;
 				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
 				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
@@ -1251,7 +1265,7 @@ namespace PlantPipingSystemsManager {
 						ShowFatalError( "Preceding error causes program termination." );
 					}
 
-					// Horizontal insualtion perimeter width
+					// Horizontal insulation perimeter width
 					PipingSystemDomains( DomainCtr ).HorizInsWidth = Domain( ZoneCoupledDomainCtr ).HorizInsWidth;
 				}
 
@@ -1333,6 +1347,8 @@ namespace PlantPipingSystemsManager {
 					ThisArea += PipingSystemDomains( DomainCtr ).ZoneCoupledSurfaces( SurfCtr ).SurfaceArea;
 				}
 
+				PipingSystemDomains( DomainCtr ).SlabArea = ThisArea / 4; // We are only interested in 1/4 of total area due to symmetry
+
 				// Surface dimensions
 				PipingSystemDomains( DomainCtr ).SlabWidth = std::sqrt( ThisArea / Domain( ZoneCoupledDomainCtr ).AspectRatio );
 				PipingSystemDomains( DomainCtr ).SlabLength = PipingSystemDomains( DomainCtr ).SlabWidth * Domain( ZoneCoupledDomainCtr ).AspectRatio;
@@ -1387,7 +1403,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 				// Other parameters
-				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.01;
+				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
 				PipingSystemDomains( DomainCtr ).SimControls.MaxIterationsPerTS = 250;
 
 				// additional evapotranspiration parameter, min/max validated by IP
@@ -1415,7 +1431,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       Summer 2014  Sushobhit Acharya to accomodate basement calculations
+		//       MODIFIED       Summer 2014  Sushobhit Acharya to accommodate basement calculations
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1546,7 +1562,7 @@ namespace PlantPipingSystemsManager {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cNumericFieldNames( CurIndex ), rNumericArgs( CurIndex ), "Basement depth must be a positive nonzero value.", ErrorsFound );
 			}
 
-			// get boundary condition model names and indeces --error check
+			// get boundary condition model names and indices --error check
 			CurIndex = 4;
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
@@ -1638,7 +1654,7 @@ namespace PlantPipingSystemsManager {
 					ShowFatalError( "Preceding error causes program termination." );
 				}
 
-				// Horizontal insualtion perimeter width
+				// Horizontal insulation perimeter width
 				PipingSystemDomains( DomainNum ).HorizInsWidth = Domain( BasementCtr ).HorizInsWidth;
 			}
 
@@ -2367,6 +2383,27 @@ namespace PlantPipingSystemsManager {
 		SetupOutputVariable( "Maximum Domain Energy Imbalance X Location []", PipingSystemDomains( DomainNum ).MaxEnergyImbalance_XLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		SetupOutputVariable( "Maximum Domain Energy Imbalance Y Location []", PipingSystemDomains( DomainNum ).MaxEnergyImbalance_YLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		SetupOutputVariable( "Maximum Domain Energy Imbalance Z Location []", PipingSystemDomains( DomainNum ).MaxEnergyImbalance_ZLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+		SetupOutputVariable( "Total Heat Flux Energy Uniform Heat Flux []", PipingSystemDomains( DomainNum ).TotalEnergyUniformHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Total Heat Flux Energy Weighted Heat Flux []", PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Heat Flux Weighting Factor []", PipingSystemDomains( DomainNum ).HeatFluxWeightingFactor, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+		SetupOutputVariable( "Cell with Minimum Number of Sides Calculated []", PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Cell with Minimum Number of Sides Calculated X Location []", PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated_XLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Cell with Minimum Number of Sides Calculated Y Location []", PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated_YLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Cell with Minimum Number of Sides Calculated Z Location []", PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated_ZLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+		SetupOutputVariable( "Cell with Maximum Number of Sides Calculated []", PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Cell with Maximum Number of Sides Calculated X Location []", PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated_XLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Cell with Maximum Number of Sides Calculated Y Location []", PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated_YLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Cell with Maximum Number of Sides Calculated Z Location []", PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated_ZLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+		SetupOutputVariable( "Unweighted GroundDomain Slab Zone Coupled Surface Temperature []", PipingSystemDomains( DomainNum ).AvgUnweightedSurfTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+		SetupOutputVariable( "Max Temperature Difference Due To Energy Imbalance []", PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Max Temperature Difference Due To Energy Imbalance X Location []", PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance_XLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Max Temperature Difference Due To Energy Imbalance Y Location []", PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance_YLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		SetupOutputVariable( "Max Temperature Difference Due To Energy Imbalance Z Location []", PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance_ZLocation, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 #endif
 
 	}
@@ -5430,6 +5467,8 @@ namespace PlantPipingSystemsManager {
 		int NumInsulationCells = 0;
 		int NumGroundSurfaceCells = 0;
 
+		std::ofstream static outFile( "Cells.csv", std::ofstream::out );
+
 		struct tCellExtents
 		{
 			// Members
@@ -5760,7 +5799,7 @@ namespace PlantPipingSystemsManager {
 					}
 
 #ifdef CalcEnergyBalance
-					cell.MyBase.energyFromEachSide.allocate( 6 );
+					outFile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << cell.X_max - cell.X_min << "," << cell.Y_max - cell.Y_min << "," << cell.Z_max - cell.Z_min << std::endl;
 #endif
 
 				} //'z
@@ -6358,12 +6397,14 @@ namespace PlantPipingSystemsManager {
 				if ( PipingSystemDomains( DomainNum ).DomainNeedsSimulation ) PerformTemperatureFieldUpdate( DomainNum );
 				FinishedIterationLoop = false;
 				DoEndOfIterationOperations( DomainNum, FinishedIterationLoop );
-				if ( FinishedIterationLoop ) break;
-			}
 
 #ifdef CalcEnergyBalance
-			UpdateEnergyBalance( DomainNum );
+				if( FinishedIterationLoop ) {
+					UpdateMaxEnergyBalance( DomainNum );
+				}
 #endif
+				if ( FinishedIterationLoop ) break;
+			}
 
 			// Update the basement surface temperatures, if any
 			if ( PipingSystemDomains( DomainNum ).HasBasement || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
@@ -6436,9 +6477,12 @@ namespace PlantPipingSystemsManager {
 					}
 
 #ifdef CalcEnergyBalance
-					Real64 thisCellMass = cell.MyBase.Properties.Density * Volume( cell );
-					Real64 totalEnergyChange = thisCellMass * cell.MyBase.Properties.SpecificHeat * ( cell.MyBase.Temperature - cell.MyBase.Temperature_PrevTimeStep );
-					cell.MyBase.totalEnergyChange = totalEnergyChange;
+					if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+						Real64 massCp = cell.MyBase.Properties.Density * Volume( cell ) * cell.MyBase.Properties.SpecificHeat;
+						cell.MyBase.totalEnergyChange = massCp * ( cell.MyBase.Temperature_PrevIteration - cell.MyBase.Temperature_PrevTimeStep );
+						cell.MyBase.energyImbalance = std::abs( cell.MyBase.totalEnergyChange - cell.MyBase.sumEnergyFromAllSides );
+						cell.MyBase.tempDiffDueToImbalance = cell.MyBase.energyImbalance / massCp;
+					}
 #endif
 					}
 				}
@@ -6501,10 +6545,9 @@ namespace PlantPipingSystemsManager {
 		EvaluateCellNeighborDirections( DomainNum, cell );
 
 #ifdef CalcEnergyBalance
-		int index = 0;
 		Real64 energyFromThisSide = 0.0;
 		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.energyFromEachSide = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
 #endif
 
 		// loop across each direction in the simulation
@@ -6514,15 +6557,17 @@ namespace PlantPipingSystemsManager {
 
 			//'evaluate the transient expression terms
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-			Numerator += ( Beta / Resistance ) * NeighborTemp;
-			Denominator += Beta / Resistance;
+			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( CurDirection );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
 #endif
 		}
 
@@ -6597,7 +6642,6 @@ namespace PlantPipingSystemsManager {
 		Real64 IncidentHeatGain;
 		int DirectionCounter;
 		int CurDirection;
-		Real64 AdiabaticMultiplier;
 		Real64 Beta;
 		Real64 Latitude_Degrees; // Latitude, degrees N
 		Real64 StMeridian_Degrees; // Standard meridian, degrees W -- note it is degrees E in DataEnvironment
@@ -6650,7 +6694,6 @@ namespace PlantPipingSystemsManager {
 		GroundCoverCoefficient = PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient;
 
 		// initialize values
-		AdiabaticMultiplier = 1.0;
 		Numerator = 0.0;
 		Denominator = 0.0;
 		Resistance = 0.0;
@@ -6658,10 +6701,9 @@ namespace PlantPipingSystemsManager {
 		ThisNormalArea = NormalArea( cell, Direction_PositiveY );
 
 #ifdef CalcEnergyBalance
-		int index = 0;
 		Real64 energyFromThisSide = 0.0;
 		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.energyFromEachSide = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
 #endif
 
 		//'add effect from previous time step
@@ -6675,28 +6717,19 @@ namespace PlantPipingSystemsManager {
 		for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
 			CurDirection = NeighborFieldCells( DirectionCounter );
 
-			if ( PipingSystemDomains( DomainNum ).HasBasement ) {
-				// We have adiabatic z-faces, check if we are adjacent to one in the opposite direction
-				if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == PipingSystemDomains( DomainNum ).Cells.u3() ) ) {
-					AdiabaticMultiplier = 2.0;
-				} else if ( ( CurDirection == Direction_PositiveZ ) && ( cell.Z_index == 0 ) ) {
-					AdiabaticMultiplier = 2.0;
-				} else {
-					AdiabaticMultiplier = 1.0;
-				}
-			}
-
 			// Use the multiplier ( either 1 or 2 ) to calculate the neighbor cell effects
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-			Numerator = AdiabaticMultiplier * Numerator + ( Beta / Resistance ) * NeighborTemp;
-			Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
+			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( CurDirection );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
 #endif
 
 		}
@@ -6704,6 +6737,8 @@ namespace PlantPipingSystemsManager {
 		// do all non-adiabatic boundary types here
 		for ( DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
 			CurDirection = NeighborBoundaryCells( DirectionCounter );
+
+			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
 
 			// For Zone-coupled slab or basement configuration
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
@@ -6715,15 +6750,22 @@ namespace PlantPipingSystemsManager {
 				if ( CurDirection == Direction_NegativeX || CurDirection == Direction_NegativeZ ) {
 					// always farfield
 					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-					Numerator += ( Beta / Resistance ) * NeighborTemp;
-					Denominator += ( Beta / Resistance );
+					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 				} else if ( CurDirection == Direction_PositiveY ) {
 					// convection at the surface
 					if ( WindSpeed > 0.1 ) {
 						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
-						Numerator += ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
-						Denominator += ( Beta / Resistance );
+						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
+						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+						NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
+					} else {
+						// Need to incorporate natural convection effects here
+						Resistance = 100000;
+						NeighborTemp = cell.MyBase.Temperature;
 					}
+				} else if ( CurDirection == Direction_PositiveZ || CurDirection == Direction_PositiveX ) {
+					AdiabaticMultiplier = 0.0;
 				} else if ( CurDirection == Direction_NegativeY ) {
 					assert( false ); // debug error, can't get here!
 				}
@@ -6735,16 +6777,16 @@ namespace PlantPipingSystemsManager {
 				if ( ( CurDirection == Direction_PositiveX ) || ( CurDirection == Direction_NegativeX ) ) {
 					// always farfield
 					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-					Numerator += ( Beta / Resistance ) * NeighborTemp;
-					Denominator += ( Beta / Resistance );
+					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 				} else if ( ( CurDirection == Direction_PositiveZ ) || ( CurDirection == Direction_NegativeZ ) ) {
 					// debug error, can't get here
 				} else if ( CurDirection == Direction_PositiveY ) {
 					// convection at the surface
 					if ( WindSpeed > 0.1 ) {
 						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
-						Numerator += ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
-						Denominator += ( Beta / Resistance );
+						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
+						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 					} else {
 						// Future development should include additional natural convection effects here
 					}
@@ -6754,11 +6796,11 @@ namespace PlantPipingSystemsManager {
 			}
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( CurDirection );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
 #endif
 		}
 
@@ -6897,11 +6939,13 @@ namespace PlantPipingSystemsManager {
 		Numerator += Beta * IncidentHeatGain;
 
 #ifdef CalcEnergyBalance
-		energyFromThisSide = IncidentHeatGain * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-		cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-		// Convert "CurDirection" to array index
-		index = abs( Direction_PositiveY );
-		cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+		if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+			energyFromThisSide = IncidentHeatGain * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+			// Don't add one here because we already accounted for this side
+			// when we calculated the surface convective resistance above
+			cell.MyBase.numberOfSidesCalculated += 0;
+		}
 #endif
 
 		// Calculate the return temperature and leave
@@ -6957,10 +7001,9 @@ namespace PlantPipingSystemsManager {
 		Beta = cell.MyBase.Beta;
 
 #ifdef CalcEnergyBalance
-		int index = 0;
 		Real64 energyFromThisSide = 0.0;
 		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.energyFromEachSide = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
 #endif
 
 		//'add effect from previous time step
@@ -6997,11 +7040,11 @@ namespace PlantPipingSystemsManager {
 			Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( CurDirection );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
 #endif
 
 		}
@@ -7056,10 +7099,9 @@ namespace PlantPipingSystemsManager {
 		Resistance = 0.0;
 
 #ifdef CalcEnergyBalance
-		int index = 0;
 		Real64 energyFromThisSide = 0.0;
 		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.energyFromEachSide = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
 #endif
 		{ auto const SELECT_CASE_var( cell.CellType );
 		if ( ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementFloor ) ) {
@@ -7084,11 +7126,11 @@ namespace PlantPipingSystemsManager {
 			Numerator += Beta * HeatFlux * Height( cell );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = HeatFlux * Height( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			int index = abs( Direction_NegativeX );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = HeatFlux * Height( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 			// then get the +x conduction to continue the heat balance
 			EvaluateNeighborCharacteristics( DomainNum, cell, Direction_PositiveX, NeighborTemp, Resistance );
@@ -7096,11 +7138,11 @@ namespace PlantPipingSystemsManager {
 			Denominator += ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( Direction_PositiveX );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 		} else if ( SELECT_CASE_var == CellType_BasementFloor ) {
 
@@ -7111,11 +7153,11 @@ namespace PlantPipingSystemsManager {
 			Numerator += Beta * HeatFlux * Width( cell );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = HeatFlux * Width( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			int index = abs( Direction_PositiveY );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = HeatFlux * Width( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 			// then get the -y conduction to continue the heat balance
 			EvaluateNeighborCharacteristics( DomainNum, cell, Direction_NegativeY, NeighborTemp, Resistance );
@@ -7123,11 +7165,11 @@ namespace PlantPipingSystemsManager {
 			Denominator += ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( Direction_NegativeY );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 		} else if ( SELECT_CASE_var == CellType_BasementCorner ) {
 
@@ -7137,22 +7179,22 @@ namespace PlantPipingSystemsManager {
 			Denominator += ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( Direction_PositiveX );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 			EvaluateNeighborCharacteristics( DomainNum, cell, Direction_NegativeY, NeighborTemp, Resistance );
 			Numerator += ( Beta / Resistance ) * NeighborTemp;
 			Denominator += ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( Direction_NegativeY );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 		}}
 
@@ -7375,10 +7417,9 @@ namespace PlantPipingSystemsManager {
 			Beta = cell.MyBase.Beta;
 
 #ifdef CalcEnergyBalance
-			int index = 0;
 			Real64 energyFromThisSide = 0.0;
 			cell.MyBase.sumEnergyFromAllSides = 0.0;
-			cell.MyBase.energyFromEachSide = 0.0;
+			cell.MyBase.numberOfSidesCalculated = 0;
 #endif
 
 			// add effect from previous time step
@@ -7411,11 +7452,11 @@ namespace PlantPipingSystemsManager {
 			}
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = HeatFlux * ConductionArea * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			//index = abs( Direction_NegativeY );
-			//cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = HeatFlux * ConductionArea * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += 1;
+			}
 #endif
 			//determine the neighbor types based on cell location
 			EvaluateCellNeighborDirections( DomainNum, cell );
@@ -7424,45 +7465,46 @@ namespace PlantPipingSystemsManager {
 			for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
 
 				CurDirection = NeighborFieldCells( DirectionCounter );
+				Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
 
 				// Have to be careful here to make sure heat conduction happens only in the appropriate directions
 				if ( cell.CellType == CellType_BasementWall ) {
-					// No heat conduction from the X-side basementwall cell to the +x cell ( basement cutaway )
+					// No heat conduction from the X-side basement wall cell to the +x cell ( basement cutaway )
 					if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex && CurDirection != Direction_PositiveX ) {
 						// Evaluate the transient expression terms
 						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-						Numerator += ( Beta / Resistance ) * NeighborTemp;
-						Denominator += ( Beta / Resistance );
+						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 					}
-					// No heat conduction from the Z-side basementwall cell to the +z cell ( basement cutaway )
+					// No heat conduction from the Z-side basement wall cell to the +z cell ( basement cutaway )
 					if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex && CurDirection != Direction_PositiveZ ) {
 						// Evaluate the transient expression terms
 						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-						Numerator += ( Beta / Resistance ) * NeighborTemp;
-						Denominator += ( Beta / Resistance );
+						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 					}
 				} else if ( cell.CellType == CellType_BasementFloor ) {
-					// No heat conduction from the basement floorcell to the +y cell ( basement cutaway )
+					// No heat conduction from the basement floor cell to the +y cell ( basement cutaway )
 					if ( CurDirection != Direction_PositiveY ) {
 						// Evaluate the transient expression terms
 						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-						Numerator += ( Beta / Resistance ) * NeighborTemp;
-						Denominator += ( Beta / Resistance );
+						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 					}
 				} else if ( cell.CellType == CellType_ZoneGroundInterface || cell.CellType == CellType_BasementCorner ) {
 					// Heat conduction in all directions
 					// Evaluate the transient expression terms
 					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-					Numerator += ( Beta / Resistance ) * NeighborTemp;
-					Denominator += ( Beta / Resistance );
+					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 				}
 
 #ifdef CalcEnergyBalance
-				energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-				// Convert "CurDirection" to array index
-				index = abs( CurDirection );
-				cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+				if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+					energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+					cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+					cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+				}
 #endif
 			}
 
@@ -7613,12 +7655,11 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 RunningSummation;
+		Real64 RunningSummation = 0.0;
 		Real64 CellVolume;
-		Real64 RunningVolume;
-
-		RunningSummation = 0.0;
-		RunningVolume = 0.0;
+		Real64 RunningVolume = 0.0;
+		Real64 AvgTemp = 0.0;
+		int NumCells = 0;
 
 		auto const & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -7629,13 +7670,17 @@ namespace PlantPipingSystemsManager {
 						CellVolume = Volume( cell );
 						RunningVolume += CellVolume;
 						RunningSummation += CellVolume * cell.MyBase.Temperature;
+						AvgTemp += cell.MyBase.Temperature;
+						NumCells += 1;
 					}
 				}
 			}
 		}
 
+		PipingSystemDomains( DomainNum ).AvgUnweightedSurfTemp = AvgTemp / NumCells;
+
 		if ( RunningVolume > 0.0 ) {
-			RetVal = RunningSummation / double( RunningVolume );
+			RetVal = RunningSummation / RunningVolume;
 		} else {
 			// ERROR!!!
 			RetVal = 0.0; //Autodesk:Return Line added to assure return value is set: Proper error handling needed here!
@@ -7692,10 +7737,9 @@ namespace PlantPipingSystemsManager {
 		Beta = cell.MyBase.Beta;
 
 #ifdef CalcEnergyBalance
-		int index = 0;
 		Real64 energyFromThisSide = 0.0;
 		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.energyFromEachSide = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
 #endif
 
 		// add effect from previous time step
@@ -7705,21 +7749,22 @@ namespace PlantPipingSystemsManager {
 		// now that we aren't infinitesimal, we need to determine the neighbor types based on cell location
 		EvaluateCellNeighborDirections( DomainNum, cell );
 
-		// This may be incomplete, as there may need to be adiabatic conditions to be handled here as well
-
 		// Do all neighbor cells
 		for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
 			CurDirection = NeighborFieldCells( DirectionCounter );
+
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-			Numerator += ( Beta / Resistance ) * NeighborTemp;
-			Denominator += ( Beta / Resistance );
+			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance  ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( CurDirection );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance  ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
 #endif
 		}
 
@@ -7728,15 +7773,23 @@ namespace PlantPipingSystemsManager {
 			CurDirection = NeighborBoundaryCells( DirectionCounter );
 
 			EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-			Numerator += ( Beta / Resistance ) * NeighborTemp;
-			Denominator += ( Beta / Resistance );
+			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
+
+			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+				if ( CurDirection == Direction_PositiveX || CurDirection == Direction_PositiveZ ) {
+					AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at Xmax, Ymin, Zmax
+				}
+			}
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
-			energyFromThisSide = ( cell.MyBase.Temperature - NeighborTemp ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			// Convert "CurDirection" to array index
-			index = abs( CurDirection );
-			cell.MyBase.energyFromEachSide( index ) = energyFromThisSide;
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
 #endif
 		}
 
@@ -8152,7 +8205,7 @@ namespace PlantPipingSystemsManager {
 	void
 	SimulateRadialToCartesianInterface(
 		int const DomainNum,
-		CartesianCell & ThisCell
+		CartesianCell & cell
 	)
 	{
 
@@ -8185,8 +8238,8 @@ namespace PlantPipingSystemsManager {
 		Real64 Denominator;
 		Real64 Resistance;
 		Real64 Beta;
-		int DirCtr;
-		int Dir;
+		int DirectionCounter;
+		int CurDirection;
 		Real64 NeighborTemp;
 		Real64 OutermostRadialCellOuterRadius;
 		Real64 OutermostRadialCellRadialCentroid;
@@ -8196,26 +8249,26 @@ namespace PlantPipingSystemsManager {
 		Denominator = 0.0;
 
 		//'retrieve beta
-		Beta = ThisCell.MyBase.Beta;
+		Beta = cell.MyBase.Beta;
 
 		//'add effects from this cell history
-		Numerator += ThisCell.MyBase.Temperature_PrevTimeStep;
+		Numerator += cell.MyBase.Temperature_PrevTimeStep;
 		++Denominator;
 
 		//'add effects from outermost radial cell
-		OutermostRadialCellOuterRadius = ThisCell.PipeCellData.Soil( ThisCell.PipeCellData.Soil.u1() ).OuterRadius;
-		OutermostRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( ThisCell.PipeCellData.Soil.u1() ).RadialCentroid;
-		OutermostRadialCellTemperature = ThisCell.PipeCellData.Soil( ThisCell.PipeCellData.Soil.u1() ).MyBase.Temperature;
-		Resistance = std::log( OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid ) / ( 2.0 * Pi * Depth( ThisCell ) * ThisCell.MyBase.Properties.Conductivity );
+		OutermostRadialCellOuterRadius = cell.PipeCellData.Soil( cell.PipeCellData.Soil.u1() ).OuterRadius;
+		OutermostRadialCellRadialCentroid = cell.PipeCellData.Soil( cell.PipeCellData.Soil.u1() ).RadialCentroid;
+		OutermostRadialCellTemperature = cell.PipeCellData.Soil( cell.PipeCellData.Soil.u1() ).MyBase.Temperature;
+		Resistance = std::log( OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid ) / ( 2.0 * Pi * Depth( cell ) * cell.MyBase.Properties.Conductivity );
 		Numerator += ( Beta / Resistance ) * OutermostRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from neighboring Cartesian cells
-		for ( DirCtr = Directions.l1(); DirCtr <= Directions.u1(); ++DirCtr ) {
-			Dir = Directions( DirCtr );
+		for ( DirectionCounter = Directions.l1(); DirectionCounter <= Directions.u1(); ++DirectionCounter ) {
+			CurDirection = Directions( DirectionCounter );
 
 			//'get info about cartesian neighbors
-			EvaluateNeighborCharacteristics( DomainNum, ThisCell, Dir, NeighborTemp, Resistance );
+			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 
 			//'add to the numerator and denominator expressions
 			Numerator += ( Beta / Resistance ) * NeighborTemp;
@@ -8224,7 +8277,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'calculate the new temperature
-		ThisCell.MyBase.Temperature = Numerator / Denominator;
+		cell.MyBase.Temperature = Numerator / Denominator;
 
 	}
 
@@ -8236,7 +8289,7 @@ namespace PlantPipingSystemsManager {
 	SimulateOuterMostRadialSoilSlice(
 		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
-		CartesianCell & ThisCell
+		CartesianCell & cell
 	)
 	{
 
@@ -8284,54 +8337,54 @@ namespace PlantPipingSystemsManager {
 		Resistance = 0.0;
 
 		//'convenience variables
-		MaxRadialIndex = ThisCell.PipeCellData.Soil.u1();
-		ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( MaxRadialIndex ).OuterRadius;
-		ThisRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( MaxRadialIndex ).RadialCentroid;
-		ThisRadialCellConductivity = ThisCell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Properties.Conductivity;
-		ThisRadialCellInnerRadius = ThisCell.PipeCellData.Soil( MaxRadialIndex ).InnerRadius;
-		ThisRadialCellTemperature_PrevTimeStep = ThisCell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature_PrevTimeStep;
-		ThisRadialCellTemperature = ThisCell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature;
-		if ( size( ThisCell.PipeCellData.Soil ) == 1 ) {
+		MaxRadialIndex = cell.PipeCellData.Soil.u1();
+		ThisRadialCellOuterRadius = cell.PipeCellData.Soil( MaxRadialIndex ).OuterRadius;
+		ThisRadialCellRadialCentroid = cell.PipeCellData.Soil( MaxRadialIndex ).RadialCentroid;
+		ThisRadialCellConductivity = cell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Properties.Conductivity;
+		ThisRadialCellInnerRadius = cell.PipeCellData.Soil( MaxRadialIndex ).InnerRadius;
+		ThisRadialCellTemperature_PrevTimeStep = cell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature_PrevTimeStep;
+		ThisRadialCellTemperature = cell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature;
+		if ( size( cell.PipeCellData.Soil ) == 1 ) {
 			if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
-				NextOuterRadialCellOuterRadius = ThisCell.PipeCellData.Insulation.OuterRadius;
-				NextOuterRadialCellRadialCentroid = ThisCell.PipeCellData.Insulation.RadialCentroid;
-				NextOuterRadialCellConductivity = ThisCell.PipeCellData.Insulation.MyBase.Properties.Conductivity;
-				NextOuterRadialCellInnerRadius = ThisCell.PipeCellData.Insulation.InnerRadius;
-				NextOuterRadialCellTemperature = ThisCell.PipeCellData.Insulation.MyBase.Temperature;
+				NextOuterRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
+				NextOuterRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
+				NextOuterRadialCellConductivity = cell.PipeCellData.Insulation.MyBase.Properties.Conductivity;
+				NextOuterRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
+				NextOuterRadialCellTemperature = cell.PipeCellData.Insulation.MyBase.Temperature;
 			} else {
-				NextOuterRadialCellOuterRadius = ThisCell.PipeCellData.Pipe.OuterRadius;
-				NextOuterRadialCellRadialCentroid = ThisCell.PipeCellData.Pipe.RadialCentroid;
-				NextOuterRadialCellConductivity = ThisCell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
-				NextOuterRadialCellInnerRadius = ThisCell.PipeCellData.Pipe.InnerRadius;
-				NextOuterRadialCellTemperature = ThisCell.PipeCellData.Pipe.MyBase.Temperature;
+				NextOuterRadialCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+				NextOuterRadialCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+				NextOuterRadialCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
+				NextOuterRadialCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+				NextOuterRadialCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
 			}
 		} else {
-			NextOuterRadialCellOuterRadius = ThisCell.PipeCellData.Soil( MaxRadialIndex - 1 ).OuterRadius;
-			NextOuterRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( MaxRadialIndex - 1 ).RadialCentroid;
-			NextOuterRadialCellConductivity = ThisCell.PipeCellData.Soil( MaxRadialIndex - 1 ).MyBase.Properties.Conductivity;
-			NextOuterRadialCellInnerRadius = ThisCell.PipeCellData.Soil( MaxRadialIndex - 1 ).InnerRadius;
-			NextOuterRadialCellTemperature = ThisCell.PipeCellData.Soil( MaxRadialIndex - 1 ).MyBase.Temperature;
+			NextOuterRadialCellOuterRadius = cell.PipeCellData.Soil( MaxRadialIndex - 1 ).OuterRadius;
+			NextOuterRadialCellRadialCentroid = cell.PipeCellData.Soil( MaxRadialIndex - 1 ).RadialCentroid;
+			NextOuterRadialCellConductivity = cell.PipeCellData.Soil( MaxRadialIndex - 1 ).MyBase.Properties.Conductivity;
+			NextOuterRadialCellInnerRadius = cell.PipeCellData.Soil( MaxRadialIndex - 1 ).InnerRadius;
+			NextOuterRadialCellTemperature = cell.PipeCellData.Soil( MaxRadialIndex - 1 ).MyBase.Temperature;
 		}
 
 		//'any broadly defined variables
-		Beta = ThisCell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Beta;
+		Beta = cell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Beta;
 
 		//'add effects from this cell history
 		Numerator += ThisRadialCellTemperature_PrevTimeStep;
 		++Denominator;
 
 		//'add effects from interface cell
-		Resistance = std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * ThisRadialCellConductivity );
-		Numerator += ( Beta / Resistance ) * ThisCell.MyBase.Temperature;
+		Resistance = std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity );
+		Numerator += ( Beta / Resistance ) * cell.MyBase.Temperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from inner radial cell
-		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * ThisRadialCellConductivity ) ) + ( std::log( NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * NextOuterRadialCellConductivity ) );
+		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) ) + ( std::log( NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * NextOuterRadialCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * NextOuterRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'calculate the new temperature
-		ThisCell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature = Numerator / Denominator;
+		cell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature = Numerator / Denominator;
 
 	}
 
@@ -8340,7 +8393,9 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	SimulateAllInteriorRadialSoilSlices( CartesianCell & ThisCell )
+	SimulateAllInteriorRadialSoilSlices(
+		CartesianCell & cell
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -8393,51 +8448,51 @@ namespace PlantPipingSystemsManager {
 		Numerator = 0.0;
 		Denominator = 0.0;
 
-		for ( rCtr = ThisCell.PipeCellData.Soil.u1() - 1; rCtr >= 1; --rCtr ) {
+		for ( rCtr = cell.PipeCellData.Soil.u1() - 1; rCtr >= 1; --rCtr ) {
 
 			Numerator = 0.0;
 			Denominator = 0.0;
 			Resistance = 0.0;
 
 			//'convenience variables
-			ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr ).OuterRadius;
-			ThisRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( rCtr ).RadialCentroid;
-			ThisRadialCellConductivity = ThisCell.PipeCellData.Soil( rCtr ).MyBase.Properties.Conductivity;
-			ThisRadialCellInnerRadius = ThisCell.PipeCellData.Soil( rCtr ).InnerRadius;
-			ThisRadialCellTemperature_PrevTimeStep = ThisCell.PipeCellData.Soil( rCtr ).MyBase.Temperature_PrevTimeStep;
-			ThisRadialCellTemperature = ThisCell.PipeCellData.Soil( rCtr ).MyBase.Temperature;
+			ThisRadialCellOuterRadius = cell.PipeCellData.Soil( rCtr ).OuterRadius;
+			ThisRadialCellRadialCentroid = cell.PipeCellData.Soil( rCtr ).RadialCentroid;
+			ThisRadialCellConductivity = cell.PipeCellData.Soil( rCtr ).MyBase.Properties.Conductivity;
+			ThisRadialCellInnerRadius = cell.PipeCellData.Soil( rCtr ).InnerRadius;
+			ThisRadialCellTemperature_PrevTimeStep = cell.PipeCellData.Soil( rCtr ).MyBase.Temperature_PrevTimeStep;
+			ThisRadialCellTemperature = cell.PipeCellData.Soil( rCtr ).MyBase.Temperature;
 
-			InnerRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr - 1 ).OuterRadius;
-			InnerRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( rCtr - 1 ).RadialCentroid;
-			InnerRadialCellConductivity = ThisCell.PipeCellData.Soil( rCtr - 1 ).MyBase.Properties.Conductivity;
-			InnerRadialCellInnerRadius = ThisCell.PipeCellData.Soil( rCtr - 1 ).InnerRadius;
-			InnerRadialCellTemperature = ThisCell.PipeCellData.Soil( rCtr - 1 ).MyBase.Temperature;
+			InnerRadialCellOuterRadius = cell.PipeCellData.Soil( rCtr - 1 ).OuterRadius;
+			InnerRadialCellRadialCentroid = cell.PipeCellData.Soil( rCtr - 1 ).RadialCentroid;
+			InnerRadialCellConductivity = cell.PipeCellData.Soil( rCtr - 1 ).MyBase.Properties.Conductivity;
+			InnerRadialCellInnerRadius = cell.PipeCellData.Soil( rCtr - 1 ).InnerRadius;
+			InnerRadialCellTemperature = cell.PipeCellData.Soil( rCtr - 1 ).MyBase.Temperature;
 
-			OuterRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr + 1 ).OuterRadius;
-			OuterRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( rCtr + 1 ).RadialCentroid;
-			OuterRadialCellConductivity = ThisCell.PipeCellData.Soil( rCtr + 1 ).MyBase.Properties.Conductivity;
-			OuterRadialCellInnerRadius = ThisCell.PipeCellData.Soil( rCtr + 1 ).InnerRadius;
-			OuterRadialCellTemperature = ThisCell.PipeCellData.Soil( rCtr + 1 ).MyBase.Temperature;
+			OuterRadialCellOuterRadius = cell.PipeCellData.Soil( rCtr + 1 ).OuterRadius;
+			OuterRadialCellRadialCentroid = cell.PipeCellData.Soil( rCtr + 1 ).RadialCentroid;
+			OuterRadialCellConductivity = cell.PipeCellData.Soil( rCtr + 1 ).MyBase.Properties.Conductivity;
+			OuterRadialCellInnerRadius = cell.PipeCellData.Soil( rCtr + 1 ).InnerRadius;
+			OuterRadialCellTemperature = cell.PipeCellData.Soil( rCtr + 1 ).MyBase.Temperature;
 
 			//'any broadly defined variables
-			Beta = ThisCell.PipeCellData.Soil( rCtr ).MyBase.Beta;
+			Beta = cell.PipeCellData.Soil( rCtr ).MyBase.Beta;
 
 			//'add effects from this cell history
 			Numerator += ThisRadialCellTemperature_PrevTimeStep;
 			++Denominator;
 
 			//'add effects from outer cell
-			Resistance = ( std::log( OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * OuterRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * ThisRadialCellConductivity ) );
+			Resistance = ( std::log( OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * OuterRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) );
 			Numerator += ( Beta / Resistance ) * OuterRadialCellTemperature;
 			Denominator += ( Beta / Resistance );
 
 			//'add effects from inner cell
-			Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * ThisRadialCellConductivity ) ) + ( std::log( InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * InnerRadialCellConductivity ) );
+			Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) ) + ( std::log( InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * InnerRadialCellConductivity ) );
 			Numerator += ( Beta / Resistance ) * InnerRadialCellTemperature;
 			Denominator += ( Beta / Resistance );
 
 			//'calculate the new temperature
-			ThisCell.PipeCellData.Soil( rCtr ).MyBase.Temperature = Numerator / Denominator;
+			cell.PipeCellData.Soil( rCtr ).MyBase.Temperature = Numerator / Denominator;
 
 		}
 
@@ -8451,7 +8506,7 @@ namespace PlantPipingSystemsManager {
 	SimulateInnerMostRadialSoilSlice(
 		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
-		CartesianCell & ThisCell
+		CartesianCell & cell
 	)
 	{
 
@@ -8506,51 +8561,51 @@ namespace PlantPipingSystemsManager {
 
 		//'convenience variables
 		if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
-			InnerNeighborRadialCellOuterRadius = ThisCell.PipeCellData.Insulation.OuterRadius;
-			InnerNeighborRadialCellRadialCentroid = ThisCell.PipeCellData.Insulation.RadialCentroid;
-			InnerNeighborRadialCellConductivity = ThisCell.PipeCellData.Insulation.MyBase.Properties.Conductivity;
-			InnerNeighborRadialCellInnerRadius = ThisCell.PipeCellData.Insulation.InnerRadius;
-			InnerNeighborRadialCellTemperature = ThisCell.PipeCellData.Insulation.MyBase.Temperature;
+			InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
+			InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
+			InnerNeighborRadialCellConductivity = cell.PipeCellData.Insulation.MyBase.Properties.Conductivity;
+			InnerNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
+			InnerNeighborRadialCellTemperature = cell.PipeCellData.Insulation.MyBase.Temperature;
 		} else {
-			InnerNeighborRadialCellOuterRadius = ThisCell.PipeCellData.Pipe.OuterRadius;
-			InnerNeighborRadialCellRadialCentroid = ThisCell.PipeCellData.Pipe.RadialCentroid;
-			InnerNeighborRadialCellConductivity = ThisCell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
-			InnerNeighborRadialCellInnerRadius = ThisCell.PipeCellData.Pipe.InnerRadius;
-			InnerNeighborRadialCellTemperature = ThisCell.PipeCellData.Pipe.MyBase.Temperature;
+			InnerNeighborRadialCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+			InnerNeighborRadialCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+			InnerNeighborRadialCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
+			InnerNeighborRadialCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+			InnerNeighborRadialCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
 		}
 
-		ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( 0 ).OuterRadius;
-		ThisRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( 0 ).RadialCentroid;
-		ThisRadialCellConductivity = ThisCell.PipeCellData.Soil( 0 ).MyBase.Properties.Conductivity;
-		ThisRadialCellInnerRadius = ThisCell.PipeCellData.Soil( 0 ).InnerRadius;
-		ThisRadialCellTemperature_PrevTimeStep = ThisCell.PipeCellData.Soil( 0 ).MyBase.Temperature_PrevTimeStep;
-		ThisRadialCellTemperature = ThisCell.PipeCellData.Soil( 0 ).MyBase.Temperature;
+		ThisRadialCellOuterRadius = cell.PipeCellData.Soil( 0 ).OuterRadius;
+		ThisRadialCellRadialCentroid = cell.PipeCellData.Soil( 0 ).RadialCentroid;
+		ThisRadialCellConductivity = cell.PipeCellData.Soil( 0 ).MyBase.Properties.Conductivity;
+		ThisRadialCellInnerRadius = cell.PipeCellData.Soil( 0 ).InnerRadius;
+		ThisRadialCellTemperature_PrevTimeStep = cell.PipeCellData.Soil( 0 ).MyBase.Temperature_PrevTimeStep;
+		ThisRadialCellTemperature = cell.PipeCellData.Soil( 0 ).MyBase.Temperature;
 
-		OuterNeighborRadialCellOuterRadius = ThisCell.PipeCellData.Soil( 1 ).OuterRadius;
-		OuterNeighborRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( 1 ).RadialCentroid;
-		OuterNeighborRadialCellConductivity = ThisCell.PipeCellData.Soil( 1 ).MyBase.Properties.Conductivity;
-		OuterNeighborRadialCellInnerRadius = ThisCell.PipeCellData.Soil( 1 ).InnerRadius;
-		OuterNeighborRadialCellTemperature = ThisCell.PipeCellData.Soil( 1 ).MyBase.Temperature;
+		OuterNeighborRadialCellOuterRadius = cell.PipeCellData.Soil( 1 ).OuterRadius;
+		OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Soil( 1 ).RadialCentroid;
+		OuterNeighborRadialCellConductivity = cell.PipeCellData.Soil( 1 ).MyBase.Properties.Conductivity;
+		OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Soil( 1 ).InnerRadius;
+		OuterNeighborRadialCellTemperature = cell.PipeCellData.Soil( 1 ).MyBase.Temperature;
 
 		//'any broadly defined variables
-		Beta = ThisCell.PipeCellData.Soil( 0 ).MyBase.Beta;
+		Beta = cell.PipeCellData.Soil( 0 ).MyBase.Beta;
 
 		//'add effects from this cell history
 		Numerator += ThisRadialCellTemperature_PrevTimeStep;
 		++Denominator;
 
 		//'add effects from outer radial cell
-		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * ThisRadialCellConductivity ) );
+		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * OuterNeighborRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from pipe cell
-		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * ThisRadialCellConductivity ) ) + ( std::log( InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * InnerNeighborRadialCellConductivity ) );
+		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) ) + ( std::log( InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * InnerNeighborRadialCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * InnerNeighborRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'calculate the new temperature
-		ThisCell.PipeCellData.Soil( 0 ).MyBase.Temperature = Numerator / Denominator;
+		cell.PipeCellData.Soil( 0 ).MyBase.Temperature = Numerator / Denominator;
 
 	}
 
@@ -8559,7 +8614,9 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	SimulateRadialInsulationCell( CartesianCell & ThisCell )
+	SimulateRadialInsulationCell(
+		CartesianCell & cell
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -8598,9 +8655,9 @@ namespace PlantPipingSystemsManager {
 		Denominator = 0.0;
 
 		//'convenience variables
-		PipeCell = ThisCell.PipeCellData.Pipe;
-		ThisInsulationCell = ThisCell.PipeCellData.Insulation;
-		NextInnerRadialCell = ThisCell.PipeCellData.Soil( 0 );
+		PipeCell = cell.PipeCellData.Pipe;
+		ThisInsulationCell = cell.PipeCellData.Insulation;
+		NextInnerRadialCell = cell.PipeCellData.Soil( 0 );
 
 		//'any broadly defined variables
 		Beta = ThisInsulationCell.MyBase.Beta;
@@ -8610,17 +8667,17 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		//'add effects from outer radial cell
-		Resistance = ( std::log( NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * NextInnerRadialCell.MyBase.Properties.Conductivity ) ) + ( std::log( ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * ThisInsulationCell.MyBase.Properties.Conductivity ) );
+		Resistance = ( std::log( NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius ) / ( 2 * Pi * Depth( cell ) * NextInnerRadialCell.MyBase.Properties.Conductivity ) ) + ( std::log( ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisInsulationCell.MyBase.Properties.Conductivity ) );
 		Numerator += ( Beta / Resistance ) * NextInnerRadialCell.MyBase.Temperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from pipe cell
-		Resistance = ( std::log( ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * ThisInsulationCell.MyBase.Properties.Conductivity ) ) + ( std::log( PipeCell.OuterRadius / PipeCell.RadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * PipeCell.MyBase.Properties.Conductivity ) );
+		Resistance = ( std::log( ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisInsulationCell.MyBase.Properties.Conductivity ) ) + ( std::log( PipeCell.OuterRadius / PipeCell.RadialCentroid ) / ( 2 * Pi * Depth( cell ) * PipeCell.MyBase.Properties.Conductivity ) );
 		Numerator += ( Beta / Resistance ) * PipeCell.MyBase.Temperature;
 		Denominator += ( Beta / Resistance );
 
 		//'calculate the new temperature
-		ThisCell.PipeCellData.Insulation.MyBase.Temperature = Numerator / Denominator;
+		cell.PipeCellData.Insulation.MyBase.Temperature = Numerator / Denominator;
 
 	}
 
@@ -8632,7 +8689,7 @@ namespace PlantPipingSystemsManager {
 	SimulateRadialPipeCell(
 		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
-		CartesianCell & ThisCell,
+		CartesianCell & cell,
 		Real64 const ConvectionCoefficient
 	)
 	{
@@ -8687,49 +8744,49 @@ namespace PlantPipingSystemsManager {
 
 		//'convenience variables
 		if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
-			OuterNeighborRadialCellOuterRadius = ThisCell.PipeCellData.Insulation.OuterRadius;
-			OuterNeighborRadialCellRadialCentroid = ThisCell.PipeCellData.Insulation.RadialCentroid;
-			OuterNeighborRadialCellConductivity = ThisCell.PipeCellData.Insulation.MyBase.Properties.Conductivity;
-			OuterNeighborRadialCellInnerRadius = ThisCell.PipeCellData.Insulation.InnerRadius;
-			OuterNeighborRadialCellTemperature = ThisCell.PipeCellData.Insulation.MyBase.Temperature;
+			OuterNeighborRadialCellOuterRadius = cell.PipeCellData.Insulation.OuterRadius;
+			OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Insulation.RadialCentroid;
+			OuterNeighborRadialCellConductivity = cell.PipeCellData.Insulation.MyBase.Properties.Conductivity;
+			OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Insulation.InnerRadius;
+			OuterNeighborRadialCellTemperature = cell.PipeCellData.Insulation.MyBase.Temperature;
 		} else {
-			OuterNeighborRadialCellOuterRadius = ThisCell.PipeCellData.Soil( 0 ).OuterRadius;
-			OuterNeighborRadialCellRadialCentroid = ThisCell.PipeCellData.Soil( 0 ).RadialCentroid;
-			OuterNeighborRadialCellConductivity = ThisCell.PipeCellData.Soil( 0 ).MyBase.Properties.Conductivity;
-			OuterNeighborRadialCellInnerRadius = ThisCell.PipeCellData.Soil( 0 ).InnerRadius;
-			OuterNeighborRadialCellTemperature = ThisCell.PipeCellData.Soil( 0 ).MyBase.Temperature;
+			OuterNeighborRadialCellOuterRadius = cell.PipeCellData.Soil( 0 ).OuterRadius;
+			OuterNeighborRadialCellRadialCentroid = cell.PipeCellData.Soil( 0 ).RadialCentroid;
+			OuterNeighborRadialCellConductivity = cell.PipeCellData.Soil( 0 ).MyBase.Properties.Conductivity;
+			OuterNeighborRadialCellInnerRadius = cell.PipeCellData.Soil( 0 ).InnerRadius;
+			OuterNeighborRadialCellTemperature = cell.PipeCellData.Soil( 0 ).MyBase.Temperature;
 		}
 
-		ThisPipeCellOuterRadius = ThisCell.PipeCellData.Pipe.OuterRadius;
-		ThisPipeCellRadialCentroid = ThisCell.PipeCellData.Pipe.RadialCentroid;
-		ThisPipeCellConductivity = ThisCell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
-		ThisPipeCellInnerRadius = ThisCell.PipeCellData.Pipe.InnerRadius;
-		ThisPipeCellTemperature_PrevTimeStep = ThisCell.PipeCellData.Pipe.MyBase.Temperature_PrevTimeStep;
-		ThisPipeCellTemperature = ThisCell.PipeCellData.Pipe.MyBase.Temperature;
+		ThisPipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+		ThisPipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+		ThisPipeCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
+		ThisPipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+		ThisPipeCellTemperature_PrevTimeStep = cell.PipeCellData.Pipe.MyBase.Temperature_PrevTimeStep;
+		ThisPipeCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
 
-		FluidCellTemperature = ThisCell.PipeCellData.Fluid.MyBase.Temperature;
+		FluidCellTemperature = cell.PipeCellData.Fluid.MyBase.Temperature;
 
 		//'any broadly defined variables
-		Beta = ThisCell.PipeCellData.Pipe.MyBase.Beta;
+		Beta = cell.PipeCellData.Pipe.MyBase.Beta;
 
 		//'add effects from this cell history
 		Numerator += ThisPipeCellTemperature_PrevTimeStep;
 		++Denominator;
 
 		//'add effects from outer radial cell
-		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid ) / ( 2 * Pi * Depth( ThisCell ) * ThisPipeCellConductivity ) );
+		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisPipeCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * OuterNeighborRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from water cell
-		PipeConductionResistance = std::log( ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * ThisPipeCellConductivity );
-		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * Depth( ThisCell ) );
+		PipeConductionResistance = std::log( ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisPipeCellConductivity );
+		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * Depth( cell ) );
 		Resistance = PipeConductionResistance + ConvectiveResistance;
 		Numerator += ( Beta / Resistance ) * FluidCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'calculate new temperature
-		ThisCell.PipeCellData.Pipe.MyBase.Temperature = Numerator / Denominator;
+		cell.PipeCellData.Pipe.MyBase.Temperature = Numerator / Denominator;
 
 	}
 
@@ -8739,7 +8796,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateFluidCell(
-		CartesianCell & ThisCell,
+		CartesianCell & cell,
 		Real64 const FlowRate,
 		Real64 const ConvectionCoefficient,
 		Real64 const EnteringFluidTemp
@@ -8789,24 +8846,24 @@ namespace PlantPipingSystemsManager {
 		Denominator = 0.0;
 
 		//'convenience variables
-		FluidCellTemperature_PrevTimeStep = ThisCell.PipeCellData.Fluid.MyBase.Temperature_PrevTimeStep;
-		FluidCellSpecificHeat = ThisCell.PipeCellData.Fluid.Properties.MyBase.SpecificHeat;
+		FluidCellTemperature_PrevTimeStep = cell.PipeCellData.Fluid.MyBase.Temperature_PrevTimeStep;
+		FluidCellSpecificHeat = cell.PipeCellData.Fluid.Properties.MyBase.SpecificHeat;
 
-		PipeCellOuterRadius = ThisCell.PipeCellData.Pipe.OuterRadius;
-		PipeCellRadialCentroid = ThisCell.PipeCellData.Pipe.RadialCentroid;
-		PipeCellConductivity = ThisCell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
-		PipeCellInnerRadius = ThisCell.PipeCellData.Pipe.InnerRadius;
-		PipeCellTemperature = ThisCell.PipeCellData.Pipe.MyBase.Temperature;
+		PipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+		PipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+		PipeCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
+		PipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+		PipeCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
 
-		Beta = ThisCell.PipeCellData.Fluid.MyBase.Beta;
+		Beta = cell.PipeCellData.Fluid.MyBase.Beta;
 
 		//'add effects from this cell history
 		Numerator += FluidCellTemperature_PrevTimeStep;
 		++Denominator;
 
 		//'add effects from outer pipe cell
-		PipeConductionResistance = std::log( PipeCellRadialCentroid / PipeCellInnerRadius ) / ( 2 * Pi * Depth( ThisCell ) * PipeCellConductivity );
-		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * Depth( ThisCell ) );
+		PipeConductionResistance = std::log( PipeCellRadialCentroid / PipeCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * PipeCellConductivity );
+		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * Depth( cell ) );
 		TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
 		Numerator += ( Beta / TotalPipeResistance ) * PipeCellTemperature;
 		Denominator += ( Beta / TotalPipeResistance );
@@ -8821,7 +8878,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'calculate new temperature
-		ThisCell.PipeCellData.Fluid.MyBase.Temperature = Numerator / Denominator;
+		cell.PipeCellData.Fluid.MyBase.Temperature = Numerator / Denominator;
 
 	}
 
@@ -9082,8 +9139,8 @@ namespace PlantPipingSystemsManager {
 
 		// If pipe circuit present
 		if ( present( CircuitNum ) ) {
-			// retreive fluid properties based on the circuit inlet temperature -- which varies during the simulation
-			// but need to verify the value of inlet temperature during warmup, etc.
+			// retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
+			// but need to verify the value of inlet temperature during warm up, etc.
 			FluidCp = GetSpecificHeatGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 			FluidDensity = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 			FluidConductivity = GetConductivityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
@@ -9166,6 +9223,10 @@ namespace PlantPipingSystemsManager {
 			}
 		}
 
+#ifdef CalcEnergyBalance
+		PipingSystemDomains( DomainNum ).finalIteration = false;
+#endif
+
 		//'conductivity calculations
 		//'Dim K_quartz As Double = 7.7! 'W / mk
 		//'Dim RHO_b As Double = 1290 '!Kg / m3
@@ -9228,6 +9289,13 @@ namespace PlantPipingSystemsManager {
 
 		//'check if we have converged for this iteration if we are doing implicit transient
 		Finished = IsConverged_CurrentToPrevIteration( DomainNum );
+
+#ifdef CalcEnergyBalance
+		if ( Finished && !PipingSystemDomains( DomainNum ).finalIteration ) {
+			PipingSystemDomains( DomainNum ).finalIteration = true;
+			Finished = false;
+		}
+#endif
 
 		//'check for out of range temperatures here so they aren't plotted
 		//'this routine should be *much* more restrictive than the exceptions, so we should be safe with this location
@@ -9651,34 +9719,75 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
+	Real64
+	CalcAdiabaticMultiplier(
+		int const DomainNum,
+		CartesianCell const & cell,
+		int CurDirection
+	)
+	{
+		if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == PipingSystemDomains( DomainNum ).Cells.u3() ) ) {
+			// +Z Face is adiabatic
+			return 2.0;
+		} else if ( ( CurDirection == Direction_NegativeX ) && ( cell.X_index == PipingSystemDomains( DomainNum ).Cells.u1() ) ) {
+			// +X Face is adiabatic
+			return 2.0;
+		} else {
+			// The rest are normal
+			return 1.0;
+		}
+	}
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
 #ifdef CalcEnergyBalance
 	void
-	UpdateEnergyBalance(
+	UpdateMaxEnergyBalance(
 		int const DomainNum
 	)
 	{
-	Real64 maxImbalance = 0.0;
-	int maxX;
-	int maxY;
-	int maxZ;
+		PipingSystemDomains( DomainNum ).MaxEnergyImbalance = 0.0;
+		PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance = 0.0;
+
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
 			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+
 					auto & cell( cells( X, Y, Z ) );
-					cell.MyBase.energyImbalance = abs( cell.MyBase.totalEnergyChange ) - abs( cell.MyBase.sumEnergyFromAllSides );
-					if ( cell.MyBase.energyImbalance > maxImbalance ){
 
-						maxImbalance = cell.MyBase.energyImbalance;
-						maxX = X;
-						maxY = Y;
-						maxZ = Z;
-
-						PipingSystemDomains( DomainNum ).MaxEnergyImbalance = maxImbalance;
+					// Max energy imbalance
+					if ( cell.MyBase.energyImbalance > PipingSystemDomains( DomainNum ).MaxEnergyImbalance ){
+						PipingSystemDomains( DomainNum ).MaxEnergyImbalance = cell.MyBase.energyImbalance;
 						PipingSystemDomains( DomainNum ).MaxEnergyImbalance_XLocation = X;
 						PipingSystemDomains( DomainNum ).MaxEnergyImbalance_YLocation = Y;
 						PipingSystemDomains( DomainNum ).MaxEnergyImbalance_ZLocation = Z;
+					}
 
+					// Cell with min num sides calculated
+					if ( cell.MyBase.numberOfSidesCalculated < PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated ) {
+						PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated = cell.MyBase.numberOfSidesCalculated;
+						PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated_XLocation = X;
+						PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated_YLocation = Y;
+						PipingSystemDomains( DomainNum ).minNumberOfSidesCalculated_ZLocation = Z;
+					}
+
+					// Cell with max num sides calculated
+					if ( cell.MyBase.numberOfSidesCalculated > PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated ) {
+						PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated = cell.MyBase.numberOfSidesCalculated;
+						PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated_XLocation = X;
+						PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated_YLocation = Y;
+						PipingSystemDomains( DomainNum ).maxNumberOfSidesCalculated_ZLocation = Z;
+					}
+
+					// Cell with max temp difference do to energy imbalance
+					if ( cell.MyBase.tempDiffDueToImbalance > PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance ) {
+						PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance = cell.MyBase.tempDiffDueToImbalance;
+						PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance_XLocation = X;
+						PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance_YLocation = Y;
+						PipingSystemDomains( DomainNum ).maxTempDiffDueToImbalance_ZLocation = Z;
 					}
 				}
 			}
