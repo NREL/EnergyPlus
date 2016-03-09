@@ -90,12 +90,11 @@ The plant system solver iterates within a single HVAC manager iteration. This in
 Use in an IDF:
 
 \begin{lstlisting}
-
 ConvergenceLimits,
-    0,        !- Minimum System Timestep (0 = same as zone timestep)
-    25,       !- Maximum HVAC Iterations
+  0,        !- Minimum System Timestep (0 = same as zone timestep)
+  25,       !- Maximum HVAC Iterations
   3,        !- Minimum Plant Iterations
-    9;        !- Maximum Plant Iterations
+  9;        !- Maximum Plant Iterations
 \end{lstlisting}
 
 \subsection{Building}\label{building}
