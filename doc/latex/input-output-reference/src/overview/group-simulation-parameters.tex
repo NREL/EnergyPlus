@@ -16,23 +16,23 @@ The Version object allows you to enter the proper version that your IDF was crea
 
 \paragraph{Field: Number of Timesteps per Hour}\label{field-number-of-timesteps-per-hour}
 
-The Timestep object specifies the ``basic'' timestep for the simulation. The value entered here is usually known as the Zone Timestep.~ This is used in the Zone Heat Balance Model calculation as the driving timestep for heat transfer and load calculations.~ The value entered here is the number of timesteps to use within an hour.~ Longer length timesteps have lower values for Number of Timesteps per Hour.~ For example a value of 6 entered here directs the program to use a zone timestep of 10 minutes and a value of 60 means a 1 minute timestep.~ The user's choice for Number of Timesteps per Hour must be evenly divisible into 60; the allowable choices are 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, and 60.
+The Timestep object specifies the ``basic'' timestep for the simulation. The value entered here is usually known as the Zone Timestep. This is used in the Zone Heat Balance Model calculation as the driving timestep for heat transfer and load calculations. The value entered here is the number of timesteps to use within an hour. Longer length timesteps have lower values for Number of Timesteps per Hour. For example a value of 6 entered here directs the program to use a zone timestep of 10 minutes and a value of 60 means a 1 minute timestep. The user's choice for Number of Timesteps per Hour must be evenly divisible into 60; the allowable choices are 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, and 60.
 
-The choice made for this field has important implications for modeling accuracy and the overall time it takes to run a simulation.~ Here are some considerations when choosing a value:
+The choice made for this field has important implications for modeling accuracy and the overall time it takes to run a simulation. Here are some considerations when choosing a value:
 
 \begin{itemize}
 \item
-  The solution technique used in EnergyPlus has been designed to be stable with zone timesteps of up to sixty minutes (Number Timesteps in Hour = 1).~ However, 60 minutes is considered a ``long'' timestep and it should only be used in rare occasions where there is no HVAC system, accuracy is not a concern, and short run times are critical.~ Such long timesteps are not recommended to use because simulation results are more accurate for shorter timesteps, of say 10 minutes or less (Number of Timesteps per Hour of 6 or more).~ Shorter zone timesteps improve the numerical solution of the Zone Heat Balance Model because they improve how models for surface temperature and zone air temperature are coupled together.~ Longer timesteps introduce more lag and lead to more a dampened dynamic response.
+  The solution technique used in EnergyPlus has been designed to be stable with zone timesteps of up to sixty minutes (Number Timesteps in Hour = 1). However, 60 minutes is considered a ``long'' timestep and it should only be used in rare occasions where there is no HVAC system, accuracy is not a concern, and short run times are critical. Such long timesteps are not recommended to use because simulation results are more accurate for shorter timesteps, of say 10 minutes or less (Number of Timesteps per Hour of 6 or more). Shorter zone timesteps improve the numerical solution of the Zone Heat Balance Model because they improve how models for surface temperature and zone air temperature are coupled together. Longer timesteps introduce more lag and lead to more a dampened dynamic response.
 \item
-  Simulation run time increases with shorter timesteps or larger values for Number of Timesteps per Hour.~ The effect varies with the nature of the model.~ The user can test out different values on their particular model to understand the implications for his or her particular case.~ Sometimes large models with multizone HVAC and Plant systems execute nearly as fast with 15 minute timesteps as with 60 minute timesteps because fewer iterations are required in the system modeling since the prior timestep's results are close to the final outcome of next timestep.
+  Simulation run time increases with shorter timesteps or larger values for Number of Timesteps per Hour. The effect varies with the nature of the model. The user can test out different values on their particular model to understand the implications for his or her particular case. Sometimes large models with multizone HVAC and Plant systems execute nearly as fast with 15 minute timesteps as with 60 minute timesteps because fewer iterations are required in the system modeling since the prior timestep's results are close to the final outcome of next timestep.
 \item
-  The weather data files usually have 60-minute (or hourly) data.~ However, it does not follow that this should be used as the basis for choosing the zone timestep because:
+  The weather data files usually have 60-minute (or hourly) data. However, it does not follow that this should be used as the basis for choosing the zone timestep because:
 \item
-  EnergyPlus carefully interpolates the weather data between data points for use at shorter timesteps.~ This is discussed in a later section: Weather Data Hourly Interpolation
+  EnergyPlus carefully interpolates the weather data between data points for use at shorter timesteps. This is discussed in a later section: Weather Data Hourly Interpolation
 \item
-  Many aspects of a model have time scales that differ from the that of the weather data.~ A goal of the modeling is to predict how the building will respond to the weather.~ However, the building's response is not \emph{governed} by the time scale that the weather data are available at, but rather the time scales of the dynamic performance of the thermal envelope as well as things like schedules for internal gains, thermostats, and equipment availability.
+  Many aspects of a model have time scales that differ from the that of the weather data. A goal of the modeling is to predict how the building will respond to the weather. However, the building's response is not \emph{governed} by the time scale that the weather data are available at, but rather the time scales of the dynamic performance of the thermal envelope as well as things like schedules for internal gains, thermostats, and equipment availability.
 \item
-  If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time.~ If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained.~ For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff's demand window.~ The following table lists what values are consistent with various demand windows.
+  If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time. If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained. For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff's demand window. The following table lists what values are consistent with various demand windows.
 \end{itemize}
 
 \begin{longtable}[c]{@{}ll@{}}
@@ -49,7 +49,7 @@ FullHour, Day, Week & Any \tabularnewline
 There is also second type of timestep inside EnergyPlus that is known as the System Timestep. This is a variable-length timestep that governs the driving timestep for HVAC and Plant system modeling.  The user cannot directly control the system timestep (except by use of the ConvergenceLimits object). When the HVAC portion of the simulation begins its solution for the current zone timestep, it uses the zone timestep as its maximum length but then can reduce the timestep, as necessary, to improve the solution.  The technical details of the approach are explained in the Engineering Documentation under "Integrated Solution Manager".
 \end{lstlisting}
 
-Users can see the system timestep used if they select the ``detailed'' frequency option on an HVAC output variable (e.g.~Zone Air Temperature). To contrast, the ``Zone'' variables will only be reported on the zone timestep (e.g.~Zone Mean Air Temperature).
+Users can see the system timestep used if they select the ``detailed'' frequency option on an HVAC output variable (e.g. Zone Air Temperature). To contrast, the ``Zone'' variables will only be reported on the zone timestep (e.g. Zone Mean Air Temperature).
 
 And, the IDF example:
 
@@ -82,11 +82,11 @@ In order to reduce time used in simulating your building, you may choose to ente
 
 \paragraph{Field: Minimum Plant Iterations}\label{field-minimum-plant-iterations}
 
-The plant system modeling includes a solver that iterates within a single HVAC manager iteration.~ This input field and the next one provide some control over how the plant solver iterates.~ This field sets a minimum threshold for plant interations. The default for this field is the value ``2'' which indicates that a minimum of two full plant model interations will be performed every time plant is called by the HVAC manager.~ For faster performance with simple plant systems, this input field could be set to the value ``1''.~ For complicated plant systems that present difficulties to solve, this value may need to be set higher to ensure accuracy but at the expense of speed.~ Complicated plant systems include those with several interconnected loops, sizing miss-matches such that plant components are starved of flow compared to their desired flow, heat recovery systems, and thermal load following onsite generators.
+The plant system modeling includes a solver that iterates within a single HVAC manager iteration. This input field and the next one provide some control over how the plant solver iterates. This field sets a minimum threshold for plant interations. The default for this field is the value ``2'' which indicates that a minimum of two full plant model interations will be performed every time plant is called by the HVAC manager. For faster performance with simple plant systems, this input field could be set to the value ``1''. For complicated plant systems that present difficulties to solve, this value may need to be set higher to ensure accuracy but at the expense of speed. Complicated plant systems include those with several interconnected loops, sizing miss-matches such that plant components are starved of flow compared to their desired flow, heat recovery systems, and thermal load following onsite generators.
 
 \paragraph{Field: Maximum Plant Iterations}\label{field-maximum-plant-iterations}
 
-The plant system solver iterates within a single HVAC manager iteration.~ This input field and the previous one provide some control over how the plant model iterates.~ This field sets a maximum limit for plant interations.~ The default for this field is the value ``8'' which indicates that the plant solver will exit after having completed eight full iterations.~ This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called ``Plant Solver Sub Iteration Count'' (typically reported at the ``detailed'' frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation.~ The lower limit of the value for this field is ``2.''
+The plant system solver iterates within a single HVAC manager iteration. This input field and the previous one provide some control over how the plant model iterates. This field sets a maximum limit for plant interations. The default for this field is the value ``8'' which indicates that the plant solver will exit after having completed eight full iterations. This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called ``Plant Solver Sub Iteration Count'' (typically reported at the ``detailed'' frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation. The lower limit of the value for this field is ``2.''
 
 Use in an IDF:
 
@@ -175,7 +175,7 @@ In this case, shadow patterns on exterior surfaces caused by detached shading, w
 
 This is the same as FullExterior except that instead of assuming all transmitted beam solar falls on the floor the program calculates the amount of beam radiation falling on each surface in the zone, including floor, walls and windows, by projecting the sun's rays through the exterior windows, taking into account the effect of exterior shadowing surfaces and window shading devices.
 
-If this option is used, you should be sure that the surfaces of the zone totally enclose a space. This can be determined by viewing the \textbf{eplusout.dxf} file with a program like AutoDesk's Volo View Express. You should also be sure that the zone is \textbf{convex}. Examples of convex and non-convex zones are shown in Figure~\ref{fig:illustration-of-convex-and-non-convex-zones}. The most common non-convex zone is an L-shaped zone. (A formal definition of convex is that any straight line passing through the zone intercepts at most two surfaces.)~ If the zone's surfaces do not enclose a space or if the zone is not convex you should use Solar Distribution = \textbf{FullExterior} instead of \textbf{FullInteriorAndExterior}.
+If this option is used, you should be sure that the surfaces of the zone totally enclose a space. This can be determined by viewing the \textbf{eplusout.dxf} file with a program like AutoDesk's Volo View Express. You should also be sure that the zone is \textbf{convex}. Examples of convex and non-convex zones are shown in Figure~\ref{fig:illustration-of-convex-and-non-convex-zones}. The most common non-convex zone is an L-shaped zone. (A formal definition of convex is that any straight line passing through the zone intercepts at most two surfaces.) If the zone's surfaces do not enclose a space or if the zone is not convex you should use Solar Distribution = \textbf{FullExterior} instead of \textbf{FullInteriorAndExterior}.
 
 If you use \textbf{FullInteriorAndExterior} the program will also calculate how much beam radiation falling on the inside of an exterior window (from other windows in the zone) is absorbed by the window, how much is reflected back into the zone, and how much is transmitted to the outside. In this calculation the effect of a shading device, if present, is accounted for.
 
@@ -191,15 +191,15 @@ Note: Using the reflection calculations can be very time-consuming. Even error-p
 
 If using reflections, the program calculates beam and sky solar radiation that is reflected from exterior surfaces and then strikes the building. These reflecting surfaces fall into three categories:
 
-1)~~~\textbf{Shadowing surfaces}. These are surfaces like overhangs or neighboring buildings entered with Shading:Site, Shading:Building, Shading:Site:Detailed, Shading:Building:Detailed, Shading:Overhang, Shading:Overhang:Projection, Shading:Fin, Shading:Fin:Projection or Shading:Zone:Detailed objects. See Figure~\ref{fig:solar-reflection-from-shadowing-surfaces.}.
+1) \textbf{Shadowing surfaces}. These are surfaces like overhangs or neighboring buildings entered with Shading:Site, Shading:Building, Shading:Site:Detailed, Shading:Building:Detailed, Shading:Overhang, Shading:Overhang:Projection, Shading:Fin, Shading:Fin:Projection or Shading:Zone:Detailed objects. See Figure~\ref{fig:solar-reflection-from-shadowing-surfaces.}.
 
-These surfaces can have diffuse and/or specular (beam-to-beam)~ reflectance values that are specified with the ShadingProperty:Reflectance object which specifies those parameters. They have a default value of .2 for both visible and diffuse reflection.
+These surfaces can have diffuse and/or specular (beam-to-beam) reflectance values that are specified with the ShadingProperty:Reflectance object which specifies those parameters. They have a default value of .2 for both visible and diffuse reflection.
 
-2)~~~\textbf{Exterior building surfaces}. In this case one section of the building reflects solar radiation onto another section (and vice-versa). See Figure~\ref{fig:solar-reflection-from-building-surfaces-onto}.
+2) \textbf{Exterior building surfaces}. In this case one section of the building reflects solar radiation onto another section (and vice-versa). See Figure~\ref{fig:solar-reflection-from-building-surfaces-onto}.
 
 The building surfaces are assumed to be diffusely reflecting if they are opaque (walls, for example) and specularly reflecting if they are windows or glass doors. The reflectance values for opaque surfaces are calculated by the program from the Solar Absorptance and Visible Absorptance values of the outer material layer of the surface's construction (ref: Material object properties). The reflectance values for windows and glass doors are calculated by the program from the reflectance properties of the individual glass layers that make up surface's construction assuming no shading device is present and taking into account inter-reflections among the layers (ref: Window Properties).
 
-3)~~~\textbf{The ground surface}. Reflection from the ground is calculated even if reflections option is not used;l but then the ground plane is considered unobstructed, i.e., the shadowing of the ground by the building itself or by obstructions such as neighboring buildings is ignored. Shadowing by the building itself or neighboring buildings is taken into account~ when the ``with reflections'' option is used but then the ``view factor to ground'' is NOT used. This is shown in Figure~\ref{fig:shadowing-from-building-affects-beam-solar}.
+3) \textbf{The ground surface}. Reflection from the ground is calculated even if reflections option is not used;l but then the ground plane is considered unobstructed, i.e., the shadowing of the ground by the building itself or by obstructions such as neighboring buildings is ignored. Shadowing by the building itself or neighboring buildings is taken into account when the ``with reflections'' option is used but then the ``view factor to ground'' is NOT used. This is shown in Figure~\ref{fig:shadowing-from-building-affects-beam-solar}.
 
 \begin{figure}[hbtp] % fig 3
 \centering
@@ -257,7 +257,7 @@ Building,
 
 \subsection{SurfaceConvectionAlgorithm:Inside}\label{surfaceconvectionalgorithminside}
 
-This input object is used control the choice of models used for surface convection at the inside face of all the heat transfer surfaces in the model.~ This object sets the selection for convection correlations in a global way. The Zone Inside Convection Algorithm input field in the Zone object may be used to selectively override this value on a zone-by-zone basis. Further, individual surfaces can refine the choice by each surface or surface lists -- see~ object SurfaceProperty:ConvectionCoefficients and object SurfaceProperty:ConvectionCoefficients:MultipleSurface.
+This input object is used control the choice of models used for surface convection at the inside face of all the heat transfer surfaces in the model. This object sets the selection for convection correlations in a global way. The Zone Inside Convection Algorithm input field in the Zone object may be used to selectively override this value on a zone-by-zone basis. Further, individual surfaces can refine the choice by each surface or surface lists -- see object SurfaceProperty:ConvectionCoefficients and object SurfaceProperty:ConvectionCoefficients:MultipleSurface.
 
 \subsubsection{Inputs}\label{inputs-4-031}
 
@@ -271,7 +271,7 @@ The \textbf{TARP} model correlates the heat transfer coefficient to the temperat
 
 The \textbf{CeilingDiffuser} model is a mixed and forced convection model for ceiling diffuser configurations. The model correlates the heat transfer coefficient to the air change rate for ceilings, walls and floors. These correlations are based on experiments performed in an isothermal room with a cold ceiling jet. To avoid discontinuities in surface heat transfer rate calculations, all of correlations have been extrapolated beyond the lower limit of the data set (3 ACH) to a natural convection limit that is applied during the hours when the system is off.
 
-The \textbf{AdaptiveConvectionAlgorithm} model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies.~ The adaptive convection algorithm can also be customized using the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections input object.~ These models are explained in detail in the EnergyPlus Engineering Reference Document.
+The \textbf{AdaptiveConvectionAlgorithm} model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies. The adaptive convection algorithm can also be customized using the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections input object. These models are explained in detail in the EnergyPlus Engineering Reference Document.
 
 The default is \textbf{TARP}.
 
@@ -284,7 +284,7 @@ SurfaceConvectionAlgorithm:Inside,TARP;
 
 \subsection{SurfaceConvectionAlgorithm:Outside}\label{surfaceconvectionalgorithmoutside}
 
-Various exterior convection models may be selected for global use.~ The optional Zone Outside Convection Algorithm input field in the Zone object may be used to selectively override this value on a zone-by-zone basis. Further, individual surfaces can refine the choice by each surface or surface lists -- see~ object SurfaceProperty:ConvectionCoefficients and object SurfaceProperty:ConvectionCoefficients:MultipleSurface.
+Various exterior convection models may be selected for global use. The optional Zone Outside Convection Algorithm input field in the Zone object may be used to selectively override this value on a zone-by-zone basis. Further, individual surfaces can refine the choice by each surface or surface lists -- see object SurfaceProperty:ConvectionCoefficients and object SurfaceProperty:ConvectionCoefficients:MultipleSurface.
 
 \subsubsection{Inputs}\label{inputs-5-028}
 
@@ -300,11 +300,11 @@ The \textbf{TARP} algorithm was developed for the TARP software and combines nat
 
 The \textbf{DOE-2} and \textbf{MoWiTT} were derived from field measurements. DOE-2 uses a correlation from measurements by Klems and Yazdanian for rough surfaces. MoWitt uses a correlation from measurements by Klems and Yazdanian for smooth surfaces and, therefore, is most appropriate for windows (see SurfaceProperty:ConvectionCoefficients:MultipleSurface for how to apply to only windows).
 
-The \textbf{AdaptiveConvectionAlgorithm} model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies.~ The adaptive convection algorithm can also be customized using the SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections input object.~ All algorithms are described more fully in the Engineering Reference.
+The \textbf{AdaptiveConvectionAlgorithm} model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies. The adaptive convection algorithm can also be customized using the SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections input object. All algorithms are described more fully in the Engineering Reference.
 
 The default is \textbf{DOE-2}.
 
-Note that when the surface is wet (i.e.~it is raining and the surface is exposed to wind) then the convection coefficient appears as a very large number (1000) and the surface is exposed to the Outdoor Wet-bulb Temperature rather than the Outdoor Dry-bulb Temperature.
+Note that when the surface is wet (i.e. it is raining and the surface is exposed to wind) then the convection coefficient appears as a very large number (1000) and the surface is exposed to the Outdoor Wet-bulb Temperature rather than the Outdoor Dry-bulb Temperature.
 
 IDF Example:
 
@@ -315,7 +315,7 @@ SurfaceConvectionAlgorithm:Outside, AdaptiveConvectionAlgorithm;
 
 \subsection{HeatBalanceAlgorithm}\label{heatbalancealgorithm}
 
-The HeatBalanceAlgorithm object provides a way to select what type of heat and moisture transfer algorithm will be used for calculating the performance of the building's surface assemblies.~ This input controls the overall algorithm used for all the surfaces unless one or more of the SurfaceProperty:HeatTransferAlgorithm:* objects are used to alter the selection for particular surfaces.
+The HeatBalanceAlgorithm object provides a way to select what type of heat and moisture transfer algorithm will be used for calculating the performance of the building's surface assemblies. This input controls the overall algorithm used for all the surfaces unless one or more of the SurfaceProperty:HeatTransferAlgorithm:* objects are used to alter the selection for particular surfaces.
 
 \subsubsection{Inputs}\label{inputs-6-025}
 
@@ -354,7 +354,7 @@ Four values are allowed to select which solution will be used.
 
 \paragraph{Field: Surface Temperature Upper Limit}\label{field-surface-temperature-upper-limit}
 
-This field is a bit ``advanced''.~ It should only be used when the simulation fails AND you cannot determine a cause for the failure.~ That is, you receive an error similar to:
+This field is a bit ``advanced''. It should only be used when the simulation fails AND you cannot determine a cause for the failure. That is, you receive an error similar to:
 
 \begin{lstlisting}
    ** Severe  ** Temperature out of bounds (202.91) for surface = Wall1
@@ -371,29 +371,31 @@ And, after careful perusal, you cannot find a solution as suggested in the error
 
 \paragraph{Field: Minimum Surface Convection Heat Transfer Coefficient Value}\label{field-minimum-surface-convection-heat-transfer-coefficient-value}
 
-This optional field is used to set an overall minimum for the value of the coefficient for surface convection heat transfer (Hc) in W/m2-K.~ A minimum is necessary for numerical robustness because some correlations for Hc can result in zero values and create numerical problems.~~ This field can be used to support specialized validation testing to suppress convection heat transfer and to investigate the implications of different minimum Hc values. The default is 0.1.
+This optional field is used to set an overall minimum for the value of the coefficient for surface convection heat transfer (Hc) in W/m2-K. A minimum is necessary for numerical robustness because some correlations for Hc can result in zero values and create numerical problems. This field can be used to support specialized validation testing to suppress convection heat transfer and to investigate the implications of different minimum Hc values. The default is 0.1.
 
 \paragraph{Field: Maximum Surface Convection Heat Transfer Coefficient Value}\label{field-maximum-surface-convection-heat-transfer-coefficient-value}
 
-This optional field is used to set an overall maximum for the value of the coefficient for surface convection heat transfer (Hc) in W/m2-K.~~ High Hc values are used in EnergyPlus to approximate fixed surface temperature boundary conditions. This field can be used to alter the accepted range of user-defined Hc values.
+This optional field is used to set an overall maximum for the value of the coefficient for surface convection heat transfer (Hc) in W/m2-K. High Hc values are used in EnergyPlus to approximate fixed surface temperature boundary conditions. This field can be used to alter the accepted range of user-defined Hc values.
 
 And, a default IDF example
 
-HeatBalanceAlgorithm,ConductionTransferFunction;~~ ! Solution Algorithm
+\begin{lstlisting}
+HeatBalanceAlgorithm,ConductionTransferFunction; ! Solution Algorithm
+\end{lstlisting}
 
 \subsection{HeatBalanceSettings:ConductionFiniteDifference}\label{heatbalancesettingsconductionfinitedifference}
 
-This object is used to control the behavior of the Conduction Finite Difference algorithm for surface heat transfer.~ The settings are global and affect how the model behaves for all the surfaces.
+This object is used to control the behavior of the Conduction Finite Difference algorithm for surface heat transfer. The settings are global and affect how the model behaves for all the surfaces.
 
 \subsubsection{Inputs}\label{inputs-7-025}
 
 \paragraph{Field: Difference Scheme}\label{field-difference-scheme}
 
-This field determines the solution scheme used by the Conduction Finite Difference model.~ There are two options CrankNicholsonSecondOrder and FullyImplicitFirstOrder.~ The CrankNicholsonSecondOrder scheme is second order in time and may be faster.~ But it can be unstable over time when boundary conditions change abruptly and severely.~ The FullyImplicitFirstOrder scheme is first order in time and is more stable over time. But it may be slower. The default is FullyImplicitFirstOrder when ConductionFiniteDifference is selected as the Heat Balance Algorithm.
+This field determines the solution scheme used by the Conduction Finite Difference model. There are two options CrankNicholsonSecondOrder and FullyImplicitFirstOrder. The CrankNicholsonSecondOrder scheme is second order in time and may be faster. But it can be unstable over time when boundary conditions change abruptly and severely. The FullyImplicitFirstOrder scheme is first order in time and is more stable over time. But it may be slower. The default is FullyImplicitFirstOrder when ConductionFiniteDifference is selected as the Heat Balance Algorithm.
 
 \paragraph{Field: Space Discretization Constant}\label{field-space-discretization-constant}
 
-This field controls how the model determines spatial discretization, or the count of nodes across each material layer in the construction.~ The model calculates the nominal distance associated with a node, \(\Delta x\) , using
+This field controls how the model determines spatial discretization, or the count of nodes across each material layer in the construction. The model calculates the nominal distance associated with a node, \(\Delta x\), using
 
 \begin{equation}
 \Delta x = \sqrt {C\alpha \Delta t}
@@ -407,25 +409,24 @@ Where
 
 \emph{C} is a constant set by this field.
 
-The default is 3.~ Typical values are from 1 to 3.~ Lower values for this constant lead to more nodes and finer-grained space discretization.
+The default is 3. Typical values are from 1 to 3. Lower values for this constant lead to more nodes and finer-grained space discretization.
 
 \paragraph{Field: Relaxation Factor}\label{field-relaxation-factor}
 
-The finite difference solver includes under-relaxation for improved stability for interactions with the other surfaces. This input field can optionally be used to modify the starting value for the relaxation factor.~ Larger numbers may solve faster, while smaller numbers may be more stable.~ The default is 1.0.~ If the program detects numerical instability, it may reduce the value entered here to something lower and more stable.
+The finite difference solver includes under-relaxation for improved stability for interactions with the other surfaces. This input field can optionally be used to modify the starting value for the relaxation factor. Larger numbers may solve faster, while smaller numbers may be more stable. The default is 1.0. If the program detects numerical instability, it may reduce the value entered here to something lower and more stable.
 
 \paragraph{Field: Inside Face Surface Temperature Convergence Criteria}\label{field-inside-face-surface-temperature-convergence-criteria}
 
-The surface heat balance model at the inside face has a numerical solver that uses a convergence parameter for a maximum allowable differences in surface temperature.~ This field can optionally be used to modify this convergence criteria.~ The default value is 0.002 and was selected for stability.~ Lower values may further increase stability at the expense of longer runtimes, while higher values may decrease runtimes but lead to possible instabilities.~ The units are in degrees Celsius.
+The surface heat balance model at the inside face has a numerical solver that uses a convergence parameter for a maximum allowable differences in surface temperature. This field can optionally be used to modify this convergence criteria. The default value is 0.002 and was selected for stability. Lower values may further increase stability at the expense of longer runtimes, while higher values may decrease runtimes but lead to possible instabilities. The units are in degrees Celsius.
 
 An example IDF object follows.
 
 \begin{lstlisting}
-
-  HeatBalanceSettings:ConductionFiniteDifference,
-      FullyImplicitFirstOrder , !- Difference Scheme
-      3.0 ,  !- Space Discretization Constant
-      1.0,   !- Relaxation Factor
-      0.002 ;!- Inside Face Surface Temperature Convergence Criteria
+HeatBalanceSettings:ConductionFiniteDifference,
+  FullyImplicitFirstOrder, !- Difference Scheme
+  3.0,                     !- Space Discretization Constant
+  1.0,                     !- Relaxation Factor
+  0.002;                   !- Inside Face Surface Temperature Convergence Criteria
 \end{lstlisting}
 
 \subsection{ZoneAirHeatBalanceAlgorithm}\label{zoneairheatbalancealgorithm}
@@ -440,7 +441,9 @@ Three choices are allowed to select which solution algorithm will be used. The \
 
 And, a default IDF example is shown below:
 
-ZoneAirHeatBalanceAlgorithm, ThirdOrderBackwardDifference;~~ !- Algorithm
+\begin{lstlisting}
+ZoneAirHeatBalanceAlgorithm, ThirdOrderBackwardDifference; !- Algorithm
+\end{lstlisting}
 
 \subsection{ZoneAirContaminantBalance}\label{zoneaircontaminantbalance}
 
@@ -515,7 +518,7 @@ This object is used to control some details of EnergyPlus's solar, shadowing and
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation.~ The default and fastest method is selected using the keyword AverageOverDaysInFrequency.~ A more detailed and slower method can be selected using the keyword DetailedTimestepIntegration.~ The later method is useful modeling dynamic fenestration and shading surfaces.
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword DetailedTimestepIntegration. The later method is useful modeling dynamic fenestration and shading surfaces.
 
 \paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
 
@@ -523,7 +526,7 @@ This numeric field will cause the shadowing calculations to be done periodically
 
 \paragraph{Field: Maximum Figures in Shadow Overlap Calculations}\label{field-maximum-figures-in-shadow-overlap-calculations}
 
-This numeric field will allow you to increase the number of figures in shadow overlaps. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time.~ Likewise, too few figures may not result in as accurate calculations as you desire.
+This numeric field will allow you to increase the number of figures in shadow overlaps. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
 
 \paragraph{Field: Polygon Clipping Algorithm}\label{field-polygon-clipping-algorithm}
 
@@ -531,11 +534,11 @@ This is an advanced feature. Prior to V7, the internal polygon clipping method w
 
 \paragraph{Field: Sky Diffuse Modeling Algorithm}\label{field-sky-diffuse-modeling-algorithm}
 
-Two choices are available here: SimpleSkyDiffuseModeling and DetailedSkyDiffuseModeling. \textbf{SimpleSkyDiffuseModeling} (default) performs a one-time calculation for sky diffuse properties. This has implications if you have shadowing surfaces with changing transmittance (i.e.~not all opaque or not all transparent) during the year. The program checks to see if this might be the case and automatically selects \textbf{DetailedSkyDiffuseModeling} if the shading transmittance varies. Even if the transmittance doesn't vary and the option for detailed modeling is used, that option is retained (though it will increase execution time) because you may be using EMS to vary the transmittance. When the detailed modeling is done, there will be a warning posted if the Calculation Frequency (above) is \textgreater{} 1.
+Two choices are available here: SimpleSkyDiffuseModeling and DetailedSkyDiffuseModeling. \textbf{SimpleSkyDiffuseModeling} (default) performs a one-time calculation for sky diffuse properties. This has implications if you have shadowing surfaces with changing transmittance (i.e. not all opaque or not all transparent) during the year. The program checks to see if this might be the case and automatically selects \textbf{DetailedSkyDiffuseModeling} if the shading transmittance varies. Even if the transmittance doesn't vary and the option for detailed modeling is used, that option is retained (though it will increase execution time) because you may be using EMS to vary the transmittance. When the detailed modeling is done, there will be a warning posted if the Calculation Frequency (above) is \textgreater{} 1.
 
 In general (and you should also read the previous field description), if shadowing surfaces are used with the transmittance property, the user should be careful to synchronize this calculation with the scheduled occurrence of the transmittance (if any) (or use 1, which will be the most accurate but will cause more time in the calculations).
 
-This field applies to the method called ``AverageOverDaysInFrequency.''~ When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
+This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
@@ -561,7 +564,7 @@ Both fields of the Output:Diagnostics command can accept all the applicable keys
 
 Allowable choices are:
 
-\textbf{DisplayAllWarnings} -- use this to get all warnings (except the developer warnings ``DisplayZoneAirHeatBalanceOffBalance'').~ This key sets all other display warning values to on.
+\textbf{DisplayAllWarnings} -- use this to get all warnings (except the developer warnings ``DisplayZoneAirHeatBalanceOffBalance''). This key sets all other display warning values to on.
 
 \textbf{DisplayExtraWarnings} -- use this to get all extra warnings. An example of an extra warning is when a user enters a ceiling height or volume with the Zone object and EnergyPlus calculates something significantly different based on the entered zone geometry.
 
@@ -577,7 +580,7 @@ Allowable choices are:
 
 \textbf{DisplayWeatherMissingDataWarnings} -- use this to turn on the missing data warnings from the read of the weather file.
 
-\textbf{ReportDuringWarmup} -- use this to allow reporting during warmup days. This can show you exactly how your facility is converging (or not) during the initial ``warmup'' days of the simulation.~ Generally, only developers or expert simulation users would need this kind of detail.
+\textbf{ReportDuringWarmup} -- use this to allow reporting during warmup days. This can show you exactly how your facility is converging (or not) during the initial ``warmup'' days of the simulation. Generally, only developers or expert simulation users would need this kind of detail.
 
 \textbf{ReportDetailedWarmupConvergence} -- use this to produce detailed reporting (essentially each warmup day for each zone) for warmup convergence.
 
@@ -625,7 +628,7 @@ There is no reason for a user to enter an Output:PreprocessorMessage object but 
 
 \paragraph{Field: Preprocessor Name}\label{field-preprocessor-name}
 
-The preprocessor name (e.g.~EPMacro, ExpandObjects) is entered here.~ Case is retained so that messages from EnergyPlus look very similar to what a preprocessor would produce.
+The preprocessor name (e.g. EPMacro, ExpandObjects) is entered here. Case is retained so that messages from EnergyPlus look very similar to what a preprocessor would produce.
 
 \paragraph{Field: Error Severity}\label{field-error-severity}
 
@@ -656,29 +659,29 @@ No problems for processing
 
 \subsection{ZoneCapacitanceMultiplier:ResearchSpecial}\label{zonecapacitancemultiplierresearchspecial}
 
-This object is an advanced feature that can be used to control the effective storage capacity of the zone.~ Capacitance multipliers of 1.0 indicate the capacitance is that of the (moist) air in the volume of the specified zone. This multiplier can be increased if the zone air capacitance needs to be increased for stability of the simulation or to allow modeling higher or lower levels of damping of behavior over time. The multipliers are applied to the base value corresponding to the total capacitance for the zone's volume of air at current zone (moist) conditions.
+This object is an advanced feature that can be used to control the effective storage capacity of the zone. Capacitance multipliers of 1.0 indicate the capacitance is that of the (moist) air in the volume of the specified zone. This multiplier can be increased if the zone air capacitance needs to be increased for stability of the simulation or to allow modeling higher or lower levels of damping of behavior over time. The multipliers are applied to the base value corresponding to the total capacitance for the zone's volume of air at current zone (moist) conditions.
 
 \subsubsection{Inputs}\label{inputs-14-014}
 
 \paragraph{Field: Temperature Capacity Multiplier}\label{field-temperature-capacity-multiplier}
 
-This field is used to alter the effective heat capacitance of the zone air volume. This affects the transient calculations of zone air temperature. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the temperature of zone air from timestep to timestep.~ Note that sensible heat capacity can also be modeled using internal mass surfaces.
+This field is used to alter the effective heat capacitance of the zone air volume. This affects the transient calculations of zone air temperature. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the temperature of zone air from timestep to timestep. Note that sensible heat capacity can also be modeled using internal mass surfaces.
 
 \paragraph{Field: Humidity Capacity Multiplier}\label{field-humidity-capacity-multiplier}
 
-This field is used to alter the effective moisture capacitance of the zone air volume.~ This affects the transient calculations of zone air humidity ratio.~ Values greater than 1.0 have the effect of smoothing, or damping, the rate of change in the water content of zone air from timestep to timestep.
+This field is used to alter the effective moisture capacitance of the zone air volume. This affects the transient calculations of zone air humidity ratio. Values greater than 1.0 have the effect of smoothing, or damping, the rate of change in the water content of zone air from timestep to timestep.
 
 \paragraph{Field: Carbon Dioxide Capacity Multiplier}\label{field-carbon-dioxide-capacity-multiplier}
 
-This field is used to alter the effective carbon dioxide capacitance of the zone air volume. This affects the transient calculations of zone air carbon dioxide concentration.~ Values greater than 1.0 have the effect of smoothing or damping the rate of change in the carbon dioxide level of zone air from timestep to timestep.
+This field is used to alter the effective carbon dioxide capacitance of the zone air volume. This affects the transient calculations of zone air carbon dioxide concentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the carbon dioxide level of zone air from timestep to timestep.
 
 \paragraph{Field: Generic Contaminant Capacity Multiplier}\label{field-generic-contaminant-capacity-multiplier}
 
-This field is used to alter the effective generic contaminantcapacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration.~ Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
+This field is used to alter the effective generic contaminantcapacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
 
 \subsection{SimulationControl}\label{simulationcontrol}
 
-The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and~ desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
+The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
 
 Only one SimulationControl object is permitted for each EnergyPlus input file. While a SimulationControl is needed to trigger sizing calculations, it is optional for other runs (design days, run periods). The actions will still be shown in the eplusout.eio file (see Output Details and Examples Document).
 
@@ -728,13 +731,13 @@ An IDF example:
 
 \subsection{ProgramControl}\label{programcontrol}
 
-This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.~ Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.~ This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly).~ This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.~ When this object is used, its input for the number of threads will take precedent over the value of the environment variable \textbf{``EP\_OMP\_NUM\_THREADS''} which is an alternate method of controlling the program's threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is \textless{} = 30.
+This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer. Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation. This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly). This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed. When this object is used, its input for the number of threads will take precedent over the value of the environment variable \textbf{``EP\_OMP\_NUM\_THREADS''} which is an alternate method of controlling the program's threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is \textless{} = 30.
 
 \subsubsection{Inputs}\label{inputs-16-010}
 
 \paragraph{Field: Number of Threads Allowed}\label{field-number-of-threads-allowed}
 
-This field is used to specify a limit on the number of threads EnergyPlus will use.~ If a zero is entered then the program will set the number of threads to the maximum available on the computer.~ If the number entered is larger than the number of processors or cores, then the hardware limits will take precedent over this limit.
+This field is used to specify a limit on the number of threads EnergyPlus will use. If a zero is entered then the program will set the number of threads to the maximum available on the computer. If the number entered is larger than the number of processors or cores, then the hardware limits will take precedent over this limit.
 
 An example IDF object that sets the program to use only one thread follows.
 
@@ -785,7 +788,7 @@ A fuel type should be specified for the meter. All assignments to this meter wil
   OtherFuel2
 \end{itemize}
 
-Fuel types are generally self-explanatory. Generic is included for convenience when a custom meter is defined that doesn't quite fit the ``fuel'' categories.~ See the examples below.
+Fuel types are generally self-explanatory. Generic is included for convenience when a custom meter is defined that doesn't quite fit the ``fuel'' categories. See the examples below.
 
 \paragraph{Field: group(s) Key Name-Output Variable/Meter Name}\label{field-groups-key-name-output-variablemeter-name}
 
