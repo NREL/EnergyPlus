@@ -1903,7 +1903,8 @@ namespace FanCoilUnits {
 		Real64 MdotLockH; // saved value of locked chilled water mass flow rate [kg/s]
 		Real64 MdotLockC; // saved value of locked hot water mass flow rate [kg/s]
 		Real64 CWFlow; // cold water mass flow rate solution [kg/s]
-		Real64 CWFlowBypass; // cold water bypassed mass flow rate [ kg/s ]
+		Real64 CWFlowBypass; // cold water bypassed mass flow rate [kg/s]
+		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
 		bool ColdFlowLocked; // if true cold water flow is locked
 		bool HotFlowLocked; // if true Hot water flow is locked
 		// FLOW
@@ -4289,8 +4290,8 @@ namespace FanCoilUnits {
 	{
 
 		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   July 2015
+		//       AUTHOR         Fred Buhl, FSEC
+		//       DATE WRITTEN   Jan 2016
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
@@ -4348,7 +4349,7 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 
 		Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = HWFlow;
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); 
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -4369,7 +4370,7 @@ namespace FanCoilUnits {
 	{
 
 		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
+		//       AUTHOR         Fred Buhl Jan 2016
 		//       DATE WRITTEN   July 2015
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -4428,7 +4429,7 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 
 		Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = CWFlow;
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); 
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -5140,28 +5141,6 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 } // FanCoilUnits
 
 } // EnergyPlus

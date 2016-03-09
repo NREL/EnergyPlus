@@ -70,7 +70,8 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Fans.hh>
@@ -94,7 +95,7 @@ using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace DataHeatBalFanSys;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataSizing;
@@ -1745,9 +1746,7 @@ namespace EnergyPlus {
 		CoilNames.deallocate();
 
 	}
-}
 	TEST_F( EnergyPlusFixture, FanCoil_ASHRAE90VariableFan ) {
-
 
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );
@@ -2126,5 +2125,4 @@ namespace EnergyPlus {
 		CoilNames.deallocate();
 
 	}
-
 }
