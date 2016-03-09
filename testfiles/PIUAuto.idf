@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Timestep,6;
 
@@ -2223,7 +2223,6 @@
     Reheat Coil Zone 1,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    Zone 1 Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     0.0001;                  !- Convergence Tolerance
 
   AirTerminal:SingleDuct:VAV:Reheat,
@@ -2263,7 +2262,6 @@
     Reheat Coil Zone 3,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    Zone 3 Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     0.0001;                  !- Convergence Tolerance
 
   AirLoopHVAC:ZoneMixer,

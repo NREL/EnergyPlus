@@ -1239,7 +1239,7 @@ The thermal-to-electric ratio describes how the nominal thermal output compares 
 
 ### Electrical Storage
 
-The internal variable called “Electrical Storage Maximum Capacity” provides information about the capacity of electrical storage devices. This is the value of the field called Maximum Storage Capacity in the ElectricLoadCenter:Storage:Simple input object. The units are in Joules.
+The internal variables called Electrical Storage Simple Maximum Capacity and  Electrical Storage Battery Maximum Capacity provide information about the capacity of electrical storage devices. Electrical Storage Simple Maximum Capacity is the value of the field called Maximum Storage Capacity in the ElectricLoadCenter:Storage:Simple input object, the units are in Joules.  Electrical Storage Battery Maximum Capacityâ is the value of the field called Maximum Module Capacity in the ElectricLoadCenter:Storage:Battery input object, the units are in amp-hours for just one battery module.
 
 Sizing
 ------

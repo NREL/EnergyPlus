@@ -466,6 +466,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		GSHPRefrigIndex = FindRefrigerant( GSHPRefrigerant );
 		if ( GSHPRefrigIndex == 0 ) {
 			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant );
+			ShowFatalError( "FluidProperties:* objects for " + GSHPRefrigerant + " must be included in the idf file.");
 		}
 
 		//CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'

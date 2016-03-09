@@ -129,6 +129,15 @@ namespace DirectAirManager {
 	int NumDirectAir( 0 );
 	Array1D_bool CheckEquipName;
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetDirectAirInputFlag( true );
+	}
+
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
 	// Object Data
@@ -140,6 +149,7 @@ namespace DirectAirManager {
 		NumDirectAir = 0;
 		CheckEquipName.deallocate();
 		DirectAir.deallocate();
+		GetDirectAirInputFlag = true;
 	}
 
 	// Functions
@@ -188,7 +198,6 @@ namespace DirectAirManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DirectAirNum;
-		static bool GetDirectAirInputFlag( true );
 
 		if ( GetDirectAirInputFlag ) { //First time subroutine has been entered
 			GetDirectAirInput();

@@ -110,7 +110,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Timestep,6;
 
@@ -2196,7 +2196,6 @@
     West Zone Reheat Air Outlet Node,  !- Air Outlet Node Name
     West Zone Reheat Air Inlet Node,  !- Air Inlet Node Name
     5.0,                     !- Maximum Air Flow Rate {m3/s}
-    West Zone Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil West Zone,   !- Reheat Coil Name
     0.05,                    !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -2209,7 +2208,6 @@
     East Zone Reheat Air Outlet Node,  !- Air Outlet Node Name
     East Zone Reheat Air Inlet Node,  !- Air Inlet Node Name
     5.0,                     !- Maximum Air Flow Rate {m3/s}
-    East Zone Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil East Zone,   !- Reheat Coil Name
     0.05,                    !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -2222,7 +2220,6 @@
     North Zone Reheat Air Outlet Node,  !- Air Outlet Node Name
     North Zone Reheat Air Inlet Node,  !- Air Inlet Node Name
     8.5,                     !- Maximum Air Flow Rate {m3/s}
-    North Zone Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil North Zone,  !- Reheat Coil Name
     0.05,                    !- Maximum Hot Water or Steam Flow Rate {m3/s}

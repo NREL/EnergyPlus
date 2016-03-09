@@ -119,7 +119,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutScheduleName
 
   LOGICAL :: ErrFlag
-  
+
   REAL :: IndirectOldFieldFive
   REAL :: IndirectOldFieldSix
   REAL :: IndirectNewFieldThirteen
@@ -363,14 +363,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1) = sVersionNum
                 nodiff=.false.
 
-    !!!    Changes for this version
-!              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP')
-!                ! object rename only
-!                ObjectName = "Coil:WaterHeating:AirToWaterHeatPump:Pumped"
-!                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-!                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-!                nodiff=.true.
-                        
+
+              ! It is debatable whether I should actually improve this to make it more like the report variables
+              ! I think it is much less likely that these will change between versions
+              ! So for now I'll just change them on a version by version basis.
+              CASE ('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                SELECT CASE ( MakeUPPERCase ( InArgs(4) ) )
+                CASE ('OUTDOOR AIR DRYBLUB TEMPERATURE')
+				  nodiff = .true.
+				  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Drybulb Temperature'
+                CASE ('OUTDOOR AIR WETBLUB TEMPERATURE')
+                  nodiff = .true.
+                  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Wetbulb Temperature'
+                END SELECT
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -799,6 +808,63 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
+
+              CASE('AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:15)=InArgs(1:15)   ! No change at all
+                OutArgs(16:16)=InArgs(17:17) ! Moved up
+                CurArgs = CurArgs - 1
+              CASE('AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:16)=InArgs(1:16)   ! No change at all
+                OutArgs(17:17)=InArgs(18:18) ! Moved up
+                CurArgs = CurArgs - 1
+              CASE('AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT')
+                ! Removed Input Field !- Hot Water or Steam Inlet Node Name
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:5) = InArgs(1:5)   ! F1-F5  No Change
+                ! Old input field F6 removed
+                OutArgs(6:CurArgs-1) = InArgs(7:CurArgs)  ! Move up old F7 - F12
+                CurArgs = CurArgs - 1
+
+              CASE('AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION')
+                ! Removed Input Field !- Hot Water Inlet Node Name, Cold Water Inlet Node Name
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:7) = InArgs(1:7)   ! F1-F7  No Change
+                ! Old input fields F8 - F9 removed
+                OutArgs(8:CurArgs-2) = InArgs(10:CurArgs)  ! Move up old Fields F10 - F20
+                CurArgs = CurArgs - 2
+
+              CASE('AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT')
+                ! Removed Input Field !- Hot Water or Steam Inlet Node Name
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6) = InArgs(1:6)   ! F1-F6  No Change
+                ! Old input field F7 removed
+                OutArgs(7:CurArgs-1) = InArgs(8:CurArgs)  ! Move up old F8 - F14
+                CurArgs = CurArgs - 1
+
+              CASE('AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN')
+                ! Removed Input Fields
+                !- Air Inlet Node Name, Air Outlet Node Name, Heating Coil Air Inlet Node Name, & Hot Water or Steam Inlet Node Name
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:7) = InArgs(1:7)   ! F1-F7  No Change
+                ! Old input Fields F8 - F9 removed
+                OutArgs(8:CurArgs-2) = InArgs(10:CurArgs)  ! Move up old F10 - F16
+                CurArgs = CurArgs - 2
+
+              CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:3)=InArgs(1:3)   ! No change at all
+                OutArgs(4) = 'No'
+                OutArgs(5:12)=InArgs(4:11) ! Moved down
+                CurArgs = CurArgs + 1
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN

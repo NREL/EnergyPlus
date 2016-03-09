@@ -1169,6 +1169,7 @@ namespace HeatingCoils {
 		int NumOfStages; // total number of stages of multi-stage heating coil
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int NumCoilsSized = 0; // counter used to deallocate temporary string array after all coils have been sized
+		Real64 TempSize; // sizing variable temp value
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
 			FieldNum = 1 + ( HeatingCoil( CoilNum ).NumOfStages * 2 );
@@ -1187,8 +1188,31 @@ namespace HeatingCoils {
 		CompName = HeatingCoil( CoilNum ).Name;
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
 		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
+
+		if ( TempCap == AutoSize ) {
+			if ( HeatingCoil( CoilNum ).DesiccantRegenerationCoil ) {
+				DataDesicRegCoil = true;
+				bPRINT = false;
+				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				DataDesInletAirTemp = TempSize;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				DataDesOutletAirTemp = TempSize;
+				if ( CurOASysNum > 0 ) {
+					OASysEqSizing( CurOASysNum ).AirFlow = true;
+					OASysEqSizing( CurOASysNum ).AirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+				}
+				DataDesicDehumNum = 0;
+				bPRINT = true;
+			}
+		}
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
+		DataDesicRegCoil = false; // reset global to false so other heating coils are not affected
+		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not 
+		DataDesOutletAirTemp = 0.0; // reset global data to zero so other heating coils are not affected
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage || HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
 			HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages ) = TempCap;
@@ -3317,6 +3341,47 @@ namespace HeatingCoils {
 		CheckEquipName.deallocate();
 		HeatingCoil.deallocate();
 		HeatingCoilNumericFields.deallocate();
+
+	}
+
+	void
+	SetHeatingCoilData(
+		int const CoilNum, // Number of electric or gas heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used 
+		) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function sets data to Heating Coil using the coil index and arguments passed
+
+		// Using/Aliasing
+		using General::TrimSigDigits;
+
+		if ( GetCoilsInputFlag ) { 
+			GetHeatingCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		if ( CoilNum <= 0 || CoilNum > NumHeatingCoils ) {
+			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumHeatingCoils ) );
+			ErrorsFound = true;
+			return;
+		}
+
+		if ( present( DesiccantRegenerationCoil ) ) {
+			HeatingCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+		}
+
+		if ( present( DesiccantDehumIndex ) ) {
+			HeatingCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
+		}
 
 	}
 
