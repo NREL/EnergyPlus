@@ -73,7 +73,9 @@ Usually the minimum system timestep is allowed to vary from the zone timestep (a
 
 The HVAC Manager will iterate to a solution or up to a set number of iterations. If not ``converged'', then a warning error appears:
 
-SimHVAC: Maximum iterations (20) exceeded for all HVAC loops, at CHICAGO IL USA TMY2-94846 WMO\# = 725300, 10/07 14:06 - 14:08
+\begin{lstlisting}
+SimHVAC: Maximum iterations (20) exceeded for all HVAC loops, at CHICAGO IL USA TMY2-94846 WMO# = 725300, 10/07 14:06 - 14:08
+\end{lstlisting}
 
 In order to reduce time used in simulating your building, you may choose to enter a lesser number than the default of 20 for the maximum number of iterations to be used. Or, you may wish to enter a bigger number for certain buildings. To get more information printed with a ``max iteration'' message, you need to enter a ``Output:Diagnostics, DisplayExtraWarnings;'' command (which may also generate other warnings than just this one).
 
