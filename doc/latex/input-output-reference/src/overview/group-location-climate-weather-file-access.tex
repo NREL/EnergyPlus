@@ -22,37 +22,35 @@ This field represents the longitude (in degrees) of the facility. By convention,
 
 \paragraph{Field: Time Zone}\label{field-time-zone}
 
-This field represents the time zone of the facility (relative to Greenwich Mean Time or the 0\(^{h}\) meridian). Time zones west of GMT (e.g.~North America) are represented as negative; east of GMT as positive. Non-whole hours can be represented in decimal (e.g.~6:30 is 6.5).
+This field represents the time zone of the facility (relative to Greenwich Mean Time or the 0\(^{th}\) meridian). Time zones west of GMT (e.g. North America) are represented as negative; east of GMT as positive. Non-whole hours can be represented in decimal (e.g. 6:30 is 6.5).
 
 \paragraph{Field: Elevation}\label{field-elevation}
 
 This field represents the elevation of the facility in meters (relative to sea level).
 
-Units with their abbreviations are shown in Appendix A.~ And, as shown in an IDF:
+Units with their abbreviations are shown in Appendix A. And, as shown in an IDF:
 
 \begin{lstlisting}
-
-Site:Location, DENVER COLORADO,     ! Name
-     39.75000    ,     ! Latitude {N+ S-}
-    -104.8700    ,     ! Longitude {W- E+}
-    -7.000000    ,     ! TimeZoneNumber {GMT+/-}
-    1610.26;           ! Elevation {m}
+Site:Location, DENVER COLORADO, ! Name
+   39.75000,                    ! Latitude {N+ S-}
+  -104.8700,                    ! Longitude {W- E+}
+  -7.000000,                    ! TimeZoneNumber {GMT+/-}
+  1610.26;                      ! Elevation {m}
 \end{lstlisting}
 
 Most examples in this document include the comment lines that illustrate each data field's value. However, this is not necessary (though it makes the IDF more readable). The previous example could also be:
 
 \begin{lstlisting}
-
 Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
 \end{lstlisting}
 
 \subsection{SizingPeriod:DesignDay}\label{sizingperioddesignday}
 
-The design day input describes the parameters to effect a ``design day'' simulation, often used for load calculations or sizing equipment. Using the values in these fields, EnergyPlus ``creates'' a complete days' worth of weather data (air temperatures, solar radiation, etc.)~ Normal operation uses the default range multipliers as shown in Figure~\ref{fig:default-daily-range-multiplier-for-design} though users may choose to input their own multiplier schedule. Likewise, normal operation specifies one ``humidity indicating condition'' which is used to calculate the humidity ratio at maximum temperature -- this is used as the constant humidity ratio for the entire day. Again, this can be overridden by specifying a relative humidity schedule or requesting generation of an hourly wet-bulb temperature profile.~ Multiple design days may be specified.
+The design day input describes the parameters to effect a ``design day'' simulation, often used for load calculations or sizing equipment. Using the values in these fields, EnergyPlus ``creates'' a complete days' worth of weather data (air temperatures, solar radiation, etc.) Normal operation uses the default range multipliers as shown in Figure~\ref{fig:default-daily-range-multiplier-for-design} though users may choose to input their own multiplier schedule. Likewise, normal operation specifies one ``humidity indicating condition'' which is used to calculate the humidity ratio at maximum temperature -- this is used as the constant humidity ratio for the entire day. Again, this can be overridden by specifying a relative humidity schedule or requesting generation of an hourly wet-bulb temperature profile. Multiple design days may be specified.
 
 We refer you to the ASHRAE Handbook of Fundamentals for philosophy of what parameters are important for use as ``design conditions'' in sizing equipment.
 
-In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. http://www.energyplus.gov/cfm/weather\_data.cfm ~These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
+In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. http://www.energyplus.gov/cfm/weather\_data.cfm These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
 
 \subsubsection{Inputs}\label{inputs-1-024}
 
@@ -70,7 +68,7 @@ This numeric field specifies the day of the month. That, in conjunction with the
 
 \paragraph{Field: Day Type}\label{field-day-type}
 
-This alpha field specifies the day type for the design day. This value indicates which day profile to use in schedules. For further information, see the Schedule discussion later in this document. (ref: Schedule)~ Note that two of the possible day types are SummerDesignDay (for cooling) and WinterDesignDay (for heating) -- allowing the user to customize schedules for the design conditions. That is, for design days tagged with a SummerDesignDay type, you can set schedules to be worst or typical schedules for a cooling season.
+This alpha field specifies the day type for the design day. This value indicates which day profile to use in schedules. For further information, see the Schedule discussion later in this document. (ref: Schedule) Note that two of the possible day types are SummerDesignDay (for cooling) and WinterDesignDay (for heating) -- allowing the user to customize schedules for the design conditions. That is, for design days tagged with a SummerDesignDay type, you can set schedules to be worst or typical schedules for a cooling season.
 
 \paragraph{Field: Maximum Dry-Bulb Temperature}\label{field-maximum-dry-bulb-temperature}
 
@@ -102,7 +100,7 @@ T\(_{e}\) = User supplied Daily Temperature Range
 
 T\(_{r}\) = Range multiplier as shown on the above graph
 
-The range multiplier values represent typical conditions of diurnal temperatures (i.e.~the low temperature for the day occurring about 5:00 AM and the maximum temperature for the day occurring about 3:00 PM.~ Note that EnergyPlus does not shift the profile based on the time of solar noon as is optionally allowed in ASHRAE procedures.
+The range multiplier values represent typical conditions of diurnal temperatures (i.e. the low temperature for the day occurring about 5:00 AM and the maximum temperature for the day occurring about 3:00 PM. Note that EnergyPlus does not shift the profile based on the time of solar noon as is optionally allowed in ASHRAE procedures.
 
 ASHRAE research indicates that dry-bulb and wet-bulb temperatures typically follow the same profile, so EnergyPlus can use the default profile to generate humidity conditions (see Humidity Indicating Type = WetBulbProfileDefaultMultipliers below).
 
@@ -129,7 +127,7 @@ The values/schedules indicated here and in subsequent fields create the humidity
 The Humidity Condition Type fields have interacting uses and units, summarized as follows:
 
 % table 2
-\begin{longtable}[c]{p{1.5in}p{1.62in}p{2.87in}}
+\begin{longtable}[c]{p{2.25in}p{1.75in}p{2.0in}}
 \caption{Humidity Indicating Field Interactions - Design Day \protect \label{table:humidity-indicating-field-interactions-design}}\\
 \toprule 
 Humidity Condition Type & Primary Humidity Indicating Field & Humidity Indicating Day Schedule \tabularnewline \midrule
@@ -138,10 +136,10 @@ WetBulb & Wetbulb or DewPoint at Maximum Dry-Bulb & N/A (unused) \tabularnewline
 DewPoint & Wetbulb or DewPoint at Maximum Dry-Bulb & N/A (unused) \tabularnewline
 HumidityRatio & Humidity Ratio at Maximum Dry-Bulb & N/A (unused) \tabularnewline
 Enthalpy & Enthalpy at Maximum Dry-Bulb & N/A (unused) \tabularnewline
-WetBulbProfileDefaultMultipliers & Wetbulb or DewPoint at Maximum Dry-Bulb & N/A (unused) \tabularnewline
-WetBulbProfileMultiplierSchedule & Wetbulb or DewPoint at Maximum Dry-Bulb & Fractions of wet-bulb daily range (0 – 1) \tabularnewline
-WetBulbProfileDifferenceSchedule & Wetbulb or DewPoint at Maximum Dry-Bulb & Difference between maximum and hour/timestep wet-bulb temperature, C \tabularnewline
-RelativeHumiditySchedule & N/A & Relative humidity (\%, 0 – 100) \tabularnewline
+WetBulbProfile\-DefaultMultipliers & Wetbulb or DewPoint at Maximum Dry-Bulb & N/A (unused) \tabularnewline
+WetBulbProfile\-MultiplierSchedule & Wetbulb or DewPoint at Maximum Dry-Bulb & Fractions of wet-bulb daily range (0 – 1) \tabularnewline
+WetBulbProfile\-DifferenceSchedule & Wetbulb or DewPoint at Maximum Dry-Bulb & Difference between maximum and hour/timestep wet-bulb temperature, C \tabularnewline
+RelativeHumidity\-Schedule & N/A & Relative humidity (\%, 0 – 100) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -149,25 +147,25 @@ Humidity conditions over the day are derived as follows:
 
 \textbf{WetBulb, DewPoint, HumidityRatio, or Enthalpy}:
 
-These four methods assume constant absolute humidity over the day.~ Calculate W = humidity ratio at Maximum Dry-Bulb Temperature and Humidity Indicating Conditions.~ Derive hourly/timestep humidity conditions from W and hour/timestep dry-bulb temperature.
+These four methods assume constant absolute humidity over the day. Calculate W = humidity ratio at Maximum Dry-Bulb Temperature and Humidity Indicating Conditions. Derive hourly/timestep humidity conditions from W and hour/timestep dry-bulb temperature.
 
 \textbf{WetBulbProfileDefaultMultipliers}
 
-Generate the wet-bulb temperature profile using Default Daily Range Multiplier for Design Days (shown in Figure~\ref{fig:default-daily-range-multiplier-for-design} above) and Daily Wet-Bulb Temperature Range (below).~ This method is analogous to DefaultMultiplier generation of the dry-bulb temperature profile and is the procedure recommended in Chapter 14 of ASHRAE 2009 HOF.
+Generate the wet-bulb temperature profile using Default Daily Range Multiplier for Design Days (shown in Figure~\ref{fig:default-daily-range-multiplier-for-design} above) and Daily Wet-Bulb Temperature Range (below). This method is analogous to DefaultMultiplier generation of the dry-bulb temperature profile and is the procedure recommended in Chapter 14 of ASHRAE 2009 HOF.
 
 \textbf{WetBulbProfileMultiplierSchedule}
 
-Generate the wet-bulb profile using multipliers from the Humidity Indicating Day Schedule and Daily Wet-Bulb Temperature Range (below).~ Analogous to dry-bulb MultiplierSchedule.
+Generate the wet-bulb profile using multipliers from the Humidity Indicating Day Schedule and Daily Wet-Bulb Temperature Range (below). Analogous to dry-bulb MultiplierSchedule.
 
 \textbf{WetBulbProfileDifferenceSchedule}
 
-Generate the wet-bulb profile by subtracting Humidity Indicating Day Schedule values from the daily maximum wet-bulb temperature (specified in Humidity Indicating Conditions at Maximum Dry-Bulb). ~Analogous to dry-bulb DifferenceSchedule.
+Generate the wet-bulb profile by subtracting Humidity Indicating Day Schedule values from the daily maximum wet-bulb temperature (specified in Humidity Indicating Conditions at Maximum Dry-Bulb). Analogous to dry-bulb DifferenceSchedule.
 
 \textbf{RelativeHumiditySchedule}
 
 Hourly relative humidity is specified in Humidity Indicating Day Schedule.
 
-In all cases, the humidity ratio is limited to saturation at the hour/timestep dry-bulb (that is, the dry-bulb temperature is used as specified, but the humidity ratio is modified as needed to be physically possible).~ Once a valid air state is determined, a complete set of consistent hour/timestep psychrometric values (dewpoint, wet-bulb, and enthalpy) is derived.
+In all cases, the humidity ratio is limited to saturation at the hour/timestep dry-bulb (that is, the dry-bulb temperature is used as specified, but the humidity ratio is modified as needed to be physically possible). Once a valid air state is determined, a complete set of consistent hour/timestep psychrometric values (dewpoint, wet-bulb, and enthalpy) is derived.
 
 \paragraph{Field: Wetbulb or DewPoint at Maximum Dry-Bulb}\label{field-wetbulb-or-dewpoint-at-maximum-dry-bulb}
 
@@ -187,7 +185,7 @@ If \textbf{Enthalpy} is chosen for the Humidity Condition Type field, then this 
 
 \paragraph{Field: Daily Wet-Bulb Temperature Range}\label{field-daily-wet-bulb-temperature-range}
 
-The difference between the maximum and minimum wet-bulb temperatures on the design day (Celsius).~ Used for generating daily profiles of humidity conditions when Humidity Condition Type field (above) is \textbf{WetBulbProfileDefaultMultipliers} or \textbf{WetBulbProfileMultiplierSchedule}.~ Values for wet-bulb temperature range are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE 2009 HOF.
+The difference between the maximum and minimum wet-bulb temperatures on the design day (Celsius). Used for generating daily profiles of humidity conditions when Humidity Condition Type field (above) is \textbf{WetBulbProfileDefaultMultipliers} or \textbf{WetBulbProfileMultiplierSchedule}. Values for wet-bulb temperature range are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE 2009 HOF.
 
 \paragraph{Field: Barometric Pressure}\label{field-barometric-pressure}
 
@@ -215,7 +213,7 @@ This field specifies whether to consider this day to be a Daylight Saving Day. Y
 
 \paragraph{Field: Solar Model Indicator}\label{field-solar-model-indicator}
 
-This field allows the user to select \textbf{ASHRAEClearSky, ASHRAETau, ZhangHuang, or Schedule} for solar modeling in the calculation of the solar radiation in the design day.~ ASHRAEClearSky and ZhangHuang use the Clearness value as part of their calculations.~ ASHRAETau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below).~ Technical details of the models are described in the Engineering Reference.~ The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
+This field allows the user to select \textbf{ASHRAEClearSky, ASHRAETau, ZhangHuang, or Schedule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAEClearSky and ZhangHuang use the Clearness value as part of their calculations. ASHRAETau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
 
 \paragraph{Field: Beam Solar Day Schedule Name}\label{field-beam-solar-day-schedule-name}
 
@@ -223,90 +221,86 @@ This field allows the option for you to put in your own day profile of beam sola
 
 \paragraph{Field: Diffuse Solar Day Schedule Name}\label{field-diffuse-solar-day-schedule-name}
 
-This field allows the option for you to put in your own day profile of diffuse solar values (wh/m2).~ These values will replace the calculated values during design day processing. Only day schedules (ref. Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List objects) are used here.
+This field allows the option for you to put in your own day profile of diffuse solar values (wh/m2). These values will replace the calculated values during design day processing. Only day schedules (ref. Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List objects) are used here.
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)}\label{field-ashrae-clear-sky-optical-depth-for-beam-irradiance-taub}
 
-Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAETau.~ See next field.
+Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAETau. See next field.
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)}\label{field-ashrae-clear-sky-optical-depth-for-diffuse-irradiance-taud}
 
-Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau.~ Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE 2009 HOF.
+Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE 2009 HOF.
 
 \paragraph{Field: Sky Clearness}\label{field-sky-clearness}
 
-If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the ``clearness'' value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level.~ Values greated than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this ``sky clearness'' does not have the same meaning as output variable ``Site Daylighting Model Sky Clearness''.
+If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the ``clearness'' value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level. Values greated than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this ``sky clearness'' does not have the same meaning as output variable ``Site Daylighting Model Sky Clearness''.
 
 IDF Examples:
 
 \begin{lstlisting}
-
 ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (WB = >MDB)
-  !   .4%, MDB = 35.8°C WB = 24.5°C
-   SizingPeriod:DesignDay,
-    Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns WB = >MDB,     !- Name
-            7,      !- Month
-           21,      !- Day of Month
-    SummerDesignDay,!- Day Type
-         35.8,      !- Maximum Dry-Bulb Temperature {C}
-           12,      !- Daily Dry-Bulb Temperature Range {C}
-   DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-             ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-      Wetbulb,      !- Humidity Condition Type
-         24.5,      !- Wetbulb at Maximum Dry-Bulb {C}
-             ,      !- Humidity Indicating Day Schedule Name
-             ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-             ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-             ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-       97342.,      !- Barometric Pressure {Pa}
-          4.1,      ! Wind Speed {m/s}
-          260,      !- Wind Direction {Degrees; N = 0, S = 180}
-           No,      !- Rain {Yes/No}
-           No,      !- Snow on ground {Yes/No}
-           No,      !- Daylight Savings Time Indicator
-         ASHRAETau, !- Solar Model Indicator
-             ,      !- Beam Solar Day Schedule Name
-             ,      !- Diffuse Solar Day Schedule Name
-        0.588,     !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-        1.653;  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+!   .4%, MDB = 35.8°C WB = 24.5°C
+SizingPeriod:DesignDay,
+  Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns WB = >MDB, !- Name
+          7,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       35.8,      !- Maximum Dry-Bulb Temperature {C}
+         12,      !- Daily Dry-Bulb Temperature Range {C}
+  DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       24.5,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     97342.,      !- Barometric Pressure {Pa}
+        4.1,      ! Wind Speed {m/s}
+        260,      !- Wind Direction {Degrees; N = 0, S = 180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.588,     !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      1.653;  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
+SizingPeriod:DesignDay,
+  Denver Centennial Golden Ann Htg 99% Condns DB - sched solar,  !- Name
+  1,                       !- Month
+  13,                      !- Day of Month
+  WinterDesignDay,         !- Day Type
+  -16,                     !- Maximum Dry-Bulb Temperature {C}
+  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+  ,                        !- Dry-Bulb Temperature Range Modifier Type
+  ,                    !- Dry-Bulb Temperature Range Modifier Schedule Name
+  Wetbulb,                 !- Humidity Condition Type
+  -16,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                        !- Humidity Indicating Day Schedule Name
+  ,               !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+  83411.,                  !- Barometric Pressure {Pa}
+  2.3,                     !- Wind Speed {m/s}
+  180,                     !- Wind Direction {deg}
+  No,                      !- Rain Indicator
+  No,                      !- Snow Indicator
+  No,                      !- Daylight Saving Time Indicator
+  Schedule,                !- Solar Model Indicator
+  Winter (1/13) Beam Solar,!- Beam Solar Day Schedule Name
+  Winter (1/13) Diffuse Solar;  !- Diffuse Solar Day Schedule Name
 
-    SizingPeriod:DesignDay,
-      Denver Centennial Golden Ann Htg 99% Condns DB - sched solar,  !- Name
-      1,                       !- Month
-      13,                      !- Day of Month
-      WinterDesignDay,         !- Day Type
-      -16,                     !- Maximum Dry-Bulb Temperature {C}
-      0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
-      ,                        !- Dry-Bulb Temperature Range Modifier Type
-      ,                    !- Dry-Bulb Temperature Range Modifier Schedule Name
-      Wetbulb,                 !- Humidity Condition Type
-      -16,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-      ,                        !- Humidity Indicating Day Schedule Name
-      ,               !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-      ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-      ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-      83411.,                  !- Barometric Pressure {Pa}
-      2.3,                     !- Wind Speed {m/s}
-      180,                     !- Wind Direction {deg}
-      No,                      !- Rain Indicator
-      No,                      !- Snow Indicator
-      No,                      !- Daylight Saving Time Indicator
-      Schedule,                !- Solar Model Indicator
-      Winter (1/13) Beam Solar,!- Beam Solar Day Schedule Name
-      Winter (1/13) Diffuse Solar;  !- Diffuse Solar Day Schedule Name
+Schedule:Day:Hourly,
+  Winter (1/13) Beam Solar,
+  Any Number,
+  0,0,0,0,0,0,0,190,698,852,892,919,957,953,856,700,213,0,0,0,0,0,0,0;
 
-
-    Schedule:Day:Hourly,
-      Winter (1/13) Beam Solar,
-      Any Number,
-      0,0,0,0,0,0,0,190,698,852,892,919,957,953,856,700,213,0,0,0,0,0,0,0;
-
-
-    Schedule:Day:Hourly,
-      Winter (1/13) Diffuse Solar,
-      Any Number,
-      0,0,0,0,0,0,0,35,118,116,92,65,40,14,0,0,5,0,0,0,0,0,0,0;
+Schedule:Day:Hourly,
+  Winter (1/13) Diffuse Solar,
+  Any Number,
+  0,0,0,0,0,0,0,35,118,116,92,65,40,14,0,0,5,0,0,0,0,0,0,0;
 \end{lstlisting}
 
 Look at the example files 1ZoneUncontrolled\_DDChanges.idf and 1ZoneUncontrolled\_DD2009 for several examples of specifying Design Day inputs.
@@ -364,11 +358,11 @@ This schedule value is active when any Design Day objects have / use the Weather
 
 \subsection{Longer Design Periods}\label{longer-design-periods}
 
-Some features may benefit by using a longer design weather period for sizing or loads calculations.~ Longer design periods may be created by using the \textbf{SizingPeriod:WeatherFileDays} or \textbf{SizingPeriod:WeatherFileConditionType} objects.~ These two objects allow for selections from an attached weather file to be used in the sizing calculations.
+Some features may benefit by using a longer design weather period for sizing or loads calculations. Longer design periods may be created by using the \textbf{SizingPeriod:WeatherFileDays} or \textbf{SizingPeriod:WeatherFileConditionType} objects. These two objects allow for selections from an attached weather file to be used in the sizing calculations.
 
 \subsection{SizingPeriod:WeatherFileDays}\label{sizingperiodweatherfiledays}
 
-The SizingPeriod:WeatherFileDays object describes using a selected period from the ``attached'' weather file to be used in load calculations or sizing equipment.~ The period selected can be as small as a single day or larger.~ Multiple periods may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
+The SizingPeriod:WeatherFileDays object describes using a selected period from the ``attached'' weather file to be used in load calculations or sizing equipment. The period selected can be as small as a single day or larger. Multiple periods may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
 
 \subsubsection{Inputs}\label{inputs-2-022}
 
@@ -394,7 +388,7 @@ This numeric field should contain the ending day of the ending month (must be va
 
 \paragraph{Field: Day of Week for Start Day}\label{field-day-of-week-for-start-day}
 
-For flexibility, the day of week indicated on the weather file can be overridden by this field's value. Valid days of the week (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) or special days (SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2) must be entered in this field. To clarify, this value will be used as the Start Day (type) for this sizing period. When weekdays are used, each subsequent day in the period will be incremented.~ When SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2 -- are used, the day type will be applied for the entire period.
+For flexibility, the day of week indicated on the weather file can be overridden by this field's value. Valid days of the week (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) or special days (SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2) must be entered in this field. To clarify, this value will be used as the Start Day (type) for this sizing period. When weekdays are used, each subsequent day in the period will be incremented. When SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2 -- are used, the day type will be applied for the entire period.
 
 \paragraph{Field: Use Weather File Daylight Saving Period}\label{field-use-weather-file-daylight-saving-period}
 
@@ -404,7 +398,7 @@ Note that a blank or null field in this field will indicate \textbf{Yes}.
 
 \paragraph{Field: Use Weather File Rain and Snow Indicators}\label{field-use-weather-file-rain-and-snow-indicators}
 
-Weather files can contain ``rain'' and ``snow'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Snow indicators can change the ground reflectance if there is snow on the ground. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain'' and ``Snow'';~ entering ``\textbf{No}'' in the field ``turns off'' the rain/snow indicators for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``rain'' and ``snow'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Snow indicators can change the ground reflectance if there is snow on the ground. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain'' and ``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the rain/snow indicators for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 IDF Example:
 
@@ -428,7 +422,7 @@ SizingPeriod:WeatherFileDays,
 
 \subsection{SizingPeriod:WeatherFileConditionType}\label{sizingperiodweatherfileconditiontype}
 
-When the EPW files are created, a heuristic procedure identifies extreme and typical periods in the actual weather file.~ This object will allow one of those periods to be selected for sizing or load calculations (typically). Multiple objects may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
+When the EPW files are created, a heuristic procedure identifies extreme and typical periods in the actual weather file. This object will allow one of those periods to be selected for sizing or load calculations (typically). Multiple objects may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
 
 \subsubsection{Inputs}\label{inputs-3-020}
 
@@ -438,7 +432,7 @@ This field allows for an assigned name for this run period so it can be tracked 
 
 \paragraph{Field: Period Selection}\label{field-period-selection}
 
-This field allows the generic period calculated from the weather file to be selected for this run period.~ It is not completely generic as there may be extreme cold periods in some weather files but extreme wet periods (tropical) in others. Not all weather files have all of the valid choices. The choices for this field are:
+This field allows the generic period calculated from the weather file to be selected for this run period. It is not completely generic as there may be extreme cold periods in some weather files but extreme wet periods (tropical) in others. Not all weather files have all of the valid choices. The choices for this field are:
 
 \begin{itemize}
 \item
@@ -469,7 +463,7 @@ This field allows the generic period calculated from the weather file to be sele
 
 \paragraph{Field: Day of Week for Start Day}\label{field-day-of-week-for-start-day-1}
 
-For flexibility, the day of week indicated on the weather file can be overridden by this field's value. Valid days of the week (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) or special days (SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2) must be entered in this field. To clarify, this value will be used as the Start Day (type) for this sizing period. When weekdays are used, each subsequent day in the period will be incremented.~ When SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2 -- are used, the day type will be applied for the entire period.
+For flexibility, the day of week indicated on the weather file can be overridden by this field's value. Valid days of the week (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) or special days (SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2) must be entered in this field. To clarify, this value will be used as the Start Day (type) for this sizing period. When weekdays are used, each subsequent day in the period will be incremented. When SummerDesignDay, WinterDesignDay, CustomDay1, CustomDay2 -- are used, the day type will be applied for the entire period.
 
 \paragraph{Field: Use Weather File Daylight Saving Period}\label{field-use-weather-file-daylight-saving-period-1}
 
@@ -479,7 +473,7 @@ Note that a blank or null field in this field will indicate \textbf{Yes}.
 
 \paragraph{Field: Use Weather File Rain and Snow Indicators}\label{field-use-weather-file-rain-and-snow-indicators-1}
 
-Weather files can contain ``rain'' and ``snow'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Snow indicators can change the ground reflectance if there is snow on the ground. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain'' and ``Snow'';~ entering ``\textbf{No}'' in the field ``turns off'' the rain/snow indicators for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``rain'' and ``snow'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Snow indicators can change the ground reflectance if there is snow on the ground. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain'' and ``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the rain/snow indicators for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 IDF Example:
 
@@ -503,7 +497,7 @@ IDF Example:
 
 \subsection{RunPeriod}\label{runperiod}
 
-The RunPeriod object describes the elements necessary to create a weather file simulation. Multiple run periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format (described briefly below this document and in more detail in the Auxiliary Programs document). These files can describe Daylight Saving Time periods as well as holidays within their definitions. The RunPeriod object allows the user to override the use of both the Daylight Saving Period (i.e.~use or ignore) and holidays that are embedded within the weather file. Note that the weather file also may contain design condition information, typical and extreme period information, ground temperatures based on air temperature calculations.
+The RunPeriod object describes the elements necessary to create a weather file simulation. Multiple run periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format (described briefly below this document and in more detail in the Auxiliary Programs document). These files can describe Daylight Saving Time periods as well as holidays within their definitions. The RunPeriod object allows the user to override the use of both the Daylight Saving Period (i.e. use or ignore) and holidays that are embedded within the weather file. Note that the weather file also may contain design condition information, typical and extreme period information, ground temperatures based on air temperature calculations.
 
 \subsubsection{Inputs}\label{inputs-4-018}
 
@@ -545,23 +539,25 @@ Note that a blank or null field in this field will indicate \textbf{Yes}.
 
 \paragraph{Field: Apply Weekend Holiday Rule}\label{field-apply-weekend-holiday-rule}
 
-In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday; if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day, will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a day-month combination).~ If the field is blank or \textbf{No}, then the holiday will be shown on the day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run will use the rule -- there is no override for individual special days.
+In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday; if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day, will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a day-month combination). If the field is blank or \textbf{No}, then the holiday will be shown on the day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run will use the rule -- there is no override for individual special days.
 
 Note that a blank or null field in this field will indicate \textbf{No}.
 
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: http://www.energyplus.gov/cfm/weather\_data.cfm have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+\begin{callout}
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+\end{callout}
 
 \paragraph{Field: Use Weather File Rain Indicators}\label{field-use-weather-file-rain-indicators}
 
-Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain'';~ entering ``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain''; entering ``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 \paragraph{Field: Use Weather File Snow Indicators}\label{field-use-weather-file-snow-indicators}
 
-Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates ``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Snow'';~ entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates ``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 \paragraph{Field: Number of Times Runperiod to be Repeated}\label{field-number-of-times-runperiod-to-be-repeated}
 
-This numeric field represents the number of times (usually years) the simulation has to be carried out in a multi runperiod simulation. The default value is set to 1. The number of years of simulation, in case of a Ground Loop Heat Exchanger (GLHE) simulation, should be equal to the length of simulation field in GLHE object. Note that you can specify a number of simulation years with a shorter run period (e.g.~1 week) and EnergyPlus will repeat the simulation of the shorter run period for that many times. Note that repeating will work with any weather file that contains the start date and end date in a ``Data Period'' (refer to Auxiliary Programs document for more documentation on weather file contents).
+This numeric field represents the number of times (usually years) the simulation has to be carried out in a multi runperiod simulation. The default value is set to 1. The number of years of simulation, in case of a Ground Loop Heat Exchanger (GLHE) simulation, should be equal to the length of simulation field in GLHE object. Note that you can specify a number of simulation years with a shorter run period (e.g. 1 week) and EnergyPlus will repeat the simulation of the shorter run period for that many times. Note that repeating will work with any weather file that contains the start date and end date in a ``Data Period'' (refer to Auxiliary Programs document for more documentation on weather file contents).
 
 \paragraph{Field: Increment Day of Week on Repeat}\label{field-increment-day-of-week-on-repeat}
 
@@ -574,42 +570,38 @@ When repeating a period, you might (for whatever reason), choose to have a speci
 And, as shown in an IDF:
 
 \begin{lstlisting}
+RunPeriod,  ! Winter Simulation
+  Winter Simulation,  !- Name
+  12,  !- Begin Month
+  1,  !- Begin Day of Month
+  3,  !- End Month
+  31,  !- End Day of Month
+  UseWeatherFile,  !- Day of Week for Start Day
+  Yes,  !- Use Weather File Holidays and Special Days
+  Yes,  !- Use Weather File Daylight Saving Period
+  No,  !- Apply Weekend Holiday Rule
+  Yes,  !- Use Weather File Rain Indicators
+  Yes;  !- Use Weather File Snow Indicators
 
- RunPeriod,  ! Winter Simulation
-      Winter Simulation,  !- Name
-      12,  !- Begin Month
-      1,  !- Begin Day of Month
-      3,  !- End Month
-      31,  !- End Day of Month
-      UseWeatherFile,  !- Day of Week for Start Day
-      Yes,  !- Use Weather File Holidays and Special Days
-      Yes,  !- Use Weather File Daylight Saving Period
-      No,  !- Apply Weekend Holiday Rule
-      Yes,  !- Use Weather File Rain Indicators
-      Yes;  !- Use Weather File Snow Indicators
-
-
-
-
-   ! Multiple year simulation example
-   RunPeriod,
-      Multiple Years,  !- Name
-      1,    !- Begin Month
-      1,    !- Begin Day of Month
-      12,   !- End Month
-      31,   !- End Day of Month
-      UseWeatherFile,  !- Day of Week for Start Day
-      Yes,  !- Use Weather File Holidays and Special Days
-      Yes,  !- Use Weather File Daylight Saving Period
-      No,   !- Apply Weekend Holiday Rule
-      Yes,  !- Use Weather File Rain Indicators
-      Yes,  !- Use Weather File Snow Indicators
-       3;   !- Number of Times Runperiod to be Repeated
+! Multiple year simulation example
+RunPeriod,
+  Multiple Years,  !- Name
+  1,    !- Begin Month
+  1,    !- Begin Day of Month
+  12,   !- End Month
+  31,   !- End Day of Month
+  UseWeatherFile,  !- Day of Week for Start Day
+  Yes,  !- Use Weather File Holidays and Special Days
+  Yes,  !- Use Weather File Daylight Saving Period
+  No,   !- Apply Weekend Holiday Rule
+  Yes,  !- Use Weather File Rain Indicators
+  Yes,  !- Use Weather File Snow Indicators
+  3;    !- Number of Times Runperiod to be Repeated
 \end{lstlisting}
 
 \subsection{RunPeriod:CustomRange}\label{runperiodcustomrange}
 
-The RunPeriod:CustomRange object describes the elements necessary to use a specially crafted (likely multiple year) weather file in a simulation. These kinds of weather files and simulations might be useful for matching utility periods or simulating several years of differing weather data. Multiple run periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format (described briefly below this document and in more detail in the Auxiliary Programs document). In order to effectively use this object, however, you will need to use a text editor (EnergyPlus weather files area simple text files) or possibly a spreadsheet program and then save to a csv (comma separated variable) file. Weather files can describe Daylight Saving Time periods as well as holidays within their definitions. The RunPeriod:CustomRange object allows the user to override the use of both the Daylight Saving Period (i.e.~use or ignore) and holidays that are embedded within the weather file. Note that the weather file also may contain design condition information, typical and extreme period information, ground temperatures based on air temperature calculations.
+The RunPeriod:CustomRange object describes the elements necessary to use a specially crafted (likely multiple year) weather file in a simulation. These kinds of weather files and simulations might be useful for matching utility periods or simulating several years of differing weather data. Multiple run periods may be input. EnergyPlus accepts weather files in the special EnergyPlus weather format (described briefly below this document and in more detail in the Auxiliary Programs document). In order to effectively use this object, however, you will need to use a text editor (EnergyPlus weather files area simple text files) or possibly a spreadsheet program and then save to a csv (comma separated variable) file. Weather files can describe Daylight Saving Time periods as well as holidays within their definitions. The RunPeriod:CustomRange object allows the user to override the use of both the Daylight Saving Period (i.e. use or ignore) and holidays that are embedded within the weather file. Note that the weather file also may contain design condition information, typical and extreme period information, ground temperatures based on air temperature calculations.
 
 \subsubsection{Inputs}\label{inputs-5-016}
 
@@ -627,7 +619,7 @@ This numeric field should contain the starting day of the starting month (must b
 
 \paragraph{Field: Begin Year}\label{field-begin-year}
 
-This numeric field should contain the beginning year for the custom range. Though all EnergyPlus (EPW) weather files contain a year/year field, the RunPeriod object does not use this field (previous object). The \textbf{RunPeriod:CustomRange} object causes the program to look specifically for the begin date specified by these three fields (i.e.~Begin Month, Begin Day of Month, Begin Year).
+This numeric field should contain the beginning year for the custom range. Though all EnergyPlus (EPW) weather files contain a year/year field, the RunPeriod object does not use this field (previous object). The \textbf{RunPeriod:CustomRange} object causes the program to look specifically for the begin date specified by these three fields (i.e. Begin Month, Begin Day of Month, Begin Year).
 
 \paragraph{Field: End Month}\label{field-end-month-2}
 
@@ -639,7 +631,7 @@ This numeric field should contain the ending day of the ending month (must be va
 
 \paragraph{Field: End Year}\label{field-end-year}
 
-This numeric field should contain the end year for the custom range. Though all EnergyPlus (EPW) weather files contain a year/year field, the RunPeriod object does not use this field (previous object). The \textbf{RunPeriod:CustomRange} object causes the program to look specifically for the end date specified by these three fields (i.e.~End Month, End Day of Month, End Year).
+This numeric field should contain the end year for the custom range. Though all EnergyPlus (EPW) weather files contain a year/year field, the RunPeriod object does not use this field (previous object). The \textbf{RunPeriod:CustomRange} object causes the program to look specifically for the end date specified by these three fields (i.e. End Month, End Day of Month, End Year).
 
 \paragraph{Field: Day of Week for Start Day}\label{field-day-of-week-for-start-day-3}
 
@@ -659,25 +651,29 @@ Note that a blank or null field in this field will indicate \textbf{Yes}.
 
 \paragraph{Field: Apply Weekend Holiday Rule}\label{field-apply-weekend-holiday-rule-1}
 
-In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday; if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day, will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a day-month combination).~ If the field is blank or \textbf{No}, then the holiday will be shown on the day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run will use the rule -- there is no override for individual special days.
+In some countries (notably the US), when holidays fall on weekends, they are often observed on a weekday close to the holiday day. (Usually if the specific day falls on a Saturday, the observed day is Friday; if on a Sunday, the observed day is Monday). EnergyPlus will represent this custom using the value in this field. If the field is \textbf{Yes}, then specific date holidays that have a duration of one day, will be ``observed'' on the Monday after the day. (Specific day holidays are such as January 1 -- a day-month combination). If the field is blank or \textbf{No}, then the holiday will be shown on the day-month as entered. As this option is listed at the RunPeriod, all applicable special days for the run will use the rule -- there is no override for individual special days.
 
 Note that a blank or null field in this field will indicate \textbf{No}.
 
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: http://www.energyplus.gov/cfm/weather\_data.cfm have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+\begin{callout}
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+\end{callout}
 
 \paragraph{Field: Use Weather File Rain Indicators}\label{field-use-weather-file-rain-indicators-1}
 
-Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain'';~ entering ``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``rain'' indicators. (EPW field ``Present Weather Codes'' -- described in the AuxiliaryPrograms document). In turn, rain indicates wet surfaces which changes the film convection coefficient for the surface. Other models may use rain as well (Ground Heat Exchangers). Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Rain''; entering ``\textbf{No}'' in the field ``turns off'' the rain indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 \paragraph{Field: Use Weather File Snow Indicators}\label{field-use-weather-file-snow-indicators-1}
 
-Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates ``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Snow'';~ entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
+Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgreater{} 0 indicates ``Snow on the ground''). In turn, snow changes the reflectivity of the ground and cascades changes of this reflectivity. Entering ``\textbf{Yes}'' in this field allows the weather file conditions to represent ``Snow''; entering ``\textbf{No}'' in the field ``turns off'' the snow indicator for this period. You might use this to be able to compare two ``same location'' weather files of different years, origins, etc.
 
 \subsection{RunPeriodControl:SpecialDays}\label{runperiodcontrolspecialdays}
 
 For weather file run periods, special day run periods can be described. These will always be in effect for the selected days in the run period. Depending on the Use Special Days value in the RunPeriod:* object(s), these can augment any special days included on the weather file.
 
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: http://www.energyplus.gov/cfm/weather\_data.cfm have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+\begin{callout}
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+\end{callout}
 
 \subsubsection{Inputs}\label{inputs-6-013}
 
@@ -718,20 +714,21 @@ This alpha field designates the ``day type'' for schedule use during the special
 An example in the IDF would be:
 
 \begin{lstlisting}
-
 RunPeriodControl:SpecialDays, President’s Day, 3rd Monday in February,1,Holiday;
-  RunPeriodControl:SpecialDays, Thanksgiving, 4th Thursday in November, 1,Holiday;
-  RunPeriodControl:SpecialDays, Halloween, 10/31, 1, Holiday;
-  RunPeriodControl:SpecialDays, Vacation, 5/1, 14, CustomDay1;
+RunPeriodControl:SpecialDays, Thanksgiving, 4th Thursday in November, 1,Holiday;
+RunPeriodControl:SpecialDays, Halloween, 10/31, 1, Holiday;
+RunPeriodControl:SpecialDays, Vacation, 5/1, 14, CustomDay1;
 \end{lstlisting}
 
 \subsection{RunPeriodControl:DaylightSavingTime}\label{runperiodcontroldaylightsavingtime}
 
 Similar to a special day period, a daylight saving period may be entered to be applied to weather file run periods. These will always be in effect, regardless of the value entered on the RunPeriod object. Note that this period will always override any daylight saving period specified in a weather file.
 
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: http://www.energyplus.gov/cfm/weather\_data.cfm have neither special days specified nor daylight saving period.
+\begin{callout}
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period.
 
-\textbf{Note:~ For EnergyPlus Output:Variable and Output:Meter reporting, the time stamps are always in standard time. When daylight saving time is active, scheduled loads and controls will shift one hour relative to standard time.}
+\warning{Note: For EnergyPlus Output:Variable and Output:Meter reporting, the time stamps are always in standard time. When daylight saving time is active, scheduled loads and controls will shift one hour relative to standard time.}
+\end{callout}
 
 \subsubsection{Inputs}\label{inputs-7-013}
 
@@ -746,18 +743,17 @@ This is the ending date of the daylight saving period. Note that it can be enter
 And in the IDF:
 
 \begin{lstlisting}
-
 ! U.S. Standard for Daylight Saving
-  RunPeriodControl:DaylightSavingTime,2nd Sunday in March, 1st Sunday in November; !2007
-  ! Brazil standard
-  RunPeriodControl:DaylightSavingTime,1st Sunday in October, Last Sunday in February;
-  ! European Standard
-  RunPeriodControl:DaylightSavingTime, Last Sunday in March, Last Sunday in October;
-  ! Syria Standard
-  RunPeriodControl:DaylightSavingTime, 4/1, 10/1;
+RunPeriodControl:DaylightSavingTime,2nd Sunday in March, 1st Sunday in November; !2007
+! Brazil standard
+RunPeriodControl:DaylightSavingTime,1st Sunday in October, Last Sunday in February;
+! European Standard
+RunPeriodControl:DaylightSavingTime, Last Sunday in March, Last Sunday in October;
+! Syria Standard
+RunPeriodControl:DaylightSavingTime, 4/1, 10/1;
 \end{lstlisting}
 
-Of course, these could not all appear in the same IDF as only one DaylightSavingPeriod object per input file is allowed. More information on Daylight Saving Periods can be seen on the web at: http://www.webexhibits.org/daylightsaving/~ The ASHRAE Handbook of Fundamentals {[}ASHRAE 2005{]} also contains information about daylight saving periods and their climatic information now includes start and end dates for many locations.
+Of course, these could not all appear in the same IDF as only one DaylightSavingPeriod object per input file is allowed. More information on Daylight Saving Periods can be seen on the web at: \url{http://www.webexhibits.org/daylightsaving/}. The ASHRAE Handbook of Fundamentals {[}ASHRAE 2005{]} also contains information about daylight saving periods and their climatic information now includes start and end dates for many locations.
 
 \subsection{WeatherProperty:SkyTemperature}\label{weatherpropertyskytemperature}
 
@@ -775,45 +771,42 @@ Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDr
 
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
-This field specifies a schedule name to accomplish the sky temperature calculation from the previous field. A Schedule:Day:* (i.e., Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List) should be specified if the name in the name field matches a SizingPeriod:DesignDay object. If the name is one of the weather file period specifications (i.e.~matches a SizingPeriod:WeatherFileDays, SizingPeriod:WeatherFileConditionType or RunPeriod), then the schedule name must match a full year schedule (i.e.~Schedule:Year, Schedule:Compact, Schedule:File, or Schedule:Constant).
+This field specifies a schedule name to accomplish the sky temperature calculation from the previous field. A Schedule:Day:* (i.e., Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List) should be specified if the name in the name field matches a SizingPeriod:DesignDay object. If the name is one of the weather file period specifications (i.e. matches a SizingPeriod:WeatherFileDays, SizingPeriod:WeatherFileConditionType or RunPeriod), then the schedule name must match a full year schedule (i.e. Schedule:Year, Schedule:Compact, Schedule:File, or Schedule:Constant).
 
 An example of IDF usage (with DesignDay):
 
 \begin{lstlisting}
+SizingPeriod:DesignDay,
+  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
+  32.6,              !- Maximum Dry-Bulb Temperature {C}
+  15.2,              !- Daily Temperature Range {deltaC}
+  15.5,              !- Humidity Indicating Conditions at Maximum Dry-Bulb
+  83411.,            !- Barometric Pressure {Pa}
+  4,                 !- Wind Speed {m/s}
+  120,               !- Wind Direction {deg}
+  1.00,              !- Sky Clearness
+  0,                 !- Rain Indicator
+  0,                 !- Snow Indicator
+  25,                !- Day of Month
+  7,                 !- Month
+  SummerDesignDay,   !- Day Type
+  0,                 !- Daylight Saving Time Indicator
+  WetBulb,           !- Humidity Indicating Type
+  ,                  !- Relative Humidity Day Schedule Name
+  deltaschedule,     !- Dry-Bulb Temperature Range Modifier Type
+  temp range deltas; !- Dry-Bulb Temperature Range Modifier Schedule Name
 
-  SizingPeriod:DesignDay,
-      DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
-      32.6,               !- Maximum Dry-Bulb Temperature {C}
-      15.2,               !- Daily Temperature Range {deltaC}
-      15.5,               !- Humidity Indicating Conditions at Maximum Dry-Bulb
-      83411.,                  !- Barometric Pressure {Pa}
-      4,                       !- Wind Speed {m/s}
-      120,                     !- Wind Direction {deg}
-      1.00,                    !- Sky Clearness
-      0,                       !- Rain Indicator
-      0,                       !- Snow Indicator
-      25,                      !- Day of Month
-      7,                       !- Month
-      SummerDesignDay,         !- Day Type
-      0,                       !- Daylight Saving Time Indicator
-      WetBulb,                 !- Humidity Indicating Type
-      ,                        !- Relative Humidity Day Schedule Name
-      deltaschedule,           !- Dry-Bulb Temperature Range Modifier Type
-      temp range deltas; !-   Dry-Bulb Temperature Range Modifier Schedule Name
+WeatherProperty:SkyTemperature,
+  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier, !- Name
+  ScheduleValue,     !- Calculation Type
+  DaySchedule5;      !- Schedule Name
 
-
-    WeatherProperty:SkyTemperature,
-      DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
-      ScheduleValue,           !- Calculation Type
-      DaySchedule5;            !- Schedule Name
-
-
-    Schedule:Day:Interval,
-      DaySchedule5,            !- Name
-      Temperature,             !- Schedule Type Limits Name
-      Yes,                     !- Interpolate to Timestep
-      until: 24:00,            !- Time 1
-      5;                       !- Value Until Time 1
+Schedule:Day:Interval,
+  DaySchedule5,      !- Name
+  Temperature,       !- Schedule Type Limits Name
+  Yes,               !- Interpolate to Timestep
+  until: 24:00,      !- Time 1
+  5;                 !- Value Until Time 1
 \end{lstlisting}
 
 \subsection{Site:WeatherStation}\label{siteweatherstation}
@@ -876,12 +869,11 @@ For example, if you are using weather data measured on the top of your building,
 Or, in IDF terms, with a building in a town or city:
 
 \begin{lstlisting}
-
 Site:WeatherStation,
-      30,  !- Wind Sensor Height Above Ground {m}
-      0.33,  !- Wind Speed Profile Exponent {}
-      460,  !- Wind Speed Profile Boundary Layer Thickness {m}
-      30;  !- Air Temperature Sensor Height Above Ground {m}
+  30,    !- Wind Sensor Height Above Ground {m}
+  0.33,  !- Wind Speed Profile Exponent {}
+  460,   !- Wind Speed Profile Boundary Layer Thickness {m}
+  30;    !- Air Temperature Sensor Height Above Ground {m}
 \end{lstlisting}
 
 This would change if you had a different wind speed profile exponent or wind speed profile boundary layer thickness at your site.
@@ -919,18 +911,19 @@ The wind speed profile boundary layer thickness {[}m{]} for the terrain surround
 The air temperature gradient coefficient {[}K/m{]} is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the \emph{Air Temperature Sensor Height} in the \textbf{Site:WeatherStation} object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the \textbf{Site:WeatherStation} object assumes an air temperature gradient of 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height.
 
 \begin{lstlisting}
-
-  Site:HeightVariation,
-      0.22,  !- Wind Speed Profile Exponent
-      370,  !- Wind Speed Profile Boundary Layer Thickness {m}
-      0.0065;  !- Air Temperature Gradient Coefficient {deltaC/m}
+Site:HeightVariation,
+  0.22,    !- Wind Speed Profile Exponent
+  370,     !- Wind Speed Profile Boundary Layer Thickness {m}
+  0.0065;  !- Air Temperature Gradient Coefficient {deltaC/m}
 \end{lstlisting}
 
 \subsection{Site:GroundTemperature:BuildingSurface}\label{sitegroundtemperaturebuildingsurface}
 
 Ground temperatures are used for the ground heat transfer model. There can be only one ground temperature object included, and it is used as the outside surface temperature for all surfaces with Outside Boundary Condition = Ground. The object is options if you have no surfaces with ground contact. The outside surface temperature for individual surfaces can be specified using the OtherSideCoefficients (ref: SurfaceProperty:OtherSideCoefficients) object that allows Toutside to be set with a schedule. This permits using any number of different outside face temperatures in addition to the ground temperature.
 
+\begin{callout}
 Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the Site:GroundTemperature:Shallow and Site:GroundTemperature:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
+\end{callout}
 
 More information about determining appropriate ground temperatures is given in the Auxiliary Programs document.
 
@@ -938,20 +931,21 @@ More information about determining appropriate ground temperatures is given in t
 
 \paragraph{Field: Month Temperature(s) -- 12 fields in all}\label{field-month-temperatures-12-fields-in-all}
 
-Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January = 1\(^{t}\) field, February = 2\(^{d}\) field, etc.)
+Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January = 1\(^{st}\) field, February = 2\(^{nd}\) field, etc.)
 
 An IDF example:
 
 \begin{lstlisting}
-
 Site:GroundTemperature:BuildingSurface,19,20,20,20,20,20,20,20,20,20,20,20;
 \end{lstlisting}
 
 \subsection{Site:GroundTemperature:Shallow}\label{sitegroundtemperatureshallow}
 
-Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e.~object: GroundHeatExchanger:Surface). Only one shallow ground temperature object can be included.
+Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e. object: GroundHeatExchanger:Surface). Only one shallow ground temperature object can be included.
 
+\begin{callout}
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields -- namely, the .5 m depth temperatures that are calculated for ``undisturbed'' soil of ``typical'' conditions. However, you may wish to use some other change effect -- based on the weather conditions of the building location.
+\end{callout}
 
 This object may be used for objects requiring ``undisturbed'' ground temperatures. In these instances, the ``name'' input field is not required.
 
@@ -964,15 +958,16 @@ Each numeric field is the monthly surface ground temperature (degrees Celsius) u
 An IDF example:
 
 \begin{lstlisting}
-
-Site:GroundTemperature:Shallow,  4,4,6,6,10,10,15,15,14,14,8,8;
+Site:GroundTemperature:Shallow,4,4,6,6,10,10,15,15,14,14,8,8;
 \end{lstlisting}
 
 \subsection{Site:GroundTemperature:Deep}\label{sitegroundtemperaturedeep}
 
-Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i.e.~object: GroundHeatExchanger:Pond). Only one deep ground temperature object can be included.
+Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i.e. object: GroundHeatExchanger:Pond). Only one deep ground temperature object can be included.
 
+\begin{callout}
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields -- namely, the 4 m depth temperatures that are calculated for ``undisturbed'' soil of ``typical'' conditions. However, you may wish to use some other change effect -- based on the weather conditions or special knowledge of the building location.
+\end{callout}
 
 This object may be used for objects requiring ``undisturbed'' ground temperatures. In these instances, the ``name'' input field is not required.
 
@@ -985,7 +980,6 @@ Each numeric field is the monthly deep ground temperature (degrees Celsius) used
 An IDF example:
 
 \begin{lstlisting}
-
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 \end{lstlisting}
 
@@ -1144,22 +1138,18 @@ Generally, there are two scenarios which Site:GroundDomain is equipped to model:
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image012.png}
-\caption{}
+\caption{In-grade configuration. \protect \label{fig:in-grade-configuration}}
 \end{figure}
-
-Figure 7In-grade configuration.
 
 The in-grade slab option can be used to simulate situations when the upper slab surface is near the ground surface level. For this situation, slab's upper surface must interact with the zone via an OSCM boundary. Due to this, the FloorConstruction object for the zone floor must include a thin layer of the upper floor material. Horizontal and vertical insulation are modeled by the GroundDomain in this scenario. Horizontal insulation can be modeled as covering the full horizontal surface, or it can be limited to the perimeter regions only. In the latter case, the perimeter insulation width must be specified.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image013.png}
-\caption{}
+\caption{On-grade configuration \protect \label{fig:on-grade-configuration}}
 \end{figure}
 
-Figure 8 On-grade configuration
-
-The on-grade slab option can be used to simulate situations when the lower slab surface is near the ground surface level. In this situation, the entire floor must be included within the floor construction object. Vertical insulation is modeled by the GroundDomain in this scenario.~ Horizontal insulation can only be modeled as covering the full horizontal surface.
+The on-grade slab option can be used to simulate situations when the lower slab surface is near the ground surface level. In this situation, the entire floor must be included within the floor construction object. Vertical insulation is modeled by the GroundDomain in this scenario. Horizontal insulation can only be modeled as covering the full horizontal surface.
 
 \subsubsection{Inputs}\label{inputs-16-006}
 
@@ -1258,61 +1248,59 @@ Alpha field indicating whether the domain will update temperatures at each zone 
 An IDF example of an in-grade slab.
 
 \begin{lstlisting}
-
 Site:GroundDomain:Slab,
-      IngradeCoupledSlab, !- Name
-      5,                  !- Ground Domain Depth
-      1,                  !- Aspect Ratio
-      5,                  !- Domain Perimeter Offset
-      1.8,                !- Soil Thermal Conductivity
-      3200,               !- Soil Density
-      836,                !- Soil Specific Heat
-      30,                 !- Soil Moisture Content Volume Fraction
-      50,                 !- Soil Moisture Content Volume Fraction at Saturation
-      Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-      KATemps;                            !- Name of Undisturbed Ground Temperature Object
-      1,    !- Evapotranspiration Ground Cover Parameter
-      GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
-      InGrade,                !- Slab Location (InGrade/OnGrade)
-      Slab Material-In-grade, !- Slab Material Name
-      Yes,                    !- Horizontal Insulation
-      Slab Insulation,    !- Horizontal Insulation Material Name
-      Perimeter,          !- Full Horizontal or Perimeter Only
-      1,                  !- Perimeter insulation width
-      Yes,                !- Vertical Insulation
-      Slab Insulation,    !- Vertical Insulation Name
-      2,                  !- Vertical perimeter insulation depth from surface
-      Hourly;             !- Simulation timestep</td>
+  IngradeCoupledSlab, !- Name
+  5,                  !- Ground Domain Depth
+  1,                  !- Aspect Ratio
+  5,                  !- Domain Perimeter Offset
+  1.8,                !- Soil Thermal Conductivity
+  3200,               !- Soil Density
+  836,                !- Soil Specific Heat
+  30,                 !- Soil Moisture Content Volume Fraction
+  50,                 !- Soil Moisture Content Volume Fraction at Saturation
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,            !- Name of Undisturbed Ground Temperature Object
+  1,                  !- Evapotranspiration Ground Cover Parameter
+  GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
+  InGrade,            !- Slab Location (InGrade/OnGrade)
+  Slab Material-In-grade, !- Slab Material Name
+  Yes,                !- Horizontal Insulation
+  Slab Insulation,    !- Horizontal Insulation Material Name
+  Perimeter,          !- Full Horizontal or Perimeter Only
+  1,                  !- Perimeter insulation width
+  Yes,                !- Vertical Insulation
+  Slab Insulation,    !- Vertical Insulation Name
+  2,                  !- Vertical perimeter insulation depth from surface
+  Hourly;             !- Simulation timestep
 \end{lstlisting}
 
 And IDF example of an on-grade slab
 
 \begin{lstlisting}
-
 Site:GroundDomain:Slab,
-      OngradeCoupledSlab, !- Name
-      5,                  !- Ground Domain Depth {m}
-      1,                  !- Aspect Ratio
-      5,                  !- Domain Perimeter Offset {m}
-      1.8,                !- Soil Thermal Conductivity {W/m-K}
-      3200,               !- Soil Density {kg/m3}
-      836,                !- Soil Specific Heat {J/kg-K}
-      30,                 !- Soil Moisture Content Volume Fraction
-      50,                 !- Soil Moisture Content Volume Fraction at Saturation
-      Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-      KATemps;            !- Name of Undisturbed Ground Temperature Object
-      1,                  !- Evapotranspiration Ground Cover Parameter
-      GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-      OnGrade,            !- Slab Location (InGrade/OnGrade)
-      ,                   !- Slab Material Name
-      ,                   !- Horizontal Insulation (Yes/No)
-      ,                   !- Horizontal Insulation Material Name
-      ,                   !- Full Horizontal or Perimeter Only
-      ,                   !- Perimeter insulation width (m)
-      Yes,                !- Vertical Insulation (Yes/No)
-      Slab Insulation,    !- Vertical Insulation Name
-      2,                  !- Vertical perimeter insulation depth from surface
-      Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
+  OngradeCoupledSlab, !- Name
+  5,                  !- Ground Domain Depth {m}
+  1,                  !- Aspect Ratio
+  5,                  !- Domain Perimeter Offset {m}
+  1.8,                !- Soil Thermal Conductivity {W/m-K}
+  3200,               !- Soil Density {kg/m3}
+  836,                !- Soil Specific Heat {J/kg-K}
+  30,                 !- Soil Moisture Content Volume Fraction
+  50,                 !- Soil Moisture Content Volume Fraction at Saturation
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps;            !- Name of Undisturbed Ground Temperature Object
+  1,                  !- Evapotranspiration Ground Cover Parameter
+  GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
+  OnGrade,            !- Slab Location (InGrade/OnGrade)
+  ,                   !- Slab Material Name
+  ,                   !- Horizontal Insulation (Yes/No)
+  ,                   !- Horizontal Insulation Material Name
+  ,                   !- Full Horizontal or Perimeter Only
+  ,                   !- Perimeter insulation width (m)
+  Yes,                !- Vertical Insulation (Yes/No)
+  Slab Insulation,    !- Vertical Insulation Name
+  2,                  !- Vertical perimeter insulation depth from surface
+  Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-015}
@@ -1326,10 +1314,6 @@ The following output variables are available.
 \item
   Zone, Average, Zone Coupled Surface Temperature {[}C{]}
 \end{itemize}
-
-\begin{lstlisting}
-</td>
-\end{lstlisting}
 
 \paragraph{Zone Coupled Surface Heat Flux {[}W/m2{]}}\label{zone-coupled-surface-heat-flux-wm2}
 
@@ -1346,38 +1330,35 @@ This section documents the input object used to simulate ground coupled heat tra
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image900.png}
-\caption{}
+\caption{Basement Configuration \protect \label{fig:basement-configuration}}
 \end{figure}
 
-Figure: Basement Configuration
-
 \begin{lstlisting}
-
 Site:GroundDomain:Basement,
-  CoupledBasement,         !- Name
-  10,                      !- Ground Domain Depth {m}
-  1,                       !- Aspect ratio
-  5,                       !- Perimeter offset {m}
-  1.8,                     !- Soil Thermal Conductivity {W/m-K}
-  3200,                    !- Soil Density {kg/m3}
-  836,                     !- Soil Specific Heat {J/kg-K}
-  30,                      !- Soil Moisture Content Volume Fraction {percent}
-  50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-      Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-      KATemps;                 !- Name of Undisturbed Ground Temperature Object
-  1,                       !- Evapotranspiration Ground Cover Parameter
-  BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
-  Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
-  Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
-  Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
-  ,                        !- Perimeter width (m)
-  2.5,                     !- Depth of Basement Wall In Ground Domain {m}
-  BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
-  Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
-  Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
-  2.5,                     !- Vertical insulation depth from surface (m)
-  Hourly;                  !- Domain Update interval. (Timestep, Hourly)
-  4;                       ! Mesh Density Parameter
+  CoupledBasement,     !- Name
+  10,                  !- Ground Domain Depth {m}
+  1,                   !- Aspect ratio
+  5,                   !- Perimeter offset {m}
+  1.8,                 !- Soil Thermal Conductivity {W/m-K}
+  3200,                !- Soil Density {kg/m3}
+  836,                 !- Soil Specific Heat {J/kg-K}
+  30,                  !- Soil Moisture Content Volume Fraction {percent}
+  50,                  !- Soil Moisture Content Volume Fraction at Saturation {percent}
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,             !- Name of Undisturbed Ground Temperature Object
+  1,                   !- Evapotranspiration Ground Cover Parameter
+  BasementFloorOSCM,   !- Name of Basement Floor Boundary Condition Model
+  Yes,                 !- Basement Horizontal Underfloor Insulation Present (Yes/No)
+  Basement Insulation, !- Basement Horizontal Insulation Underfloor Material Name
+  Full,                !- Full Horizontal or Perimeter Only (Full/Perimeter)
+  ,                    !- Perimeter width (m)
+  2.5,                 !- Depth of Basement Wall In Ground Domain {m}
+  BasementWallOSCM,    !- Name of Basement Wall Boundary Condition Model
+  Yes,                 !- Basement Wall Vertical Insulation Present(Yes/No)
+  Basement Insulation, !- Basement Wall Vertical Insulation Material Name
+  2.5,                 !- Vertical insulation depth from surface (m)
+  Hourly;              !- Domain Update interval. (Timestep, Hourly)
+  4;                   ! Mesh Density Parameter
 \end{lstlisting}
 
 \subsubsection{Inputs}\label{inputs-17-004}
@@ -1392,7 +1373,7 @@ Numeric field used to determine the depth of the simulation domain, in meters. A
 
 \paragraph{Field: Aspect Ratio}\label{field-aspect-ratio-1}
 
-Numeric field, which is the ratio of basement length to width, used to determine the aspect ratio of the basement. This field along with the total basement floor area, which is taken as the combination of all surfaces connected to the floor OtherSideConditionsModel, are used to determine the size and shape of the basement domain. Aspect ratios and the inverse of aspect ratios should produce identical results. i.e.~AR = 2 equals AR = 0.5. This field has units of meters/meters.
+Numeric field, which is the ratio of basement length to width, used to determine the aspect ratio of the basement. This field along with the total basement floor area, which is taken as the combination of all surfaces connected to the floor OtherSideConditionsModel, are used to determine the size and shape of the basement domain. Aspect ratios and the inverse of aspect ratios should produce identical results. i.e. AR = 2 equals AR = 0.5. This field has units of meters/meters.
 
 \paragraph{Field: Domain Perimeter Offset}\label{field-domain-perimeter-offset}
 
@@ -1599,7 +1580,7 @@ Outputs will show both the inputs from the above object as well as monthly value
 
 \subsection{Site:WaterMainsTemperature}\label{sitewatermainstemperature}
 
-The Site:WaterMainsTemperature object is used to calculate water temperatures delivered~ by underground water main pipes. The mains temperatures are used as default, make-up water temperature inputs for several plant objects, including:~ \textbf{WaterUse:Equipment, WaterUse:Connections, WaterHeater:Mixed} and \textbf{WaterHeater:Stratified}. The mains temperatures are also used in the water systems objects to model the temperature of cold water supplies.
+The Site:WaterMainsTemperature object is used to calculate water temperatures delivered by underground water main pipes. The mains temperatures are used as default, make-up water temperature inputs for several plant objects, including: \textbf{WaterUse:Equipment, WaterUse:Connections, WaterHeater:Mixed} and \textbf{WaterHeater:Stratified}. The mains temperatures are also used in the water systems objects to model the temperature of cold water supplies.
 
 Water mains temperatures are a function of outdoor climate conditions and vary with time of year. A correlation has been formulated to predict water mains temperatures based on two weather inputs:
 
@@ -1648,7 +1629,7 @@ If the calculation method is Correlation, this field is used in the calculation 
 
 The Site:Precipitation object is used to describe the amount of water precipitation at the building site over the course of the simulation run period. Precipitation includes both rain and the equivalent water content of snow. Precipitation is not yet described well enough in the many building weather data files. So this object can be used to provide the data using Schedule objects that define rates of precipitation in meters per hour.
 
-A set of schedules for site precipitation have been developed for USA weather locations and are provided with EnergyPlus in the data set called PrecipitationSchedulesUSA.idf.~ The user can develop schedules however they want. The schedules in the data set were developed using EnergyPlus' weather file (EPW) observations and the average monthly precipitation for the closest weather site provided by NOAA. EPW files for the USA that were based on TMY or TMY2 include weather observations for Light/Moderate/Heavy rainfall, however most international locations do not include these observations. The values were modeled by taking the middle of the ranges quoted in the EPW data dictionary. The assumed piecewise function is shown below.
+A set of schedules for site precipitation have been developed for USA weather locations and are provided with EnergyPlus in the data set called PrecipitationSchedulesUSA.idf. The user can develop schedules however they want. The schedules in the data set were developed using EnergyPlus' weather file (EPW) observations and the average monthly precipitation for the closest weather site provided by NOAA. EPW files for the USA that were based on TMY or TMY2 include weather observations for Light/Moderate/Heavy rainfall, however most international locations do not include these observations. The values were modeled by taking the middle of the ranges quoted in the EPW data dictionary. The assumed piecewise function is shown below.
 
 \begin{equation}
 Amount\,(m/hour) = \,\left\{ {\begin{array}{*{20}{c}}{Light = 0.0125}\\\{Moderate = 0.052}\\\{Heavy = 0.1}\end{array}} \right.
@@ -1946,7 +1927,7 @@ Site Direct Solar Radiation Rate per Area is amount of solar radiation in W/m\(^
 
 This is the amount of liquid precipitation (m). The source of this field may be the weather file or the Site:Precipitation object. The weather file values are in millimeters, but the report here is in meters. Two separate entities are displayed -- from the weather file the key value is ``Environment''; from the Site:Precipitation object the key value is Site:Precipitation.
 
-If the weather file does not have a liquid precipitation field but does have the present weather fields, then a heuristic calculation is attempted for both flagging when it is raining and the amount of precipitation. If the weather file does have liquid precipitation fields, then the output (e.g.~monthly) can be compared with the weather file stat file.
+If the weather file does not have a liquid precipitation field but does have the present weather fields, then a heuristic calculation is attempted for both flagging when it is raining and the amount of precipitation. If the weather file does have liquid precipitation fields, then the output (e.g. monthly) can be compared with the weather file stat file.
 
 \paragraph{Site Ground Reflected Solar Radiation Rate per Area {[}W/m2{]}}\label{site-ground-reflected-solar-radiation-rate-per-area-wm2}
 
@@ -1998,7 +1979,7 @@ The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degre
 
 \paragraph{Site Solar Hour Angle {[}deg{]}}\label{site-solar-hour-angle-deg}
 
-The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees;~ 360° of the Earth's rotation takes place every 24 hours.)~ The relationship of angles in degrees to time is shown in the following table:
+The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees; 360° of the Earth's rotation takes place every 24 hours.) The relationship of angles in degrees to time is shown in the following table:
 
 % table 6
 \begin{longtable}[c]{@{}ll@{}}
@@ -2015,11 +1996,11 @@ Unit of Angle & Equivalent time \tabularnewline \midrule
 
 \paragraph{\texorpdfstring{Site Rain Status \protect\hyperlink{section-1}{}}{Site Rain Status }}\label{site-rain-status}
 
-This field shows whether or not (1 = yes, 0 = no) the weather shows ``raining''. For a Design Day, one can denote rain for the entire day but not timestep by timestep. Weather files may indicate rain for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g.~daily reporting) means that it was raining during each timestep of that period.
+This field shows whether or not (1 = yes, 0 = no) the weather shows ``raining''. For a Design Day, one can denote rain for the entire day but not timestep by timestep. Weather files may indicate rain for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that it was raining during each timestep of that period.
 
 \paragraph{\texorpdfstring{Site Snow on Ground Status \protect\hyperlink{section-1}{}}{Site Snow on Ground Status }}\label{site-snow-on-ground-status}
 
-This field shows whether or not (1 = yes, 0 = no) the weather shows ``snow on the ground''. For a Design Day, one can denote snow for the entire day but not timestep by timestep. Weather files may indicate snow (snow depth) for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g.~daily reporting) means that there was snow on the ground during each timestep of that period.
+This field shows whether or not (1 = yes, 0 = no) the weather shows ``snow on the ground''. For a Design Day, one can denote snow for the entire day but not timestep by timestep. Weather files may indicate snow (snow depth) for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that there was snow on the ground during each timestep of that period.
 
 \paragraph{\texorpdfstring{Site Daylight Saving Time Status \protect\hyperlink{section-1}{}}{Site Daylight Saving Time Status }}\label{site-daylight-saving-time-status}
 

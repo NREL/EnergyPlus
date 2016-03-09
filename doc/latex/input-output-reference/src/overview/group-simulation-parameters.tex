@@ -445,7 +445,7 @@ ZoneAirHeatBalanceAlgorithm, ThirdOrderBackwardDifference; !- Algorithm
 
 \subsection{ZoneAirContaminantBalance}\label{zoneaircontaminantbalance}
 
-The ZoneAirContaminantBalance object provides a way to select which contaminant type will be simulated. \lstinline!Although carbon dioxide is not considered as an indoor contaminant but it is used as an indicator of indoor air quality in buildings. From modeling point of view EnergyPlus treats carbon dioxide as a type of contaminant. In addition to carbon dioxide, a generic contaminant type model was also added.!This object is optional, only required in the input data file if the user wishes to model contaminant concentration levels as part of their simulation.
+The ZoneAirContaminantBalance object provides a way to select which contaminant type will be simulated. Although carbon dioxide is not considered as an indoor contaminant but it is used as an indicator of indoor air quality in buildings. From modeling point of view EnergyPlus treats carbon dioxide as a type of contaminant. In addition to carbon dioxide, a generic contaminant type model was also added. This object is optional, only required in the input data file if the user wishes to model contaminant concentration levels as part of their simulation.
 
 \subsubsection{Inputs}\label{inputs-9-021}
 
@@ -468,21 +468,21 @@ This field specifies the name of a schedule that contains outdoor air generic co
 An IDF example:
 
 \begin{lstlisting}
-
 ZoneAirContaminantBalance,
-    Yes,                       !- Carbon Dioxide Concentration
-    Outdoor CO2 Schedule,      !- Outdoor Carbon Dioxide Schedule Name
-    Yes,                       !- Generic Contaminant Concentration
-    Generic Contaminant Schedule; !- Outdoor Generic Contaminant Schedule Name
+  Yes,                          !- Carbon Dioxide Concentration
+  Outdoor CO2 Schedule,         !- Outdoor Carbon Dioxide Schedule Name
+  Yes,                          !- Generic Contaminant Concentration
+  Generic Contaminant Schedule; !- Outdoor Generic Contaminant Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-033}
 
 The following output variables are available when Carbon Dioxide Concentration = Yes.
 
+\begin{lstlisting}
 HVAC,Average,Zone Air CO2 Internal Gain Volume Flow Rate
-
-HVAC,Average,Zone Air CO2 Concentration {[}ppm{]}
+HVAC,Average,Zone Air CO2 Concentration [ppm]
+\end{lstlisting}
 
 \paragraph{Zone Air CO2 Concentration {[}ppm{]}}\label{zone-air-co2-concentration-ppm}
 
@@ -541,11 +541,9 @@ This field applies to the method called ``AverageOverDaysInFrequency.'' When the
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
-
 ShadowCalculation,AverageOverDaysInFrequency,1;
 
-
-  ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
 \end{lstlisting}
 
 Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
@@ -587,9 +585,8 @@ Allowable choices are:
 In IDF use:
 
 \begin{lstlisting}
-
 Output:Diagnostics,
-    DisplayExtraWarnings;
+  DisplayExtraWarnings;
 \end{lstlisting}
 
 \subsection{Output:DebuggingData}\label{outputdebuggingdata}
@@ -611,7 +608,6 @@ This field allows the debug data to be reported during the warmup period. When a
 In IDF use:
 
 \begin{lstlisting}
-
 Output:DebuggingData,
   1,1;
 \end{lstlisting}
@@ -681,7 +677,9 @@ This field is used to alter the effective generic contaminantcapacitance of the 
 
 The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
 
+\begin{callout}
 Only one SimulationControl object is permitted for each EnergyPlus input file. While a SimulationControl is needed to trigger sizing calculations, it is optional for other runs (design days, run periods). The actions will still be shown in the eplusout.eio file (see Output Details and Examples Document).
+\end{callout}
 
 \subsubsection{Inputs}\label{inputs-15-014}
 
@@ -716,13 +714,12 @@ This field is optional and is only used if the previous field is set to Yes. The
 An IDF example:
 
 \begin{lstlisting}
-
-  SimulationControl,
-      No,                      !- Do Zone Sizing Calculation
-      No,                      !- Do System Sizing Calculation
-      No,                      !- Do Plant Sizing Calculation
-      Yes,                     !- Run Simulation for Sizing Periods
-      Yes;                     !- Run Simulation for Weather File Run Periods
+SimulationControl,
+  No,                      !- Do Zone Sizing Calculation
+  No,                      !- Do System Sizing Calculation
+  No,                      !- Do Plant Sizing Calculation
+  Yes,                     !- Run Simulation for Sizing Periods
+  Yes,                     !- Run Simulation for Weather File Run Periods
   No,                      !- Do HVAC Sizing Simulation for Sizing Periods
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
@@ -740,9 +737,8 @@ This field is used to specify a limit on the number of threads EnergyPlus will u
 An example IDF object that sets the program to use only one thread follows.
 
 \begin{lstlisting}
-
-  ProgramControl,
-      1 ; !- Number of Threads Allowed
+ProgramControl,
+  1; !- Number of Threads Allowed
 \end{lstlisting}
 
 \subsection{Meter:Custom}\label{metercustom}
@@ -864,55 +860,48 @@ Details of the Meter:Custom/Meter:CustomDecrement are shown on the Meter Details
 In the following examples, the custom meters are set up to illustrate the capabilities of custom meters. Custom meter ``\textbf{MyGeneralLights}'' duplicates the InteriorLights:Electricity meter. Custom meter ``\textbf{MyBuildingElectric}'' duplicates the Electricity:Building meter (by specifying that meter). Custom Meter (Decrement) ``\textbf{MyBuildingOther}'' uses the Electricity:Building meter as the source meter and subtracts out the values for MyGeneralLights (aka InteriorLights:Electricity). The resultant value for the MyBuildingOther meter should be equal to the value for the meters Electricity:Building -- InteriorLights:Electricity.
 
 \begin{lstlisting}
+Meter:Custom,
+  MyGeneralLights,         !- Name
+  Electricity,             !- Fuel Type
+  SPACE1-1,                !- Key Name 1
+  Lights Electric Energy,  !- Output Variable or Meter Name 1
+  SPACE2-1,                !- Key Name 2
+  Lights Electric Energy,  !- Output Variable or Meter Name 2
+  SPACE3-1,                !- Key Name 3
+  Lights Electric Energy,  !- Output Variable or Meter Name 3
+  SPACE4-1,                !- Key Name 4
+  Lights Electric Energy,  !- Output Variable or Meter Name 4
+  SPACE5-1,                !- Key Name 5
+  Lights Electric Energy;  !- Output Variable or Meter Name 5
 
 Meter:Custom,
-      MyGeneralLights,         !- Name
-      Electricity,             !- Fuel Type
-      SPACE1-1,                !- Key Name 1
-      Lights Electric Energy,  !- Output Variable or Meter Name 1
-      SPACE2-1,                !- Key Name 2
-      Lights Electric Energy,  !- Output Variable or Meter Name 2
-      SPACE3-1,                !- Key Name 3
-      Lights Electric Energy,  !- Output Variable or Meter Name 3
-      SPACE4-1,                !- Key Name 4
-      Lights Electric Energy,  !- Output Variable or Meter Name 4
-      SPACE5-1,                !- Key Name 5
-      Lights Electric Energy;  !- Output Variable or Meter Name 5
+  MyBuildingElectric,      !- Name
+  Electricity,             !- Fuel Type
+  ,                        !- Key Name #1
+  Electricity:Building;    !- Output Variable or Meter Name #1
 
-
-  Meter:Custom,
-      MyBuildingElectric,      !- Name
-      Electricity,             !- Fuel Type
-      ,                        !- Key Name \#1
-      Electricity:Building;    !- Output Variable or Meter Name \#1
-
-
-
-
-  Meter:CustomDecrement,
-      MyBuildingOther,         !- Name
-      Electricity,             !- Fuel Type
-      Electricity:Building,    !- Source Meter Name
-      ,                        !- Key Name \#1
-      MyGeneralLights;         !- Output Variable or Meter Name \#1
+Meter:CustomDecrement,
+  MyBuildingOther,         !- Name
+  Electricity,             !- Fuel Type
+  Electricity:Building,    !- Source Meter Name
+  ,                        !- Key Name #1
+  MyGeneralLights;         !- Output Variable or Meter Name #1
 \end{lstlisting}
 
 For an example of ``generic'' fuel type, one might put the Building Infiltration Heat Loss \& Heat Gain on a set of custom meters:
 
 \begin{lstlisting}
+Meter:Custom,
+  Building Infiltration Heat Loss,          !- Name
+  Generic,                                  !- Fuel Type
+  *,                                        !- Key Name 1
+  Zone Infiltration Total Heat Loss Energy; !- Output Variable Name 1
 
-  Meter:Custom,
-      Building Infiltration Heat Loss,  !- Name
-      Generic,             !- Fuel Type
-      *,                       !- Key Name 1
-      Zone Infiltration Total Heat Loss Energy;  !- Output Variable Name 1
-
-
-    Meter:Custom,
-      Building Infiltration Heat Gain,  !- Name
-      Generic,             !- Fuel Type
-      *,                       !- Key Name 1
-      Zone Infiltration Total Heat Gain Energy;  !- Output Variable Name 1
+Meter:Custom,
+  Building Infiltration Heat Gain,          !- Name
+  Generic,                                  !- Fuel Type
+  *,                                        !- Key Name 1
+  Zone Infiltration Total Heat Gain Energy; !- Output Variable Name 1
 \end{lstlisting}
 
 One can then report these values the same way one reports other standard meters.
