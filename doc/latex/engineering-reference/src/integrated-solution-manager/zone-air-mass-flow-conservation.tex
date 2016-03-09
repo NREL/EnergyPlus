@@ -2,14 +2,15 @@
 
 \subsubsection{Overiew}\label{overiew}
 
-The zone air mass flow conservation object, ZoneAirMassFlowConservation, activates zone air mass flow balance calculations. This feature is available only for controlled zones (ZoneVAC:EquipmentConnections) which also have either a zone mixing or infiltration object. The user may specify that zone mixing, infiltration, or both can be overridden to balance the zone air mass flows. The following rules apply:
+The zone air mass flow conservation object, ZoneAirMassFlowConservation, activates zone air mass flow balance calculations. This feature is available only for controlled zones
+(ZoneVAC:EquipmentConnections) which also have either a zone mixing or infiltration object. The user may specify that zone mixing, infiltration, or both can be overridden to balance the zone air mass flows. The following rules apply:
 
 \begin{itemize}
 \tightlist
 \item
   If there are no zone mixing flows to adjacent zones, then the zone air mass flow is balanced by setting the Zone Mixing objects mass flow rate to zero.
 \item
-  If there are no zone exhaust fans defined and there are no zone mixing objects specified, then a zone in an air loop is always balanced.\\
+  If there are no zone exhaust fans defined and there are no zone mixing objects specified, then a zone in an air loop is always balanced.
 \item
   Infiltration mass flow is included in the zone air mass flow balance depending upon one of three options: none (all infiltration is assumed to be self-balanced), all zones, or only zones that serve as a source zone for zone mixing objects.
 \item
