@@ -45,7 +45,8 @@ In order to calculate the derivative term with respect to time, the first order 
 The zone air carbon dioxide concentration update at the current time step using the EulerMethod may be expressed as follows:
 
 \begin{equation}
-{\rho_{air}}{V_Z}{C_{CO2}}{\left( {\delta t} \right)^{ - 1}}\left( {C_z^t - C_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} *{10^6} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right) + {\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right) + {\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)
+{\rho_{air}}{V_Z}{C_{CO2}}{\left( {\delta t} \right)^{ - 1}}\left( {C_z^t - C_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} *{10^6} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right) \\
+\quad \quad \quad \quad + {\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right) + {\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)
 \end{equation}
 
 To preserve the stability of the calculation of the zone carbon dioxide concentration, the third order differential approximation, derived by a Taylor Series and used in the calculation of the next time step's zone air temperature, is also applied to the zone air carbon dioxide calculations. This algorithm is the default choice and is defined as ThirdOrderBackwardDifference in the ZoneAirHeatBalanceAlgorithm object.
@@ -58,7 +59,9 @@ The third order derivative derived from a Taylor Series expansion is defined as:
 
 The coefficients of the approximated derivative are very close to the coefficients of the analogous Adams-Bashforth algorithm. Then the approximated derivative is substituted into the mass balance and the terms with the carbon dioxide concentration at past time steps are all put on the right-hand side of the equation. This third order derivative zone carbon dioxide update increases the number of previous time steps that are used in calculating the new zone carbon dioxide concentration, and decreases the dependence on the most recent. The higher order derivative approximations have the potential to allow the use of larger time steps by smoothing transitions through sudden changes in zone operating conditions.
 
+\begin{equation}
 \begin{array}{l}\frac{{{\rho_{air}}{V_z}{C_{CO2}}}}{{\delta t}}\left( {\frac{{11}}{6}} \right)C_z^t + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} C_z^t + {{\dot m}_{\inf }}C_z^t + {{\dot m}_{sys}}C_z^t = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} *{10^6}\\\;\;\;\;\;\;\; + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}} + {{\dot m}_{\inf }}{C_\infty } + {{\dot m}_{sys}}{C_{\sup }} - \frac{{{\rho_{air}}{V_z}{C_{CO2}}}}{{\delta t}}( - 3C_z^{t - \delta t} + \frac{3}{2}C_z^{t - 2\delta t} - \frac{1}{3}C_z^{t - 3\delta t})\end{array}
+\end{equation}
 
 This gives us the basic air mass balance equation that will be solved two different ways, one way for the predict step and one way for the correct step.
 
@@ -78,19 +81,30 @@ Since the program provides three solution algorithms, the carbon dioxide predict
 
 For this solution algorithm, the air mass balance for the predicted air system load or response is:
 
+\begin{equation}
 \begin{array}{l}{\rm{PredictedSystemLoad}}\;[kg/\sec ] = {\rho_{air}}{V_Z}{C_{CO2}}{\left( {\delta t} \right)^{ - 1}}\left( {C_{{\rm{setpoint}}}^t - C_z^{t - \delta t}} \right)\\\;\;\;\; - \left[ {\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} *{{10}^6} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_{{\rm{setpoint}}}^t} \right) + {{\dot m}_{\inf }}\left( {{C_\infty } - C_{{\rm{setpoint}}}^t} \right)} \right]\\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\end{array}
+\end{equation}
 
 \subsubsection{ThirdOrderBackwardDifference}\label{thirdorderbackwarddifference}
 
 For this solution algorithm, the air mass balance for the predicted system load or response is given below:
 
+\begin{equation}
 \begin{array}{l}{\rm{PredictedSystemLoad}}\;[kg/\sec ] = \left[ {\frac{{{\rho_{air}}{V_z}{C_{CO2}}}}{{\delta t}}\left( {\frac{{11}}{6}} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {{\dot m}_{\inf }}} \right]*C_{{\rm{setpoint}}}^t\\\;\;\;\; - \left[ {\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}} + {{\dot m}_{\inf }}{C_\infty } + \frac{{{\rho_{air}}{V_z}{C_{CO2}}}}{{\delta t}}\left( {3C_z^{t - \delta t} - \frac{3}{2}C_z^{t - 2\delta t} + \frac{1}{3}C_z^{t - 3\delta t}} \right)} \right]\\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\end{array}
+\end{equation}
 
 \subsubsection{AnalyticalSolution}\label{analyticalsolution}
 
 For this solution algorithm, the air mass balance for the predicted air system load or response is given below:
 
+\begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
 \begin{array}{l}{\rm{PredictedSystemLoad}}\;[kg/\sec ] = \left[ {\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }}} \right]*\;\left[ {C_{{\rm{setpoint}}}^t - C_z^{t - \delta t}*\exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {{\dot m}_{\inf }}}}{{{\rho_{air}}{V_Z}{C_{CO2}}}}\delta t} \right)} \right]*\\\;\;\;{\left[ {1 - \exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }}}}{{{\rho_{air}}{V_Z}{C_{CO2}}}}\delta t} \right)} \right]^{ - 1}} - \;\left( {\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}}\; + {{\dot m}_{\inf }}{C_\infty }} \right)\end{array}
+\end{equation}
 
 At the prediction point in the simulation, the system air mass flows are not known; therefore, the system response is approximated. The predicted air system carbon dioxide load is then used in the system simulation to achieve the best results possible. If a central HVAC system provides the outdoor flow rate from a Controller:MechanicalVentilation object, the outdoor airflow rate may be approximated as:
 
@@ -119,11 +133,19 @@ C_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}
 \subsubsection{ThirdOrderBackwardDifference}\label{thirdorderbackwarddifference-1}
 
 \begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
 C_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}} + {{\dot m}_{\inf }}{C_\infty } + {{\dot m}_{sys}}{C_{\sup }} + \frac{{{\rho_{air}}{V_Z}{C_{CO2}}}}{{\delta t}}(3C_z^{t - \delta t} - \frac{3}{2}C_z^{t - 2\delta t} + \frac{1}{3}C_z^{t - 3\delta t})}}{{\frac{{{\rho_{air}}{V_Z}{C_{CO2}}}}{{\delta t}}\left( {\frac{{11}}{6}} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}
 \end{equation}
 
 \subsubsection{AnalyticalSolution}\label{analyticalsolution-1}
 
-\begin{array}{l}C_z^t = \left[ {C_z^{t - \delta t} - \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}}\; + {{\dot m}_{\inf }}{C_\infty } + {{\dot m}_{sys}}{C_{sys}}}}{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}} \right]*\exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}{{{\rho_{air}}{V_Z}{C_{CO2}}}}\delta t} \right) + \\\;\;\;\frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}}\; + {{\dot m}_{\inf }}{C_\infty } + {{\dot m}_{sys}}{C_{sys}}}}{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}\end{array}
+\begin{equation}
+\begin{array}{l}C_z^t = \left[ {C_z^{t - \delta t} - \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}}\; + {{\dot m}_{\inf }}{C_\infty } + {{\dot m}_{sys}}{C_{sys}}}}{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}} \right]*\exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}{{{\rho_{air}}{V_Z}{C_{CO2}}}}\delta t} \right) \\
+\;\;\; + \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{10}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_{zi}}\; + {{\dot m}_{\inf }}{C_\infty } + {{\dot m}_{sys}}{C_{sys}}}}{{\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}\end{array}
+\end{equation}
 
 The above solutions are implemented in the Correct Zone Air Carbon Dioxide step in the Zone Contaminant Predictor Corrector module of EnergyPlus.
