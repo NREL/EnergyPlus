@@ -38,7 +38,7 @@ BeginSimFlag = .TRUE.
           DO TimeStep = 1, NumOfTimeStepInHour  ! Begin time step (TINC) loop ...
           BeginTimeStepFlag = .TRUE.
           EndTimeStepFlag   = .FALSE.
-          ! Set the End\_\_Flag variables to true if necessary. Note that each flag builds on
+          ! Set the End_Flag variables to true if necessary. Note that each flag builds on
           ! the previous level. EndDayFlag cannot be .true. unless EndHourFlag is also .true., etc.
           ! Note that the EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
           ! Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
