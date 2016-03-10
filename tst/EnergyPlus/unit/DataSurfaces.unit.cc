@@ -84,6 +84,263 @@ using namespace EnergyPlus::SurfaceGeometry;
 using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 
+TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
+{
+
+	bool ErrorsFound( false );
+
+	std::string const idf_objects = delimited_string({
+		"Version,",
+		"    8.4;                     !- Version Identifier",
+
+		"	BuildingSurface:Detailed,",
+		"    Surface 1,        !- Name",
+		"    Floor,                   !- Surface Type",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+		"    T3-RF1,                  !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    NoSun,                   !- Sun Exposure",
+		"    NoWind,                  !- Wind Exposure",
+		"    ,                        !- View Factor to Ground",
+		"    ,                        !- Number of Vertices",
+		"    0.0,       !- Vertex 1 X-coordinate {m}",
+		"    0.0,         !- Vertex 1 Y-coordinate {m}",
+		"    0.0,                     !- Vertex 1 Z-coordinate {m}",
+		"    2.0,       !- Vertex 2 X-coordinate {m}",
+		"    0.0,        !- Vertex 2 Y-coordinate {m}",
+		"    0.0,                     !- Vertex 2 Z-coordinate {m}",
+		"    1.0,       !- Vertex 3 X-coordinate {m}",
+		"    2.0,        !- Vertex 3 Y-coordinate {m}",
+		"    0.0;                     !- Vertex 3 Z-coordinate {m}",
+
+		"	BuildingSurface:Detailed,",
+		"    Surface 2,        !- Name",
+		"    Floor,                   !- Surface Type",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+		"    T3-RF1,                  !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    NoSun,                   !- Sun Exposure",
+		"    NoWind,                  !- Wind Exposure",
+		"    ,                        !- View Factor to Ground",
+		"    ,                        !- Number of Vertices",
+		"    -73.4395447868102,       !- Vertex 1 X-coordinate {m}",
+		"    115.81641271866,         !- Vertex 1 Y-coordinate {m}",
+		"    -4.90860981523342e-014,  !- Vertex 1 Z-coordinate {m}",
+		"    -58.0249751030646,       !- Vertex 2 X-coordinate {m}",
+		"    93.1706338416311,        !- Vertex 2 Y-coordinate {m}",
+		"    -6.93120848813091e-014,  !- Vertex 2 Z-coordinate {m}",
+		"    -68.9295447868101,       !- Vertex 3 X-coordinate {m}",
+		"    74.3054685889134,        !- Vertex 3 Y-coordinate {m}",
+		"    -6.06384403665968e-014,  !- Vertex 3 Z-coordinate {m}",
+		"    -58.0345461881513,       !- Vertex 4 X-coordinate {m}",
+		"    93.1761597101821,        !- Vertex 4 Y-coordinate {m}",
+		"    -6.9300904918858e-014;   !- Vertex 4 Z-coordinate {m}",
+
+		"	BuildingSurface:Detailed,",
+		"    Surface 3,               !- Name",
+		"    Wall,                    !- Surface Type",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+		"    T3-RF1,                  !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    NoSun,                   !- Sun Exposure",
+		"    NoWind,                  !- Wind Exposure",
+		"    ,                        !- View Factor to Ground",
+		"    ,                        !- Number of Vertices",
+		"    0.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+		"    1.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 2 {m}",
+		"    1.0, 0.0, 1.0,           !- X,Y,Z ==> Vertex 3 {m}",
+		"    0.0, 0.0, 1.0;           !- X,Y,Z ==> Vertex 4 {m}",
+
+		"	FenestrationSurface:Detailed,",
+		"    Surface 4,    !- Name",
+		"    Window,                  !- Surface Type",
+		"    SINGLE PANE HW WINDOW,   !- Construction Name",
+		"    Surface 3,               !- Building Surface Name",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    0.0,                     !- View Factor to Ground",
+		"    ,                        !- Shading Control Name",
+		"    ,                        !- Frame and Divider Name",
+		"    1.0,                     !- Multiplier",
+		"    Autocalculate,           !- Number of Vertices",
+		"    0.2, 0.0, 0.2,           !- X,Y,Z ==> Vertex 1 {m}",
+		"    0.8, 0.0, 0.2,           !- X,Y,Z ==> Vertex 2 {m}",
+		"    0.8, 0.0, 0.8,           !- X,Y,Z ==> Vertex 3 {m}",
+		"    0.2, 0.0, 0.8;           !- X,Y,Z ==> Vertex 4 {m}",
+
+		"	FenestrationSurface:Detailed,",
+		"    Surface 8,    !- Name",
+		"    Window,                  !- Surface Type",
+		"    SINGLE PANE HW WINDOW,   !- Construction Name",
+		"    Surface 3,               !- Building Surface Name",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    0.0,                     !- View Factor to Ground",
+		"    ,                        !- Shading Control Name",
+		"    ,                        !- Frame and Divider Name",
+		"    1.0,                     !- Multiplier",
+		"    Autocalculate,           !- Number of Vertices",
+		"    0.05, 0.0, 0.05,           !- X,Y,Z ==> Vertex 1 {m}",
+		"    0.15, 0.0, 0.05,           !- X,Y,Z ==> Vertex 2 {m}",
+		"    0.10, 0.0, 0.15;           !- X,Y,Z ==> Vertex 3 {m}",
+
+		"	BuildingSurface:Detailed,",
+		"    Surface 10,        !- Name",
+		"    Floor,                   !- Surface Type",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+		"    T3-RF1,                  !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    NoSun,                   !- Sun Exposure",
+		"    NoWind,                  !- Wind Exposure",
+		"    ,                        !- View Factor to Ground",
+		"    ,                        !- Number of Vertices",
+		"    0.0,       !- Vertex 1 X-coordinate {m}",
+		"    0.0,         !- Vertex 1 Y-coordinate {m}",
+		"    0.0,  !- Vertex 1 Z-coordinate {m}",
+		"    1.0,       !- Vertex 2 X-coordinate {m}",
+		"    0.0,        !- Vertex 2 Y-coordinate {m}",
+		"    0.0,  !- Vertex 2 Z-coordinate {m}",
+		"    1.0,       !- Vertex 3 X-coordinate {m}",
+		"    1.0,        !- Vertex 3 Y-coordinate {m}",
+		"    0.0,  !- Vertex 3 Z-coordinate {m}",
+		"    0.5,       !- Vertex 4 X-coordinate {m}",
+		"    2.0,        !- Vertex 4 Y-coordinate {m}",
+		"    0.0,   !- Vertex 4 Z-coordinate {m}",
+		"    0.0,       !- Vertex 4 X-coordinate {m}",
+		"    1.0,        !- Vertex 4 Y-coordinate {m}",
+		"    0.0;   !- Vertex 4 Z-coordinate {m}",
+
+		"Zone,",
+		"    T3-RF1,                  !- Name",
+		"    60,                      !- Direction of Relative North {deg}",
+		"    234.651324196041,        !- X Origin {m}",
+		"    -132.406575100608,       !- Y Origin {m}",
+		"    14.8000000000003,        !- Z Origin {m}",
+		"    ,                        !- Type",
+		"    ,                        !- Multiplier",
+		"    ,                        !- Ceiling Height {m}",
+		"    ,                        !- Volume {m3}",
+		"    ,                        !- Floor Area {m2}",
+		"    ,                        !- Zone Inside Convection Algorithm",
+		"    ,                        !- Zone Outside Convection Algorithm",
+		"    No;                      !- Part of Total Floor Area",
+
+		"Construction,",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
+		"    MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
+		"    CP02 CARPET PAD;         !- Layer 2",
+
+		"Material,",
+		"    MAT-CC05 4 HW CONCRETE,  !- Name",
+		"    Rough,                   !- Roughness",
+		"    0.1016,                  !- Thickness {m}",
+		"    1.311,                   !- Conductivity {W/m-K}",
+		"    2240,                    !- Density {kg/m3}",
+		"    836.800000000001,        !- Specific Heat {J/kg-K}",
+		"    0.9,                     !- Thermal Absorptance",
+		"    0.85,                    !- Solar Absorptance",
+		"    0.85;                    !- Visible Absorptance",
+
+		"Material:NoMass,",
+		"    CP02 CARPET PAD,         !- Name",
+		"    Smooth,                  !- Roughness",
+		"    0.1,                     !- Thermal Resistance {m2-K/W}",
+		"    0.9,                     !- Thermal Absorptance",
+		"    0.8,                     !- Solar Absorptance",
+		"    0.8;                     !- Visible Absorptance",
+
+		"	Construction,",
+		"    SINGLE PANE HW WINDOW,   !- Name",
+		"    GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer",
+
+		"	WindowMaterial:Glazing,",
+		"    GLASS - CLEAR PLATE 1 / 4 IN,  !- Name",
+		"    SpectralAverage,         !- Optical Data Type",
+		"    ,                        !- Window Glass Spectral Data Set Name",
+		"    6.0000001E-03,           !- Thickness {m}",
+		"    0.7750000,               !- Solar Transmittance at Normal Incidence",
+		"    7.1000002E-02,           !- Front Side Solar Reflectance at Normal Incidence",
+		"    7.1000002E-02,           !- Back Side Solar Reflectance at Normal Incidence",
+		"    0.8810000,               !- Visible Transmittance at Normal Incidence",
+		"    7.9999998E-02,           !- Front Side Visible Reflectance at Normal Incidence",
+		"    7.9999998E-02,           !- Back Side Visible Reflectance at Normal Incidence",
+		"    0,                       !- Infrared Transmittance at Normal Incidence",
+		"    0.8400000,               !- Front Side Infrared Hemispherical Emissivity",
+		"    0.8400000,               !- Back Side Infrared Hemispherical Emissivity",
+		"    0.9000000;               !- Conductivity {W/m-K}",
+
+		"SurfaceConvectionAlgorithm:Inside,TARP;",
+
+		"SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+		"HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+		"ZoneAirHeatBalanceAlgorithm,",
+		"    AnalyticalSolution;      !- Algorithm",
+
+		});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	GetProjectControlData( ErrorsFound ); // read project control data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	GetMaterialData( ErrorsFound ); // read material data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	GetConstructData( ErrorsFound ); // read construction data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	GetZoneData( ErrorsFound ); // read zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	CosZoneRelNorth.allocate( 1 );
+	SinZoneRelNorth.allocate( 1 );
+
+	CosZoneRelNorth( 1 ) = std::cos( -Zone( 1 ).RelNorth * DegToRadians );
+	SinZoneRelNorth( 1 ) = std::sin( -Zone( 1 ).RelNorth * DegToRadians );
+	CosBldgRelNorth = 1.0;
+	SinBldgRelNorth = 0.0;
+
+	GetSurfaceData( ErrorsFound ); // setup zone geometry and get zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	AllocateModuleArrays();
+
+// as soon as a window was added, the surface order was jumbled. "Surface 1" is the triangle surface, but it's Surface(4) in the array
+//	int const Triangle( 1 );
+	ProcessSurfaceVertices( 4, ErrorsFound );
+	EXPECT_EQ( Triangle, Surface( 4 ).Shape );
+
+//	int const Quadrilateral( 2 );
+	ProcessSurfaceVertices( 5, ErrorsFound );
+	EXPECT_EQ( Quadrilateral, Surface( 5 ).Shape );
+
+//	int const Rectangle( 3 );
+	ProcessSurfaceVertices( 1, ErrorsFound );
+	EXPECT_EQ( Rectangle, Surface( 1 ).Shape );
+
+//	int const RectangularDoorWindow( 4 );
+	ProcessSurfaceVertices( 2, ErrorsFound );
+	EXPECT_EQ( RectangularDoorWindow, Surface( 2 ).Shape );
+
+//	int const TriangularWindow( 8 );
+	ProcessSurfaceVertices( 3, ErrorsFound );
+	EXPECT_EQ( TriangularWindow, Surface( 3 ).Shape );
+
+//	int const Polygonal( 10 );
+	ProcessSurfaceVertices( 6, ErrorsFound );
+	EXPECT_EQ( Polygonal, Surface( 6 ).Shape );
+
+//	int const RectangularOverhang( 5 );
+//	int const RectangularLeftFin( 6 );
+//	int const RectangularRightFin( 7 );
+//	int const TriangularDoor( 9 );
+
+}
+
 TEST_F( EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest )
 {
 

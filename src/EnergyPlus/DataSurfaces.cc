@@ -112,13 +112,13 @@ namespace DataSurfaces {
 	int const Triangle( 1 );
 	int const Quadrilateral( 2 );
 	int const Rectangle( 3 );
-	int const Polygonal( 9 );
 	int const RectangularDoorWindow( 4 );
 	int const RectangularOverhang( 5 );
 	int const RectangularLeftFin( 6 );
 	int const RectangularRightFin( 7 );
 	int const TriangularWindow( 8 );
 	int const TriangularDoor( 9 );
+	int const Polygonal( 10 );
 
 	// Parameters to indicate exterior boundary conditions for use with
 	// the Surface derived type (see below):
