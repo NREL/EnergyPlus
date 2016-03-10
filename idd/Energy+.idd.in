@@ -45829,7 +45829,6 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
         \required-field
         \type real
         \minimum> 0.0
-        \units Pa
    N4, \field Low Pressure Cutoff
         \required-field
         \type real
