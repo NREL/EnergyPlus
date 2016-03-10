@@ -2,7 +2,7 @@
 
 This group of objects allows the user to influence scheduling of many items (such as occupancy density, lighting, thermostatic controls, occupancy activity). In addition, schedules are used to control shading element density on the building.
 
-EnergyPlus schedules consist of three pieces:~ a day description, a week description, and an annual description. An optional element is the schedule type. Each description level builds off the previous sub-level. The day description is simply a name and the values that span the 24 hours in a day to be associated with that name. The week description also has an identifier (name) and twelve additional names corresponding to previously defined day descriptions. There are names for each individual day of the week plus holiday, summer design day, winter design day and two more custom day designations. Finally, the annual schedule contains an identifier and the names and FROM-THROUGH dates of the week schedules associate with this annual schedule. The annual schedule can have several FROM-THROUGH date pairs.~ One type of schedule reads the values from an external file to facilitate the incorporation of monitored data or factors that change throughout the year.
+EnergyPlus schedules consist of three pieces: a day description, a week description, and an annual description. An optional element is the schedule type. Each description level builds off the previous sub-level. The day description is simply a name and the values that span the 24 hours in a day to be associated with that name. The week description also has an identifier (name) and twelve additional names corresponding to previously defined day descriptions. There are names for each individual day of the week plus holiday, summer design day, winter design day and two more custom day designations. Finally, the annual schedule contains an identifier and the names and FROM-THROUGH dates of the week schedules associate with this annual schedule. The annual schedule can have several FROM-THROUGH date pairs. One type of schedule reads the values from an external file to facilitate the incorporation of monitored data or factors that change throughout the year.
 
 Schedules are processed by the EnergyPlus Schedule Manager, stored within the Schedule Manager and are accessed through module routines to get the basic values (timestep, hourly, etc). Values are resolved at the Zone Timestep frequency and carry through any HVAC timesteps.
 
@@ -76,12 +76,11 @@ This field is used to indicate the kind of units that may be associated with the
 Several IDF Examples will illustrate the use:
 
 \begin{lstlisting}
-
-ScheduleTypeLimits,Any Number;  ! Not limited
-  ScheduleTypeLimits,Fraction, 0.0 , 1.0 ,CONTINUOUS;
-  ScheduleTypeLimits,Temperature,-60,200,CONTINUOUS;
-  ScheduleTypeLimits,Control Type,0,4,DISCRETE;
-  ScheduleTypeLimits,On/Off,0,1,DISCRETE;
+ScheduleTypeLimits,Any Number;  ! Not limited
+ScheduleTypeLimits,Fraction, 0.0 , 1.0 ,CONTINUOUS;
+ScheduleTypeLimits,Temperature,-60,200,CONTINUOUS;
+ScheduleTypeLimits,Control Type,0,4,DISCRETE;
+ScheduleTypeLimits,On/Off,0,1,DISCRETE;
 \end{lstlisting}
 
 \subsection{Day Schedules}\label{day-schedules}
@@ -104,14 +103,13 @@ This field contains a reference to the Schedule Type Limits object. If found in 
 
 \paragraph{Field: Hour Values (1-24)}\label{field-hour-values-1-24}
 
-These fields contain the hourly values for each of the 24 hours in a day. (Hour field 1 represents clock time 00:00:01 AM to 1:00:00 AM, hour field 2 is 1:00:01 AM to 2:00:00 AM, etc.)~ The values in these fields will be passed to the simulation as indicated for ``scheduled'' items.
+These fields contain the hourly values for each of the 24 hours in a day. (Hour field 1 represents clock time 00:00:01 AM to 1:00:00 AM, hour field 2 is 1:00:01 AM to 2:00:00 AM, etc.) The values in these fields will be passed to the simulation as indicated for ``scheduled'' items.
 
 An IDF example:
 
 \begin{lstlisting}
-
 Schedule:Day:Hourly, Day On Peak, Fraction,
-    0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.;
+  0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.;
 \end{lstlisting}
 
 \subsection{Schedule:Day:Interval}\label{scheduledayinterval}
@@ -149,13 +147,12 @@ This represents the actual value to be passed to the simulation at the appropria
 And an example of use:
 
 \begin{lstlisting}
-
 Schedule:Day:Interval,
-      dd winter rel humidity,  !- Name
-      Percent,                 !- Schedule Type Limits Name
-      No,                      !- Interpolate to Timestep
-      until: 24:00,             !- Time 1
-      74;                      !- Value Until Time 1
+  dd winter rel humidity, !- Name
+  Percent,                !- Schedule Type Limits Name
+  No,                     !- Interpolate to Timestep
+  until: 24:00,           !- Time 1
+  74;                     !- Value Until Time 1
 \end{lstlisting}
 
 \subsection{Schedule:Day:List}\label{scheduledaylist}
@@ -189,15 +186,14 @@ This is the value to be used for the specified number of minutes.
 For example:
 
 \begin{lstlisting}
-
 Schedule:Day:List,
-    Myschedule,  ! name
-    Fraction,   ! Schedule type
-    No,   ! Interpolate value
-    30,   ! Minutes per item
-    0.0,  ! from 00:01 to 00:30
-    0.5,  ! from 00:31 to 01:00
-    <snipped>
+  Myschedule, ! name
+  Fraction,   ! Schedule type
+  No,         ! Interpolate value
+  30,         ! Minutes per item
+  0.0,        ! from 00:01 to 00:30
+  0.5,        ! from 00:31 to 01:00
+  <snipped>
 \end{lstlisting}
 
 \subsection{Week Schedule(s)}\label{week-schedules}
@@ -219,12 +215,11 @@ These fields contain day schedule names for the appropriate day types. Days of t
 An IDF example:
 
 \begin{lstlisting}
-
 Schedule:Week:Daily, Week on Peak,
-          Day On Peak,Day On Peak,Day On Peak,
-          Day On Peak,Day On Peak,Day On Peak,
-          Day On Peak,Day On Peak,Day On Peak,
-          Day On Peak,Day On Peak,Day On Peak;
+  Day On Peak,Day On Peak,Day On Peak,
+  Day On Peak,Day On Peak,Day On Peak,
+  Day On Peak,Day On Peak,Day On Peak,
+  Day On Peak,Day On Peak,Day On Peak;
 \end{lstlisting}
 
 \subsection{Schedule:Week:Compact}\label{scheduleweekcompact}
@@ -252,15 +247,15 @@ This field contains the name of the day schedule (any of the Schedule:Day object
 Some IDF examples:
 
 \begin{lstlisting}
-
 Schedule:Week:Compact, Week on Peak,
-          For: AllDays,
-          Day On Peak;
-  Schedule:Week:Compact, WeekDays on Peak,
-          WeekDays,
-          Day On Peak,
-          AllOtherDays
-          Day Off Peak;
+  For: AllDays,
+  Day On Peak;
+
+Schedule:Week:Compact, WeekDays on Peak,
+  WeekDays,
+  Day On Peak,
+  AllOtherDays
+  Day Off Peak;
 \end{lstlisting}
 
 \subsection{Schedule:Year}\label{scheduleyear}
@@ -304,24 +299,24 @@ This numeric field is the ending day for the schedule time period.
 Note that there are many possible periods to be described. An IDF example with a single period:
 
 \begin{lstlisting}
-
 Schedule:Year, On Peak, Fraction,
-          Week On Peak, 1,1, 12,31;
+  Week On Peak, 1,1, 12,31;
 \end{lstlisting}
 
 And a multiple period illustration:
 
 \begin{lstlisting}
-
 Schedule:Year,CoolingCoilAvailSched,Fraction,
-          FanAndCoilAllOffWeekSched, 1,1, 3,31,
-          FanAndCoilSummerWeekSched, 4,1, 9,30,
-          FanAndCoilAllOffWeekSched, 10,1, 12,31;
+  FanAndCoilAllOffWeekSched, 1,1, 3,31,
+  FanAndCoilSummerWeekSched, 4,1, 9,30,
+  FanAndCoilAllOffWeekSched, 10,1, 12,31;
 \end{lstlisting}
 
 The following definition will generate an error (if any scheduled items are used in the simulation):
 
+\begin{lstlisting}
 Schedule:Year,MySchedule,Fraction,4,1,9,30;
+\end{lstlisting}
 
 \subsection{Schedule:Compact}\label{schedulecompact}
 
@@ -366,48 +361,45 @@ Finally, the value field is the schedule value for the specified time interval.
 And, some IDF examples:
 
 \begin{lstlisting}
-
 Schedule:Compact,
-    POFF,    !- Name
-    Fraction,  !- Schedule Type Limits Name
-    Through: 4/30,
-    For: AllDays,
-    Until: 24:00, 1.0,
-    Through: 12/31,
-    For: Weekdays,
-     Until: 7:00,   .1,
-     Until: 17:00, 1.0,
-     Until: 24:00,  .1,
-    For: Weekends Holidays,
-     Until: 24:00,  .1,
-    For: AllOtherDays,
-     Until: 24:00,  .1;
+  POFF,       !- Name
+  Fraction,   !- Schedule Type Limits Name
+  Through: 4/30,
+  For: AllDays,
+  Until: 24:00, 1.0,
+  Through: 12/31,
+  For: Weekdays,
+    Until: 7:00,   .1,
+    Until: 17:00, 1.0,
+    Until: 24:00,  .1,
+  For: Weekends Holidays,
+    Until: 24:00,  .1,
+  For: AllOtherDays,
+    Until: 24:00,  .1;
 
+! Schedule Continuous
+Schedule:Compact,
+  Continuous,
+  on/off,
+  Through: 12/31,
+  For: AllDays,
+    Until: 24:00, 1.0;
 
-  ! Schedule Continuous
-  Schedule:Compact,
-    Continuous,
-    on/off,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00, 1.0;
-
-
-  ! Schedule Daytime Ventilation
-  Schedule:Compact,
-    Daytime Ventilation,
-    Fraction,
-    Through: 12/31,
-    For: Weekdays SummerDesignDay,
-    Until: 08:00, 0.0,
-    Until: 18:00, 1.0,
-    Until: 24:00, 0.0,
-    For: Weekends WinterDesignDay,
-    Until: 10:00, 0.0,
-    Until: 16:00, 1.0,
-    Until: 24:00, 0.0,
-    For: Holidays AllOtherDays,
-    Until: 24:00, 0.0;
+! Schedule Daytime Ventilation
+Schedule:Compact,
+  Daytime Ventilation,
+  Fraction,
+  Through: 12/31,
+  For: Weekdays SummerDesignDay,
+    Until: 08:00, 0.0,
+    Until: 18:00, 1.0,
+    Until: 24:00, 0.0,
+  For: Weekends WinterDesignDay,
+    Until: 10:00, 0.0,
+    Until: 16:00, 1.0,
+    Until: 24:00, 0.0,
+  For: Holidays AllOtherDays,
+    Until: 24:00, 0.0;
 \end{lstlisting}
 
 \subsection{Schedule:Constant}\label{scheduleconstant}
@@ -431,26 +423,24 @@ This field contains a constant real value. A fixed value is assigned as an hourl
 An IDF example:
 
 \begin{lstlisting}
-
 Schedule:Constant,
-    AlwaysOn,                  !- Name
-    On/Off,                    !- Schedule Type Limits Name
-    1.0;                       !- Hourly Value
+  AlwaysOn,     !- Name
+  On/Off,       !- Schedule Type Limits Name
+  1.0;          !- Hourly Value
 
-
-  ScheduleTypeLimits,
-      On/Off,                  !- Name
-      0,                       !- Lower Limit Value
-      1,                       !- Upper Limit Value
-      DISCRETE,                !- Numeric Type
-      Availability;            !- Unit Type
+ScheduleTypeLimits,
+  On/Off,       !- Name
+  0,            !- Lower Limit Value
+  1,            !- Upper Limit Value
+  DISCRETE,     !- Numeric Type
+  Availability; !- Unit Type
 \end{lstlisting}
 
 \subsection{Schedule:File}\label{schedulefile}
 
 At times, data is available from a building being monitored or for factors that change throughout the year. The Schedule:File object allows this type of data to be used in EnergyPlus as a schedule. Schedule:File can also be used to read in hourly or sub-hourly schedules computed by other software or developed in a spreadsheet or other utility.
 
-The format for the data file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. The file may contain header lines that are skipped. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. Multiple schedules may be created using a single external data file or multiple external data files may be used.~ The first row of data must be for January 1, hour 1 (or timestep 1 for subhourly files).
+The format for the data file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. The file may contain header lines that are skipped. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. Multiple schedules may be created using a single external data file or multiple external data files may be used. The first row of data must be for January 1, hour 1 (or timestep 1 for subhourly files).
 
 Schedule:File may be used along with the FuelFactors object and TDV files in the DataSets directory to compute Time Dependent Valuation based source energy as used by the California Energy Commission's Title 24 Energy Code. See Fuel Factor for more discussion on Time Dependent Valuation.
 
@@ -468,7 +458,7 @@ This field contains a reference to the Schedule Type Limits object. If found in 
 
 \paragraph{Field: File Name}\label{field-file-name}
 
-This field contains the name of the file that contains the data for the schedule. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+This field contains the name of the file that contains the data for the schedule. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
 \paragraph{Field: Column Number}\label{field-column-number}
 
@@ -480,7 +470,7 @@ Many times the data in a file contains rows (lines) that are describing the file
 
 \paragraph{Field: Number of Hours of Data}\label{field-number-of-hours-of-data}
 
-The value entered in this field should be either 8760 or 8784 as the number of hours of data. 8760 does not include the extra 24 hours for a leap year (if needed).~ 8784 will include the possibility of leap year data which can be processed according to leap year indicators in the weather file or specified elsewhere. Note if the simulation does not have a leap year specified but the schedule file contains 8784 hours of data, the first 8760 hours of data will be used. The schedule manager will not know to skip the 24 hours representing Feburary 29.
+The value entered in this field should be either 8760 or 8784 as the number of hours of data. 8760 does not include the extra 24 hours for a leap year (if needed). 8784 will include the possibility of leap year data which can be processed according to leap year indicators in the weather file or specified elsewhere. Note if the simulation does not have a leap year specified but the schedule file contains 8784 hours of data, the first 8760 hours of data will be used. The schedule manager will not know to skip the 24 hours representing Feburary 29.
 
 \paragraph{Field: Column Separator}\label{field-column-separator-001}
 
@@ -494,65 +484,55 @@ For example, if ``yes'' is entered and the minutes per item is 15 minutes (say a
 
 \paragraph{Field: Minutes Per Item}\label{field-minutes-per-item-1}
 
-This field represents the number of minutes for each item -- in this case each line of the file. The value here must be \textless{} = 60 and evenly divisible into 60 (same as the timestep limits).
+This field represents the number of minutes for each item -- in this case each line of the file. The value here must be \(\le\) 60 and evenly divisible into 60 (same as the timestep limits).
 
 Here is an IDF example:
 
 \begin{lstlisting}
-
 Schedule:File,
-     elecTDVfromCZ01res,   !- Name
-     Any Number,           !- ScheduleType
-     TDV_kBtu_CTZ01.csv,   !- Name of File
-     2,                    !- Column Number
-     4,                    !- Rows to Skip at Top
-     8760,                 !- Number of Hours of Data
-     Comma;                !- Column Separator
+  elecTDVfromCZ01res, !- Name
+  Any Number,         !- ScheduleType
+  TDV_kBtu_CTZ01.csv, !- Name of File
+  2,                  !- Column Number
+  4,                  !- Rows to Skip at Top
+  8760,               !- Number of Hours of Data
+  Comma;              !- Column Separator
 \end{lstlisting}
 
 or with a relational path:
 
 \begin{lstlisting}
-
 Schedule:File,
-     elecTDVfromCZ01res,   !- Name
-     Any Number,           !- ScheduleType
-     DataSets\TDV\TDV_kBtu_CTZ01.csv,   !- Name of File
-     2,                    !- Column Number
-     4;                    !- Rows to Skip at Top
+  elecTDVfromCZ01res, !- Name
+  Any Number,         !- ScheduleType
+  DataSets\TDV\TDV_kBtu_CTZ01.csv,  !- Name of File
+  2,                  !- Column Number
+  4;                  !- Rows to Skip at Top
 \end{lstlisting}
 
 A sub-hourly indication. Note that this is identical to an hourly file because there are 60 minutes per item -- the number of hours defaults to 8760 and the column separator defaults to a comma. If the number of minutes per item had been, say, 15, then the file would need to contain 8760*4 or 35,040 rows for this item.
 
 \begin{lstlisting}
-
-  Schedule:File,
-      elecTDVfromCZ06com,      !- Name
-      Any Number,              !- Schedule Type Limits Name
-      DataSets\TDV\TDV_2008_kBtu_CTZ06.csv,  !- File Name
-      1,                       !- Column Number
-      4,                       !- Rows to Skip at Top
-      ,                        !- Number of Hours of Data
-      ,                        !- Column Separator
-      ,                        !- Interpolate to Timestep
-      60;                      !- Minutes per Item
+Schedule:File,
+  elecTDVfromCZ06com, !- Name
+  Any Number,         !- Schedule Type Limits Name
+  DataSets\TDV\TDV_2008_kBtu_CTZ06.csv, !- File Name
+  1,                  !- Column Number
+  4,                  !- Rows to Skip at Top
+  ,                   !- Number of Hours of Data
+  ,                   !- Column Separator
+  ,                   !- Interpolate to Timestep
+  60;                 !- Minutes per Item
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-031}
 
 An optional report can be used to gain the values described in the previous Schedule objects. This is a condensed reporting that illustrates the full range of schedule values -- in the style of input: DaySchedule, WeekSchedule, Annual Schedule.
 
+\begin{lstlisting}
 ! will give them on hourly increments (day schedule resolution)
-
-\begin{lstlisting}
-
 Output:Reports, Schedules, Hourly;
-\end{lstlisting}
-
 ! will give them at the timestep of the simulation
-
-\begin{lstlisting}
-
 Output:Reports, Schedules, Timestep;
 \end{lstlisting}
 
@@ -560,14 +540,16 @@ This report is placed on the eplusout.eio file. Details of this reporting are sh
 
 \paragraph{Schedule Value Output}\label{schedule-value-output}
 
+\begin{lstlisting}
 Zone,Average,Schedule Value \protect\hyperlink{section-1}{}
+\end{lstlisting}
 
 \paragraph{Schedule Value}\label{schedule-value}
 
 This is the schedule value (as given to whatever entity that uses it). It has no units in this context because values may be many different units (i.e.~temperatures, fractions, watts). For best results, you may want to apply the schedule name when you use this output variable to avoid output proliferation. For example, the following reporting should yield the values shown above, depending on day of week and day type:
 
 \begin{lstlisting}
-
 Output:Variable,People_Shopping_Sch,Schedule Value,hourly;
-  Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
+Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
 \end{lstlisting}
+
