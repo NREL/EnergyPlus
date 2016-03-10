@@ -63,7 +63,6 @@ else()
 endif()
 
 # Install files that are in the current repo
-INSTALL(FILES "${CMAKE_SOURCE_DIR}/doc/index.html" DESTINATION "./Documentation")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/Boilers.idf" DESTINATION "./DataSets")
@@ -392,30 +391,21 @@ configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
   "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
-
-
-
-if (NOT PACKAGE_BUILT_DOCS)
-  # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/Acknowledgements.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/EngineeringReference.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/ExternalInterfaces_Application_Guide.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/GettingStarted.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/InputOutputReference.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/InterfaceDeveloper.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/ModuleDeveloper.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/OutputDetailsAndExamples.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/PlantApplicationGuide.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
-
-  # Should this be included or no? There is no .md source for generating
-  #install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
-endif()
-
-
+if ( BUILD_DOCS )
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/Acknowledgements.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/AuxiliaryPrograms.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/EMS_Application_Guide.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/EngineeringReference.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/ExternalInterfaces_Application_Guide.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/GettingStarted.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/InputOutputReference.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/InterfaceDeveloper.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/ModuleDeveloper.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/PlantApplicationGuide.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/Tips_and_Tricks_Using_EnergyPlus.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/Using_EnergyPlus_for_Compliance.pdf" DESTINATION "./Documentation")
+endif ()
 
 INCLUDE(CPack)
 
