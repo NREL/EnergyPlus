@@ -387,12 +387,12 @@ k\(_{1}\) is the change in conductivity per degree temperature difference from 2
 
 \paragraph{Field Set: Temperature-Enthalpy}\label{field-set-temperature-enthalpy}
 
-The temperature -- enthalpy set of inputs specify a two column tabular temperature-enthalpy function for the basic material. Sixteen pairs can be specified. Specify only the number of pairs necessary. The tabular function must cover the entire temperature range that will be seen by the material in the simulation. It is suggested that the function start at a low temperature, and extend to 100C. Note that the function has no negative slopes and the lowest slope that will occur is the base material specific heat. Temperature values should be strictly increasing. Enthalpy contributions of the phase change are always added to the enthalpy that would result from a constant specific heat base material.~ An example of a simple enthalpy temperature function is shown below.
+The temperature -- enthalpy set of inputs specify a two column tabular temperature-enthalpy function for the basic material. Sixteen pairs can be specified. Specify only the number of pairs necessary. The tabular function must cover the entire temperature range that will be seen by the material in the simulation. It is suggested that the function start at a low temperature, and extend to 100C. Note that the function has no negative slopes and the lowest slope that will occur is the base material specific heat. Temperature values should be strictly increasing. Enthalpy contributions of the phase change are always added to the enthalpy that would result from a constant specific heat base material. An example of a simple enthalpy temperature function is shown below.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image024.png}
-\caption{Temp-Enth Example}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image024.png}
+\caption{Temp-Enth Example \protect \label{fig:temp-enth-example}}
 \end{figure}
 
 \paragraph{Field: Temperature x}\label{field-temperature-x}
@@ -989,24 +989,22 @@ Thermal conductivity (W/m-K).
 
 \paragraph{Field: Dirt Correction Factor for Solar and Visible Transmittance}\label{field-dirt-correction-factor-for-solar-and-visible-transmittance}
 
-This is a factor that corrects for the presence of dirt on the glass. The program multiplies the fields ``Solar Transmittance at Normal Incidence'' and ``Visible Transmittance at Normal Incidence'' by this factor if the material is used as the outer glass layer of an exterior window or glass door.\protect\hyperlink{ux5fftn1}{{[}1{]}} If the material is used as an inner glass layer (in double glazing, for example), the dirt correction factor is not applied because inner glass layers are assumed to be clean. Using a material with dirt correction factor \textless{} 1.0 in the construction for an interior window will result in an error message.
+This is a factor that corrects for the presence of dirt on the glass. The program multiplies the fields ``Solar Transmittance at Normal Incidence'' and ``Visible Transmittance at Normal Incidence'' by this factor if the material is used as the \underline{outer} glass layer of an \underline{exterior} window or glass door.\footnote{If Optical Data Type = Spectral, the program multiplies the solar and visible transmittance at each wavelength by the dirt correction factor.} If the material is used as an inner glass layer (in double glazing, for example), the dirt correction factor is not applied because inner glass layers are assumed to be clean. Using a material with dirt correction factor \textless{} 1.0 in the construction for an interior window will result in an error message.
 
-Representative values of the dirt correction factor are shown in Table 7.
-
-~~~~ Table 7. Dirt Correction Factors
+Representative values of the dirt correction factor are shown in Table~\ref{table:dirt-correction-factors}.
 
 \begin{longtable}[c]{@{}llll@{}}
+\caption{Dirt Correction Factors \protect \label{table:dirt-correction-factors}} \\
 \toprule 
-Type of Location & Angle of Glazing \tabularnewline \midrule
+Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
+                 & Vertical & 45$^{o}$ & Horizontal \\ \midrule
 \endhead
-Vertical & 45 & Horizontal \tabularnewline
-Non-industrial & 0.9 & 0.8 & 0.7 \tabularnewline
-Industrial & 0.7 & 0.6 & 0.5 \tabularnewline
-Very Dirty & 0.6 & 0.5 & 0.4 \tabularnewline
+Non-industrial & 0.9 & 0.8 & 0.7 \\
+Industrial & 0.7 & 0.6 & 0.5 \\
+Very Dirty & 0.6 & 0.5 & 0.4 \\
 \bottomrule
+{\tiny From Appendix A, ``Daylighting in Sports Halls, Report 2,'' SportScotland, Nov. 2002 (www.sportscotland.org.uk)}
 \end{longtable}
-
-From Appendix A, ``Daylighting in Sports Halls, Report 2,'' SportScotland, Nov. 2002 (www.sportscotland.org.uk)
 
 The default value of the dirt correction factor is 1.0, which means the glass is clean.
 
@@ -1014,7 +1012,7 @@ It is assumed that dirt, if present, has no effect on the IR properties of the g
 
 \paragraph{Field: Solar Diffusing}\label{field-solar-diffusing}
 
-Takes values No (the default) and Yes. If No, the glass is transparent and beam solar radiation incident on the glass is transmitted as beam radiation with no diffuse component. If Yes, the glass is translucent and beam solar radiation incident on the glass is transmitted as hemispherically diffuse radiation with no beam component.\protect\hyperlink{ux5fftn2}{{[}2{]}} See Figure~\ref{fig:comparison-between-transmittance-properties}. Solar Diffusing = Yes should only be used on the \emph{innermost} pane of glass in an exterior window; it does not apply to interior windows.
+Takes values No (the default) and Yes. If No, the glass is \underline{transparent} and beam solar radiation incident on the glass is transmitted as beam radiation with no diffuse component. If Yes, the glass is \underline{translucent} and beam solar radiation incident on the glass is transmitted as hemispherically diffuse radiation with no beam component.\footnote{EnergyPlus does not model the ``partially translucent'' case in which beam solar radiation incident on the glass is transmitted as a combination of beam and diffuse.} See Figure~\ref{fig:comparison-between-transmittance-properties}. Solar Diffusing = Yes should only be used on the \emph{innermost} pane of glass in an exterior window; it does not apply to interior windows.
 
 For both Solar Diffusing = No and Yes, beam is reflected as beam with no diffuse component (see Figure~\ref{fig:comparison-between-transmittance-properties}). Solar Diffusing cannot be used with Window Shading Control devices (except Switchable Glazing). When attempted, the window property will be set to No for Solar Diffusing. The Surface Details report will reflect the override.
 
@@ -1140,9 +1138,9 @@ Thermal conductivity (W/m-K).
 
 \paragraph{Field: Dirt Correction Factor for Solar and Visible Transmittance}\label{field-dirt-correction-factor-for-solar-and-visible-transmittance-1}
 
-This is a factor that corrects for the presence of dirt on the glass. It multiplies the solar and visible transmittance at normal Incidence (which the program calculates from the input values of thickness, solar index of refraction, solar extinction coefficient, etc.) if the material is used as the outer glass layer of an exterior window or glass door. If the material is used as an inner glass layer (in double glazing, for example), the dirt correction factor is not applied because inner glass layers are assumed to be clean. Using a material with dirt correction factor \textless{} 1.0 in the construction for an interior window will result in an error message.
+This is a factor that corrects for the presence of dirt on the glass. It multiplies the solar and visible transmittance at normal Incidence (which the program calculates from the input values of thickness, solar index of refraction, solar extinction coefficient, etc.) if the material is used as the \underline{outer} glass layer of an \underline{exterior} window or glass door. If the material is used as an inner glass layer (in double glazing, for example), the dirt correction factor is not applied because inner glass layers are assumed to be clean. Using a material with dirt correction factor \textless{} 1.0 in the construction for an interior window will result in an error message.
 
-Representative values of the direct correction factor are shown in Table 7.
+Representative values of the direct correction factor are shown in Table~\ref{table:dirt-correction-factors}.
 
 The default value of the dirt correction factor is 1.0, which means the glass is clean. It is assumed that dirt, if present, has no effect on the IR properties of the glass.
 
@@ -1157,17 +1155,16 @@ In a zone with Daylighting:Detailed, translucent glazing, which is often used in
 An IDF example:
 
 \begin{lstlisting}
-
 WindowMaterial:Glazing:RefractionExtinctionMethod,
-  4MM CLEAR GLASS, !- Material name
-      0.004, !- Thickness {m}
-      1.526, !- Solar index of refraction
-      30.0 , !- Solar extinction coefficient (1/m)
-      1.526, !- Visible index of refraction
-      30.0 , !- Visible extinction coefficient (1/m)
-      0.0,   !- IR transmittance at normal incidence
-      0.84,  !- IR emissivity
-      0.9;   !- Conductivity {W/m-K}
+  4MM CLEAR GLASS,  !- Material name
+  0.004,            !- Thickness {m}
+  1.526,            !- Solar index of refraction
+  30.0 ,            !- Solar extinction coefficient (1/m)
+  1.526,            !- Visible index of refraction
+  30.0 ,            !- Visible extinction coefficient (1/m)
+  0.0,              !- IR transmittance at normal incidence
+  0.84,             !- IR emissivity
+  0.9;              !- Conductivity {W/m-K}
 \end{lstlisting}
 
 \subsection{Glass Optical Properties Conversion}\label{glass-optical-properties-conversion}
@@ -1176,19 +1173,43 @@ WindowMaterial:Glazing:RefractionExtinctionMethod,
 
 The optical properties of uncoated glass are sometimes specified by index of refraction, n, and transmittance at normal incidence, T.
 
-The following equations show how to convert from this set of values to the transmittance and reflectance values required by WindowMaterial:Glazing. These equations apply only to uncoated glass, and can be used to convert either spectral-average solar properties or spectral-average visible properties (in general, \emph{n} and \emph{T} are different for the solar and visible). Note that since the glass is uncoated, the front and back reflectances are the same and equal to the \emph{R} that is solved for in the following equations.
+The following equations show how to convert from this set of values to the transmittance and reflectance values required by WindowMaterial:Glazing. These equations apply only to \underline{uncoated} glass, and can be used to convert either spectral-average solar properties or spectral-average visible properties (in general, \(n\) and \(T\) are different for the solar and visible). Note that since the glass is uncoated, the front and back reflectances are the same and equal to the \(R\) that is solved for in the following equations.
 
-Given \emph{n} and \emph{T}, find \emph{R}:
+Given \(n\) and \(T\), find \(R\):
 
-\begin{array}{l}r = {\left( {\frac{{n - 1}}{{n + 1}}} \right)^2}\\\tau  = \frac{{{{\left[ {{{(1 - r)}^4} + 4{r^2}{T^2}} \right]}^{1/2}} - {{(1 - r)}^2}}}{{2{r^2}T}}\\R = r + \frac{{{{(1 - r)}^2}r{\tau ^2}}}{{1 - {r^2}{\tau ^2}}}\end{array}
+\begin{equation*}
+r = \left( \frac{n - 1}{n + 1} \right)^2
+\end{equation*}
+
+\begin{equation*}
+\tau = \frac{ \left[ (1 - r)^4 + 4 r^2 T^2 \right]^{1/2} - (1 - r)^2}{2 r^2 T}
+\end{equation*}
+
+\begin{equation*}
+R = r + \frac{(1 - r)^2 r \tau ^2}{1 - r^2 \tau ^2}
+\end{equation*}
 
 \textbf{Example:}
 
-\emph{T} = 0.86156
+\begin{equation*}
+T = 0.86156
+\end{equation*}
 
-\emph{n} = 1.526
+\begin{equation*}
+n = 1.526
+\end{equation*}
 
-\begin{array}{l}r = {\left( {\frac{{1.526 - 1}}{{1.526 + 1}}} \right)^2}\\\tau  = 0.93974\\R = 0.07846\end{array}
+\begin{equation*}
+r = \left( \frac{1.526 - 1}{1.526 + 1} \right)^2
+\end{equation*}
+
+\begin{equation*}
+\tau = 0.93974
+\end{equation*}
+
+\begin{equation*}
+R = 0.07846
+\end{equation*}
 
 \subsection{WindowMaterial:GlazingGroup:Thermochromic}\label{windowmaterialglazinggroupthermochromic}
 
@@ -1217,270 +1238,269 @@ The window glazing (defined with WindowMaterial:Glazing) name that provides the 
 IDF Examples
 
 \begin{lstlisting}
+Construction,
+  window_const,     !- Name
+  Usual Glass,      !- Layer 1
+  AIR 6MM,          !- Layer 2
+  TCGlazings,       !- Layer 3
+  AIR 6MM,          !- Layer 4
+  Usual Glass;      !- Layer 5
 
-  Construction,
-      window_const,             !- Name
-      Usual Glass,              !- Layer 1
-      AIR 6MM,                  !- Layer 2
-      TCGlazings,               !- Layer 3
-      AIR 6MM,                  !- Layer 4
-      Usual Glass;              !- Layer 5
+WindowMaterial:Gas,
+  AIR 6MM,          !- Name
+  Air,              !- Gas Type
+  0.0063;           !- Thickness {m}
 
-    WindowMaterial:Gas,
-      AIR 6MM,                 !- Name
-      Air,                     !- Gas Type
-      0.0063;                  !- Thickness {m}
+! Added for thermochromic glazings
+WindowMaterial:GlazingGroup:Thermochromic,
+  TCGlazings,
+  0 ,  TCGlazing0,
+  20,  TCGlazing20,
+  25,  TCGlazing25,
+  30,  TCGlazing30,
+  35,  TCGlazing35,
+  40,  TCGlazing40,
+  45,  TCGlazing45,
+  50,  TCGlazing50,
+  55,  TCGlazing55,
+  60,  TCGlazing60,
+  65,  TCGlazing65,
+  75,  TCGlazing75,
+  85,  TCGlazing85;
 
-  ! Added for thermochromic glazings
-    WindowMaterial:GlazingGroup:Thermochromic,
-      TCGlazings,
-      0 ,  TCGlazing0,
-      20,  TCGlazing20,
-      25,  TCGlazing25,
-      30,  TCGlazing30,
-      35,  TCGlazing35,
-      40,  TCGlazing40,
-      45,  TCGlazing45,
-      50,  TCGlazing50,
-      55,  TCGlazing55,
-      60,  TCGlazing60,
-      65,  TCGlazing65,
-      75,  TCGlazing75,
-      85,  TCGlazing85;
+WindowMaterial:Glazing,
+  TCGlazing0,       !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing0,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing20,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing20,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing25,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing25,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing30,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing30,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing35,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing35,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing40,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing40,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing45,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing45,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing50,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing50,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing55,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing55,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing60,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing60,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing65,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing65,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing75,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 
-  WindowMaterial:Glazing,
-    TCGlazing75,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
-
-  WindowMaterial:Glazing,
-    TCGlazing85,  !- Name
-    SpectralAverage,  !- Optical Data Type
-    ,        !- Window Glass Spectral Data Set Name
-    0.0030,  !- Thickness
-    0.2442,  !- Solar Transmittance at Normal Incidence
-    0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-    0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-    0.3192,  !- Visible Transmittance at Normal Incidence
-    0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-    0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-    0.0000,  !- Infrared Transmittance at Normal Incidence
-    0.9000,  !- Front Side Infrared Hemispherical Emissivity
-    0.9000,  !- Back Side Infrared Hemispherical Emissivity
-    0.0199,  !- Conductivity
-    1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-    No;      !- Solar Diffusing
+WindowMaterial:Glazing,
+  TCGlazing85,      !- Name
+  SpectralAverage,  !- Optical Data Type
+  ,                 !- Window Glass Spectral Data Set Name
+  0.0030,           !- Thickness
+  0.2442,           !- Solar Transmittance at Normal Incidence
+  0.7058,           !- Front Side Solar Reflectance at Normal Incidence
+  0.7058,           !- Back Side Solar Reflectance at Normal Incidence
+  0.3192,           !- Visible Transmittance at Normal Incidence
+  0.6308,           !- Front Side Visible Reflectance at Normal Incidence
+  0.6308,           !- Back Side Visible Reflectance at Normal Incidence
+  0.0000,           !- Infrared Transmittance at Normal Incidence
+  0.9000,           !- Front Side Infrared Hemispherical Emissivity
+  0.9000,           !- Back Side Infrared Hemispherical Emissivity
+  0.0199,           !- Conductivity
+  1.0000,           !- Dirt Correction Factor for Solar and Visible Transmittance
+  No;               !- Solar Diffusing
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-019}
@@ -1782,7 +1802,7 @@ WindowGap:SupportPillar,       !- gap support pillar
 
 \subsection{WindowMaterial:SimpleGlazingSystem}\label{windowmaterialsimpleglazingsystem}
 
-This model should be used with caution. There may be significant differences in performance between the simple window system and the usual more detailed model.
+\warning{This model should be used with caution. There may be significant differences in performance between the simple window system and the usual more detailed model.}
 
 This input object differs from the other WindowMaterial objects in that it describes an entire glazing system rather than individual layers. This object is used when only very limited information is available on the glazing layers or when specific performance levels are being targeted. The layer by layer description offers superior method of modeling windows that should be used instead of this object when sufficient data are available. This object accesses a model that turns simple performance indices into a fuller model of the glazing system.
 
@@ -1889,16 +1909,16 @@ For most non-metallic materials \emph{ε}is about 0.9.
 
 \paragraph{Field: Thermal Transmittance}\label{field-thermal-transmittance}
 
-Effective long-wave transmittance. Assumed independent of incidence angle. We can approximate this~ effective long-wave transmittance, \emph{τ\(_{f}\),}~ as follows. Let \emph{η} be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \emph{τ}. Then
+Effective long-wave transmittance. Assumed independent of incidence angle. We can approximate this effective long-wave transmittance, \(T_{\rm{eff}}\) as follows. Let \(\eta\) be the ``openness'' of the shade, i.e., the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \(T\). Then
 
 \begin{equation}
-{T_{{\rm{eff}}}} \approx \eta  + T\left( {1 - \eta } \right)
+T_{\rm{eff}} \approx \eta + T \left( 1 - \eta \right)
 \end{equation}
 
-For most materials* τ* is very close to zero, which gives
+For most materials \(T\) is very close to zero, which gives
 
 \begin{equation}
-{T_{{\rm{eff}}}} \approx \eta
+T_{\rm{eff}} \approx \eta
 \end{equation}
 
 \paragraph{Field: Thickness}\label{field-thickness-6}
@@ -1938,35 +1958,34 @@ The fraction of the shade surface that is open to air flow, i.e., the total area
 \begin{figure}[hbtp] % fig 12
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image033.png}
-\caption{Vertical section (a) and perspective view (b) of glass  and interior shade layers  showing variables used in the gap air flow analysis. In (b), the air-flow opening areas *A\$\_\{t\}\$*, *A\$\_\{p\}\$*, *A\$\_\{l\}\$*, *A\$\_\{r\}\$* and *A\$\_\{h\}\$* are shown schematically. See *Engineering Manual* for definition of thermal variables. \protect \label{fig:vertical-section-a-and-perspective-view-b-of}}
+\caption{Vertical section (a) and perspective view (b) of glass  and interior shade layers  showing variables used in the gap air flow analysis. In (b), the air-flow opening areas \(A_{\rm{bot}}\), \(A_{\rm{top}}\), \(A_{l}\), \(A_{r}\) and \(A_{h}\) are shown schematically. See \emph{Engineering Manual} for definition of thermal variables. \protect \label{fig:vertical-section-a-and-perspective-view-b-of}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 13
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image034.png}
-\caption{Examples of air-flow openings for an interior shade covering glass of height *H* and width *W*. Not to scale. (a) Horizontal section through shade with openings on the left and right sides (top view). (b) Vertical section through shade with openings at the top and bottom (side view). In (a) Left-Side Opening Multiplier = *A\$\_\{l\}\$ /sH* = min(*l/s*,1) and Right-Side Opening Multiplier = *A\$\_\{r\}\$ /sH* = min(*r/s*,1). In (b) Top Opening Multiplier = *A\$\_\{p\}\$ /sW* = *t/s* and Bottom Opening Multiplier = *A\$\_\{t\}\$ /sW = b/s.* \protect \label{fig:examples-of-air-flow-openings-for-an-interior}}
+\caption{Examples of air-flow openings for an interior shade covering glass of height \(H\) and width \(W\). Not to scale. (a) Horizontal section through shade with openings on the left and right sides (top view). (b) Vertical section through shade with openings at the top and bottom (side view). In (a) Left-Side Opening Multiplier = \(A_{l}/sH = min(l/s, 1)\) and Right-Side Opening Multiplier = \(A_{r}/sH = min(r/s, 1)\). In (b) Top Opening Multiplier = \(A_{\rm{top}}/sW = t/s\) and Bottom Opening Multiplier = \(A_{\rm{bot}}/sW = b/s\). \protect \label{fig:examples-of-air-flow-openings-for-an-interior}}
 \end{figure}
 
 An IDF example:
 
 \begin{lstlisting}
-
 WindowMaterial:Shade,
-      DRAPES - CLOSE WEAVE MEDIUM,  !- Name
-      0.05,                    !- Solar transmittance
-      0.3000000,               !- Solar Reflectance
-      .05,                     !- Visible transmittance
-      0.3000000,               !- Visible reflectance
-      0.9000000,               !- Thermal Hemispherical Emissivity
-      0.0,                     !- Thermal Transmittance
-      0.003,                   !- Thickness {m}
-      0.1,                     !- Conductivity {W/m-K}
-      0.050,                   !- Shade to glass distance {m}
-      1.0,                     !- Top opening multiplier
-      1.0,                     !- Bottom opening multiplier
-      0.0,                     !- Left-side opening multiplier
-      0.0,                     !- Right-side opening multiplier
-      0.0;                     !- Air flow permeability
+  DRAPES - CLOSE WEAVE MEDIUM,  !- Name
+  0.05,                         !- Solar transmittance
+  0.3000000,                    !- Solar Reflectance
+  .05,                          !- Visible transmittance
+  0.3000000,                    !- Visible reflectance
+  0.9000000,                    !- Thermal Hemispherical Emissivity
+  0.0,                          !- Thermal Transmittance
+  0.003,                        !- Thickness {m}
+  0.1,                          !- Conductivity {W/m-K}
+  0.050,                        !- Shade to glass distance {m}
+  1.0,                          !- Top opening multiplier
+  1.0,                          !- Bottom opening multiplier
+  0.0,                          !- Left-side opening multiplier
+  0.0,                          !- Right-side opening multiplier
+  0.0;                          !- Air flow permeability
 \end{lstlisting}
 
 \subsection{WindowMaterial:Blind}\label{windowmaterialblind}
@@ -2172,7 +2191,7 @@ WindowMaterial:Blind,
 \begin{figure}[hbtp] % fig 14
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image035.png}
-\caption{(a) Side view of a window blind with horizontal slats  (or top view of blind with vertical slats) showing slat geometry. The front face of a slat is shown by a heavy line. The slat angle is defined as the angle between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat. (b) Slat orientations for representative slat angles. The slat angle varies from 0\$\^{}\{O\}\$, when the front of the slat is parallel to the glazing and faces toward the outdoors,  to 90\$\^{}\{O\}\$, when the slat is perpendicular to the glazing, to 180\$\^{}\{O\}\$, when the front of the slat is parallel to the glazing and faces toward the indoors. The minimum and maximum slat angles are determined by the slat thickness, width and separation. \protect \label{fig:a-side-view-of-a-window-blind-with-horizontal}}
+\caption{(a) Side view of a window blind with horizontal slats (or top view of blind with vertical slats) showing slat geometry. The front face of a slat is shown by a heavy line. The slat angle is defined as the angle between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat. (b) Slat orientations for representative slat angles. The slat angle varies from 0\(^{o}\), when the front of the slat is parallel to the glazing and faces toward the outdoors,  to 90\(^{o}\), when the slat is perpendicular to the glazing, to 180\(^{o}\), when the front of the slat is parallel to the glazing and faces toward the indoors. The minimum and maximum slat angles are determined by the slat thickness, width and separation. \protect \label{fig:a-side-view-of-a-window-blind-with-horizontal}}
 \end{figure}
 
 \subsection{WindowMaterial:ComplexShade}\label{windowmaterialcomplexshade}
@@ -2187,7 +2206,7 @@ Unique name of the shading layer.
 
 \paragraph{Field: Shading Layer Type}\label{field-shading-layer-type}
 
-The type of shading layer.~ The options are:
+The type of shading layer. The options are:
 
 \begin{itemize}
 \item
@@ -2241,43 +2260,53 @@ The top opening multiplier value will depend on the location of the shading devi
 
 \textbf{Shading device on the indoor/outdoor side of the window}
 
-In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame (d\(_{p}\)), divided by the gap width (S).~ There are three possible cases for the position of a shading device the on indoor/outdoor side (see Figure 15).
+In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame (d\(_{p}\)), divided by the gap width (S). There are three possible cases for the position of a shading device the on indoor/outdoor side (see Figure~\ref{fig:three-cases-for-the-dp-calculation-for-an-indoor-outdoor-shade}).
 
-\includegraphics{media/image036.png}~~~~ \includegraphics{media/image038.png}
-
-Figure 15. Three cases for the D\(_{p}\) calculation for an indoor/outdoor shade: Case a) A shading device between the frame; Case b) A shading device outside the frame, covering the frame; Case c) a shading device outside the frame, not covering the frame.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/three-cases-for-the-dtop-calculation-for-an-indoor-outdoor-shade-collage.png}
+\caption{Three cases for the D\(_{p}\) calculation for an indoor/outdoor shade: Case a) A shading device between the frame; Case b) A shading device outside the frame, covering the frame; Case c) a shading device outside the frame, not covering the frame. \protect \label{fig:three-cases-for-the-dp-calculation-for-an-indoor-outdoor-shade}}
+\end{figure}
 
 In the case where the distance between the frame and the shading device is bigger than the gap width, the d\(_{p}\) multiplier is equal to one. Therefore, the calculation of the D\(_{p}\) opening multiplier is:
 
-A\(_{p}\) = min(d\(_{p}\)/S, 1)
+\begin{equation*}
+A_p = min(d_p/S, 1)
+\end{equation*}
 
 \textbf{Shading device between glass layers}
 
 In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame or spacer (d\(_{p}\)), divided by the smaller gap width (the minimum of (S\(_{1}\) andS\(_{2}\))).
 
-\includegraphics{media/image039.png}~~~~~~~~~ \includegraphics{media/image040.png}
-
-Figure 16. Calculation of Dtop for a shading device between glass layers
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/calculation-of-dtop-for-a-shading-device-collage.png}
+\caption{Calculation of Dtop for a shading device between glass layers \protect \label{fig:calculation-of-dtop-for-a-shading-device-between-glass-layers}}
+\end{figure}
 
 The D\(_{p}\) opening multiplier for a between glass shade is calculated as:
 
-A\(_{p}\) = min(d\(_{p}\)/S\(_{n}\), 1)
+\begin{equation*}
+A_p = min(d_p/S_n, 1)
+\end{equation*}
 
 Where
 
-S\(_{n}\) = min(S\(_{1}\), S\(_{2}\))
+\begin{equation*}
+S_n = min(S_1, S_2)
+\end{equation*}
 
 \paragraph{Field: Bottom Opening Multiplier}\label{field-bottom-opening-multiplier-1}
 
-The bottom opening multiplier (d\(_{t}\)) is calculated in the same way as the top opening multiplier, with the rules applied to the bottom of the shading device.
+The bottom opening multiplier (d\(_t\)) is calculated in the same way as the top opening multiplier, with the rules applied to the bottom of the shading device.
 
 \paragraph{Field: Left Side Opening Multiplier}\label{field-left-side-opening-multiplier-1}
 
-The left side opening multiplier (d\(_{t}\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the left side of the shading device.
+The left side opening multiplier (d\(_t\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the left side of the shading device.
 
 \paragraph{Field: Right Side Opening Multiplier}\label{field-right-side-opening-multiplier-1}
 
-The right side opening multiplier (d\(_{t}\))~ is calcuated in the same way as the top opening multiplier, with the rules applied to the right side of the shading device.
+The right side opening multiplier (d\(_t\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the right side of the shading device.
 
 \paragraph{Field: Front Opening Multiplier}\label{field-front-opening-multiplier}
 
