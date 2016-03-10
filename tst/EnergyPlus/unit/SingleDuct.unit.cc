@@ -165,7 +165,6 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		int ZoneNodeNum = 1;
 		int InletNodeNum = 4;
 		bool FirstHVACIteration = true;
-		int CompIndex = 1;
 		Real64 SysMinMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 		Real64 SysMaxMassFlow = 2.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 
@@ -335,7 +334,6 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		int ZoneNodeNum = 1;
 		int InletNodeNum = 5;
 		bool FirstHVACIteration = true;
-		int CompIndex = 1;
 		Real64 SysMinMassFlow = 0.25 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 		Real64 SysMaxMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 
