@@ -1140,6 +1140,7 @@ namespace SingleDuct {
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
 			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
@@ -2651,10 +2652,13 @@ namespace SingleDuct {
 				// Recalculate the Damper Position.
 				if ( MassFlow == 0.0 ) {
 					Sys( SysNum ).DamperPosition = 0.0;
+					Sys( SysNum ).ZoneMinAirFracReport = 0.0;
 				} else if ( ( MassFlow > 0.0 ) && ( MassFlow < Sys( SysNum ).AirMassFlowRateMax ) ) {
 					Sys( SysNum ).DamperPosition = MassFlow / Sys( SysNum ).AirMassFlowRateMax;
+					Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 				} else if ( MassFlow == Sys( SysNum ).AirMassFlowRateMax ) {
 					Sys( SysNum ).DamperPosition = 1.0;
+					Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 				}
 
 			} else if ( SELECT_CASE_var == HCoilType_SteamAirHeating ) { // ! COIL:STEAM:AIRHEATING
