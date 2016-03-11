@@ -157,7 +157,6 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		//  4   Zone 1 Zone Equip Inlet
 
 		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Zone 2 has a cooling load
 
 		// Setup for Zone 1 VAV No Reheat
 		int SysNum = 1;
@@ -169,7 +168,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		Real64 SysMaxMassFlow = 2.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 
 		// Test with heating load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Zone 1 has a heating load - expect min flow rate
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
 		// First test - AlwaysOff Schedule - expecting no flow
 		SingleDuct::Sys( SysNum ).SchedPtr = 1;
@@ -199,7 +198,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		EXPECT_EQ( SysMinMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
 		// Test with cooling load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Zone 1 has a cooling load - expect max flow rate
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
 		// First test - AlwaysOff Schedule - expecting no flow
 		SingleDuct::Sys( SysNum ).SchedPtr = 1;
@@ -326,7 +325,6 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		//  5   Zone 1 Zone Equip Inlet
 
 		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Zone 2 has a cooling load
 
 		// Setup for Zone 1 VAV No Reheat
 		int SysNum = 1;
@@ -338,7 +336,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		Real64 SysMaxMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 
 		// Test with heating load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Zone 1 has a heating load - expect min flow rate
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
 		// First test - AlwaysOff Schedule - expecting no flow
 		SingleDuct::Sys( SysNum ).SchedPtr = 1;
@@ -368,7 +366,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		EXPECT_EQ( SysMinMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
 		// Test with cooling load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Zone 1 has a cooling load - expect max flow rate
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
 		// First test - AlwaysOff Schedule - expecting no flow
 		SingleDuct::Sys( SysNum ).SchedPtr = 1;
