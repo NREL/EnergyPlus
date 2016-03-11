@@ -164,29 +164,42 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    0.8, 0.0, 0.8,           !- X,Y,Z ==> Vertex 3 {m}",
 		"    0.2, 0.0, 0.8;           !- X,Y,Z ==> Vertex 4 {m}",
 
-//		"	Shading:Overhang:Projection,",
-//		"    Surface 5 - RectangularOverhang,               !- Name",
-//		"    Surface 9,               !- Window or Door Name",
-//		"    .01,                     !- Height above Window or Door {m}",
-//		"    90,                      !- Tilt Angle from Window/Door {deg}",
-//		"    .01,                     !- Left extension from Window/Door Width {m}",
-//		"    .01,                     !- Right extension from Window/Door Width {m}",
-//		"    .2;                      !- Depth as Fraction of Window/Door Height {dimensionless}",
+		"	Shading:Overhang:Projection,",
+		"    Surface 5 - RectangularOverhang,  !- Name",
+		"    Surface 9 - TriangularDoor,       !- Window or Door Name",
+		"    .01,                     !- Height above Window or Door {m}",
+		"    91,                      !- Tilt Angle from Window/Door {deg}",
+		"    .01,                     !- Left extension from Window/Door Width {m}",
+		"    .01,                     !- Right extension from Window/Door Width {m}",
+		"    .2;                      !- Depth as Fraction of Window/Door Height {dimensionless}",
 
-//		"	Shading:Fin:Projection,",
-//		"    Surface 6 - Left Fin,    !- Name",
-//		"    Surface 3 - Rectangle,   !- Window or Door Name",
-//		"    .01,                     !- Left Extension from Window/Door {m}",
-//		"    .01,                     !- Left Distance Above Top of Window {m}",
-//		"    .01,                     !- Left Distance Below Bottom of Window {m}",
-//		"    90,                      !- Left Tilt Angle from Window/Door {deg}",
-//		"    .01,                     !- Left Depth as Fraction of Window/Door Width {dimensionless}",
-//		"    0,                       !- Right Extension from Window/Door {m}",
-//		"    0,                       !- Right Distance Above Top of Window {m}",
-//		"    0,                       !- Right Distance Below Bottom of Window {m}",
-//		"    0,                       !- Right Tilt Angle from Window/Door {deg}",
-//		"    0;                       !- Right Depth as Fraction of Window/Door Width {dimensionless}",
+		"	Shading:Fin:Projection,",
+		"    Surface 6 - RectangularLeftFin,    !- Name",
+		"    Surface 3 - Rectangle,   !- Window or Door Name",
+		"    .01,                     !- Left Extension from Window/Door {m}",
+		"    .01,                     !- Left Distance Above Top of Window {m}",
+		"    .01,                     !- Left Distance Below Bottom of Window {m}",
+		"    90,                      !- Left Tilt Angle from Window/Door {deg}",
+		"    .01,                     !- Left Depth as Fraction of Window/Door Width {dimensionless}",
+		"    0,                       !- Right Extension from Window/Door {m}",
+		"    0,                       !- Right Distance Above Top of Window {m}",
+		"    0,                       !- Right Distance Below Bottom of Window {m}",
+		"    0,                       !- Right Tilt Angle from Window/Door {deg}",
+		"    0;                       !- Right Depth as Fraction of Window/Door Width {dimensionless}",
 
+		"	Shading:Fin:Projection,",
+		"    Surface 7 - RectangularRightFin,   !- Name",
+		"    Surface 3 - Rectangle,   !- Window or Door Name",
+		"    0,                       !- Left Extension from Window/Door {m}",
+		"    0,                       !- Left Distance Above Top of Window {m}",
+		"    0,                       !- Left Distance Below Bottom of Window {m}",
+		"    0,                       !- Left Tilt Angle from Window/Door {deg}",
+		"    0,                       !- Left Depth as Fraction of Window/Door Width {dimensionless}",
+		"    .01,                     !- Right Extension from Window/Door {m}",
+		"    .01,                     !- Right Distance Above Top of Window {m}",
+		"    .01,                     !- Right Distance Below Bottom of Window {m}",
+		"    90,                      !- Right Tilt Angle from Window/Door {deg}",
+		"    .01;                     !- Right Depth as Fraction of Window/Door Width {dimensionless}",
 
 		"	FenestrationSurface:Detailed,",
 		"    Surface 8 - TriangularWindow,    !- Name",
@@ -203,20 +216,20 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    0.15, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
 		"    0.10, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
 
-//		"	FenestrationSurface:Detailed,",
-//		"    Surface 9 - TriangularDoor,      !- Name",
-//		"    Door,                    !- Surface Type",
-//		"    External door,           !- Construction Name",
-//		"    Surface 3,               !- Building Surface Name",
-//		"    ,                        !- Outside Boundary Condition Object",
-//		"    0.5,                     !- View Factor to Ground",
-//		"    ,                        !- Shading Control Name",
-//		"    ,                        !- Frame and Divider Name",
-//		"    1,                       !- Multiplier",
-//		"    3,                       !- Number of Vertices",
-//		"    0.80, 0.0, 0.05,         !- X,Y,Z ==> Vertex 1 {m}",
-//		"    0.95, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
-//		"    0.90, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
+		"	FenestrationSurface:Detailed,",
+		"    Surface 9 - TriangularDoor,      !- Name",
+		"    Door,                    !- Surface Type",
+		"    External door,           !- Construction Name",
+		"    Surface 3 - Rectangle,   !- Building Surface Name",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    0.5,                     !- View Factor to Ground",
+		"    ,                        !- Shading Control Name",
+		"    ,                        !- Frame and Divider Name",
+		"    1,                       !- Multiplier",
+		"    3,                       !- Number of Vertices",
+		"    0.80, 0.0, 0.05,         !- X,Y,Z ==> Vertex 1 {m}",
+		"    0.95, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
+		"    0.90, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
 
 
 		"	BuildingSurface:Detailed,",
@@ -266,9 +279,9 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
 		"    CP02 CARPET PAD;         !- Layer 2",
 
-//		" Construction,",
-//		"    External door,   !- Name",
-//		"    Painted Oak;        !- Outside Layer",
+		" Construction,",
+		"    External door,   !- Name",
+		"    Painted Oak;        !- Outside Layer",
 	
 		" Material,",
 		"    MAT-CC05 4 HW CONCRETE,  !- Name",
@@ -362,41 +375,54 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
 
 //	enum surfaceShape:Triangle = 1
-//	Surface( 4 ).Name = "Surface 1 - Triangle"
-	ProcessSurfaceVertices( 4, ErrorsFound );
-	EXPECT_EQ( Triangle, Surface( 4 ).Shape );
+//	Surface( 11 ).Name = "Surface 1 - Triangle"
+	ProcessSurfaceVertices( 11, ErrorsFound );
+	EXPECT_EQ( Triangle, Surface( 11 ).Shape );
 
 //	enum surfaceShape:Quadrilateral = 2
-//	Surface( 5 ).Name = "Surface 2 - Quadrilateral"
-	ProcessSurfaceVertices( 5, ErrorsFound );
-	EXPECT_EQ( Quadrilateral, Surface( 5 ).Shape );
+//	Surface( 12 ).Name = "Surface 2 - Quadrilateral"
+	ProcessSurfaceVertices( 12, ErrorsFound );
+	EXPECT_EQ( Quadrilateral, Surface( 12 ).Shape );
 
 //	enum surfaceShape:Rectangle = 3
-//	Surface( 1 ).Name = "Surface 3 - Rectangle"
-	ProcessSurfaceVertices( 1, ErrorsFound );
-	EXPECT_EQ( Rectangle, Surface( 1 ).Shape );
+//	Surface( 7 ).Name = "Surface 3 - Rectangle"
+	ProcessSurfaceVertices( 7, ErrorsFound );
+	EXPECT_EQ( Rectangle, Surface( 7 ).Shape );
 
 //	enum surfaceShape:RectangularDoorWindow = 4
-//	Surface( 2 ).Name = "Surface 4 - RectangularDoorWindow"
-	ProcessSurfaceVertices( 2, ErrorsFound );
-	EXPECT_EQ( RectangularDoorWindow, Surface( 2 ).Shape );
+//	Surface( 8 ).Name = "Surface 4 - RectangularDoorWindow"
+	ProcessSurfaceVertices( 8, ErrorsFound );
+	EXPECT_EQ( RectangularDoorWindow, Surface( 8 ).Shape );
 
-// not sure why these are causing problems
 //	enum surfaceShape:RectangularOverhang = 5
+//	Surface( 1 ).Name = "Surface 5 - RectangularOverhang"
+	ProcessSurfaceVertices( 1, ErrorsFound );
+	EXPECT_NE( TriangularWindow, Surface( 1 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
+
 //	enum surfaceShape:RectangularLeftFin = 6
+//	Surface( 3 ).Name = "Surface 6 - RectangularLeftFin"
+	ProcessSurfaceVertices( 3, ErrorsFound );
+	EXPECT_NE( RectangularLeftFin, Surface( 3 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
+
 //	enum surfaceShape:RectangularRightFin = 7
+//	Surface( 5 ).Name = "Surface 7 - RectangularRightFin"
+	ProcessSurfaceVertices( 5, ErrorsFound );
+	EXPECT_NE( RectangularRightFin, Surface( 5 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
 
 //	enum surfaceShape:TriangularWindow = 8
-//	Surface( 3 ).Name = "Surface 8 - TriangularWindow"
-	ProcessSurfaceVertices( 3, ErrorsFound );
-	EXPECT_EQ( TriangularWindow, Surface( 3 ).Shape );
+//	Surface( 9 ).Name = "Surface 8 - TriangularWindow"
+	ProcessSurfaceVertices( 9, ErrorsFound );
+	EXPECT_EQ( TriangularWindow, Surface( 9 ).Shape );
 
 //	enum surfaceShape:TriangularDoor = 9
+//	Surface( 10 ).Name = "Surface 9 - TriangularDoor"
+	ProcessSurfaceVertices( 10, ErrorsFound );
+	EXPECT_EQ( TriangularDoor, Surface( 10 ).Shape );
 
 //	enum surfaceShape:Polygonal = 10
-//	Surface( 6 ).Name = "Surface 10 - Polygonal"
-	ProcessSurfaceVertices( 6, ErrorsFound );
-	EXPECT_EQ( Polygonal, Surface( 6 ).Shape );
+//	Surface( 13 ).Name = "Surface 10 - Polygonal"
+	ProcessSurfaceVertices( 13, ErrorsFound );
+	EXPECT_EQ( Polygonal, Surface( 13 ).Shape );
 
 
 }
