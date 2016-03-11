@@ -9,9 +9,9 @@ add_subdirectory(engineering-reference)
 add_subdirectory(external-interfaces-application-guide)
 add_subdirectory(getting-started)
 add_subdirectory(input-output-reference)
+add_subdirectory(interface-developer)
 
 set( DOCS
-     interface-developer:InterfaceDeveloper
      module-developer:ModuleDeveloper
      output-details-and-examples:OutputDetailsAndExamples
      plant-application-guide:PlantApplicationGuide
