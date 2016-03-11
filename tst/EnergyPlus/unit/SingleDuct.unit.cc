@@ -82,7 +82,7 @@ using namespace EnergyPlus;
 
 
 TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
-		std::string const idf_objects = delimited_string( {
+	std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 		"  Zone,",
 		"    Zone 1;                !- Name",
@@ -121,120 +121,120 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		"    ,                        !- Schedule Type Limits Name",
 		"    1;                       !- Hourly Value",
 
-		} ) ;
+	} ) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_FALSE( process_idf( idf_objects ) );
 
-		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-		ScheduleManager::ProcessScheduleInput(); // read schedules
-		ScheduleManager::ScheduleInputProcessed = true;
-		DataEnvironment::Month = 1;
-		DataEnvironment::DayOfMonth = 21;
-		DataGlobals::HourOfDay = 1;
-		DataGlobals::TimeStep = 1;
-		DataEnvironment::DSTIndicator = 0;
-		DataEnvironment::DayOfWeek = 2;
-		DataEnvironment::HolidayIndex = 0;
-		DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-		DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
-		ScheduleManager::UpdateScheduleValues();
+	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+	ScheduleManager::ProcessScheduleInput(); // read schedules
+	ScheduleManager::ScheduleInputProcessed = true;
+	DataEnvironment::Month = 1;
+	DataEnvironment::DayOfMonth = 21;
+	DataGlobals::HourOfDay = 1;
+	DataGlobals::TimeStep = 1;
+	DataEnvironment::DSTIndicator = 0;
+	DataEnvironment::DayOfWeek = 2;
+	DataEnvironment::HolidayIndex = 0;
+	DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	ScheduleManager::UpdateScheduleValues();
 
-		bool ErrorsFound = false;
-		HeatBalanceManager::GetZoneData(ErrorsFound);
-		ASSERT_FALSE(ErrorsFound);
-		DataZoneEquipment::GetZoneEquipmentData1();
-		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
-		SingleDuct::GetSysInput();
-		EXPECT_TRUE( compare_err_stream( "" ) );
-		DataHeatBalFanSys::TempControlType.allocate( 1 );
-		DataHeatBalFanSys::TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
+	bool ErrorsFound = false;
+	HeatBalanceManager::GetZoneData(ErrorsFound);
+	ASSERT_FALSE(ErrorsFound);
+	DataZoneEquipment::GetZoneEquipmentData1();
+	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+	SingleDuct::GetSysInput();
+	EXPECT_TRUE( compare_err_stream( "" ) );
+	DataHeatBalFanSys::TempControlType.allocate( 1 );
+	DataHeatBalFanSys::TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-		// node number table
-		//  1   Zone 1 Air Node
-		//  2   Zone 1 Return Node
-		//  3   Zone 1 Supply Inlet
-		//  4   Zone 1 Zone Equip Inlet
+	// node number table
+	//  1   Zone 1 Air Node
+	//  2   Zone 1 Return Node
+	//  3   Zone 1 Supply Inlet
+	//  4   Zone 1 Zone Equip Inlet
 
-		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+	DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
 
-		// Setup for Zone 1 VAV No Reheat
-		int SysNum = 1;
-		int ZoneNum = 1;
-		int ZoneNodeNum = 1;
-		int InletNodeNum = 4;
-		bool FirstHVACIteration = true;
-		Real64 SysMinMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
-		Real64 SysMaxMassFlow = 2.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
+	// Setup for Zone 1 VAV No Reheat
+	int SysNum = 1;
+	int ZoneNum = 1;
+	int ZoneNodeNum = 1;
+	int InletNodeNum = 4;
+	bool FirstHVACIteration = true;
+	Real64 SysMinMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
+	Real64 SysMaxMassFlow = 2.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 
-		// Test with heating load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
+	// Test with heating load
+	DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
-		// First test - AlwaysOff Schedule - expecting no flow
-		SingleDuct::Sys( SysNum ).SchedPtr = 1;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		DataGlobals::BeginEnvrnFlag = false;
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// First test - AlwaysOff Schedule - expecting no flow
+	SingleDuct::Sys( SysNum ).SchedPtr = 1;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	DataGlobals::BeginEnvrnFlag = false;
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Second test - AlwaysOn Schedule - expecting flow
-		// Reset flows and switch to AlwaysOn Schedule
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		SingleDuct::Sys( SysNum ).SchedPtr = 2;
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( SysMinMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// Second test - AlwaysOn Schedule - expecting flow
+	// Reset flows and switch to AlwaysOn Schedule
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	SingleDuct::Sys( SysNum ).SchedPtr = 2;
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( SysMinMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Test with cooling load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
+	// Test with cooling load
+	DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
-		// First test - AlwaysOff Schedule - expecting no flow
-		SingleDuct::Sys( SysNum ).SchedPtr = 1;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		DataGlobals::BeginEnvrnFlag = false;
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// First test - AlwaysOff Schedule - expecting no flow
+	SingleDuct::Sys( SysNum ).SchedPtr = 1;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	DataGlobals::BeginEnvrnFlag = false;
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Second test - AlwaysOn Schedule - expecting flow
-		// Reset flows and switch to AlwaysOn Schedule
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		SingleDuct::Sys( SysNum ).SchedPtr = 2;
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// Second test - AlwaysOn Schedule - expecting flow
+	// Reset flows and switch to AlwaysOn Schedule
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	SingleDuct::Sys( SysNum ).SchedPtr = 2;
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Cleanup
-		DataHeatBalFanSys::TempControlType.deallocate();
-		DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
+	// Cleanup
+	DataHeatBalFanSys::TempControlType.deallocate();
+	DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
 
 }
 
 TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
-		std::string const idf_objects = delimited_string( {
+	std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 		"  Zone,",
 		"    Zone 1;                !- Name",
@@ -288,115 +288,115 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		"    ,                        !- Schedule Type Limits Name",
 		"    1;                       !- Hourly Value",
 
-		} ) ;
+	} ) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_FALSE( process_idf( idf_objects ) );
 
-		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-		ScheduleManager::ProcessScheduleInput(); // read schedules
-		ScheduleManager::ScheduleInputProcessed = true;
-		DataEnvironment::Month = 1;
-		DataEnvironment::DayOfMonth = 21;
-		DataGlobals::HourOfDay = 1;
-		DataGlobals::TimeStep = 1;
-		DataEnvironment::DSTIndicator = 0;
-		DataEnvironment::DayOfWeek = 2;
-		DataEnvironment::HolidayIndex = 0;
-		DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-		DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
-		ScheduleManager::UpdateScheduleValues();
+	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+	ScheduleManager::ProcessScheduleInput(); // read schedules
+	ScheduleManager::ScheduleInputProcessed = true;
+	DataEnvironment::Month = 1;
+	DataEnvironment::DayOfMonth = 21;
+	DataGlobals::HourOfDay = 1;
+	DataGlobals::TimeStep = 1;
+	DataEnvironment::DSTIndicator = 0;
+	DataEnvironment::DayOfWeek = 2;
+	DataEnvironment::HolidayIndex = 0;
+	DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	ScheduleManager::UpdateScheduleValues();
 
-		bool ErrorsFound = false;
-		HeatBalanceManager::GetZoneData(ErrorsFound);
-		ASSERT_FALSE(ErrorsFound);
-		DataZoneEquipment::GetZoneEquipmentData1();
-		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
-		SingleDuct::GetSysInput();
-		EXPECT_TRUE( compare_err_stream( "" ) );
-		DataHeatBalFanSys::TempControlType.allocate( 1 );
-		DataHeatBalFanSys::TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
+	bool ErrorsFound = false;
+	HeatBalanceManager::GetZoneData(ErrorsFound);
+	ASSERT_FALSE(ErrorsFound);
+	DataZoneEquipment::GetZoneEquipmentData1();
+	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+	SingleDuct::GetSysInput();
+	EXPECT_TRUE( compare_err_stream( "" ) );
+	DataHeatBalFanSys::TempControlType.allocate( 1 );
+	DataHeatBalFanSys::TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-		// node number table
-		//  1   Zone 1 Air Node
-		//  2   Zone 1 Return Node
-		//  3   Zone 1 Supply Inlet
-		//  4   Zone 1 VAV Reheat Coil Air Inlet
-		//  5   Zone 1 Zone Equip Inlet
+	// node number table
+	//  1   Zone 1 Air Node
+	//  2   Zone 1 Return Node
+	//  3   Zone 1 Supply Inlet
+	//  4   Zone 1 VAV Reheat Coil Air Inlet
+	//  5   Zone 1 Zone Equip Inlet
 
-		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+	DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
 
-		// Setup for Zone 1 VAV No Reheat
-		int SysNum = 1;
-		int ZoneNum = 1;
-		int ZoneNodeNum = 1;
-		int InletNodeNum = 5;
-		bool FirstHVACIteration = true;
-		Real64 SysMinMassFlow = 0.25 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
-		Real64 SysMaxMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
+	// Setup for Zone 1 VAV No Reheat
+	int SysNum = 1;
+	int ZoneNum = 1;
+	int ZoneNodeNum = 1;
+	int InletNodeNum = 5;
+	bool FirstHVACIteration = true;
+	Real64 SysMinMassFlow = 0.25 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
+	Real64 SysMaxMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
 
-		// Test with heating load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
+	// Test with heating load
+	DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
-		// First test - AlwaysOff Schedule - expecting no flow
-		SingleDuct::Sys( SysNum ).SchedPtr = 1;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		DataGlobals::BeginEnvrnFlag = false;
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// First test - AlwaysOff Schedule - expecting no flow
+	SingleDuct::Sys( SysNum ).SchedPtr = 1;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	DataGlobals::BeginEnvrnFlag = false;
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Second test - AlwaysOn Schedule - expecting flow
-		// Reset flows and switch to AlwaysOn Schedule
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		SingleDuct::Sys( SysNum ).SchedPtr = 2;
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( SysMinMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// Second test - AlwaysOn Schedule - expecting flow
+	// Reset flows and switch to AlwaysOn Schedule
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	SingleDuct::Sys( SysNum ).SchedPtr = 2;
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( SysMinMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Test with cooling load
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
+	// Test with cooling load
+	DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
-		// First test - AlwaysOff Schedule - expecting no flow
-		SingleDuct::Sys( SysNum ).SchedPtr = 1;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		DataGlobals::BeginEnvrnFlag = false;
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// First test - AlwaysOff Schedule - expecting no flow
+	SingleDuct::Sys( SysNum ).SchedPtr = 1;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru SingleDuct::InitSys for this terminal unit
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	DataGlobals::BeginEnvrnFlag = false;
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( 0.0, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Second test - AlwaysOn Schedule - expecting flow
-		// Reset flows and switch to AlwaysOn Schedule
-		DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
-		DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
-		SingleDuct::Sys( SysNum ).SchedPtr = 2;
-		FirstHVACIteration = true;
-		SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-		FirstHVACIteration = false;
-		SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
-		SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
-		EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
-		EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
+	// Second test - AlwaysOn Schedule - expecting flow
+	// Reset flows and switch to AlwaysOn Schedule
+	DataLoopNode::Node( InletNodeNum ).MassFlowRate = SysMinMassFlow;
+	DataLoopNode::Node( InletNodeNum ).MassFlowRateMaxAvail = SysMaxMassFlow;
+	SingleDuct::Sys( SysNum ).SchedPtr = 2;
+	FirstHVACIteration = true;
+	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
+	FirstHVACIteration = false;
+	SingleDuct::InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
+	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
+	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
+	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-		// Cleanup
-		DataHeatBalFanSys::TempControlType.deallocate();
-		DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
+	// Cleanup
+	DataHeatBalFanSys::TempControlType.deallocate();
+	DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
 
 }
