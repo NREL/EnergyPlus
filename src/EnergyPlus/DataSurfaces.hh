@@ -93,16 +93,18 @@ namespace DataSurfaces {
 	// Parameters to indicate surface shape for use with the Surface
 	// derived type (see below):
 
-	extern int const Triangle;
-	extern int const Quadrilateral;
-	extern int const Rectangle;
-	extern int const Polygonal;
-	extern int const RectangularDoorWindow;
-	extern int const RectangularOverhang;
-	extern int const RectangularLeftFin;
-	extern int const RectangularRightFin;
-	extern int const TriangularWindow;
-	extern int const TriangularDoor;
+	enum surfaceShape {
+		Triangle = 1,
+		Quadrilateral = 2,
+		Rectangle = 3,
+		RectangularDoorWindow = 4,
+		RectangularOverhang = 5,
+		RectangularLeftFin = 6,
+		RectangularRightFin = 7,
+		TriangularWindow = 8,
+		TriangularDoor = 9,
+		Polygonal = 10
+	};
 
 	// Parameters to indicate exterior boundary conditions for use with
 	// the Surface derived type (see below):

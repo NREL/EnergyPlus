@@ -94,31 +94,25 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    8.4;                     !- Version Identifier",
 
 		"	BuildingSurface:Detailed,",
-		"    Surface 1,        !- Name",
+		"    Surface 1 - Triangle,    !- Name",
 		"    Floor,                   !- Surface Type",
 		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
-		"    T3-RF1,                  !- Zone Name",
+		"    Zone1,                   !- Zone Name",
 		"    Outdoors,                !- Outside Boundary Condition",
 		"    ,                        !- Outside Boundary Condition Object",
 		"    NoSun,                   !- Sun Exposure",
 		"    NoWind,                  !- Wind Exposure",
 		"    ,                        !- View Factor to Ground",
 		"    ,                        !- Number of Vertices",
-		"    0.0,       !- Vertex 1 X-coordinate {m}",
-		"    0.0,         !- Vertex 1 Y-coordinate {m}",
-		"    0.0,                     !- Vertex 1 Z-coordinate {m}",
-		"    2.0,       !- Vertex 2 X-coordinate {m}",
-		"    0.0,        !- Vertex 2 Y-coordinate {m}",
-		"    0.0,                     !- Vertex 2 Z-coordinate {m}",
-		"    1.0,       !- Vertex 3 X-coordinate {m}",
-		"    2.0,        !- Vertex 3 Y-coordinate {m}",
-		"    0.0;                     !- Vertex 3 Z-coordinate {m}",
+		"    0.0, 0.0, 0.0,           !- Vertex 1 X-coordinate {m}",
+		"    2.0, 0.0, 0.0,           !- Vertex 2 X-coordinate {m}",
+		"    1.0, 2.0, 0.0;           !- Vertex 3 X-coordinate {m}",
 
 		"	BuildingSurface:Detailed,",
-		"    Surface 2,        !- Name",
+		"    Surface 2 - Quadrilateral,  !- Name",
 		"    Floor,                   !- Surface Type",
 		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
-		"    T3-RF1,                  !- Zone Name",
+		"    Zone1,                   !- Zone Name",
 		"    Outdoors,                !- Outside Boundary Condition",
 		"    ,                        !- Outside Boundary Condition Object",
 		"    NoSun,                   !- Sun Exposure",
@@ -139,10 +133,10 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    -6.9300904918858e-014;   !- Vertex 4 Z-coordinate {m}",
 
 		"	BuildingSurface:Detailed,",
-		"    Surface 3,               !- Name",
+		"    Surface 3 - Rectangle,   !- Name",
 		"    Wall,                    !- Surface Type",
 		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
-		"    T3-RF1,                  !- Zone Name",
+		"    Zone1,                   !- Zone Name",
 		"    Outdoors,                !- Outside Boundary Condition",
 		"    ,                        !- Outside Boundary Condition Object",
 		"    NoSun,                   !- Sun Exposure",
@@ -155,10 +149,10 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    0.0, 0.0, 1.0;           !- X,Y,Z ==> Vertex 4 {m}",
 
 		"	FenestrationSurface:Detailed,",
-		"    Surface 4,    !- Name",
+		"    Surface 4 - RectangularDoorWindow,    !- Name",
 		"    Window,                  !- Surface Type",
 		"    SINGLE PANE HW WINDOW,   !- Construction Name",
-		"    Surface 3,               !- Building Surface Name",
+		"    Surface 3 - Rectangle,   !- Building Surface Name",
 		"    ,                        !- Outside Boundary Condition Object",
 		"    0.0,                     !- View Factor to Ground",
 		"    ,                        !- Shading Control Name",
@@ -170,26 +164,66 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    0.8, 0.0, 0.8,           !- X,Y,Z ==> Vertex 3 {m}",
 		"    0.2, 0.0, 0.8;           !- X,Y,Z ==> Vertex 4 {m}",
 
+//		"	Shading:Overhang:Projection,",
+//		"    Surface 5 - RectangularOverhang,               !- Name",
+//		"    Surface 9,               !- Window or Door Name",
+//		"    .01,                     !- Height above Window or Door {m}",
+//		"    90,                      !- Tilt Angle from Window/Door {deg}",
+//		"    .01,                     !- Left extension from Window/Door Width {m}",
+//		"    .01,                     !- Right extension from Window/Door Width {m}",
+//		"    .2;                      !- Depth as Fraction of Window/Door Height {dimensionless}",
+
+//		"	Shading:Fin:Projection,",
+//		"    Surface 6 - Left Fin,    !- Name",
+//		"    Surface 3 - Rectangle,   !- Window or Door Name",
+//		"    .01,                     !- Left Extension from Window/Door {m}",
+//		"    .01,                     !- Left Distance Above Top of Window {m}",
+//		"    .01,                     !- Left Distance Below Bottom of Window {m}",
+//		"    90,                      !- Left Tilt Angle from Window/Door {deg}",
+//		"    .01,                     !- Left Depth as Fraction of Window/Door Width {dimensionless}",
+//		"    0,                       !- Right Extension from Window/Door {m}",
+//		"    0,                       !- Right Distance Above Top of Window {m}",
+//		"    0,                       !- Right Distance Below Bottom of Window {m}",
+//		"    0,                       !- Right Tilt Angle from Window/Door {deg}",
+//		"    0;                       !- Right Depth as Fraction of Window/Door Width {dimensionless}",
+
+
 		"	FenestrationSurface:Detailed,",
-		"    Surface 8,    !- Name",
+		"    Surface 8 - TriangularWindow,    !- Name",
 		"    Window,                  !- Surface Type",
 		"    SINGLE PANE HW WINDOW,   !- Construction Name",
-		"    Surface 3,               !- Building Surface Name",
+		"    Surface 3 - Rectangle,   !- Building Surface Name",
 		"    ,                        !- Outside Boundary Condition Object",
 		"    0.0,                     !- View Factor to Ground",
 		"    ,                        !- Shading Control Name",
 		"    ,                        !- Frame and Divider Name",
 		"    1.0,                     !- Multiplier",
 		"    Autocalculate,           !- Number of Vertices",
-		"    0.05, 0.0, 0.05,           !- X,Y,Z ==> Vertex 1 {m}",
-		"    0.15, 0.0, 0.05,           !- X,Y,Z ==> Vertex 2 {m}",
-		"    0.10, 0.0, 0.15;           !- X,Y,Z ==> Vertex 3 {m}",
+		"    0.05, 0.0, 0.05,         !- X,Y,Z ==> Vertex 1 {m}",
+		"    0.15, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
+		"    0.10, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
+
+//		"	FenestrationSurface:Detailed,",
+//		"    Surface 9 - TriangularDoor,      !- Name",
+//		"    Door,                    !- Surface Type",
+//		"    External door,           !- Construction Name",
+//		"    Surface 3,               !- Building Surface Name",
+//		"    ,                        !- Outside Boundary Condition Object",
+//		"    0.5,                     !- View Factor to Ground",
+//		"    ,                        !- Shading Control Name",
+//		"    ,                        !- Frame and Divider Name",
+//		"    1,                       !- Multiplier",
+//		"    3,                       !- Number of Vertices",
+//		"    0.80, 0.0, 0.05,         !- X,Y,Z ==> Vertex 1 {m}",
+//		"    0.95, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
+//		"    0.90, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
+
 
 		"	BuildingSurface:Detailed,",
-		"    Surface 10,        !- Name",
+		"    Surface 10 - Polygonal,  !- Name",
 		"    Floor,                   !- Surface Type",
 		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
-		"    T3-RF1,                  !- Zone Name",
+		"    Zone1,                   !- Zone Name",
 		"    Outdoors,                !- Outside Boundary Condition",
 		"    ,                        !- Outside Boundary Condition Object",
 		"    NoSun,                   !- Sun Exposure",
@@ -213,11 +247,11 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    0.0;   !- Vertex 4 Z-coordinate {m}",
 
 		"Zone,",
-		"    T3-RF1,                  !- Name",
-		"    60,                      !- Direction of Relative North {deg}",
-		"    234.651324196041,        !- X Origin {m}",
-		"    -132.406575100608,       !- Y Origin {m}",
-		"    14.8000000000003,        !- Z Origin {m}",
+		"    Zone1,                   !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0.0,                     !- X Origin {m}",
+		"    0.0,                     !- Y Origin {m}",
+		"    0.0,                     !- Z Origin {m}",
 		"    ,                        !- Type",
 		"    ,                        !- Multiplier",
 		"    ,                        !- Ceiling Height {m}",
@@ -227,12 +261,16 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    ,                        !- Zone Outside Convection Algorithm",
 		"    No;                      !- Part of Total Floor Area",
 
-		"Construction,",
+		" Construction,",
 		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
 		"    MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
 		"    CP02 CARPET PAD;         !- Layer 2",
 
-		"Material,",
+//		" Construction,",
+//		"    External door,   !- Name",
+//		"    Painted Oak;        !- Outside Layer",
+	
+		" Material,",
 		"    MAT-CC05 4 HW CONCRETE,  !- Name",
 		"    Rough,                   !- Roughness",
 		"    0.1016,                  !- Thickness {m}",
@@ -243,7 +281,18 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 		"    0.85,                    !- Solar Absorptance",
 		"    0.85;                    !- Visible Absorptance",
 
-		"Material:NoMass,",
+		" Material,",
+		"    Painted Oak,        !- Name",
+		"    Rough,                   !- Roughness",
+		"    0.035,                   !- Thickness {m}",
+		"    0.19,                    !- Conductivity {W/m-K}",
+		"    700,                     !- Density {kg/m3}",
+		"    2390,                    !- Specific Heat {J/kg-K}",
+		"    0.9,                     !- Thermal Absorptance",
+		"    0.5,                     !- Solar Absorptance",
+		"    0.5;                     !- Visible Absorptance",
+
+		" Material:NoMass,",
 		"    CP02 CARPET PAD,         !- Name",
 		"    Smooth,                  !- Roughness",
 		"    0.1,                     !- Thermal Resistance {m2-K/W}",
@@ -309,35 +358,46 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 
 	AllocateModuleArrays();
 
-// as soon as a window was added, the surface order was jumbled. "Surface 1" is the triangle surface, but it's Surface(4) in the array
-//	int const Triangle( 1 );
+//  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
+//	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
+
+//	enum surfaceShape:Triangle = 1
+//	Surface( 4 ).Name = "Surface 1 - Triangle"
 	ProcessSurfaceVertices( 4, ErrorsFound );
 	EXPECT_EQ( Triangle, Surface( 4 ).Shape );
 
-//	int const Quadrilateral( 2 );
+//	enum surfaceShape:Quadrilateral = 2
+//	Surface( 5 ).Name = "Surface 2 - Quadrilateral"
 	ProcessSurfaceVertices( 5, ErrorsFound );
 	EXPECT_EQ( Quadrilateral, Surface( 5 ).Shape );
 
-//	int const Rectangle( 3 );
+//	enum surfaceShape:Rectangle = 3
+//	Surface( 1 ).Name = "Surface 3 - Rectangle"
 	ProcessSurfaceVertices( 1, ErrorsFound );
 	EXPECT_EQ( Rectangle, Surface( 1 ).Shape );
 
-//	int const RectangularDoorWindow( 4 );
+//	enum surfaceShape:RectangularDoorWindow = 4
+//	Surface( 2 ).Name = "Surface 4 - RectangularDoorWindow"
 	ProcessSurfaceVertices( 2, ErrorsFound );
 	EXPECT_EQ( RectangularDoorWindow, Surface( 2 ).Shape );
 
-//	int const TriangularWindow( 8 );
+// not sure why these are causing problems
+//	enum surfaceShape:RectangularOverhang = 5
+//	enum surfaceShape:RectangularLeftFin = 6
+//	enum surfaceShape:RectangularRightFin = 7
+
+//	enum surfaceShape:TriangularWindow = 8
+//	Surface( 3 ).Name = "Surface 8 - TriangularWindow"
 	ProcessSurfaceVertices( 3, ErrorsFound );
 	EXPECT_EQ( TriangularWindow, Surface( 3 ).Shape );
 
-//	int const Polygonal( 10 );
+//	enum surfaceShape:TriangularDoor = 9
+
+//	enum surfaceShape:Polygonal = 10
+//	Surface( 6 ).Name = "Surface 10 - Polygonal"
 	ProcessSurfaceVertices( 6, ErrorsFound );
 	EXPECT_EQ( Polygonal, Surface( 6 ).Shape );
 
-//	int const RectangularOverhang( 5 );
-//	int const RectangularLeftFin( 6 );
-//	int const RectangularRightFin( 7 );
-//	int const TriangularDoor( 9 );
 
 }
 
