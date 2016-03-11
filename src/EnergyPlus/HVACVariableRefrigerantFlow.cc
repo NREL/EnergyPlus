@@ -6271,7 +6271,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 LoadToCoolingSP; // thermostat load to cooling setpoint (W)
 		Real64 LoadToHeatingSP; // thermostat load to heating setpoint (W)
 		Real64 TempOutput; // terminal unit output [W]
-		int FanOpMode; // TU fan operating mode
 
 		MaxDeltaT = 0.0;
 		MinDeltaT = 0.0;
