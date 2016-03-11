@@ -226,7 +226,7 @@ namespace SingleDuct {
 			HeatAirMassFlowRateMax( 0.0 ),
 			ZoneMinAirFracMethod( ConstantMinFrac ),
 			ZoneMinAirFrac( 0.0 ),
-			ZoneMinAirFracReport(0.0),
+			ZoneMinAirFracReport( 0.0 ),
 			ZoneFixedMinAir( 0.0 ),
 			ZoneMinAirFracSchPtr( 0 ),
 			ConstantMinAirFracSetByUser( false ),
