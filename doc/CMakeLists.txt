@@ -4,12 +4,12 @@ execute_process( COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/doc ${CMAKE
 
 add_subdirectory(acknowledgements)
 add_subdirectory(auxiliary-programs)
+add_subdirectory(ems-application-guide)
 add_subdirectory(engineering-reference)
 
 add_subdirectory(input-output-reference)
 
 set( DOCS
-     ems-application-guide:EMS_Application_Guide
      external-interfaces-application-guide:ExternalInterfaces_Application_Guide
      getting-started:GettingStarted
      interface-developer:InterfaceDeveloper
