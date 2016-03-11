@@ -2,11 +2,12 @@
 
 execute_process( COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/doc ${CMAKE_BINARY_DIR}/doc-build)
 
+add_subdirectory(engineering-reference)
+
 set( DOCS
      acknowledgements:Acknowledgements
      auxiliary-programs:AuxiliaryPrograms
      ems-application-guide:EMS_Application_Guide
-     engineering-reference:EngineeringReference
      external-interfaces-application-guide:ExternalInterfaces_Application_Guide
      getting-started:GettingStarted
      input-output-reference:InputOutputReference
