@@ -10,9 +10,9 @@ add_subdirectory(external-interfaces-application-guide)
 add_subdirectory(getting-started)
 add_subdirectory(input-output-reference)
 add_subdirectory(interface-developer)
+add_subdirectory(module-developer)
 
 set( DOCS
-     module-developer:ModuleDeveloper
      output-details-and-examples:OutputDetailsAndExamples
      plant-application-guide:PlantApplicationGuide
      tips-and-tricks-using-energyplus:Tips_and_Tricks_Using_EnergyPlus
