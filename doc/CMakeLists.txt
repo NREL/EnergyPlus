@@ -11,7 +11,6 @@ add_subdirectory(external-interfaces-application-guide)
 add_subdirectory(input-output-reference)
 
 set( DOCS
-     external-interfaces-application-guide:ExternalInterfaces_Application_Guide
      getting-started:GettingStarted
      interface-developer:InterfaceDeveloper
      module-developer:ModuleDeveloper
