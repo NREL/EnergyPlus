@@ -6,6 +6,7 @@ add_subdirectory(acknowledgements)
 add_subdirectory(auxiliary-programs)
 add_subdirectory(ems-application-guide)
 add_subdirectory(engineering-reference)
+add_subdirectory(external-interfaces-application-guide)
 
 add_subdirectory(input-output-reference)
 
