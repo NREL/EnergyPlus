@@ -27,7 +27,7 @@ The solar radiation transmitted by a system of glass layers and the solar radiat
 
 % table 28
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
-\caption{  Variables in Window Calculations \label{table:variables-in-window-calculations}}\\
+\caption{Variables in Window Calculations \label{table:variables-in-window-calculations}}\\
 \toprule 
 \textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule \endhead
 T & Transmittance & - & - \tabularnewline \midrule
@@ -40,12 +40,12 @@ R\(^{dir}_{gl,f}\), R\(^{dir}_{gl,b}\) & Direct front and back reflectance of gl
 A\(^{f}_{i}\), A\(^{b}_{i}\) & Front~ absorptance, back absorptance of layer i & - & - \tabularnewline \midrule
 N & Number of glass layers & - & Nlayer \tabularnewline \midrule
 $\lambda$ & Wavelength & microns & Wle \tabularnewline \midrule
-E\(_{s}\) ($\lambda$) & Solar spectral irradiance function & W/m  -micron & E \tabularnewline \midrule
+E\(_{s}\) ($\lambda$) & Solar spectral irradiance function & W/m\(^{2}\)-micron & E \tabularnewline \midrule
 V($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline \midrule
 $\varphi$ & Angle of incidence (angle between surface normal and direction of incident beam radiation) & Rad & Phi \tabularnewline \midrule
 $\tau$ & Transmittivity or transmittance & - & tf0 \tabularnewline \midrule
 $\rho$ & Reflectivity or reflectance & - & rf0, rb0 \tabularnewline \midrule
-$\alpha$ & Spectral absorption coefficient & m & - \tabularnewline \midrule
+$\alpha$ & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline \midrule
 d & Glass thickness & M & Material\%Thickness \tabularnewline \midrule
 n & Index of refraction & - & ngf, ngb \tabularnewline \midrule
 $\kappa$ & Extinction coefficient & - & - \tabularnewline \midrule
@@ -55,7 +55,7 @@ $\tau$\(_{sh}\) & Shade transmittance & - & Material\%Trans \tabularnewline \mid
 $\rho$\(_{sh}\) & Shade reflectance & - & Material\%ReflectShade \tabularnewline \midrule
 $\alpha$\(_{sh}\) & Shade absorptance & - & Material\%AbsorpSolar \tabularnewline \midrule
 $\tau$\(_{bl}\) $\rho$\(_{bl}\) $\alpha$\(_{bl}\) & Blind transmittance, reflectance, absorptance & - & - \tabularnewline \midrule
-Q, G, J & Source, irradiance and radiosity for blind optical properties calculation & W/m & - \tabularnewline \midrule
+Q, G, J & Source, irradiance and radiosity for blind optical properties calculation & W/m\(^{2}\) & - \tabularnewline \midrule
 F\(_{ij}\) & View factor between segments i and j & - & - \tabularnewline \midrule
 f\(_{switch}\) & Switching factor & - & SwitchFac \tabularnewline \midrule
 R($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline \midrule
@@ -63,7 +63,7 @@ $\varphi$' & Relative azimuth angle (angle between screen surface normal and ver
 $\alpha$' & Relative altitude angle (angle between screen surface horizontal normal plane and direction of incident beam radiation, Ref. Figure 87) & Rad & SunAltitudeToScreenNormal \tabularnewline \midrule
 $\rho$\(_{sc}\) & Beam-to-diffuse solar reflectance of screen material & - & Screens\%ReflectCylinder \tabularnewline \midrule
 $\gamma$ & Screen material aspect ratio & - & Screens\%ScreenDiameterTo SpacingRatio \tabularnewline \midrule
-Α & Spectral absorption coefficient & m & - \tabularnewline \midrule
+Α & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline \midrule
 D & Glass thickness & M & Material\%Thickness \tabularnewline \midrule
 N & Index of refraction & - & ngf, ngb \tabularnewline \midrule
 Κ & Extinction coefficient & - & - \tabularnewline \midrule

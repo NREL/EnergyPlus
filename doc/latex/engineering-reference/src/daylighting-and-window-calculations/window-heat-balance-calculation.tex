@@ -1,31 +1,31 @@
 \section{Window Heat Balance Calculation}\label{window-heat-balance-calculation}
 
 % table 36
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Fortran Variables used in Window Heat Balance Calculations \protect \label{table:fortran-variables-used-in-window-heat-balance}}\\
+\begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
+\caption{Fortran Variables used in Window Heat Balance Calculations \protect \label{table:fortran-variables-used-in-window-heat-balance}}\\
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule
 \endhead
-N & Number of glass layers & - & nlayer \tabularnewline
-σ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline
-ε & Emissivity of face i & - & emis \tabularnewline
-k & Conductance of glass layer i & W/m  -K & scon \tabularnewline
-h  , h & Outside, inside air film convective conductance & W/m  -K & hcout, hcout \tabularnewline
-h & Conductance of gap j & W/m  -K & hgap \tabularnewline
-T  , T & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline
-E  , E & Exterior, interior long-wave radiation incident on window & W/m & outir, rmir \tabularnewline
-θ & Temperature of face i & K & thetas \tabularnewline
-S & Radiation (short-wave, and long-wave from zone internal sources) absorbed by face i & W/m & AbsRadGlassFace \tabularnewline
-I & Exterior beam normal solar irradiance & W/m & BeamSolarRad \tabularnewline
-I & Exterior diffuse solar irradiance on glazing & W/m & - \tabularnewline
-I & Interior short-wave radiation (from lights and from reflected diffuse solar) incident on glazing from inside & W/m & QS \tabularnewline
-I & Long-wave radiation from lights and equipment incident on glazing from inside & W/m & QL \tabularnewline
-φ & Angle of incidence & radians & - \tabularnewline
-A & Front beam solar absorptance of glass layer j & - & - \tabularnewline
-A   , A & Front and back diffuse solar absorptance of glass layer j & - & AbsDiff, AbsDiffBack \tabularnewline
-A, B & Matrices used to solve glazing heat balance equations & W/m  , W/m  -K & Aface, Bface \tabularnewline
-h & Radiative conductance for face i & W/m  -K & hr(i) \tabularnewline
-Δθ & Difference in temperature of face i between successive iterations & K & - \tabularnewline
+N & Number of glass layers & - & nlayer \tabularnewline \midrule
+$\alpha$ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline \midrule
+$\varepsilon$\(_{i}\) & Emissivity of face i & - & emis \tabularnewline \midrule
+k\(_{i}\) & Conductance of glass layer i & W/m\(^{2}\)-K & scon \tabularnewline \midrule
+h\(_{o}\), h\(_{i}\) & Outside, inside air film convective conductance & W/m\(^{2}\)-K & hcout, hcout \tabularnewline \midrule
+h\(_{i}\) & Conductance of gap j & W/m\(^{2}\)-K & hgap \tabularnewline \midrule
+T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline \midrule
+E\(_{o}\), E\(_{i}\) & Exterior, interior long-wave radiation incident on window & W/m\(^{2}\) & outir, rmir \tabularnewline \midrule
+$\theta$\(_{i}\) & Temperature of face i & K & thetas \tabularnewline \midrule
+S\(_{i}\) & Radiation (short-wave, and long-wave from zone internal sources) absorbed by face i & W/m\(^{2}\) & AbsRadGlassFace \tabularnewline \midrule
+I\(^{ext}_{bm}\) & Exterior beam normal solar irradiance & W/m\(^{2}\) & BeamSolarRad \tabularnewline \midrule
+I\(^{ext}_{dif}\) & Exterior diffuse solar irradiance on glazing & W/m\(^{2}\) & - \tabularnewline \midrule
+I\(^{int}_{sw}\) & Interior short-wave radiation (from lights and from reflected diffuse solar) incident on glazing from inside & W/m\(^{2}\) & QS \tabularnewline \midrule
+I\(^{int}_{lw}\) & Long-wave radiation from lights and equipment incident on glazing from inside & W/m\(^{2}\) & QL \tabularnewline \midrule
+$\varphi$ & Angle of incidence & radians & - \tabularnewline \midrule
+A\(^{f}_{j}\) & Front beam solar absorptance of glass layer j & - & - \tabularnewline \midrule
+A\(^{f,diff}_{j}\), A\(^{b,diff}_{j}\) & Front and back diffuse solar absorptance of glass layer j & - & AbsDiff, AbsDiffBack \tabularnewline \midrule
+A, B & Matrices used to solve glazing heat balance equations & W/m\(^{2}\), W/m\(^{2}\)-K & Aface, Bface \tabularnewline \midrule
+h\(_{r,i}\) & Radiative conductance for face i & W/m\(^{2}\)-K & hr(i) \tabularnewline \midrule
+$\Delta\theta$\(_{i}\) & Difference in temperature of face i between successive iterations & K & - \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -36,7 +36,7 @@ The window glass face temperatures are determined by solving the heat balance eq
 \begin{figure}[hbtp] % fig 95
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1470.png}
-\caption{  Glazing system with two glass layers showing variables used in heat balance equations. \protect \label{fig:glazing-system-with-two-glass-layers-showing}}
+\caption{  Glazing system with two glass layers showing variables used in heat balance equations. \protect \label{fig:glazing-system-with-two-glass-layers-showing}}
 \end{figure}
 
 The following assumptions are made in deriving the heat balance equations:
@@ -213,7 +213,7 @@ The value of the inside face temperature, \({\theta_{2N}}\) , determined in this
 
 % table 37
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Fortran Variables used in Edge of Glass calculations \protect \label{table:fortran-variables-used-in-edge-of-glass}}\\
+\caption{  Fortran Variables used in Edge of Glass calculations \protect \label{table:fortran-variables-used-in-edge-of-glass}}\\
 \toprule 
 Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
 \endhead
@@ -259,7 +259,7 @@ The different regions are shown in Figure~\ref{fig:different-types-of-glass-regi
 \begin{figure}[hbtp] % fig 96
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1534.png}
-\caption{  Different types of glass regions. \protect \label{fig:different-types-of-glass-regions.}}
+\caption{  Different types of glass regions. \protect \label{fig:different-types-of-glass-regions.}}
 \end{figure}
 
 Equation can be rewritten as
@@ -365,7 +365,7 @@ For the zone heat balance calculation the inside surface temperature of the fram
 
 % table 38
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Fortran Variables used in Window/Frame and Divider calculations \protect \label{table:fortran-variables-used-in-windowframe}}\\
+\caption{  Fortran Variables used in Window/Frame and Divider calculations \protect \label{table:fortran-variables-used-in-windowframe}}\\
 \toprule 
 Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
 \endhead
@@ -419,7 +419,7 @@ Figure~\ref{fig:cross-section-through-a-window-showing-frame} shows a cross sect
 \begin{figure}[hbtp] % fig 97
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1557.png}
-\caption{  Cross section through a window showing frame and divider (exaggerated horizontally). \protect \label{fig:cross-section-through-a-window-showing-frame}}
+\caption{  Cross section through a window showing frame and divider (exaggerated horizontally). \protect \label{fig:cross-section-through-a-window-showing-frame}}
 \end{figure}
 
 \textbf{~}
@@ -635,7 +635,7 @@ The amount of beam solar reflected from reveal surfaces depends, among other thi
 \begin{figure}[hbtp] % fig 98
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1593.png}
-\caption{  Example of shadowing of reveal surfaces by other reveal surfaces. \protect \label{fig:example-of-shadowing-of-reveal-surfaces-by}}
+\caption{  Example of shadowing of reveal surfaces by other reveal surfaces. \protect \label{fig:example-of-shadowing-of-reveal-surfaces-by}}
 \end{figure}
 
 The size of the shadowed areas, and the size of the corresponding illuminated areas, depends on the following factors:
@@ -692,7 +692,7 @@ Figure 99.~ Expression for area of shaded regions for different shadow patterns:
 \begin{figure}[hbtp] % fig 100
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1607.png}
-\caption{  Vertical section through a vertical window with outside and inside reveal showing calculation of the shadows cast by the top reveal onto the inside sill and by the frame onto the inside sill. \protect \label{fig:vertical-section-through-a-vertical-window}}
+\caption{  Vertical section through a vertical window with outside and inside reveal showing calculation of the shadows cast by the top reveal onto the inside sill and by the frame onto the inside sill. \protect \label{fig:vertical-section-through-a-vertical-window}}
 \end{figure}
 
 The following logic gives expressions for the shadowed areas for all possible shadow patterns. Here:
@@ -728,119 +728,119 @@ L1 = average distance to frame of illuminated area of outside reveal (used to ca
 L2 = average distance to frame of illuminated area of inside reveal (used to calculate view factor to frame).
 
 \begin{lstlisting}
- IF(window does not have a frame) THEN
-      IF(d2prime < = d2) THEN
-     IF(d12*TanAlpha < = L) THEN
-       A1sh = 0.5*TanAlpha*d1**2
-       A2sh = d2prime*L + 0.5*TanAlpha*d12**2 - A1sh
-     ELSE  ! d12*TanAlpha > L
-       IF(d1*TanAlpha < = L) THEN
-         A1sh = 0.5*TanAlpha*d1**2
-         A2sh = d2*L - 0.5*TanAlpha*(L/TanAlpha - d1)**2
-       ELSE  ! d1*TanAlpha > L
-         A1sh = d1*L - (0.5/TanAlpha)*L**2
-         A2sh = d2*L
-       END IF
-     END IF
-   ELSE  ! d2prime > d2
-     A2sh = d2*L
-     IF(d2prime < d1+d2) THEN
-       IF(d12*TanAlpha < = L) THEN
-         A1sh = L*(d2prime-d2) + 0.5*TanAlpha*d12**2
-       ELSE  ! d12*TanAlpha > L
-         A1sh = d1*L - 0.5*L**2/TanAlpha
-       END IF
-     ELSE  ! d2prime > = d1+d2
-       A1sh = d1*L
-     END IF
-   END IF
- ELSE  ! Window has a frame
-  f1 = d1-P1
-  f2 = d2-P2
-  d2prime2 = FrameWidth/TanGamma
-  IF(vertical reveal) THEN  ! Vertical reveal
-    IF(InsReveal+0.5*GlazingThickness < = P2) d2 = P2 + 0.001
-  ELSE                      ! Horizontal
-    IF(bottom reveal surfaces may be illuminated) THEN
-      ! Bottom reveal surfaces may be illuminated
-      IF(InsSillDepth+0.5*GlazingThickness< = P2) d2 = P2 + 0.001
-    ELSE
-      ! Top reveal surfaces may be illuminated
-      IF(InsReveal+0.5*GlazingThickness < = P2) d2 = P2 + 0.001
-    END IF
-  END IF
-  IF(d2prime < = f2) THEN
-    ! Shadow from opposing reveal does not go beyond inside
-     !  surface of frame
-    IF(d12*TanAlpha < = L) THEN
-      A1sh = 0.5*TanAlpha*f1**2
-      L1   = f1*(f1*TanAlpha/(6*L)+0.5)
-      IF(d2-(d2prime+d2prime2+P2) > = 0.) THEN
-        A2sh = (d2prime+d2prime2)*L + &
-          0.5*TanAlpha*((d1+d2-d2prime)**2-d1+p2+d2prime2)**2)
-        L2   = d2prime2 + 0.5*(d2-(d2prime+d2prime2+P2))
-      ELSE  ! d2-(d2prime+d2prime2+P2) < 0.
-        ! Inside reveal is fully shadowed by frame and/or
-         !opposing reveal
-        A2sh = f2*L
-        L2   = f2
-      END IF
-    ELSE  ! d12*TanAlpha > = L
-      IF((d1+P2)*TanAlpha < = L) THEN
-        A1sh = 0.5*TanAlpha*f1**2
-        L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
-        IF((d1+P2+d2prime2)*TanAlpha > = L) THEN
-          A2sh = f2*L
-          L2   = f2
-        ELSE  ! (d1+P2+d2prime2)*TanAlpha < L
-          A2sh = f2*L - 0.5*(L-(d1+P2)*TanAlpha)**2/TanAlpha &
-             + d2prime2*(L-(d1+P2+d2prime2/2)*TanAlpha)
-          L2 = d2prime2 + (L/TanAlpha - (d1+P2+d2prime2))/3
-        END IF
-      ELSE  ! (d1+P2)*TanAlpha > L
-        L2 = f2
-        A2sh = f2*L
-        IF(f1*TanAlpha < = L) THEN
-          A1sh = 0.5*TanAlpha*f1**2
-          L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
-        ELSE  ! f1*TanAlpha > L
-          A1sh = f1*L - 0.5*L**2/TanAlpha
-          L1 = f1-(L/TanAlpha)/3
-        END IF
-      END IF
-    END IF
-  ELSE
-     ! d2prime > f2 -- Shadow from opposing reveal goes beyond
-     ! inside of frame
-    A2sh = f2*L
-    L2 = f2
-    IF(d2prime > = d1+d2) THEN
-      A1sh = 0.0
-      L1   = f1
-    ELSE  ! d2prime < d1+d2
-      IF(d2prime < = d2+P1) THEN
-        IF(f1*TanAlpha < = L) THEN
-          A1sh = 0.5*TanAlpha*f1**2
-          L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
-        ELSE  ! f1*TanAlpha > L
-          A1sh = f1*L - 0.5*L**2/TanAlpha
-              L1   = f1 - (L/TanAlpha)/3
-            END IF
-          ELSE  ! d2prime > d2+P1
-            IF(d12*TanAlpha < = L) THEN
-              A1sh = L*(d2prime-(d2+P1)) + 0.5*TanAlpha*d12**2
-              L1   = (L*(f1-d12/2)-d12*TanAlpha* &
-                 (f1/2-d12/3))/(L-d12*TanAlpha/2)
-            ELSE  ! d12*TanAlpha > L
-              A1sh = f1*L - 0.5*L**2/TanAlpha
-              L1   = f1 - (L/TanAlpha)/3
-            END IF
-          END IF
-        END IF
-      END IF
-      FracToGlassOuts = 0.5*(1.0 - ATAN(FrameWidth/L1)/PiOvr2)
-      FracToGlassIns  = 0.5*(1.0 - ATAN(FrameWidth/L2)/PiOvr2)
-    END IF  ! End of check if window has frame
+ IF(window does not have a frame) THEN
+      IF(d2prime < = d2) THEN
+     IF(d12*TanAlpha < = L) THEN
+       A1sh = 0.5*TanAlpha*d1**2
+       A2sh = d2prime*L + 0.5*TanAlpha*d12**2 - A1sh
+     ELSE  ! d12*TanAlpha > L
+       IF(d1*TanAlpha < = L) THEN
+         A1sh = 0.5*TanAlpha*d1**2
+         A2sh = d2*L - 0.5*TanAlpha*(L/TanAlpha - d1)**2
+       ELSE  ! d1*TanAlpha > L
+         A1sh = d1*L - (0.5/TanAlpha)*L**2
+         A2sh = d2*L
+       END IF
+     END IF
+   ELSE  ! d2prime > d2
+     A2sh = d2*L
+     IF(d2prime < d1+d2) THEN
+       IF(d12*TanAlpha < = L) THEN
+         A1sh = L*(d2prime-d2) + 0.5*TanAlpha*d12**2
+       ELSE  ! d12*TanAlpha > L
+         A1sh = d1*L - 0.5*L**2/TanAlpha
+       END IF
+     ELSE  ! d2prime > = d1+d2
+       A1sh = d1*L
+     END IF
+   END IF
+ ELSE  ! Window has a frame
+  f1 = d1-P1
+  f2 = d2-P2
+  d2prime2 = FrameWidth/TanGamma
+  IF(vertical reveal) THEN  ! Vertical reveal
+    IF(InsReveal+0.5*GlazingThickness < = P2) d2 = P2 + 0.001
+  ELSE                      ! Horizontal
+    IF(bottom reveal surfaces may be illuminated) THEN
+      ! Bottom reveal surfaces may be illuminated
+      IF(InsSillDepth+0.5*GlazingThickness< = P2) d2 = P2 + 0.001
+    ELSE
+      ! Top reveal surfaces may be illuminated
+      IF(InsReveal+0.5*GlazingThickness < = P2) d2 = P2 + 0.001
+    END IF
+  END IF
+  IF(d2prime < = f2) THEN
+    ! Shadow from opposing reveal does not go beyond inside
+     !  surface of frame
+    IF(d12*TanAlpha < = L) THEN
+      A1sh = 0.5*TanAlpha*f1**2
+      L1   = f1*(f1*TanAlpha/(6*L)+0.5)
+      IF(d2-(d2prime+d2prime2+P2) > = 0.) THEN
+        A2sh = (d2prime+d2prime2)*L + &
+          0.5*TanAlpha*((d1+d2-d2prime)**2-d1+p2+d2prime2)**2)
+        L2   = d2prime2 + 0.5*(d2-(d2prime+d2prime2+P2))
+      ELSE  ! d2-(d2prime+d2prime2+P2) < 0.
+        ! Inside reveal is fully shadowed by frame and/or
+         !opposing reveal
+        A2sh = f2*L
+        L2   = f2
+      END IF
+    ELSE  ! d12*TanAlpha > = L
+      IF((d1+P2)*TanAlpha < = L) THEN
+        A1sh = 0.5*TanAlpha*f1**2
+        L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
+        IF((d1+P2+d2prime2)*TanAlpha > = L) THEN
+          A2sh = f2*L
+          L2   = f2
+        ELSE  ! (d1+P2+d2prime2)*TanAlpha < L
+          A2sh = f2*L - 0.5*(L-(d1+P2)*TanAlpha)**2/TanAlpha &
+             + d2prime2*(L-(d1+P2+d2prime2/2)*TanAlpha)
+          L2 = d2prime2 + (L/TanAlpha - (d1+P2+d2prime2))/3
+        END IF
+      ELSE  ! (d1+P2)*TanAlpha > L
+        L2 = f2
+        A2sh = f2*L
+        IF(f1*TanAlpha < = L) THEN
+          A1sh = 0.5*TanAlpha*f1**2
+          L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
+        ELSE  ! f1*TanAlpha > L
+          A1sh = f1*L - 0.5*L**2/TanAlpha
+          L1 = f1-(L/TanAlpha)/3
+        END IF
+      END IF
+    END IF
+  ELSE
+     ! d2prime > f2 -- Shadow from opposing reveal goes beyond
+     ! inside of frame
+    A2sh = f2*L
+    L2 = f2
+    IF(d2prime > = d1+d2) THEN
+      A1sh = 0.0
+      L1   = f1
+    ELSE  ! d2prime < d1+d2
+      IF(d2prime < = d2+P1) THEN
+        IF(f1*TanAlpha < = L) THEN
+          A1sh = 0.5*TanAlpha*f1**2
+          L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
+        ELSE  ! f1*TanAlpha > L
+          A1sh = f1*L - 0.5*L**2/TanAlpha
+              L1   = f1 - (L/TanAlpha)/3
+            END IF
+          ELSE  ! d2prime > d2+P1
+            IF(d12*TanAlpha < = L) THEN
+              A1sh = L*(d2prime-(d2+P1)) + 0.5*TanAlpha*d12**2
+              L1   = (L*(f1-d12/2)-d12*TanAlpha* &
+                 (f1/2-d12/3))/(L-d12*TanAlpha/2)
+            ELSE  ! d12*TanAlpha > L
+              A1sh = f1*L - 0.5*L**2/TanAlpha
+              L1   = f1 - (L/TanAlpha)/3
+            END IF
+          END IF
+        END IF
+      END IF
+      FracToGlassOuts = 0.5*(1.0 - ATAN(FrameWidth/L1)/PiOvr2)
+      FracToGlassIns  = 0.5*(1.0 - ATAN(FrameWidth/L2)/PiOvr2)
+    END IF  ! End of check if window has frame
 \end{lstlisting}
 
 The beam solar reflected from a sunlit region of area \(A\) is given by
@@ -1013,7 +1013,7 @@ For interior and exterior shading devices a pressure-balance equation is used to
 \begin{figure}[hbtp] % fig 102
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1670.png}
-\caption{  Vertical section (a) and perspective view (b) of glass layer and interior shading layer showing variables used in the gap airflow analysis. The opening areas *A\$\_\{t\}\$*, *A\$\_\{p\}\$*, *A\$\_\{l\}\$*, *A\$\_\{r\}\$* and *A\$\_\{h\}\$* are shown schematically. \protect \label{fig:vertical-section-a-and-perspective-view-b-of}}
+\caption{  Vertical section (a) and perspective view (b) of glass layer and interior shading layer showing variables used in the gap airflow analysis. The opening areas *A\$\_\{t\}\$*, *A\$\_\{p\}\$*, *A\$\_\{l\}\$*, *A\$\_\{r\}\$* and *A\$\_\{h\}\$* are shown schematically. \protect \label{fig:vertical-section-a-and-perspective-view-b-of}}
 \end{figure}
 
 \subsubsection{Pressure Balance Equation}\label{pressure-balance-equation}
@@ -1116,7 +1116,7 @@ Figure~\ref{fig:examples-of-openings-for-an-interior-shading} shows examples of 
 \begin{figure}[hbtp] % fig 103
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1679.png}
-\caption{  Examples of openings for an interior shading layer covering glass of height H and width W. Not to scale. (a) Horizontal section through shading layer with openings on the left and right sides (top view). (b) Vertical section through shading layer with openings at the top and bottom (side view). \protect \label{fig:examples-of-openings-for-an-interior-shading}}
+\caption{  Examples of openings for an interior shading layer covering glass of height H and width W. Not to scale. (a) Horizontal section through shading layer with openings on the left and right sides (top view). (b) Vertical section through shading layer with openings at the top and bottom (side view). \protect \label{fig:examples-of-openings-for-an-interior-shading}}
 \end{figure}
 
 Expression for the Gap Air Velocity
@@ -1174,7 +1174,7 @@ The thermal equivalent mean temperature of the gap air is
 \begin{figure}[hbtp] % fig 104
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1687.png}
-\caption{  Variation of gap air temperature with distance from the inlet for upward flow. \protect \label{fig:variation-of-gap-air-temperature-with}}
+\caption{  Variation of gap air temperature with distance from the inlet for upward flow. \protect \label{fig:variation-of-gap-air-temperature-with}}
 \end{figure}
 
 Solution Sequence for Gap Air Velocity and Outlet Temperature
@@ -1497,7 +1497,7 @@ where
 {H_0} = \frac{{\rho {C_p}s}}{{2{h_{cv}}}}v
 \end{equation}
 
-\emph{T\(_{n}\)}\(_{ }\) = ~ gap air inlet temperature (\emph{T\(_{i}\)} if the airflow source is indoor air, \emph{T\(_{o}\)} if the airflow source is outside air) (K)
+\emph{T\(_{n}\)}\(_{ }\) = ~ gap air inlet temperature (\emph{T\(_{i}\)} if the airflow source is indoor air, \emph{T\(_{o}\)} if the airflow source is outside air) (K)
 
 The outlet air temperature is given by
 
@@ -1515,7 +1515,7 @@ The convective heat gain to the zone air due to the gap airflow when the airflow
 
 where
 
-\emph{C\(_{i}\)}\(_{ }\) = heat capacity of the indoor air (J/kg-K)
+\emph{C\(_{i}\)}\(_{ }\) = heat capacity of the indoor air (J/kg-K)
 
 \emph{C\(_{t}\)} = heat capacity of the gap outlet air (J/kg-K)
 
@@ -1553,7 +1553,7 @@ where the average temperature of the two outlet air streams is
 
 and
 
-\emph{C\(_{t}\)}\(_{ }\) = heat capacity of the outlet air evaluated at \emph{T\(_{t}\)} (J/kg-K)
+\emph{C\(_{t}\)}\(_{ }\) = heat capacity of the outlet air evaluated at \emph{T\(_{t}\)} (J/kg-K)
 
 \begin{figure}[hbtp] % fig 108
 \centering
