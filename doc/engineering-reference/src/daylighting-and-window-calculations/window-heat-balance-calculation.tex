@@ -212,23 +212,23 @@ The value of the inside face temperature, \({\theta_{2N}}\) , determined in this
 \subsection{Edge-Of-Glass Effects}\label{edge-of-glass-effects}
 
 % table 37
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Fortran Variables used in Edge of Glass calculations \protect \label{table:fortran-variables-used-in-edge-of-glass}}\\
+\begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
+\caption{Fortran Variables used in Edge of Glass calculations \protect \label{table:fortran-variables-used-in-edge-of-glass}}\\
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule
 \endhead
-\$\textbackslashbar h\$ & Area-weighted net conductance of glazing including edge-of-glass effects & W/m  -K & - \tabularnewline
-A & Area of center-of-glass region & m & CenterGlArea \tabularnewline
-A & Area of frame edge region & m & FrameEdgeArea \tabularnewline
-A & Area of divider edge region & m & DividerEdgeArea \tabularnewline
-A & Total glazing area & m & Surface\%Area \tabularnewline
-h & Conductance of center-of-glass region (without air films) & W/m  -K & - \tabularnewline
-h & Conductance of frame edge region (without air films) & W/m  -K & - \tabularnewline
-h & Conductance of divider edge region (without air films) & W/m  -K & - \tabularnewline
-h & Convective conductance of gap k & W/m  -K & - \tabularnewline
-h & Radiative conductance of gap k & W/m  -K & - \tabularnewline
-η & Area ratio & - & - \tabularnewline
-α & Conductance ratio & - & FrEdgeToCenterGlCondRatio, DivEdgeToCenterGlCondRatio \tabularnewline
+\(\overline h\) & Area-weighted net conductance of glazing including edge-of-glass effects & W/m\(^{2}\)-K & - \tabularnewline \midrule
+A\(_{cg}\) & Area of center-of-glass region & m\(^{2}\) & CenterGlArea \tabularnewline \midrule
+A\(_{fe}\) & Area of frame edge region & m\(^{2}\) & FrameEdgeArea \tabularnewline \midrule
+A\(_{de}\) & Area of divider edge region & m\(^{2}\) & DividerEdgeArea \tabularnewline \midrule
+A\(_{tot}\) & Total glazing area & m\(^{2}\) & Surface\%Area \tabularnewline \midrule
+h\(_{cg}\) & Conductance of center-of-glass region (without air films) & W/m\(^{2}\)-K & - \tabularnewline \midrule
+h\(_{fe}\) & Conductance of frame edge region (without air films) & W/m\(^{2}\)-K & - \tabularnewline \midrule
+h\(_{de}\) & Conductance of divider edge region (without air films) & W/m\(^{2}\)-K & - \tabularnewline \midrule
+h\(_{ck}\) & Convective conductance of gap k & W/m\(^{2}\)-K & - \tabularnewline \midrule
+h\(_{rk}\) & Radiative conductance of gap k & W/m\(^{2}\)-K & - \tabularnewline \midrule
+$\eta$ & Area ratio & - & - \tabularnewline \midrule
+$\alpha$ & Conductance ratio & - & FrEdgeToCenterGlCondRatio, DivEdgeToCenterGlCondRatio \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -302,17 +302,17 @@ Neglecting the very small resistance of the glass layers, the center-of-glass co
 
 where
 
-\$\{h\_\{c,k\}\} = \$ convective conductance of the \emph{k\(^{h}\)} gap
+\emph{h\(_{c,k}\)} = convective conductance of the \emph{k\(^{h}\)} gap
 
-\$\{h\_\{r,k\}\} = \$ radiative conductance of the \emph{k\(^{h}\)} gap
+\emph{h\(_{r,k}\)} = radiative conductance of the \emph{k\(^{h}\)} gap
 
 \begin{equation}
 = \frac{1}{2}\sigma \frac{{{\varepsilon_i}{\varepsilon_j}}}{{1 - \left( {1 - {\varepsilon_i}} \right)\left( {1 - {\varepsilon_j}} \right)}}{\left( {{\theta_i} + {\theta_j}} \right)^3}
 \end{equation}
 
-\$\{\varepsilon\_i\},\{\varepsilon\_j\} = \$ emissivity of the faces bounding the gap
+$\varepsilon$\(_{i}\), $\varepsilon$\(_{j}\) = emissivity of the faces bounding the gap
 
-\$\{\theta\_i\},\{\theta\_j\} = \$ temperature of faces bounding the gap (K)
+$\theta$\(_{i}\), $\theta$\(_{j}\) = temperature of faces bounding the gap (K)
 
 Equation then becomes
 
@@ -364,50 +364,50 @@ Otherwise
 For the zone heat balance calculation the inside surface temperature of the frame and that of the divider are needed. These temperatures are determined by solving the heat balance equations on the inside and outside surfaces of the frame and divider.
 
 % table 38
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Fortran Variables used in Window/Frame and Divider calculations \protect \label{table:fortran-variables-used-in-windowframe}}\\
+\begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
+\caption{Fortran Variables used in Window/Frame and Divider calculations \protect \label{table:fortran-variables-used-in-windowframe}}\\
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule
 \endhead
-Q & IR from the exterior surround absorbed by outside frame surfaces & W & - \tabularnewline
-Q & IR emitted by outside frame surfaces & W & - \tabularnewline
-Q & Convection from outside air to outside frame surfaces & W & - \tabularnewline
-Q & Conduction through frame from inside frame surfaces to outside frame surfaces & W & - \tabularnewline
-Q & Solar radiation plus outside glass IR absorbed by outside of frame & W & - \tabularnewline
-Q & Diffuse solar absorbed by outside frame surfaces, per unit frame face area & W/ m & - \tabularnewline
-Q & Beam solar absorbed by outside frame surfaces, per unit frame face area & W/ m & - \tabularnewline
-I & Diffuse solar incident on window & W/ m & - \tabularnewline
-I & Direct normal solar irradiance & W/ m & - \tabularnewline
-α & Solar absorptance of frame & - & FrameSolAbsorp \tabularnewline
-R & Front diffuse solar reflectance of glazing & - & ~ \tabularnewline
-R & Front beam solar reflectance of glazing & - & ~ \tabularnewline
-cos(β  ) & Cosine of angle of incidence of beam solar on frame outside face & ~ & CosIncAng \tabularnewline
-Cos(β  ) & Cosine of angle of incidence of beam solar on frame projection parallel to window x-axis & - & CosIncAngHorProj \tabularnewline
-Cos(β  ) & Cosine of angle of incidence of beam solar on frame projection parallel to window y-axis & - & CosIncAngVertProj \tabularnewline
-f & Fraction of window that is sunlit & - & SunlitFrac \tabularnewline
-A & Area of frame’s outside face (same as area of frame’s inside face) & m & - \tabularnewline
-A  , A & Area of frame’s outside and inside projection faces & m & - \tabularnewline
-F & Form factor of frame’s outside or inside face for IR & - & - \tabularnewline
-F  , F & Form factor of frame outside projection for exterior IR; form factor of frame inside projection for interior IR & - & - \tabularnewline
-E & Exterior IR incident on window plane & W/m & outir \tabularnewline
-E & Interior IR incident on window plane & W/m & SurroundIRfromParentZone \tabularnewline
-ε  , ε & Outside, inside frame surface emissivity & - & FrameEmis \tabularnewline
-θ  , θ & Frame outside, inside surface temperature & K & FrameTempSurfOut, FrameTempSurfIn \tabularnewline
-T  , T & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline
-h  , h & Frame outside and inside air film convective conductance & W/m2-K & HOutConv, HInConv \tabularnewline
-k & Effective inside-surface to outside-surface conductance of frame per unit area of frame projected onto window plane & W/m  -K & FrameConductance, FrameCon \tabularnewline
-S & Q  /A & W/m  -K & FrameQRadOutAbs \tabularnewline
-S & Interior short-wave radiation plus interior IR from internal sources absorbed by inside of frame divided by A & W/m  -K & FrameQRadInAbs \tabularnewline
-η  , η & A  /A  , A  /A & - & - \tabularnewline
-H & Height of glazed portion of window & m & Surface\%Height \tabularnewline
-W & Width of glazed portion of window & m & Surface\%Width \tabularnewline
-w  , w & Frame width, divider width & m & FrameWidth, DividerWidth \tabularnewline
-p  , p & Frame outside, inside projection & m & FrameProjectionOut, FrameProjectionIn \tabularnewline
-N  , N & Number of horizontal, vertical dividers & - & HorDividers, VertDividers \tabularnewline
-T  , T & Frame outside, inside radiative temperature & K & TOutRadFr, TInRadFr \tabularnewline
-h  , h & Frame outside, inside surface radiative conductance & W/m  -K & HOutRad, HInRad \tabularnewline
-A & Intermediate variable in frame heat balance solution & K & Afac \tabularnewline
-C & Intermediate variable in frame heat balance solution & - & Efac \tabularnewline
+Q\(_{ExtIR,abs}\) & IR from the exterior surround absorbed by outside frame surfaces & W & - \tabularnewline \midrule
+Q\(_{IR,emitted}\) & IR emitted by outside frame surfaces & W & - \tabularnewline \midrule
+Q\(_{conv}\) & Convection from outside air to outside frame surfaces & W & - \tabularnewline \midrule
+Q\(_{cond}\) & Conduction through frame from inside frame surfaces to outside frame surfaces & W & - \tabularnewline \midrule
+Q\(_{abs}\) & Solar radiation plus outside glass IR absorbed by outside of frame & W & - \tabularnewline \midrule
+Q\(^{dif}_{abs,sol}\) & Diffuse solar absorbed by outside frame surfaces, per unit frame face area & W/m\(^{2}\) & - \tabularnewline \midrule
+Q\(^{bm}_{abs,sol}\) & Beam solar absorbed by outside frame surfaces, per unit frame face area & W/m\(^{2}\) & - \tabularnewline \midrule
+I\(^{dif}_{ext}\) & Diffuse solar incident on window & W/m\(^{2}\) & - \tabularnewline \midrule
+I\(^{bm}_{ext}\) & Direct normal solar irradiance & W/m\(^{2}\) & - \tabularnewline \midrule
+$\alpha$\(^{fr}_{sol}\) & Solar absorptance of frame & - & FrameSolAbsorp \tabularnewline \midrule
+R\(_{gl}^{f,dif}\) & Front diffuse solar reflectance of glazing & - & ~ \tabularnewline \midrule
+R\(_{gl}^{f,bm}\) & Front beam solar reflectance of glazing & - & ~ \tabularnewline \midrule
+cos($\beta$\(_{face}\)) & Cosine of angle of incidence of beam solar on frame outside face & ~ & CosIncAng \tabularnewline \midrule
+cos($\beta$\(_{h}\)) & Cosine of angle of incidence of beam solar on frame projection parallel to window x-axis & - & CosIncAngHorProj \tabularnewline \midrule
+cos($\beta$\(_{v}\)) & Cosine of angle of incidence of beam solar on frame projection parallel to window y-axis & - & CosIncAngVertProj \tabularnewline \midrule
+f\(_{sunlight}\) & Fraction of window that is sunlit & - & SunlitFrac \tabularnewline \midrule
+A\(_{f}\) & Area of frame’s outside face (same as area of frame’s inside face) & m\(^{2}\) & - \tabularnewline \midrule
+A\(_{p1}\), A\(_{p2}\) & Area of frame’s outside and inside projection faces & m\(^{2}\) & - \tabularnewline \midrule
+F\(_{f}\) & Form factor of frame’s outside or inside face for IR & - & - \tabularnewline \midrule
+F\(_{p1}\), F\(_{p2}\) & Form factor of frame outside projection for exterior IR; form factor of frame inside projection for interior IR & - & - \tabularnewline \midrule
+E\(_{o}\) & Exterior IR incident on window plane & W/m\(^{2}\) & outir \tabularnewline \midrule
+E\(_{i}\) & Interior IR incident on window plane & W/m\(^{2}\) & SurroundIRfromParentZone \tabularnewline \midrule
+$\varepsilon$\(_{1}\), $\varepsilon$\(_{2}\) & Outside, inside frame surface emissivity & - & FrameEmis \tabularnewline \midrule
+$\theta$\(_{1}\), $\theta$\(_{2}\) & Frame outside, inside surface temperature & K & FrameTempSurfOut, FrameTempSurfIn \tabularnewline \midrule
+T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline \midrule
+h\(_{o,c}\), h\(_{i,c}\) & Frame outside and inside air film convective conductance & W/m\(^{2}\)-K & HOutConv, HInConv \tabularnewline \midrule
+k & Effective inside-surface to outside-surface conductance of frame per unit area of frame projected onto window plane & W/m\(^{2}\)-K & FrameConductance, FrameCon \tabularnewline \midrule
+S\(_{1}\) & Q\(_{abs}\)/A\(_{f}\) & W/m\(^{2}\)-K & FrameQRadOutAbs \tabularnewline \midrule
+S\(_{2}\) & Interior short-wave radiation plus interior IR from internal sources absorbed by inside of frame divided by A\(_{f}\) & W/m\(^{2}\)-K & FrameQRadInAbs \tabularnewline \midrule
+$\eta$\(_{1}\), $\eta$\(_{2}\) & A\(_{p1}\)/A\(_{f}\), A\(_{p2}\)/A\(_{f}\) & - & - \tabularnewline \midrule
+H & Height of glazed portion of window & m & Surface\%Height \tabularnewline \midrule
+W & Width of glazed portion of window & m & Surface\%Width \tabularnewline \midrule
+w\(_{f}\), w\(_{d}\) & Frame width, divider width & m & FrameWidth, DividerWidth \tabularnewline \midrule
+p\(_{f1}\), p\(_{f2}\) & Frame outside, inside projection & m & FrameProjectionOut, FrameProjectionIn \tabularnewline \midrule
+N\(_{h}\), N\(_{v}\) & Number of horizontal, vertical dividers & - & HorDividers, VertDividers \tabularnewline \midrule
+T\(_{o,r}\), T\(_{i,r}\) & Frame outside, inside radiative temperature & K & TOutRadFr, TInRadFr \tabularnewline \midrule
+h\(_{o,r}\), h\(_{i,r}\) & Frame outside, inside surface radiative conductance & W/m\(^{2}\)-K & HOutRad, HInRad \tabularnewline \midrule
+A & Intermediate variable in frame heat balance solution & K & Afac \tabularnewline \midrule
+C & Intermediate variable in frame heat balance solution & - & Efac \tabularnewline \midrule
 B, D & Intermediate variables in frame heat balance solution & - & Bfac, Dfac \tabularnewline
 \bottomrule
 \end{longtable}
@@ -675,24 +675,22 @@ For each shadow pattern in Figure 99, equations are given for the shadowed areas
 
 For simplicity it is assumed that, for the case without a frame, the shadowed and illuminated areas extend into the glazing region. For this reason, \({d_1}\) and \({d_2}\) are measured from the midplane of the glazing. For the case with a frame, the beam solar absorbed by the surfaces formed by the frame outside and inside projections perpendicular to the glazing is calculated as described in ``Window Frame and Divider Calculation: Calculation of Solar Radiation Absorbed by Frame.''
 
-Figure 99.~ Expression for area of shaded regions for different shadow patterns: (a) window without frame, (b) window with frame
-
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image1605.png}
-\caption{}
+\caption{Expression for area of shaded regions for different shadow patterns: (a) window without frame, (b) window with frame}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image1606.png}
-\caption{}
+\caption{Expression for area of shaded regions for different shadow patterns: (a) window without frame, (b) window with frame}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 100
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1607.png}
-\caption{  Vertical section through a vertical window with outside and inside reveal showing calculation of the shadows cast by the top reveal onto the inside sill and by the frame onto the inside sill. \protect \label{fig:vertical-section-through-a-vertical-window}}
+\caption{Vertical section through a vertical window with outside and inside reveal showing calculation of the shadows cast by the top reveal onto the inside sill and by the frame onto the inside sill. \protect \label{fig:vertical-section-through-a-vertical-window}}
 \end{figure}
 
 The following logic gives expressions for the shadowed areas for all possible shadow patterns. Here:
@@ -926,15 +924,15 @@ The heat balance equation for the glass surface facing the gap between glass and
 
 where
 
-\emph{τ\(_{h}\)} = IR diffuse transmittance of shading device
+\emph{$\tau$\(_{sh}\)} = IR diffuse transmittance of shading device
 
-\emph{ε\(_{h}\)} = diffuse emissivity of shading device
+\emph{$\varepsilon$\(_{h}\)} = diffuse emissivity of shading device
 
-\emph{ρ\(_{h}\)} = IR diffuse reflectance of shading device ( = 1 - ( \emph{τ\(_{h}\)} + \emph{ε\(_{h}\)}))
+\emph{$\rho$\(_{sh}\)} = IR diffuse reflectance of shading device ( = 1 - ( \emph{$\tau$\(_{sh}\)} + \emph{$\varepsilon$\(_{sh}\)}))
 
-\emph{θ\(_{5}\)} = temperature of the surface of the shading layer that faces the gap (K).
+\emph{$\theta$\(_{5}\)} = temperature of the surface of the shading layer that faces the gap (K).
 
-The term 1 -- \emph{ρ\(_{4}\) ρ\(_{h}\)} accounts for the inter-reflection of IR radiation between glass and shading layer.
+The term 1 - \emph{$\rho$\(_{4}\)$\rho$\(_{sh}\)} accounts for the inter-reflection of IR radiation between glass and shading layer.
 
 The convective heat transfer from glass layer \#2 to the air in the gap is
 
@@ -990,11 +988,11 @@ The heat balance equation for the shading layer surface facing the gap is
 
 where
 
-\emph{k\(_{h}\)} = shading layer conductance (W/m\(^{2}\)K).
+\emph{k\(_{sh}\)} = shading layer conductance (W/m\(^{2}\)K).
 
-\emph{θ\(_{6}\)} = temperature of shading layer surface facing the zone air (K).
+\emph{$\theta$\(_{6}\)} = temperature of shading layer surface facing the zone air (K).
 
-\emph{S\(_{1}\)} = solar radiation plus short-wave radiation from lights plus IR radiation from lights and zone equipment absorbed by the gap-side face of the shading layer (W/m\(^{2}\)K).
+\emph{S\(_{sh,l}\)} = solar radiation plus short-wave radiation from lights plus IR radiation from lights and zone equipment absorbed by the gap-side face of the shading layer (W/m\(^{2}\)K).
 
 The heat balance equation for the shading layer surface facing the zone air is
 
@@ -1004,7 +1002,7 @@ The heat balance equation for the shading layer surface facing the zone air is
 
 where
 
-\emph{S\(_{2}\)} = solar radiation plus short-wave radiation from lights plus IR radiation from lights and zone equipment absorbed by the zone-side face of the shading layer (W/m\(^{2}\)K).
+\emph{S\(_{sh,2}\)} = solar radiation plus short-wave radiation from lights plus IR radiation from lights and zone equipment absorbed by the zone-side face of the shading layer (W/m\(^{2}\)K).
 
 \subsection{Solving for Gap Airflow and Temperature}\label{solving-for-gap-airflow-and-temperature}
 
@@ -1013,7 +1011,7 @@ For interior and exterior shading devices a pressure-balance equation is used to
 \begin{figure}[hbtp] % fig 102
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1670.png}
-\caption{  Vertical section (a) and perspective view (b) of glass layer and interior shading layer showing variables used in the gap airflow analysis. The opening areas *A\$\_\{t\}\$*, *A\$\_\{p\}\$*, *A\$\_\{l\}\$*, *A\$\_\{r\}\$* and *A\$\_\{h\}\$* are shown schematically. \protect \label{fig:vertical-section-a-and-perspective-view-b-of}}
+\caption{Vertical section (a) and perspective view (b) of glass layer and interior shading layer showing variables used in the gap airflow analysis. The opening areas A\(_{bot}\), A\(_{top}\), A\(_{l}\), A\(_{r}\) and A\(_{h}\) are shown schematically. \protect \label{fig:vertical-section-a-and-perspective-view-b-of}}
 \end{figure}
 
 \subsubsection{Pressure Balance Equation}\label{pressure-balance-equation}
@@ -1032,7 +1030,7 @@ Here, \emph{Δp\(_{T}\)}is the driving pressure difference between room air and 
 
 where
 
-\emph{ρ\(_{0}\)} = density of air at temperature \emph{T\(_{0}\)} (kg/m\(^{3}\))
+\emph{$\rho$\(_{0}\)} = density of air at temperature \emph{T\(_{0}\)} (kg/m\(^{3}\))
 
 \emph{T\(_{0}\)} = reference temperature (283K)
 
@@ -1040,11 +1038,11 @@ where
 
 \emph{H} = height of shading layer (m)
 
-\emph{φ} = tilt angle of window (vertical = 90\(^{o}\))
+\emph{$\phi$} = tilt angle of window (vertical = 90\(^{o}\))
 
-\emph{T\(_{p}\)} = effective mean temperature of the gap air (K)
+\emph{T\(_{gap}\)} = effective mean temperature of the gap air (K)
 
-\emph{T\(_{n}\)} = gap inlet temperature ( = zone air temperature for interior shading) (K)
+\emph{T\(_{in}\)} = gap inlet temperature ( = zone air temperature for interior shading) (K)
 
 The \emph{Δp\(_{B}\)} term is due to the acceleration of air to velocity \emph{v} (Bernoulli's law). It is given by
 
@@ -1052,7 +1050,7 @@ The \emph{Δp\(_{B}\)} term is due to the acceleration of air to velocity \emph{
 \Delta {p_B} = \frac{\rho }{2}{v^2}{\rm{    (Pa)}}
 \end{equation}
 
-where~ \emph{ρ}is the gap air density evaluated at \emph{T\(_{p}\)} (kg/m\(^{3}\)).
+where \emph{$\rho$}is the gap air density evaluated at \emph{T\(_{p}\)} (kg/m\(^{3}\)).
 
 The \emph{Δp\(_{P}\)} term represents the pressure drop due to friction with the shading layer and glass surfaces as the air moves through the gap. Assuming steady laminar flow, it is given by the Hagen-Poiseuille law for flow between parallel plates {[}Munson et al. 1998{]}:
 
@@ -1060,15 +1058,15 @@ The \emph{Δp\(_{P}\)} term represents the pressure drop due to friction with th
 \Delta {p_{HP}} = 12\mu \frac{H}{{{s^2}}}{v^{}}{\rm{    (Pa)}}
 \end{equation}
 
-where \emph{~μ}~ is the viscosity of air at temperature \emph{T\(_{p}\)} (Pa-s).
+where \emph{$\mu$} is the viscosity of air at temperature \emph{T\(_{p}\)} (Pa-s).
 
-The~ \emph{Δp\(_{Z}\)}~term is the sum of the pressure drops at the inlet and outlet openings:
+The \emph{Δp\(_{Z}\)} term is the sum of the pressure drops at the inlet and outlet openings:
 
 \begin{equation}
 \Delta {p_Z} = \frac{{\rho {v^2}}}{2}\left( {{Z_{in}} + {Z_{out}}} \right){\rm{    (Pa)}}
 \end{equation}
 
-Here, the inlet pressure drop factor,* Z\(_{n}\)\emph{, and the outlet pressure drop factor,}Z\(_{t}\)*, are given by
+Here, the inlet pressure drop factor, Z\(_{in}\), and the outlet pressure drop factor, Z\(_{out}\), are given by
 
 \begin{array}{rl}
     Z_{in}  & = \left( \frac{A_{gap}}{0.66A_{eq,in}}  - 1 \right)^2 \\
@@ -1079,20 +1077,20 @@ Here, the inlet pressure drop factor,* Z\(_{n}\)\emph{, and the outlet pressure 
 
 where
 
-\emph{A\(_{n}\)} = equivalent inlet opening area (m\(^{2}\))
+\emph{A\(_{eq,in}\)} = equivalent inlet opening area (m\(^{2}\))
 
-\emph{A\(_{t}\)} = equivalent outlet opening area (m\(^{2}\))
+\emph{A\(_{eq,out}\)} = equivalent outlet opening area (m\(^{2}\))
 
-\emph{A\(_{p}\)} = cross-sectional area of the gap = \emph{sW}(m\(^{2}\))
+\emph{A\(_{gap}\)} = cross-sectional area of the gap = \emph{sW}(m\(^{2}\))
 
-If~ T\(_{p}\) \textgreater{} T\(_{n}\)
+If T\(_{gap}\) \textgreater{} T\(_{gap,in}\)
 
 \begin{array}{rl}
     A_{eq,in}  & = A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
     A_{eq,out} & = A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
   \end{array}
 
-If~ T\(_{p}\) ≤ T\(_{n}\)
+If T\(_{gap}\) ≤ T\(_{gap,in}\)
 
 \begin{array}{rl}
     A_{eq,in}  & = A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
@@ -1101,9 +1099,9 @@ If~ T\(_{p}\) ≤ T\(_{n}\)
 
 Here, the area of the openings through which airflow occurs (see Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-openings-for-an-interior-shading}) are defined as follows:
 
-A\(_{t}\) = area of the bottom opening (m\(^{2}\))
+A\(_{bot}\) = area of the bottom opening (m\(^{2}\))
 
-A\(_{p}\) = area of the top opening (m\(^{2}\))
+A\(_{top}\) = area of the top opening (m\(^{2}\))
 
 A\(_{l}\) = area of the left-side opening (m\(^{2}\))
 
@@ -1111,7 +1109,7 @@ A\(_{r}\) = area of the right-side opening (m\(^{2}\))
 
 A\(_{h}\) = air permeability of the shading device expressed as the total area of openings (``holes'') in the shade surface (these openings are assumed to be uniformly distributed over the shade) (m\(^{2}\))
 
-Figure~\ref{fig:examples-of-openings-for-an-interior-shading} shows examples of A\(_{t}\), A\(_{p}\), A\(_{l}\) and A\(_{r}\) for different shading device configurations.~ These areas range from zero to a maximum value equal to the associated shade/screen/blind-to-glass cross-sectional area; i.e., A\(_{t}\) and A\(_{p}\) ≤ sW,~ A\(_{l}\) and A\(_{r}\) ≤ sH.
+Figure~\ref{fig:examples-of-openings-for-an-interior-shading} shows examples of A\(_{bot}\), A\(_{top}\), A\(_{l}\) and A\(_{r}\) for different shading device configurations.~ These areas range from zero to a maximum value equal to the associated shade/screen/blind-to-glass cross-sectional area; i.e., A\(_{bot}\) and A\(_{top}\) ≤ sW,~ A\(_{l}\) and A\(_{r}\) ≤ sH.
 
 \begin{figure}[hbtp] % fig 103
 \centering
@@ -1133,7 +1131,7 @@ Solving this gives
 v = \frac{{{{\left[ {{{\left( {\frac{{12\mu H}}{{{s^2}}}} \right)}^2} + \frac{{2{\rho ^2}(1 + {Z_{in}} + {Z_{out}}){\rho_0}{T_0}gH\sin \phi \left| {{T_{gap,in}} - {T_{gap}}} \right|}}{{{T_{gap,in}}{T_{gap}}}}} \right]}^{1/2}} - \frac{{12\mu H}}{{{s^2}}}}}{{\rho (1 + {Z_{in}} + {Z_{out}})}}
 \end{equation}
 
-The choice of the root of the quadratic equation is dictated by the requirement that \emph{v} = 0 if \emph{T\(_{n}\)} = \emph{T\(_{p}\)}.
+The choice of the root of the quadratic equation is dictated by the requirement that \emph{v} = 0 if \emph{T\(_{gap,in}\)} = \emph{T\(_{gap}\)}.
 
 Gap Outlet Temperature and Equivalent Mean Air Temperature
 
@@ -1181,21 +1179,21 @@ Solution Sequence for Gap Air Velocity and Outlet Temperature
 
 The routine WinShadeGapFlow is called within the glazing heat balance iterative loop in SolveForWindowTemperatures to determine \emph{v} and \emph{T\(_{t}\)}. The solution sequence in WinShadeGapFlow is as follows:
 
-At start of iteration, guess \emph{T\(_{p}\)} as ((\emph{T\(_{l}\)} + \emph{T\(_{h}\)})/2 + \emph{T\(_{n}\)})/2. Thereafter use value from previous iteration.
+At start of iteration, guess \emph{T\(_{gap}\)} as ((\emph{T\(_{gl}\)} + \emph{T\(_{sh}\)})/2 + \emph{T\(_{gap,in}\)})/2. Thereafter use value from previous iteration.
 
 Get still-air conductance, \emph{h\(_{c}\)}, by calling WindowGasConductance and NusseltNumber.
 
 Get \emph{v} from Equation
 
-Get \emph{h\(_{v}\)} from Equation
+Get \emph{h\(_{cv}\)} from Equation
 
-Get \emph{T\(_{e}\)}from Equation
+Get \emph{T\(_{ave}\)}from Equation
 
-Get \emph{T\(_{t}\)} from Equation
+Get \emph{T\(_{gap,out}\)} from Equation
 
-Get new value of \emph{T\(_{p}\)}from Equation
+Get new value of \emph{T\(_{gap}\)}from Equation
 
-The values of \emph{h\(_{v}\)} and \emph{T\(_{p}\)} so determined are then used in the window heat balance equations to find new values of the face temperatures of the glass and shading layers. These temperatures are used in turn to get new values of \emph{h\(_{v}\)} and \emph{T\(_{p}\)} until the whole iterative process converges.
+The values of \emph{h\(_{cv}\)} and \emph{T\(_{gap}\)} so determined are then used in the window heat balance equations to find new values of the face temperatures of the glass and shading layers. These temperatures are used in turn to get new values of \emph{h\(_{cv}\)} and \emph{T\(_{gap}\)} until the whole iterative process converges.
 
 Convective Heat Gain to Zone from Gap Airflow
 
@@ -1247,9 +1245,9 @@ where
 {R_1} = {\rho_5} + \frac{{\tau_{sh}^2{\rho_3}}}{{1 - {\rho_6}{\rho_3}}}
 \end{equation}
 
-\$\{T\_\{gap,1\}\} = \$ ~effective mean air temperature in gap 1 (K)
+\emph{T\(_{gap,1}\)} = effective mean air temperature in gap 1 (K)
 
-\$\{h\_\{cv,1\}\} = \$ ~convective heat transfer coefficient from glass or shading layer to gas in gap 1 (W/m\(^{2}\)K)
+\emph{h\(_{cv,1}\)} = convective heat transfer coefficient from glass or shading layer to gas in gap 1 (W/m\(^{2}\)K)
 
 For face \#3:
 
@@ -1269,9 +1267,9 @@ where
 {R_2} = {\rho_6} + \frac{{\tau_{sh}^2{\rho_2}}}{{1 - {\rho_5}{\rho_2}}}
 \end{equation}
 
-\$\{T\_\{gap,2\}\} = \$ ~effective mean air temperature in gap 2 (K)
+\emph{T\(_{gap,2}\)} = effective mean air temperature in gap 2 (K)
 
-\$\{h\_\{cv,2\}\} = \$ ~convective heat transfer coefficient from glass or shading layer to gas in gap 2 (W/m\(^{2}\)K)
+\emph{h\(_{cv,2}\)} = convective heat transfer coefficient from glass or shading layer to gas in gap 2 (W/m\(^{2}\)K)
 
 The heat balance equations for the shading layer faces are:
 
@@ -1305,9 +1303,9 @@ The convective heat transfer coefficients are given by
 
 where
 
-\$\{h\_\{c,1\}\},\{h\_\{c,2\}\} = \$ ~~~~ surface-to-surface heat transfer coefficients for gap \#1 and \#2,~ respectively,~ when these gaps are non-vented (closed).
+\emph{h\(_{cv,1}\),h\(_{cv,2}\)} = surface-to-surface heat transfer coefficients for gap \#1 and \#2,~ respectively,~ when these gaps are non-vented (closed).
 
-\$v = \$ ~~~~~~~~~~~~~~ air velocity in the gaps (m/s). It is assumed that the gap widths are equal, so that the velocity of flow in the gaps is equal and opposite, i.e., when the airflow is upward in gap \#1 it is downward in gap \#2 and vice-versa.
+\emph{v} = air velocity in the gaps (m/s). It is assumed that the gap widths are equal, so that the velocity of flow in the gaps is equal and opposite, i.e., when the airflow is upward in gap \#1 it is downward in gap \#2 and vice-versa.
 
 In analogy to the interior or exterior shading device case, the air velocity is determined by solving the following pressure balance equation:
 
@@ -1409,15 +1407,15 @@ In airflow windows forced air flows in the gap between adjacent layers of glass.
 
 Five configurations of airflow windows are modeled (Figure~\ref{fig:gap-airflow-configurations-for-airflow}) that depend on the source and destination of forced air. The allowed combinations of Airflow Source and Airflow Destination are:
 
-InsideAir à OutsideAir
+InsideAir \rightarrow OutsideAir
 
-InsideAir à InsideAir
+InsideAir \rightarrow InsideAir
 
-InsideAir à ReturnAir
+InsideAir \rightarrow ReturnAir
 
-OutsideAir à InsideAir
+OutsideAir \rightarrow InsideAir
 
-OutsideAir à OutsideAir
+OutsideAir \rightarrow OutsideAir
 
 \begin{figure}[hbtp] % fig 106
 \centering
@@ -1449,9 +1447,9 @@ The corresponding equation for the right-hand glass surface facing the gap is:
 
 Here,
 
-\emph{T\(_{p}\)} = effective mean temperature of the gap air (K)
+\emph{T\(_{gap}\)} = effective mean temperature of the gap air (K)
 
-\emph{h\(_{v}\)} = convective heat transfer coefficient from glass to gap air (W/m2K).
+\emph{h\(_{cv}\)} = convective heat transfer coefficient from glass to gap air (W/m2K).
 
 The convective heat transfer coefficient is given by
 
@@ -1475,7 +1473,7 @@ where
 
 \emph{F} = airflow rate (m\(^{3}\)/s)
 
-\emph{A\(_{p}\)} = gap cross-sectional area in direction of flow (m2)
+\emph{A\(_{gap}\)} = gap cross-sectional area in direction of flow (m2)
 
 It is assumed that the airflow is uniform across the width of the window.
 
@@ -1497,7 +1495,7 @@ where
 {H_0} = \frac{{\rho {C_p}s}}{{2{h_{cv}}}}v
 \end{equation}
 
-\emph{T\(_{n}\)}\(_{ }\) = ~ gap air inlet temperature (\emph{T\(_{i}\)} if the airflow source is indoor air, \emph{T\(_{o}\)} if the airflow source is outside air) (K)
+\emph{T\(_{gap,in}\)} = gap air inlet temperature (\emph{T\(_{i}\)} if the airflow source is indoor air, \emph{T\(_{o}\)} if the airflow source is outside air) (K)
 
 The outlet air temperature is given by
 
@@ -1515,9 +1513,9 @@ The convective heat gain to the zone air due to the gap airflow when the airflow
 
 where
 
-\emph{C\(_{i}\)}\(_{ }\) = heat capacity of the indoor air (J/kg-K)
+\emph{C\(_{p,i}\)} = heat capacity of the indoor air (J/kg-K)
 
-\emph{C\(_{t}\)} = heat capacity of the gap outlet air (J/kg-K)
+\emph{C\(_{p,out}\)} = heat capacity of the gap outlet air (J/kg-K)
 
 and where the air mass flow rate in the gap is
 
@@ -1537,7 +1535,7 @@ Figure~\ref{fig:airflow-window-with-between-glass-shading} shows the case of a d
 v = \frac{{F/2}}{{{A_{gap}}}}{\rm{      (m/s)}}
 \end{equation}
 
-where \emph{A\(_{p}\)} = \emph{sW} is the cross-sectional area of the gap on either side of the shading device. It is assumed that the shading device is centered between the two panes of glass so that the airflow, \emph{F}, is divided equally between the two gaps.
+where \emph{A\(_{gap}\)} = \emph{sW} is the cross-sectional area of the gap on either side of the shading device. It is assumed that the shading device is centered between the two panes of glass so that the airflow, \emph{F}, is divided equally between the two gaps.
 
 The convective heat gain to the zone air due to the airflow through the two gaps when the airflow destination is indoor air is
 
@@ -1553,7 +1551,7 @@ where the average temperature of the two outlet air streams is
 
 and
 
-\emph{C\(_{t}\)}\(_{ }\) = heat capacity of the outlet air evaluated at \emph{T\(_{t}\)} (J/kg-K)
+\emph{C\(_{p,ave,out}\)} = heat capacity of the outlet air evaluated at \emph{T\(_{gap,ave,out}\)} (J/kg-K)
 
 \begin{figure}[hbtp] % fig 108
 \centering
@@ -1595,9 +1593,9 @@ Where:
 \alpha  = \frac{{{\alpha_1}{\alpha_2}}}{{{\alpha_2} + {\alpha_1}\left( {1 - {\alpha_2}} \right)}}
 \end{equation}
 
-a\(_{1}\), a\(_{2}\) = Accommodation coefficients of the gas molecules with the two surfaces.~ These values depend on the temperature, surface conditions, etc.~ For the present configuration and conditions, it is expected that \emph{a} is approximately 0.5.~ If conservative value is needed than value of 1.0 could be used.~ With a\(_{1}\), a\(_{2}\) = 0.5, a = 0.333
+$\alpha$\(_{1}\), $\alpha$\(_{2}\) = Accommodation coefficients of the gas molecules with the two surfaces.~ These values depend on the temperature, surface conditions, etc.~ For the present configuration and conditions, it is expected that \emph{a} is approximately 0.5.~ If conservative value is needed than value of 1.0 could be used.~ With $\alpha$\(_{1}\), $\alpha$\(_{2}\) = 0.5, $\alpha$ = 0.333
 
-g~~~~ = Specific heat ratio, g\(_{r}\) = 1.40.
+$\gamma$~~~~ = Specific heat ratio, $\gamma$\(_{r}\) = 1.40.
 
 \emph{R}~~~ = Universal gas constant, \emph{R} = 8,314.462175 J/mol·K
 
@@ -1609,7 +1607,7 @@ g~~~~ = Specific heat ratio, g\(_{r}\) = 1.40.
 
 From the paper Collins and Robinson (Collins, R., \& Robinson, S. (1991)), B is set at approximately 50 for Air, if pressure is given in torr.~ Therefore according to Collins and Robinson, for air and approximate conditions of EGU:
 
-\emph{C}\(_{D}\) ≈ 50·P
+\emph{C}\(_{D}\) \approx 50·P
 
 Where P is in torr (i.e., mm Hg).
 
@@ -1617,7 +1615,7 @@ Where P is in torr (i.e., mm Hg).
 
 Using formula 2 and assuming \emph{T}\(_{1}\) to be 20 ºC and \emph{T}\(_{2}\) to be -18 ºC (expected temperatures of glass surfaces in EGU, if one glass surface is low-e and unit is exposed to NFRC standard environmental conditions), and using SI system of units, the B is calculated as 54.4, which is very close to the value of 50, proposed by Collins and Robinson
 
-\emph{C}\(_{D}\) ≈ 54.4·P
+\emph{C}\(_{D}\) \approx 54.4·P
 
 We will use exact value, calculated by the formula, so values of will be input into the calculations, which enables more flexible model that can account for special treatment of glass surfaces.
 
@@ -1631,9 +1629,9 @@ Radiation conductance for the two parallel plates is given by:
 
 Where:
 
-e\(_{1}\)~~~ = emissivity of the first facing glass surface, {[} - {]}
+$\varepsilon$\(_{1}\)~~~ = emissivity of the first facing glass surface, {[} - {]}
 
-e\(_{2}\)~~~ = emissivity of the second facing glass surface, {[} - {]}
+$\varepsilon$\(_{2}\)~~~ = emissivity of the second facing glass surface, {[} - {]}
 
 s~~~ = Stefan-Boltzmann Constant, 5.67 x 10\(^{8}\), {[}W/(m\(^{2}\)·K\(^{4}\)){]}
 
@@ -1643,13 +1641,13 @@ T\(_{2}\)~~ = Temperature of the second facing glass surface. {[}K{]}
 
 Assuming glass surface temperatures of 20 ºC and -18 ºC, respectively, the following radiation conductances are obtained for the three different glass emissivities:
 
-Clear Glass (e\(_{1}\) = e\(_{2}\) = 0.84): C\(_{D}\) = 3.4 W/m\(^{2}\)K
+Clear Glass ($\varepsilon$\(_{1}\) = $\varepsilon$\(_{2}\) = 0.84): C\(_{RAD}\) = 3.4 W/m\(^{2}\)K
 
-Hard Coat Low-e (e\(_{1}\) or e\(_{2}\) = 0.15): C\(_{D}\) = 0.68 W/m\(^{2}\)K
+Hard Coat Low-e ($\varepsilon$\(_{1}\) or $\varepsilon$\(_{2}\) = 0.15): C\(_{RAD}\) = 0.68 W/m\(^{2}\)K
 
-Soft Coat Low-e (e\(_{1}\) or e\(_{2}\) = 0.04): C\(_{D}\) = 0.19 W/m\(^{2}\)K
+Soft Coat Low-e ($\varepsilon$\(_{1}\) or $\varepsilon$\(_{2}\) = 0.04): C\(_{RAD}\) = 0.19 W/m\(^{2}\)K
 
-\textbf{\emph{Note:}} \emph{C\(_{D}\) of 0.09 is theoretically possible using best low-e technology today (i.e.,} \emph{e\(_{1}\) or} \emph{e\(_{2}\) = 0.02).}
+\textbf{\emph{Note:}} \emph{C\(_{RAD}\) of 0.09 is theoretically possible using best low-e technology today (i.e.,} \emph{$\varepsilon$\(_{1}\) or} \emph{$\varepsilon$\(_{2}\) = 0.02).}
 
 \textbf{\emph{Note:}} \emph{Low-e values above are typical values, which will vary by manufacturer.~ Some more recent hard coat low-e values are at or below 0.1.}
 
@@ -1685,11 +1683,11 @@ U = \frac{1}{{{R_{tot}}}} = \frac{1}{{{R_o} + 2 \cdot {R_{glass}} + {R_{gap}} + 
 
 Where:
 
-\emph{t}\(_{s}\) = glass thickness; {[}m{]}
+\emph{t}\(_{glass}\) = glass thickness; {[}m{]}
 
-\emph{k}\(_{s}\) = glass conductivity; \emph{k}\(_{s}\) = 1 W/(m·K)
+\emph{k}\(_{glass}\) = glass conductivity; \emph{k}\(_{s}\) = 1 W/(m·K)
 
-\emph{R}\(_{s}\) = 0.003 m\(^{2}\)K/W (for 3 mm glass pane)
+\emph{R}\(_{glass}\) = 0.003 m\(^{2}\)K/W (for 3 mm glass pane)
 
 \emph{R}\(_{o}\) ≈ 0.033 m\(^{2}\)K/W
 
@@ -1751,7 +1749,7 @@ For the square array of support pillars (Collins and Fischer-Cripps 1991) propos
 
 Where:
 
-l~~~ = pillar spacing, m
+$\lambda$ = pillar spacing, m
 
 This formula is approximate and does not include effect of the conductivity of the pillar, but it gives good approximation for common materials used in this technology, since conductivity of the pillar does not play substantial role for non-insulating pillars (where ``non-insulating'' would mean that conductivity of the pillar is equal or higher than the conductivity of the glass pane.
 
@@ -1827,7 +1825,7 @@ Where,
 
 \emph{t} = thickness of glazing pane {[}Length; SI: m, IP: in.{]}
 
-n = poison's ratio (0.22 for glass) {[}Non-Dimensional{]}
+$\nu$ = poison's ratio (0.22 for glass) {[}Non-Dimensional{]}
 
 \begin{figure}[hbtp] % fig 110
 \centering
@@ -1835,11 +1833,11 @@ n = poison's ratio (0.22 for glass) {[}Non-Dimensional{]}
 \caption{Deflection Coordinate System - 3D \protect \label{fig:deflection-coordinate-system-3d}}
 \end{figure}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{)}\)} - \emph{P\(_{)}\)} (for i-th pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
+Δ\emph{P\(_{i}\)} = \emph{P\(_{gap(i)}\)} - \emph{P\(_{gap(i-1)}\)} (for i-th pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{)}\)} - \emph{P\(_{a}\)} (first pane) {[}Force per unit Area; SI: Pa, IP: psi{]}\emph{~~~~~~~~~~~~~~~~~~}
+Δ\emph{P\(_{i}\)} = \emph{P\(_{gap(1)}\)} - \emph{P\(_{a}\)} (first pane) {[}Force per unit Area; SI: Pa, IP: psi{]}\emph{~~~~~~~~~~~~~~~~~~}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{a}\) - P\(_{)}\)} (last pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
+Δ\emph{P\(_{i}\)} = \emph{P\(_{a}\) - P\(_{pag(n-1)}\)} (last pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
 Where,
 
@@ -1851,11 +1849,11 @@ Where,
 
 Where,
 
-\emph{P\(_{i}\)} = Initial pressure. Applies to all gaps as a single value (input data - measured or otherwise) {[}Force per unit Area; SI: Pa, IP: psi{]}
+\emph{P\(_{ini}\)} = Initial pressure. Applies to all gaps as a single value (input data - measured or otherwise) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
-\emph{T\(_{i}\)} = Initial temperature. Applies to all gaps as a single value (input data - measured or otherwise) {[}Degree Temperature; SI: K, IP: R{]}
+\emph{T\(_{ini}\)} = Initial temperature. Applies to all gaps as a single value (input data - measured or otherwise) {[}Degree Temperature; SI: K, IP: R{]}
 
-\emph{V\(_{)}\)} = Initial volume for i-th gap. {[}Length*Length*Length; SI: m\(^{3}\), IP: in\(^{3}\){]}
+\emph{V\(_{ini(i)}\)} = Initial volume for i-th gap. {[}Length*Length*Length; SI: m\(^{3}\), IP: in\(^{3}\){]}
 
 \begin{equation}
 {V_{ini\left( i \right)}} = {L_i}\cdot W\cdot H
@@ -1869,9 +1867,9 @@ Where,
 
 \emph{H} = IGU height {[}Length; SI: m, IP: in.{]}
 
-\emph{T\(_{)}\)} = temperature of the gap between two glass panes (calculated using center of glazing thermal calculation algorithm, as described in ISO 15099 (ISO 2003). This value is first calculated using non-deflected state and is recalculated after the resulting deflection is calculated. This process is repeated until temperature at next iteration does not differ by more than 0.1 ºC
+\emph{T\(_{gap(i)}\)} = temperature of the gap between two glass panes (calculated using center of glazing thermal calculation algorithm, as described in ISO 15099 (ISO 2003). This value is first calculated using non-deflected state and is recalculated after the resulting deflection is calculated. This process is repeated until temperature at next iteration does not differ by more than 0.1 ºC
 
-\emph{V\(_{)}\)} = volume of the IGU gap in deflected state {[}Lentgh*Length*Length; SI: m\(^{3}\), IP: in\(^{3}\){]}
+\emph{V\(_{gap(i)}\)} = volume of the IGU gap in deflected state {[}Lentgh*Length*Length; SI: m\(^{3}\), IP: in\(^{3}\){]}
 
 \begin{equation}
 {V_{gap\left( i \right)}} = {V_{ini\left( i \right)}} + W\cdot H\cdot \left( {\overline {{L_{D,i}}}  - \overline {{L_{D,i + 1}}} } \right)
@@ -1921,13 +1919,13 @@ After calculating mean pane deflection the following equation is used to calcula
 
 \emph{Where,}
 
-\emph{L\(_{)}\) = Mean gap ``i'' width after incorporating glazing deflection. This mean gap width is used to recalculate thermal performance of deflected IGU.}
+\emph{L\(_{r(i)}\) = Mean gap ``i'' width after incorporating glazing deflection. This mean gap width is used to recalculate thermal performance of deflected IGU.}
 
 \(\overline {{L_{D,i}}}\) \textbf{\emph{~}}* = mean glazing deflection for each pane ``i''.*
 
 Calculation of the deflection at the center of glazing and mean glazing deflection for each pane is an iterative process, where the initial temperature distribution is calculated for non-deflected state, then deflection is calculated based on this temperature distribution, new temperature distribution is calculated for this deflected state, then temperatures from previous iteration are compared to the current iteration and the process is repeated until the difference is no larger than 0.1 ºC.
 
-At the end of calculations, program will calculate and return maximum deflection value for each pane (i.e., center of glazing deflection). If we label maximum deflection of each pane as \emph{L\(_{x}\)}, we can calculate this value by substituting \emph{x} = \emph{W}/2 and \emph{y} = \emph{H}/2 in equation to determine deflection at the center point. Therefore,
+At the end of calculations, program will calculate and return maximum deflection value for each pane (i.e., center of glazing deflection). If we label maximum deflection of each pane as \emph{L\(_{D(i),max}\)}, we can calculate this value by substituting \emph{x} = \emph{W}/2 and \emph{y} = \emph{H}/2 in equation to determine deflection at the center point. Therefore,
 
 \begin{equation}
 {L_{D\left( i \right),max}} = \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{{\sin \frac{{m\pi }}{2}\sin \frac{{n\pi }}{2}}}{{mn{{\left( {{{\left( {\frac{m}{2}} \right)}^2} + {{\left( {\frac{n}{2}} \right)}^2}} \right)}^2}}}
@@ -1937,11 +1935,11 @@ For glazing systems with more than two glazing layers, meaning multiple gas fill
 
 \subsubsection{Non-Linked Gaps in 3 or more glazing layer system:}\label{non-linked-gaps-in-3-or-more-glazing-layer-system}
 
-The procedure shown above generally applies to the 3 or more layer glazing system, with the exception that neighboring pressures are no longer \emph{P\(_{a}\)}, but rather could be \emph{P\(_{a}\)} on one side and \emph{P\(_{p}\)} on the other, or have \emph{P\(_{p}\)} on both sides, as shown in Figure~\ref{fig:deflection-direction-convention} for gap ``\emph{i}''. Center of glazing thermal calculation will determine new temperature distribution, after deflection is calculated for each glazing and will be used to determine new \emph{P\(_{p}\)}, as per the procedure above.
+The procedure shown above generally applies to the 3 or more layer glazing system, with the exception that neighboring pressures are no longer \emph{P\(_{a}\)}, but rather could be \emph{P\(_{a}\)} on one side and \emph{P\(_{gap}\)} on the other, or have \emph{P\(_{gap}\)} on both sides, as shown in Figure~\ref{fig:deflection-direction-convention} for gap ``\emph{i}''. Center of glazing thermal calculation will determine new temperature distribution, after deflection is calculated for each glazing and will be used to determine new \emph{P\(_{gap}\)}, as per the procedure above.
 
 \subsubsection{Linked Gaps in 3 or more glazing layer system:}\label{linked-gaps-in-3-or-more-glazing-layer-system}
 
-When one or more gaps are linked together, their pressure is assumed to be identical (e.g., in triple glazing IGU \emph{P\(_{1}\)} = \emph{P\(_{2}\)}.)~ This pressure is calculated from temperatures of bounding glazing for linked gaps (e.g., for triple glazing IGU, glazing 1 and 3) and using neighboring pressures outside of those bounding glazing (e.g., for triple glazed IGU, \emph{P\(_{a}\)} on both sides).
+When one or more gaps are linked together, their pressure is assumed to be identical (e.g., in triple glazing IGU \emph{P\(_{gap,1}\)} = \emph{P\(_{gap,2}\)}.)~ This pressure is calculated from temperatures of bounding glazing for linked gaps (e.g., for triple glazing IGU, glazing 1 and 3) and using neighboring pressures outside of those bounding glazing (e.g., for triple glazed IGU, \emph{P\(_{a}\)} on both sides).
 
 \emph{Note: This feature is not implemented in WINDOW 7.1. It is considered for future enhancements to the program.}
 
@@ -1953,7 +1951,7 @@ If one or more glazing gaps are linked to either indoor or outdoor environment i
 
 When deflection is measured, it is normally measured at the point of maximum deflection. Maximum deflection occurs at center of the IGU (at \emph{W}/2 and \emph{H}/2).
 
-Measured value is typically gap width at the point of maximum deflection, which we can label \emph{L\(_{)}\)}. For i-th measured gap the width is equal to:
+Measured value is typically gap width at the point of maximum deflection, which we can label \emph{L\(_{G(i)}\)}. For i-th measured gap the width is equal to:
 
 \begin{equation}
 {L_{G\left( i \right)}} = {L_{\left( i \right)}} + \left( {{L_{D\left( i \right),max}} - {L_{D\left( {i + 1} \right),max}}} \right)
@@ -1965,13 +1963,13 @@ Measured value is typically gap width at the point of maximum deflection, which 
 \caption{Sketch of the non-symetrically Deflected Glazing Panes \protect \label{fig:sketch-of-the-non-symetrically-deflected}}
 \end{figure}
 
-If we label ratio of mean deflection and maximum deflection as R\(_{)}\), then:
+If we label ratio of mean deflection and maximum deflection as R\(_{(i)}\), then:
 
 \begin{equation}
 {R_{(i)}} = \frac{{\overline {{L_{D(i)}}} }}{{{L_{D(i)}}_{,\max }}} = \sum\limits_{m = 1,3,5,...}^\infty  {\sum\limits_{n = 1,3,5,...}^\infty  {\frac{4}{{{m^2}{n^2}{\pi ^2}{{\left( {{{(\frac{m}{W})}^2} + {{(\frac{n}{H})}^2}} \right)}^2}}}} }
 \end{equation}
 
-\($ Important thing to note is that ratios (\)\{R\_\{\left( i \right)\}\}\$ ) for all gaps in glazing system are equal.
+\($ Important thing to note is that ratios \emp{(R\(_{(i)}\))} for all gaps in glazing system are equal.
 
 \begin{equation}
 {R_{\left( 1 \right)}} = {R_{\left( 2 \right)}} =  \ldots  = {R_{\left( i \right)}} =  \ldots  = {R_{\left( {n - 1} \right)}} = R
@@ -2422,7 +2420,7 @@ The diffuse-diffuse material properties are obtained by Rhomberg numerical integ
 {\tau ^{{\rm{screen}}}} = {\rm{1 - }}{\tau ^{\rm{w}}} \cdot \left( {{\rm{1  -  }}{{\rm{A}}_{\rm{o}}}} \right)
 \end{equation}
 
-The apparent wire material emissivity can be taken as \emph{e}\(^{w}\) = 0.93 for common insect screens - screens with dark, rough, non-metallic wire surfaces. The corresponding infrared wire material transmittance is \emph{t}\(^{w}\) = 0.98. A lower infrared emissivity can be used for screens constructed with shiny metallic wire. For example, to model stainless-steel wire mesh use \emph{e}\(^{w}\) = 0.32 and \emph{t}\(^{w}\) = 0.81.
+The apparent wire material emissivity can be taken as \emph{\varepsilon}\(^{w}\) = 0.93 for common insect screens - screens with dark, rough, non-metallic wire surfaces. The corresponding infrared wire material transmittance is \emph{\tau}\(^{w}\) = 0.98. A lower infrared emissivity can be used for screens constructed with shiny metallic wire. For example, to model stainless-steel wire mesh use \emph{\varepsilon}\(^{w}\) = 0.32 and \emph{\tau}\(^{w}\) = 0.81.
 
 \subsubsection{Integration with Heat Balance Method}\label{integration-with-heat-balance-method}
 
@@ -2442,11 +2440,11 @@ The equivalent layer thermal model is calculated only once for each time step. B
 
 where
 
-\emph{e\(^{f}\)}~~ = ~~~~~~~~~ composite indoor (room-side) longwave emissivity, (-)
+\emph{$\varepsilon$\(^{eff}\)}~~ = ~~~~~~~~~ composite indoor (room-side) longwave emissivity, (-)
 
-\emph{e\(_{j}\)~~~ = ~~~~~~~~~} effective emissivity of layer j, (-)
+\emph{$\varepsilon$\(_{j}\)~~~ = ~~~~~~~~~} effective emissivity of layer j, (-)
 
-\emph{t\(_{k}\)~~~ = ~~~~~~~~~} effective infrared transmittance of layer k (\emph{t\(_{1}\)} = 1)
+\emph{$\tau$\(_{k}\)~~~ = ~~~~~~~~~} effective infrared transmittance of layer k (\emph{t\(_{1}\)} = 1)
 
 \emph{nl~~~ = ~~~~~~~~~} number of layers in fenestration system (glazing and shade). Layers are numbered outside to inside (layer 1 is outermost, layer \emph{nl} is innermost).
 
@@ -2458,11 +2456,11 @@ Each equivalent layer window surafce yields net longwave radiant flux exchanged 
 
 where
 
-\emph{T\(^{f}\)}~ = ~~~~~~~~~ inside surface temperature of the composite layer, °C (°F)
+\emph{T\(^{eff}\)}~ = ~~~~~~~~~ inside surface temperature of the composite layer, °C (°F)
 
-\emph{Q\(_{w}\)}~ = ~~~~~~~~~ infrared radiant gain from zone, W/m2 (Btu/h-ft2)
+\emph{Q\(_{lw}\)}~ = ~~~~~~~~~ infrared radiant gain from zone, W/m2 (Btu/h-ft2)
 
-\emph{s}~~~ = ~~~~~~~~~ Stefan-Boltzmann constant, W/m2-K4 (Btu/h-ft2-R4)
+\emph{$\sigma$}~~~ = ~~~~~~~~~ Stefan-Boltzmann constant, W/m2-K4 (Btu/h-ft2-R4)
 
 \emph{T\(_{0}\)}~~ = ~~~~~~~~~ Temperature of absolute zero, -273.15 °C (-459.67 °F)
 
@@ -2476,7 +2474,7 @@ Where,
 
 \emph{h\(_{c}\)~~ = ~~~~~~~~~} inside convective coefficient of the fenestration, W/m\(^{2}\)-K (Btu/h-ft\(^{2}\)-F)
 
-\emph{Q\(_{v}\)~~~~~~~~~~~ = ~~~~~~~~~} total convective heat flux to zone from equivalent layer window thermal model, W/m\(^{2}\) (Btu/h-ft\(^{2}\)); includes open-channel gains and impact of inside surface convective coefficient
+\emph{Q\(_{conv}\)~~~~~~~~~~~ = ~~~~~~~~~} total convective heat flux to zone from equivalent layer window thermal model, W/m\(^{2}\) (Btu/h-ft\(^{2}\)); includes open-channel gains and impact of inside surface convective coefficient
 
 \emph{T\(_{a}\)~~ = ~~~~~~~~~} zone air temperature, °C (°F)
 
