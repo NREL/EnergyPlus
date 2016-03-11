@@ -7,11 +7,10 @@ add_subdirectory(auxiliary-programs)
 add_subdirectory(ems-application-guide)
 add_subdirectory(engineering-reference)
 add_subdirectory(external-interfaces-application-guide)
-
+add_subdirectory(getting-started)
 add_subdirectory(input-output-reference)
 
 set( DOCS
-     getting-started:GettingStarted
      interface-developer:InterfaceDeveloper
      module-developer:ModuleDeveloper
      output-details-and-examples:OutputDetailsAndExamples
