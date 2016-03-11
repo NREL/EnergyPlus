@@ -4,13 +4,14 @@ execute_process( COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/doc ${CMAKE
 
 add_subdirectory(engineering-reference)
 
+add_subdirectory(input-output-reference)
+
 set( DOCS
      acknowledgements:Acknowledgements
      auxiliary-programs:AuxiliaryPrograms
      ems-application-guide:EMS_Application_Guide
      external-interfaces-application-guide:ExternalInterfaces_Application_Guide
      getting-started:GettingStarted
-     input-output-reference:InputOutputReference
      interface-developer:InterfaceDeveloper
      module-developer:ModuleDeveloper
      output-details-and-examples:OutputDetailsAndExamples
