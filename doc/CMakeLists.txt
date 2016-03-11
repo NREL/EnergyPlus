@@ -11,9 +11,9 @@ add_subdirectory(getting-started)
 add_subdirectory(input-output-reference)
 add_subdirectory(interface-developer)
 add_subdirectory(module-developer)
+add_subdirectory(output-details-and-examples)
 
 set( DOCS
-     output-details-and-examples:OutputDetailsAndExamples
      plant-application-guide:PlantApplicationGuide
      tips-and-tricks-using-energyplus:Tips_and_Tricks_Using_EnergyPlus
      using-energyplus-for-compliance:Using_EnergyPlus_for_Compliance
