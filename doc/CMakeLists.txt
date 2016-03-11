@@ -14,20 +14,4 @@ add_subdirectory(module-developer)
 add_subdirectory(output-details-and-examples)
 add_subdirectory(plant-application-guide)
 add_subdirectory(tips-and-tricks-using-energyplus)
-set( DOCS
-     using-energyplus-for-compliance:Using_EnergyPlus_for_Compliance
-)
-
-foreach( DOC ${DOCS} )
-    string(REPLACE ":" ";" TOKENS ${DOC})
-    list(GET TOKENS 0 FOLDER)
-    list(GET TOKENS 1 FILENAME)
-    add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/${FILENAME}.pdf
-	                COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DOUTNAME=${FILENAME} -DINNAME=${FOLDER} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${FOLDER}
-			DEPENDS ${CMAKE_SOURCE_DIR}/doc/${FOLDER}/${FOLDER}.tex
-		      )
-    add_custom_target( zPDF_${FILENAME} ALL
-	               DEPENDS ${CMAKE_BINARY_DIR}/doc-build/${FILENAME}.pdf
-		     )
-endforeach()
+add_subdirectory(using-energyplus-for-compliance)
