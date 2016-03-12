@@ -377,52 +377,52 @@ TEST_F( EnergyPlusFixture, DataSurfaces_ProcessSurfaceVertices )
 //	enum surfaceShape:Triangle = 1
 //	Surface( 11 ).Name = "Surface 1 - Triangle"
 	ProcessSurfaceVertices( 11, ErrorsFound );
-	EXPECT_EQ( Triangle, Surface( 11 ).Shape );
+	EXPECT_EQ( SurfaceShape::Triangle, Surface( 11 ).Shape );
 
 //	enum surfaceShape:Quadrilateral = 2
 //	Surface( 12 ).Name = "Surface 2 - Quadrilateral"
 	ProcessSurfaceVertices( 12, ErrorsFound );
-	EXPECT_EQ( Quadrilateral, Surface( 12 ).Shape );
+	EXPECT_EQ( SurfaceShape::Quadrilateral, Surface( 12 ).Shape );
 
 //	enum surfaceShape:Rectangle = 3
 //	Surface( 7 ).Name = "Surface 3 - Rectangle"
 	ProcessSurfaceVertices( 7, ErrorsFound );
-	EXPECT_EQ( Rectangle, Surface( 7 ).Shape );
+	EXPECT_EQ( SurfaceShape::Rectangle, Surface( 7 ).Shape );
 
 //	enum surfaceShape:RectangularDoorWindow = 4
 //	Surface( 8 ).Name = "Surface 4 - RectangularDoorWindow"
 	ProcessSurfaceVertices( 8, ErrorsFound );
-	EXPECT_EQ( RectangularDoorWindow, Surface( 8 ).Shape );
+	EXPECT_EQ( SurfaceShape::RectangularDoorWindow, Surface( 8 ).Shape );
 
 //	enum surfaceShape:RectangularOverhang = 5
 //	Surface( 1 ).Name = "Surface 5 - RectangularOverhang"
 	ProcessSurfaceVertices( 1, ErrorsFound );
-	EXPECT_NE( TriangularWindow, Surface( 1 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
+	EXPECT_NE( SurfaceShape::TriangularWindow, Surface( 1 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
 
 //	enum surfaceShape:RectangularLeftFin = 6
 //	Surface( 3 ).Name = "Surface 6 - RectangularLeftFin"
 	ProcessSurfaceVertices( 3, ErrorsFound );
-	EXPECT_NE( RectangularLeftFin, Surface( 3 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
+	EXPECT_NE( SurfaceShape::RectangularLeftFin, Surface( 3 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
 
 //	enum surfaceShape:RectangularRightFin = 7
 //	Surface( 5 ).Name = "Surface 7 - RectangularRightFin"
 	ProcessSurfaceVertices( 5, ErrorsFound );
-	EXPECT_NE( RectangularRightFin, Surface( 5 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
+	EXPECT_NE( SurfaceShape::RectangularRightFin, Surface( 5 ).Shape ); // Shape is getting set to Rectangular=3 since BaseSurf=0 at this point. This must get corrected later in code.
 
 //	enum surfaceShape:TriangularWindow = 8
 //	Surface( 9 ).Name = "Surface 8 - TriangularWindow"
 	ProcessSurfaceVertices( 9, ErrorsFound );
-	EXPECT_EQ( TriangularWindow, Surface( 9 ).Shape );
+	EXPECT_EQ( SurfaceShape::TriangularWindow, Surface( 9 ).Shape );
 
 //	enum surfaceShape:TriangularDoor = 9
 //	Surface( 10 ).Name = "Surface 9 - TriangularDoor"
 	ProcessSurfaceVertices( 10, ErrorsFound );
-	EXPECT_EQ( TriangularDoor, Surface( 10 ).Shape );
+	EXPECT_EQ( SurfaceShape::TriangularDoor, Surface( 10 ).Shape );
 
 //	enum surfaceShape:Polygonal = 10
 //	Surface( 13 ).Name = "Surface 10 - Polygonal"
 	ProcessSurfaceVertices( 13, ErrorsFound );
-	EXPECT_EQ( Polygonal, Surface( 13 ).Shape );
+	EXPECT_EQ( SurfaceShape::Polygonal, Surface( 13 ).Shape );
 
 
 }
@@ -553,7 +553,7 @@ TEST( SurfaceTest, Plane )
 		SurfaceData s;
 		s.Vertex.dimension( 3 );
 		s.Vertex = { Vector(1,1,1), Vector(-1,1,0), Vector(2,0,3) };
-		s.Shape = Triangle;
+		s.Shape = SurfaceShape::Triangle;
 		s.set_computed_geometry();
 
 		EXPECT_DOUBLE_EQ( -1.0, s.plane.x );
@@ -565,7 +565,7 @@ TEST( SurfaceTest, Plane )
 		SurfaceData s;
 		s.Vertex.dimension( 3 );
 		s.Vertex = { Vector(2,1,-1), Vector(0,-2,0), Vector(1,-1,2) };
-		s.Shape = Triangle;
+		s.Shape = SurfaceShape::Triangle;
 		s.set_computed_geometry();
 
 		EXPECT_DOUBLE_EQ( -7.0, s.plane.x );
@@ -582,7 +582,7 @@ TEST( SurfaceTest, Surface2D )
 		SurfaceData s;
 		s.Vertex.dimension( 4 );
 		s.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(1,1,0), Vector(0,1,0) };
-		s.Shape = Rectangle;
+		s.Shape = SurfaceShape::Rectangle;
 		s.set_computed_geometry();
 
 		Surface2D const & s2d( s.surface2d );

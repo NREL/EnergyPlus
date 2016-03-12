@@ -118,7 +118,7 @@ TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 
 	ProcessSurfaceVertices( ThisSurf, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
-	EXPECT_EQ( Rectangle, Surface( ThisSurf ).Shape );
+	EXPECT_EQ( SurfaceShape::Rectangle, Surface( ThisSurf ).Shape );
 
 	// Surface 2 - Isosceles Trapezoid
 	ThisSurf = 2;
@@ -145,7 +145,7 @@ TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 
 	ProcessSurfaceVertices( ThisSurf, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
-	EXPECT_EQ( Quadrilateral, Surface( ThisSurf ).Shape );
+	EXPECT_EQ( SurfaceShape::Quadrilateral, Surface( ThisSurf ).Shape );
 
 	// Surface 3 - Parallelogram
 	ThisSurf = 3;
@@ -172,7 +172,7 @@ TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 
 	ProcessSurfaceVertices( ThisSurf, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
-	EXPECT_EQ( Quadrilateral, Surface( ThisSurf ).Shape );
+	EXPECT_EQ( SurfaceShape::Quadrilateral, Surface( ThisSurf ).Shape );
 
 	// Surface 4 - Triangle
 	ThisSurf = 4;
@@ -195,7 +195,7 @@ TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 
 	ProcessSurfaceVertices( ThisSurf, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
-	EXPECT_EQ( Triangle, Surface( ThisSurf ).Shape );
+	EXPECT_EQ( SurfaceShape::Triangle, Surface( ThisSurf ).Shape );
 
 	// Surface 5 - Polygon
 	ThisSurf = 5;
@@ -226,7 +226,7 @@ TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 
 	ProcessSurfaceVertices( ThisSurf, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
-	EXPECT_EQ( Polygonal, Surface( ThisSurf ).Shape );
+	EXPECT_EQ( SurfaceShape::Polygonal, Surface( ThisSurf ).Shape );
 }
 
 TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )

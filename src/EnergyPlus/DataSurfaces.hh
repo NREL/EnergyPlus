@@ -93,17 +93,18 @@ namespace DataSurfaces {
 	// Parameters to indicate surface shape for use with the Surface
 	// derived type (see below):
 
-	enum surfaceShape {
-		Triangle = 1,
-		Quadrilateral = 2,
-		Rectangle = 3,
-		RectangularDoorWindow = 4,
-		RectangularOverhang = 5,
-		RectangularLeftFin = 6,
-		RectangularRightFin = 7,
-		TriangularWindow = 8,
-		TriangularDoor = 9,
-		Polygonal = 10
+	enum class SurfaceShape : int {
+		None = 0,
+		Triangle,
+		Quadrilateral,
+		Rectangle,
+		RectangularDoorWindow,
+		RectangularOverhang,
+		RectangularLeftFin,
+		RectangularRightFin,
+		TriangularWindow,
+		TriangularDoor,
+		Polygonal
 	};
 
 	// Parameters to indicate exterior boundary conditions for use with
@@ -587,7 +588,7 @@ namespace DataSurfaces {
 		int ConstructionStoredInputValue; // holds the original value for Construction per surface input
 		int Class;
 		// Geometry related parameters
-		int Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
+		SurfaceShape Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
 		//                Rectangular Window/Door=4,Rectangular Overhang=5,
 		//                Rectangular Left Fin=6,Rectangular Right Fin=7,
 		//                Triangular Window=8)
@@ -758,7 +759,7 @@ namespace DataSurfaces {
 			EMSConstructionOverrideValue( 0 ),
 			ConstructionStoredInputValue( 0 ),
 			Class( 0 ),
-			Shape( 0 ),
+			Shape( SurfaceShape::None ),
 			Sides( 0 ),
 			Area( 0.0 ),
 			GrossArea( 0.0 ),

@@ -677,21 +677,21 @@ namespace DataSurfaces {
 		SurfaceData::
 		computed_shapeCat() const
 		{
-			if ( Shape == Triangle ) {
+			if ( Shape == SurfaceShape::Triangle ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == TriangularWindow ) {
+			} else if ( Shape == SurfaceShape::TriangularWindow ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == TriangularDoor ) {
+			} else if ( Shape == SurfaceShape::TriangularDoor ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == Rectangle ) {
+			} else if ( Shape == SurfaceShape::Rectangle ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularDoorWindow ) {
+			} else if ( Shape == SurfaceShape::RectangularDoorWindow ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularOverhang ) {
+			} else if ( Shape == SurfaceShape::RectangularOverhang ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularLeftFin ) {
+			} else if ( Shape == SurfaceShape::RectangularLeftFin ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularRightFin ) {
+			} else if ( Shape == SurfaceShape::RectangularRightFin ) {
 				return ShapeCat::Rectangular;
 			} else if ( IsConvex ) {
 				return ShapeCat::Convex;

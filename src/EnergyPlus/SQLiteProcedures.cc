@@ -2526,7 +2526,7 @@ bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt )
 	sqliteBindDouble(insertStmt, 8, azimuth);
 	sqliteBindDouble(insertStmt, 9, height);
 	sqliteBindDouble(insertStmt, 10, reveal);
-	sqliteBindInteger(insertStmt, 11, shape);
+	sqliteBindInteger(insertStmt, 11, static_cast<int>( shape ) );
 	sqliteBindInteger(insertStmt, 12, sides);
 	sqliteBindDouble(insertStmt, 13, tilt);
 	sqliteBindDouble(insertStmt, 14, width);
