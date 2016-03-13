@@ -9,7 +9,7 @@ The baffle is assumed to be sufficiently thin and high-conductivity so that it c
 \begin{figure}[hbtp] % fig 33
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image438.png}
-\caption{  Baffle Surface Heat Balance \protect \label{fig:baffle-surface-heat-balance}}
+\caption{  Baffle Surface Heat Balance \protect \label{fig:baffle-surface-heat-balance}}
 \end{figure}
 
 The heat balance on the baffle surface's control volume is:
@@ -18,17 +18,19 @@ The heat balance on the baffle surface's control volume is:
 {q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,Env}} + {q''_{LWR,cav}} + {q''_{conv,cav}} + {q''_{source}} = 0
 \end{equation}
 
-where: \(_{ }\)is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
-
-\({q''_{LWR,Env}}\) ~is net long wavelength (thermal) radiation flux exchange with the air and surroundings. \(_{ }\) = surface convection flux exchange with outside air. \(_{ }\)is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s). \(_{ }\) = surface convection flux exchange with cavity air.
-
-\({q''_{source}}\) ~is a source/sink term that accounts for energy exported out of the control volume when the baffle is a hybrid device such as a photovoltaic panel.
+where: 
+\(q''_{\alpha sol}\) is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
+\(q''_{LWR,Env}\) is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
+\(q''_{conv,Env}\) = surface convection flux exchange with outside air.
+\(q''_{LWR,cav}\) is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
+\(q''_{conv,cav}\) = surface convection flux exchange with cavity air.
+\({q''_{source}}\) is a source/sink term that accounts for energy exported out of the control volume when the baffle is a hybrid device such as a photovoltaic panel.
 
 All terms are positive for net flux to the baffle.~ Each of these heat balance components is introduced briefly below.
 
 \subsubsection{External SW Radiation}\label{external-sw-radiation}
 
-\(_{ }\)~is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.~ The baffle blocks all shortwave radiation from reaching the underlying surface.
+\(q''_{\alpha sol}\)~is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.~ The baffle blocks all shortwave radiation from reaching the underlying surface.
 
 \subsubsection{External LW Radiation}\label{external-lw-radiation}
 
@@ -36,7 +38,7 @@ All terms are positive for net flux to the baffle.~ Each of these heat balance c
 
 \subsubsection{External Convection}\label{external-convection}
 
-\(q''_{conv,env}\) ~is modeled using the classical formulation: \(q''_{conv}  = h_{co}(T_{air} - T_{o})\) where h\(_{o}\), is the convection coefficient.~ The h\(_{o}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for \({h_{co}}\) .
+\(q''_{conv,env}\) ~is modeled using the classical formulation: \(q''_{conv}  = h_{co}(T_{air} - T_{o})\) where h\(_{co}\), is the convection coefficient.~ The h\(_{co}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for \({h_{co}}\) .
 
 \subsubsection{Cavity LW Radiation}\label{cavity-lw-radiation}
 
@@ -44,7 +46,7 @@ All terms are positive for net flux to the baffle.~ Each of these heat balance c
 
 \subsubsection{Cavity Convection}\label{cavity-convection}
 
-\(q''_{conv,cav}\) ~is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o))\) ~ where h\(_{p}\), is the convection coefficient.~ The value for h\(_{p}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+\(q''_{conv,cav}\) ~is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o))\) ~ where h\(_{cp}\), is the convection coefficient.~ The value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
 Substituting models into (113) and solving for \({T_{s,baff}}\) ~yields the following equation:
 
@@ -85,7 +87,7 @@ The \emph{cavity} is the volume of air located between the baffle and the underl
 \begin{figure}[hbtp] % fig 34
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image469.png}
-\caption{  Cavity Air Heat Balance \protect \label{fig:cavity-air-heat-balance}}
+\caption{  Cavity Air Heat Balance \protect \label{fig:cavity-air-heat-balance}}
 \end{figure}
 
 The heat balance on the cavity air control volume is:
@@ -96,7 +98,7 @@ The heat balance on the cavity air control volume is:
 
 where,
 
-\({\dot Q_{vent}}\) ~is the net rate of energy added from natural ventilation -- where outdoor ambient air exchanges with the cavity air. \(_{ }\)~is the net rate of energy added by surface convection heat transfer with the underlying surface.
+\({\dot Q_{vent}}\) ~is the net rate of energy added from natural ventilation -- where outdoor ambient air exchanges with the cavity air. \(_{ }\)~is the net rate of energy added by surface convection heat transfer with the underlying surface.
 
 \({\dot Q_{c,baff}}\) is the net rate of energy added by surface convection heat transfer with the collector.
 
@@ -120,14 +122,14 @@ where,
 
 \(\rho\) ~is the density of air {[}kg/m\(^{3}\){]}, and
 
-\(\dot{V}_{tot} = \dot{V}_{wind} + \dot{V}_{thermal}\) ~is the total volumetric flow rate of air ventilating in and out of the cavity.
+\(\rlap{--} \dot{V}_{tot} = \rlap{--} \dot{V}_{wind} + \rlap{--} \dot{V}_{thermal}\) ~is the total volumetric flow rate of air ventilating in and out of the cavity.
 
 \begin{equation}
-\dot{V}_{wind} = C_{v}A_{in}U_{\infty}
+\rlap{--} \dot{V}_{wind} = C_{v}A_{in}U_{\infty}
 \end{equation}
 
 \begin{equation}
-\dot{V}_{thermal} = \left\{
+\rlap{--} \dot{V}_{thermal} = \left\{
     \begin{array}{cl}
       C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{a,cav}-T_{amb}\right)/T_{a,cov}} & \; \left(T_{a,cav}>T_{amb}\right) \\
       C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{amb}-T_{a,cav}\right)/T_{amb}} & \; \left(T_{a,cav} \lt T_{amb}\,\text{and baffle is vertical}\right) 
@@ -179,12 +181,12 @@ where z is the height of the centroid of the system, z\(_{t}\) is the height of 
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Terrain-Dependent Coefficients (ASHRAE 2001). \protect \label{table:terrain-dependent-coefficients-ashrae-2001.}}\\
 \toprule 
-Terrain & Description & Exponent, a & Layer Thickness,d (m) \tabularnewline \midrule
+\textbf{Terrain} & \textbf{Description} & \textbf{Exponent, a} & \textbf{Layer Thickness, $\delta$ (m)} \tabularnewline \midrule
 \endhead
-1 & Flat, open country & 0.14 & 270 \tabularnewline
-2 & Rough, wooded country & 0.22 & 370 \tabularnewline
-3 & Towns and cities & 0.33 & 460 \tabularnewline
-4 & Ocean & 0.10 & 210 \tabularnewline
+1 & Flat, open country & 0.14 & 270 \tabularnewline \midrule
+2 & Rough, wooded country & 0.22 & 370 \tabularnewline \midrule
+3 & Towns and cities & 0.33 & 460 \tabularnewline \midrule
+4 & Ocean & 0.10 & 210 \tabularnewline \midrule
 5 & Urban, industrial, forest & 0.22 & 370 \tabularnewline
 \bottomrule
 \end{longtable}

@@ -18,7 +18,7 @@ C_p \rho \Delta x \frac{T_i^{j+1}-T_i^j}{\Delta t} =
 
 Where:
 
-T \(_{}\) node temperature
+T = node temperature
 
 Subscripts:
 
@@ -32,9 +32,9 @@ j+1 = new time step
 
 j = previous time step
 
-Dt = calculation time step
+$\Delta$t = calculation time step
 
-Dx = finite difference layer thickness (always less than construction layer thickness)
+$\Delta$x = finite difference layer thickness (always less than construction layer thickness)
 
 C\(_{p}\) = specific heat of material
 
@@ -42,7 +42,7 @@ k\(_{w}\) = thermal conductivity for interface between i node and i+1 node
 
 k\(_{E}\) = thermal conductivity for interface between i node and i-1 node
 
-r~ = density of material
+$\rho$ = density of material
 
 Then, this equation is accompanied by a second equation that relates enthalpy and temperature.
 
@@ -66,7 +66,7 @@ For both schemes, EnergyPlus uses the following four types of nodes, as shown in
 \caption{Node depiction for Conduction Finite Difference Model \protect \label{fig:node-depiction-for-conduction-finite}}
 \end{figure}
 
-In the CondFD model, surface discretization depends on the thermal diffusivity of the material (α) and time step (Δt) selected, as shown in the equation below. The default value of 3 for the space discretization constant, \emph{C}, is basically the inverse of the Fourier Number:
+In the CondFD model, surface discretization depends on the thermal diffusivity of the material ($\alpha$) and time step ($\Delta$t) selected, as shown in the equation below. The default value of 3 for the space discretization constant, \emph{C}, is basically the inverse of the Fourier Number:
 
 \begin{equation}
 Fo = \frac{\alpha \Delta t}{\Delta x^2}

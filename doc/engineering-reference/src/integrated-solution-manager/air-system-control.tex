@@ -24,9 +24,9 @@ The amount of heating or cooling provided by the air system in relation to the d
 {\dot Q_{sys}} = {\dot m_{sys}}{C_p}\eta \left( {{T_{\sup }} - {T_{z,\,desired}}} \right)
 \end{equation}
 
-where h is the fraction of the time step that the air system is turned on and varies between 0 and 1. The supply air temperature is also implicitly limited by the effectiveness of the coils and the operating parameters of the central plant components. These interactions are discussed later.
+where $\eta$ is the fraction of the time step that the air system is turned on and varies between 0 and 1. The supply air temperature is also implicitly limited by the effectiveness of the coils and the operating parameters of the central plant components. These interactions are discussed later.
 
-A far more complex, though again simplified, air system is the variable air volume (VAV) system, shown in Figure~\ref{fig:simplified-variable-volume-air-system.}. Simplified Variable Volume Air System. In VAV systems, the supply air temperature, as well as the supply air volume, are continuous functions of zone air temperature. As shown in Figure~\ref{fig:idealized-variable-volume-system-operation.}. Idealized Variable Volume System Operation., when the zone air temperature is between Tcl and Tcu, cooling is required and the air system varies the supply air flow rate while maintaining a constant supply air temperature. When the zone air temperature is between Thl and Thu, heating is required and air is supplied at a constant minimum flow rate while the supply air temperature is varied.
+A far more complex, though again simplified, air system is the variable air volume (VAV) system, shown in Figure~\ref{fig:simplified-variable-volume-air-system.}. Simplified Variable Volume Air System. In VAV systems, the supply air temperature, as well as the supply air volume, are continuous functions of zone air temperature. As shown in Figure~\ref{fig:idealized-variable-volume-system-operation.}. Idealized Variable Volume System Operation., when the zone air temperature is between T\(_{cl}\) and T\(_{cu}\), cooling is required and the air system varies the supply air flow rate while maintaining a constant supply air temperature. When the zone air temperature is between T\(_{hl}\) and T\(_{hu}\), heating is required and air is supplied at a constant minimum flow rate while the supply air temperature is varied.
 
 \begin{figure}[hbtp] % fig 6
 \centering
@@ -60,7 +60,7 @@ When a zone requires cooling, the VAV system is designed to provide air to that 
 {\eta_c} = {\eta_{c,\,\min }} + \left( {1 - {\eta_{c,\,\min }}} \right)\left( {\frac{{{T_z} - {T_{c,\,lower}}}}{{{T_{c,\,upper}} - {T_{c,\,lower}}}}} \right);\,{\eta_{c,\,\min }} \le {\eta_c} \le 1.0
 \end{equation}
 
-Normally, the minimum supply air fraction hc,min must be greater than zero to ensure a supply of fresh air sufficient to eliminate contaminants from the zone.
+Normally, the minimum supply air fraction $\eta$\(_{c,min}\) must be greater than zero to ensure a supply of fresh air sufficient to eliminate contaminants from the zone.
 
 Conversely, when heating is required in a zone, the VAV system becomes a constant volume flow rate system with a variable supply air temperature. The dampers are set to provide air to the zone at the minimum supply air fraction. Throttling the hot water supply to the reheat coil, which effectively alters the coil's heating capacity, modulates the supply air temperature. Again, assuming the heat energy output varies linearly with zone air temperature and normalizing with respect to the maximum coil output gives the following result:
 
@@ -68,7 +68,7 @@ Conversely, when heating is required in a zone, the VAV system becomes a constan
 {\eta_h} = \left( {\frac{{{T_{h,\,upper}} - {T_z}}}{{{T_{h,\,upper}} - {T_{h,\,lower}}}}} \right);\,0 \le {\eta_h} \le 1.0
 \end{equation}
 
-Observe that when hh is equal to zero, the zone is supplied with air at the cooling coil outlet temperature at the minimum air fraction. Because the control strategies of the VAV system are different whether the air system is heating or cooling, two equations are necessary to describe the air system output in terms of hh and hc. These expressions are as shown in Equations and :
+Observe that when $\eta$\(_{h}\) is equal to zero, the zone is supplied with air at the cooling coil outlet temperature at the minimum air fraction. Because the control strategies of the VAV system are different whether the air system is heating or cooling, two equations are necessary to describe the air system output in terms of $\eta$\(_{h}\) and $\eta$\(_{c}\). These expressions are as shown in Equations and :
 
 \begin{equation}
 {\dot Q_{sys,h}} = {\eta_h}{\dot Q_{h/c,\,\max }} + {C_p}\rho {\dot V_{\min }}\left( {{T_{c/c}} - {T_{z,pred,heat}}} \right)
@@ -78,7 +78,7 @@ Observe that when hh is equal to zero, the zone is supplied with air at the cool
 {\dot Q_{sys,c}} = {C_p}\rho \left( {{\eta_c}{{\dot V}_{\max }}} \right)\left( {{T_{c/c}} - {T_{z,pred,cool}}} \right)
 \end{equation}
 
-Equation is valid for zone air temperatures below Th,upper, while Equation is valid for all temperatures above this value. Equating the system output to the zone load, as given by Equation , the definitions of hc and hh were then used to develop expressions for the predicted zone air temperature in the cases of heating and cooling:
+Equation is valid for zone air temperatures below T\(_{h,upper}\), while Equation is valid for all temperatures above this value. Equating the system output to the zone load, as given by Equation , the definitions of $\eta$\(_{c}\) and $\eta$\(_{h}\) were then used to develop expressions for the predicted zone air temperature in the cases of heating and cooling:
 
 \begin{equation}
 {T_{z,pred,heat}} = \frac{{{{\dot Q}_{h/c,\max }}{T_{h,upper}}}}{{{T_{h,upper}} - {T_{h,lower}}}} + {\dot Q_0} + \frac{{{C_p}\rho {{\dot V}_{\min }}{T_{c/c}}}}{{\frac{{{{\dot Q}_{h/c,\max }}}}{{{T_{h,upper}} - {T_{h,lower}}}} + {C_p}\rho {{\dot V}_{\min }} + {{\dot Q}_{slope}}}}
@@ -118,10 +118,10 @@ Once the predicted zone air temperature has been calculated from Equations and ,
 {\dot V_{\sup ply}} = {\eta_c}{\dot V_{\max }}
 \end{equation}
 
-where the supply air fraction hc is computed from Equation . When heating is required by the zone, the air system provides air at the minimum volume flow rate and at a temperature given by:
+where the supply air fraction $\eta$\(_{c}\) is computed from Equation . When heating is required by the zone, the air system provides air at the minimum volume flow rate and at a temperature given by:
 
 \begin{equation}
 {T_{\sup ply}} = {T_{c/c}} + \frac{{{\eta_h}{{\dot Q}_{h/c,\max }}}}{{{C_p}\rho {{\dot V}_{\min }}}}
 \end{equation}
 
-The reheat coil capacity fraction hh is determined by using Equation . Once Equation or , has been used, the supply air flow rate and temperature are known. These values are then used in Equation to calculate the updated zone air temperature. The equations describing VAV system operation may be solved without iteration if the cooling coil outlet temperature is constant, i.e.~if the coil has infinite capacity, and if the reheat coil capacity varies linearly with zone air temperature. This is not the case, either in practice or in simulations, when realistic coil models are used. Therefore, an iteration scheme was developed that solved these equations simultaneously with the coil performance models.
+The reheat coil capacity fraction $\eta$\(_{h}\) is determined by using Equation . Once Equation or , has been used, the supply air flow rate and temperature are known. These values are then used in Equation to calculate the updated zone air temperature. The equations describing VAV system operation may be solved without iteration if the cooling coil outlet temperature is constant, i.e.~if the coil has infinite capacity, and if the reheat coil capacity varies linearly with zone air temperature. This is not the case, either in practice or in simulations, when realistic coil models are used. Therefore, an iteration scheme was developed that solved these equations simultaneously with the coil performance models.

@@ -12,36 +12,36 @@ Dependencies on moisture content are indicated by a superscript \(^{w}\), on hea
 \caption{Combined Heat and Moisture Transfer Model Nomenclature \label{table:combined-heat-and-moisture-transfer-model}}\\
 \toprule 
 Symbol & Units & Meaning \tabularnewline \midrule \endhead
-T & °C & Temperature \tabularnewline
-RH,φ & \%, fraction & Relative humidity \tabularnewline
-W & $kg/m^3$ & Moisture Content \tabularnewline
-$\partial{H}/\partial{T}$ & $J/m^3C$ & Moisture dependent heat storage capacity \tabularnewline
-$\partial{w}/\partial{\phi}$ & $kg/m^3$ & Moisture dependent moisture storage capacity \tabularnewline
-${k^w}$ & W/mC & Moisture dependent thermal conductivity \tabularnewline
-${h_v}$ & J/kg & Evaporation enthalpy of water (= 2,489,000~J/kg) \tabularnewline
-$\delta$ & kg/msPa & Vapor diffusion coefficient in air \tabularnewline
-$\mu$ & --- & Moisture dependent vapor diffusion resistance factor \tabularnewline
-P & Pa & Vapor pressure \tabularnewline
-$p_{\text{ambient}}$ & Pa & Ambient air pressure \tabularnewline
-C & J/kgC & Specific heat capacity of dry material \tabularnewline
-$c_{w}$ & J/KgC & Specific heat capacity of water (= 4,180~J/kg$^{o}$C@ 20$^{o}$C) \tabularnewline
-$\rho$ & $kg/m^3$ & Material Density \tabularnewline
-${\rho ^w}$ & $kg/m^3$ & Density of water (= 1,000$kg/m^3$) \tabularnewline
-${D^w}$ & $m^2/s$ & Liquid Transport Coefficient \tabularnewline
-A & $m^2$ & Contact Surface area \tabularnewline
-$\Delta {V_i}$ & $m^3$ & Cell Volume \tabularnewline
-$t$ & s & Time \tabularnewline
-$\Delta \tau$ & s & Time step between calculations \tabularnewline
-x & m & Distance between cell centres \tabularnewline
-$C_i^h$ & J/C & Heat Capacitance of cell i \tabularnewline
-$C_i^w$ & kg & Moisture Capacitance of cell i \tabularnewline
-$R_{ij}^h$ & C/W & Heat Resistance between cells i and j \tabularnewline
-$R_{ij}^v$ & sPa/kg & Vapor Resistance between cells i and j \tabularnewline
-$^{R_{ij}^w}$ & s/kg & Liquid Moisture Resistance between cells i and j \tabularnewline
-$^{q_i^v}$ & W & Heat due to Vaporisation \tabularnewline
-$^{q_i^{adds}}$ & W & Heat from additional Sources \tabularnewline
-P & m3/m3 & Material Porosity \tabularnewline
-p(as a superscript) & s & Present Time Step \tabularnewline
+T & °C & Temperature \tabularnewline \midrule
+RH,$\varphi$ & \%, fraction & Relative humidity \tabularnewline \midrule
+W & $kg/m^3$ & Moisture Content \tabularnewline \midrule
+$\partial{H}/\partial{T}$ & $J/m^3C$ & Moisture dependent heat storage capacity \tabularnewline \midrule
+$\partial{w}/\partial{\phi}$ & $kg/m^3$ & Moisture dependent moisture storage capacity \tabularnewline \midrule
+${k^w}$ & W/mC & Moisture dependent thermal conductivity \tabularnewline \midrule
+${h_v}$ & J/kg & Evaporation enthalpy of water (= 2,489,000~J/kg) \tabularnewline \midrule
+$\delta$ & kg/msPa & Vapor diffusion coefficient in air \tabularnewline \midrule
+$\mu$ & --- & Moisture dependent vapor diffusion resistance factor \tabularnewline \midrule
+P & Pa & Vapor pressure \tabularnewline \midrule
+$p_{\text{ambient}}$ & Pa & Ambient air pressure \tabularnewline \midrule
+C & J/kgC & Specific heat capacity of dry material \tabularnewline \midrule
+$c_{w}$ & J/KgC & Specific heat capacity of water (= 4,180~J/kg$^{o}$C@ 20$^{o}$C) \tabularnewline \midrule
+$\rho$ & $kg/m^3$ & Material Density \tabularnewline \midrule
+${\rho ^w}$ & $kg/m^3$ & Density of water (= 1,000$kg/m^3$) \tabularnewline \midrule
+${D^w}$ & $m^2/s$ & Liquid Transport Coefficient \tabularnewline \midrule
+A & $m^2$ & Contact Surface area \tabularnewline \midrule
+$\Delta {V_i}$ & $m^3$ & Cell Volume \tabularnewline \midrule
+$t$ & s & Time \tabularnewline \midrule
+$\Delta \tau$ & s & Time step between calculations \tabularnewline \midrule
+x & m & Distance between cell centres \tabularnewline \midrule
+$C_i^h$ & J/C & Heat Capacitance of cell i \tabularnewline \midrule
+$C_i^w$ & kg & Moisture Capacitance of cell i \tabularnewline \midrule
+$R_{ij}^h$ & C/W & Heat Resistance between cells i and j \tabularnewline \midrule
+$R_{ij}^v$ & sPa/kg & Vapor Resistance between cells i and j \tabularnewline \midrule
+$^{R_{ij}^w}$ & s/kg & Liquid Moisture Resistance between cells i and j \tabularnewline \midrule
+$^{q_i^v}$ & W & Heat due to Vaporisation \tabularnewline \midrule
+$^{q_i^{adds}}$ & W & Heat from additional Sources \tabularnewline \midrule
+P & m3/m3 & Material Porosity \tabularnewline \midrule
+p(as a superscript) & s & Present Time Step \tabularnewline \midrule
 i,j & --- & Cell indices \tabularnewline
 \bottomrule
 \end{longtable}
@@ -60,19 +60,19 @@ The three terms in equation describe the storage, transport and generation of he
 \frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{D^w}\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial x}}} \right) + \frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)
 \end{equation}
 
-The three terms in equation describe the storage of moisture, the transport of liquid moisture and the transport of vapor respectively. The equation to calculate the vapor diffusion coefficient in air (\(\delta\) ) used in the third term of both equations, is also taken from Künzel,
+The three terms in equation describe the storage of moisture, the transport of liquid moisture and the transport of vapor respectively. The equation to calculate the vapor diffusion coefficient in air (\(\delta\)) used in the third term of both equations, is also taken from Künzel,
 
 \begin{equation}
 \delta  = \frac{{\left( {2 \times {{10}^{ - 7}} \times {{\left( {T + 273.15} \right)}^{0.81}}} \right)}}{{{P_{ambient}}}}
 \end{equation}
 
-The heat storage capacity (\(\frac{\partial H}{\partial T}\) ) depends on the moisture content w of the material by the following equation.
+The heat storage capacity (\(\frac{\partial H}{\partial T}\)) depends on the moisture content w of the material by the following equation.
 
 \begin{equation}
 \frac{{\partial H}}{{\partial T}} = \left( {c\rho  + {c^w}w} \right)
 \end{equation}
 
-The moisture content of the material w and the vapor diffusion resistance factor μ depend on the relative humidity inside the material. The parameters \(\frac{\partial w}{\partial \phi}\) , \({k^w}\) ~and \({D^w}\) are also moisture dependent parameters.
+The moisture content of the material w and the vapor diffusion resistance factor $\mu$ depend on the relative humidity inside the material. The parameters \(\frac{\partial w}{\partial \phi}\), \({k^w}\) ~and \({D^w}\) are also moisture dependent parameters.
 
 The following sections describe how the above equations are used within the HAMT model.
 
@@ -88,19 +88,19 @@ Equation 1 can be re-written and used to describe the heat storage and transfer 
 \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\frac{{T_i^{p + 1} - T_i^p}}{{\Delta \tau }} = \sum\limits_j {k_{ij}^w{A_{ij}}\frac{{T_j^{p + 1} - T_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
 \end{equation}
 
-In the one dimensional case there are only two adjacent cells each labelled j. The heat generated due to vaporisation\(q_i^v\) ~can be calculated separately.
+In the one dimensional case there are only two adjacent cells each labelled j. The heat generated due to vaporization \(q_i^v\) can be calculated separately.
 
 \begin{equation}
 q_i^v = \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
 \end{equation}
 
-Rearranging equation and including other sources of heat (\(q_i^{adds}\) ) such as radiation from other surfaces in the calculation gives the temperature in a cell in the next time step as,
+Rearranging equation and including other sources of heat (\(q_i^{adds}\)) such as radiation from other surfaces in the calculation gives the temperature in a cell in the next time step as,
 
 \begin{equation}
 T_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{T_j^{p + 1}}}{{R_{ij}^h}}}  + q_i^v + q_i^{adds} + C_i^h\frac{{T_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^h}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^h}}} }}
 \end{equation}
 
-where\(C_i^h = \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\) ~is thermal heat capacitance of cell i and \(R_{ij}^h = \frac{x_{ij}}{k_{ij}A_{ij}}\) ~is the thermal resistance between cells i and j.
+where \(C_i^h = \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\) is thermal heat capacitance of cell i and \(R_{ij}^h = \frac{x_{ij}}{k_{ij}A_{ij}}\) ~is the thermal resistance between cells i and j.
 
 This equation can be solved using the Gauss-Seidel iteration technique. The i\(^{h}\) cell temperature is calculated whilst the j\(^{h}\) cell temperatures are kept as up to date as possible. The iteration is stopped when the maximum difference between two consecutive calculations in all cells is less than a threshold of 0.002°C.
 

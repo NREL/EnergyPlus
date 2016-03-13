@@ -4,13 +4,16 @@ Building energy code and standards like ASHRAE 90.1, 90.2 and California Title 2
 
 A simplified approach is introduced to create equivalent constructions and model the ground heat transfer through underground walls and ground floors for the building energy code compliance calculations. The approach is to create constructions based on the user defined C or F factor with two layers: one concrete layer (0.15 m thick) with thermal mass, and one fictitious insulation layer with no thermal mass.
 
-Three objects are used in the C and F factor calculations:
+\begin{itemize}
+\item
+  Three objects are used in the C and F factor calculations:
+\item
+  Construction:CfactorUndergroundWall
+\item
+  Construction:FfactorGroundFloor
+\end{itemize}
 
-*~Construction:CfactorUndergroundWall
-
-*~Construction:FfactorGroundFloor
-
-*~Site:GroundTemperature:FCfactorMethod
+Site:GroundTemperature:FCfactorMethod
 
 Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
 
@@ -28,43 +31,43 @@ Q is the steady state heat transfer through the floor in Watt
 
 Area is the area of the floor in m\(^{2}\)
 
-U\(_{f}\) is the effective heat transfer coefficient including the floor construction, the soil, and the thermal resistance of the interior and exterior air films.
+U\(_{efff}\) is the effective heat transfer coefficient including the floor construction, the soil, and the thermal resistance of the interior and exterior air films.
 
-T\(_{n}\) is the indoor air temperature in °C
+T\(_{air,in}\) is the indoor air temperature in °C
 
-T\(_{t}\) is the outside air temperature in °C
+T\(_{air,out}\) is the outside air temperature in °C
 
-P\(_{p}\) is the exposed perimeter of the floor in m
+P\(_{exp}\) is the exposed perimeter of the floor in m
 
 F-Factor is the heat transfer through the floor, induced by a unit temperature difference between the outside and inside air temperature, on the per linear length of the exposed perimeter of the floor. The unit is W/m·K.
 
 Therefore,
 
-U\(_{f}\) = (P\(_{p}\) * F-factor) / Area
+U\(_{eff}\) = (P\(_{exp}\) * F-factor) / Area
 
-1 / U\(_{f}\) = R\(_{f}\) + R\(_{n}\) + R\(_{t}\)
+1 / U\(_{eff}\) = R\(_{eff}\) + R\(_{film,in}\) + R\(_{film,out}\)
 
-R\(_{f}\) = Area / (P\(_{p}\) * F-factor) - R\(_{n}\) - R\(_{t}\)
+R\(_{eff}\) = Area / (P\(_{exp}\) * F-factor) - R\(_{film,in}\) - R\(_{film,out}\)
 
 Where,
 
-R\(_{f}\) is the effective thermal resistance in m\(^{2}\)·K/W, including the soil and the floor construction
+R\(_{eff}\) is the effective thermal resistance in m\(^{2}\)·K/W, including the soil and the floor construction
 
-R\(_{n}\) and R\(_{t}\) are the air film resistance of the inside and outside surfaces, respectively.
+R\(_{film,in}\) and R\(_{film,out}\) are the air film resistance of the inside and outside surfaces, respectively.
 
-The outside air film resistance R\(_{t}\) = 0.03 m\(^{2}\)·K/W. The inside air film resistance R\(_{n}\) = 0.125 m\(^{2}\)·K/W, which is the average of the 0.14 m\(^{2}\)·K/W for heat flow up and 0.11 m\(^{2}\)·K/W for heat flow down.
+The outside air film resistance R\(_{film,out}\) = 0.03 m\(^{2}\)·K/W. The inside air film resistance R\(_{film,in}\) = 0.125 m\(^{2}\)·K/W, which is the average of the 0.14 m\(^{2}\)·K/W for heat flow up and 0.11 m\(^{2}\)·K/W for heat flow down.
 
 Approximate the thermal mass of the floor construction with a 6-inch (0.15 m) heavy concrete, and use a fictitious insulation layer with no thermal mass to match the thermal resistance of the construction.
 
 We have,
 
-R\(_{c}\) = R\(_{f}\) -- R\(_{n}\)
+R\(_{fic}\) = R\(_{eff}\) -- R\(_{con}\)
 
 Where,
 
-R\(_{c}\) is the thermal resistance of the fictitious insulation layer in m\(^{2}\)·K/W.
+R\(_{fic}\) is the thermal resistance of the fictitious insulation layer in m\(^{2}\)·K/W.
 
-R\(_{n}\) is the thermal resistance of the concrete layer in m\(^{2}\)·K/W.
+R\(_{con}\) is the thermal resistance of the concrete layer in m\(^{2}\)·K/W.
 
 Properties of the concrete layer are:
 
@@ -76,11 +79,11 @@ Density = 2240 kg/m\(^{3}\)
 
 Specific heat = 900 J/kg·K
 
-R\(_{n}\) = 0.15/1.95 = 0.077 m\(^{2}\)·K/W
+R\(_{con}\) = 0.15/1.95 = 0.077 m\(^{2}\)·K/W
 
 Finally,
 
-R\(_{c}\) = R\(_{f}\) -- 0.077
+R\(_{fic}\) = R\(_{eff}\) -- 0.077
 
 \begin{figure}[hbtp] % fig 32
 \centering
@@ -88,15 +91,15 @@ R\(_{c}\) = R\(_{f}\) -- 0.077
 \caption{Schematic for Slab on Grade - Two Spaces \protect \label{fig:schematic-for-slab-on-grade-two-spaces}}
 \end{figure}
 
-For slabs-on-grade as shown in the figure above, the exposed perimeter is (2A + C) for the Dining area, and (2B + C) for the Kitchen area. For underground floors with no exposed perimeter, the R\(_{f}\) can be assumed a big value such as 1000 hr·ft\(^{2}\)·°F/Btu (177 m\(^{2}\)·K/W).
+For slabs-on-grade as shown in the figure above, the exposed perimeter is (2A + C) for the Dining area, and (2B + C) for the Kitchen area. For underground floors with no exposed perimeter, the R\(_{eff}\) can be assumed a big value such as 1000 hr·ft\(^{2}\)·°F/Btu (177 m\(^{2}\)·K/W).
 
 \textbf{\emph{Underground Walls Defined with C-Factors}}
 
 The steady state heat transfer through the underground wall is calculated as,
 
-Q = Area * U\(_{f}\) * (T\(_{t}\) -- T\(_{n}\))
+Q = Area * U\(_{eff}\) * (T\(_{air,out}\) -- T\(_{air,in}\))
 
-1 / U\(_{f}\) = R\(_{f}\) + R\(_{t}\) + R\(_{n}\)
+1 / U\(_{eff}\) = R\(_{eff}\) + R\(_{film,out}\) + R\(_{film,in}\)
 
 Where,
 
@@ -104,39 +107,37 @@ Q is the heat transfer through the wall in Watt
 
 Area is the area of the wall in m2
 
-U\(_{f}\) is the effective heat transfer coefficient including the floor construction, the soil, and the thermal resistance of the interior and exterior air films.
+U\(_{eff}\) is the effective heat transfer coefficient including the floor construction, the soil, and the thermal resistance of the interior and exterior air films.
 
-R\(_{f}\) is the effective thermal resistance in m\(^{2}\)·K/W, including the soil and the wall construction
+R\(_{eff}\) is the effective thermal resistance in m\(^{2}\)·K/W, including the soil and the wall construction
 
-R\(_{n}\) and R\(_{t}\) are the air film resistance of the inside and outside surfaces, respectively.
+R\(_{film,in}\) and R\(_{film,out}\) are the air film resistance of the inside and outside surfaces, respectively.
 
 C-factor is the time rate of steady-state heat flow through unit area of the construction, induced by a unit temperature difference between the body surfaces. The C-Factor unit is W/m\(^{2}\)·K. The C-factor does not include soil or air films.
 
-R\(_{f}\) = 1/C-factor + R\(_{l}\) \(_{ }\)
+R\(_{eff}\) = 1/C-factor + R\(_{soil}\)
 
-R\(_{l}\) is the effective R-value of the soil. Reference values from Table C6.10.1 of the SI version of the ASHRAE Standard 90.1-2010 are as follows:
-
-Table 17. Effective R-Value of Soil for Below-Grade Walls
+R\(_{soil}\) is the effective R-value of the soil. Reference values from Table C6.10.1 of the SI version of the ASHRAE Standard 90.1-2010 are as follows:
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image436.png}
-\caption{}
+\caption{Effective R-Value of Soil for Below-Grade Walls}
 \end{figure}
 
 A fairly good linear regression (R\(^{2}\) = 0.9967) for the above data is,
 
-R\(_{l}\) = 0.0607 + 0.3479 * Depth
+R\(_{soil}\) = 0.0607 + 0.3479 * Depth
 
 Approximate the thermal mass of the wall construction with a 6-inch (0.15 m) heavy concrete, and use a fictitious insulation layer with no thermal mass to match the thermal resistance of the construction. Then we have the thermal resistance of the insulation layer,
 
-R\(_{c}\) = R\(_{f}\) -- R\(_{n}\)
+R\(_{fic}\) = R\(_{eff}\) -- R\(_{con}\)
 
 Where,
 
-R\(_{c}\) is the thermal resistance of the fictitious insulation layer
+R\(_{fic}\) is the thermal resistance of the fictitious insulation layer
 
-R\(_{n}\) is the thermal resistance of the concrete layer in m\(^{2}\)·K/W.
+R\(_{con}\) is the thermal resistance of the concrete layer in m\(^{2}\)·K/W.
 
 Properties of the concrete layer are:
 
@@ -148,4 +149,4 @@ Density = 2240 kg/m\(^{3}\)
 
 Specific heat = 900 J/kg·K
 
-R\(_{n}\) = 0.15/1.95 = 0.077 m\(^{2}\)·K/W
+R\(_{con}\) = 0.15/1.95 = 0.077 m\(^{2}\)·K/W

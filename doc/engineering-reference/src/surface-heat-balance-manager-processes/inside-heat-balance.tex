@@ -36,9 +36,12 @@ Each of these heat balance components is introduced briefly below.
 
 There are two limiting cases for internal LW radiation exchange that are easily modeled:
 
-nThe zone air is completely transparent to LW radiation.
-
-nThe zone air completely absorbs LW radiation from the surfaces within the zone.
+\begin{itemize}
+\item
+The zone air is completely transparent to LW radiation.
+\item
+The zone air completely absorbs LW radiation from the surfaces within the zone.
+\end{itemize}
 
 The limiting case of completely absorbing air has been used for load calculations and also in some energy analysis calculations.~ This model is attractive because it can be formulated simply using a combined radiation and convection heat transfer coefficient from each surface to the zone air.~ However, it oversimplifies the zone surface exchange problem, and as a result, the heat balance formulation in EnergyPlus treats air as completely transparent.~ This means that it does not participate in the LW radiation exchange among the surfaces in the zone. The model, which considers room air to be completely transparent, is reasonable physically because of the low water vapor concentrations and the short mean path lengths.~ It also permits separating the radiant and convective parts of the heat transfer at the surface, which is an important attribute of the heat balance method.
 
@@ -52,19 +55,25 @@ EnergyPlus uses a grey interchange model for the longwave radiation among zone s
 
 The determination of the ``seen'' area has several constraints:
 
-·~~~~~~~~No surface sees itself.
-
-·~~~~~~~~All surfaces see thermal mass surfaces.
-
-·~~~~~~~~No surface facing within 10 degrees of another surface is seen by the other surface.
-
-·~~~~~~~~All surfaces see roofs, floors and ceilings (subject to the preceding facing direction constraint).
+\begin{itemize}
+\item
+  No surface sees itself.
+\item
+  All surfaces see thermal mass surfaces.
+\item
+  No surface facing within 10 degrees of another surface is seen by the other surface.
+\item
+  All surfaces see roofs, floors and ceilings (subject to the preceding facing direction constraint).
+\end{itemize}
 
 Because the approximate view factors may not satisfy the basic requirements of reciprocity (two surfaces should exchange equal amounts of heat in each direction), and completeness (every surface should have a direct view factor sum of 1.0), EnergyPlus does a view factor fix operation before they are used in the ScriptF determination.~ Normally both of the requirements are satisfied, but in some special situations they are not, and special rules are applied.
 
-·~~~~~~~~If a user includes less than four surfaces in a zone, only reciprocity is enforced.
-
-·~~~~~~~~If the area of one surface in a zone is greater than the sum of the areas of all other surfaces, reciprocity only is enforced, but sometimes, for very large surfaces, that enforcement becomes impossible, and the view factors are modified so that only the large surface is seen by very small surfaces.
+\begin{itemize}
+\item
+  If a user includes less than four surfaces in a zone, only reciprocity is enforced.
+\item
+  If the area of one surface in a zone is greater than the sum of the areas of all other surfaces, reciprocity only is enforced, but sometimes, for very large surfaces, that enforcement becomes impossible, and the view factors are modified so that only the large surface is seen by very small surfaces.
+\end{itemize}
 
 Warning messages are produced for both of these cases, and the results should be examined very carefully to ascertain that they are reasonable.~~ The suggested action for the second case (the extra-large surface) is to divide the large surface into several smaller surfaces; then the enclosure will be treated as normal.
 
@@ -74,7 +83,7 @@ Once the ScriptF coefficients are determined, the longwave radiant exchange is c
 {q_{i,j}} = {A_i}{F_{i,j}}\left( {T_i^4 - T_j^4} \right)
 \end{equation}
 
-where \textbf{\emph{F}}\(_{j}\) is the ScriptF between surfaces i and j.
+where \textbf{\emph{F}}\(_{i,j}\) is the ScriptF between surfaces i and j.
 
 \subsubsection{Thermal Mass and Furniture}\label{thermal-mass-and-furniture}
 
@@ -144,10 +153,11 @@ SurfaceConvectionAlgorithm:Inside:AdapativeModelSelections object) so that the u
 
 The adaptive convection algorithm implemented in EnergyPlus for the inside face has a total of 45 different categories for surfaces and 29 different options for \emph{h\(_{c}\)} equation selections.~ The following table summarizes the categories and the default assignments for \emph{h\(_{c}\)} equations.~ The individual \emph{h\(_{c}\)} equations are documented below.
 
-\begin{longtable}[c]{p{0.25in}p{1.25in}p{0.25in}p{1.5in}p{2.75in}}
+\scriptsize{
+\begin{longtable}[c]{p{0.25in}p{1.25in}p{0.25in}p{1.5in}p{2.5in}}
 \caption{Table 13. Inside Convection Categories and Assignments \label{table:table-13.-inside-convection-categories}}\\
 \toprule 
-\# & Zone Air Flow Regime & IB-M's \# & Surface orientation and heat flow direction & Keywords for Applicable Model Equation Sources \tabularnewline \midrule \endhead
+\textbf{\#} & \textbf{Zone Air Flow Regime} & \textbf{IB-M's \#} & \textbf{Surface orientation and heat flow direction} & \textbf{Keywords for Applicable Model Equation Sources} \tabularnewline \midrule \endhead
 1  & & & Vertical Walls & FohannoPolidoriVerticalWall* \tabularnewline
    & & & & AlamdariHammondVerticalWall \tabularnewline
    & & & & ASHRAEVerticalWall \tabularnewline
@@ -419,7 +429,7 @@ h = \frac{{2.175{{\left| {\Delta T} \right|}^{0.308}}}}{{D_h^{0.076}}}
 
 where,
 
-\({D_h} = \frac{{4A}}{P}\) ~, hydraulic diameter of horizontal surface, \emph{A} is area (m\(^{2}\)) and \emph{P} is the perimeter (m) of the entire zone (all of the adjacent floor surfaces if more than one in the zone).
+\({D_h} = \frac{{4A}}{P}\), hydraulic diameter of horizontal surface, \emph{A} is area (m\(^{2}\)) and \emph{P} is the perimeter (m) of the entire zone (all of the adjacent floor surfaces if more than one in the zone).
 
 \subsubsection{Awbi Hatton Heated Wall}\label{awbi-hatton-heated-wall}
 
@@ -431,7 +441,7 @@ h = \frac{{1.823{{\left| {\Delta T} \right|}^{0.293}}}}{{D_h^{0.076}}}
 
 where,
 
-\({D_h} = \frac{{4A}}{P}\) ~, hydraulic diameter of wall surface, \emph{A} is area (m\(^{2}\)) and \emph{P} is the perimeter (m) of the entire wall (all of the adjacent wall surfaces if more than one along the wall).
+\({D_h} = \frac{{4A}}{P}\), hydraulic diameter of wall surface, \emph{A} is area (m\(^{2}\)) and \emph{P} is the perimeter (m) of the entire wall (all of the adjacent wall surfaces if more than one along the wall).
 
 \subsubsection{Beausoleil Morrison Mixed Assisted Wall}\label{beausoleil-morrison-mixed-assisted-wall}
 
@@ -457,7 +467,7 @@ h = \left(
 
 where,
 
-~~~~~ \emph{T\(_{T}\)} is the supply air temperature at the diffuser.
+~~~~~ \emph{T\(_{SAT}\)} is the supply air temperature at the diffuser.
 
 Here the reference temperature is the zone air temperature rather than the diffuser supply air temperature.
 
@@ -718,17 +728,17 @@ For no temperature difference OR a vertical surface the following correlation is
 
 \(h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (90)
 
-For (DT \textless{} 0.0 AND an upward facing surface)~ OR~ (DT \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
+For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
 
 \(h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (91)
 
-where S is the surface tilt angle.
+where $\Sigma$ is the surface tilt angle.
 
-For (DT \textgreater{} 0.0 AND an upward facing surface)~ OR~ (DT \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
+For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
 
 \(h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (92)
 
-where S is the surface tilt angle.
+where $\Sigma$ is the surface tilt angle.
 
 \subsubsection{Simple Natural Convection Algorithm}\label{simple-natural-convection-algorithm}
 
