@@ -213,7 +213,6 @@ namespace MixedAir {
 	int const UnitarySystem( 21 );
 	int const Humidifier( 22 );
 
-	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
 	int const ControllerStandAloneERV( 3 );
 
@@ -4710,8 +4709,6 @@ namespace MixedAir {
 						OAController( OAControllerNum ).MaxOA = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					}}
 
-				} else if ( SELECT_CASE_var == ControllerSimple ) {
-
 				} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
 
 				} else {
@@ -4726,8 +4723,6 @@ namespace MixedAir {
 
 					CheckZoneSizing( CurrentModuleObject, OAController( OAControllerNum ).Name );
 					OAController( OAControllerNum ).MaxOA = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-
-				} else if ( SELECT_CASE_var == ControllerSimple ) {
 
 				} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
 
@@ -4860,8 +4855,8 @@ namespace MixedAir {
 			}
 			else
 			{
-			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-			Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
 				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 			}
 			Node( RelAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).RelMassFlow;
@@ -4877,29 +4872,11 @@ namespace MixedAir {
 			}
 			else
 			{
-			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 			}
 			Node( RetAirNodeNum ).MassFlowRate = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
 			Node( RetAirNodeNum ).MassFlowRateMaxAvail = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
-		}
-
-		if ( Contaminant.CO2Simulation && OAController( OAControllerNum ).ControllerType_Num == ControllerSimple ) {
-			Node( RelAirNodeNum ).CO2 = Node( InletAirNodeNum ).CO2;
-			if ( Node( RetAirNodeNum ).MassFlowRate > 0.0 ) {
-				Node( RetAirNodeNum ).CO2 = ( ( Node( InletAirNodeNum ).MassFlowRate - Node( RelAirNodeNum ).MassFlowRate ) * Node( InletAirNodeNum ).CO2 + Node( OutAirNodeNum ).MassFlowRate * OutdoorCO2 ) / Node( RetAirNodeNum ).MassFlowRate;
-			} else {
-				Node( RetAirNodeNum ).CO2 = Node( InletAirNodeNum ).CO2;
-			}
-		}
-
-		if ( Contaminant.GenericContamSimulation && OAController( OAControllerNum ).ControllerType_Num == ControllerSimple ) {
-			Node( RelAirNodeNum ).GenContam = Node( InletAirNodeNum ).GenContam;
-			if ( Node( RetAirNodeNum ).MassFlowRate > 0.0 ) {
-				Node( RetAirNodeNum ).GenContam = ( ( Node( InletAirNodeNum ).MassFlowRate - Node( RelAirNodeNum ).MassFlowRate ) * Node( InletAirNodeNum ).GenContam + Node( OutAirNodeNum ).MassFlowRate * OutdoorGC ) / Node( RetAirNodeNum ).MassFlowRate;
-			} else {
-				Node( RetAirNodeNum ).GenContam = Node( InletAirNodeNum ).GenContam;
-			}
 		}
 
 	}
