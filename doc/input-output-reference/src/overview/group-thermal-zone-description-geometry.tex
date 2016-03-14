@@ -28,7 +28,7 @@ Zone type is currently unused.
 
 \paragraph{Field: Multiplier}\label{field-multiplier}
 
-Zone Multiplier is designed as a ``multiplier'' for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied.~ The default is 1.
+Zone Multiplier is designed as a ``multiplier'' for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.
 
 \paragraph{Field: Ceiling Height}\label{field-ceiling-height}
 
@@ -54,7 +54,7 @@ If omitted or blank, the algorithm specified in the SurfaceConvectionAlgorithm:I
 
 The Zone Outside Convection Algorithm field is optional. This field specifies the convection model to be used for the outside face of heat transfer surfaces associated with this zone. The choices are: \textbf{SimpleCombined}, \textbf{TARP}, \textbf{DOE-2}, \textbf{MoWiTT, and AdaptiveConvectionAlgorithm}. The simple convection model applies heat transfer coefficients depending on the roughness and windspeed. This is a combined heat transfer coefficient that includes radiation to sky, ground, and air. The correlation is based on Figure~\ref{fig:schematic-of-the-energyplus-unitary-system}, Page 25.1 (Thermal and Water Vapor Transmission Data), 2001 ASHRAE Handbook of Fundamentals.
 
-The other convection models apply heat transfer coefficients depending on the roughness, windspeed, and terrain of the building's location. These are \emph{convection only} heat transfer coefficients; radiation heat transfer coefficients are calculated automatically by the program. The TARP algorithm was developed for the TARP software and combines natural and wind-driven convection correlations from laboratory measurements on flat plates.~ The DOE-2 and MoWiTT were derived from field measurements.~ The AdaptiveConvectionAlgorithm model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies.~ The adaptive convection algorithm can also be customized using the SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections input object. All algorithms are described more fully in the Engineering Reference.
+The other convection models apply heat transfer coefficients depending on the roughness, windspeed, and terrain of the building's location. These are \emph{convection only} heat transfer coefficients; radiation heat transfer coefficients are calculated automatically by the program. The TARP algorithm was developed for the TARP software and combines natural and wind-driven convection correlations from laboratory measurements on flat plates. The DOE-2 and MoWiTT were derived from field measurements. The AdaptiveConvectionAlgorithm model is an dynamic algorithm that organizes a large number of different convection models and automatically selects the one that best applies. The adaptive convection algorithm can also be customized using the SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections input object. All algorithms are described more fully in the Engineering Reference.
 
 If omitted or blank, the algorithm specified in the SurfaceConvectionAlgorithm:Outside object is the default.
 
@@ -168,9 +168,10 @@ In addition to the canned Surface reports (view the Reports section later in thi
 
 Two of these are of particular interest:
 
-Zone,Average,Zone Mean Air Temperature {[}C{]}
-
-HVAC,Average,Zone Air Temperature {[}C{]}
+\begin{lstlisting}
+Zone,Average,Zone Mean Air Temperature [C]
+HVAC,Average,Zone Air Temperature [C]
+\end{lstlisting}
 
 These two variable outputs are/should be identical. However, note that they can be reported at different time intervals. ``Zone Mean Air Temperature'' is only available on the Zone/HB timestep (Number of Timesteps per Hour) whereas ``Zone Air Temperature'' can be reported at the HVAC timestep (which can vary).
 
@@ -188,7 +189,7 @@ This is the dewpoint temperature of the zone calculated from the Zone Mean Air T
 
 \subsubsection{Zone Thermostat Air Temperature {[}C{]}}\label{zone-thermostat-air-temperature-c}
 
-This is the zone air node temperature for the well-mixed room air model, which is the default room air model type (RoomAirModelType = Mixing).~ But for other types of Room Air Model (the RoomAir:TemperaturePattern:* and RoomAirSettings:* objects) the zone thermostat air temperature may depend on the Thermostat Height and Thermostat Offset.
+This is the zone air node temperature for the well-mixed room air model, which is the default room air model type (RoomAirModelType = Mixing). But for other types of Room Air Model (the RoomAir:TemperaturePattern:* and RoomAirSettings:* objects) the zone thermostat air temperature may depend on the Thermostat Height and Thermostat Offset.
 
 \subsubsection{Zone Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c}
 
@@ -196,15 +197,15 @@ The Mean Radiant Temperature (MRT) in degrees Celsius of a space is a measure of
 
 \subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c}
 
-Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT),~ OT = 0.5*MAT + 0.5*MRT.~ This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
+Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems. See also Zone Thermostat Operative Temperature.
 
 \subsubsection{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
 
-The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains, including people, lights, equipment etc.~ This and the following provide results on the load components of the zone air heat balance.~ This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains, including people, lights, equipment etc. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance Surface Convection Rate {[}W{]}}\label{zone-air-heat-balance-surface-convection-rate-w}
 
-The Zone Air Heat Balance Surface Convection Rate is the sum, in watts, of heat transferred to the zone air from all the surfaces.~ This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Surface Convection Rate is the sum, in watts, of heat transferred to the zone air from all the surfaces. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance Interzone Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-interzone-air-transfer-rate-w}
 
@@ -212,43 +213,45 @@ The Zone Air Heat Balance Interzone Air Transfer Rate is the sum, in watts, of h
 
 \subsubsection{Zone Air Heat Balance Outdoor Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-outdoor-air-transfer-rate-w}
 
-The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of heat transferred to the zone air from all the transfers of air from the out side, such as infiltration.~ This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of heat transferred to the zone air from all the transfers of air from the out side, such as infiltration. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units.~ Such HVAC systems are connected to the zone by an inlet node (see ZoneHVac:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVac:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
-The Zone Air Heat Balance System Convective Heat Gain Rate is the sum, in watts, of heat transferred directly to the zone air by ``non-air'' HVAC systems.~ Such HVAC systems are not connected to the zone by an inlet node but rather add or subtract heat directly to the zone air in a manner similar to internal gains.~ These include the convective fraction of zone HVAC baseboards and high temperature radiant systems, zone HVAC refrigeration chiller set, and the extra convective cooling provided by the cooled beam air terminal unit.~ This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Convective Heat Gain Rate is the sum, in watts, of heat transferred directly to the zone air by ``non-air'' HVAC systems. Such HVAC systems are not connected to the zone by an inlet node but rather add or subtract heat directly to the zone air in a manner similar to internal gains. These include the convective fraction of zone HVAC baseboards and high temperature radiant systems, zone HVAC refrigeration chiller set, and the extra convective cooling provided by the cooled beam air terminal unit. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance Air Energy Storage Rate {[}W{]}}\label{zone-air-heat-balance-air-energy-storage-rate-w}
 
-The Zone Air Heat Balance Air Energy Storage Rate is the heat stored, in watts, in the zone air as result of zone air temperature changing from one timestep to the next.~ This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Air Energy Storage Rate is the heat stored, in watts, in the zone air as result of zone air temperature changing from one timestep to the next. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance Deviation Rate {[}W{]}}\label{zone-air-heat-balance-deviation-rate-w}
 
-The Zone Air Heat Balance Deviation Rate is the imbalance, in watts, in the energy balance for zone air.~ The value should be near zero but will become non-zero if zone conditions are changing rapidly or erratically.~ This field is not multiplied by zone or group multipliers.~ (This output variable is only generated if the user has set a computer system environment variable DisplayAdvancedReportVariables equal to ``yes''.)
+The Zone Air Heat Balance Deviation Rate is the imbalance, in watts, in the energy balance for zone air. The value should be near zero but will become non-zero if zone conditions are changing rapidly or erratically. This field is not multiplied by zone or group multipliers. (This output variable is only generated if the user has set a computer system environment variable DisplayAdvancedReportVariables equal to ``yes''.)
 
 \subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j}
 
-This output variable represents the sensible heating energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. . This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible heating energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
+\begin{callout}
 Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
 
 Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variable will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
+\end{callout}
 
 \subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j}
 
-This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.~~ This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w}
 
-This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.~~ This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w}
 
-This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.~~ This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratio-kgwaterkgdryair}
 
@@ -262,7 +265,7 @@ This output variable represents the air relative humidity after the correct step
 
 \subsubsection{Zone Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j}
 
-These output variables represent the sum of radiant gains from specific internal sources~ (e.g.~equipment) throughout the zone in Watts (for rate) or joules. This includes radiant gain from People, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of radiant gains from specific internal sources (e.g.~equipment) throughout the zone in Watts (for rate) or joules. This includes radiant gain from People, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
 \subsubsection{Zone Total Internal Visible Radiation Heating Rate {[}W{]}}\label{zone-total-internal-visible-radiation-heating-rate-w}
 
@@ -334,7 +337,9 @@ All ZoneList variables are the sum of the corresponding Zone variables. \emph{Zo
 
 The ZoneGroup object adds a multiplier to a ZoneList. This can be used to reduce the amount of input necessary for simulating repetitive structures, such as the identical floors of a multi-story building. To create a ``Floor Multiplier'', use the ZoneList object to organize several zones into a typical floor. Then use the \emph{Zone List Multiplier} field in the ZoneGroup object to multiply the system load for the zones in the list will also be multiplied. Zones with a \emph{Multiplier} field greater than one in the Zone object are effectively double-multiplied.
 
-NOTE:~ Although ZoneLists are not exclusive by themselves, ZoneLists used to form a ZoneGroup are exclusive; the ZoneLists used with a ZoneGroup must not have any zones in common.
+\begin{callout}
+NOTE: Although ZoneLists are not exclusive by themselves, ZoneLists used to form a ZoneGroup are exclusive; the ZoneLists used with a ZoneGroup must not have any zones in common.
+\end{callout}
 
 \subsubsection{Inputs}\label{inputs-2-042}
 
@@ -418,14 +423,18 @@ During specification of surfaces, several ``outside'' environments may be chosen
   \textbf{Outdoors} -- when the surface is an external surface (e.g.~walls, roofs, windows directly exposed to the outdoor conditions)
 \item
   \textbf{Surface} -- when the surface is
-\item
-  An adiabatic internal zone surface
-\item
-  A interzone surface
+  \begin{itemize}
+    \item
+      An adiabatic internal zone surface
+    \item
+      A interzone surface
+  \end{itemize}
 \item
   \textbf{Zone --} when the surface is
-\item
-  A interzone surface in which the other surface is not put in the input file.
+  \begin{itemize}
+    \item
+      A interzone surface in which the other surface is not put in the input file.
+  \end{itemize}
 \item
   \textbf{OtherSideCoefficients} -- when using a custom profile to describe the external conditions of the surface (advanced concept -- covered in subject: SurfaceProperty:OtherSideCoefficients)
 \item
@@ -435,6 +444,7 @@ During specification of surfaces, several ``outside'' environments may be chosen
 \textbf{Surface} items must also specify an ``outside face object''. This is
 
 \begin{itemize}
+\tightlist
 \item
   Current surface name -- for adiabatic internal surfaces.
 \item
@@ -451,11 +461,15 @@ During specification of surfaces, several ``outside'' environments may be chosen
   The zone that contains the other surface that is adjactent to this surface but is not entered in input.
 \end{itemize}
 
+\begin{callout}
 Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description -- these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
+\end{callout}
 
 \textbf{Shading} surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g.~trees, bushes, mountains, nearby buildings which aren't being simulated as part of this facility, etc.)
 
+\begin{callout}
 Note that surfaces which are part of the simulated building automatically shade other parts of the building as geometry and time of day dictate -- there is no need on the user's part to include surfaces that might be in other zones for shading.
+\end{callout}
 
 Another surface type:
 
@@ -490,21 +504,24 @@ Note that this does not take into account that surfaces may be ``around the corn
 
 To summarize, using the Surface ``Class'', the approximate view factors have:
 
-1.~~~~~No surface sees itself.
+\begin{enumerate}
+\item
+  No surface sees itself.
+\item
+  No Floor sees another floor.
+\item
+  All other surface types see Internal Mass.
+\item
+  All other surface types see floors.
+\item
+  Floors always see ceilings.
+\item
+  Floors always see roofs.
+\item
+  All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other.
+\end{enumerate}
 
-2.~~~~No Floor sees another floor.
-
-3.~~~~All other surface types see Internal Mass.
-
-4.~~~~All other surface types see floors.
-
-5.~~~~Floors always see ceilings.
-
-6.~~~~Floors always see roofs.
-
-7.~~~~All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other.
-
-If geometry is correct, conditions 1,3, and 7 should take care of all surfaces, but the other conditions supply common sense when the geometry is incorrect. More information about the EnergyPlus view factor calculation is contained in the Engineering Reference document.
+If geometry is correct, conditions 1, 3, and 7 should take care of all surfaces, but the other conditions supply common sense when the geometry is incorrect. More information about the EnergyPlus view factor calculation is contained in the Engineering Reference document.
 
 \subsection{GlobalGeometryRules}\label{globalgeometryrules}
 
@@ -524,7 +541,7 @@ In order to perform shadowing calculations, the building surfaces must be specif
 
 \paragraph{Field: Starting Vertex Position}\label{field-starting-vertex-position}
 
-The shadowing algorithms in EnergyPlus rely on surfaces having vertices in a certain order and positional structure. Thus, the surface translator needs to know the starting point for each surface entry. The choices are:~ UpperLeftCorner, LowerLeftCorner , UpperRightCorner, or LowerRightCorner. Since most surfaces will be 4 sided, the convention will specify this position as though each surface were 4 sided. Extrapolate 3 sided figures to this convention. For 5 and more sided figures, again, try to extrapolate the best ``corner'' starting position.
+The shadowing algorithms in EnergyPlus rely on surfaces having vertices in a certain order and positional structure. Thus, the surface translator needs to know the starting point for each surface entry. The choices are: UpperLeftCorner, LowerLeftCorner , UpperRightCorner, or LowerRightCorner. Since most surfaces will be 4 sided, the convention will specify this position as though each surface were 4 sided. Extrapolate 3 sided figures to this convention. For 5 and more sided figures, again, try to extrapolate the best ``corner'' starting position.
 
 \paragraph{Field: Vertex Entry Direction}\label{field-vertex-entry-direction}
 
@@ -540,7 +557,7 @@ Typically, all zone origin values for ``World'' coordinates will be (0,0,0) but 
 
 \paragraph{Field: Daylighting Reference Point Coordinate System}\label{field-daylighting-reference-point-coordinate-system}
 
-Daylighting reference points need to be specified as well.~ Again, there can be two flavors; \textbf{relative} and \textbf{world}. Daylighting reference points must fit within the zone boundaries.
+Daylighting reference points need to be specified as well. Again, there can be two flavors; \textbf{relative} and \textbf{world}. Daylighting reference points must fit within the zone boundaries.
 
 \textbf{Relative} coordinates make use of both Building and Zone North Axis values as well as Zone Origin values to locate the reference point in 3D coordinate space. \textbf{World} coordinates do not use these values.
 
@@ -578,15 +595,17 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle}
 
-The Azimuth Angle indicates the direction that the wall faces (outward normal).~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction that the wall faces (outward normal). The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Normally, walls are tilted 90 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Normally, walls are tilted 90 degrees and that is the default for this field.
 
-\paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface}
+\begin{callout}
+\textbf{Starting Corner for the surface}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+\end{callout}
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate}
 
@@ -628,15 +647,17 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-1}
 
-The Azimuth Angle indicates the direction that the wall faces (outward normal).~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction that the wall faces (outward normal). The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-1}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Normally, walls are tilted 90 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Normally, walls are tilted 90 degrees and that is the default for this field.
 
-\paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-1}
+\begin{callout}
+\textbf{Starting Corner for the surface}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+\end{callout}
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-1}
 
@@ -678,15 +699,15 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-2}
 
-The Azimuth Angle indicates the direction that the wall faces (outward normal).~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction that the wall faces (outward normal). The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-2}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Normally, walls are tilted 90 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Normally, walls are tilted 90 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-2}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-2}
 
@@ -728,19 +749,19 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object}
 
-The Outside Boundary Condition Object field is the name of a wall in an adjacent zone or the name of the adjacent zone.~ If the adjacent zone option is used, the adjacent wall is automatically generated in the adjacent zone.~ If the surface name is used, it must be in the adjacent zone.
+The Outside Boundary Condition Object field is the name of a wall in an adjacent zone or the name of the adjacent zone. If the adjacent zone option is used, the adjacent wall is automatically generated in the adjacent zone. If the surface name is used, it must be in the adjacent zone.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-3}
 
-The Azimuth Angle indicates the direction that the wall faces (outward normal).~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction that the wall faces (outward normal). The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-3}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Normally, walls are tilted 90 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Normally, walls are tilted 90 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-3}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-3}
 
@@ -786,15 +807,15 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-4}
 
-The Azimuth Angle indicates the direction of the outward normal for the roof. ~The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-4}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Flat roofs are tilted 0 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Flat roofs are tilted 0 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-4}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-4}
 
@@ -836,15 +857,15 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-5}
 
-The Azimuth Angle indicates the direction of the outward normal for the roof.~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-5}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Flat ceilings are tilted 0 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Flat ceilings are tilted 0 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-5}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-5}
 
@@ -886,19 +907,19 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-1}
 
-The Outside Boundary Condition Object field is the name of a floor in an adjacent zone or the name of the adjacent zone.~ If the adjacent zone option is used, the adjacent floor is automatically generated in the adjacent zone.~ If the surface name is used, it must be in the adjacent zone.
+The Outside Boundary Condition Object field is the name of a floor in an adjacent zone or the name of the adjacent zone. If the adjacent zone option is used, the adjacent floor is automatically generated in the adjacent zone. If the surface name is used, it must be in the adjacent zone.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-6}
 
-The Azimuth Angle indicates the direction of the outward normal for the roof.~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-6}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Flat ceilings are tilted 0 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Flat ceilings are tilted 0 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-6}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-6}
 
@@ -944,15 +965,15 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-7}
 
-The Azimuth Angle indicates the direction of the outward normal for the roof.~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-7}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Flat floors are tilted 180 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Flat floors are tilted 180 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-7}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-7}
 
@@ -994,15 +1015,15 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-8}
 
-The Azimuth Angle indicates the direction of the outward normal for the roof.~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-8}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Flat floors are tilted 180 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Flat floors are tilted 180 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-8}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-8}
 
@@ -1044,19 +1065,19 @@ This is the zone name to which the surface belongs.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-2}
 
-The Outside Boundary Condition Object field is the name of a ceiling in an adjacent zone or the name of the adjacent zone.~ If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone.~ If the surface name is used, it must be in the adjacent zone.
+The Outside Boundary Condition Object field is the name of a ceiling in an adjacent zone or the name of the adjacent zone. If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone. If the surface name is used, it must be in the adjacent zone.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-9}
 
-The Azimuth Angle indicates the direction of the outward normal for the roof.~ The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
 \paragraph{Field: Tilt Angle}\label{field-tilt-angle-9}
 
-The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground).~ Flat floors are tilted 180 degrees and that is the default for this field.
+The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Flat floors are tilted 180 degrees and that is the default for this field.
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-9}
 
-The rectangular surfaces specify the lower left corner of the surface for their starting coordinate.~ This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
+The rectangular surfaces specify the lower left corner of the surface for their starting coordinate. This is specified with (x,y,z) and can be relative to the zone origin or in world coordinates, depending on the value for rectangular surfaces specified in the GlobalGeometryRules object.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-9}
 
@@ -1080,7 +1101,7 @@ This field is the width of the floor in meters.
 
 \subsection{Windows/Doors}\label{windowsdoors}
 
-The following window and door objects can be used to specify simple, rectangular doors and windows. In each case, the lower left corner (locator coordinate) of the window or door is specified \textbf{relative} to the surface it is on.~ Viewing the base surface as a planar surface, base the relative location from the lower left corner of the base surface. Vertex entry description as well as provisions for a few other surface types can be entered with the FenestrationSurface:Detailed object.
+The following window and door objects can be used to specify simple, rectangular doors and windows. In each case, the lower left corner (locator coordinate) of the window or door is specified \textbf{relative} to the surface it is on. Viewing the base surface as a planar surface, base the relative location from the lower left corner of the base surface. Vertex entry description as well as provisions for a few other surface types can be entered with the FenestrationSurface:Detailed object.
 
 \subsection{Window}\label{window}
 
@@ -1126,7 +1147,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-10}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.~ This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-10}
 
@@ -1176,7 +1197,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-11}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.~ This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-11}
 
@@ -1238,7 +1259,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-12}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.~ This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-12}
 
@@ -1278,7 +1299,7 @@ This is the name of a surface that contains this subsurface. Certain kinds of su
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-3}
 
-The Outside Boundary Condition Object field is the name of a window in an adjacent zone or the name of the adjacent zone.~ If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone.~ If the surface name is used, it must be in the adjacent zone.
+The Outside Boundary Condition Object field is the name of a window in an adjacent zone or the name of the adjacent zone. If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone. If the surface name is used, it must be in the adjacent zone.
 
 \paragraph{Field: Multiplier}\label{field-multiplier-4}
 
@@ -1294,7 +1315,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-13}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.~ This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-13}
 
@@ -1332,7 +1353,7 @@ This is the name of a surface that contains this subsurface. Certain kinds of su
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-4}
 
-The Outside Boundary Condition Object field is the name of a door in an adjacent zone or the name of the adjacent zone.~ If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone.~ If the surface name is used, it must be in the adjacent zone.
+The Outside Boundary Condition Object field is the name of a door in an adjacent zone or the name of the adjacent zone. If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone. If the surface name is used, it must be in the adjacent zone.
 
 \paragraph{Field: Multiplier}\label{field-multiplier-5}
 
@@ -1348,7 +1369,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-14}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.~ This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-14}
 
@@ -1388,7 +1409,7 @@ This is the name of a surface that contains this subsurface. Certain kinds of su
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-5}
 
-The Outside Boundary Condition Object field is the name of a glazed (glass) door in an adjacent zone or the name of the adjacent zone.~ If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone.~ If the surface name is used, it must be in the adjacent zone.
+The Outside Boundary Condition Object field is the name of a glazed (glass) door in an adjacent zone or the name of the adjacent zone. If the adjacent zone option is used, the adjacent ceiling is automatically generated in the adjacent zone. If the surface name is used, it must be in the adjacent zone.
 
 \paragraph{Field: Multiplier}\label{field-multiplier-6}
 
@@ -1404,7 +1425,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-15}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.~ This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-15}
 
@@ -1533,9 +1554,11 @@ Each of the following surfaces:
   Shading:Zone:Detailed
 \end{itemize}
 
-use the same vertex input. The numeric parameters indicated below are taken from the BuildingSurface:Detailed definition;~ the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, if you want more vertices for these surfaces, you may add to the IDD definition as indicated in the ``extensible'' comment or, as EnergyPlus is ``auto-extensible'' just add the number of vertices into your input file.. Note that FenestrationSurface:Detailed is not extensible and is limited to 4 (max) vertices. If you leave the Number of Surface Vertex groups blank or enter \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
+use the same vertex input. The numeric parameters indicated below are taken from the BuildingSurface:Detailed definition; the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, if you want more vertices for these surfaces, you may add to the IDD definition as indicated in the ``extensible'' comment or, as EnergyPlus is ``auto-extensible'' just add the number of vertices into your input file.. Note that FenestrationSurface:Detailed is not extensible and is limited to 4 (max) vertices. If you leave the Number of Surface Vertex groups blank or enter \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
 
-\textbf{Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (\textless{}1 mm) may result in invalid dot product and fatal errors during shading calculations.}
+\begin{callout}
+\warning{Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (\textless{} 1 mm) may result in invalid dot product and fatal errors during shading calculations.}
+\end{callout}
 
 \begin{figure}[hbtp] % fig 29
 \centering
@@ -1545,17 +1568,14 @@ use the same vertex input. The numeric parameters indicated below are taken from
 
 The figure above will help illustrate Surface Vertex entry. The convention used in ``GlobalGeometryRules'' dictates the order of the vertices (ref: GlobalGeometryRules). In this example, the conventions used are Starting Vertex Position = UpperLeftCorner and Vertex Entry Direction = CounterClockwise. The surfaces for this single zone are:
 
-4,0,0,H, 0,0,0, A,0,0, A,0,H; ! \textbf{(4 vertices, South Wall)}
-
-4,A,0,H,A,0,0,A,B,0,A,B,H;~ ! \textbf{(4 vertices, East Wall)}
-
-~~~~ \textbf{ignore other walls that are not shown in this figure}
-
-4,C,0,J,A,0,H,A,B,H,C,B,J; ! \textbf{(4 vertices, roof)}
-
-3,C,0,J,0,0,H,A,0,H; ! \textbf{(3 vertices, gable end)}
-
-4,0,0,H, 0,0,0, A,0,0, A,0,H; ! \textbf{(4 vertices, South Wall)}
+\begin{lstlisting}
+4,0,0,H, 0,0,0, A,0,0, A,0,H; ! (4 vertices, South Wall)
+4,A,0,H,A,0,0,A,B,0,A,B,H; ! (4 vertices, East Wall)
+     ignore other walls that are not shown in this figure
+4,C,0,J,A,0,H,A,B,H,C,B,J; ! (4 vertices, roof)
+3,C,0,J,0,0,H,A,0,H; ! (3 vertices, gable end)
+4,0,0,H, 0,0,0, A,0,0, A,0,H; ! (4 vertices, South Wall)
+\end{lstlisting}
 
 Note that in this example, point 1 of the entry is the Upper Left Corner of the rectangular surfaces and the point of the triangle for the 3 sided surface. The east wall shows the order of vertex entry. For horizontal surfaces, any vertex may be chosen as the starting position, but the Vertex Entry Direction convention must be followed. The surface details report (Output: Surfaces:List, Details;) is very useful for reviewing the accuracy of surface geometry inputs (ref: Surface Output Variables/Reports and Variable Dictionary Reports).
 
@@ -1625,7 +1645,9 @@ As stated above, if the Outside Boundary Condition is ``Surface'', then this fie
 
 If the Outside Boundary Condition is Zone, then this field should contain the zone name of the adjacent zone for the surface.
 
+\begin{callout}
 Note: Zones with interzone heat transfer are not adiabatic and the internal surfaces contribute to gains or losses. Adiabatic surfaces are modeled by specifying the base surface itself in this field.~ Also, for interzone heat transfer, both surfaces must be represented -- for example, if you want interzone heat transfer to an attic space, the ceiling in the lower zone must have a surface object with the outside face environment as the floor in the attic and, likewise, there must be a floor surface object in the attic that references the ceiling surface name in the lower zone.
+\end{callout}
 
 Equally, if the Outside Boundary Condition is ``OtherSideCoefficients'', then this field's value must be the SurfaceProperty:OtherSideCoefficients name. Or if the Outside Boundary Condition is ``OtherSideConditionsModel'' then this field's value must be the SurfaceProperty:OtherSideConditionsModel name.
 
@@ -1639,7 +1661,9 @@ Note, a cantilevered floor could have ``Outdoors'' but ``NoSun'' exposure.
 
 If the surface is exposed to the Wind, then ``WindExposed'' should be entered in this field. Otherwise, ``NoWind'' should be entered.
 
+\begin{callout}
 Note: When a surface is specified with ``NoWind'', this has several implications. Within the heat balance code, this surface will default to using the simple ASHRAE exterior convection coefficient correlation with a zero wind speed. In addition, since the ASHRAE simple method does not have a separate value for equivalent long wavelength radiation to the sky and ground, using ``NoWind'' also eliminates long wavelength radiant exchange from the exterior of the surface to both the sky and the ground. Thus, only simple convection takes place at the exterior face of a surface specified with ``NoWind''.
+\end{callout}
 
 \paragraph{Field: View Factor to Ground}\label{field-view-factor-to-ground}
 
@@ -1727,7 +1751,9 @@ As stated above, if the Outside Boundary Condition is ``Surface'', then this fie
 
 If the Outside Boundary Condition is Zone, then this field should contain the zone name of the adjacent zone for the surface.
 
+\begin{callout}
 Note: Zones with interzone heat transfer are not adiabatic and the internal surfaces contribute to gains or losses. Adiabatic surfaces are modeled by specifying the base surface itself in this field.~ Also, for interzone heat transfer, both surfaces must be represented -- for example, if you want interzone heat transfer to an attic space, the ceiling in the lower zone must have a surface object with the outside face environment as the floor in the attic and, likewise, there must be a floor surface object in the attic that references the ceiling surface name in the lower zone.
+\end{callout}
 
 Equally, if the Outside Boundary Condition is ``OtherSideCoefficients'', then this field's value must be the SurfaceProperty:OtherSideCoefficients name. Or if the Outside Boundary Condition is ``OtherSideConditionsModel'' then this field's value must be the SurfaceProperty:OtherSideConditionsModel name.
 
@@ -1741,7 +1767,9 @@ Note, a cantilevered floor could have ``Outdoors'' but ``NoSun'' exposure.
 
 If the surface is exposed to the Wind, then ``WindExposed'' should be entered in this field. Otherwise, ``NoWind'' should be entered.
 
+\begin{callout}
 Note: When a surface is specified with ``NoWind'', this has several implications. Within the heat balance code, this surface will default to using the simple ASHRAE exterior convection coefficient correlation with a zero wind speed. In addition, since the ASHRAE simple method does not have a separate value for equivalent long wavelength radiation to the sky and ground, using ``NoWind'' also eliminates long wavelength radiant exchange from the exterior of the surface to both the sky and the ground. Thus, only simple convection takes place at the exterior face of a surface specified with ``NoWind''.
+\end{callout}
 
 \paragraph{Field: View Factor to Ground}\label{field-view-factor-to-ground-1}
 
@@ -1831,7 +1859,9 @@ As stated above, if the Outside Boundary Condition is ``Surface'', then this fie
 
 If the Outside Boundary Condition is Zone, then this field should contain the zone name of the adjacent zone for the surface.
 
+\begin{callout}
 Note: Zones with interzone heat transfer are not adiabatic and the internal surfaces contribute to gains or losses. Adiabatic surfaces are modeled by specifying the base surface itself in this field.~ Also, for interzone heat transfer, both surfaces must be represented -- for example, if you want interzone heat transfer to an attic space, the ceiling in the lower zone must have a surface object with the outside face environment as the floor in the attic and, likewise, there must be a floor surface object in the attic that references the ceiling surface name in the lower zone.
+\end{callout}
 
 Equally, if the Outside Boundary Condition is ``OtherSideCoefficients'', then this field's value must be the SurfaceProperty:OtherSideCoefficients name. Or if the Outside Boundary Condition is ``OtherSideConditionsModel'' then this field's value must be the SurfaceProperty:OtherSideConditionsModel name.
 
@@ -1845,7 +1875,9 @@ Note, a cantilevered floor could have ``Outdoors'' but ``NoSun'' exposure.
 
 If the surface is exposed to the Wind, then ``WindExposed'' should be entered in this field. Otherwise, ``NoWind'' should be entered.
 
+\begin{callout}
 Note: When a surface is specified with ``NoWind'', this has several implications. Within the heat balance code, this surface will default to using the simple ASHRAE exterior convection coefficient correlation with a zero wind speed. In addition, since the ASHRAE simple method does not have a separate value for equivalent long wavelength radiation to the sky and ground, using ``NoWind'' also eliminates long wavelength radiant exchange from the exterior of the surface to both the sky and the ground. Thus, only simple convection takes place at the exterior face of a surface specified with ``NoWind''.
+\end{callout}
 
 \paragraph{Field: View Factor to Ground}\label{field-view-factor-to-ground-2}
 
@@ -1991,7 +2023,9 @@ As stated above, if the Outside Boundary Condition is ``Surface'', then this fie
 
 If the Outside Boundary Condition is Zone, then this field should contain the zone name of the adjacent zone for the surface.
 
+\begin{callout}
 Note: Zones with interzone heat transfer are not adiabatic and the internal surfaces contribute to gains or losses. Adiabatic surfaces are modeled by specifying the base surface itself in this field.~ Also, for interzone heat transfer, both surfaces must be represented -- for example, if you want interzone heat transfer to an attic space, the ceiling in the lower zone must have a surface object with the outside face environment as the floor in the attic and, likewise, there must be a floor surface object in the attic that references the ceiling surface name in the lower zone.
+\end{callout}
 
 Equally, if the Outside Boundary Condition is ``OtherSideCoefficients'', then this field's value must be the SurfaceProperty:OtherSideCoefficients name. Or if the Outside Boundary Condition is ``OtherSideConditionsModel'' then this field's value must be the SurfaceProperty:OtherSideConditionsModel name.
 
@@ -2005,7 +2039,9 @@ Note, a cantilevered floor could have ``Outdoors'' but ``NoSun'' exposure.
 
 If the surface is exposed to the Wind, then ``WindExposed'' should be entered in this field. Otherwise, ``NoWind'' should be entered.
 
+\begin{callout}
 Note: When a surface is specified with ``NoWind'', this has several implications. Within the heat balance code, this surface will default to using the simple ASHRAE exterior convection coefficient correlation with a zero wind speed. In addition, since the ASHRAE simple method does not have a separate value for equivalent long wavelength radiation to the sky and ground, using ``NoWind'' also eliminates long wavelength radiant exchange from the exterior of the surface to both the sky and the ground. Thus, only simple convection takes place at the exterior face of a surface specified with ``NoWind''.
+\end{callout}
 
 \paragraph{Field: View Factor to Ground}\label{field-view-factor-to-ground-3}
 
@@ -2195,34 +2231,34 @@ FenestrationSurface:Detailed,
 The following table shows what input objects/fields to use to model different window options. It also gives the name of an example input, if available, that demonstrates the option.
 
 % table 8
-\begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
+\begin{longtable}[c]{p{2.0in}p{2.0in}p{2.0in}}
 \caption{Window Modeling Options \protect \label{table:window-modeling-options}}\\
 \toprule 
-Option & Object/Field or Output Variable & Input File (histributeh with install) \tabularnewline \midrule
+Option & Object/Field or Output Variable & Input File (distributed with install) \tabularnewline \midrule
 \endhead
-Build up a window from layers & WindowMaterial:Glazing, WindowMaterial:Gas, WindowMaterial:Shade, WindowMaterial:Screen, WindowMaterial:Blind, Construction & WindowTests.idf \tabularnewline
-Add an overhang & Shading:Zone:Detailed & 5ZoneAirCooled.idf \tabularnewline
-Add a shading device & WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blind; WindowProperty:ShadingControl & WindowTests.idf, PurchAirWindowBlind.idf \tabularnewline
-Control a shading device & WindowProperty:ShadingControl & PurchAirWindowBlind.idf \tabularnewline
-Determine when a shading device is on in a particular timestep & Print the variable~ “Surface Shading Device Is On Time Fraction” & PurchAirWindowBlind.idf \tabularnewline
-Control the slat angle of a blind & WindowProperty:ShadingControl & PurchAirWindowBlind.idf \tabularnewline
-Add a frame & WindowProperty:FrameAndDivider & PurchAirWithDaylighting.idf \tabularnewline
-Add a divider & WindowProperty:FrameAndDivider & PurchAirWithDaylighting.idf \tabularnewline
-Allow window to daylight a zone & Daylighting:Controls, Daylighting:DELight:Controls & PurchAirWithDaylighting.idf, DElight-Detailed-Comparison.idf \tabularnewline
-Find solar reflected onto window from neighboring buildings & Building/SolarDistribution field – uses “WithReflections” & ReflectiveAdjacentBuilding.idf \tabularnewline
-Model switchable glazing (e.g., electrochromic glass) & WindowProperty:ShadingControl & PurchAirWithDaylighting.idf \tabularnewline
-Add an interior window & Define two FenestrationSurface:Detailed’s, one for each associated interior wall & PurchAirWithDoubleFacadeDaylighting.idf \tabularnewline
-Track how beam solar falls on interior surfaces & Building/Solar Distribution = FullInteriorAndExterior & PurchAirWithDoubleFacadeDaylighting.idf \tabularnewline
-Track beam solar transmitted through interior windows & Building/Solar Distribution = FullInteriorAndExterior & PurchAirWithDoubleFacadeDaylighting.idf \tabularnewline
-Add a shading device on an interior window & Not allowed & ~ \tabularnewline
-Model an airflow window (aka, heat extract window) & WindowProperty:AirflowControl & AirflowWindowsAndBetweenGlassBlinds.idf \tabularnewline
-Add a storm window glass layer & WindowProperty:StormWindow & StormWindow.idf \tabularnewline
-Add natural ventilation through an open window & Ventilation or AirflowNetwork objects (AirflowNetwork:Multizone:Surface, AirflowNetwork:MultiZone:Component:DetailedOpening, etc.) & AirflowNetwork3zvent.idf \tabularnewline
-Add diffusing glass & WindowMaterial:Glazing/Solar Diffusing = Yes & ~ \tabularnewline
-Add dirt on window & WindowMaterial:Glazing/Dirt Correction Factor for Solar and Visible Transmittance & ~ \tabularnewline
-Import window (and frame/divider if present) from WINDOW program & See “Importing Windows from WINDOW program” & ~ \tabularnewline
-Find daylighting through interior windows & See “Double Facades: Daylighting through Interior Windows” & PurchAirWithDoubleFacadeDaylighting.idf \tabularnewline
-Determine when condensation occurs & Print the variables “Surface Window Inside Face Glazing Condensation Status,” “Surface Window Inside Face Frame Condensation Status,” “Surface Window Inside Face Divider Condensation Status” & ~ \tabularnewline
+Build up a window from \textbf{layers} & Window\-Material:\-Glazing, Window\-Material:-Gas, Window\-Material:\-Shade, Window\-Material:\-Screen, Window\-Material:\-Blind, Construction & Window\-Tests.idf \tabularnewline
+Add an \textbf{overhang} & Shading:\-Zone:\-Detailed & 5Zone\-Air\-Cooled.idf \tabularnewline
+Add a \textbf{shading device} & Window\-Material:\-Shade, Window\-Material:\-Screen or Window\-Material:\-Blind; Window\-Property:\-Shading\-Control & Window\-Tests.idf, Purch\-Air\-Window\-Blind.idf \tabularnewline
+\textbf{Control} a shading device & Window\-Property:\-Shading\-Control & Purch\-Air\-WindowBlind.idf \tabularnewline
+Determine when a shading device is on in a particular timestep & Print the variable ``Surface Shading Device Is On Time Fraction'' & Purch\-Air\-Window\-Blind.idf \tabularnewline
+Control the \textbf{slat angle} of a blind & Window\-Property:\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
+Add a \textbf{frame} & Window\-Property:\-FrameAndDivider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
+Add a \textbf{divider} & Window\-Property:\-Frame\-And\-Divider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
+Allow window to \textbf{daylight} a zone & Day\-lighting:Controls, Day\-lighting:\-DELight:\-Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
+Find \textbf{solar reflected} onto window from neighboring buildings & Building/\-Solar\-Distribution field – uses ``WithReflections'' & Reflective\-Adjacent\-Building.idf \tabularnewline
+Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Property:\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
+Add an \textbf{interior window} & Define two Fenestration\-Surface:\-Detailed's, one for each associated interior wall & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
+\textbf{Track} how beam solar falls on interior surfaces & Building/\-Solar Distribution = Full\-Interior\-And\-Exterior & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
+\textbf{Track} beam solar transmitted through interior windows & Building/Solar Distribution = Full\-Interior\-And\-Exterior & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
+Add a \textbf{shading device on an interior window} & Not allowed & \tabularnewline
+Model an \textbf{airflow window} (aka, heat extract window) & Window\-Property:\-Air\-flow\-Control & Air\-flow\-Windows\-And\-Between\-Glass\-Blinds.idf \tabularnewline
+Add a \textbf{storm window} glass layer & Window\-Property:\-Storm\-Window & Storm\-Window.idf \tabularnewline
+Add \textbf{natural ventilation} through an open window & Ventilation or Airflow\-Network objects (Airflow\-Network:\-Multizone:\-Surface, Airflow\-Network:\-Multi\-Zone:\-Component:\-Detailed\-Opening, etc.) & Airflow\-Network\-3zvent.idf \tabularnewline
+Add \textbf{diffusing glass} & Window\-Material:\-Glazing/\-Solar Diffusing = Yes & \tabularnewline
+Add \textbf{dirt on window} & Window\-Material:\-Glazing/\-Dirt Correction Factor for Solar and Visible Transmittance & \tabularnewline
+Import window (and frame/divider if present) from \textbf{WINDOW} program & See ``Importing Windows from WINDOW program'' & \tabularnewline
+Find \textbf{daylighting through interior windows} & See ``Double Facades: Daylighting through Interior Windows'' & Purch\-Air\-With\-Double\-Facade\-Daylighting.idf \tabularnewline
+Determine when \textbf{condensation} occurs & Print the variables ``Surface Window Inside Face Glazing Condensation Status,'' ``Surface Window Inside Face Frame Condensation Status,'' ``Surface Window Inside Face Divider Condensation Status'' & \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2232,7 +2268,7 @@ Any surface that would logically be described as an interior wall, floor or ceil
 
 \subsubsection{Inputs}\label{inputs-25-004}
 
-\paragraph{Example}\label{example}
+\textbf{Example}
 
 When zoning an office building, five west-facing offices have been combined into one zone. All of the offices have interior walls made of the same materials. As shown in the figure below, this zone may be described with 5 exterior walls and 11 internal walls or 1 exterior wall and 1 internal mass. Note that fewer surfaces will speed up the EnergyPlus calculations.
 
@@ -2242,7 +2278,7 @@ When zoning an office building, five west-facing offices have been combined into
 \caption{Representing 11 internal walls as internal mass \protect \label{fig:representing-11-internal-walls-as-internal}}
 \end{figure}
 
-\paragraph{Example}\label{example-1}
+\textbf{Example}
 
 A five-story building has the same ceiling/floor construction separating each of the levels. Zones that are on floors 2 through 4 may be described using a single piece of internal mass to represent both the floor and ceiling. The construction for this internal mass would be identical to the ceiling/floor construction that would be used to describe separate surfaces and the area of the internal mass surface would be the total surface area of the combined ceilings/floors (i.e.~twice the total floor area).
 
@@ -2265,16 +2301,17 @@ This field is the surface area of the internal mass. The area that is specified 
 IDF examples of Internal Mass surfaces:
 
 \begin{lstlisting}
+InternalMass,
+  Zn002:IntM001,                !- Surface Name
+  INTERIOR,                     !- Construction Name
+  DORM ROOMS AND COMMON AREAS,  !- Zone
+  408.7734;                     !- Total area exposed to Zone {m2}
 
-InternalMass,Zn002:IntM001,  !- Surface Name
-    INTERIOR,  !- Construction Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone
-     408.7734    ;  !- Total area exposed to Zone {m2}
-
-  InternalMass,Zn002:IntM002,  !- Surface Name
-    PARTITION02,  !- Construction Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone
-     371.6122    ;  !- Total area exposed to Zone {m2}
+InternalMass,
+  Zn002:IntM002,                !- Surface Name
+  PARTITION02,                  !- Construction Name
+  DORM ROOMS AND COMMON AREAS,  !- Zone
+  371.6122;                     !- Total area exposed to Zone {m2}
 \end{lstlisting}
 
 \subsection{Surface Output Variables/Reports}\label{surface-output-variablesreports}
@@ -2282,6 +2319,7 @@ InternalMass,Zn002:IntM001,  !- Surface Name
 Note that Surface Outputs from specialized algorithms (such as Effective Moisture Penetration Depth (EMPD), Combined Heat and Moisture Transport (HAMT) and Conduction Finite Difference (CondFD) are discussed under the objects that describe the specialized inputs for these algorithms). You can access them via these links:
 
 \begin{itemize}
+\tightlist
 \item
   Moisture Penetration Depth (EMPD) Outputs
 \item
@@ -2292,414 +2330,231 @@ Note that Surface Outputs from specialized algorithms (such as Effective Moistur
 
 Additionally, the output variables applicable to all heat transfer surfaces:
 
-\begin{itemize}
-\item
-  Zone,Sum,Surface Inside Face Heat Balance Calculation Iteration Count \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Inside Face Temperature {[}C{]}
-\item
-  Zone,Average,Surface Outside Face Temperature {[}C{]}
-\item
-  Zone,Average,Surface Inside Face Adjacent Air Temperature {[}C{]}
-\item
-  Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient {[}W/m2-K{]}
-\item
-  Zone,Average,Surface Inside Face Convection Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Convection Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Convection Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Internal Gains Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face System Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face System Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face System Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Outside Face Convection Heat Transfer Coefficient {[}W/m2-K{]}
-\item
-  Zone,Average,Surface Outside Face Convection Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Outside Face Convection Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Outside Face Convection Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient {[}W/m2-K{]}
-\item
-  Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient {[}W/m2-K{]}
-\item
-  Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient {[}W/m2-K{]}
-\item
-  Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate {[}W{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Sum,Surface Inside Face Heat Balance Calculation Iteration Count []
+Zone,Average,Surface Inside Face Temperature [C]
+Zone,Average,Surface Outside Face Temperature [C]
+Zone,Average,Surface Inside Face Adjacent Air Temperature [C]
+Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Inside Face Convection Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Convection Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Convection Heat Gain Energy [J]
+Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy [J]
+Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
+Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
+Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Internal Gains Radiation Heat Gain Energy [J]
+Zone,Average,Surface Inside Face System Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face System Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face System Radiation Heat Gain Energy [J]
+Zone,Average,Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Convection Heat Gain Rate [W]
+Zone,Average,Surface Outside Face Convection Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Outside Face Convection Heat Gain Energy [J]
+Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]
+Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]
+Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]
+Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]
+Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
+Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
+Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
+Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
+Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
+Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
+\end{lstlisting}
 
 Output variables applicable to all exterior heat transfer surfaces:
 
-\begin{itemize}
-\item
-  Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature {[}C{]}
-\item
-  Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature {[}C{]}
-\item
-  Zone,Average,Surface Outside Face Outdoor Air Wind Speed {[}m/s{]}
-\item
-  Zone,Average,Surface Outside Face Sunlit Area {[}m2{]}
-\item
-  Zone,Average,Surface Outside Face Sunlit Fraction \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Outside Face Solar Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Ext Diff Sol From Bm-To-Diff Refl From Ground{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area{[}W/m2{]}
-\item
-  Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Anisotropic Sky Multiplier \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window BSDF Beam Direction Number \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window BSDF Beam Theta Angle {[}rad{]}
-\item
-  Zone,Average,Surface Window BSDF Beam Phi Angle {[}rad{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]
+Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]
+Zone,Average,Surface Outside Face Outdoor Air Wind Speed [m/s]
+Zone,Average,Surface Outside Face Sunlit Area [m2]
+Zone,Average,Surface Outside Face Sunlit Fraction \protect\hyperlinksection-1
+Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate [W]
+Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Outside Face Solar Radiation Heat Gain Energy [J]
+Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Ext Diff Sol From Bm-To-Diff Refl From Ground[W/m2]
+Zone,Average,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
+Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value[] 
+Zone,Average,Surface Anisotropic Sky Multiplier []
+Zone,Average,Surface Window BSDF Beam Direction Number []
+Zone,Average,Surface Window BSDF Beam Theta Angle [rad]
+Zone,Average,Surface Window BSDF Beam Phi Angle [rad]
+\end{lstlisting}
 
 Output variables applicable to opaque heat transfer surfaces (FLOOR, WALL, ROOF, DOOR). \textbf{Note -- these are advanced variables -- you must read the descriptions and understand before use -- then you must use the Diagnostics object to allow reporting.}
 
-\begin{itemize}
-\item
-  Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Inside Face Conduction Heat Transfer Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Conduction Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Conduction Heat Loss Rate {[}W{]}
-\item
-  Zone,Average,Surface Inside Face Conduction Heat Transfer Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Inside Face Conduction Heat Transfer Energy {[}J{]}
-\item
-  Zone,Average,Surface Outside Face Conduction Heat Transfer Rate {[}W{]}
-\item
-  Zone,Average,Surface Outside Face Conduction Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Outside Face Conduction Heat Loss Rate {[}W{]}
-\item
-  Zone,Average,Surface Outside Face Conduction Heat Transfer Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Outside Face Conduction Heat Transfer Energy {[}J{]}
-\item
-  Zone,Average,Surface Average Face Conduction Heat Transfer Rate {[}W{]}
-\item
-  Zone,Average,Surface Average Face Conduction Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Average Face Conduction Heat Loss Rate {[}W{]}
-\item
-  Zone,Average,Surface Average Face Conduction Heat Transfer Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Average Face Conduction Heat Transfer Energy {[}J{]}
-\item
-  Zone,Average,Surface Heat Storage Rate {[}W{]}
-\item
-  Zone,Average,Surface Heat Storage Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Heat Storage Loss Rate {[}W{]}
-\item
-  Zone,Average,Surface Heat Storage Rate per Area {[}W/m2{]}
-\item
-  Zone,Sum,Surface Heat Storage Energy {[}J{]}
-\item
-  Zone,Average,Surface Internal Source Location Temperature {[}C{]}
-\item
-  Zone,Average,Zone Opaque Surface Inside Face Conduction {[}W{]}
-\item
-  Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate {[}W{]}
-\item
-  Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy {[}J{]}
-\item
-  Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy {[}J{]}
-\item
-  Zone,Average,Zone Opaque Surface Outside Face Conduction {[}W{]}
-\item
-  Zone,Average,Zone Opaque Surface Outside Face Conduction Gain{[}W{]}
-\item
-  Zone,Average,Zone Opaque Surface Outside Face Conduction Loss{[}W{]}
-\item
-  Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate {[}W{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
+Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
+Zone,Average,Surface Inside Face Conduction Heat Transfer Rate [W]
+Zone,Average,Surface Inside Face Conduction Heat Gain Rate [W]
+Zone,Average,Surface Inside Face Conduction Heat Loss Rate [W]
+Zone,Average,Surface Inside Face Conduction Heat Transfer Rate per Area [W/m2]
+Zone,Sum,Surface Inside Face Conduction Heat Transfer Energy [J]
+Zone,Average,Surface Outside Face Conduction Heat Transfer Rate [W]
+Zone,Average,Surface Outside Face Conduction Heat Gain Rate [W]
+Zone,Average,Surface Outside Face Conduction Heat Loss Rate [W]
+Zone,Average,Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]
+Zone,Sum,Surface Outside Face Conduction Heat Transfer Energy [J]
+Zone,Average,Surface Average Face Conduction Heat Transfer Rate [W]
+Zone,Average,Surface Average Face Conduction Heat Gain Rate [W]
+Zone,Average,Surface Average Face Conduction Heat Loss Rate [W]
+Zone,Average,Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]
+Zone,Sum,Surface Average Face Conduction Heat Transfer Energy [J]
+Zone,Average,Surface Heat Storage Rate [W]
+Zone,Average,Surface Heat Storage Gain Rate [W]
+Zone,Average,Surface Heat Storage Loss Rate [W]
+Zone,Average,Surface Heat Storage Rate per Area [W/m2]
+Zone,Sum,Surface Heat Storage Energy [J]
+Zone,Average,Surface Internal Source Location Temperature [C]
+Zone,Average,Zone Opaque Surface Inside Face Conduction [W]
+Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate [W]
+Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate [W]
+Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy [J]
+Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy [J]
+Zone,Average,Zone Opaque Surface Outside Face Conduction [W]
+Zone,Average,Zone Opaque Surface Outside Face Conduction Gain[W]
+Zone,Average,Zone Opaque Surface Outside Face Conduction Loss[W]
+Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
+\end{lstlisting}
 
 \subsection{Window Output Variables}\label{window-output-variables}
 
 Output variables applicable only to exterior windows and glass doors:
 
-\begin{itemize}
-\item
-  Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Zone Transmitted Solar Energy {[}J{]}
-\item
-  Zone,Average,Zone Windows Total Heat Gain Rate {[}W{]}
-\item
-  Zone,Sum,Zone Windows Total Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Zone Windows Total Heat Loss Rate {[}W{]}
-\item
-  Zone,Sum,Zone Windows Total Heat Loss Energy {[}J{]}
-\item
-  Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Shading Device Absorbed Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Shading Device Absorbed Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average, Surface Window Transmitted Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Transmitted Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Transmitted Beam To Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Transmitted Beam To Diffuse Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Sum,Surface Window Transmitted Beam To Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Sum,Surface Window Transmitted Beam To Diffuse Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Window System Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window System Solar Absorptance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window System Solar Reflectance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Gap Convective Heat Transfer Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Gap Convective Heat Transfer Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Heat Gain Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Heat Gain Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Heat Loss Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Heat Loss Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Glazing Diffuse to Diffuse Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Model Solver Iteration Count \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Solar Horizontal Profile Angle{[}deg{]}
-\item
-  Zone,Average,Surface Window Solar Vertical Profile Angle{[}deg{]}
-\item
-  Zone,Average,Surface Window Outside Reveal Reflected Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Outside Reveal Reflected Beam Solar Radiation Energy
-\item
-  Zone,Average,Surface Window Inside Reveal Reflected Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Inside Reveal Reflected Beam Solar Radiation Energy {[}J{]}
-\item
-  Zone,Average,Surface Window Inside Reveal Absorbed Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Inside Face Glazing Condensation Status \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Inside Face Frame Condensation Status \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Inside Face Divider Condensation Status \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Shading Device Is On Time Fraction\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Blind Slat Angle {[}deg{]}
-\item
-  Zone,Average,Surface Window Blind Beam to Beam Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Blind Beam to Diffuse Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Blind Diffuse to Diffuse Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Blind and Glazing System Beam Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Blind and Glazing System Diffuse Solar Transmittance\protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Screen Beam to Beam Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Screen Beam to Diffuse Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Screen Diffuse to Diffuse Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Screen and Glazing System Beam Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Screen and Glazing System Diffuse Solar Transmittance \protect\hyperlink{section-1}{}
-\item
-  Zone,State,Surface Storm Window On Off Status \protect\hyperlink{section-1}{}
-\item
-  Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Frame Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Frame Heat Loss Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Divider Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Divider Heat Loss Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Frame Inside Temperature {[}C{]}
-\item
-  Zone,Average,Surface Window Frame Outside Temperature {[}C{]}
-\item
-  Zone,Average,Surface Window Divider Inside Temperature {[}C{]}
-\item
-  Zone,Average,Surface Window Divider Outside Temperature {[}C{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
+Zone,Sum,Zone Transmitted Solar Energy [J]
+Zone,Average,Zone Windows Total Heat Gain Rate [W]
+Zone,Sum,Zone Windows Total Heat Gain Energy [J]
+Zone,Average,Zone Windows Total Heat Loss Rate [W]
+Zone,Sum,Zone Windows Total Heat Loss Energy [J]
+Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
+Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]
+Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]
+Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]
+Zone,Average,Surface Window Shading Device Absorbed Solar Radiation Rate [W]
+Zone,Sum,Surface Window Shading Device Absorbed Solar Radiation Energy [J]
+Zone,Average, Surface Window Transmitted Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate [W]
+Zone,Average,Surface Window Transmitted Beam To Beam Solar Radiation Rate [W]
+Zone,Average,Surface Window Transmitted Beam To Diffuse Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
+Zone,Sum,Surface Window Transmitted Beam To Beam Solar Radiation Energy [J]
+Zone,Sum,Surface Window Transmitted Beam To Diffuse Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy [J]
+Zone,Average,Surface Window System Solar Transmittance []
+Zone,Average,Surface Window System Solar Absorptance []
+Zone,Average,Surface Window System Solar Reflectance []
+Zone,Average,Surface Window Gap Convective Heat Transfer Rate [W]
+Zone,Sum,Surface Window Gap Convective Heat Transfer Energy [J]
+Zone,Average,Surface Window Heat Gain Rate [W]
+Zone,Sum,Surface Window Heat Gain Energy [J]
+Zone,Average,Surface Window Heat Loss Rate [W]
+Zone,Sum,Surface Window Heat Loss Energy [J]
+Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance[]
+Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance []
+Zone,Average,Surface Window Glazing Diffuse to Diffuse Solar Transmittance[]
+Zone,Average,Surface Window Model Solver Iteration Count []
+Zone,Average,Surface Window Solar Horizontal Profile Angle[deg]
+Zone,Average,Surface Window Solar Vertical Profile Angle[deg]
+Zone,Average,Surface Window Outside Reveal Reflected Beam Solar Radiation Rate [W]
+Zone,Sum,Surface Window Outside Reveal Reflected Beam Solar Radiation Energy
+Zone,Average,Surface Window Inside Reveal Reflected Beam Solar Radiation Rate [W]
+Zone,Sum,Surface Window Inside Reveal Reflected Beam Solar Radiation Energy [J]
+Zone,Average,Surface Window Inside Reveal Absorbed Beam Solar Radiation Rate [W]
+Zone,Average,Surface Window Inside Face Glazing Condensation Status []
+Zone,Average,Surface Window Inside Face Frame Condensation Status []
+Zone,Average,Surface Window Inside Face Divider Condensation Status []
+Zone,Average,Surface Shading Device Is On Time Fraction[]
+Zone,Average,Surface Window Blind Slat Angle [deg]
+Zone,Average,Surface Window Blind Beam to Beam Solar Transmittance[]
+Zone,Average,Surface Window Blind Beam to Diffuse Solar Transmittance[]
+Zone,Average,Surface Window Blind Diffuse to Diffuse Solar Transmittance[]
+Zone,Average,Surface Window Blind and Glazing System Beam Solar Transmittance[]
+Zone,Average,Surface Window Blind and Glazing System Diffuse Solar Transmittance[]
+Zone,Average,Surface Window Screen Beam to Beam Solar Transmittance []
+Zone,Average,Surface Window Screen Beam to Diffuse Solar Transmittance []
+Zone,Average,Surface Window Screen Diffuse to Diffuse Solar Transmittance []
+Zone,Average,Surface Window Screen and Glazing System Beam Solar Transmittance []
+Zone,Average,Surface Window Screen and Glazing System Diffuse Solar Transmittance []
+Zone,State,Surface Storm Window On Off Status []
+Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]
+Zone,Average,Surface Window Frame Heat Gain Rate [W]
+Zone,Average,Surface Window Frame Heat Loss Rate [W]
+Zone,Average,Surface Window Divider Heat Gain Rate [W]
+Zone,Average,Surface Window Divider Heat Loss Rate [W]
+Zone,Average,Surface Window Frame Inside Temperature [C]
+Zone,Average,Surface Window Frame Outside Temperature [C]
+Zone,Average,Surface Window Divider Inside Temperature [C]
+Zone,Average,Surface Window Divider Outside Temperature [C]
+\end{lstlisting}
 
 If the user requests to display advanced report/output variables (e.g.~see Output:Diagnostics keyword DisplayAdvancedReportVariables) the the following additional output variables are available for exterior windows and glass doors
 
-\begin{itemize}
-\item
-  Zone,Average,Surface Window Inside Face Glazing Zone Convection Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate {[}W{]}
-\item
-  Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate {[}W{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average,Surface Window Inside Face Glazing Zone Convection Heat Gain Rate [W]
+Zone,Average,Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate [W]
+Zone,Average,Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate [W]
+Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]
+Zone,Average,Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate [W]
+Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]
+Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]
+\end{lstlisting}
 
 Output variables applicable only to interior windows and glass doors:
 
-\begin{itemize}
-\item
-  Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate {[}W{]}
-\item
-  Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy {[}J{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
+\end{lstlisting}
 
 If the user requests to display advanced report/output variables (e.g.~see Output:Diagnostics keyword DisplayAdvancedReportVariables) the the following additional output variable is available for Equivalent Layer Window;
 
-\begin{itemize}
-\item
-  Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate {[}W{]}
-\item
-  Output variables applicable to interior and exterior windows and doors are:
-\item
-  Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer \textless{}x\textgreater{} {[}W{]}
-\item
-  Zone,Average,Surface Window Front Face Temperature Layer \textless{}x\textgreater{} {[}C{]}
-\item
-  Zone,Average,Surface Window Back Face Temperature Layer \textless{}x\textgreater{} {[}C{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]
+\end{lstlisting}
+
+Output variables applicable to interior and exterior windows and doors are:
+
+\begin{lstlisting}
+Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer <x> [W]
+Zone,Average,Surface Window Front Face Temperature Layer <x> [C]
+Zone,Average,Surface Window Back Face Temperature Layer <x> [C]
+\end{lstlisting}
 
 \subsubsection{Surface Window Total Absorbed Shortwave Radiation Rate Layer \textless{}x\textgreater{} {[}W{]}}\label{surface-window-total-absorbed-shortwave-radiation-rate-layer-x-w}
 
@@ -2818,8 +2673,6 @@ Former Name: Prior to version 7.1, these outputs were called ``Surface Ext Therm
 \subsubsection{Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy {[}J{]}}\label{surface-inside-face-exterior-windows-incident-beam-solar-radiation-energy-j}
 
 Beam solar radiation from the exterior windows in a zone incident on the inside face of a surface in the zone. If Solar Distribution in the BUILDING object is equal to MinimalShadowing or FullExterior, it is assumed that all beam solar from exterior windows falls on the floor. In this case the value of this output variable can be greater than zero only for floor surfaces. If Solar Distribution equals FullInteriorExterior the program tracks where beam solar from exterior windows falls inside the zone, in which case the value of this variable can be greater than zero for floor as well as wall surfaces. Different versions of the report are available including the basic incident rate (W), a per unit area flux (W/m2), and an energy version (J).
-
-\subsubsection{}\label{section-000}
 
 \subsubsection{Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate {[}W{]}}\label{surface-inside-face-interior-windows-incident-beam-solar-radiation-rate-w}
 
@@ -3116,13 +2969,13 @@ Surface Window Transmitted Beam Solar Radiation Energy = Surface Window Transmit
 
 \subsubsection{Surface Window Transmitted Beam To Beam Solar Radiation Energy {[}J{]}}\label{surface-window-transmitted-beam-to-beam-solar-radiation-energy-j}
 
-\subsubsection{For a window with a blind, this transmitted radiation consists of beam radiation that passes between the slats. For a window with a screen, this value consists of direct beam radiation that is transmitted through the screen (gaps between the screen material).}\label{for-a-window-with-a-blind-this-transmitted-radiation-consists-of-beam-radiation-that-passes-between-the-slats.-for-a-window-with-a-screen-this-value-consists-of-direct-beam-radiation-that-is-transmitted-through-the-screen-gaps-between-the-screen-material.}
+For a window with a blind, this transmitted radiation consists of beam radiation that passes between the slats. For a window with a screen, this value consists of direct beam radiation that is transmitted through the screen (gaps between the screen material).
 
 \subsubsection{Surface Window Transmitted Beam To Diffuse Solar Radiation Rate {[}W{]}}\label{surface-window-transmitted-beam-to-diffuse-solar-radiation-rate-w}
 
 \subsubsection{Surface Window Transmitted Beam To Diffuse Solar Radiation Energy {[}J{]}}\label{surface-window-transmitted-beam-to-diffuse-solar-radiation-energy-j}
 
-\subsubsection{For a window with a blind, this transmitted radiation consists of diffuse radiation reflected from beam by the slats. For a window with a screen, this value consists of diffuse radiation reflected by the screen material.}\label{for-a-window-with-a-blind-this-transmitted-radiation-consists-of-diffuse-radiation-reflected-from-beam-by-the-slats.-for-a-window-with-a-screen-this-value-consists-of-diffuse-radiation-reflected-by-the-screen-material.}
+For a window with a blind, this transmitted radiation consists of diffuse radiation reflected from beam by the slats. For a window with a screen, this value consists of diffuse radiation reflected by the screen material.
 
 \subsubsection{Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-rate-w}
 
@@ -3451,7 +3304,7 @@ This is the convection surface heat transfer from the front side of any interior
 
 The net exchange of infrared radiation heat transfer from the shade or blind to the zone in watts.~ This output variable is the term called ``{[}Net IR heat flow to the zone from the zone side of the shading device{]}'' under the description above for Surface Window Heat Gain Rate output variable.
 
-\textbf{\emph{Surface Window Inside Face Other Convection Heat Gain Rate {[}W{]}}}
+\subsubsection{Surface Window Inside Face Other Convection Heat Gain Rate {[}W{]}}\label{surface-window-inside-face-other-convection-heat-gain-rate-w}
 
 The other (extra) convection heat transfer rate from the inside face of a an equivalent layer window. This output is computed from the difference in convection flux when using equivalent inside surface temperature of a window instead of the inside surface temperature from the standard surface heat balance calculation.
 
@@ -3951,7 +3804,9 @@ Proper specification for this overhang (facing up) is:
 
 4,(C,0,D),(C,-B,D),(C+A,-B,D),(C+A,0,D); () used to illustrate each vertex.
 
+\begin{callout}
 Note that for horizontal surfaces, any corner may be chosen as the starting corner. The order of vertices determines whether the surface is facing up or down. Shading surfaces are mirrored automatically unless the user specifies ``DoNotMirrorDetachedShading'', so each shading surface need only be described once.
+\end{callout}
 
 Thus, another shading surface will be created (facing down):
 
@@ -3960,33 +3815,35 @@ Thus, another shading surface will be created (facing down):
 IDF example of attached shading surfaces (overhang, fin):
 
 \begin{lstlisting}
+Shading:Zone:Detailed,
+  Zn001:Wall001:Shade001,       !- Surface Name
+  Zn001:Wall001,                !- Base Surface Name
+  ShadingTransmittance:0001,    !- Shadowing Transmittance Schedule
+  4,                            !-RectangularOverhang
+  1.524000 , -0.3050000    , 2.865000,
+  1.524000 ,  0.0000000E+00, 2.865000,
+  4.572000 ,  0.0000000E+00, 2.865000,
+  4.572000 , -0.3050000    , 2.865000;
 
 Shading:Zone:Detailed,
-    Zn001:Wall001:Shade001,  !- Surface Name
-    Zn001:Wall001,  !- Base Surface Name
-    ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule
-     4, !-RectangularOverhang
-     1.524000    , -0.3050000    ,   2.865000    ,
-     1.524000    ,  0.0000000E+00,   2.865000    ,
-     4.572000    ,  0.0000000E+00,   2.865000    ,
-     4.572000    , -0.3050000    ,   2.865000    ;
-  Shading:Zone:Detailed,
-    Zn003:Wall001:Shade001,  !- Surface Name
-    Zn003:Wall001,  !- Base Surface Name
-    ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule
-     4, !-RectangularLeftFin
-     57.97000    ,   8.450000    ,   10.00000    ,
-     57.97000    ,   8.450000    ,  0.0000000E+00,
-     57.97000    ,   6.450000    ,  0.0000000E+00,
-     57.97000    ,   6.450000    ,   10.00000    ;
-   Shading:Zone:Detailed,Zn003:Wall001:Shade002,  !- Surface Name
-    Zn003:Wall001,  !- Base Surface Name
-    ShadingTransmittance:0003,  !- Shadowing Transmittance Schedule
-     4, !-RectangularRightFin
-     77.97000    ,   6.450000    ,   10.00000    ,
-     77.97000    ,   6.450000    ,  0.0000000E+00,
-     77.97000    ,   8.450000    ,  0.0000000E+00,
-     77.97000    ,   8.450000    ,   10.00000    ;
+  Zn003:Wall001:Shade001,       !- Surface Name
+  Zn003:Wall001,                !- Base Surface Name
+  ShadingTransmittance:0001,    !- Shadowing Transmittance Schedule
+  4,                            !-RectangularLeftFin
+  57.97000 ,   8.450000    ,10.00000      ,
+  57.97000 ,   8.450000    , 0.0000000E+00,
+  57.97000 ,   6.450000    , 0.0000000E+00,
+  57.97000 ,   6.450000    ,10.00000      ;
+
+Shading:Zone:Detailed,
+  Zn003:Wall001:Shade002,       !- Surface Name
+  Zn003:Wall001,                !- Base Surface Name
+  ShadingTransmittance:0003,    !- Shadowing Transmittance Schedule
+  4,                            !-RectangularRightFin
+  77.97000 ,   6.450000    ,10.00000      ,
+  77.97000 ,   6.450000    , 0.0000000E+00,
+  77.97000 ,   8.450000    , 0.0000000E+00,
+  77.97000 ,   8.450000    ,10.00000      ;
 \end{lstlisting}
 
 \subsection{ShadingProperty:Reflectance}\label{shadingpropertyreflectance}
@@ -4091,9 +3948,9 @@ A shading device can also be of a kind in which the optical properties of the gl
 
 There are two ways of specifying the actual shading device:
 
-\subsubsection{Inputs}\label{inputs-32-001}
-
-\paragraph{\texorpdfstring{Specify ``Name of Construction with Shading''}{Specify Name of Construction with Shading}}\label{specify-name-of-construction-with-shading}
+\begin{itemize}
+  \item
+\textbf{Specify ``Name of Construction with Shading''}
 
 This is the name of a window Construction that has the shading device as one of its layers. The thermal and solar-optical properties of the shading device are given by the shading material referenced in that Construction (ref: Construction, WindowMaterial:Shade, WindowMaterial:Screen and WindowMaterial:Blind). To use this method you have to define two Constructions for the window, one without the shading device and one with it. See Example 1, below.
 
@@ -4101,7 +3958,8 @@ The Construction without the shading device is referenced in the FenestrationSur
 
 For Shading Type = InteriorShade, InteriorBlind, ExteriorShade, ExteriorScreen and ExteriorBlind these two Constructions must be identical expect for the presence of the shading layer in the shaded Construction, otherwise you will get an error message. You will also get an error message if the Construction referenced by the window has a shading layer.
 
-\paragraph{\texorpdfstring{Specify the ``Material Name of the Shading Device''}{Specify the Material Name of the Shading Device}}\label{specify-the-material-name-of-the-shading-device}
+  \item
+\textbf{Specify the ``Material Name of the Shading Device''}
 
 This is the name of a WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blind. This method can be used with Shading Type = InteriorShade, InteriorBlind, ExteriorShade and ExteriorBlind. It cannot be used with Shading Type = BetweenGlassShade, BetweenGlassBlind, or SwitchableGlazing. If Shading Type = InteriorShade or ExteriorShade, then you specify the name of a WindowMaterial:Shade. If Shading Type = InteriorBlind or ExteriorBlind, then you specify the name of a WindowMaterial:Blind. If Shading Type = ExteriorScreen, then you specify the name of a WindowMaterial:Screen. See Example 2, below. This method is simpler to use since you don't have to specify two Constructions that differ only by the shading layer.
 
@@ -4110,6 +3968,7 @@ When this method is used, the program will automatically create a shaded window 
 This method is the required if you want to add a shading device to a construction brought in from a WINDOW Data File (ref:Construction:WindowDataFile).
 
 Note that if both ``Name of Construction with Shading'' and ``Material Name of Shading Device'' are specified, the former takes precedence.
+\end{itemize}
 
 Most Shading Control Types allow you to specify a schedule that determines when the control is active. One example is a control that is active seasonally. For example, to deploy shading only in the summer when the incident solar is high enough, use Shading Control Type = OnIfHighSolarOnWindow with a schedule that is 1 during the summer months and 0 otherwise and specify Shading Control Is Scheduled = YES.
 
@@ -4120,6 +3979,8 @@ If Shading Type = InteriorBlind, ExteriorBlind or BetweenGlassBlind you can use 
 A special type of WindowProperty:ShadingControl is SwitchableGlazing. An example is electrochromic glazing in which the transmittance and reflectance of the glass is controlled electronically. For example, you could have electrochromic glazing switch from clear (high transmittance) to dark (low transmittance) to control solar gain. If you choose the Shading Type = SwitchableGlazing option for WindowProperty:ShadingControl, the unswitched (clear) state is specified by the Construction referenced by the window and the switched (dark) state is specified by the Construction referenced by WindowProperty:ShadingControl for that window. For example, if you specify Shading Type = SwitchableGlazing and Shading Control Type = OnIfHighSolarOnWindow, then the glazing will switch to the dark state whenever the solar radiation striking the window exceeds the Setpoint value.
 
 For Shading Type = SwitchableGlazing the state of the window is either clear (unswitched) or dark (fully switched) for all Shading Control Types except MeetDaylightIlluminanceSetpoint. In this case, the transmittance of the glazing is adjusted to just meet the daylight illuminance set point at the first daylighting reference point (see Daylighting). This type of control assures that there is just enough solar gain to meet the daylighting requirements in a zone, and no more, thus reducing the cooling load.
+
+\subsubsection{Inputs}\label{inputs-32-001}
 
 \paragraph{Field: Name}\label{field-name-29-001}
 
@@ -4938,15 +4799,15 @@ Note that these variables are calculated at the system timestep. When reported a
 
 \subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j-1}
 
-This field represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.~~ This field is not multiplied by zone or group multipliers.
+This field represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w-1}
 
-This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.~~ This field is not multiplied by zone or group multipliers.
+This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w-1}
 
-This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.~~ This field is not multiplied by zone or group multipliers.
+This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratiokgwaterkgdryair}
 
@@ -4958,7 +4819,7 @@ This field represents the air relative humidity ratio after the correct step for
 
 \subsubsection{Zone Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j-1}
 
-This field represents the sum of radiant gains from specific internal sources~ (e.g.~equipment) throughout the zone in joules. This includes radiant gain from People, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+This field represents the sum of radiant gains from specific internal sources (e.g.~equipment) throughout the zone in joules. This includes radiant gain from People, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
 \subsubsection{Zone-Total Internal Visible Heat Gain {[}J{]}}\label{zone-total-internal-visible-heat-gain-j}
 

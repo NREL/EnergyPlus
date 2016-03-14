@@ -4200,17 +4200,14 @@ Matrix:TwoDimension,       !- matrix for basis definition
 
 This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM.This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
 
+\begin{lstlisting}
 WindowMaterial:Glass:EquivalentLayer
-
 WindowMaterial:Shade:EquivalentLayer
-
 WindowMaterial:Drape:EquivalentLayer
-
 WindowMaterial:Blind:EquivalentLayer
-
 WindowMaterial:Screen:EquivalentLayer
-
 WindowMaterial:Gap:EquivalentLayer
+\end{lstlisting}
 
 \subsubsection{Inputs}\label{inputs-41}
 
@@ -4264,40 +4261,33 @@ If this field is left blank, the file name is defaulted to Window5DataFile.dat.
 Input Example
 
 \begin{lstlisting}
-
 Construction:WindowDataFile,
-    DoubleClear;          !- Name of a Window on the Window Data File
-\end{lstlisting}
-
-\textbf{~ ! Note -- Window5DataFile.dat is presumed to be in the ``run'' folder where EnergyPlus.exe is}
-
-\begin{lstlisting}
+  DoubleClear;            !- Name of a Window on the Window Data File
+  ! Note -- Window5DataFile.dat is presumed to be in the "run" folder where EnergyPlus.exe is
 
 FenestrationSurface:Detailed,
-    Zn001:Wall001:Win001, !- Name
-    Window,               !- Class
-    DoubleClear,          !- Construction Name
-    Zn001:Wall001,,       !- Base Surface Name, and Target (if applicable)
-    0.5,                  !- View Factor to Ground
-    ,                     !- Window Shading Control name
-    ,                     !- Frame/Divider name
-    1.0,                  !- Multiplier
-    4,                    !- Number of vertices
-    0.548, 0.0, 2.5000,   !- X,Y,Z of Vertices
-    0.548, 0.0, 0.5000,
-    5.548, 0.0, 0.5000,
-    5.548, 0.0, 2.5000;
+  Zn001:Wall001:Win001, !- Name
+  Window,               !- Class
+  DoubleClear,          !- Construction Name
+  Zn001:Wall001,        !- Base Surface Name, and Target (if applicable)
+  0.5,                  !- View Factor to Ground
+  ,                     !- Window Shading Control name
+  ,                     !- Frame/Divider name
+   1.0,                 !- Multiplier
+  4,                    !- Number of vertices
+  0.548, 0.0, 2.5000,   !- X,Y,Z of Vertices
+  0.548, 0.0, 0.5000,
+  5.548, 0.0, 0.5000,
+  5.548, 0.0, 2.5000;
 \end{lstlisting}
 
 An example showing use of specific data file name and complete path location follows:
 
 \begin{lstlisting}
-
 Construction:WindowDataFile,
-    DoubleClear,            !- Name of a Window on the Window Data File
+  DoubleClear,          !- Name of a Window on the Window Data File
+  C:\EnergyPlusData\DataSets\MyWindow.dat;
 \end{lstlisting}
-
-\textbf{~ C:\textbackslash{}EnergyPlusData\textbackslash{}DataSets\textbackslash{}MyWindow.dat;}
 
 \subsubsection{Outputs}\label{outputs-4-016}
 
