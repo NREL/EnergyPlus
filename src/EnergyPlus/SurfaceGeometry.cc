@@ -1267,6 +1267,14 @@ namespace SurfaceGeometry {
 			}
 		}
 
+		// find base surface for overhangs and fins
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( Surface( SurfNum ).Class != SurfaceClass_Shading ) continue;
+
+			Surface( SurfNum ).BaseSurf = FindItemInList( Surface( SurfNum ).BaseSurfName, Surface, TotSurfaces );
+
+		}
+
 		if ( MovedSurfs != TotSurfaces ) {
 			gio::write( ClassMsg, fmtLD ) << MovedSurfs;
 			strip( ClassMsg );
@@ -5201,6 +5209,7 @@ namespace SurfaceGeometry {
 						TiltAngle = SurfaceTmp( Found ).Tilt;
 						SurfaceTmp( SurfNum ).Tilt = TiltAngle;
 						SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth - ( 180.0 - rNumericArgs( 4 ) );
+						if ( SurfaceTmp( SurfNum ).Azimuth < 0.0 ) SurfaceTmp( SurfNum ).Azimuth += 360.0;
 
 						// Make it relative to surface origin.....
 
@@ -5296,7 +5305,8 @@ namespace SurfaceGeometry {
 
 						TiltAngle = SurfaceTmp( Found ).Tilt;
 						SurfaceTmp( SurfNum ).Tilt = TiltAngle;
-						SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth - ( 180.0 - rNumericArgs( 9 ) );
+						SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth - ( 180.0 + rNumericArgs( 9 ) );
+						if ( SurfaceTmp( SurfNum ).Azimuth < 0.0 ) SurfaceTmp( SurfNum ).Azimuth += 360.0;
 						SurfaceTmp( SurfNum ).CosAzim = std::cos( SurfaceTmp( SurfNum ).Azimuth * DegToRadians );
 						SurfaceTmp( SurfNum ).SinAzim = std::sin( SurfaceTmp( SurfNum ).Azimuth * DegToRadians );
 						SurfaceTmp( SurfNum ).CosTilt = std::cos( SurfaceTmp( SurfNum ).Tilt * DegToRadians );
