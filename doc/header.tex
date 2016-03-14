@@ -72,6 +72,14 @@
 \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
 \fi
 
+% this is a great package for printing units in a standard way, we should move this way
+\usepackage{siunitx}
+
+% some additional macros
+\newcommand{\PB}[1]{\left(#1\right)}
+\newcommand{\RB}[1]{\left[#1\right]}
+\newcommand{\CB}[1]{\left\{#1\right\}}
+\newcommand{\bracketunits}[1]{\RB{\si[per-mode=fraction]{#1}}}
+
 \author{U.S. Department of Energy}
 \date{March 31, 2016}
-

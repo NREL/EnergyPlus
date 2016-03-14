@@ -1,21 +1,24 @@
 \section{Inputs}\label{inputs}
 
-First step in curve generation is to select appropriate parameters from the dropdown menu. These inputs define the DX Coil Type, Curve Type, Independent Variable and the Units type. The choices available for each input parameters are described in table-1. Once these input parameters are selected the tool read in the values and automatically populates labels for each of the independent and dependent variables. The labels guide users to enter the data for each variable in the corresponding worksheet input range. Two sets of input data are required for curve generation: Rated, and Performance Data.
+First step in curve generation is to select appropriate parameters from the dropdown menu. These inputs define the DX Coil Type, Curve Type, Independent Variable and the Units type. The choices available for each input parameters are described in the following table. Once these input parameters are selected the tool read in the values and automatically populates labels for each of the independent and dependent variables. The labels guide users to enter the data for each variable in the corresponding worksheet input range. Two sets of input data are required for curve generation: Rated, and Performance Data.
 
-Table-1 Input parameters description
-
-\begin{longtable}[c]{p{1.5in}p{4.5in}}
-\toprule 
-Input Parameter & Description of Inputs \tabularnewline \midrule
-\endhead
-DX Coil Type & Cooling: applicable for DX cooling coil single speed Heating: applicable for DX heating coil single speed Other: applicable for any equipment that use the three curve types \tabularnewline
-Independent Variables & Temperature Flow \tabularnewline
-Curve Types & Biquadratic: Capacity and EIR as a function of temperature Cubic: Capacity and EIR as a function of flow fraction or temperature Quadratic: capacity and EIR as a function of flow fraction \tabularnewline
-Units & IP: Temperature in °F, Capacity in kBtu/h, Power in kW, and Flow in CFM SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m  /s \tabularnewline
-Curve Object Name & This input is optional. This string is appended to the default curve object name, or if left blank the default curve object name will be displayed. A curve object is named is created by concatenation as follows: \textbackslash\$ = \textbackslashleft\{
-\textbackslashbegin\{array\}\{c\}  \textbackslashtext\{User Specified\} \textbackslash  \textbackslashtext\{Curve Object Name\}  \textbackslashend\{array\}
-\textbackslashright\} + \textbackslashtext\{"DXCoilType"\} + \textbackslashleft\{
-\textbackslashbegin\{array\}\{c\}  \textbackslashtext\{CAPFTemp\} \textbackslash  \textbackslashtext\{CAPFFF\} \textbackslash  \textbackslashtext\{EIRFTemp\} \textbackslash  \textbackslashtext\{EIRFFF\}  \textbackslashend\{array\}
-\textbackslashright\}\textbackslash\$ \tabularnewline
+\begin{longtable}{p{2in}|p{4in}}
+\toprule
+Input Parameter & Input Description \tabularnewline \midrule
+\endhead 
+DX Coil Type & \emph{Cooling}: Applicable for DX cooling coil single speed; 
+               \emph{Heating}: Applicable for DX heating coil single speed; 
+               \emph{Other}: Applicable for any equipment that use the three curve types
+\tabularnewline
+Independent Variables & Temperature and Flow 
+\tabularnewline
+Curve Types & \emph{Biquadratic}: Capacity and EIR as a function of temperature;
+              \emph{Cubic}: Capacity and EIR as a function of flow fraction or temperature;
+              \emph{Quadratic}: Capacity and EIR as a function of flow fraction
+\tabularnewline
+Units & \emph{IP}: Temperature in °F, Capacity in kBtu/h, Power in kW, and Flow in CFM;
+        \emph{SI}: Temperature in °C, Capacity in kW, Power in kW, and Flow in m/s 
+\tabularnewline
+Curve Object Name & This input is optional. This string is appended to the default curve object name, or if left blank the default curve object name will be displayed. A curve object is named is created by concatenation as follows: (User-specified curve object name) + ``DXCoilType'' + one of: [``CAPFTEMP'', ``CAPFFF'', ``EIRFTEMP'', ``EIRFFF'']\tabularnewline
 \bottomrule
 \end{longtable}

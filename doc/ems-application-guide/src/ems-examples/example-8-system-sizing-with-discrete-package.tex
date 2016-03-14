@@ -10,15 +10,15 @@ Examining the vendor's literature for one line of commercial packaged single-zon
 
 \begin{longtable}[c]{p{4.03in}p{1.96in}}
 \toprule 
-Thresholh & Selection \tabularnewline \midrule
+Threshold & Selection \tabularnewline \midrule
 \endhead
-\$0  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 0.566\$ & \$\textbackslashdot\{V\} = 0.566\$ \tabularnewline
-\$0.566  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 0.755\$ & \$\textbackslashdot\{V\} = 0.755\$ \tabularnewline
-\$0.755  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 0.944\$ & \$\textbackslashdot\{V\} = 0.944\$ \tabularnewline
-\$0.944  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 1.133\$ & \$\textbackslashdot\{V\} = 1.133\$ \tabularnewline
-\$1.133  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 1.416\$ & \$\textbackslashdot\{V\} = 1.416\$ \tabularnewline
-\$1.416  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 1.604\$ & \$\textbackslashdot\{V\} = 1.604\$ \tabularnewline
-\$1.604  <  \textbackslashdot\{V\}\_\{size\} \textbackslashleq 1.888\$ & \$\textbackslashdot\{V\} = 1.888\$ \tabularnewline
+$0  <  \dot{V}_{size} \leq 0.566$ & $\dot{V} = 0.566$ \tabularnewline
+$0.566  <  \dot{V}_{size} \leq 0.755$ & $\dot{V} = 0.755$ \tabularnewline
+$0.755  <  \dot{V}_{size} \leq 0.944$ & $\dot{V} = 0.944$ \tabularnewline
+$0.944  <  \dot{V}_{size} \leq 1.133$ & $\dot{V} = 1.133$ \tabularnewline
+$1.133  <  \dot{V}_{size} \leq 1.416$ & $\dot{V} = 1.416$ \tabularnewline
+$1.416  <  \dot{V}_{size} \leq 1.604$ & $\dot{V} = 1.604$ \tabularnewline
+$1.604  <  \dot{V}_{size} \leq 1.888$ & $\dot{V} = 1.888$ \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -37,74 +37,74 @@ A set of input objects for EMS control for discrete resizing of 10 air systems f
 \begin{lstlisting}
 
 Output:EnergyManagementSystem,
-    Verbose,
-    Verbose,
-    Verbose;
+    Verbose,
+    Verbose,
+    Verbose;
 
 
   EnergyManagementSystem:ProgramCallingManager,
-    Apply Discrete Package Sizes to Air System Sizing , ! Name
-    EndOfSystemSizing ,    ! EnergyPlus Model Calling Point
-    Resize_PSZ_To_Match_Product_Availability;         ! Program Name 1
+    Apply Discrete Package Sizes to Air System Sizing , ! Name
+    EndOfSystemSizing ,    ! EnergyPlus Model Calling Point
+    Resize_PSZ_To_Match_Product_Availability;         ! Program Name 1
 
 
 
 
   EnergyManagementSystem:Program,
-    Resize_PSZ_To_Match_Product_Availability , ! Name
-    SET argMainVdot = PSZ_1_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_1_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_2_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_2_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_3_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_3_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_4_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_4_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_5_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_5_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_6_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_6_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_7_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_7_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_8_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_8_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_9_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_9_MainSupVdotSet = argDiscreteMainVdot,
-    SET argMainVdot = PSZ_10_CalcMainSupVdot,
-    RUN Select_Discrete_Nominal_Air_Flow,
-    SET PSZ_10_MainSupVdotSet = argDiscreteMainVdot;
+    Resize_PSZ_To_Match_Product_Availability , ! Name
+    SET argMainVdot = PSZ_1_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_1_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_2_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_2_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_3_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_3_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_4_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_4_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_5_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_5_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_6_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_6_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_7_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_7_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_8_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_8_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_9_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_9_MainSupVdotSet = argDiscreteMainVdot,
+    SET argMainVdot = PSZ_10_CalcMainSupVdot,
+    RUN Select_Discrete_Nominal_Air_Flow,
+    SET PSZ_10_MainSupVdotSet = argDiscreteMainVdot;
 
 
   EnergyManagementSystem:Subroutine,
-    Select_Discrete_Nominal_Air_Flow,
-    ! argMainVdot          Input
-    ! argDiscreteMainVdot         Output
-    IF (argMainVdot < = 0.56628) , ! 1200 cfm
-      SET argDiscreteMainVdot = 0.56628 ,
-    ELSEIF (argMainVdot > 0.56628) && (argMainVdot < = 0.75504) , ! 1600 CFM
-      SET argDiscreteMainVdot = 0.75504 ,
-    ELSEIF (argMainVdot > 0.75504) && (argMainVdot < = 0.9438 ) , ! 2000 CFM
-      SET argDiscreteMainVdot = 0.9438 ,
-    ELSEIF (argMainVdot > 0.9438) && (argMainVdot < = 1.13256 ) , ! 2400 CFM
-      SET argDiscreteMainVdot = 1.13256 ,
-    ELSEIF (argMainVdot > 1.13256) && (argMainVdot < = 1.4157 ) , ! 3000 CFM
-      SET argDiscreteMainVdot = 1.4157 ,
-    ELSEIF (argMainVdot > 1.4157) && (argMainVdot < = 1.60446 ) , ! 3400 CFM
-      SET argDiscreteMainVdot = 1.60446 ,
-    ELSEIF (argMainVdot > 1.60446) && (argMainVdot < = 1.8879 ) , ! 4000 CFM
-      SET argDiscreteMainVdot = 1.8879 ,
-    ELSEIF (argMainVdot > 1.8879), ! too high
-      set dummy = @SevereWarnEP 666.0,
-    ENDIF;
+    Select_Discrete_Nominal_Air_Flow,
+    ! argMainVdot          Input
+    ! argDiscreteMainVdot         Output
+    IF (argMainVdot < = 0.56628) , ! 1200 cfm
+      SET argDiscreteMainVdot = 0.56628 ,
+    ELSEIF (argMainVdot > 0.56628) && (argMainVdot < = 0.75504) , ! 1600 CFM
+      SET argDiscreteMainVdot = 0.75504 ,
+    ELSEIF (argMainVdot > 0.75504) && (argMainVdot < = 0.9438 ) , ! 2000 CFM
+      SET argDiscreteMainVdot = 0.9438 ,
+    ELSEIF (argMainVdot > 0.9438) && (argMainVdot < = 1.13256 ) , ! 2400 CFM
+      SET argDiscreteMainVdot = 1.13256 ,
+    ELSEIF (argMainVdot > 1.13256) && (argMainVdot < = 1.4157 ) , ! 3000 CFM
+      SET argDiscreteMainVdot = 1.4157 ,
+    ELSEIF (argMainVdot > 1.4157) && (argMainVdot < = 1.60446 ) , ! 3400 CFM
+      SET argDiscreteMainVdot = 1.60446 ,
+    ELSEIF (argMainVdot > 1.60446) && (argMainVdot < = 1.8879 ) , ! 4000 CFM
+      SET argDiscreteMainVdot = 1.8879 ,
+    ELSEIF (argMainVdot > 1.8879), ! too high
+      set dummy = @SevereWarnEP 666.0,
+    ENDIF;
 
 
   EnergyManagementSystem:GlobalVariable, argDiscreteMainVdot;
@@ -112,133 +112,133 @@ Output:EnergyManagementSystem,
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_1_CalcMainSupVdot,
-     PSZ-AC_1:1 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_1_CalcMainSupVdot,
+     PSZ-AC_1:1 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_1_MainSupVdotSet,                            ! Name
-     PSZ-AC_1:1  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_1_MainSupVdotSet,                            ! Name
+     PSZ-AC_1:1  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_2_CalcMainSupVdot,
-     PSZ-AC_2:2 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_2_CalcMainSupVdot,
+     PSZ-AC_2:2 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_2_MainSupVdotSet,                            ! Name
-     PSZ-AC_2:2  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_2_MainSupVdotSet,                            ! Name
+     PSZ-AC_2:2  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_3_CalcMainSupVdot,
-     PSZ-AC_3:3 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_3_CalcMainSupVdot,
+     PSZ-AC_3:3 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_3_MainSupVdotSet,                            ! Name
-     PSZ-AC_3:3  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_3_MainSupVdotSet,                            ! Name
+     PSZ-AC_3:3  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_4_CalcMainSupVdot,
-     PSZ-AC_4:4 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_4_CalcMainSupVdot,
+     PSZ-AC_4:4 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_4_MainSupVdotSet,                            ! Name
-     PSZ-AC_4:4  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_4_MainSupVdotSet,                            ! Name
+     PSZ-AC_4:4  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_5_CalcMainSupVdot,
-     PSZ-AC_5:5 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_5_CalcMainSupVdot,
+     PSZ-AC_5:5 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_5_MainSupVdotSet,                            ! Name
-     PSZ-AC_5:5  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_5_MainSupVdotSet,                            ! Name
+     PSZ-AC_5:5  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_6_CalcMainSupVdot,
-     PSZ-AC_6:6 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_6_CalcMainSupVdot,
+     PSZ-AC_6:6 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_6_MainSupVdotSet,                            ! Name
-     PSZ-AC_6:6  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_6_MainSupVdotSet,                            ! Name
+     PSZ-AC_6:6  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_7_CalcMainSupVdot,
-     PSZ-AC_7:7 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_7_CalcMainSupVdot,
+     PSZ-AC_7:7 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_7_MainSupVdotSet,                            ! Name
-     PSZ-AC_7:7  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_7_MainSupVdotSet,                            ! Name
+     PSZ-AC_7:7  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_8_CalcMainSupVdot,
-     PSZ-AC_8:8 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_8_CalcMainSupVdot,
+     PSZ-AC_8:8 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_8_MainSupVdotSet,                            ! Name
-     PSZ-AC_8:8  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_8_MainSupVdotSet,                            ! Name
+     PSZ-AC_8:8  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_9_CalcMainSupVdot,
-     PSZ-AC_9:9 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_9_CalcMainSupVdot,
+     PSZ-AC_9:9 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_9_MainSupVdotSet,                            ! Name
-     PSZ-AC_9:9  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_9_MainSupVdotSet,                            ! Name
+     PSZ-AC_9:9  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-     PSZ_10_CalcMainSupVdot,
-     PSZ-AC_10:10 ,
-     Intermediate Air System Main Supply Volume Flow Rate;
+     PSZ_10_CalcMainSupVdot,
+     PSZ-AC_10:10 ,
+     Intermediate Air System Main Supply Volume Flow Rate;
 
 
   EnergyManagementSystem:Actuator,
-     PSZ_10_MainSupVdotSet,                            ! Name
-     PSZ-AC_10:10  ,                  ! Component Name
-     Sizing:System, ! Component Type
-     Main Supply Volume Flow Rate;    ! Control Type
+     PSZ_10_MainSupVdotSet,                            ! Name
+     PSZ-AC_10:10  ,                  ! Component Name
+     Sizing:System, ! Component Type
+     Main Supply Volume Flow Rate;    ! Control Type
 \end{lstlisting}

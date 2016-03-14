@@ -44,7 +44,25 @@ The EnergyPlus model for displacement ventilation and cross-ventilation (version
 
 The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department of Mechanical and Aerospace Engineering, University of California, San Diego.
 
-ASHRAE research project 1254-RP supported the development of the following features first added in EnergyPlus v1.2.2: DXSystem:AirLoop enhancements (valid as OA system equipment, new humidity control options); New set point managers: SET POINT MANAGER:SINGLE ZONE HEATING, SET POINT MANAGER:SINGLE ZONE COOLING, and SET POINT MANAGER:OUTSIDE AIR PRETREAT; New 2-stage DX coil with enhanced dehumidification option (COIL:DX:MultiMode:CoolingEmpirical); Additional DESICCANT DEHUMIDIFIER:SOLID setpoint control option;~ American Society of Heating Refrigerating and Air-Conditioning Engineers, Inc., 1791 Tullie Circle, N.E., Atlanta, GA 30329. \href{http://www.ashrae.org/}{www.ashrae.org/}. Work performed by GARD Analytics, Inc., 115 S. Wilke Road, Suite 105, Arlington Heights, IL, USA, \textless{}info@gard.com\textgreater{}, \href{http://www.gard.com/}{www.gard.com/}, November 2004. These items were renamed in V3.0 to SetpointManager:SingleZone:Heating, SetpointManager:SingleZone:Cooling, SetpointManager:OutdoorAirPretreat, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Dehumidifier:Desiccant:NoFans, respectively.
+ASHRAE research project 1254-RP supported the development of the following features first added in EnergyPlus v1.2.2: 
+\begin{itemize}
+  \item DXSystem:AirLoop enhancements (valid as OA system equipment, new humidity control options)
+  \item New set point managers: SET POINT MANAGER:SINGLE ZONE HEATING, SET POINT MANAGER:SINGLE ZONE COOLING, and SET POINT MANAGER:OUTSIDE AIR PRETREAT
+  \item New 2-stage DX coil with enhanced dehumidification option:
+  \begin{itemize}
+  	\item COIL:DX:MultiMode:CoolingEmpirical
+  \end{itemize}
+  \item Additional DESICCANT DEHUMIDIFIER:SOLID setpoint control option
+\end{itemize}
+
+American Society of Heating Refrigerating and Air-Conditioning Engineers, Inc., 1791 Tullie Circle, N.E., Atlanta, GA 30329\footnote{\url{http://www.ashrae.org/}}. Work performed by GARD Analytics, Inc., 115 S. Wilke Road, Suite 105, Arlington Heights, IL, USA\footnote{url{info@gard.com}; \url{http://www.gard.com/}}, November 2004. These items were renamed in V3.0 to:
+\begin{itemize}
+  \item SetpointManager:SingleZone:Heating
+  \item SetpointManager:SingleZone:Cooling
+  \item SetpointManager:OutdoorAirPretreat
+  \item Coil:Cooling:DX:TwoStageWithHumidityControlMode
+  \item Dehumidifier:Desiccant:NoFans
+\end{itemize}
 
 The Ecoroof (Green Roof) model, first introduced in EnergyPlus v2.0, was developed at Portland State University, by David Sailor and his students. It is based on the FASST vegetation models developed by Frankenstein and Koenig for the US Army Corps of Engineers.
 

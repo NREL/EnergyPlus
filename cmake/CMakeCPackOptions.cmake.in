@@ -213,6 +213,6 @@ if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
   set(CPACK_PACKAGE_RELOCATABLE false)
   set( CPACK_PACKAGE_VENDOR "usdoe" )
   configure_file(@CMAKE_SOURCE_DIR@/cmake/CPack.Info.plist.in.in "@CMAKE_BINARY_DIR@/Modules/CPack.Info.plist.in")
-  set(CPACK_RESOURCE_FILE_README "@CMAKE_BINARY_DIR@/install_temp/readme.html")
+  set(CPACK_RESOURCE_FILE_README "@CMAKE_SOURCE_DIR@/release/readme.html")
 endif()
 
