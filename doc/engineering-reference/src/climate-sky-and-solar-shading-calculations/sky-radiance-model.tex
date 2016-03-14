@@ -42,33 +42,33 @@ The \emph{horizon brightening} is assumed to be a linear source at the horizon a
 \begin{longtable}[c]{p{1.0in}p{2.0in}p{1.0in}p{2.0in}}
 \caption{Variables in Anisotropic Sky Model and Shadowing of Sky Diffuse Radiation \label{table:variables-in-anisotropic-sky-model}}\\
 \toprule 
-\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN variable} \tabularnewline \midrule \endhead
-$I_{sky}$ & Solar irradiance on surface from sky & W/m\(^{2}\) & - \tabularnewline \midrule
-$I_{horizon}$ & Solar irradiance on surface from sky horizon & W/m\(^{2}\) & - \tabularnewline \midrule
-$I_{dome}$ & Solar irradiance on surface from sky dome & W/m\(^{2}\) & - \tabularnewline \midrule
-$I_{circumsolar}$ & Solar irradiance on surface from circumsolar region & W/m\(^{2}\) & - \tabularnewline \midrule
-$I_h$ & Horizontal solar irradiance & W/m\(^{2}\) & - \tabularnewline \midrule
-S & Surface tilt & radians & Surface(SurfNum)\%Tilt*DegToRadians \tabularnewline \midrule
-a, b & intermediate variables & - & - \tabularnewline \midrule
-$F_1$, $F_2$ & Circumsolar and horizon brightening coefficients & - & F1, F2 \tabularnewline \midrule
-$\alpha$ & Incidence angle of sun on surface & radians & IncAng \tabularnewline \midrule
-Z & Solar zenith angle & radians & ZenithAng \tabularnewline \midrule
-$Delta$ & Sky brightness factor & - & Delta \tabularnewline \midrule
-$\varepsilon$ & Sky clearness factor & - & Epsilon \tabularnewline \midrule
-m & relative optical air mass & - & AirMass \tabularnewline \midrule
-$I_o$ & Extraterrestrial solar irradiance & W/m\(^{2}\) & - \tabularnewline \midrule
-$I$ & Direct normal solar irradiance & W/m\(^{2}\) & Material\%Thickness \tabularnewline \midrule
-$\kappa$ & constant = 1.041 for Z in radians & radians & - \tabularnewline \midrule
-$F_{ij}$ & Brightening coefficient factors & - & F11R, F12R, etc. \tabularnewline \midrule
-$R_{circumsolar}$ & Shadowing factor for circumsolar radiation & - & SunLitFrac \tabularnewline \midrule
-$R_{dome}$ & Shadowing factor for sky dome radiation & - & DifShdgRatioIsoSky \tabularnewline \midrule
-$R_{horizon}$ & Shadowing factor for horizon radiation & - & DifShdgRatioHoriz \tabularnewline \midrule
-E & Sky radiance & W/m\(^{2}\) & - \tabularnewline \midrule
-$\theta$ & Azimuth angle of point in sky & radians & Theta \tabularnewline \midrule
-$\varphi$ & Altitude angle of point in sky & radians & Phi \tabularnewline \midrule
-$I_i$ & Irradiance on surface from a horizon element & W/m\(^{2}\) & - \tabularnewline \midrule
-$I_{ij}$ & Irradiance on surface from a sky dome element & W/m\(^{2}\) & - \tabularnewline \midrule
-SF & Sunlit fraction & - & FracIlluminated \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule \endhead
+$I_{sky}$ & Solar irradiance on surface from sky & W/m\(^{2}\) & - \tabularnewline
+$I_{horizon}$ & Solar irradiance on surface from sky horizon & W/m\(^{2}\) & - \tabularnewline
+$I_{dome}$ & Solar irradiance on surface from sky dome & W/m\(^{2}\) & - \tabularnewline
+$I_{circumsolar}$ & Solar irradiance on surface from circumsolar region & W/m\(^{2}\) & - \tabularnewline
+$I_h$ & Horizontal solar irradiance & W/m\(^{2}\) & - \tabularnewline
+S & Surface tilt & radians & Surface(SurfNum)\%Tilt*DegToRadians \tabularnewline
+a, b & intermediate variables & - & - \tabularnewline
+$F_1$, $F_2$ & Circumsolar and horizon brightening coefficients & - & F1, F2 \tabularnewline
+$\alpha$ & Incidence angle of sun on surface & radians & IncAng \tabularnewline
+Z & Solar zenith angle & radians & ZenithAng \tabularnewline
+$Delta$ & Sky brightness factor & - & Delta \tabularnewline
+$\varepsilon$ & Sky clearness factor & - & Epsilon \tabularnewline
+m & relative optical air mass & - & AirMass \tabularnewline
+$I_o$ & Extraterrestrial solar irradiance & W/m\(^{2}\) & - \tabularnewline
+$I$ & Direct normal solar irradiance & W/m\(^{2}\) & Material\%Thickness \tabularnewline
+$\kappa$ & constant = 1.041 for Z in radians & radians & - \tabularnewline
+$F_{ij}$ & Brightening coefficient factors & - & F11R, F12R, etc. \tabularnewline
+$R_{circumsolar}$ & Shadowing factor for circumsolar radiation & - & SunLitFrac \tabularnewline
+$R_{dome}$ & Shadowing factor for sky dome radiation & - & DifShdgRatioIsoSky \tabularnewline
+$R_{horizon}$ & Shadowing factor for horizon radiation & - & DifShdgRatioHoriz \tabularnewline
+E & Sky radiance & W/m\(^{2}\) & - \tabularnewline
+$\theta$ & Azimuth angle of point in sky & radians & Theta \tabularnewline
+$\varphi$ & Altitude angle of point in sky & radians & Phi \tabularnewline
+$I_i$ & Irradiance on surface from a horizon element & W/m\(^{2}\) & - \tabularnewline
+$I_{ij}$ & Irradiance on surface from a sky dome element & W/m\(^{2}\) & - \tabularnewline
+SF & Sunlit fraction & - & FracIlluminated \tabularnewline
 $I'$ & Sky solar irradiance on surface with shadowing & W/m\(^{2}\) & - \tabularnewline
 \bottomrule
 \end{longtable}
@@ -147,17 +147,17 @@ $\kappa$ = 1.041 for Z in radians
 The factors \emph{F\(_{j}\)} ~are shown in the following table. The F\(_{j}\) values in this table were provided by R. Perez, private communication, 5/21/99. These values have higher precision than those listed in Table \# 6 of Perez et al., 1990.
 
 % table 22
-\scriptsize{
+{\scriptsize
 \begin{longtable}[c]{p{0.4in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
 \caption{$F_{ij}$ Factors as a Function of Sky Clearness Range \label{table:fij-factors-as-a-function-of-sky-clearness}}\\
 \toprule 
-\textbf{$\varepsilon$ Range} & \textbf{1.000-1.065} & \textbf{1.065-1.230} & \textbf{1.230-1.500} & \textbf{1.500-1.950} & \textbf{1.950-2.800} & \textbf{2.800-4.500} & \textbf{4.500-6.200} & \textbf{> 6.2005} \tabularnewline \midrule
-\textbf{$F_{11}$} & -0.0083117 & 0.1299457 & 0.3296958 & 0.5682053 & 0.8730280 & 1.1326077 & 1.0601591 & 0.6777470 \tabularnewline \midrule
-\textbf{$F_{12}$} & 0.5877285 & 0.6825954 & 0.4868735 & 0.1874525 & -0.3920403 & -1.2367284 & -1.5999137 & -0.3272588 \tabularnewline \midrule
-\textbf{$F_{13}$} & -0.0620636 & -0.1513752 & -0.2210958 & -0.2951290 & -0.3616149 & -0.4118494 & -0.3589221 & -0.2504286 \tabularnewline \midrule
-\textbf{$F_{21}$} & -0.0596012 & -0.0189325 & 0.0554140 & 0.1088631 & 0.2255647 & 0.2877813 & 0.2642124 & 0.1561313 \tabularnewline \midrule
-\textbf{$F_{22}$} & 0.0721249 & 0.0659650 & -0.0639588 & -0.1519229 & -0.4620442 & -0.8230357 & -1.1272340 & -1.3765031 \tabularnewline \midrule
-\textbf{$F_{23}$} & -0.0220216 & -0.0288748 & -0.0260542 & -0.0139754 & 0.0012448 & 0.0558651 & 0.1310694 & 0.2506212 \tabularnewline \midrule
+\textbf{$\varepsilon$ Range} & \textbf{1.000-1.065} & \textbf{1.065-1.230} & \textbf{1.230-1.500} & \textbf{1.500-1.950} & \textbf{1.950-2.800} & \textbf{2.800-4.500} & \textbf{4.500-6.200} & \textbf{> 6.2005} \tabularnewline
+\textbf{$F_{11}$} & -0.0083117 & 0.1299457 & 0.3296958 & 0.5682053 & 0.8730280 & 1.1326077 & 1.0601591 & 0.6777470 \tabularnewline
+\textbf{$F_{12}$} & 0.5877285 & 0.6825954 & 0.4868735 & 0.1874525 & -0.3920403 & -1.2367284 & -1.5999137 & -0.3272588 \tabularnewline
+\textbf{$F_{13}$} & -0.0620636 & -0.1513752 & -0.2210958 & -0.2951290 & -0.3616149 & -0.4118494 & -0.3589221 & -0.2504286 \tabularnewline
+\textbf{$F_{21}$} & -0.0596012 & -0.0189325 & 0.0554140 & 0.1088631 & 0.2255647 & 0.2877813 & 0.2642124 & 0.1561313 \tabularnewline
+\textbf{$F_{22}$} & 0.0721249 & 0.0659650 & -0.0639588 & -0.1519229 & -0.4620442 & -0.8230357 & -1.1272340 & -1.3765031 \tabularnewline
+\textbf{$F_{23}$} & -0.0220216 & -0.0288748 & -0.0260542 & -0.0139754 & 0.0012448 & 0.0558651 & 0.1310694 & 0.2506212 \tabularnewline
 \bottomrule
 \end{longtable}}
 

@@ -5,54 +5,54 @@
 A daylighting calculation is performed each time step that the sun is up for each zone that has one or two daylighting reference points specified. The exterior horizontal illuminance from the sun and sky is determined from solar irradiance data from the weather file. The interior illuminance at each reference point is found for each window by interpolating the daylight illuminance factors for the current sun position, then, for sky-related interior illuminance, multiplying by the exterior horizontal illuminance from the appropriate sky types that time step, and, for sun-related interior illuminance, multiplying by the exterior horizontal solar illuminance that time step. By summation, the net illuminance and glare due to all of the windows in a zone are found. If glare control has been specified window shading (by movable shading devices or switchable glazing) is deployed to reduce glare. Finally the illuminance at each reference point for the final window and shade configuration is used by the lighting control system simulation to determine the electric lighting power required to meet the illuminance setpoint at each reference point.
 
 % table 27
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Variables in Time-Step Calculations \protect \label{table:variables-in-time-step-calculations}}\\
+\begin{longtable}[c]{p{1.0in}p{2.0in}p{1.0in}p{2.0in}}
+\caption{  Variables in Time-Step Calculations \protect \label{table:variables-in-time-step-calculations}}\\
 \toprule 
 Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
 \endhead
-S & Direct normal solar irradiance & W/m & BeamSolarRad \tabularnewline
-S & Exterior diffuse horizontal solar irradiance & W/m & SDIFH, DifSolarRad \tabularnewline
-S & Exterior direct horizontal solar irradiance & W/m & SDIRH \tabularnewline
+S\(_{norm,dir}\) & Direct normal solar irradiance & W/m\(^{2}\) & BeamSolarRad \tabularnewline
+S\(_{h,dif}\) & Exterior diffuse horizontal solar irradiance & W/m\(^{2}\) & SDIFH, DifSolarRad \tabularnewline
+S\(_{h,dir}\) & Exterior direct horizontal solar irradiance & W/m\(^{2}\) & SDIRH \tabularnewline
 Z & Solar zenith angle & radians & Zeta \tabularnewline
 m & Relative optical air mass & - & AirMass \tabularnewline
-Δ & Sky brightness & - & SkyBrightness \tabularnewline
-ε & Sky clearness & - & SkyClearness \tabularnewline
+$\Delta$ & Sky brightness & - & SkyBrightness \tabularnewline
+$\varepsilon$ & Sky clearness & - & SkyClearness \tabularnewline
 k, k’ & Sky type index & - & ISky \tabularnewline
-s & Interpolation factor for skies k and k’ & - & SkyWeight \tabularnewline
-ψ & Sky luminance distribution formed from linear interpolation of skies k and k’ & cd/m & - \tabularnewline
-f & Fraction of sky that is type k & - & - \tabularnewline
-E & Horizontal illuminance from sky type k & cd/m & HorIllSky \tabularnewline
-E & Exterior horizontal illuminance from sky & lux & HISKF \tabularnewline
-E & Exterior horizontal illuminance from sun & lux & HISUNF \tabularnewline
-η  , η & Luminous efficacy of diffuse and direct solar radiation & lm/W & DiffLumEff, DirLumEff \tabularnewline
-I & Interior illuminance from a window & lux & DaylIllum \tabularnewline
-S & Window luminance & cd/m & SourceLumFromWinAtRefPt \tabularnewline
-B & Window background luminance & cd/m & BACLUM \tabularnewline
-d  , d & Interior illuminance factor for sun, for sky of type k & - & DaylIllFacSun, DFSUHR, DaylIllFacSky, DFSUHR \tabularnewline
-w  , w & Window luminance factor for sun, for sky of type k & - & DaylSourceFacSun, SFSUHR, DaylSourceFacSky, SFSKHR \tabularnewline
-b  , b & Window background luminance factor for sun, for sky of type k & - & DaylBackFacSun, BFSUHR, DaylBackFacSky, BFSKHR \tabularnewline
-w & Weighting factor for time step interpolation & - & WeightNow \tabularnewline
-i & Reference point index & - & IL \tabularnewline
-i & Window shade index & - & IS \tabularnewline
-I & Total daylight illuminance at reference point & lux & DaylIllum \tabularnewline
-B  , B & Total window background luminance & cd/m & BLUM \tabularnewline
-I & Illuminance setpoint & lux & ZoneDaylight\%IllumSetPoint \tabularnewline
-f & Fractional electric lighting output & - & FL \tabularnewline
-f & Fractional electric lighting input power & - & FP \tabularnewline
-N & Number of steps in a stepped control system & - & LightControlSteps \tabularnewline
-M & Lighting power multiplier & - & ZonePowerReductionFactor \tabularnewline
+s\(_{k,k'}\) & Interpolation factor for skies k and k’ & - & SkyWeight \tabularnewline
+$\psi$\(_{k,k'}\) & Sky luminance distribution formed from linear interpolation of skies k and k’ & cd/m\(^{2}\) & - \tabularnewline
+f\(_{k}\) & Fraction of sky that is type k & - & - \tabularnewline
+E\(_{h,k}\) & Horizontal illuminance from sky type k & cd/m\(^{2}\) & HorIllSky \tabularnewline
+E\(_{h,sky}\) & Exterior horizontal illuminance from sky & lux & HISKF \tabularnewline
+E\(_{h,sun}\) & Exterior horizontal illuminance from sun & lux & HISUNF \tabularnewline
+$\eta$\(_{dif}\), $\eta$\(_{dir}\) & Luminous efficacy of diffuse and direct solar radiation & lm/W & DiffLumEff, DirLumEff \tabularnewline
+I\(_{win}\) & Interior illuminance from a window & lux & DaylIllum \tabularnewline
+S\(_{win}\) & Window luminance & cd/m\(^{2}\) & SourceLumFromWinAtRefPt \tabularnewline
+B\(_{win}\) & Window background luminance & cd/m\(^{2}\) & BACLUM \tabularnewline
+d\(_{sun}\), d\(_{sky,k}\) & Interior illuminance factor for sun, for sky of type k & - & DaylIllFacSun, DFSUHR, DaylIllFacSky, DFSUHR \tabularnewline
+w\(_{sun}\), w\(_{sky,k}\) & Window luminance factor for sun, for sky of type k & - & DaylSourceFacSun, SFSUHR, DaylSourceFacSky, SFSKHR \tabularnewline
+b\(_{sun}\), b\(_{sky,k}\) & Window background luminance factor for sun, for sky of type k & - & DaylBackFacSun, BFSUHR, DaylBackFacSky, BFSKHR \tabularnewline
+w\(_{j}\) & Weighting factor for time step interpolation & - & WeightNow \tabularnewline
+i\(_{L}\) & Reference point index & - & IL \tabularnewline
+i\(_{S}\) & Window shade index & - & IS \tabularnewline
+I\(_{tot}\) & Total daylight illuminance at reference point & lux & DaylIllum \tabularnewline
+B\(_{tot}\), B & Total window background luminance & cd/m\(^{2}\) & BLUM \tabularnewline
+I\(_{set}\) & Illuminance setpoint & lux & ZoneDaylight\%IllumSetPoint \tabularnewline
+f\(_{L}\) & Fractional electric lighting output & - & FL \tabularnewline
+f\(_{p}\) & Fractional electric lighting input power & - & FP \tabularnewline
+N\(_{L}\) & Number of steps in a stepped control system & - & LightControlSteps \tabularnewline
+M\(_{P}\) & Lighting power multiplier & - & ZonePowerReductionFactor \tabularnewline
 \bottomrule
 \end{longtable}
 
 \subsection{Time-Step Sky Luminance}\label{time-step-sky-luminance}
 
-The sky luminance distribution, \emph{ψ}, for a particular time step is expressed as a linear interpolation of two of the four standard skies --- \emph{ψ\(_{s}\)}, \emph{ψ\(_{s}\)} , \emph{ψ\(_{s}\)} and \emph{ψ\(_{s}\)} --- described above under ``Sky Luminance Distributions.'' The two sky types that are interpolated depend on the value of the sky clearness. The interpolation factors are a function of sky clearness and sky brightness (Perez et al., 1990). Sky clearness is given by
+The sky luminance distribution, \emph{$\psi$}, for a particular time step is expressed as a linear interpolation of two of the four standard skies --- \emph{$\psi$\(_{cs}\)}, \emph{$\psi$\(_{ts}\)} , \emph{$\psi$\(_{is}\)} and \emph{$\psi$\(_{os}\)} --- described above under ``Sky Luminance Distributions.'' The two sky types that are interpolated depend on the value of the sky clearness. The interpolation factors are a function of sky clearness and sky brightness (Perez et al., 1990). Sky clearness is given by
 
 \begin{equation}
 \varepsilon  = \frac{{\frac{{{S_{h,dif}} + {S_{norm,dir}}}}{{{S_{h,dif}}}} + \kappa {Z^3}}}{{1 + \kappa {Z^3}}}
 \end{equation}
 
-where \emph{S\(_{f}\)} is the diffuse horizontal solar irradiance, \emph{S\(_{r}\)}is the direct normal solar irradiance, \emph{Z} is the solar zenith angle and \emph{κ} is a constant equal to 1.041 for \emph{Z} in radians.
+where \emph{S\(_{h,dif}\)} is the diffuse horizontal solar irradiance, \emph{S\(_{norm,dir}\)} is the direct normal solar irradiance, \emph{Z} is the solar zenith angle and \emph{$\kappa$} is a constant equal to 1.041 for \emph{Z} in radians.
 
 Sky brightness is given by
 
@@ -62,37 +62,37 @@ Sky brightness is given by
 
 where \emph{m} is the relative optical air mass and \(S_{norm,dir}^{ext}\) is the extraterrestrial direct normal solar irradiance.
 
-If \emph{ε} ≤ 1.2
+If \emph{$\varepsilon$} $≤$ 1.2
 
 \begin{equation}
 {\psi_{is,os}} = {s_{is,os}}{\psi_{is}} + (1 - {s_{is,os}}){\psi_{os}}
 \end{equation}
 
-where \emph{ψ\(_{s}\)} is the intermediate sky luminance distribution, \emph{ψ\(_{s}\)} is the overcast sky luminance distribution, and
+where \emph{$\psi$\(_{is}\)} is the intermediate sky luminance distribution, \emph{$\psi$\(_{os}\)} is the overcast sky luminance distribution, and
 
 \begin{equation}
 {s_{is,os}} = \min \{ 1,\max [0,(\varepsilon  - 1)/0.2,(\Delta  - 0.05)/0.4]\}
 \end{equation}
 
-If 1.2\textless{}\emph{ε} ≤ 3
+If 1.2\textless{}\emph{$\varepsilon$} $≤$ 3
 
 \begin{equation}
 {\psi_{ts,is}} = {s_{ts,is}}{\psi_{ts}} + (1 - {s_{ts,is}}){\psi_{is}}
 \end{equation}
 
-where \emph{ψ\(_{s}\)} is the clear turbid sky luminance distribution and
+where \emph{$\psi$\(_{ts}\)} is the clear turbid sky luminance distribution and
 
 \begin{equation}
 {s_{ts,is}} = (\varepsilon  - 1.2)/1.8
 \end{equation}
 
-If \emph{ε} \textgreater{} 3
+If \emph{$\varepsilon$} \textgreater{} 3
 
 \begin{equation}
 {\psi_{cs,ts}} = {s_{cs,ts}}{\psi_{cs}} + (1 - {s_{cs,ts}}){\psi_{ts}}
 \end{equation}
 
-where \emph{ψ\(_{s}\)} is the clear sky luminance distribution and
+where \emph{$\psi$\(_{cs}\)} is the clear sky luminance distribution and
 
 \begin{equation}
 {s_{cs,ts}} = \min [1,(\varepsilon  - 3)/3]
@@ -100,7 +100,7 @@ where \emph{ψ\(_{s}\)} is the clear sky luminance distribution and
 
 \subsection{Interior Illuminance}\label{interior-illuminance}
 
-For each time step the interior illuminance, \emph{I\(_{n}\)}, from a window is calculated as follows by multiplying daylight factors and exterior illuminance.
+For each time step the interior illuminance, \emph{I\(_{win}\)}, from a window is calculated as follows by multiplying daylight factors and exterior illuminance.
 
 First, the sun- and sky-related daylight illuminance factors for the time step are determined by interpolation of the hourly factors:
 
@@ -112,7 +112,7 @@ First, the sun- and sky-related daylight illuminance factors for the time step a
 {\bar d_{sky,k}}({i_L},{i_S}) = {w_j}{d_{sky,k}}({i_L},{i_S},{i_h}) + (1 - {w_j}){d_{sky,k}}({i_L},{i_S},{i_h} + 1)
 \end{equation}
 
-where \emph{i\(_{L}\)} is the reference point index (1 or 2), \emph{i\(_{S}\)} is the window shade index (1 for unshaded window, 2 for shaded window),* i\(_{h}\)* is the hour number, and \emph{k} is the sky type index. For the* j*th time step in an hour, the time-step interpolation weight is given by
+where \emph{i\(_{L}\)} is the reference point index (1 or 2), \emph{i\(_{S}\)} is the window shade index (1 for unshaded window, 2 for shaded window), \emph{i\(_{h}\)} is the hour number, and \emph{k} is the sky type index. For the \emph{j\(^{th}\)} time step in an hour, the time-step interpolation weight is given by
 
 \begin{equation}
 {w_j} = 1 - \min [1,j/{N_t}]
@@ -126,7 +126,7 @@ The interior illuminance from a window is calculated as
 {I_{win}}({i_L},{i_S}) = {\bar d_{sun}}{E_{h,sun}} + [{\bar d_{sky,k}}({i_L},{i_S}){f_k} + {\bar d_{sky,k'}}({i_L},{i_S}){f_{k'}}]{E_{h,sky}}
 \end{equation}
 
-where \emph{E\(_{n}\)} and \emph{E\(_{y}\)} are the exterior horizontal illuminance from the sun and sky, respectively, and \emph{f\(_{k}\)} and \emph{f\(_{’}\)} are the fraction of the exterior horizontal illuminance from the sky that is due to sky type \emph{k} and \emph{k'}, respectively.
+where \emph{E\(_{sun}\)} and \emph{E\(_{sky}\)} are the exterior horizontal illuminance from the sun and sky, respectively, and \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are the fraction of the exterior horizontal illuminance from the sky that is due to sky type \emph{k} and \emph{k'}, respectively.
 
 The horizontal illuminance from sun and sky are given by
 
@@ -135,16 +135,16 @@ The horizontal illuminance from sun and sky are given by
     E_{h,sky} & = \eta_{dif} S_{h,dif}
   \end{array}
 
-where \emph{Z} is the solar zenith angle,~ \emph{η\(_{f}\)} is the luminous efficacy (in lumens/Watt) of diffuse solar radiation from the sky and \emph{η\(_{r}\)} is the luminous efficacy of direct radiation from the sun. The efficacies are calculated from direct and global solar irradiance using a method described in (Perez et al, 1990).
+where \emph{Z} is the solar zenith angle,~ \emph{$\eta$\(_{dif}\)} is the luminous efficacy (in lumens/Watt) of diffuse solar radiation from the sky and \emph{$\eta$\(_{dir}\)} is the luminous efficacy of direct radiation from the sun. The efficacies are calculated from direct and global solar irradiance using a method described in (Perez et al, 1990).
 
-The fractions \emph{f\(_{k}\)} and \emph{f\(_{’}\)} are given by
+The fractions \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are given by
 
 \begin{array}{rl}
     f_k    & = \frac{ s_{k,k'} E_{h,k} } { s_{k,k'} E_{h,k} + (1 - s_{k,k'})E_{h,k'}} \\
     f_{k'} & = \frac{ (1 - s_{k,k'} ) E_{h,k'} } { s_{k,k'} E_{h,k} + (1 - s_{k,k'} ) E_{h,k'}}
   \end{array}
 
-where \emph{E\(_{k}\)} and \emph{E\(_{’}\)} are the horizontal illuminances from skies \emph{k} and \emph{k'}, respectively (see ``Exterior Horizontal Luminance,'' above), and \emph{s\(_{’}\)} is the interpolation factor for skies \emph{k}and \emph{k'}(see ``Time-Step Sky Luminance,'' above).~ For example, if~ \emph{ε} \textgreater{} 3, \emph{k} = \emph{cs} (clear sky), \emph{k'} = \emph{ts} (clear turbid sky) and
+where \emph{E\(_{h,k}\)} and \emph{E\(_{h,k’}\)} are the horizontal illuminances from skies \emph{k} and \emph{k'}, respectively (see ``Exterior Horizontal Luminance,'' above), and \emph{s\(_{’}\)} is the interpolation factor for skies \emph{k}and \emph{k'}(see ``Time-Step Sky Luminance,'' above).~ For example, if~ \emph{$\varepsilon$} \textgreater{} 3, \emph{k} = \emph{cs} (clear sky), \emph{k'} = \emph{ts} (clear turbid sky) and
 
 ~\(s_{k,k'} = s_{cs,ts} = \min [1,(\varepsilon - 3)/3]\)
 
@@ -231,7 +231,7 @@ For a continuously-dimmable control system, it is assumed that \emph{f\(_{P}\)} 
 \begin{figure}[hbtp] % fig 60
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image823.png}
-\caption{  Control action for a continuous dimming system. \protect \label{fig:control-action-for-a-continuous-dimming}}
+\caption{  Control action for a continuous dimming system. \protect \label{fig:control-action-for-a-continuous-dimming}}
 \end{figure}
 
 \subsubsection{Continuous/Off Dimming Control}\label{continuousoff-dimming-control}
@@ -240,7 +240,7 @@ A ``continuous/off'' dimming system has the same behavior as a continuous dimmin
 
 \subsubsection{Stepped Control}\label{stepped-control}
 
-For a stepped control system, \emph{f\(_{P}\)} takes on discrete values depending on the range of \emph{f\(_{L}\)}and the number of steps, \emph{N\(_{L}\)}\(_{ }\) (Figure~\ref{fig:stepped-lighting-control-with-three-steps.}). This gives
+For a stepped control system, \emph{f\(_{P}\)} takes on discrete values depending on the range of \emph{f\(_{L}\)}and the number of steps, \emph{N\(_{L}\)}\(_{ }\) (Figure~\ref{fig:stepped-lighting-control-with-three-steps.}). This gives
 
 \begin{equation}
 {f_P} = \left\{ \begin{array}{l}0, & {\rm{if }}{f_L} = 0\\\frac{{{\mathop{\rm int}} ({N_L}{f_L}) + 1}}{{{N_L}}}, & {\rm{for }}0 < {f_L} < 1\\1, & {\rm{if }}{f_L} = 1\end{array} \right.
@@ -251,7 +251,7 @@ If a lighting control probability,* p\(_{L}\)\emph{, is specified,} f\(_{P}\)* i
 \begin{figure}[hbtp] % fig 61
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image825.png}
-\caption{  Stepped lighting control with three steps. \protect \label{fig:stepped-lighting-control-with-three-steps.}}
+\caption{  Stepped lighting control with three steps. \protect \label{fig:stepped-lighting-control-with-three-steps.}}
 \end{figure}
 
 \subsubsection{Lighting Power Reduction}\label{lighting-power-reduction}
