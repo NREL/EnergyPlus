@@ -998,7 +998,7 @@ namespace PlantPipingSystemsManager {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Edwin Lee
 			//       DATE WRITTEN   Summer 2011
-			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accomodate ground coupled calculations
+			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accommodate ground coupled calculations
 			//       RE-ENGINEERED  na
 
 			// PURPOSE OF THIS SUBROUTINE:
@@ -1147,7 +1147,6 @@ namespace PlantPipingSystemsManager {
 						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
 						ErrorsFound = true;
 					} else {
-						// check this
 						PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
 						PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
 						PipingSystemDomains( DomainCtr ).SlabProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).SpecHeat;
@@ -1186,19 +1185,18 @@ namespace PlantPipingSystemsManager {
 					// Set flag for horizontal insulation extents
 					if ( SameString( cAlphaArgs( 9 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
+						// Horizontal insulation perimeter width
+						if ( Domain( ZoneCoupledDomainCtr ).HorizInsWidth > 0.0 ) {
+							PipingSystemDomains( DomainCtr ).HorizInsWidth = Domain( ZoneCoupledDomainCtr ).HorizInsWidth;
+						} else {
+							ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) );
+							ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+							ErrorsFound = true;
+						}
 					} else if ( SameString( cAlphaArgs( 9 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
-						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
-						ErrorsFound = true;
-					}
-
-					// Horizontal insulation perimeter width
-					if ( Domain( ZoneCoupledDomainCtr ).HorizInsWidth > 0.0 ) {
-						PipingSystemDomains( DomainCtr ).HorizInsWidth = Domain( ZoneCoupledDomainCtr ).HorizInsWidth;
-					} else {
-						ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) );
 						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
 						ErrorsFound = true;
 					}
@@ -1266,11 +1264,13 @@ namespace PlantPipingSystemsManager {
 				// get boundary condition model names and indices -- error check
 				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM );
 				if ( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex <= 0 ) {
-					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
+					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
+					ErrorsFound = true;
 				} else {
 					NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex );
 					if ( NumSurfacesWithThisOSCM <= 0 ) {
-						IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.", ErrorsFound );
+						IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.", ErrorsFound );
+						ErrorsFound = true;
 					} else {
 						PipingSystemDomains( DomainCtr ).ZoneCoupledSurfaces.allocate( NumSurfacesWithThisOSCM );
 						// Create GetSurfaceDataForOSCM function
@@ -1516,10 +1516,12 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
+				ErrorsFound = true;
 			} else {
 				NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex );
 				if ( NumSurfacesWithThisOSCM <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.", ErrorsFound );
+					ErrorsFound = true;
 				} else {
 					PipingSystemDomains( DomainNum ).BasementZone.WallSurfacePointers.allocate( NumSurfacesWithThisOSCM );
 					PipingSystemDomains( DomainNum ).BasementZone.WallSurfacePointers = GetSurfaceIndecesForOSCM( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex, NumSurfacesWithThisOSCM );
@@ -1584,19 +1586,18 @@ namespace PlantPipingSystemsManager {
 				// Set flag for horizontal insulation extents
 				if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = false;
+					// Horizontal insulation perimeter width
+					if ( Domain( BasementCtr ).HorizInsWidth > 0.0 ) {
+						PipingSystemDomains( DomainNum ).HorizInsWidth = Domain( BasementCtr ).HorizInsWidth;
+					} else {
+						ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) );
+						ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+						ErrorsFound = true;
+					}
 				} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + "=" + cAlphaArgs( 7 ) );
-					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
-					ErrorsFound = true;
-				}
-
-				// Horizontal insulation perimeter width
-				if ( Domain( BasementCtr ).HorizInsWidth > 0.0 ) {
-					PipingSystemDomains( DomainNum ).HorizInsWidth = Domain( BasementCtr ).HorizInsWidth;
-				} else {
-					ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) );
 					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
 					ErrorsFound = true;
 				}
@@ -8841,8 +8842,8 @@ namespace PlantPipingSystemsManager {
 
 		// If pipe circuit present
 		if ( present( CircuitNum ) ) {
-			// retreive fluid properties based on the circuit inlet temperature -- which varies during the simulation
-			// but need to verify the value of inlet temperature during warmup, etc.
+			// retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
+			// but need to verify the value of inlet temperature during warm up, etc.
 			FluidCp = GetSpecificHeatGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 			FluidDensity = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 			FluidConductivity = GetConductivityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
