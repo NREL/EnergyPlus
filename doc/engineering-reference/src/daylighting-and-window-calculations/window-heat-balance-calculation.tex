@@ -4,27 +4,27 @@
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
 \caption{Fortran Variables used in Window Heat Balance Calculations \protect \label{table:fortran-variables-used-in-window-heat-balance}}\\
 \toprule 
-\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule
 \endhead
-N & Number of glass layers & - & nlayer \tabularnewline \midrule
-$\alpha$ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline \midrule
-$\varepsilon$\(_{i}\) & Emissivity of face i & - & emis \tabularnewline \midrule
-k\(_{i}\) & Conductance of glass layer i & W/m\(^{2}\)-K & scon \tabularnewline \midrule
-h\(_{o}\), h\(_{i}\) & Outside, inside air film convective conductance & W/m\(^{2}\)-K & hcout, hcout \tabularnewline \midrule
-h\(_{i}\) & Conductance of gap j & W/m\(^{2}\)-K & hgap \tabularnewline \midrule
-T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline \midrule
-E\(_{o}\), E\(_{i}\) & Exterior, interior long-wave radiation incident on window & W/m\(^{2}\) & outir, rmir \tabularnewline \midrule
-$\theta$\(_{i}\) & Temperature of face i & K & thetas \tabularnewline \midrule
-S\(_{i}\) & Radiation (short-wave, and long-wave from zone internal sources) absorbed by face i & W/m\(^{2}\) & AbsRadGlassFace \tabularnewline \midrule
-I\(^{ext}_{bm}\) & Exterior beam normal solar irradiance & W/m\(^{2}\) & BeamSolarRad \tabularnewline \midrule
-I\(^{ext}_{dif}\) & Exterior diffuse solar irradiance on glazing & W/m\(^{2}\) & - \tabularnewline \midrule
-I\(^{int}_{sw}\) & Interior short-wave radiation (from lights and from reflected diffuse solar) incident on glazing from inside & W/m\(^{2}\) & QS \tabularnewline \midrule
-I\(^{int}_{lw}\) & Long-wave radiation from lights and equipment incident on glazing from inside & W/m\(^{2}\) & QL \tabularnewline \midrule
-$\varphi$ & Angle of incidence & radians & - \tabularnewline \midrule
-A\(^{f}_{j}\) & Front beam solar absorptance of glass layer j & - & - \tabularnewline \midrule
-A\(^{f,diff}_{j}\), A\(^{b,diff}_{j}\) & Front and back diffuse solar absorptance of glass layer j & - & AbsDiff, AbsDiffBack \tabularnewline \midrule
-A, B & Matrices used to solve glazing heat balance equations & W/m\(^{2}\), W/m\(^{2}\)-K & Aface, Bface \tabularnewline \midrule
-h\(_{r,i}\) & Radiative conductance for face i & W/m\(^{2}\)-K & hr(i) \tabularnewline \midrule
+N & Number of glass layers & - & nlayer \tabularnewline
+$\alpha$ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline 
+$\varepsilon$\(_{i}\) & Emissivity of face i & - & emis \tabularnewline
+k\(_{i}\) & Conductance of glass layer i & W/m\(^{2}\)-K & scon \tabularnewline
+h\(_{o}\), h\(_{i}\) & Outside, inside air film convective conductance & W/m\(^{2}\)-K & hcout, hcout \tabularnewline
+h\(_{i}\) & Conductance of gap j & W/m\(^{2}\)-K & hgap \tabularnewline
+T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline
+E\(_{o}\), E\(_{i}\) & Exterior, interior long-wave radiation incident on window & W/m\(^{2}\) & outir, rmir \tabularnewline
+$\theta$\(_{i}\) & Temperature of face i & K & thetas \tabularnewline
+S\(_{i}\) & Radiation (short-wave, and long-wave from zone internal sources) absorbed by face i & W/m\(^{2}\) & AbsRadGlassFace \tabularnewline
+I\(^{ext}_{bm}\) & Exterior beam normal solar irradiance & W/m\(^{2}\) & BeamSolarRad \tabularnewline
+I\(^{ext}_{dif}\) & Exterior diffuse solar irradiance on glazing & W/m\(^{2}\) & - \tabularnewline
+I\(^{int}_{sw}\) & Interior short-wave radiation (from lights and from reflected diffuse solar) incident on glazing from inside & W/m\(^{2}\) & QS \tabularnewline
+I\(^{int}_{lw}\) & Long-wave radiation from lights and equipment incident on glazing from inside & W/m\(^{2}\) & QL \tabularnewline
+$\varphi$ & Angle of incidence & radians & - \tabularnewline
+A\(^{f}_{j}\) & Front beam solar absorptance of glass layer j & - & - \tabularnewline
+A\(^{f,diff}_{j}\), A\(^{b,diff}_{j}\) & Front and back diffuse solar absorptance of glass layer j & - & AbsDiff, AbsDiffBack \tabularnewline
+A, B & Matrices used to solve glazing heat balance equations & W/m\(^{2}\), W/m\(^{2}\)-K & Aface, Bface \tabularnewline
+h\(_{r,i}\) & Radiative conductance for face i & W/m\(^{2}\)-K & hr(i) \tabularnewline
 $\Delta\theta$\(_{i}\) & Difference in temperature of face i between successive iterations & K & - \tabularnewline
 \bottomrule
 \end{longtable}
@@ -215,19 +215,19 @@ The value of the inside face temperature, \({\theta_{2N}}\) , determined in this
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
 \caption{Fortran Variables used in Edge of Glass calculations \protect \label{table:fortran-variables-used-in-edge-of-glass}}\\
 \toprule 
-\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule
 \endhead
-\(\overline h\) & Area-weighted net conductance of glazing including edge-of-glass effects & W/m\(^{2}\)-K & - \tabularnewline \midrule
-A\(_{cg}\) & Area of center-of-glass region & m\(^{2}\) & CenterGlArea \tabularnewline \midrule
-A\(_{fe}\) & Area of frame edge region & m\(^{2}\) & FrameEdgeArea \tabularnewline \midrule
-A\(_{de}\) & Area of divider edge region & m\(^{2}\) & DividerEdgeArea \tabularnewline \midrule
-A\(_{tot}\) & Total glazing area & m\(^{2}\) & Surface\%Area \tabularnewline \midrule
-h\(_{cg}\) & Conductance of center-of-glass region (without air films) & W/m\(^{2}\)-K & - \tabularnewline \midrule
-h\(_{fe}\) & Conductance of frame edge region (without air films) & W/m\(^{2}\)-K & - \tabularnewline \midrule
-h\(_{de}\) & Conductance of divider edge region (without air films) & W/m\(^{2}\)-K & - \tabularnewline \midrule
-h\(_{ck}\) & Convective conductance of gap k & W/m\(^{2}\)-K & - \tabularnewline \midrule
-h\(_{rk}\) & Radiative conductance of gap k & W/m\(^{2}\)-K & - \tabularnewline \midrule
-$\eta$ & Area ratio & - & - \tabularnewline \midrule
+\(\overline h\) & Area-weighted net conductance of glazing including edge-of-glass effects & W/m\(^{2}\)-K & - \tabularnewline
+A\(_{cg}\) & Area of center-of-glass region & m\(^{2}\) & CenterGlArea \tabularnewline
+A\(_{fe}\) & Area of frame edge region & m\(^{2}\) & FrameEdgeArea \tabularnewline
+A\(_{de}\) & Area of divider edge region & m\(^{2}\) & DividerEdgeArea \tabularnewline
+A\(_{tot}\) & Total glazing area & m\(^{2}\) & Surface\%Area \tabularnewline
+h\(_{cg}\) & Conductance of center-of-glass region (without air films) & W/m\(^{2}\)-K & - \tabularnewline
+h\(_{fe}\) & Conductance of frame edge region (without air films) & W/m\(^{2}\)-K & - \tabularnewline
+h\(_{de}\) & Conductance of divider edge region (without air films) & W/m\(^{2}\)-K & - \tabularnewline
+h\(_{ck}\) & Convective conductance of gap k & W/m\(^{2}\)-K & - \tabularnewline
+h\(_{rk}\) & Radiative conductance of gap k & W/m\(^{2}\)-K & - \tabularnewline
+$\eta$ & Area ratio & - & - \tabularnewline
 $\alpha$ & Conductance ratio & - & FrEdgeToCenterGlCondRatio, DivEdgeToCenterGlCondRatio \tabularnewline
 \bottomrule
 \end{longtable}
@@ -367,47 +367,47 @@ For the zone heat balance calculation the inside surface temperature of the fram
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
 \caption{Fortran Variables used in Window/Frame and Divider calculations \protect \label{table:fortran-variables-used-in-windowframe}}\\
 \toprule 
-\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule
 \endhead
-Q\(_{ExtIR,abs}\) & IR from the exterior surround absorbed by outside frame surfaces & W & - \tabularnewline \midrule
-Q\(_{IR,emitted}\) & IR emitted by outside frame surfaces & W & - \tabularnewline \midrule
-Q\(_{conv}\) & Convection from outside air to outside frame surfaces & W & - \tabularnewline \midrule
-Q\(_{cond}\) & Conduction through frame from inside frame surfaces to outside frame surfaces & W & - \tabularnewline \midrule
-Q\(_{abs}\) & Solar radiation plus outside glass IR absorbed by outside of frame & W & - \tabularnewline \midrule
-Q\(^{dif}_{abs,sol}\) & Diffuse solar absorbed by outside frame surfaces, per unit frame face area & W/m\(^{2}\) & - \tabularnewline \midrule
-Q\(^{bm}_{abs,sol}\) & Beam solar absorbed by outside frame surfaces, per unit frame face area & W/m\(^{2}\) & - \tabularnewline \midrule
-I\(^{dif}_{ext}\) & Diffuse solar incident on window & W/m\(^{2}\) & - \tabularnewline \midrule
-I\(^{bm}_{ext}\) & Direct normal solar irradiance & W/m\(^{2}\) & - \tabularnewline \midrule
-$\alpha$\(^{fr}_{sol}\) & Solar absorptance of frame & - & FrameSolAbsorp \tabularnewline \midrule
-R\(_{gl}^{f,dif}\) & Front diffuse solar reflectance of glazing & - & ~ \tabularnewline \midrule
-R\(_{gl}^{f,bm}\) & Front beam solar reflectance of glazing & - & ~ \tabularnewline \midrule
-cos($\beta$\(_{face}\)) & Cosine of angle of incidence of beam solar on frame outside face & ~ & CosIncAng \tabularnewline \midrule
-cos($\beta$\(_{h}\)) & Cosine of angle of incidence of beam solar on frame projection parallel to window x-axis & - & CosIncAngHorProj \tabularnewline \midrule
-cos($\beta$\(_{v}\)) & Cosine of angle of incidence of beam solar on frame projection parallel to window y-axis & - & CosIncAngVertProj \tabularnewline \midrule
-f\(_{sunlight}\) & Fraction of window that is sunlit & - & SunlitFrac \tabularnewline \midrule
-A\(_{f}\) & Area of frame’s outside face (same as area of frame’s inside face) & m\(^{2}\) & - \tabularnewline \midrule
-A\(_{p1}\), A\(_{p2}\) & Area of frame’s outside and inside projection faces & m\(^{2}\) & - \tabularnewline \midrule
-F\(_{f}\) & Form factor of frame’s outside or inside face for IR & - & - \tabularnewline \midrule
-F\(_{p1}\), F\(_{p2}\) & Form factor of frame outside projection for exterior IR; form factor of frame inside projection for interior IR & - & - \tabularnewline \midrule
-E\(_{o}\) & Exterior IR incident on window plane & W/m\(^{2}\) & outir \tabularnewline \midrule
-E\(_{i}\) & Interior IR incident on window plane & W/m\(^{2}\) & SurroundIRfromParentZone \tabularnewline \midrule
-$\varepsilon$\(_{1}\), $\varepsilon$\(_{2}\) & Outside, inside frame surface emissivity & - & FrameEmis \tabularnewline \midrule
-$\theta$\(_{1}\), $\theta$\(_{2}\) & Frame outside, inside surface temperature & K & FrameTempSurfOut, FrameTempSurfIn \tabularnewline \midrule
-T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline \midrule
-h\(_{o,c}\), h\(_{i,c}\) & Frame outside and inside air film convective conductance & W/m\(^{2}\)-K & HOutConv, HInConv \tabularnewline \midrule
-k & Effective inside-surface to outside-surface conductance of frame per unit area of frame projected onto window plane & W/m\(^{2}\)-K & FrameConductance, FrameCon \tabularnewline \midrule
-S\(_{1}\) & Q\(_{abs}\)/A\(_{f}\) & W/m\(^{2}\)-K & FrameQRadOutAbs \tabularnewline \midrule
-S\(_{2}\) & Interior short-wave radiation plus interior IR from internal sources absorbed by inside of frame divided by A\(_{f}\) & W/m\(^{2}\)-K & FrameQRadInAbs \tabularnewline \midrule
-$\eta$\(_{1}\), $\eta$\(_{2}\) & A\(_{p1}\)/A\(_{f}\), A\(_{p2}\)/A\(_{f}\) & - & - \tabularnewline \midrule
-H & Height of glazed portion of window & m & Surface\%Height \tabularnewline \midrule
-W & Width of glazed portion of window & m & Surface\%Width \tabularnewline \midrule
-w\(_{f}\), w\(_{d}\) & Frame width, divider width & m & FrameWidth, DividerWidth \tabularnewline \midrule
-p\(_{f1}\), p\(_{f2}\) & Frame outside, inside projection & m & FrameProjectionOut, FrameProjectionIn \tabularnewline \midrule
-N\(_{h}\), N\(_{v}\) & Number of horizontal, vertical dividers & - & HorDividers, VertDividers \tabularnewline \midrule
-T\(_{o,r}\), T\(_{i,r}\) & Frame outside, inside radiative temperature & K & TOutRadFr, TInRadFr \tabularnewline \midrule
-h\(_{o,r}\), h\(_{i,r}\) & Frame outside, inside surface radiative conductance & W/m\(^{2}\)-K & HOutRad, HInRad \tabularnewline \midrule
-A & Intermediate variable in frame heat balance solution & K & Afac \tabularnewline \midrule
-C & Intermediate variable in frame heat balance solution & - & Efac \tabularnewline \midrule
+Q\(_{ExtIR,abs}\) & IR from the exterior surround absorbed by outside frame surfaces & W & - \tabularnewline
+Q\(_{IR,emitted}\) & IR emitted by outside frame surfaces & W & - \tabularnewline
+Q\(_{conv}\) & Convection from outside air to outside frame surfaces & W & - \tabularnewline
+Q\(_{cond}\) & Conduction through frame from inside frame surfaces to outside frame surfaces & W & - \tabularnewline
+Q\(_{abs}\) & Solar radiation plus outside glass IR absorbed by outside of frame & W & - \tabularnewline
+Q\(^{dif}_{abs,sol}\) & Diffuse solar absorbed by outside frame surfaces, per unit frame face area & W/m\(^{2}\) & - \tabularnewline
+Q\(^{bm}_{abs,sol}\) & Beam solar absorbed by outside frame surfaces, per unit frame face area & W/m\(^{2}\) & - \tabularnewline
+I\(^{dif}_{ext}\) & Diffuse solar incident on window & W/m\(^{2}\) & - \tabularnewline
+I\(^{bm}_{ext}\) & Direct normal solar irradiance & W/m\(^{2}\) & - \tabularnewline
+$\alpha$\(^{fr}_{sol}\) & Solar absorptance of frame & - & FrameSolAbsorp \tabularnewline
+R\(_{gl}^{f,dif}\) & Front diffuse solar reflectance of glazing & - & ~ \tabularnewline
+R\(_{gl}^{f,bm}\) & Front beam solar reflectance of glazing & - & ~ \tabularnewline
+cos($\beta$\(_{face}\)) & Cosine of angle of incidence of beam solar on frame outside face & ~ & CosIncAng \tabularnewline
+cos($\beta$\(_{h}\)) & Cosine of angle of incidence of beam solar on frame projection parallel to window x-axis & - & CosIncAngHorProj \tabularnewline
+cos($\beta$\(_{v}\)) & Cosine of angle of incidence of beam solar on frame projection parallel to window y-axis & - & CosIncAngVertProj \tabularnewline
+f\(_{sunlight}\) & Fraction of window that is sunlit & - & SunlitFrac \tabularnewline
+A\(_{f}\) & Area of frame’s outside face (same as area of frame’s inside face) & m\(^{2}\) & - \tabularnewline
+A\(_{p1}\), A\(_{p2}\) & Area of frame’s outside and inside projection faces & m\(^{2}\) & - \tabularnewline
+F\(_{f}\) & Form factor of frame’s outside or inside face for IR & - & - \tabularnewline
+F\(_{p1}\), F\(_{p2}\) & Form factor of frame outside projection for exterior IR; form factor of frame inside projection for interior IR & - & - \tabularnewline
+E\(_{o}\) & Exterior IR incident on window plane & W/m\(^{2}\) & outir \tabularnewline
+E\(_{i}\) & Interior IR incident on window plane & W/m\(^{2}\) & SurroundIRfromParentZone \tabularnewline
+$\varepsilon$\(_{1}\), $\varepsilon$\(_{2}\) & Outside, inside frame surface emissivity & - & FrameEmis \tabularnewline
+$\theta$\(_{1}\), $\theta$\(_{2}\) & Frame outside, inside surface temperature & K & FrameTempSurfOut, FrameTempSurfIn \tabularnewline
+T\(_{o}\), T\(_{i}\) & Outdoor and indoor air temperatures & K & tout, tin \tabularnewline
+h\(_{o,c}\), h\(_{i,c}\) & Frame outside and inside air film convective conductance & W/m\(^{2}\)-K & HOutConv, HInConv \tabularnewline
+k & Effective inside-surface to outside-surface conductance of frame per unit area of frame projected onto window plane & W/m\(^{2}\)-K & FrameConductance, FrameCon \tabularnewline
+S\(_{1}\) & Q\(_{abs}\)/A\(_{f}\) & W/m\(^{2}\)-K & FrameQRadOutAbs \tabularnewline
+S\(_{2}\) & Interior short-wave radiation plus interior IR from internal sources absorbed by inside of frame divided by A\(_{f}\) & W/m\(^{2}\)-K & FrameQRadInAbs \tabularnewline
+$\eta$\(_{1}\), $\eta$\(_{2}\) & A\(_{p1}\)/A\(_{f}\), A\(_{p2}\)/A\(_{f}\) & - & - \tabularnewline
+H & Height of glazed portion of window & m & Surface\%Height \tabularnewline
+W & Width of glazed portion of window & m & Surface\%Width \tabularnewline
+w\(_{f}\), w\(_{d}\) & Frame width, divider width & m & FrameWidth, DividerWidth \tabularnewline
+p\(_{f1}\), p\(_{f2}\) & Frame outside, inside projection & m & FrameProjectionOut, FrameProjectionIn \tabularnewline
+N\(_{h}\), N\(_{v}\) & Number of horizontal, vertical dividers & - & HorDividers, VertDividers \tabularnewline
+T\(_{o,r}\), T\(_{i,r}\) & Frame outside, inside radiative temperature & K & TOutRadFr, TInRadFr \tabularnewline
+h\(_{o,r}\), h\(_{i,r}\) & Frame outside, inside surface radiative conductance & W/m\(^{2}\)-K & HOutRad, HInRad \tabularnewline
+A & Intermediate variable in frame heat balance solution & K & Afac \tabularnewline
+C & Intermediate variable in frame heat balance solution & - & Efac \tabularnewline
 B, D & Intermediate variables in frame heat balance solution & - & Bfac, Dfac \tabularnewline
 \bottomrule
 \end{longtable}

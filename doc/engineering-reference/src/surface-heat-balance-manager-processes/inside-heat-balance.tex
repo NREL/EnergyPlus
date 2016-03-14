@@ -153,11 +153,11 @@ SurfaceConvectionAlgorithm:Inside:AdapativeModelSelections object) so that the u
 
 The adaptive convection algorithm implemented in EnergyPlus for the inside face has a total of 45 different categories for surfaces and 29 different options for \emph{h\(_{c}\)} equation selections.~ The following table summarizes the categories and the default assignments for \emph{h\(_{c}\)} equations.~ The individual \emph{h\(_{c}\)} equations are documented below.
 
-\scriptsize{
+{\scriptsize
 \begin{longtable}[c]{p{0.25in}p{1.25in}p{0.25in}p{1.5in}p{2.5in}}
 \caption{Table 13. Inside Convection Categories and Assignments \label{table:table-13.-inside-convection-categories}}\\
 \toprule 
-\textbf{\#} & \textbf{Zone Air Flow Regime} & \textbf{IB-M's \#} & \textbf{Surface orientation and heat flow direction} & \textbf{Keywords for Applicable Model Equation Sources} \tabularnewline \midrule \endhead
+\# & Zone Air Flow Regime & IB-M's \# & Surface orientation and heat flow direction & Keywords for Applicable Model Equation Sources \tabularnewline \midrule \endhead
 1  & & & Vertical Walls & FohannoPolidoriVerticalWall* \tabularnewline
    & & & & AlamdariHammondVerticalWall \tabularnewline
    & & & & ASHRAEVerticalWall \tabularnewline
@@ -242,7 +242,7 @@ The adaptive convection algorithm implemented in EnergyPlus for the inside face 
 45 & & & Windows & GoldsteinNovoselacCeilingDiffuserWindow* \tabularnewline
  & & & & ISO15099Windows \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 *Indicates the default selection for \emph{h\(_{c}\)} model equation.
 

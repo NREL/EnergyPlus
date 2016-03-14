@@ -129,19 +129,20 @@ The calculation is done for the hourly sun positions on each of the design days.
 
 The factor for diffuse reflection of beam solar radiation from obstructions onto a receiving surface is calculated in subroutine CalcBeamSolDiffuseReflFactors. It is given by:
 
+{\scriptsize
 \begin{equation}
 {\rm{ReflFacBmToDiffSolObs(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}Hi{t_{obs,i,sun}}d{\Omega_i}\cos {\alpha_i}{\rho_{obs,i}}\cos {\alpha_{sun,obs,i}}} }
-\end{equation}
+\end{equation}}
 
 where
 
-\emph{~IHr} = hour number
+\emph{IHr} = hour number
 
 \(Hi{t_{obs,i}}\) = 1 if ray \emph{i} from the receiving point hits an obstruction, = 0 otherwise,
 
 \(Hi{t_{obs,i,sun}}\) = 1 if the line from ray \emph{i}'s hit point to the sun is unobstructed, = 0 otherwise,
 
-\({\alpha_{sun,obs,i}}\) ~is the angle of incidence of the sun on the obstruction.
+\({\alpha_{sun,obs,i}}\) is the angle of incidence of the sun on the obstruction.
 
 This factor is used in the timestep calculation to find the diffuse irradiance on a receiving surface due to beam solar diffusely reflected from obstructions:
 
@@ -153,9 +154,10 @@ where \emph{BeamSolarRad} is the timestep value of beam normal solar intensity (
 
 This calculation is the same as that for beam solar diffusely reflected from obstructions except that only rays from a receiving point that hit the ground are considered. The factor for diffuse reflection of beam solar from the ground onto a receiving surface is calculated in subroutine CalcBeamSolDiffuseReflFactors. It is given by:
 
+{\scriptsize
 \begin{equation}
 {\rm{ReflFacBmToDiffSolGnd(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{gnd,i}}Hi{t_{gnd,i,sun}}d{\Omega_i}\cos {\alpha_{gnd,i}}\cos {\alpha_{sun,gnd}}} }
-\end{equation}
+\end{equation}}
 
 where
 

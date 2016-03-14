@@ -94,7 +94,7 @@ There are three types of daylight factors: interior illuminance factors, window 
 
 To calculate daylight factors, daylight incident on a window is separated into two components: (1) light that originates from the \emph{sky} and reaches the window directly or by reflection from exterior surfaces; and (2) light that originates from the \emph{sun} and reaches the window directly or by reflection from exterior surfaces. Light from the window reaches the workplane directly or via reflection from the interior surfaces of the room.
 
-For fixed sun position, sky condition (clear or overcast) and room geometry, the sky-related interior daylight will be proportional to the exterior horizontal illuminance, \emph{E\(_{y}\)}, due to light from the sky. Similarly, the sun-related interior daylight will be proportional to the exterior horizontal solar illuminance, \emph{E\(_{n}\)}.
+For fixed sun position, sky condition (clear or overcast) and room geometry, the sky-related interior daylight will be proportional to the exterior horizontal illuminance, \emph{E\(_{h,sky}\)}, due to light from the sky. Similarly, the sun-related interior daylight will be proportional to the exterior horizontal solar illuminance, \emph{E\(_{h,sun}\)}.
 
 \subsection{Daylight Factors}\label{daylight-factors}
 
@@ -177,7 +177,7 @@ The clear sky luminance distribution has the form (Kittler, 1965; CIE, 1973)
 
 Here, \emph{L\(_{z}\)} is the zenith luminance (i.e., the luminance of the sky at a point directly overhead). In the calculation of daylight factors, which are ratios of interior and exterior illumination quantities that are both proportional to \emph{L\(_{z}\)}, the zenith luminance cancels out. For this reason we will use \emph{L\(_{z}\)} = 1.0 for all sky luminance distributions.
 
-The various angles, which are defined in the building coordinate system, are shown in Figure~\ref{fig:illustration-of-convex-and-non-convex-zones}. The angle,* γ*, between sun and sky element is given by
+The various angles, which are defined in the building coordinate system, are shown in Figure~\ref{fig:illustration-of-convex-and-non-convex-zones}. The angle, $\gamma$, between sun and sky element is given by
 
 \begin{equation}
 \gamma  = {\cos ^{ - 1}}\left[ {\sin {\phi_{sky}}\sin {\phi_{sun}} + \cos {\phi_{sky}}\cos {\phi_{sun}}\cos ({\theta_{sky}} - {\theta_{sun}})} \right]
@@ -203,7 +203,13 @@ The intermediate sky luminance distribution has the form {[}Matsuura, 1987{]}
 
 where
 
-\({Z_1} = \left[ {1.35(\sin (3.59{\phi_{sky}} - 0.009) + 2.31)\sin (2.6{\phi_{sun}} + 0.316) + {\phi_{sky}} + 4.799} \right]/2.326\) \({Z_2} = \exp \left[ { - 0.563\gamma \{ ({\phi_{sun}} - 0.008)({\phi_{sky}} + 1.059) + 0.812\} } \right]\)
+\begin{equation}
+{Z_1} = \left[ {1.35(\sin (3.59{\phi_{sky}} - 0.009) + 2.31)\sin (2.6{\phi_{sun}} + 0.316) + {\phi_{sky}} + 4.799} \right]/2.326 
+\end{equation}
+
+\begin{equation}
+{Z_2} = \exp \left[ { - 0.563\gamma \{ ({\phi_{sun}} - 0.008)({\phi_{sky}} + 1.059) + 0.812\} } \right]
+\end{equation}
 
 \begin{equation}
 {Z_3} = 0.99224\sin (2.6{\phi_{sun}} + 0.316) + 2.73852
@@ -241,7 +247,7 @@ The illuminance on an unobstructed horizontal plane due to diffuse radiation fro
 {E_{h,k}} = \int\limits_0^{2\pi } {\int\limits_0^{\pi /2} {{\psi_k}({\theta_{sky}},{\phi_{sky}})\sin {\phi_{sky}}\cos {\phi_{sky}}d{\theta_{sky}}} } d{\phi_{sky}}
 \end{equation}
 
-where* k* = \emph{cs}, \emph{ts}, \emph{is} or \emph{os}. The integral is evaluated as a double summation:
+where \emph{k} = \emph{cs}, \emph{ts}, \emph{is} or \emph{os}. The integral is evaluated as a double summation:
 
 \begin{equation}
 {E_{h,k}} = \sum\limits_{i = 1}^{{N_\theta }} {\sum\limits_{j = 1}^{{N_\phi }} {{\psi_k}\left( {{\theta_{sky}}(i),{\phi_{sky}}(j)} \right)} } \sin {\phi_{sky}}(j)\cos {\phi_{sky}}(j)\Delta {\theta_{sky}}\Delta {\phi_{sky}}
@@ -296,7 +302,7 @@ where
 {\hat W_n} = {\rm{ window outward normal }} = {\hat W_{21}} \times {\hat W_{23}} = \frac{{{{\vec W}_1} - {{\vec W}_2}}}{{\left| {{{\vec W}_1} - {{\vec W}_2}} \right|}} \times \frac{{{{\vec W}_3} - {{\vec W}_2}}}{{\left| {{{\vec W}_3} - {{\vec W}_2}} \right|}}
 \end{equation}
 
-Equation becomes exact as \(dx/D{\rm{ and }}dy/D \to 0\) and is accurate to better than about 1\% for \(dx \le D/4{\rm{ and }}dy \le D/4\) .
+Equation becomes exact as \(dx/D\) and \(dy/D \to 0\) and is accurate to better than about 1\% for \(dx \le D/4\) and \(dy \le D/4\) .
 
 The net illuminance from the window is obtained by summing the contributions from all the window elements:
 
@@ -304,12 +310,12 @@ The net illuminance from the window is obtained by summing the contributions fro
 {E_h} = \sum\limits_{\scriptstyle window\atop\scriptstyle elements} {{L_w}d\Omega \cos \gamma }
 \end{equation}
 
-In performing the summation, window elements that lie below the workplane (\(\cos \gamma &lt; 0\) ) are omitted since light from these elements cannot reach the workplane directly.
+In performing the summation, window elements that lie below the workplane (\(\cos \gamma \lt 0\) ) are omitted since light from these elements cannot reach the workplane directly.
 
 \begin{figure}[hbtp] % fig 58
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image755.png}
-\caption{  Geometry for calculation of direct component of daylight illuminance at a reference point. Vectors R\$\_\{f\}\$, W\$\_\{1\}\$, W\$\_\{2\}\$, W\$\_\{3\}\$ and R\$\_\{n\}\$ are in the building coordinate system. \protect \label{fig:geometry-for-calculation-of-direct-component}}
+\caption{  Geometry for calculation of direct component of daylight illuminance at a reference point. Vectors R\(_ref\), W\(_1\), W\(_2\), W\(_3\) and R\(_win\) are in the building coordinate system. \protect \label{fig:geometry-for-calculation-of-direct-component}}
 \end{figure}
 
 \subsubsection{Unshaded Window}\label{unshaded-window}
@@ -322,13 +328,13 @@ For the unshaded window case, the luminance of the window element is found by pr
 
 where \({\tau_{vis}}\) is the visible transmittance of the glass for incidence angle \emph{B}.
 
-Exterior obstructions are generally opaque (like fins, overhangs, neighboring buildings, and the building's own wall and roof surfaces) but can be transmitting (like a tree or translucent awning). Exterior obstructions are assumed to be non-reflecting. If \emph{L\(_{y}\)} is the sky luminance and \emph{t\(_{s}\)} is the transmittance of the obstruction (assumed independent of incidence angle), then \emph{L} = * L\(_{y}\)t\(_{s}\)\emph{. Interior obstructions are assumed to be opaque (}t\(_{s}\)* = 0).
+Exterior obstructions are generally opaque (like fins, overhangs, neighboring buildings, and the building's own wall and roof surfaces) but can be transmitting (like a tree or translucent awning). Exterior obstructions are assumed to be non-reflecting. If \emph{L\(_{sky}\)} is the sky luminance and \emph{$\tau$\(_{obs}\)} is the transmittance of the obstruction (assumed independent of incidence angle), then \emph{L = * L\(_{y}\)$\tau$\(_{obs}\)}. Interior obstructions are assumed to be opaque ($\tau$\(_{obs}\) = 0).
 
 \subsubsection{Shaded Window}\label{shaded-window}
 
 For the window-plus-shade case the shade is assumed to be a perfect diffuser, i.e., the luminance of the shade is independent of angle of emission of light, position on shade, and angle of incidence of solar radiation falling on the shade. Closely-woven drapery fabric and translucent roller shades are closer to being perfect diffusers than Venetian blinds or other slatted devices, which usually have non-uniform luminance characteristics.
 
-The calculation of the window luminance with the shade in place, \emph{L\(_{h}\)}, is described in {[}Winkelmann, 1983{]}. The illuminance contribution at the reference point from a shaded window element is then given by Eq. (152) with \({L_w} = {L_{w,sh}}\) .
+The calculation of the window luminance with the shade in place, \emph{L\(_{w,h}\)}, is described in {[}Winkelmann, 1983{]}. The illuminance contribution at the reference point from a shaded window element is then given by Eq. (152) with \({L_w} = {L_{w,sh}}\) .
 
 \subsection{Internally-Reflected Component of Interior Daylight Illuminance}\label{internally-reflected-component-of-interior-daylight-illuminance}
 
@@ -338,9 +344,9 @@ Daylight reaching a reference point after reflection from interior surfaces is c
 {F_1} = {\Phi_{FW}}{\rho_{FW}} + {\Phi_{CW}}{\rho_{CW}}
 \end{equation}
 
-where \emph{ρ\(_{W}\)} is the area-weighted average reflectance of the floor and those parts of the walls below the window midplane, and \emph{ρ\(_{W}\)} is the area-weighted average reflectance of the ceiling and those parts of the walls above the window midplane.
+where \emph{$\rho$\(_{W}\)} is the area-weighted average reflectance of the floor and those parts of the walls below the window midplane, and \emph{$\rho$\(_{W}\)} is the area-weighted average reflectance of the ceiling and those parts of the walls above the window midplane.
 
-To find the final average internally-reflected illuminance, \emph{E\(_{r}\)}, on the room surfaces (which in this method is uniform throughout the room) a flux balance is used. The total reflected flux absorbed by the room surfaces (or lost through the windows) is \emph{AE\(_{r}\)(1-ρ)}, where \emph{A} is the total inside surface area of the floor, walls, ceiling and windows in the room, and \emph{ρ} is the area-weighted average reflectance of the room surfaces, including windows. From conservation of energy
+To find the final average internally-reflected illuminance, \emph{E\(_{r}\)}, on the room surfaces (which in this method is uniform throughout the room) a flux balance is used. The total reflected flux absorbed by the room surfaces (or lost through the windows) is \emph{AE\(_{r}\)(1-$\rho$)}, where \emph{A} is the total inside surface area of the floor, walls, ceiling and windows in the room, and \emph{$\rho$} is the area-weighted average reflectance of the room surfaces, including windows. From conservation of energy
 
 \begin{equation}
 A{E_r}(1 - \rho ) = {F_1}
@@ -368,7 +374,7 @@ The transmitted flux is
 d\Phi  = d{\Phi_{inc}}T(\beta )
 \end{equation}
 
-where \emph{T(β)} is the window transmittance for light at incidence angle \emph{β}. This transmittance depends on whether or not the window has a shade.
+where \emph{T($\beta$)} is the window transmittance for light at incidence angle \emph{$\beta$}. This transmittance depends on whether or not the window has a shade.
 
 For an unshaded window the total downgoing transmitted flux is obtained by integrating over the part of the exterior hemisphere seen by the window that lies above the window midplane. This gives
 
@@ -494,7 +500,7 @@ By dividing the window into \emph{N\(_{x}\)} by \emph{N\(_{y}\)} rectangular ele
 {L_w} = \frac{{\sum\limits_{j = 1}^{{N_y}} {\sum\limits_{i = 1}^{{N_x}} {{L_w}(i,j)} } }}{{{N_x}{N_y}}}
 \end{equation}
 
-where \emph{L\(_{w}\)(i,j)} is the luminance of element* (i,j)* as seen from the reference point.
+where \emph{L\(_{w}\)(i,j)} is the luminance of element \emph{(i,j)} as seen from the reference point.
 
 Similarly,
 
@@ -502,7 +508,7 @@ Similarly,
 \omega  = \sum\limits_{j = 1}^{{N_y}} {\sum\limits_{i = 1}^{{N_x}} {d\omega (i,j)} }
 \end{equation}
 
-where \emph{dω(i,j)} is the solid angle subtended by element* (i,j)*with respect to the reference point.
+where \emph{d$\omega$(i,j)} is the solid angle subtended by element \emph{(i,j)} with respect to the reference point.
 
 The modified solid angle is
 
@@ -535,8 +541,8 @@ The factor \emph{p} can be obtained from graphs given in {[}Petherbridge \& Long
 \begin{longtable}[c]{p{1.0in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}}
 \caption{Position factor for glare calculation \label{table:position-factor-for-glare-calculation}}\\
 \toprule 
-						&      &\multicolumn{8}{l}{\textbf{$x_R$: Horizontal Displacement Factor}} \tabularnewline \cmidrule(r){2-9} \endhead
-						&      & \textbf{0}     & \textbf{0.5}   & \textbf{1.0}   & \textbf{1.5}   & \textbf{2.0}   & \textbf{2.5}   & \textbf{3.0}   & \textbf{>3.0} \tabularnewline \midrule
+						&      &\multicolumn{8}{l}{$x_R$: Horizontal Displacement Factor} \tabularnewline \cmidrule(r){2-9} \endhead
+						&      & \textbf{0}     & \textbf{0.5}   & \textbf{1.0}   & \textbf{1.5}   & \textbf{2.0}   & \textbf{2.5}   & \textbf{3.0}   & \textbf{>3.0} \tabularnewline
 \textbf{$y_R$:}			& \textbf{0}    & 1.00  & 0.492 & 0.226 & 0.128 & 0.081 & 0.061 & 0.057 & 0 \tabularnewline
 \textbf{Vertical}		& \textbf{0.5}  & 0.123 & 0.119 & 0.065 & 0.043 & 0.029 & 0.026 & 0.023 & 0 \tabularnewline
 \textbf{Displacement}	& \textbf{1.0}  & 0.019 & 0.026 & 0.019 & 0.016 & 0.014 & 0.011 & 0.011 & 0 \tabularnewline
@@ -552,7 +558,7 @@ The background luminance is
 {L_b} = {E_b}{\rho_b}
 \end{equation}
 
-where \emph{ρ\(_{b}\)} is approximated by the average interior surface reflectance of the entire room and
+where \emph{$\rho$\(_{b}\)} is approximated by the average interior surface reflectance of the entire room and
 
 \begin{equation}
 {E_b} = \max ({E_r},{E_s})
@@ -568,4 +574,4 @@ The net daylight glare at a reference point due to all of the windows in a room 
 {G_I} = 10{\log_{10}}\sum\limits_{i = 1}^{\scriptstyle{\rm{number of}}\atop\scriptstyle{\rm{windows}}} {{{\rm{G}}_{\rm{i}}}}
 \end{equation}
 
-where \emph{G\(_{i}\)} is the glare constant at the reference point due to the \emph{i\(^{h}\)} window
+where \emph{G\(_{i}\)} is the glare constant at the reference point due to the \emph{i\(^{th}\)} window

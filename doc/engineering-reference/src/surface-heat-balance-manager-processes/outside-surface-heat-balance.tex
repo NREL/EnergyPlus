@@ -46,17 +46,17 @@ These assumptions are frequently used in all but the most critical engineering a
 \begin{longtable}[c]{p{1.0in}p{3.0in}p{1.0in}p{1.0in}}
 \caption{Nomenclature List of Variables \label{table:nomenclature-list-of-variables}}\\
 \toprule 
-\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
-$q''_{LWR}$ & Exterior surface longwave radiation flux & $W/m^2$ & --- \tabularnewline \midrule
-$h_r$ & Linearized radiative heat transfer coefficient to air temperature & $W/m^2.K$ & --- \tabularnewline \midrule
-$T_{surf}$ & Surface Outside face temperatures & $K$ & --- \tabularnewline \midrule
-$T_{air}$ & Outside air temperature & $K$ & --- \tabularnewline \midrule
-$T_{gnd}$ & Environmental ground surface temperature & $K$ & --- \tabularnewline \midrule
-$T_{sky}$ & Sky Effective temperature & $K$ & --- \tabularnewline \midrule
-$F_{gnd}$ & view factor of wall surface to ground surface & --- & 0--1 \tabularnewline \midrule
-$F_{sky}$ & View factor of wall surface to sky & --- & 0--1 \tabularnewline \midrule
-$F_{air}$ & View factor of wall surface to air & --- & 0--1 \tabularnewline \midrule
-$\varepsilon$ & Surface long-wave emissivity & --- & 0--1 \tabularnewline \midrule
+Mathematical variable & Description & Units & Range \tabularnewline \midrule \endhead
+$q''_{LWR}$ & Exterior surface longwave radiation flux & $W/m^2$ & --- \tabularnewline
+$h_r$ & Linearized radiative heat transfer coefficient to air temperature & $W/m^2.K$ & --- \tabularnewline
+$T_{surf}$ & Surface Outside face temperatures & $K$ & --- \tabularnewline
+$T_{air}$ & Outside air temperature & $K$ & --- \tabularnewline
+$T_{gnd}$ & Environmental ground surface temperature & $K$ & --- \tabularnewline
+$T_{sky}$ & Sky Effective temperature & $K$ & --- \tabularnewline
+$F_{gnd}$ & view factor of wall surface to ground surface & --- & 0--1 \tabularnewline
+$F_{sky}$ & View factor of wall surface to sky & --- & 0--1 \tabularnewline
+$F_{air}$ & View factor of wall surface to air & --- & 0--1 \tabularnewline
+$\varepsilon$ & Surface long-wave emissivity & --- & 0--1 \tabularnewline
 $\sigma$ & Stefan-Boltzmann constant & $W/m^2.K^4$ & $5.67 \times 10^{-8}$ \tabularnewline
 \bottomrule
 \end{longtable}
@@ -258,13 +258,13 @@ The wind speed profile coefficients \emph{$\alpha$}, \emph{$\delta$}, \emph{$\al
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005). \label{table:wind-speed-profile-coefficients-ashrae}}\\
 \toprule
-\textbf{Terrain Description}       & \textbf{Exponent, $\alpha$} & \textbf{Boundary Layer Thickness, $\delta$ (m)} \tabularnewline
+Terrain Description       & Exponent, $\alpha$ & Boundary Layer Thickness, $\delta$ (m) \tabularnewline
 \midrule
 \endhead
-Flat, open country        & 0.14 & 270 \tabularnewline \midrule
-Rough, wooded country     & 0.22 & 370 \tabularnewline \midrule
-Towns and cities          & 0.33 & 460 \tabularnewline \midrule
-Ocean                     & 0.10 & 210 \tabularnewline \midrule
+Flat, open country        & 0.14 & 270 \tabularnewline
+Rough, wooded country     & 0.22 & 370 \tabularnewline
+Towns and cities          & 0.33 & 460 \tabularnewline
+Ocean                     & 0.10 & 210 \tabularnewline
 Urban, industrial, forest & 0.22 & 370 \tabularnewline
 \bottomrule
 \end{longtable}
@@ -347,13 +347,13 @@ The roughness correlation is taken from Figure~\ref{fig:energyplus-program-schem
 \begin{longtable}[c]{@{}lllll@{}}
 \caption{  Roughness Coefficients D, E, and F. \protect \label{table:roughness-coefficients-d-e-and-f.}}\\
 \toprule 
-\textbf{Roughness Index} & \textbf{D} & \textbf{E} & \textbf{F} & \textbf{Example Material} \tabularnewline \midrule
+Roughness Index & D & E & F & Example Material \tabularnewline \midrule
 \endhead
-1 (Very Rough) & 11.58 & 5.894 & 0.0 & Stucco \tabularnewline \midrule
-2 (Rough) & 12.49 & 4.065 & 0.028 & Brick \tabularnewline \midrule
-3 (Medium Rough) & 10.79 & 4.192 & 0.0 & Concrete \tabularnewline \midrule
-4 (Medium Smooth) & 8.23 & 4.0 & -0.057 & Clear pine \tabularnewline \midrule
-5 (Smooth) & 10.22 & 3.1 & 0.0 & Smooth Plaster \tabularnewline \midrule
+1 (Very Rough) & 11.58 & 5.894 & 0.0 & Stucco \tabularnewline
+2 (Rough) & 12.49 & 4.065 & 0.028 & Brick \tabularnewline
+3 (Medium Rough) & 10.79 & 4.192 & 0.0 & Concrete \tabularnewline
+4 (Medium Smooth) & 8.23 & 4.0 & -0.057 & Clear pine \tabularnewline
+5 (Smooth) & 10.22 & 3.1 & 0.0 & Smooth Plaster \tabularnewline
 6 (Very Smooth) & 8.23 & 3.33 & -0.036 & Glass \tabularnewline
 \bottomrule
 \end{longtable}
@@ -370,19 +370,19 @@ TARP, or Thermal Analysis Research Program, is an important predecessor of Energ
 \begin{longtable}[c]{p{1.5in}p{2.5in}p{1.0in}p{1.0in}}
 \caption{Nomenclature List of Variables. \label{table:nomenclature-list-of-variables.-001}}\\
 \toprule 
-\textbf{Variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
-A & Surface area of the surface & m\(^{2}\) & /=0 \tabularnewline \midrule
-h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-h\(_{f}\) & Forced convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-h\(_{n}\) & Natural convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-P & Perimeter of surface & m & - \tabularnewline \midrule
-R\(_{f}\) & Surface roughness multiplier & - & - \tabularnewline \midrule
-T\(_{air}\) & Local outdoor air temperature calculated at the height above ground of the surface centroid & °C & - \tabularnewline \midrule
-T\(_{so}\) & Outside surface temperature & °C & - \tabularnewline \midrule
-$\Delta$T & Temperature difference between the surface and air, & °C & - \tabularnewline \midrule
-V\(_{z}\) & Local wind speed calculated at the height above ground of the surface centroid & m/s & - \tabularnewline \midrule
-W\(_{f}\) & Wind direction modifier & - & - \tabularnewline \midrule
-$\phi$ & Angle between the ground outward normal and the surface outward normal & degree & - \tabularnewline \midrule
+Variable & Description & Units & Range \tabularnewline \midrule \endhead
+A & Surface area of the surface & m\(^{2}\) & /=0 \tabularnewline
+h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline
+h\(_{f}\) & Forced convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline
+h\(_{n}\) & Natural convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline
+P & Perimeter of surface & m & - \tabularnewline
+R\(_{f}\) & Surface roughness multiplier & - & - \tabularnewline
+T\(_{air}\) & Local outdoor air temperature calculated at the height above ground of the surface centroid & °C & - \tabularnewline
+T\(_{so}\) & Outside surface temperature & °C & - \tabularnewline
+$\Delta$T & Temperature difference between the surface and air, & °C & - \tabularnewline
+V\(_{z}\) & Local wind speed calculated at the height above ground of the surface centroid & m/s & - \tabularnewline
+W\(_{f}\) & Wind direction modifier & - & - \tabularnewline
+$\phi$ & Angle between the ground outward normal and the surface outward normal & degree & - \tabularnewline
 Roughness Index & Surface roughness index (6=very smooth, 5=smooth, 4=medium smooth, 3=medium rough, 2=rough, 1=very rough) & - & 1-6 \tabularnewline
 \bottomrule
 \end{longtable}
@@ -415,13 +415,13 @@ The surface roughness multiplier Rf~is based on the ASHRAE graph of surface cond
 \begin{longtable}[c]{@{}lll@{}}
 \caption{  Surface Roughness Multipliers (Walton 1981). \protect \label{table:surface-roughness-multipliers-walton-1981.}}\\
 \toprule 
-\textbf{Roughness Index} & \textbf{Rf} & \textbf{Example Material} \tabularnewline \midrule
+Roughness Index & Rf & Example Material \tabularnewline \midrule
 \endhead
-1 (Very Rough) & 2.17 & Stucco \tabularnewline \midrule
-2 (Rough) & 1.67 & Brick \tabularnewline \midrule
-3 (Medium Rough) & 1.52 & Concrete \tabularnewline \midrule
-4 (Medium Smooth) & 1.13 & Clear pine \tabularnewline \midrule
-5 (Smooth) & 1.11 & Smooth Plaster \tabularnewline \midrule
+1 (Very Rough) & 2.17 & Stucco \tabularnewline
+2 (Rough) & 1.67 & Brick \tabularnewline
+3 (Medium Rough) & 1.52 & Concrete \tabularnewline
+4 (Medium Smooth) & 1.13 & Clear pine \tabularnewline
+5 (Smooth) & 1.11 & Smooth Plaster \tabularnewline
 6 (Very Smooth) & 1.00 & Glass \tabularnewline
 \bottomrule
 \end{longtable}
@@ -456,12 +456,12 @@ where $\Sigma$ is the surface tilt angle.
 \begin{longtable}[c]{p{0.5in}p{3.0in}p{1.5in}p{1.0in}}
 \caption{Nomenclature List of Variables. \label{table:nomenclature-list-of-variables.-002}}\\
 \toprule 
-\textbf{Variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
-A & Constant & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline \midrule
-B & Constant & - & - \tabularnewline \midrule
-C\(_{t}\) & Turbulent natural convection constant & W/(m\(^{2}\)K\(^{4/3}\)) & - \tabularnewline \midrule
-h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-T\(_{so}\) & Outside surface temperature & °C/K & - \tabularnewline \midrule
+Variable & Description & Units & Range \tabularnewline \midrule \endhead
+A & Constant & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline
+B & Constant & - & - \tabularnewline
+C\(_{t}\) & Turbulent natural convection constant & W/(m\(^{2}\)K\(^{4/3}\)) & - \tabularnewline
+h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline
+T\(_{so}\) & Outside surface temperature & °C/K & - \tabularnewline
 $\Delta$T & Temperature difference between the surface and air & °C/K & - \tabularnewline
 \bottomrule
 \end{longtable}
@@ -480,7 +480,7 @@ NOTE:~ The MoWiTT algorithm may not be appropriate for rough surfaces, high-rise
 \begin{longtable}[c]{@{}llll@{}}
 \caption{MoWiTT Coefficients (Yazdanian and Klems 1994, Booten et al. 2012) \protect \label{table:mowitt-coefficients-yazdanian-and-klems-1994}}\\
 \toprule 
-\textbf{Wind Direction} & \textbf{C\(_{t}\)} & \textbf{a} & \textbf{b} \tabularnewline \midrule
+Wind Direction & C\(_{t}\) & a & b \tabularnewline \midrule
 \endhead
 (Units) & W/(m\(^{2}\)K\(^{4/3}\)) & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline
 Windward & 0.84 & 3.26 & 0.89 \tabularnewline
@@ -494,16 +494,16 @@ Leeward & 0.84 & 3.55 & 0.617 \tabularnewline
 \begin{longtable}[c]{p{0.5in}p{3.0in}p{1.5in}p{1.0in}}
 \caption{  Nomenclature List of Variables. \label{table:nomenclature-list-of-variables.-003}}\\
 \toprule 
-\textbf{Variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
-a & Constant & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline \midrule
-b & Constant & - & - \tabularnewline \midrule
-h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-h\(_{c,glass}\) & Convective heat transfer coefficient for very smooth surfaces (glass) & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-h\(_{n}\) & Natural convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
-R\(_{f}\) & Surface roughness multiplier & - & - \tabularnewline \midrule
-T\(_{so}\) & Outside surface temperature & °C/K & - \tabularnewline \midrule
-$\Delta$T & Temperature difference between the surface and air, & °C/K & - \tabularnewline \midrule
-$\Phi$ & Angle between the ground outward normal and the surface outward normal & radian & - \tabularnewline \midrule
+Variable & Description & Units & Range \tabularnewline \midrule \endhead
+a & Constant & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline
+b & Constant & - & - \tabularnewline
+h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline
+h\(_{c,glass}\) & Convective heat transfer coefficient for very smooth surfaces (glass) & W/(m\(^{2}\)K) & - \tabularnewline
+h\(_{n}\) & Natural convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline
+R\(_{f}\) & Surface roughness multiplier & - & - \tabularnewline
+T\(_{so}\) & Outside surface temperature & °C/K & - \tabularnewline
+$\Delta$T & Temperature difference between the surface and air, & °C/K & - \tabularnewline
+$\Phi$ & Angle between the ground outward normal and the surface outward normal & radian & - \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -532,14 +532,14 @@ This algorithm has a structure that allows for finer control over the models use
 The adaptive convection algorithm implemented in EnergyPlus for the outside face is much simpler than that for the inside face. The surface classification system has a total of 4 different categories for surfaces that depend on current wind direction and heat flow directions.~ However it is more complex in that the \emph{h\(_{c}\)} equation is split into two parts and there are separate model equation selections for forced convection, \emph{h\(_{f}\)}, and natural convection, \emph{h\(_{n}\)}. The following table summarizes the categories and the default assignments for \emph{h\(_{c}\)} equations. The individual \emph{h\(_{c}\)} equations are documented below.
 
 % table 12
-\scriptsize{
+{\scriptsize
 \begin{longtable}[c]{p{0.25in}p{0.75in}p{0.5in}p{0.5in}p{1.75in}p{1.75in}}
 \caption{Adaptive Convection Algorithm Details \label{table:adaptive-convection-algorithm-details}}\\
 \toprule 
-\textbf{\#} & \textbf{Surface Classification} & \textbf{Heat Flow Direction} & \textbf{Wind Direction} & \textbf{h Models} & \textbf{h Models} \tabularnewline \midrule \endhead
-1 & Roof Stable & Down & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonStableHorizontalOrTilt AlamdariStableHorizontal \tabularnewline \midrule
-2 & Roof Unstable & Up & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonUnstableHorizontalOrTilt AlamdariUnstableHorizontal \tabularnewline \midrule
-3 & Vertical Wall Windward & Any & Windward & TARPWindward DOE2Windward MoWiTTWindward NusseltJurges McAdams Mitchell BlockenWindward EmmelVertical & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline \midrule
+\# & Surface Classification & Heat Flow Direction & Wind Direction & h\(_{f}\) Models & h\(_{n}\) Models \tabularnewline \midrule \endhead
+1 & Roof Stable & Down & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonStableHorizontalOrTilt AlamdariStableHorizontal \tabularnewline
+2 & Roof Unstable & Up & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonUnstableHorizontalOrTilt AlamdariUnstableHorizontal \tabularnewline
+3 & Vertical Wall Windward & Any & Windward & TARPWindward DOE2Windward MoWiTTWindward NusseltJurges McAdams Mitchell BlockenWindward EmmelVertical & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline
 4 & Vertical Wall Leeward & Any & Leeward & TARPLeeward MoWiTTLeeward DOE2Leeward EmmelVertical NusseltJurges McAdams Mitchell & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline
 \bottomrule
 \end{longtable}}

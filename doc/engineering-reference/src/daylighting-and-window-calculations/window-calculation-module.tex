@@ -29,46 +29,46 @@ The solar radiation transmitted by a system of glass layers and the solar radiat
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
 \caption{Variables in Window Calculations \label{table:variables-in-window-calculations}}\\
 \toprule 
-\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{FORTRAN \quad variable} \tabularnewline \midrule \endhead
-T & Transmittance & - & - \tabularnewline \midrule
-R & Reflectance & - & - \tabularnewline \midrule
-R\(^{f}\), R\(^{b}\) & Front reflectance, back reflectance & - & - \tabularnewline \midrule
-T\(_{i,j}\) & Transmittance through glass layers i to j & - & - \tabularnewline \midrule
-T\(^{dir}_{gl}\) & Direct transmittance of glazing & - & - \tabularnewline \midrule
-R\(^{f}_{i,j}\), R\(^{b}_{i,j}\) & Front reflectance, back reflectance from glass layers i to j & - & - \tabularnewline \midrule
-R\(^{dir}_{gl,f}\), R\(^{dir}_{gl,b}\) & Direct front and back reflectance of glazing & - & - \tabularnewline \midrule
-A\(^{f}_{i}\), A\(^{b}_{i}\) & Front~ absorptance, back absorptance of layer i & - & - \tabularnewline \midrule
-N & Number of glass layers & - & Nlayer \tabularnewline \midrule
-$\lambda$ & Wavelength & microns & Wle \tabularnewline \midrule
-E\(_{s}\) ($\lambda$) & Solar spectral irradiance function & W/m\(^{2}\)-micron & E \tabularnewline \midrule
-V($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline \midrule
-$\varphi$ & Angle of incidence (angle between surface normal and direction of incident beam radiation) & Rad & Phi \tabularnewline \midrule
-$\tau$ & Transmittivity or transmittance & - & tf0 \tabularnewline \midrule
-$\rho$ & Reflectivity or reflectance & - & rf0, rb0 \tabularnewline \midrule
-$\alpha$ & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline \midrule
-d & Glass thickness & M & Material\%Thickness \tabularnewline \midrule
-n & Index of refraction & - & ngf, ngb \tabularnewline \midrule
-$\kappa$ & Extinction coefficient & - & - \tabularnewline \midrule
-$\beta$ & Intermediate variable & - & betaf, betab \tabularnewline \midrule
-P, p & A general property, such as transmittance & - & - \tabularnewline \midrule
-$\tau$\(_{sh}\) & Shade transmittance & - & Material\%Trans \tabularnewline \midrule
-$\rho$\(_{sh}\) & Shade reflectance & - & Material\%ReflectShade \tabularnewline \midrule
-$\alpha$\(_{sh}\) & Shade absorptance & - & Material\%AbsorpSolar \tabularnewline \midrule
-$\tau$\(_{bl}\) $\rho$\(_{bl}\) $\alpha$\(_{bl}\) & Blind transmittance, reflectance, absorptance & - & - \tabularnewline \midrule
-Q, G, J & Source, irradiance and radiosity for blind optical properties calculation & W/m\(^{2}\) & - \tabularnewline \midrule
-F\(_{ij}\) & View factor between segments i and j & - & - \tabularnewline \midrule
-f\(_{switch}\) & Switching factor & - & SwitchFac \tabularnewline \midrule
-R($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline \midrule
-$\varphi$' & Relative azimuth angle (angle between screen surface normal and vertical plane through sun, Ref. Figure 87) & Rad & SunAzimuthToScreenNormal \tabularnewline \midrule
-$\alpha$' & Relative altitude angle (angle between screen surface horizontal normal plane and direction of incident beam radiation, Ref. Figure 87) & Rad & SunAltitudeToScreenNormal \tabularnewline \midrule
-$\rho$\(_{sc}\) & Beam-to-diffuse solar reflectance of screen material & - & Screens\%ReflectCylinder \tabularnewline \midrule
-$\gamma$ & Screen material aspect ratio & - & Screens\%ScreenDiameterTo SpacingRatio \tabularnewline \midrule
-Α & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline \midrule
-D & Glass thickness & M & Material\%Thickness \tabularnewline \midrule
-N & Index of refraction & - & ngf, ngb \tabularnewline \midrule
-Κ & Extinction coefficient & - & - \tabularnewline \midrule
-Β & Intermediate variable & - & betaf, betab \tabularnewline \midrule
-P, p & A general property, such as transmittance & - & - \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule \endhead
+T & Transmittance & - & - \tabularnewline
+R & Reflectance & - & - \tabularnewline
+R\(^{f}\), R\(^{b}\) & Front reflectance, back reflectance & - & - \tabularnewline
+T\(_{i,j}\) & Transmittance through glass layers i to j & - & - \tabularnewline
+T\(^{dir}_{gl}\) & Direct transmittance of glazing & - & - \tabularnewline
+R\(^{f}_{i,j}\), R\(^{b}_{i,j}\) & Front reflectance, back reflectance from glass layers i to j & - & - \tabularnewline
+R\(^{dir}_{gl,f}\), R\(^{dir}_{gl,b}\) & Direct front and back reflectance of glazing & - & - \tabularnewline
+A\(^{f}_{i}\), A\(^{b}_{i}\) & Front~ absorptance, back absorptance of layer i & - & - \tabularnewline
+N & Number of glass layers & - & Nlayer \tabularnewline
+$\lambda$ & Wavelength & microns & Wle \tabularnewline
+E\(_{s}\) ($\lambda$) & Solar spectral irradiance function & W/m\(^{2}\)-micron & E \tabularnewline
+V($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline
+$\varphi$ & Angle of incidence (angle between surface normal and direction of incident beam radiation) & Rad & Phi \tabularnewline
+$\tau$ & Transmittivity or transmittance & - & tf0 \tabularnewline
+$\rho$ & Reflectivity or reflectance & - & rf0, rb0 \tabularnewline
+$\alpha$ & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline
+d & Glass thickness & M & Material\%Thickness \tabularnewline
+n & Index of refraction & - & ngf, ngb \tabularnewline
+$\kappa$ & Extinction coefficient & - & - \tabularnewline
+$\beta$ & Intermediate variable & - & betaf, betab \tabularnewline
+P, p & A general property, such as transmittance & - & - \tabularnewline
+$\tau$\(_{sh}\) & Shade transmittance & - & Material\%Trans \tabularnewline
+$\rho$\(_{sh}\) & Shade reflectance & - & Material\%ReflectShade \tabularnewline
+$\alpha$\(_{sh}\) & Shade absorptance & - & Material\%AbsorpSolar \tabularnewline
+$\tau$\(_{bl}\) $\rho$\(_{bl}\) $\alpha$\(_{bl}\) & Blind transmittance, reflectance, absorptance & - & - \tabularnewline
+Q, G, J & Source, irradiance and radiosity for blind optical properties calculation & W/m\(^{2}\) & - \tabularnewline
+F\(_{ij}\) & View factor between segments i and j & - & - \tabularnewline
+f\(_{switch}\) & Switching factor & - & SwitchFac \tabularnewline
+R($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline
+$\varphi$' & Relative azimuth angle (angle between screen surface normal and vertical plane through sun, Ref. Figure 87) & Rad & SunAzimuthToScreenNormal \tabularnewline
+$\alpha$' & Relative altitude angle (angle between screen surface horizontal normal plane and direction of incident beam radiation, Ref. Figure 87) & Rad & SunAltitudeToScreenNormal \tabularnewline
+$\rho$\(_{sc}\) & Beam-to-diffuse solar reflectance of screen material & - & Screens\%ReflectCylinder \tabularnewline
+$\gamma$ & Screen material aspect ratio & - & Screens\%ScreenDiameterTo SpacingRatio \tabularnewline
+Α & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline
+D & Glass thickness & M & Material\%Thickness \tabularnewline
+N & Index of refraction & - & ngf, ngb \tabularnewline
+Κ & Extinction coefficient & - & - \tabularnewline
+Β & Intermediate variable & - & betaf, betab \tabularnewline
+P, p & A general property, such as transmittance & - & - \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -215,6 +215,7 @@ And for U-values between 3.4 and 4.5, the value for \({T_{sol}}\) ~is interpolat
 
 The layer's solar reflectance is calculated by first determining the inward flowing fraction which requires values for the resistance of the inside and outside film coefficients under summer conditions, \({R_{i,s}}\) ~and \({R_{o,s}}\) respectively.~ The correlations are
 
+{\scriptsize
 \begin{equation}
 \begin{split}
 &{R_{i,s}} = \frac{1}{{\left( {29.436546\;{{\left( {SHGC - {T_{Sol}}} \right)}^3} - 21.943415{{\left( {SHGC - {T_{Sol}}} \right)}^2} + 9.945872\left( {SHGC - {T_{Sol}}} \right) + 7.426151} \right)}}; U > 4.5 \\
@@ -222,7 +223,7 @@ The layer's solar reflectance is calculated by first determining the inward flow
 &{R_{o,s}} = \frac{1}{{\left( {2.225824(SHGC - {T_{Sol}}) + 20.57708} \right)}}; U > 4.5 \\
 &{R_{o,s}} = \frac{1}{{\left( {5.763355(SHGC - {T_{Sol}}) + 20.541528} \right)}}; U < 3.4
 \end{split}
-\end{equation}
+\end{equation}}
 
 And for U-values between 3.4 and 4.5, the values are interpolated using results from both sets of equations.
 
@@ -773,9 +774,9 @@ The slat optical properties used by EnergyPlus are shown in the following table.
 \begin{longtable}[c]{p{1.5in}p{2.5in}}
 \caption{  Slat Optical Properties \protect \label{table:slat-optical-properties}}\\
 \toprule 
-\({\tau_{dir,dir}}\) & Direct-to-diffuse transmittance (same for front and back of slat) \tabularnewline \midrule
-\({\tau_{dif,dir}}\) & Diffuse-to-diffuse transmittance (same for front and back of slat) \tabularnewline \midrule
-\(\rho_{dir,dif}^f\), \(\rho_{dir,dif}^b\) & Front and back direct-to-diffuse reflectance \tabularnewline \midrule
+\({\tau_{dir,dir}}\) & Direct-to-diffuse transmittance (same for front and back of slat) \tabularnewline
+\({\tau_{dif,dir}}\) & Diffuse-to-diffuse transmittance (same for front and back of slat) \tabularnewline
+\(\rho_{dir,dif}^f\), \(\rho_{dir,dif}^b\) & Front and back direct-to-diffuse reflectance \tabularnewline
 \(\rho_{dif,dif}^f\), \(\rho_{dif,dif}^b\) & Front and back diffuse-to-diffuse reflectance \tabularnewline
 \bottomrule
 \end{longtable}
@@ -1094,32 +1095,32 @@ Table~\ref{table:comparison-of-blind-optical-properties} compares EnergyPlus and
 \label{table:comparison-of-blind-optical-properties}\tabularnewline
 \toprule 
 \multicolumn{11}{l}{\textbf{Slat Properties}} \tabularnewline \midrule
-Separation (m) & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} \tabularnewline \midrule
-Width (m) & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} \tabularnewline \midrule
-Angle (deg) & \multicolumn{2}{c}{45} & \multicolumn{2}{c}{45} & \multicolumn{2}{c}{45} & \multicolumn{2}{c}{10} & \multicolumn{2}{c}{45} \tabularnewline \midrule
-IR transmittance & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0.4} \tabularnewline \midrule
-IR emissivity, front side & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.55} \tabularnewline \midrule
-IR emissivity, back side & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.55} \tabularnewline \midrule
-Solar transmittance & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0.4} \tabularnewline \midrule
-Solar reflectance, front side & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.55} & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.5} \tabularnewline \midrule
+Separation (m) & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} & \multicolumn{2}{c}{0.012} \tabularnewline
+Width (m) & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} & \multicolumn{2}{c}{0.016} \tabularnewline
+Angle (deg) & \multicolumn{2}{c}{45} & \multicolumn{2}{c}{45} & \multicolumn{2}{c}{45} & \multicolumn{2}{c}{10} & \multicolumn{2}{c}{45} \tabularnewline
+IR transmittance & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0.4} \tabularnewline
+IR emissivity, front side & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.55} \tabularnewline
+IR emissivity, back side & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.9} & \multicolumn{2}{c}{0.55} \tabularnewline
+Solar transmittance & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0} & \multicolumn{2}{c}{0.4} \tabularnewline
+Solar reflectance, front side & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.55} & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.5} \tabularnewline
 Solar reflectance, back side & \multicolumn{2}{c}{0.7} & \multicolumn{2}{c}{0.55} & \multicolumn{2}{c}{0.4} & \multicolumn{2}{c}{0.4} & \multicolumn{2}{c}{0.5} \tabularnewline \midrule
  \tabularnewline \midrule
 Solar Profile angle (deg) & 0 & 60 & 0 & 60 & 0 & 60 & 0 & 60 & 0 & 60 \tabularnewline \midrule
  \tabularnewline \midrule
 \multicolumn{11}{l}{\textbf{Calculated blind properties} (first row = ISO 15099 calculation,} \tabularnewline
 \multicolumn{11}{l}{second row (in italics) = EnergyPlus calculation)} \tabularnewline \midrule
-Front solar transmittance, direct to Direct & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} & 0 \quad \quad \textit{0} & 0 \quad \quad \textit{0} & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} \tabularnewline \midrule
-Back solar transmittance, direct to direct & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} & 0 \quad \quad \textit{0} & 0.088 \quad \quad \textit{0.087} & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} \tabularnewline \midrule
-Front solar transmittance, direct to diffuse & 0.141 \quad \quad \textit{0.155} & 0.073 \quad \quad \textit{0.074} & 0.090 \quad \quad \textit{0.100} & 0.047 \quad \quad \textit{0.048} & 0.096 \quad \quad \textit{0.104} & 0.051 \quad \quad \textit{0.051} & 0.012 \quad \quad \textbf{\textit{0.019}} & 0.005 \quad \quad \textbf{\textit{0.006}} & 0.373 \quad \quad \textit{0.375} & 0.277 \quad \quad \textit{0.275} \tabularnewline \midrule
-Back solar transmittance, direct to diffuse & 0.141 \quad \quad \textit{0.155} & 0.288 \quad \quad \textit{0.284} & 0.090 \quad \quad \textit{0.100} & 0.216 \quad \quad \textit{0.214} & 0.076 \quad \quad \textit{0.085} & 0.271 \quad \quad \textit{0.269} & 0.011 \quad \quad \textbf{\textit{0.019}} & 0.027 \quad \quad \textbf{\textit{0.052}} & 0.373 \quad \quad \textit{0.375} & 0.306 \quad \quad \textit{0.304} \tabularnewline \midrule
-Front solar reflectance, direct to diffuse & 0.394 \quad \quad \textit{0.389} & 0.558 \quad \quad \textit{0.558} & 0.295 \quad \quad \textit{0.293} & 0.430 \quad \quad \textit{0.431} & 0.371 \quad \quad \textit{0.368} & 0.544 \quad \quad \textit{0.546} & 0.622 \quad \quad \textit{0.636} & 0.678 \quad \quad \textit{0.679} & 0.418 \quad \quad \textit{0.416} & 0.567 \quad \quad \textit{0.568} \tabularnewline \midrule
-Back solar reflectance, direct to diffuse & 0.394 \quad \quad \textit{0.389} & 0.103 \quad \quad \textit{0.115} & 0.295 \quad \quad \textit{0.293} & 0.066 \quad \quad \textit{0.074} & 0.216 \quad \quad \textit{0.214} & 0.070 \quad \quad \textit{0.077} & 0.356 \quad \quad \textit{0.363} & 0.273 \quad \quad \textit{0.272} & 0.418 \quad \quad \textit{0.416} & 0.273 \quad \quad \textit{0.275} \tabularnewline \midrule
-Front solar transmittance, hemispherical diffuse to diffuse & 0.332 \quad \quad \textit{0.338} &  & 0.294 \quad \quad \textit{0.298} &  & 0.291 \quad \quad \textit{0.295} &  & 0.038 \quad \quad \textbf{\textit{0.053}} &  & 0.495 \quad \quad \textit{0.502} \tabularnewline \midrule
-Back solar transmittance, hemispherical diffuse to diffuse & 0.332 \quad \quad \textit{0.338} &  & 0.294 \quad \quad \textit{0.298} &  & 0.291 \quad \quad \textit{0.295} &  & 0.038 \quad \quad \textbf{\textit{0.053}} &  & 0.495 \quad \quad \textit{0.502} &  \tabularnewline \midrule
-Front hemispherical IR transmittance & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.0245 \quad \quad \textit{0.025} &  & 0.385 \quad \quad \textit{0.387} &  \tabularnewline \midrule
-Back hemispherical IR transmittance & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.0245 \quad \quad \textit{0.025} &  & 0.385 \quad \quad \textit{0.387} &  \tabularnewline \midrule
-Front hemispherical IR emissivity & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.890 \quad \quad \textit{0.895} &  & 0.536 \quad \quad \textit{0.534} &  \tabularnewline \midrule
-Back hemispherical IR emissivity & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.890 \quad \quad \textit{0.895} &  & 0.536 \quad \quad \textit{0.534} &  \tabularnewline \midrule
+Front solar transmittance, direct to Direct & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} & 0 \quad \quad \textit{0} & 0 \quad \quad \textit{0} & 0.057 \quad \quad \textit{0.057} & 0 \quad \quad \textit{0} \tabularnewline
+Back solar transmittance, direct to direct & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} & 0 \quad \quad \textit{0} & 0.088 \quad \quad \textit{0.087} & 0.057 \quad \quad \textit{0.057} & 0.310 \quad \quad \textit{0.309} \tabularnewline
+Front solar transmittance, direct to diffuse & 0.141 \quad \quad \textit{0.155} & 0.073 \quad \quad \textit{0.074} & 0.090 \quad \quad \textit{0.100} & 0.047 \quad \quad \textit{0.048} & 0.096 \quad \quad \textit{0.104} & 0.051 \quad \quad \textit{0.051} & 0.012 \quad \quad \textbf{\textit{0.019}} & 0.005 \quad \quad \textbf{\textit{0.006}} & 0.373 \quad \quad \textit{0.375} & 0.277 \quad \quad \textit{0.275} \tabularnewline
+Back solar transmittance, direct to diffuse & 0.141 \quad \quad \textit{0.155} & 0.288 \quad \quad \textit{0.284} & 0.090 \quad \quad \textit{0.100} & 0.216 \quad \quad \textit{0.214} & 0.076 \quad \quad \textit{0.085} & 0.271 \quad \quad \textit{0.269} & 0.011 \quad \quad \textbf{\textit{0.019}} & 0.027 \quad \quad \textbf{\textit{0.052}} & 0.373 \quad \quad \textit{0.375} & 0.306 \quad \quad \textit{0.304} \tabularnewline
+Front solar reflectance, direct to diffuse & 0.394 \quad \quad \textit{0.389} & 0.558 \quad \quad \textit{0.558} & 0.295 \quad \quad \textit{0.293} & 0.430 \quad \quad \textit{0.431} & 0.371 \quad \quad \textit{0.368} & 0.544 \quad \quad \textit{0.546} & 0.622 \quad \quad \textit{0.636} & 0.678 \quad \quad \textit{0.679} & 0.418 \quad \quad \textit{0.416} & 0.567 \quad \quad \textit{0.568} \tabularnewline
+Back solar reflectance, direct to diffuse & 0.394 \quad \quad \textit{0.389} & 0.103 \quad \quad \textit{0.115} & 0.295 \quad \quad \textit{0.293} & 0.066 \quad \quad \textit{0.074} & 0.216 \quad \quad \textit{0.214} & 0.070 \quad \quad \textit{0.077} & 0.356 \quad \quad \textit{0.363} & 0.273 \quad \quad \textit{0.272} & 0.418 \quad \quad \textit{0.416} & 0.273 \quad \quad \textit{0.275} \tabularnewline
+Front solar transmittance, hemispherical diffuse to diffuse & 0.332 \quad \quad \textit{0.338} &  & 0.294 \quad \quad \textit{0.298} &  & 0.291 \quad \quad \textit{0.295} &  & 0.038 \quad \quad \textbf{\textit{0.053}} &  & 0.495 \quad \quad \textit{0.502} \tabularnewline
+Back solar transmittance, hemispherical diffuse to diffuse & 0.332 \quad \quad \textit{0.338} &  & 0.294 \quad \quad \textit{0.298} &  & 0.291 \quad \quad \textit{0.295} &  & 0.038 \quad \quad \textbf{\textit{0.053}} &  & 0.495 \quad \quad \textit{0.502} &  \tabularnewline
+Front hemispherical IR transmittance & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.0245 \quad \quad \textit{0.025} &  & 0.385 \quad \quad \textit{0.387} &  \tabularnewline
+Back hemispherical IR transmittance & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.227 \quad \quad \textit{0.227} &  & 0.0245 \quad \quad \textit{0.025} &  & 0.385 \quad \quad \textit{0.387} &  \tabularnewline
+Front hemispherical IR emissivity & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.890 \quad \quad \textit{0.895} &  & 0.536 \quad \quad \textit{0.534} &  \tabularnewline
+Back hemispherical IR emissivity & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.729 \quad \quad \textit{0.730} &  & 0.890 \quad \quad \textit{0.895} &  & 0.536 \quad \quad \textit{0.534} &  \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2487,39 +2488,39 @@ The reason for the definition of the Z factors is that to a great extent they ca
 \caption{Determination of array sizes \label{table:determination-of-array-sizes}}\\
 \toprule 
 \multicolumn{2}{c}{Parameters} \tabularnewline \midrule
-N\(_{Basis}\) & Number of elements in the (incoming or outgoing) basis \tabularnewline \midrule
-N\(_{Sun}\) & Number of basis directions that may be sun directions (depends on fenestration orientation \tabularnewline \midrule
-N\(^{(Gnd)}_{Sun}\) & Number of sun directions that give significantly different ground irradiation conditions, as seen by fenestration \tabularnewline \midrule
-N\(_{Sf}\) & Number of reflecting surfaces viewable by fenestration (depends on fenestration orientation) \tabularnewline \midrule
-N\(^{(Sf,n)}_{Sun}\) & Number of time steps for which surface \emph{n} is sunlit (depends on orientation of surface \emph{n}; determined during shading calculation) \tabularnewline \midrule
-N\(^{(Sf,n)}_{Refl}\) & Number of basis directions that may be reflected sun directions from surface \emph{n} (depends on orientation of fenestration and surface \emph{n}). \tabularnewline \midrule
-N\(_{IntSurf}\) & Number of interior surfaces in the zone containing the fenestration \tabularnewline \midrule
-N\(_{Layers}\) & Number of thermal layers in the fenestration system \tabularnewline \midrule
-\multicolumn{2}{c}{Arrays} \tabularnewline \midrule
-A\(^{F,l}_{i}\), A\(^{B,l}_{i}\) & Absorptance vector element; N\(_{Basis}\) \tabularnewline \midrule
-T\(_{ij}\) & Transmittance matrix element; N\(_{Basis}\) X N\(_{Basis}\) \tabularnewline \midrule
-V\(^{(Sky)}_{i}\) & Sky viewed fraction; one-dimensional, N\(_{Basis}\) \tabularnewline \midrule
-V\(^{(Sf,n)}_{i}\) & Fraction of surface \emph{n} viewed; N\(_{Basis}\) X N\(_{Sf}\) \tabularnewline \midrule
-$\rho$\(^{(n)}\), $\rho$\(^{(sp,n)}\) & Surface \emph{n} diffuse, specular reflectance; N\(_{Sf}\) (already stored by E+) \tabularnewline \midrule
-U\(^{(D,n)}_{i\,Sun(tsh)}\) & Fraction of the image of $\Delta\Omega$\(_{i}\) on surface \emph{n} that views the sun when it is in direction Sun(tsh); N\(_{Basis}\) X N\(_{Sf}\) X N\(^{(Sf,n)}_{Sun}\) \tabularnewline \midrule
-V\(^{(Gnd)}_{i}\) & Fraction of $\Delta\Omega$\(_{i}\) that views ground; N\(_{Basis}\) \tabularnewline \midrule
-U\(^{(Sky, Gnd)}_{i}\) & Fraction of sky radiation received by the image of $\Delta\Omega$\(_{i}\) on the ground; N\(_{Basis}\) \tabularnewline \midrule
-U\(^{(D,Gnd)}_{i\,Sun(tsh)}\) & Fraction of direct solar radiation for sun direction Sun(tsh) received by image of $\Delta\Omega$\(_{i}\) on ground; N\(^{Gnd}_{Sim}\) X N\(_{Basis}\) \tabularnewline \midrule
-V\(^{(D)}_{i\,s(t)}\) & Fraction of fenestration area irradiated by direct solar radiation for direction \emph{i}, given that sun angle is s(\emph{t}); N\(_{Sun}\) X N\(_{Basis}\) \tabularnewline \midrule
-F\(^{(k)}_{j}\) & Fraction of radiation in direction \emph{j} leaving fenestration interior that arrives at surface \emph{k}; N\(_{Basis}\) X N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(Sky), k}\) & Sky irradiation factor; N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(sp,Sf,n),k}_{r(t)}\) & Exterior surface specular irradiation factor; N\(^{(Sf,n)}_{Sun}\) X N\(_{Sf}\) X N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(Sun,Sf,n),k}_{s(t)}\) & Exterior surface direct-diffuse irradiation factor; N\(^{(Sf,n)}_{Sun}\) X N\(_{Sf}\) X N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(Sky,Sf,n),k}\) & Exterior surface sky irradiation factor; N\(_{Sf}\) X N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(D,Gnd),k}_{s(t)}\) & Ground-reflected direct solar irradiaton factor (given sun direction s(\emph{t})); N\(^{(Gnd)}_{Sun}\) X N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(Sky,Gnd),k}\) & Ground-reflected diffuse solar irradiation factor; N\(_{IntSurf}\) \tabularnewline \midrule
-Z\(^{(Sun),k}_{s(t)}\) & Direct solar irradiation factor; N\(_{Sun}\) X N\(_{IntSurf}\) \tabularnewline \midrule
-K\(^{(Sky),l}\) & Sky absorption factor; N\(_{Layers}\) \tabularnewline \midrule
-K\(^{(sp,Sf,n),l}_{r(t)}\) & Exterior surface specular absorption factor; N\(_{Sf}\) X N\(^{(Sf,n)}_{Refl}\) X N\(_{Layers}\) \tabularnewline \midrule
-K\(^{(Sun,Sf,n),l}_{s(t)}\) & Exterior surface diffusely reflected direct sun absorption factor; N\(_{Sf}\) X N\(^{(Sf,n)}_{Sun}\) X N\(_{Layers}\) \tabularnewline \midrule
-K\(^{(Sky,Sf,n),l}\) & Exterior surface reflected sky radiation absorption factor; N\(_{Sf}\) X N\(_{Layers}\) \tabularnewline \midrule
-K\(^{(D,Gnd),l}_{s(t)}\) & Ground-reflected direct solar absorption factor; N\(^{(Gnd)}_{Sun}\) X N\(_{Layers}\) \tabularnewline \midrule
-K\(^{(Sky,Gnd),l}\) & Ground-reflected sky radiation absorption factor; N\(_{Layers}\) \tabularnewline \midrule
+N\(_{Basis}\) & Number of elements in the (incoming or outgoing) basis \tabularnewline
+N\(_{Sun}\) & Number of basis directions that may be sun directions (depends on fenestration orientation \tabularnewline
+N\(^{(Gnd)}_{Sun}\) & Number of sun directions that give significantly different ground irradiation conditions, as seen by fenestration \tabularnewline
+N\(_{Sf}\) & Number of reflecting surfaces viewable by fenestration (depends on fenestration orientation) \tabularnewline
+N\(^{(Sf,n)}_{Sun}\) & Number of time steps for which surface \emph{n} is sunlit (depends on orientation of surface \emph{n}; determined during shading calculation) \tabularnewline
+N\(^{(Sf,n)}_{Refl}\) & Number of basis directions that may be reflected sun directions from surface \emph{n} (depends on orientation of fenestration and surface \emph{n}). \tabularnewline
+N\(_{IntSurf}\) & Number of interior surfaces in the zone containing the fenestration \tabularnewline
+N\(_{Layers}\) & Number of thermal layers in the fenestration system \tabularnewline
+\multicolumn{2}{c}{Arrays} \tabularnewline
+A\(^{F,l}_{i}\), A\(^{B,l}_{i}\) & Absorptance vector element; N\(_{Basis}\) \tabularnewline
+T\(_{ij}\) & Transmittance matrix element; N\(_{Basis}\) X N\(_{Basis}\) \tabularnewline
+V\(^{(Sky)}_{i}\) & Sky viewed fraction; one-dimensional, N\(_{Basis}\) \tabularnewline
+V\(^{(Sf,n)}_{i}\) & Fraction of surface \emph{n} viewed; N\(_{Basis}\) X N\(_{Sf}\) \tabularnewline
+$\rho$\(^{(n)}\), $\rho$\(^{(sp,n)}\) & Surface \emph{n} diffuse, specular reflectance; N\(_{Sf}\) (already stored by E+) \tabularnewline
+U\(^{(D,n)}_{i\,Sun(tsh)}\) & Fraction of the image of $\Delta\Omega$\(_{i}\) on surface \emph{n} that views the sun when it is in direction Sun(tsh); N\(_{Basis}\) X N\(_{Sf}\) X N\(^{(Sf,n)}_{Sun}\) \tabularnewline
+V\(^{(Gnd)}_{i}\) & Fraction of $\Delta\Omega$\(_{i}\) that views ground; N\(_{Basis}\) \tabularnewline
+U\(^{(Sky, Gnd)}_{i}\) & Fraction of sky radiation received by the image of $\Delta\Omega$\(_{i}\) on the ground; N\(_{Basis}\) \tabularnewline
+U\(^{(D,Gnd)}_{i\,Sun(tsh)}\) & Fraction of direct solar radiation for sun direction Sun(tsh) received by image of $\Delta\Omega$\(_{i}\) on ground; N\(^{Gnd}_{Sim}\) X N\(_{Basis}\) \tabularnewline
+V\(^{(D)}_{i\,s(t)}\) & Fraction of fenestration area irradiated by direct solar radiation for direction \emph{i}, given that sun angle is s(\emph{t}); N\(_{Sun}\) X N\(_{Basis}\) \tabularnewline
+F\(^{(k)}_{j}\) & Fraction of radiation in direction \emph{j} leaving fenestration interior that arrives at surface \emph{k}; N\(_{Basis}\) X N\(_{IntSurf}\) \tabularnewline
+Z\(^{(Sky), k}\) & Sky irradiation factor; N\(_{IntSurf}\) \tabularnewline
+Z\(^{(sp,Sf,n),k}_{r(t)}\) & Exterior surface specular irradiation factor; N\(^{(Sf,n)}_{Sun}\) X N\(_{Sf}\) X N\(_{IntSurf}\) \tabularnewline
+Z\(^{(Sun,Sf,n),k}_{s(t)}\) & Exterior surface direct-diffuse irradiation factor; N\(^{(Sf,n)}_{Sun}\) X N\(_{Sf}\) X N\(_{IntSurf}\) \tabularnewline
+Z\(^{(Sky,Sf,n),k}\) & Exterior surface sky irradiation factor; N\(_{Sf}\) X N\(_{IntSurf}\) \tabularnewline
+Z\(^{(D,Gnd),k}_{s(t)}\) & Ground-reflected direct solar irradiaton factor (given sun direction s(\emph{t})); N\(^{(Gnd)}_{Sun}\) X N\(_{IntSurf}\) \tabularnewline
+Z\(^{(Sky,Gnd),k}\) & Ground-reflected diffuse solar irradiation factor; N\(_{IntSurf}\) \tabularnewline
+Z\(^{(Sun),k}_{s(t)}\) & Direct solar irradiation factor; N\(_{Sun}\) X N\(_{IntSurf}\) \tabularnewline
+K\(^{(Sky),l}\) & Sky absorption factor; N\(_{Layers}\) \tabularnewline
+K\(^{(sp,Sf,n),l}_{r(t)}\) & Exterior surface specular absorption factor; N\(_{Sf}\) X N\(^{(Sf,n)}_{Refl}\) X N\(_{Layers}\) \tabularnewline
+K\(^{(Sun,Sf,n),l}_{s(t)}\) & Exterior surface diffusely reflected direct sun absorption factor; N\(_{Sf}\) X N\(^{(Sf,n)}_{Sun}\) X N\(_{Layers}\) \tabularnewline
+K\(^{(Sky,Sf,n),l}\) & Exterior surface reflected sky radiation absorption factor; N\(_{Sf}\) X N\(_{Layers}\) \tabularnewline
+K\(^{(D,Gnd),l}_{s(t)}\) & Ground-reflected direct solar absorption factor; N\(^{(Gnd)}_{Sun}\) X N\(_{Layers}\) \tabularnewline
+K\(^{(Sky,Gnd),l}\) & Ground-reflected sky radiation absorption factor; N\(_{Layers}\) \tabularnewline
 K\(^{(Sun),l}_{s(t)}\) & Direct sunlight absorption factor; N\(_{Sun}\) X N\(_{Layers}\) \tabularnewline
 \bottomrule
 \end{longtable}
