@@ -140,7 +140,9 @@ namespace FanCoilUnits {
 		int CapCtrlMeth_Num;
 		Real64 PLR; // Part Load Ratio, fraction of time step fancoil is on
 		int MaxIterIndexH; // Maximum iterations exceeded for heating
+		int BadMassFlowLimIndexH; // Bad mass flow limit error index for heating
 		int MaxIterIndexC; // Maximum iterations exceeded for cooling
+		int BadMassFlowLimIndexC; // Bad mass flow limit error index for cooling
 		Real64 FanAirVolFlow; // m3/s
 		Real64 MaxAirVolFlow; // m3/s
 		Real64 MaxAirMassFlow; // kg/s
@@ -222,6 +224,10 @@ namespace FanCoilUnits {
 		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
 		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
 		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
+		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
+		int LimitErrCountC; // count of SolveRegulaFalsi limit errors
+		int ConvgErrCountH; // count of SolveRegulaFalsi iteration limit errors
+		int ConvgErrCountC; // count of SolveRegulaFalsi iteration limit errors
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J
@@ -247,7 +253,9 @@ namespace FanCoilUnits {
 			CapCtrlMeth_Num( 0 ),
 			PLR( 0.0 ),
 			MaxIterIndexH( 0 ),
+			BadMassFlowLimIndexH( 0 ),
 			MaxIterIndexC( 0 ),
+			BadMassFlowLimIndexC( 0 ),
 			FanAirVolFlow( 0.0 ),
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
@@ -312,6 +320,10 @@ namespace FanCoilUnits {
 			QUnitOutNoHC( 0.0 ),
 			QUnitOutMaxH( 0.0 ),
 			QUnitOutMaxC( 0.0 ),
+			LimitErrCountH( 0 ),
+			LimitErrCountC( 0 ),
+			ConvgErrCountH( 0 ),
+			ConvgErrCountC( 0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
