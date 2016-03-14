@@ -58,23 +58,23 @@ The total solar gain on any exterior surface is a combination of the absorption 
 
 Where,
 
-a\(_{ }\) = solar absorptance of the surface
+$\alpha$ = solar absorptance of the surface
 
-\(\theta\) ~~ = angle of incidence of the sun's rays
+$\theta$ = angle of incidence of the sun's rays
 
-S\(_{ }\) = area of the surface
+S = area of the surface
 
-S\(_{ }\) = sunlit area of the surface
+S\(_{s}\) = sunlit area of the surface
 
-I\(_{ }\) = intensity of the beam (direct) radiation
+I\(_{b}\) = intensity of the beam (direct) radiation
 
-I\(_{ }\) = intensity of the sky diffuse radiation
+I\(_{s}\) = intensity of the sky diffuse radiation
 
-I\(_{ }\) = intensity of the beam (direct) radiation
+I\(_{g}\) = intensity of the beam (direct) radiation
 
-F\(_{ }\) = angle factor between the surface and the sky
+F\(_{ss}\) = angle factor between the surface and the sky
 
-F\(_{ }\) = angle factor between the surface and the ground
+F\(_{sg}\) = angle factor between the surface and the ground
 
 Now,
 
@@ -118,36 +118,36 @@ Where,
 
 \emph{QSO}~~~~~~~~~~ = Short wave radiant flux absorbed at surface of Wall.
 
-a\(_{ }\) = Absorptance of TIM
+$\alpha$\(_{TIM}\) = Absorptance of TIM
 
-t\(_{ }\) = Transmittance of TIM.
+$\tau$\(_{TIM}\) = Transmittance of TIM.
 
-a\(_{ }\) = Absorptance of Wall.
+$\alpha$\(_{WALL}\) = Absorptance of Wall.
 
-r \(_{ }\) = Reflectance of Wall surface
+$\rho$\(_{WALL}\) = Reflectance of Wall surface
 
 Following is the FORTRAN Code used in the HeatBalanceSurfaceManager module, to determine the short wave radiation absorbed on outside of movable insulation and the short wave radiation absorbed on outside of opaque surface of the wall.
 
 \begin{lstlisting}
-IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~\&
+IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)                                           &
 
-~~~ CALL EvalOutsideMovableInsulation(SurfNum,HMovInsul,RoughIndexMovInsul,AbsExt)
+    CALL EvalOutsideMovableInsulation(SurfNum,HMovInsul,RoughIndexMovInsul,AbsExt)
 
-~~~ IF (HMovInsul \textgreater{} 0) THEN~~~ ! Movable outside insulation in place
+    IF (HMovInsul \textgreater{} 0) THEN    ! Movable outside insulation in place
 
-~~~~~ QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum)*AbsExt~~~~~~~~~ \&
+      QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum)*AbsExt                              &
 
-~~~~~~~~~~ ~~~~~~~~~~~~/Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar
+                       /Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar
 
-!~ For Transparent Insulation
+!   For Transparent Insulation
 
-~~~~~ QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum)\%MaterialMovInsulExt)\%Trans~ \&
+      QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum)\%MaterialMovInsulExt)\%Trans      &
 
-~~~~~~~~~~~~ *QRadSWOutMvIns(SurfNum)*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
+             *QRadSWOutMvIns(SurfNum)*                                                    &
 
-~~~~~~~~~~~~~~~~ (~ (Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar/AbsExt)~~ \&
+                 (  (Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar/AbsExt)   &
 
-~~~~~~~~~~~~~~~~~~~~~~~ +(1-Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar)~ )
+                        +(1-Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar)~ )
 \end{lstlisting}
 
 \subsection{Sample Test Run Cases: -- Comparison}\label{sample-test-run-cases-comparison}
@@ -183,48 +183,50 @@ The Wall Construction is defined as an EXTWALL80 composed of 1'' Stucco, 4'' Com
 The following two tables shows data for two series of runs.~ The first ``summer table'' illustrates the execution of a summer design day.~ The second ``winter table'' shows winter conditions with clearness = 0 (the typical default for a winter design day) and clearness = 1 (to illustrate solar radiation with other winter conditions).~ Test cases included no movable insulation, moveable opaque insulation, and TIM on the exterior (south wall unless otherwise noted).~ Savings reported are heating and cooling loads for the design days only.~ The results showed that the TIM model was performing reasonably well and was producing results that were within expectations.
 
 % table 14
-\begin{longtable}[c]{p{3.0in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
+\scriptsize{
+\begin{longtable}[c]{p{2.5in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{  TIM with Summer Conditions \label{table:tim-with-summer-conditions}}\\
 \toprule 
-EXTWALL80 Construction & Conductivity & Thickness & Sensible Cooling Energy & Energy Saved \tabularnewline
+\textbf{EXTWALL80 Construction} & \textbf{Conductivity} & \textbf{Thickness} & \textbf{Sensible Cooling Energy} & \textbf{Energy Saved} \tabularnewline
 ~ & [W/m-K] & [m] & [J] & [J] \tabularnewline
 \midrule
 \endhead
-Normal case Without any Insulation & 0.000 & 0.000 & 3.37E+08 & 0.00E+00 \tabularnewline
-With Dense Insulation Present & 0.040 & 0.025 & 3.17E+08 & 2.05E+07 \tabularnewline
-With Dense Insulation Present & 0.040 & 0.050 & 3.09E+08 & 2.84E+07 \tabularnewline
-With Dense Insulation Present & 0.040 & 0.100 & 3.02E+08 & 3.53E+07 \tabularnewline
-With TIM Present & 0.040 & 0.025 & 4.27E+08 & -9.01E+07 \tabularnewline
-With TIM Present & 0.040 & 0.050 & 4.63E+08 & -1.26E+08 \tabularnewline
-With TIM Present & 0.040 & 0.100 & 4.89E+08 & -1.52E+08 \tabularnewline
-With TIM Present R value = (0.05m,0.04W/m-K) & 0.035 & 0.044 & 4.63E+08 & -1.26E+08 \tabularnewline
-With TIM Present (EAST WALL) & 0.040 & 0.050 & 5.49E+08 & -2.12E+08 \tabularnewline
-With TIM Present (NORTH WALL) & 0.040 & 0.050 & 3.63E+08 & -2.57E+07 \tabularnewline
+Normal case Without any Insulation & 0.000 & 0.000 & 3.37E+08 & 0.00E+00 \tabularnewline \midrule
+With Dense Insulation Present & 0.040 & 0.025 & 3.17E+08 & 2.05E+07 \tabularnewline \midrule
+With Dense Insulation Present & 0.040 & 0.050 & 3.09E+08 & 2.84E+07 \tabularnewline \midrule
+With Dense Insulation Present & 0.040 & 0.100 & 3.02E+08 & 3.53E+07 \tabularnewline \midrule
+With TIM Present & 0.040 & 0.025 & 4.27E+08 & -9.01E+07 \tabularnewline \midrule
+With TIM Present & 0.040 & 0.050 & 4.63E+08 & -1.26E+08 \tabularnewline \midrule
+With TIM Present & 0.040 & 0.100 & 4.89E+08 & -1.52E+08 \tabularnewline \midrule
+With TIM Present R value = (0.05m,0.04W/m-K) & 0.035 & 0.044 & 4.63E+08 & -1.26E+08 \tabularnewline \midrule
+With TIM Present (EAST WALL) & 0.040 & 0.050 & 5.49E+08 & -2.12E+08 \tabularnewline \midrule
+With TIM Present (NORTH WALL) & 0.040 & 0.050 & 3.63E+08 & -2.57E+07 \tabularnewline \midrule
 With TIM Present (WEST WALL) & 0.040 & 0.050 & 5.64E+08 & -2.27E+08 \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 % table 15
-\begin{longtable}[c]{p{1.5in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
+\scriptsize{
+\begin{longtable}[c]{p{1.0in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{TIM with Winter Conditions \label{table:tim-with-winter-conditions}}\\
 \toprule 
-EXTWALL80 Construction & Conductivity & Thickness & Sensible Heating Energy & Energy Saved Winter Clearness = 0 & Sensible Heating Energy & Energy Saved Winter Clearness = 1 \tabularnewline
+\textbf{EXTWALL80 Construction} & \textbf{Conductivity} & \textbf{Thickness} & \textbf{Sensible Heating Energy} & \textbf{Energy Saved Winter Clearness = 0} & \textbf{Sensible Heating Energy} & \textbf{Energy Saved Winter Clearness = 1} \tabularnewline
 ~ & [W/m-K] & [m] & [J] & [J] & [J] & [J] \tabularnewline
 \midrule
 \endhead
-Normal case Without any Insulation & 0.000 & 0.000 & 1.47E+09 & 0.00E+00 & 1.05E+09 & 0.00E+00 \tabularnewline
-With Dense Insulation Present & 0.040 & 0.025 & 1.30E+09 & 1.70E+08 & 9.76E+08 & 7.40E+07 \tabularnewline
-With Dense Insulation Present & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 9.73E+08 & 7.70E+07 \tabularnewline
-With Dense Insulation Present & 0.040 & 0.100 & 1.22E+09 & 2.50E+08 & 9.74E+08 & 7.60E+07 \tabularnewline
-With TIM Present & 0.040 & 0.025 & 1.30E+09 & 1.70E+08 & 5.66E+08 & 4.84E+08 \tabularnewline
-With TIM Present & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 4.41E+08 & 6.09E+08 \tabularnewline
-With TIM Present & 0.040 & 0.100 & 1.22E+09 & 2.50E+08 & 3.57E+08 & 6.93E+08 \tabularnewline
-With TIM Present R value = (0.05m,0.04W/m-K) & 0.035 & 0.044 & 1.26E+09 & 2.10E+08 & 4.40E+08 & 6.10E+08 \tabularnewline
-With TIM Present (EAST WALL) & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 7.36E+08 & 3.14E+08 \tabularnewline
-With TIM Present (NORTH WALL) & 0.040 & 0.050 & 1.24E+09 & 2.30E+08 & 8.31E+08 & 2.19E+08 \tabularnewline
+Normal case Without any Insulation & 0.000 & 0.000 & 1.47E+09 & 0.00E+00 & 1.05E+09 & 0.00E+00 \tabularnewline \midrule
+With Dense Insulation Present & 0.040 & 0.025 & 1.30E+09 & 1.70E+08 & 9.76E+08 & 7.40E+07 \tabularnewline \midrule
+With Dense Insulation Present & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 9.73E+08 & 7.70E+07 \tabularnewline \midrule
+With Dense Insulation Present & 0.040 & 0.100 & 1.22E+09 & 2.50E+08 & 9.74E+08 & 7.60E+07 \tabularnewline \midrule
+With TIM Present & 0.040 & 0.025 & 1.30E+09 & 1.70E+08 & 5.66E+08 & 4.84E+08 \tabularnewline \midrule
+With TIM Present & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 4.41E+08 & 6.09E+08 \tabularnewline \midrule
+With TIM Present & 0.040 & 0.100 & 1.22E+09 & 2.50E+08 & 3.57E+08 & 6.93E+08 \tabularnewline \midrule
+With TIM Present R value = (0.05m,0.04W/m-K) & 0.035 & 0.044 & 1.26E+09 & 2.10E+08 & 4.40E+08 & 6.10E+08 \tabularnewline \midrule
+With TIM Present (EAST WALL) & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 7.36E+08 & 3.14E+08 \tabularnewline \midrule
+With TIM Present (NORTH WALL) & 0.040 & 0.050 & 1.24E+09 & 2.30E+08 & 8.31E+08 & 2.19E+08 \tabularnewline \midrule
 With TIM Present (WEST WALL) & 0.040 & 0.050 & 1.24E+09 & 2.30E+08 & 7.07E+08 & 3.43E+08 \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \subsection{References}\label{references-046}
 

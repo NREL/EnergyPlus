@@ -22,7 +22,7 @@ for the inside heat flux, and
 {q''_{ko}}(t) =  - {Y_o}{T_{i,t}} - \sum\limits_{j = 1}^{nz} {{Y_j}} {T_{i,t - j\delta }} + {X_o}{T_{o,t}} + \sum\limits_{j = 1}^{nz} {{X_j}} {T_{o,t - j\delta }} + \sum\limits_{j = 1}^{nq} {{\Phi_j}{{q''}_{ko,t - j\delta }}}
 \end{equation}
 
-for the outside heat flux (q² = q/A)
+for the outside heat flux (q'' = q/A)
 
 where:
 
@@ -32,7 +32,7 @@ Y\emph{\(_{j}\)} = Cross CTF coefficient, j = 0,1,\ldots{}nz.
 
 Z\emph{\(_{j}\)} = Inside CTF coefficient, j = 0,1,\ldots{}nz.
 
-F\emph{\(_{j}\)} = Flux CTF coefficient, j = 1,2,\ldots{}nq.
+$\Phi$\emph{\(_{j}\)} = Flux CTF coefficient, j = 1,2,\ldots{}nq.
 
 T\emph{\(_{i}\)} = Inside face temperature
 
@@ -115,7 +115,7 @@ In matrix format:
 \begin{figure}[hbtp] % fig 10
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image168.svg.png}
-\caption{  Two Node State Space Example. \protect \label{fig:two-node-state-space-example.}}
+\caption{  Two Node State Space Example. \protect \label{fig:two-node-state-space-example.}}
 \end{figure}
 
 The important aspect of the state space technique is that through the use of matrix algebra the state space variables (nodal temperatures) can be eliminated to arrive at a matrix equation that gives the outputs (heat fluxes) as a function of the inputs (environmental temperatures) only.~ This eliminates the need to solve for roots in the Laplace domain.~ In addition, the resulting matrix form has more physical meaning than complex functions required by the Laplace transform method.
@@ -184,9 +184,9 @@ From the EnergyPlus code, the A matrix (AMat) is assigned with values at the int
 
 \begin{lstlisting}
 cap = ( rho(Layer)\*cp(Layer)\*dx(Layer) + rho(Layer+1)\*cp(Layer+1)\*dx(Layer+1) ) \* 0.5D0
-AMat(Node,Node-1) = rk(Layer)/dx(Layer)/cap           ! Assign matrix values for the current node
-AMat(Node,Node)   = -1.0D0 \* ( rk(Layer)/dx(Layer)+rk(Layer+1)/dx(Layer+1) ) / cap
-AMat(Node,Node+1) = rk(Layer+1)/dx(Layer+1)/cap       ! node.
+AMat(Node,Node-1) = rk(Layer)/dx(Layer)/cap           ! Assign matrix values for the current node
+AMat(Node,Node)   = -1.0D0 \* ( rk(Layer)/dx(Layer)+rk(Layer+1)/dx(Layer+1) ) / cap
+AMat(Node,Node+1) = rk(Layer+1)/dx(Layer+1)/cap       ! node.
 \end{lstlisting}
 
 Note that these equations do not change.~ For ``no mass'' layers, the density (rho) and the specific heat (cp) variables will be assigned zero values.~ In addition, the thickness (dx) will be equated with the user-defined R-Value and conductivity (rk) will be assigned a value of unity.~ In addition, the number of nodes for the ``no mass'' layer will be set to 1.

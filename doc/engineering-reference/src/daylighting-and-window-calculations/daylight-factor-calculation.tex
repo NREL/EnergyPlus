@@ -216,7 +216,7 @@ where
 \begin{figure}[hbtp] % fig 57
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image733.png}
-\caption{  Angles appearing in the expression for the clear-sky luminance distribution. \protect \label{fig:angles-appearing-in-the-expression-for}}
+\caption{  Angles appearing in the expression for the clear-sky luminance distribution. \protect \label{fig:angles-appearing-in-the-expression-for}}
 \end{figure}
 
 \subsubsection{Overcast Sky}\label{overcast-sky}
@@ -309,7 +309,7 @@ In performing the summation, window elements that lie below the workplane (\(\co
 \begin{figure}[hbtp] % fig 58
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image755.png}
-\caption{  Geometry for calculation of direct component of daylight illuminance at a reference point. Vectors R\$\_\{f\}\$, W\$\_\{1\}\$, W\$\_\{2\}\$, W\$\_\{3\}\$ and R\$\_\{n\}\$ are in the building coordinate system. \protect \label{fig:geometry-for-calculation-of-direct-component}}
+\caption{  Geometry for calculation of direct component of daylight illuminance at a reference point. Vectors R\$\_\{f\}\$, W\$\_\{1\}\$, W\$\_\{2\}\$, W\$\_\{3\}\$ and R\$\_\{n\}\$ are in the building coordinate system. \protect \label{fig:geometry-for-calculation-of-direct-component}}
 \end{figure}
 
 \subsubsection{Unshaded Window}\label{unshaded-window}
@@ -526,23 +526,23 @@ where
 \begin{figure}[hbtp] % fig 59
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image794.png}
-\caption{  Geometry for calculation of displacement ratios used in the glare formula. \protect \label{fig:geometry-for-calculation-of-displacement}}
+\caption{  Geometry for calculation of displacement ratios used in the glare formula. \protect \label{fig:geometry-for-calculation-of-displacement}}
 \end{figure}
 
 The factor \emph{p} can be obtained from graphs given in {[}Petherbridge \& Longmore, 1954{]} or it can be calculated from tabulated values of \emph{p\(_{H}\)}, the Hopkinson position factor {[}Hopkinson, 1966{]}, since \(p = p_H^{1.25}\) . The values resulting from the latter approach are given in Table~\ref{table:position-factor-for-glare-calculation}. Interpolation of this table is used in EnergyPlus to evaluate \emph{p} at intermediate values of \emph{x\(_{R}\)} and \emph{y\(_{R}\)}.
 
 % table 26
-\begin{longtable}[c]{p{1.2in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+\begin{longtable}[c]{p{1.0in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}}
 \caption{Position factor for glare calculation \label{table:position-factor-for-glare-calculation}}\\
 \toprule 
-$y_R$: Vertical Displacement Factor & \multicolumn{8}{l}{\textbf{$x_R$: Horizontal Displacement Factor}} \tabularnewline \cmidrule(r){2-9} \endhead
-     & 0     & 0.5   & 1.0   & 1.5   & 2.0   & 2.5   & 3.0   & >3.0 \tabularnewline \midrule
-0    & 1.00  & 0.492 & 0.226 & 0.128 & 0.081 & 0.061 & 0.057 & 0 \tabularnewline
-0.5  & 0.123 & 0.119 & 0.065 & 0.043 & 0.029 & 0.026 & 0.023 & 0 \tabularnewline
-1.0  & 0.019 & 0.026 & 0.019 & 0.016 & 0.014 & 0.011 & 0.011 & 0 \tabularnewline
-1.5  & 0.008 & 0.008 & 0.008 & 0.008 & 0.008 & 0.006 & 0.006 & 0 \tabularnewline
-2.0  & 0     & 0     & 0.003 & 0.003 & 0.003 & 0.003 & 0.003 & 0 \tabularnewline
->2.0 & 0     & 0     & 0     & 0     & 0     & 0     & 0     & 0 \tabularnewline
+						&      &\multicolumn{8}{l}{\textbf{$x_R$: Horizontal Displacement Factor}} \tabularnewline \cmidrule(r){2-9} \endhead
+						&      & \textbf{0}     & \textbf{0.5}   & \textbf{1.0}   & \textbf{1.5}   & \textbf{2.0}   & \textbf{2.5}   & \textbf{3.0}   & \textbf{>3.0} \tabularnewline \midrule
+\textbf{$y_R$:}			& \textbf{0}    & 1.00  & 0.492 & 0.226 & 0.128 & 0.081 & 0.061 & 0.057 & 0 \tabularnewline
+\textbf{Vertical}		& \textbf{0.5}  & 0.123 & 0.119 & 0.065 & 0.043 & 0.029 & 0.026 & 0.023 & 0 \tabularnewline
+\textbf{Displacement}	& \textbf{1.0}  & 0.019 & 0.026 & 0.019 & 0.016 & 0.014 & 0.011 & 0.011 & 0 \tabularnewline
+\textbf{Factor}			& \textbf{1.5}  & 0.008 & 0.008 & 0.008 & 0.008 & 0.008 & 0.006 & 0.006 & 0 \tabularnewline
+						& \textbf{2.0}  & 0     & 0     & 0.003 & 0.003 & 0.003 & 0.003 & 0.003 & 0 \tabularnewline
+						& \textbf{>2.0} & 0     & 0     & 0     & 0     & 0     & 0     & 0     & 0 \tabularnewline
 \bottomrule
 \end{longtable}
 

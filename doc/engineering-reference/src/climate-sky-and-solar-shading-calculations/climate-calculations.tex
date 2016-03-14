@@ -28,13 +28,13 @@ The multipliers are taken from the ASHRAE 2009 HOF, Table \# 6, p.~14.11.. More 
 
 where
 
-T\(_{t}\) = Air temperature of current Hour of Day
+T\(_{current}\) = Air temperature of current Hour of Day
 
-T\(_{x}\) = User supplied Max Dry-bulb Temperature
+T\(_{Max}\) = User supplied Max Dry-bulb Temperature
 
-T\(_{e}\) = User supplied Daily Temperature Range
+T\(_{range}\) = User supplied Daily Temperature Range
 
-T\(_{r}\) = Range multiplier as shown on the above graph
+T\(_{Multiplier}\) = Range multiplier as shown on the above graph
 
 The range multiplier values represent typical conditions of diurnal temperatures (i.e.~the low temperature for the day occurring about 5:00 AM and the maximum temperature for the day occurring about 3:00 PM.~ Note that EnergyPlus does not shift the profile based on the time of solar noon as is optionally allowed by ASHRAE procedures.
 
@@ -54,11 +54,11 @@ where
 
 Horizontal\_IR = horizontal IR intensity \{W/m\(^{2}\)\}
 
-Sky\(_{y}\) = sky emissivity
+Sky\(_{eimissivity}\) = sky emissivity
 
 Sigma = Stefan-Boltzmann constant = 5.6697e-8 \{W/m\(^{2}\)-K\(^{4}\)\}
 
-Temperature\(_{b}\) = drybulb temperature \{K\}
+Temperature\(_{drybulb}\) = drybulb temperature \{K\}
 
 The sky emissivity is given by
 
@@ -68,13 +68,13 @@ Sk{y_{emissivity}} = \left( {.787 + .764\cdot \ln \left( {\frac{{Temperatur{e_{d
 
 where
 
-Temperature\(_{t}\) = dewpoint temperature \{K\}
+Temperature\(_{dewpoint}\) = dewpoint temperature \{K\}
 
 N = opaque sky cover \{tenths\}
 
-Example: Clear sky (N = 0), Temperature\(_{b}\) = 273+20 = 293 K, Temperature\(_{t}\) = 273+10 = 283 K:
+Example: Clear sky (N = 0), Temperature\(_{drybulb}\) = 273+20 = 293 K, Temperature\(_{dewpoint}\) = 273+10 = 283 K:
 
-Sky\(_{y}\) = 0.787 + 0.764*0.036 = 0.815
+Sky\(_{emissivity}\) = 0.787 + 0.764*0.036 = 0.815
 
 Horizontal\_IR = 0.815*5.6697e-8*(293**4) = 340.6 W/m\(^{2}\)
 
@@ -90,11 +90,11 @@ Sk{y_{Temperature}} = {\left( {\frac{{Horizontal_IR}}{{Sigma}}} \right)^{.25}} -
 
 Where
 
-Sky\(_{e}\) = Sky radiative temperature \{C\}
+Sky\(_{temperature}\) = Sky radiative temperature \{C\}
 
 Horiizontal\_IR = Horizontal Infrared Radiation Intensity as described in the previous section \{Wh/m\(^{2}\)\}
 
-Temperature\(_{n}\) = Temperature conversion from Kelvin to C, i.e.~273.15
+Temperature\(_{Kelvin}\) = Temperature conversion from Kelvin to C, i.e.~273.15
 
 The Sky Temperature can also be set by the user from several options using the \textbf{WeatherProperty:SkyTemperature} object.
 
@@ -121,22 +121,22 @@ B = atmospheric extinction coefficient Table~\ref{table:extraterrestrial-solar-i
 Values of A and B vary during the year because of seasonal changes in the dust and water vapor content of the atmosphere and because of the changing earth-sun distance. Equation does not give the maximum value of direct normal irradiation that can occur in each month but yields values that are representative of conditions on cloudless days for a relatively dry and clear atmosphere. For very clear atmospheres, direct normal irradiation can be 15\% higher than indicated by Equation , using values of A and B in Table~\ref{table:extraterrestrial-solar-irradiance-and-related} below.
 
 % table 20
-\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{Extraterrestrial Solar Irradiance and Related Data Note: Data are for 21st day of each month during the base year of 1964. \protect \label{table:extraterrestrial-solar-irradiance-and-related}}\\
 \toprule 
-~ & I   \{W/m  \} & Equation of Time \{minutes\} & Declination \{degrees\} & A \{W/m  \} & B \{\} & C \{\} \tabularnewline \midrule
+~ & \textbf{I\(_{o}\)\{W/m\(^{2}\)\}} & \textbf{Equation of Time \{minutes\}} & \textbf{Declination \{degrees\}} & \textbf{A \{W/m\(^{2}\)\}} & \textbf{B \{\}} & \textbf{C \{\}} \tabularnewline \midrule
 \endhead
-Jan & 1416 & -11.2 & -20.0 & 1202 & 0.141 & 0.103 \tabularnewline
-Feb & 1401 & -13.9 & -10.8 & 1187 & 0.142 & 0.104 \tabularnewline
-Mar & 1381 & -7.5 & 0.0 & 1164 & 0.149 & 0.109 \tabularnewline
-Apr & 1356 & 1.1 & 11.6 & 1130 & 0.164 & 0.120 \tabularnewline
-May & 1336 & 3.3 & 20.0 & 1106 & 0.177 & 0.130 \tabularnewline
-Jun & 1336 & -1.4 & 23.45 & 1092 & 0.185 & 0.137 \tabularnewline
-Jul & 1336 & -6.2 & 20.6 & 1093 & 0.186 & 0.138 \tabularnewline
-Aug & 1338 & -2.4 & 12.3 & 1107 & 0.182 & 0.134 \tabularnewline
-Sep & 1359 & 7.5 & 0.0 & 1136 & 0.165 & 0.121 \tabularnewline
-Oct & 1380 & 15.4 & -10.5 & 1166 & 0.152 & 0.111 \tabularnewline
-Nov & 1405 & 13.8 & -19.8 & 1190 & 0.144 & 0.106 \tabularnewline
+Jan & 1416 & -11.2 & -20.0 & 1202 & 0.141 & 0.103 \tabularnewline \midrule
+Feb & 1401 & -13.9 & -10.8 & 1187 & 0.142 & 0.104 \tabularnewline \midrule
+Mar & 1381 & -7.5 & 0.0 & 1164 & 0.149 & 0.109 \tabularnewline \midrule
+Apr & 1356 & 1.1 & 11.6 & 1130 & 0.164 & 0.120 \tabularnewline \midrule
+May & 1336 & 3.3 & 20.0 & 1106 & 0.177 & 0.130 \tabularnewline \midrule
+Jun & 1336 & -1.4 & 23.45 & 1092 & 0.185 & 0.137 \tabularnewline \midrule
+Jul & 1336 & -6.2 & 20.6 & 1093 & 0.186 & 0.138 \tabularnewline \midrule
+Aug & 1338 & -2.4 & 12.3 & 1107 & 0.182 & 0.134 \tabularnewline \midrule
+Sep & 1359 & 7.5 & 0.0 & 1136 & 0.165 & 0.121 \tabularnewline \midrule
+Oct & 1380 & 15.4 & -10.5 & 1166 & 0.152 & 0.111 \tabularnewline \midrule
+Nov & 1405 & 13.8 & -19.8 & 1190 & 0.144 & 0.106 \tabularnewline \midrule
 Dec & 1417 & 1.6 & -23.45 & 1204 & 0.141 & 0.103 \tabularnewline
 \bottomrule
 \end{longtable}
@@ -177,13 +177,13 @@ where:
 
 \emph{\(m\)}~ = air mass
 
-t\(_{b}\) and t\(_{d}\) = beam and diffuse optical depths (from ASHRAE climatic design data)
+$\tau$\(_{b}\) and $\tau$\(_{d}\) = beam and diffuse optical depths (from ASHRAE climatic design data)
 
 \(ab\) ~and \(ad\) ~ = beam and diffuse air mass exponents (see below)
 
-Values of t\(_{b}\) and t\(_{d}\) are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.
+Values of $\tau$\(_{b}\) and $\tau$\(_{d}\) are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.
 
-The air mass exponents \(ab\) ~and \(ad\) ~were correlated to t\(_{b}\) and t\(_{d}\) through the following empirical relationships:
+The air mass exponents \(ab\) ~and \(ad\) ~were correlated to $\tau$\(_{b}\) and $\tau$\(_{d}\) through the following empirical relationships:
 
 \begin{equation}
 ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}

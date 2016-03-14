@@ -12,44 +12,51 @@ The heat balance on the outside face is:
 {q''_{\alpha sol}} + {q''_{LWR}} + {q''_{conv}} - {q''_{ko}} = 0
 \end{equation}
 
-where: \(_{ }\) = Absorbed direct and diffuse solar (short wavelength) radiation heat flux. \(_{ }\) = Net long wavelength (thermal) radiation flux exchange with the air and surroundings. \(_{ }\) = Convective flux exchange with outside air. \(_{ }\) = Conduction heat flux (q/A) into the wall.
+where:
+\(q''_{\alpha sol}\) = Absorbed direct and diffuse solar (short wavelength) radiation heat flux.
+\(q''_{LWR}\) = Net long wavelength (thermal) radiation flux exchange with the air and surroundings.
+\(q''_{conv}\) = Convective flux exchange with outside air.
+\(q''_{ko}\) = Conduction heat flux (q/A) into the wall.
 
 All terms are positive for net flux to the face except the conduction term, which is traditionally taken to be positive in the direction from outside to inside of the wall.~ Simplified procedures generally combine the first three terms by using the concept of a \emph{sol-air temperature}.~ Each of these heat balance components is introduced briefly below.
 
 \subsection{External Shortwave Radiation}\label{external-shortwave-radiation}
 
-\(_{ }\)~is calculated using procedures presented later in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, surface face material properties, weather conditions, etc.
+\(q''_{\alpha sol}\) is calculated using procedures presented later in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, surface face material properties, weather conditions, etc.
 
 \subsection{External Longwave Radiation}\label{external-longwave-radiation}
 
-\({q''_{LWR}}\) ~is a standard radiation exchange formulation between the surface, the sky, and the ground.~ The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky and ground temperatures, and sky and ground view factors.
+\({q''_{LWR}}\) is a standard radiation exchange formulation between the surface, the sky, and the ground. The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky and ground temperatures, and sky and ground view factors.
 
 The longwave radiation heat exchange between surfaces is dependent on surface temperatures, spatial relationships between surfaces and surroundings, and material properties of the surfaces. The relevant material properties of the surface, emissivity e and absorptivity a, are complex functions of temperature, angle, and wavelength for each participating surface. However, it is generally agreed that reasonable assumptions for building loads calculations are (Chapman 1984; Lienhard 1981):
 
-·~~~~~~~~each surface emits or reflects diffusely and is gray and opaque (a = e, t = 0, r = 1- e)
-
-·~~~~~~~~each surface is at a uniform temperature
-
-·~~~~~~~~energy flux leaving a surface is evenly distributed across the surface,
-
-·~~~~~~~~the medium within the enclosure is non-participating.
+\begin{itemize}
+\item
+  each surface emits or reflects diffusely and is gray and opaque ($\alpha$ = $\varepsilon$, $\tau$ = 0, $\rho$ = 1 - $\varepsilon$)
+\item
+  each surface is at a uniform temperature
+\item
+  energy flux leaving a surface is evenly distributed across the surface,
+\item
+  the medium within the enclosure is non-participating.
+\end{itemize}
 
 These assumptions are frequently used in all but the most critical engineering applications.
 
 \begin{longtable}[c]{p{1.0in}p{3.0in}p{1.0in}p{1.0in}}
 \caption{Nomenclature List of Variables \label{table:nomenclature-list-of-variables}}\\
 \toprule 
-Mathematical variable & Description & Units & Range \tabularnewline \midrule \endhead
-$q''_{LWR}$ & Exterior surface longwave radiation flux & $W/m^2$ & --- \tabularnewline
-$h_r$ & Linearized radiative heat transfer coefficient to air temperature & $W/m^2.K$ & --- \tabularnewline
-$T_{surf}$ & Surface Outside face temperatures & $K$ & --- \tabularnewline
-$T_{air}$ & Outside air temperature & $K$ & --- \tabularnewline
-$T_{gnd}$ & Environmental ground surface temperature & $K$ & --- \tabularnewline
-$T_{sky}$ & Sky Effective temperature & $K$ & --- \tabularnewline
-$F_{gnd}$ & view factor of wall surface to ground surface & --- & 0--1 \tabularnewline
-$F_{sky}$ & View factor of wall surface to sky & --- & 0--1 \tabularnewline
-$F_{air}$ & View factor of wall surface to air & --- & 0--1 \tabularnewline
-$\varepsilon$ & Surface long-wave emissivity & --- & 0--1 \tabularnewline
+\textbf{Mathematical variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
+$q''_{LWR}$ & Exterior surface longwave radiation flux & $W/m^2$ & --- \tabularnewline \midrule
+$h_r$ & Linearized radiative heat transfer coefficient to air temperature & $W/m^2.K$ & --- \tabularnewline \midrule
+$T_{surf}$ & Surface Outside face temperatures & $K$ & --- \tabularnewline \midrule
+$T_{air}$ & Outside air temperature & $K$ & --- \tabularnewline \midrule
+$T_{gnd}$ & Environmental ground surface temperature & $K$ & --- \tabularnewline \midrule
+$T_{sky}$ & Sky Effective temperature & $K$ & --- \tabularnewline \midrule
+$F_{gnd}$ & view factor of wall surface to ground surface & --- & 0--1 \tabularnewline \midrule
+$F_{sky}$ & View factor of wall surface to sky & --- & 0--1 \tabularnewline \midrule
+$F_{air}$ & View factor of wall surface to air & --- & 0--1 \tabularnewline \midrule
+$\varepsilon$ & Surface long-wave emissivity & --- & 0--1 \tabularnewline \midrule
 $\sigma$ & Stefan-Boltzmann constant & $W/m^2.K^4$ & $5.67 \times 10^{-8}$ \tabularnewline
 \bottomrule
 \end{longtable}
@@ -68,9 +75,9 @@ q_{_{LWR}}^`` = \varepsilon \sigma {F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + \varepsil
 
 where
 
-e = long-wave emittance of the surface
+$\varepsilon$ = long-wave emittance of the surface
 
-s = Stefan-Boltzmann constant
+$\sigma$ = Stefan-Boltzmann constant
 
 F\(_{d}\) = view factor of wall surface to ground surface temperature
 
@@ -116,7 +123,7 @@ The longwave view factors to ground and sky are calculated with the following ex
 {F_{sky}} = 0.5(1 + \cos \phi )
 \end{equation}
 
-where \emph{f} is the tilt angle of the surface.~ The view factor to the sky is further split between sky and air radiation by:
+where \emph{$\phi$} is the tilt angle of the surface.~ The view factor to the sky is further split between sky and air radiation by:
 
 \begin{equation}
 \beta  = \sqrt {0.5\left( {1 + \cos \phi } \right)}
@@ -158,7 +165,7 @@ Impetus for using this modeling is illustrated in the next table.~ Using a 70 st
 
 % table 4
 \begin{longtable}[c]{@{}lllll@{}}
-\caption{  Atmospheric Variables at Two Different Altitudes above Ground Level \protect \label{table:atmospheric-variables-at-two-different}}\\
+\caption{  Atmospheric Variables at Two Different Altitudes above Ground Level \protect \label{table:atmospheric-variables-at-two-different}}\\
 \toprule 
 Variable & 1.5 Meters & 284 meters & Absolute Diff & Percent Diff \tabularnewline \midrule
 \endhead
@@ -214,11 +221,11 @@ The air temperature at ground level, \emph{T\(_{b}\)}, is derived from the weath
 
 where
 
-\emph{T\(_{t}\)} = weather file air temperature (measured at the meteorological station)
+\emph{T\(_{z,met}\)} = weather file air temperature (measured at the meteorological station)
 
-\emph{z\(_{t}\)} = height above ground of the air temperature sensor at the meteorological station.
+\emph{z\(_{met}\)} = height above ground of the air temperature sensor at the meteorological station.
 
-The default value for \emph{z\(_{t}\)} for air temperature measurement is 1.5 m above ground.~ This value can be overridden by using the Site:WeatherStation object.
+The default value for \emph{z\(_{met}\)} for air temperature measurement is 1.5 m above ground.~ This value can be overridden by using the Site:WeatherStation object.
 
 \subsubsection{Local Wind Speed Calculation}\label{local-wind-speed-calculation}
 
@@ -234,37 +241,37 @@ where
 
 \emph{V\(_{z}\)} = wind speed at altitude \emph{z}
 
-\emph{a} = wind speed profile exponent at the site
+\emph{$\alpha$} = wind speed profile exponent at the site
 
-\emph{d} = wind speed profile boundary layer thickness at the site
+\emph{$\delta$} = wind speed profile boundary layer thickness at the site
 
-\emph{z\(_{t}\)} = height above ground of the wind speed sensor at the meteorological station
+\emph{z\(_{met}\)} = height above ground of the wind speed sensor at the meteorological station
 
-\emph{V\(_{t}\)} = wind speed measured at the meteorological station
+\emph{V\(_{met}\)} = wind speed measured at the meteorological station
 
-\emph{a\(_{t}\)} = wind speed profile exponent at the meteorological station
+\emph{$\alpha$\(_{met}\)} = wind speed profile exponent at the meteorological station
 
-\emph{d\(_{t}\)} = wind speed profile boundary layer thickness at the meteorological station.
+\emph{$\delta$\(_{met}\)} = wind speed profile boundary layer thickness at the meteorological station.
 
-The wind speed profile coefficients \emph{a}, \emph{d}, \emph{a\(_{t}\)}, and \emph{d\(_{t}\)}, are variables that depend on the roughness characteristics of the surrounding terrain.~ Typical values for \emph{a} and d are shown in the following table:
+The wind speed profile coefficients \emph{$\alpha$}, \emph{$\delta$}, \emph{$\alpha$\(_{met}\)}, and \emph{$\delta$\(_{met}\)}, are variables that depend on the roughness characteristics of the surrounding terrain.~ Typical values for \emph{$\alpha$} and \emph{$\delta$} are shown in the following table:
 
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005). \label{table:wind-speed-profile-coefficients-ashrae}}\\
 \toprule
-Terrain Description       & Exponent, $\alpha$ & Boundary Layer Thickness, $\delta$ (m) \tabularnewline
+\textbf{Terrain Description}       & \textbf{Exponent, $\alpha$} & \textbf{Boundary Layer Thickness, $\delta$ (m)} \tabularnewline
 \midrule
 \endhead
-Flat, open country        & 0.14 & 270 \tabularnewline
-Rough, wooded country     & 0.22 & 370 \tabularnewline
-Towns and cities          & 0.33 & 460 \tabularnewline
-Ocean                     & 0.10 & 210 \tabularnewline
+Flat, open country        & 0.14 & 270 \tabularnewline \midrule
+Rough, wooded country     & 0.22 & 370 \tabularnewline \midrule
+Towns and cities          & 0.33 & 460 \tabularnewline \midrule
+Ocean                     & 0.10 & 210 \tabularnewline \midrule
 Urban, industrial, forest & 0.22 & 370 \tabularnewline
 \bottomrule
 \end{longtable}
 
-The terrain types above map to the options in the \emph{Terrain} field of the Building object.~ The \emph{Terrain} field can be overridden with specific values for \emph{a} and d by using the Site:HeightVariation object.
+The terrain types above map to the options in the \emph{Terrain} field of the Building object.~ The \emph{Terrain} field can be overridden with specific values for \emph{$\alpha$} and \emph{$\delta$} by using the Site:HeightVariation object.
 
-The default value for \emph{z\(_{t}\)} for wind speed measurement is 10 m above ground.~ The default values for \emph{a\(_{t}\)} and \emph{d\(_{t}\)} are 0.14 and 270 m, respectively, because most meteorological stations are located in an open field.~ These values can be overridden by using the Site:WeatherStation object.
+The default value for \emph{z\(_{met}\)} for wind speed measurement is 10 m above ground.~ The default values for \emph{$\alpha$\(_{met}\)} and \emph{$\delta$\(_{met}\)} are 0.14 and 270 m, respectively, because most meteorological stations are located in an open field.~ These values can be overridden by using the Site:WeatherStation object.
 
 \subsection{Outdoor/Exterior Convection}\label{outdoorexterior-convection}
 
@@ -278,15 +285,15 @@ where
 
 \emph{Q\(_{c}\)} = rate of exterior convective heat transfer
 
-\emph{h\(_{t}\)} = exterior convection coefficient
+\emph{h\(_{c,ext}\)} = exterior convection coefficient
 
 \emph{A} = surface area
 
-\emph{T\(_{f}\)} = surface temperature
+\emph{T\(_{surf}\)} = surface temperature
 
-\emph{T\(_{r}\)} = outdoor air temperature
+\emph{T\(_{air}\)} = outdoor air temperature
 
-Substantial research has gone into the formulation of models for estimating the exterior convection coefficient. Since the 1930's there have been many different methods published for calculating this coefficient, with much disparity between them (Cole and Sturrock 1977; Yazdanian and Klems 1994).~ More recently Palyvos (2008) surveyed correlations cataloging some 91 different correlations into four categories based on functional form of the model equation.~ EnergyPlus therefore offers a wide selection of different methods for determining values for \emph{h\(_{t}\)}. The selection of model equations for \emph{h\(_{t}\)} can be made at two different levels. The first is the set of options available in the input object SurfaceConvectionAlgorithm:Outside that provides a way of broadly selecting which model equations are applied throughout the model.~ The input objects SurfaceProperty:ConvectionCoefficients and SurfaceProperty:ConvectionCoefficients:MultipleSurface also provide ways of selecting which model equations or values are applied for specific surfaces.~ These basic options are identified by the key used for input and include:
+Substantial research has gone into the formulation of models for estimating the exterior convection coefficient. Since the 1930's there have been many different methods published for calculating this coefficient, with much disparity between them (Cole and Sturrock 1977; Yazdanian and Klems 1994).~ More recently Palyvos (2008) surveyed correlations cataloging some 91 different correlations into four categories based on functional form of the model equation.~ EnergyPlus therefore offers a wide selection of different methods for determining values for \emph{h\(_{c,ext}\)}. The selection of model equations for \emph{h\(_{c,ext}\)} can be made at two different levels. The first is the set of options available in the input object SurfaceConvectionAlgorithm:Outside that provides a way of broadly selecting which model equations are applied throughout the model.~ The input objects SurfaceProperty:ConvectionCoefficients and SurfaceProperty:ConvectionCoefficients:MultipleSurface also provide ways of selecting which model equations or values are applied for specific surfaces.~ These basic options are identified by the key used for input and include:
 
 \begin{itemize}
 \item
@@ -303,15 +310,18 @@ Substantial research has gone into the formulation of models for estimating the 
 
 Note that when the outside environment indicates that it is raining, the exterior surfaces (exposed to wind) are assumed to be wet.~ The convection coefficient is set to a very high number (1000) and the outside temperature used for the surface will be the wet-bulb temperature.~ (If you choose to report this variable, you will see 1000 as its value.)
 
-When the AdaptiveConvectionAlgorithm is used, there is a second, deeper level of control available for selecting among a larger variety of \emph{h\(_{t}\)} equations and also defining custom equations using curve or table objects.~ These options are described in this section.
+When the AdaptiveConvectionAlgorithm is used, there is a second, deeper level of control available for selecting among a larger variety of \emph{h\(_{c,ext}\)} equations and also defining custom equations using curve or table objects.~ These options are described in this section.
 
 In addition to the correlation choices described below, it is also possible to override the convection coefficients on the outside of any surface by other means:
 
-*~Use the SurfaceProperty:ConvectionCoefficients object in the input file to set the convection coefficient value on either side of any surface.
-
-*~Use the SurfaceProperty:OtherSideCoefficients object in the input file to set heat transfer coefficients and temperatures on surfaces.
-
-*~Use the EnergyManagementSystem Actuators that are available for overriding h\(_{c}\) values.
+\begin{itemize}
+\item
+  Use the SurfaceProperty:ConvectionCoefficients object in the input file to set the convection coefficient value on either side of any surface.
+\item
+  Use the SurfaceProperty:OtherSideCoefficients object in the input file to set heat transfer coefficients and temperatures on surfaces.
+\item
+  Use the EnergyManagementSystem Actuators that are available for overriding h\(_{c}\) values.
+\end{itemize}
 
 These options can also use schedules to control values over time. Specific details are given in the Input Output Reference document.
 
@@ -335,15 +345,15 @@ The roughness correlation is taken from Figure~\ref{fig:energyplus-program-schem
 
 % table 6
 \begin{longtable}[c]{@{}lllll@{}}
-\caption{  Roughness Coefficients D, E, and F. \protect \label{table:roughness-coefficients-d-e-and-f.}}\\
+\caption{  Roughness Coefficients D, E, and F. \protect \label{table:roughness-coefficients-d-e-and-f.}}\\
 \toprule 
-Roughness Index & D & E & F & Example Material \tabularnewline \midrule
+\textbf{Roughness Index} & \textbf{D} & \textbf{E} & \textbf{F} & \textbf{Example Material} \tabularnewline \midrule
 \endhead
-1 (Very Rough) & 11.58 & 5.894 & 0.0 & Stucco \tabularnewline
-2 (Rough) & 12.49 & 4.065 & 0.028 & Brick \tabularnewline
-3 (Medium Rough) & 10.79 & 4.192 & 0.0 & Concrete \tabularnewline
-4 (Medium Smooth) & 8.23 & 4.0 & -0.057 & Clear pine \tabularnewline
-5 (Smooth) & 10.22 & 3.1 & 0.0 & Smooth Plaster \tabularnewline
+1 (Very Rough) & 11.58 & 5.894 & 0.0 & Stucco \tabularnewline \midrule
+2 (Rough) & 12.49 & 4.065 & 0.028 & Brick \tabularnewline \midrule
+3 (Medium Rough) & 10.79 & 4.192 & 0.0 & Concrete \tabularnewline \midrule
+4 (Medium Smooth) & 8.23 & 4.0 & -0.057 & Clear pine \tabularnewline \midrule
+5 (Smooth) & 10.22 & 3.1 & 0.0 & Smooth Plaster \tabularnewline \midrule
 6 (Very Smooth) & 8.23 & 3.33 & -0.036 & Glass \tabularnewline
 \bottomrule
 \end{longtable}
@@ -360,19 +370,19 @@ TARP, or Thermal Analysis Research Program, is an important predecessor of Energ
 \begin{longtable}[c]{p{1.5in}p{2.5in}p{1.0in}p{1.0in}}
 \caption{Nomenclature List of Variables. \label{table:nomenclature-list-of-variables.-001}}\\
 \toprule 
-Variable & Description & Units & Range \tabularnewline \midrule \endhead
-A & Surface area of the surface & m & /=0 \tabularnewline
-h & Surface exterior convective heat transfer coefficient & W/(m  K) & - \tabularnewline
-h & Forced convective heat transfer coefficient & W/(m  K) & - \tabularnewline
-h & Natural convective heat transfer coefficient & W/(m  K) & - \tabularnewline
-P & Perimeter of surface & m & - \tabularnewline
-R & Surface roughness multiplier & - & - \tabularnewline
-T & Local outdoor air temperature calculated at the height above ground of the surface centroid & °C & - \tabularnewline
-T & Outside surface temperature & °C & - \tabularnewline
-DT & Temperature difference between the surface and air, & °C & - \tabularnewline
-V & Local wind speed calculated at the height above ground of the surface centroid & m/s & - \tabularnewline
-W & Wind direction modifier & - & - \tabularnewline
-f & Angle between the ground outward normal and the surface outward normal & degree & - \tabularnewline
+\textbf{Variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
+A & Surface area of the surface & m\(^{2}\) & /=0 \tabularnewline \midrule
+h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+h\(_{f}\) & Forced convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+h\(_{n}\) & Natural convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+P & Perimeter of surface & m & - \tabularnewline \midrule
+R\(_{f}\) & Surface roughness multiplier & - & - \tabularnewline \midrule
+T\(_{air}\) & Local outdoor air temperature calculated at the height above ground of the surface centroid & °C & - \tabularnewline \midrule
+T\(_{so}\) & Outside surface temperature & °C & - \tabularnewline \midrule
+$\Delta$T & Temperature difference between the surface and air, & °C & - \tabularnewline \midrule
+V\(_{z}\) & Local wind speed calculated at the height above ground of the surface centroid & m/s & - \tabularnewline \midrule
+W\(_{f}\) & Wind direction modifier & - & - \tabularnewline \midrule
+$\phi$ & Angle between the ground outward normal and the surface outward normal & degree & - \tabularnewline \midrule
 Roughness Index & Surface roughness index (6=very smooth, 5=smooth, 4=medium smooth, 3=medium rough, 2=rough, 1=very rough) & - & 1-6 \tabularnewline
 \bottomrule
 \end{longtable}
@@ -395,7 +405,7 @@ W\(_{f}\) ~ = ~ 1.0 for windward surfaces
 
 or
 
-W\(_{f}\)~ = 0.5 for leeward surfaces
+W\(_{f}\) ~ = ~ 0.5 for leeward surfaces
 
 Leeward is defined as greater than 100 degrees from normal incidence (Walton 1981).
 
@@ -403,20 +413,20 @@ The surface roughness multiplier Rf~is based on the ASHRAE graph of surface cond
 
 % table 8
 \begin{longtable}[c]{@{}lll@{}}
-\caption{  Surface Roughness Multipliers (Walton 1981). \protect \label{table:surface-roughness-multipliers-walton-1981.}}\\
+\caption{  Surface Roughness Multipliers (Walton 1981). \protect \label{table:surface-roughness-multipliers-walton-1981.}}\\
 \toprule 
-Roughness Index & Rf & Example Material \tabularnewline \midrule
+\textbf{Roughness Index} & \textbf{Rf} & \textbf{Example Material} \tabularnewline \midrule
 \endhead
-1 (Very Rough) & 2.17 & Stucco \tabularnewline
-2 (Rough) & 1.67 & Brick \tabularnewline
-3 (Medium Rough) & 1.52 & Concrete \tabularnewline
-4 (Medium Smooth) & 1.13 & Clear pine \tabularnewline
-5 (Smooth) & 1.11 & Smooth Plaster \tabularnewline
+1 (Very Rough) & 2.17 & Stucco \tabularnewline \midrule
+2 (Rough) & 1.67 & Brick \tabularnewline \midrule
+3 (Medium Rough) & 1.52 & Concrete \tabularnewline \midrule
+4 (Medium Smooth) & 1.13 & Clear pine \tabularnewline \midrule
+5 (Smooth) & 1.11 & Smooth Plaster \tabularnewline \midrule
 6 (Very Smooth) & 1.00 & Glass \tabularnewline
 \bottomrule
 \end{longtable}
 
-The natural convection component \emph{h\(_{n}\)} is calculated in the same way as the interior ``Detailed'' model.~ The detailed natural convection model correlates the convective heat transfer coefficient to the surface orientation and the difference between the surface and zone air temperatures (where DT = Air Temperature - Surface Temperature).~ The algorithm is taken directly from Walton (1983).~ Walton derived his algorithm from the ASHRAE Handbook (2001), Table 5 on p.~3.12, which gives equations for natural convection heat transfer coefficients in the turbulent range for large, vertical plates and for large, horizontal plates facing upward when heated (or downward when cooled).~~ A note in the text also gives an approximation for large, horizontal plates facing downward when heated (or upward when cooled) recommending that it should be half of the facing upward value.~ Walton adds a curve fit as a function of the cosine of the tilt angle to provide intermediate values between vertical and horizontal.~ The curve fit values at the extremes match the ASHRAE values very well.
+The natural convection component \emph{h\(_{n}\)} is calculated in the same way as the interior ``Detailed'' model.~ The detailed natural convection model correlates the convective heat transfer coefficient to the surface orientation and the difference between the surface and zone air temperatures (where $\Delta$T = Air Temperature - Surface Temperature).~ The algorithm is taken directly from Walton (1983).~ Walton derived his algorithm from the ASHRAE Handbook (2001), Table 5 on p.~3.12, which gives equations for natural convection heat transfer coefficients in the turbulent range for large, vertical plates and for large, horizontal plates facing upward when heated (or downward when cooled).~~ A note in the text also gives an approximation for large, horizontal plates facing downward when heated (or upward when cooled) recommending that it should be half of the facing upward value.~ Walton adds a curve fit as a function of the cosine of the tilt angle to provide intermediate values between vertical and horizontal.~ The curve fit values at the extremes match the ASHRAE values very well.
 
 For no temperature difference OR a vertical surface the following correlation is used:
 
@@ -424,21 +434,21 @@ For no temperature difference OR a vertical surface the following correlation is
 h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
 \end{equation}
 
-For (DT \textless{} 0.0 AND an upward facing surface)~ OR~ (DT \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
+For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
 
 \begin{equation}
 h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}
 \end{equation}
 
-where S is the surface tilt angle.
+where $\Sigma$ is the surface tilt angle.
 
-For (DT \textgreater{} 0.0 AND an upward facing surface)~ OR~ (DT \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
+For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
 
 \begin{equation}
 h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
 \end{equation}
 
-where S is the surface tilt angle.
+where $\Sigma$ is the surface tilt angle.
 
 \subsubsection{MoWiTT Algorithm}\label{mowitt-algorithm}
 
@@ -446,13 +456,13 @@ where S is the surface tilt angle.
 \begin{longtable}[c]{p{0.5in}p{3.0in}p{1.5in}p{1.0in}}
 \caption{Nomenclature List of Variables. \label{table:nomenclature-list-of-variables.-002}}\\
 \toprule 
-Variable & Description & Units & Range \tabularnewline \midrule \endhead
-A & Constant & W/(m  K(m/s) & - \tabularnewline
-B & Constant & - & - \tabularnewline
-C & Turbulent natural convection constant & W/(m  K  ) & - \tabularnewline
-h & Surface exterior convective heat transfer coefficient & W/(m  K) & - \tabularnewline
-T & Outside surface temperature & °C/K & - \tabularnewline
-DT & Temperature difference between the surface and air & °C/K & - \tabularnewline
+\textbf{Variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
+A & Constant & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline \midrule
+B & Constant & - & - \tabularnewline \midrule
+C\(_{t}\) & Turbulent natural convection constant & W/(m\(^{2}\)K\(^{4/3}\)) & - \tabularnewline \midrule
+h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+T\(_{so}\) & Outside surface temperature & °C/K & - \tabularnewline \midrule
+$\Delta$T & Temperature difference between the surface and air & °C/K & - \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -470,9 +480,9 @@ NOTE:~ The MoWiTT algorithm may not be appropriate for rough surfaces, high-rise
 \begin{longtable}[c]{@{}llll@{}}
 \caption{MoWiTT Coefficients (Yazdanian and Klems 1994, Booten et al. 2012) \protect \label{table:mowitt-coefficients-yazdanian-and-klems-1994}}\\
 \toprule 
-Wind Direction & Ct & a & b \tabularnewline \midrule
+\textbf{Wind Direction} & \textbf{C\(_{t}\)} & \textbf{a} & \textbf{b} \tabularnewline \midrule
 \endhead
-(Units) & W/m  K & W/m  K(m/s) & - \tabularnewline
+(Units) & W/(m\(^{2}\)K\(^{4/3}\)) & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline
 Windward & 0.84 & 3.26 & 0.89 \tabularnewline
 Leeward & 0.84 & 3.55 & 0.617 \tabularnewline
 \bottomrule
@@ -484,16 +494,16 @@ Leeward & 0.84 & 3.55 & 0.617 \tabularnewline
 \begin{longtable}[c]{p{0.5in}p{3.0in}p{1.5in}p{1.0in}}
 \caption{  Nomenclature List of Variables. \label{table:nomenclature-list-of-variables.-003}}\\
 \toprule 
-Variable & Description & Units & Range \tabularnewline \midrule \endhead
-a & Constant & W/(m  K(m/s) & - \tabularnewline
-b & Constant & - & - \tabularnewline
-h & Surface exterior convective heat transfer coefficient & W/(m  K) & - \tabularnewline
-h & Convective heat transfer coefficient for very smooth surfaces (glass) & W/(m  K) & - \tabularnewline
-h & Natural convective heat transfer coefficient & W/(m  K) & - \tabularnewline
-R & Surface roughness multiplier & - & - \tabularnewline
-T & Outside surface temperature & °C/K & - \tabularnewline
-DT & Temperature difference between the surface and air, & °C/K & - \tabularnewline
-f & Angle between the ground outward normal and the surface outward normal & radian & - \tabularnewline
+\textbf{Variable} & \textbf{Description} & \textbf{Units} & \textbf{Range} \tabularnewline \midrule \endhead
+a & Constant & W/(m\(^{2}\)K(m/s)\(^{b}\) & - \tabularnewline \midrule
+b & Constant & - & - \tabularnewline \midrule
+h\(_{c}\) & Surface exterior convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+h\(_{c,glass}\) & Convective heat transfer coefficient for very smooth surfaces (glass) & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+h\(_{n}\) & Natural convective heat transfer coefficient & W/(m\(^{2}\)K) & - \tabularnewline \midrule
+R\(_{f}\) & Surface roughness multiplier & - & - \tabularnewline \midrule
+T\(_{so}\) & Outside surface temperature & °C/K & - \tabularnewline \midrule
+$\Delta$T & Temperature difference between the surface and air, & °C/K & - \tabularnewline \midrule
+$\Phi$ & Angle between the ground outward normal and the surface outward normal & radian & - \tabularnewline \midrule
 \bottomrule
 \end{longtable}
 
@@ -522,16 +532,17 @@ This algorithm has a structure that allows for finer control over the models use
 The adaptive convection algorithm implemented in EnergyPlus for the outside face is much simpler than that for the inside face. The surface classification system has a total of 4 different categories for surfaces that depend on current wind direction and heat flow directions.~ However it is more complex in that the \emph{h\(_{c}\)} equation is split into two parts and there are separate model equation selections for forced convection, \emph{h\(_{f}\)}, and natural convection, \emph{h\(_{n}\)}. The following table summarizes the categories and the default assignments for \emph{h\(_{c}\)} equations. The individual \emph{h\(_{c}\)} equations are documented below.
 
 % table 12
-\begin{longtable}[c]{p{0.25in}p{0.75in}p{0.75in}p{0.75in}p{1.75in}p{1.75in}}
+\scriptsize{
+\begin{longtable}[c]{p{0.25in}p{0.75in}p{0.5in}p{0.5in}p{1.75in}p{1.75in}}
 \caption{Adaptive Convection Algorithm Details \label{table:adaptive-convection-algorithm-details}}\\
 \toprule 
-\# & Surface Classification & Heat Flow Direction & Wind Direction & h Models & h Models \tabularnewline \midrule \endhead
-1 & Roof Stable & Down & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonStableHorizontalOrTilt AlamdariStableHorizontal \tabularnewline
-2 & Roof Unstable & Up & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonUnstableHorizontalOrTilt AlamdariUnstableHorizontal \tabularnewline
-3 & Vertical Wall Windward & Any & Windward & TARPWindward DOE2Windward MoWiTTWindward NusseltJurges McAdams Mitchell BlockenWindward EmmelVertical & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline
+\textbf{\#} & \textbf{Surface Classification} & \textbf{Heat Flow Direction} & \textbf{Wind Direction} & \textbf{h Models} & \textbf{h Models} \tabularnewline \midrule \endhead
+1 & Roof Stable & Down & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonStableHorizontalOrTilt AlamdariStableHorizontal \tabularnewline \midrule
+2 & Roof Unstable & Up & Any & TARPWindward MoWiTTWindward DOE2Windward NusseltJurges BlockenWindward EmmelRoof ClearRoof & WaltonUnstableHorizontalOrTilt AlamdariUnstableHorizontal \tabularnewline \midrule
+3 & Vertical Wall Windward & Any & Windward & TARPWindward DOE2Windward MoWiTTWindward NusseltJurges McAdams Mitchell BlockenWindward EmmelVertical & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline \midrule
 4 & Vertical Wall Leeward & Any & Leeward & TARPLeeward MoWiTTLeeward DOE2Leeward EmmelVertical NusseltJurges McAdams Mitchell & ASHRAEVerticalWall AlamdariHammondVerticalWall FohannoPolidoriVerticalWall ISO15099Windows \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \paragraph{Outside Face Surface Classification}\label{outside-face-surface-classification}
 
@@ -629,7 +640,7 @@ Emmel et al. (2007) developed a set of correlations for outdoor surfaces using n
     h_f = 3.54V^{0.76}_{10m} & : & 157.5 < \theta \leq 180.0
   \end{array}
 
-Where \emph{V\(_{m}\)} is the air velocity at the location of the weather station and θ is the angle of incidence between the wind and the surface in degrees.~ The following equations are used for horizontal (roof) surfaces (key: EmmelRoof):
+Where \emph{V\(_{m}\)} is the air velocity at the location of the weather station and $\theta$ is the angle of incidence between the wind and the surface in degrees.~ The following equations are used for horizontal (roof) surfaces (key: EmmelRoof):
 
 \begin{array}{lcl}
     h_f = 5.11V^{0.78}_{10m} & : & \theta \leq 22.5 \\
@@ -637,7 +648,7 @@ Where \emph{V\(_{m}\)} is the air velocity at the location of the weather statio
     h_f = 3.67V^{0.85}_{10m} & : & 67.5 < \theta \leq 90
   \end{array}
 
-Where θ is the angle of incidence between the wind and the longest edge of the roof surface in degrees.
+Where $\theta$ is the angle of incidence between the wind and the longest edge of the roof surface in degrees.
 
 This model is for all wind directions but lacks a natural convection component.~ The model was developed for simple, rectangular low-rise buildings.~ It is available only within the adaptive convection algorithm for the outside face
 
