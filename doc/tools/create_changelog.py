@@ -116,7 +116,7 @@ with io.open(md_file, 'w') as f:
             out(' - [#' + pr[0] + '](' + EPlusRepoPath + '/pull/' + pr[0] + ') : ' + pr[1])
 
     out('# Changelog for EnergyPlus ' + program_version)
-    out('Consists of pull requests merged in since the last release - starting with SHA [' + last_commit + '](https://github.com/' + RepoName + '/commit/' + last_commit)
+    out('Consists of pull requests merged in since the last release - starting with SHA [' + last_commit + '](https://github.com/' + RepoName + '/commit/' + last_commit + ')')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
