@@ -132,23 +132,23 @@ The regression analysis and summary statistical output is shown below. The equat
 
 \begin{lstlisting}
 
-  Curve:Biquadratic,
-      CoolCapFTExample,        !- Name
-      0.757382,                !- Coefficient1 Constant
-      0.014666,                !- Coefficient2 x
-      0.000459,                !- Coefficient3 x**2
-      -0.00095,                !- Coefficient4 y
-      -0.000067,               !- Coefficient5 y**2
-      -0.00015,                !- Coefficient6 x*y
-      17.22222,                !- Minimum Value of x
-      21.66667,                !- Maximum Value of x
-      18.33333,                !- Minimum Value of y
-      46.11111,                !- Maximum Value of y
-      ,                        !- Minimum Curve Output
-      ,                        !- Maximum Curve Output
-      Temperature,             !- Input Unit Type for X
-      Temperature,             !- Input Unit Type for Y
-      Dimensionless;           !- Output Unit Type
+  Curve:Biquadratic,
+      CoolCapFTExample,        !- Name
+      0.757382,                !- Coefficient1 Constant
+      0.014666,                !- Coefficient2 x
+      0.000459,                !- Coefficient3 x**2
+      -0.00095,                !- Coefficient4 y
+      -0.000067,               !- Coefficient5 y**2
+      -0.00015,                !- Coefficient6 x*y
+      17.22222,                !- Minimum Value of x
+      21.66667,                !- Maximum Value of x
+      18.33333,                !- Minimum Value of y
+      46.11111,                !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
 \end{lstlisting}
 
 \subsection{Curves based on three independent variables}\label{curves-based-on-three-independent-variables}
@@ -159,7 +159,13 @@ A polynomial having three independent variables represents a three-dimensional r
 
 A performance curve having an order or degree of 2 in three independent variables.
 
-\begin{array}{l}Output = a + b{x^2} + cx + d{y^2} + ey + f{z^2} + gz + h{x^2}{y^2} + ixy + jx{y^2} + k{x^2}y\\\,\,\,\, + l{x^2}{z^2} + mxz + nx{z^2} + o{x^2}z + p{y^2}{z^2} + qyz + ry{z^2} + s{y^2}z + t{x^2}{y^2}{z^2}\\\,\,\,\, + u{x^2}{y^2}z + u{x^2}y{z^2} + vx{y^2}{z^2} + w{x^2}yz + x\left( {x{y^2}x} \right) + y\left( {xy{z^2}} \right) + z\left( {xyz} \right)\end{array}
+\begin{equation}
+\begin{array}{ll}
+Output &= a + bx^2 + cx + dy^2 + ey + fz^2 + gz + hx^2y^2 + ixy + jxy^2 + kx^2y \\
+       &+ lx^2z^2 + mxz + nxz^2 + ox^2z + py^2z^2 + qyz + ryz^2 + sy^2z + tx^2y^2z^2 \\
+       &+ ux^2y^2z + ux^2yz^2 + vxy^2z^2 + wx^2yz + x\PB{xy^2z} + y\PB{xyz^2} + z\PB{xyz}
+\end{array}
+\end{equation}
 
 \subsection{Pressure drop curve}\label{pressure-drop-curve}
 

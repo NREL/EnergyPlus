@@ -200,17 +200,17 @@ where:
 The fuel energy consumption rate (LHV Basis) is then calculated as follows:
 
 \begin{equation}
-{\dot Q_{Fuel,LHV}} = {\raise0.7ex\hbox{{{P_{Elec,Operating}}}} \!\mathord{\left/ {\vphantom {{{P_{Elec,Operating}}} {ElecEf{f_{Operating}}}}}\right.}\!\lower0.7ex\hbox{{ElecEf{f_{Operating}}}}}
+\dot{Q}_{Fuel,LHV} = \frac{P_{Elec,Operating}}{ElecEff_{Operating}}
 \end{equation}
 
 where:
 
 \({\dot Q_{Fuel,LHV}}\) ~ = Fuel energy consumption rate, LHV basis (W)
 
-If \emph{ElecEff\(_{g}\)} is equal to zero, then \emph{P\(_{g}\)} and \({\dot Q_{Fuel,LHV}}\) \(_{ }\)are set to zero. The fuel mass flow rate is then calculated.
+If \emph{ElecEff\(_{g}\)} is equal to zero, then \emph{P\(_{g}\)} and \({\dot Q_{Fuel,LHV}}\) \(_{ }\)are set to zero. The fuel mass flow rate is then calculated.
 
 \begin{equation}
-{\dot m_{fuel}} = {\raise0.7ex\hbox{{{{\dot Q}_{Fuel,LHV}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Fuel,LHV}}} {\left( {LHV*1000} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {LHV*1000} \right)}}}
+\dot{m}_{fuel} = \frac{\dot{Q}_{Fuel,LHV}}{LHV*1000}
 \end{equation}
 
 where:
@@ -237,7 +237,7 @@ where:
 
 \({P_{Ancillary,Operating}}\) ~ = Ancillary electric power at the current fuel mass flow rate (W), report variable ``Generator Ancillary Electric Power {[}W{]}''.
 
-If ancillary power is constant for the simulation (e.g., no modifier curve defined), then the calculations continue as described below. However, if an ancillary power modifier curve has been defined, then the calculations described above for \emph{P\(_{g}\)}, \emph{ElecEff\(_{g}\)}, \({\dot Q_{Fuel,LHV}}\) \(_{ }\)and \emph{P\(_{g}\)} are recalculated in sequence until the solution converges.
+If ancillary power is constant for the simulation (e.g., no modifier curve defined), then the calculations continue as described below. However, if an ancillary power modifier curve has been defined, then the calculations described above for \emph{P\(_{g}\)}, \emph{ElecEff\(_{g}\)}, \({\dot Q_{Fuel,LHV}}\) \(_{ }\)and \emph{P\(_{g}\)} are recalculated in sequence until the solution converges.
 
 The generator's ``net'' electrical power output is calculated as the difference between the generator's actual power output and the ancillary electric power as follows.
 
@@ -263,7 +263,14 @@ where:
 
 Standby electrical power may also be modeled to simulate controls or other parasitics used by the generator. The standby power is calculated only when the generator is not operating (i.e., \emph{Load} from the Electric Load Center is zero). If the generator operates for a given timestep (i.e., \emph{Load} \textgreater{} 0.0), the standby power is set equal to 0.
 
-\begin{array}{l}IF\,\,\left( {Load\, <  = 0.0} \right)\,\,THEN\\\,\,\,\,\,{P_{Standby}} = {P_{Standby,user\,input}}\\ELSE\\\,\,\,\,\,{P_{Standby}} = 0.0\\END\,IF\end{array}
+\begin{equation}
+P_{Standby} = \left\{
+  \begin{array}{cc}
+    P_{Standby,UserInput} &\text{if} Load <= 0 \\
+    0                     &\text{otherwise}
+  \end{array}
+\right.
+\end{equation}
 
 where:
 
@@ -278,7 +285,7 @@ Report variables for electric energy produced, electric efficiency (LHV basis), 
 \end{equation}
 
 \begin{equation}
-ElecEf{f_{Operating,LHV}} = {\raise0.7ex\hbox{{{P_{Elec,Produced}}}} \!\mathord{\left/ {\vphantom {{{P_{Elec,Produced}}} {{{\dot Q}_{Fuel,LHV}}}}}\right.}\!\lower0.7ex\hbox{{{{\dot Q}_{Fuel,LHV}}}}}
+ElecEff_{Operating,LHV} = \frac{P_{Elec,Produced}}{\dot{Q}_{Fuel,LHV}}
 \end{equation}
 
 \begin{equation}
@@ -309,7 +316,18 @@ where:
 
 In addition to calculating electric power production and fuel usage, the model is able to determine thermal power (heat recovery) output for heating water.~ For this case, the water flow rate through the heat recovery heat exchanger is established first. If the Heat Recovery Water Flow Operating Mode (user input) is set to Plant Control, then the Reference Heat Recovery Water Flow Rate (user input) is requested whenever the generator operates (constant value), but the actual flow rate may be restricted by other plant components (e.g., pump). If the Heat Recovery Water Flow Operating Mode is set to Internal Control, then the requested water flow when the generator operates is determined by the Reference Heat Recovery Water Flow Rate and a flow rate modifier curve.
 
-\begin{array}{l}IF\,\,\left( {Plant\,Control} \right)\,\,THEN\\\,\,\,\,\,{{\dot m}_w} = {{\dot V}_{w,Ref}}\left( {{\rho_w}} \right)\\ELSEIF\,\left( {Internal\,Control} \right)\,THEN\\\,\,\,\,\,\,HeatRecFlowFTempPow = {e_1} + {e_2}\left( {{T_{w,i}}} \right) + {e_3}{\left( {{T_{w,i}}} \right)^2} + {e_4}\left( {{P_{net}}} \right) + {e_5}{\left( {{P_{net}}} \right)^2} + {e_6}\left( {{T_{w,i}}} \right)\left( {{P_{net}}} \right)\\\,\,\,\,\,\,{{\dot m}_w} = {{\dot V}_{w,Ref}}\left( {{\rho_w}} \right)\left( {HeatRecFlowFTempPow} \right)\\END\,IF\end{array}
+If \emph{PlantControl}:
+\begin{equation}
+  \dot{m}_w = \dot{V}_{w,ref}\rho_w
+\end{equation}
+
+If \emph{InternalControl}:
+\begin{equation}
+  \text{HeatRecFlowFTempPow} = e_1 + e_2 T_{w,i} + e_3 T_{w,i}^2 + e_4 P_{net} + e_5 P_{net}^2 + e_6 T_{w,i} P_{net}
+\end{equation}
+\begin{equation}
+  \dot{m}_w = \dot{V}_{w,Ref} \rho_w \PB{HeatRecFlowFTempPow}
+\end{equation}
 
 ~where:
 
@@ -351,7 +369,15 @@ The steady-state thermal power produced (heat recovery rate) is then calculated:
 
 The actual (operating) thermal power is then calculated using the steady-state thermal power and three modifier curves:
 
-\({P_{Thermal,Operating}} = {P_{Thermal,SS}}\left( {HeatRecRateFPLR} \right)\left( {HeatRecRateFTemp} \right)\left( {HeatRecRateFFlow} \right)\) \(\begin{array}{l}HeatRecRateFPLR = {g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2} + {g_4}{\left( {PLR} \right)^3}\end{array}\)
+\begin{equation}
+  P_{Thermal,Operating} = P_{Thermal,SS} \PB{\text{HeatRecRateFPLR}} \PB{\text{HeatRecRateFTemp}} \PB{\text{HeatRecRateFFlow}}
+\end{equation}
+\begin{equation}
+  \begin{array}{cc}
+    \text{HeatRecRateFPLR} &= g_1 + g_2 \PB{PLR} + g_3 \PB{PLR}^2  \\
+                 \text{OR} &= g_1 + g_2 \PB{PLR} + g_3 \PB{PLR}^2 + g_4 \PB{PLR}^3
+  \end{array}
+\end{equation}
 
 \begin{equation}
 HeatRecRateFTemp = {h_1} + {h_2}\left( {{T_{w,i}}} \right) + {h_3}{\left( {{T_{w,i}}} \right)^2}
@@ -374,7 +400,7 @@ where:
 The heat recovery output water temperature is then calculated.
 
 \begin{equation}
-{T_{w,o}} = {\rm{ }}{T_{w,i}}{\rm{ }} + {\rm{ }}{\raise0.7ex\hbox{{{P_{Thermal,Operating}}}} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {\left( {{{\dot m}_w}{\rm{ }}*{\rm{ }}C{p_w}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {{{\dot m}_w}{\rm{ }}*{\rm{ }}C{p_w}} \right)}}}
+  T_{w,o} = T_{w,i} + \frac{P_{Thermal,Operating}}{\dot{m}_w C{p,w}}
 \end{equation}
 
 where:
@@ -387,9 +413,23 @@ If the calculated heat recovery outlet water temperature exceeds to Maximum Heat
 
 If combustion air inlet and outlet node names are specified in the input, along with exhaust air flow rate and exhaust air temperature information, then the model calculates the exhaust air conditions for each simulation time step. The exhaust air mass flow rate is first calculated based on the Reference Exhaust Air Mass Flow Rate, two modifier curves and an air density adjustment. Since fans are volumetric flow devices, the ratio of the air density at actual inlet air conditions to air density at reference inlet air conditions is used as an adjustment factor.
 
-\({\dot m_{ExhAir}} = {\dot m_{ExhAir,Ref}}\left( {ExhFlowFTemp} \right)\left( {ExhFlowFPLR} \right)\left( {{\raise0.7ex\hbox{{{\rho_{a,i}}}} \!\mathord{\left/ {\vphantom {{{\rho_{a,i}}} {{\rho_{a,Ref}}}}}\right.}\!\lower0.7ex\hbox{{{\rho_{a,Ref}}}}}} \right)\) \(\begin{array}{l}ExhFlowFTemp = {j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2} + {j_4}{\left( {{T_{a,i}}} \right)^3}\end{array}\)
+\begin{equation}
+  \dot{m}_{ExhAir} = \dot{m}_{ExhAir,ref} \PB{\text{ExhFlowFTemp}} \PB{\text{ExhFlowFPLR}} \frac{\rho_{a,i}}{\rho_{a,ref}}
+\end{equation}
 
-\begin{array}{l}ExhFlowFPLR = {k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2} + {k_4}{\left( {PLR} \right)^3}\end{array}
+\begin{equation}
+  \begin{array}{cc}
+    ExhFlowFTemp     &= j_1 + j_2 T_{a,i} + j_3 T_{a,i}^2 \\
+           \text{OR} &= j_1 + j_2 T_{a,i} + j_3 T_{a,i}^2 + j_4 T_{a,i}^3
+  \end{array}
+\end{equation}
+
+\begin{equation}
+  \begin{array}{cc}
+    ExhFlowFPLR      &= k_1 + k_2 T_{PLR} + k_3 T_{PLR}^2 \\
+           \text{OR} &= k_1 + k_2 T_{PLR} + k_3 T_{PLR}^2 + k_4 T_{PLR}^3
+  \end{array}
+\end{equation}
 
 where:
 
@@ -407,9 +447,24 @@ where:
 
 In an analogous fashion, the exhaust air temperature is calculated using the Nominal (reference) Exhaust Air Outlet Temperature and two modifier curves.
 
-\({T_{a,o}} = {T_{a,o,Nom}}\left( {ExhAirTempFTemp} \right)\left( {ExhAirTempFPLR} \right)\) \(\begin{array}{l}ExhAirTempFTemp = {l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2} + {l_4}{\left( {{T_{a,i}}} \right)^3}\end{array}\)
 
-\begin{array}{l}ExhAirTempFPLR = {m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2} + {m_4}{\left( {PLR} \right)^3}\end{array}
+\begin{equation}
+  T_{a,o} = T_{a,o,Nom} \PB{\text{ExhAirTempFTemp}} \PB{\text{ExhAirTempFPLR}}
+\end{equation}
+
+\begin{equation}
+  \begin{array}{cc}
+    ExhAirTempFTemp  &= l_1 + l_2 T_{a,i} + l_3 T_{a,i}^2 \\
+           \text{OR} &= l_1 + l_2 T_{a,i} + l_3 T_{a,i}^2 + l_4 T_{a,i}^3
+  \end{array}
+\end{equation}
+
+\begin{equation}
+  \begin{array}{cc}
+    ExhAirTempFPLR   &= m_1 + m_2 T_{PLR} + m_3 T_{PLR}^2 \\
+           \text{OR} &= m_1 + m_2 T_{PLR} + m_3 T_{PLR}^2 + m_4 T_{PLR}^3
+  \end{array}
+\end{equation}
 
 where:
 
@@ -424,7 +479,7 @@ where:
 The above calculations for exhaust air outlet temperature assume no heat recovery to water is being done.~ If thermal power (water heating) is being produced, then the exhaust air outlet temperature is recalculated as follows:
 
 \begin{equation}
-{T_{a,o}} = {T_{a,o}} - {\raise0.7ex\hbox{{{P_{Thermal,Operating}}}} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {\left( {{{\dot m}_{ExhAir}}*C{p_{air}}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {{{\dot m}_{ExhAir}}*C{p_{air}}} \right)}}}
+T_{a,o} = T_{a,i} - \frac{P_{Thermal,Operating}}{\dot{m}_{ExhAir}C_{p,air}}
 \end{equation}
 
 where:
@@ -434,7 +489,7 @@ where:
 The exhaust air outlet humidity ratio is also calculated.
 
 \begin{equation}
-{w_{a,o}} = {w_{a,i}} + {\raise0.7ex\hbox{{\left[ {{{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} \mathord{\left/ {\vphantom {{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} {\left( {{h_{fg,16}}} \right)}}} \right. } {\left( {{h_{fg,16}}} \right)}}} \right]}} \!\mathord{\left/ {\vphantom {{\left[ {{{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} \mathord{\left/ {\vphantom {{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} {\left( {{h_{fg,16}}} \right)}}} \right. } {\left( {{h_{fg,16}}} \right)}}} \right]} {\left( {{{\dot m}_{ExhAir}}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {{{\dot m}_{ExhAir}}} \right)}}}
+  w_{a,o} = w_{a,i} + \frac{\dot{m}_{fuel} \PB{HHV - LHV} \PB{1000}}{h_{fg,16} \dot{m}_{ExhAir}}
 \end{equation}
 
 where:
@@ -452,7 +507,7 @@ The remaining report variables are calculated as follows.
 \end{equation}
 
 \begin{equation}
-ThermalEf{f_{Operating,LHV}} = {\raise0.7ex\hbox{{{P_{Thermal,Operating}}}} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {{{\dot Q}_{Fuel,LHV}}}}}\right.}\!\lower0.7ex\hbox{{{{\dot Q}_{Fuel,LHV}}}}}
+ThermalEff_{Operating,LHV} = \frac{P_{Thermal,Operating}{\dot{Q}_{Fuel,LHV}}
 \end{equation}
 
 where:
@@ -491,7 +546,7 @@ The Micro CHP model is a straightforward empirical model with the exception that
 \dot m_{fuel}^{t+\Delta t} = \left\{
     \begin{array}{cl}
       \dot m_{fuel,demand}^{t+\Delta t}       &\; if d\dot m_{fuel} / dt \le (d\dot m_{fuel}/dt)_{max} \\
-      \dot m_{fuel,demand}^t \pm (d\dot m_{fuel}/dt)_{max}      &\; if d\dot m_{fuel} / dt \gt (d\dot m_{fuel}/dt)_{max} 
+      \dot m_{fuel,demand}^t \pm (d\dot m_{fuel}/dt)_{max}      &\; if d\dot m_{fuel} / dt > (d\dot m_{fuel}/dt)_{max} 
     \end{array}
   \right.
 \end{equation}
@@ -503,8 +558,8 @@ The Micro CHP model is a straightforward empirical model with the exception that
 \begin{equation}
 P_{net}^{t+\Delta t} = \left\{
     \begin{array}{cl}
-      P_{net,ss}^{t+\Delta t}       &\; if dP_{net} / dt \le (dP_{net}/dt)_{max} \\
-      P_{net,ss}^t \pm (dP_{net}/dt)_{max}      &\; if dP_{net} / dt \gt (dP_{net}/dt)_{max} 
+      P_{net,ss}^{t+\Delta t}                   & \text{if} dP_{net} / dt \le (dP_{net}/dt)_{max} \\
+      P_{net,ss}^t \pm (dP_{net}/dt)_{max}      & \text{if} dP_{net} / dt > (dP_{net}/dt)_{max} 
     \end{array}
   \right.
 \end{equation}
