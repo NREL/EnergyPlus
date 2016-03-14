@@ -12,13 +12,13 @@ An \emph{N}-sided surface is assigned \emph{N} receiving points with the followi
 
 where
 
-\emph{P\(_{j}\) = j\(^{h}\)} coordinate of the* i\(^{h}\)* receiving point
+\emph{P\(_{ij}\) = j\(^{th}\)} coordinate of the* i\(^{th}\)* receiving point
 
-\emph{v\(_{j}\)} = * j\(^{h}\)* coordinate of the \emph{k\(^{h}\)} surface vertex
+\emph{v\(_{kj}\)} = * j\(^{th}\)* coordinate of the \emph{k\(^{th}\)} surface vertex
 
-If \emph{N} = 3:~ \emph{a\(_{j}\)} = 3/5 if \emph{k} = \emph{i};~ = 1/5 otherwise
+If \emph{N} = 3:~ \emph{a\(_{kj}\)} = 3/5 if \emph{k} = \emph{i};~ = 1/5 otherwise
 
-If \emph{N} \textgreater{} 3:~ \emph{a\(_{j}\)} = \(\frac{{N + 1}}{{2N}}\) ~if \emph{k} = \emph{i};~ = \(\frac{1}{{2N}}\) ~otherwise
+If \emph{N} \textgreater{} 3:~ \emph{a\(_{kj}\)} = \(\frac{{N + 1}}{{2N}}\) ~if \emph{k} = \emph{i};~ = \(\frac{1}{{2N}}\) ~otherwise
 
 For example, for a vertical 3m by 5m rectangle with vertices (0,0,3), (0,0,0), (5,0,0) and (5,0,3), this expression gives receiving points at (1.25,0,2.25), (1.25,0,0.75), (3.75,0,0.75) and (3.75,0,2.25), as shown in Figure~\ref{fig:vertical-rectangular-exterior-heat-transfer}.
 
@@ -72,13 +72,13 @@ RecSurfNum is the receiving surface number,
 
 ``\emph{obs,i}'' denotes the obstruction hit by ray \emph{i},
 
-\emph{Hit\(_{i}\)} = 1 if ray* i* hits an obstruction, = 0 otherwise,
+\emph{Hit\(_{obs,i}\)} = 1 if ray \emph{i} hits an obstruction, = 0 otherwise,
 
-\emph{ViewFacSky\(_{i}\)} = unobstructed sky view factor of the obstruction = \((1 + \cos til{t_{obs}})/2\) ,
+\emph{ViewFacSky\(_{obs,i}\)} = unobstructed sky view factor of the obstruction = \((1 + \cos til{t_{obs}})/2\) ,
 
-\emph{DifShdgRatioIsoSky\(_{i}\)} = (obstructed sky irradiance on obstruction)/(unobstructed sky irradiance on obstruction)
+\emph{DifShdgRatioIsoSky\(_{obs,i}\)} = (obstructed sky irradiance on obstruction)/(unobstructed sky irradiance on obstruction)
 
-In this equation the product\emph{ViewFacSky*DifShdgRatioIsoSky}is the sky irradiance at the hit point divided by the horizontal sky irradiance taking into account shadowing of sky diffuse radiation on the obstruction by other obstructions, and assuming that the radiance of the sky is uniform. Note that we ignore secondary reflections here and in the following sections. In the present case this means that the irradiance at the hit point due to reflection of sky radiation from the ground or from other obstructions is not considered.
+In this equation the product \emph{ViewFacSky*DifShdgRatioIsoSky} is the sky irradiance at the hit point divided by the horizontal sky irradiance taking into account shadowing of sky diffuse radiation on the obstruction by other obstructions, and assuming that the radiance of the sky is uniform. Note that we ignore secondary reflections here and in the following sections. In the present case this means that the irradiance at the hit point due to reflection of sky radiation from the ground or from other obstructions is not considered.
 
 The above reflection factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from obstructions:
 
@@ -89,7 +89,7 @@ QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad \\
 \end{split}
 \end{equation}
 
-where\emph{DifSolarRad} is the horizontal sky irradiance on an unobstructed horizontal plane (W/m\(^{2}\)).
+where \emph{DifSolarRad} is the horizontal sky irradiance on an unobstructed horizontal plane (W/m\(^{2}\)).
 
 \subsection{Sky Solar Radiation Diffusely Reflected from the Ground}\label{sky-solar-radiation-diffusely-reflected-from-the-ground}
 
@@ -109,7 +109,7 @@ where
 
 \emph{\(j(i)\) ~}~denotes an upgoing ray from the ground point hit by ray \emph{i}from the receiving point,
 
-\emph{Hit\(_{)}\)} = 1 if ray* j(i*) hits the sky, = 0 otherwise,
+\emph{Hit\(_{skyj(i)}\)} = 1 if ray \emph{\(j(i)\)} hits the sky, = 0 otherwise,
 
 \({\alpha_{j(i)}}\) is the angle of incidence of ray \(j(i)\) with respect to the ground plane,
 
