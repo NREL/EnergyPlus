@@ -155,6 +155,7 @@ namespace SingleDuct {
 		Real64 HeatAirMassFlowRateMax; // Max Specified Mass Flow Rate of unit at max heating [kg/sec]
 		int ZoneMinAirFracMethod; // parameter for what method is used for min flow fraction
 		Real64 ZoneMinAirFrac; // Fraction of supply air used as minimum flow
+		Real64 ZoneMinAirFracReport; // Fraction of supply air used as minimum flow for reporting (zero if terminal unit flow is zero)
 		Real64 ZoneFixedMinAir; // Absolute minimum supply air flow
 		int ZoneMinAirFracSchPtr; // pointer to the schedule for min flow fraction
 		bool ConstantMinAirFracSetByUser; // record if user left field blank for constant min fraction.
@@ -225,6 +226,7 @@ namespace SingleDuct {
 			HeatAirMassFlowRateMax( 0.0 ),
 			ZoneMinAirFracMethod( ConstantMinFrac ),
 			ZoneMinAirFrac( 0.0 ),
+			ZoneMinAirFracReport( 0.0 ),
 			ZoneFixedMinAir( 0.0 ),
 			ZoneMinAirFracSchPtr( 0 ),
 			ConstantMinAirFracSetByUser( false ),
