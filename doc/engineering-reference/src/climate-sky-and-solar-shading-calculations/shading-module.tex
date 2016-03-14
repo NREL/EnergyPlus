@@ -16,7 +16,7 @@ Using the \textbf{ShadowCalculation} object, you can set how often the shadowing
 
 \subsection{Solar Position}\label{solar-position}
 
-Current solar position is described in terms of three direction cosines that are convenient for determining the angle of incidence of the sun's rays on a building surface.~ The following procedure is used to determine the direction cosines.~ The values of the solar declination angle, d, and the equation of time, e, are based on \emph{Astronomical Algorithms}, Meeus.~ Solar declination is a function of local/site latitude.
+Current solar position is described in terms of three direction cosines that are convenient for determining the angle of incidence of the sun's rays on a building surface.~ The following procedure is used to determine the direction cosines.~ The values of the solar declination angle, $\delta$, and the equation of time, $\varepsilon$, are based on \emph{Astronomical Algorithms}, Meeus.~ Solar declination is a function of local/site latitude.
 
 The fractional year is calculated, in radians:
 
@@ -38,16 +38,16 @@ Solar HourAngle (\emph{H}) gives the apparent solar time for the current time pe
 \begin{longtable}[c]{@{}ll@{}}
 \caption{  Relationship of Angles (degrees) to Time \protect \label{table:relationship-of-angles-degrees-to-time}}\\
 \toprule 
-Unit of Angle & Equivalent time \tabularnewline \midrule
+\textbf{Unit of Angle} & \textbf{Equivalent time} \tabularnewline \midrule
 \endhead
-1 radian & 3.819719 hours \tabularnewline
-1 degree & 4 minutes \tabularnewline
-1 arcmin & 4 seconds \tabularnewline
+1 radian & 3.819719 hours \tabularnewline \midrule
+1 degree & 4 minutes \tabularnewline \midrule
+1 arcmin & 4 seconds \tabularnewline \midrule
 1 arcsec & 0.066667 seconds \tabularnewline
 \bottomrule
 \end{longtable}
 
-The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degrees).~ The Solar Azimuth Angle (f) is measured from the North (clockwise) and is expressed in degrees.~ This is shown more clearly in the following figure.
+The Solar Altitude Angle ($\beta$) is the angle of the sun above the horizontal (degrees).~ The Solar Azimuth Angle ($\phi$) is measured from the North (clockwise) and is expressed in degrees.~ This is shown more clearly in the following figure.
 
 \begin{figure}[hbtp] % fig 39
 \centering
@@ -57,7 +57,7 @@ The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degre
 
 \subsection{Surface Geometry}\label{surface-geometry}
 
-Shadow calculations first require that the building surfaces be described geometrically. Surfaces are described by the coordinates of their vertices in a three dimensional Cartesian coordinate system. This Right-hand coordinate system has the X-axis pointing east, the Y-axis pointing north, and the Z-axis pointing up (see figure below). The azimuth angle (y) of a surface is the angle from the north axis to the projection onto the X-Y plane of a normal to the surface (clockwise positive). The surface tilt angle (f) is the angle between the Z-axis and the normal to the surface. The vertices are recorded in counter-clockwise sequence (as the surface is viewed from outside its zone).
+Shadow calculations first require that the building surfaces be described geometrically. Surfaces are described by the coordinates of their vertices in a three dimensional Cartesian coordinate system. This Right-hand coordinate system has the X-axis pointing east, the Y-axis pointing north, and the Z-axis pointing up (see figure below). The azimuth angle ($\psi$) of a surface is the angle from the north axis to the projection onto the X-Y plane of a normal to the surface (clockwise positive). The surface tilt angle ($\phi$) is the angle between the Z-axis and the normal to the surface. The vertices are recorded in counter-clockwise sequence (as the surface is viewed from outside its zone).
 
 During surface entry, surfaces are checked for convex or non-convex shape. If non-convex and inappropriate (used as a receiving surface) then a severe error is produced telling the user that shadowing calculations may be inaccurate.
 
@@ -99,7 +99,7 @@ zo -- represents Zone Origin
 
 br -- represents the Zone Origin as input (relative to building origin)
 
-The zone may also be rotated y\(_{z}\) degrees relative to the building coordinates. Origins of zone surfaces are then given relative to the zone coordinate system. The global coordinates of the surface origins are calculated by:
+The zone may also be rotated $\psi$\(_{z}\) degrees relative to the building coordinates. Origins of zone surfaces are then given relative to the zone coordinate system. The global coordinates of the surface origins are calculated by:
 
 \begin{equation}
 {X_{so}} = {X_{zo}} + {X_{zr}}\cdot \cos {\psi_z} - {Y_{zr}}\cdot \sin {\psi_z}
@@ -113,13 +113,13 @@ The zone may also be rotated y\(_{z}\) degrees relative to the building coordina
 {X_{so}} = {X_{zo}} + {X_{zr}}\cdot \cos {\psi_z} - {Y_{zr}}\cdot \sin {\psi_z}
 \end{equation}
 
-A surface azimuth angle relative to the zone coordinate system (y\(_{s}\)) is converted to a global azimuth by:
+A surface azimuth angle relative to the zone coordinate system ($\psi$\(_{s}\)) is converted to a global azimuth by:
 
 \begin{equation}
 \psi  = {\psi_s} + {\psi_z} + {\psi_b}
 \end{equation}
 
-The surface tilt angle (f) is not changed by these rotations about the Z-axis.
+The surface tilt angle ($\phi$) is not changed by these rotations about the Z-axis.
 
 The coordinates of the surface vertices are given in a coordinate system in the plane of the surface relative to the second vertex as shown for surfaces in Figure~\ref{fig:energyplus-coordinate-system}. The X-axis of the surface coordinate system is a horizontal line through the second vertex. The global coordinates of the surface vertices are given by:
 
@@ -263,9 +263,12 @@ Note that the use of homogeneous coordinates as outlined above provides a consis
 
 Two methods for polygon clipping (treating of overlapping shadows) are currently in use in EnergyPlus.
 
-*~Convex Weiler - Atherton
-
-*~Sutherland -- Hodgman
+\begin{itemize}
+\item
+  Convex Weiler - Atherton
+\item
+  Sutherland -- Hodgman
+\end{itemize}
 
 The original EnergyPlus method for polygon clipping is a special version of the Weiler-Atherton model (Weiler, Atherton, 1977). It was developed to be sufficiently general to clip concave polygons with holes. The implementation in the current version of EnergyPlus, however, does not support concave shadowing surfaces or holes. The relative computational complexity is preserved -- the algorithm is carried out in four steps. For example, if A and B are polygons (see Figure~\ref{fig:point-a-vertex-of-a-enclosed-by-b}).
 
@@ -289,11 +292,14 @@ For ConvexWeilerAtherton, there is considerable simplification if only convex (n
 
 The vertices that define the overlap between two convex polygons, A and B, consist of:
 
-*~the vertices of A enclosed by B
-
-*~the vertices of B enclosed by A
-
-*~and the intercepts of the sides of A with the sides of B
+\begin{itemize}
+\item
+  the vertices of A enclosed by B
+\item
+  the vertices of B enclosed by A
+\item
+  and the intercepts of the sides of A with the sides of B
+\end{itemize}
 
 In Figure~\ref{fig:point-a-vertex-of-a-enclosed-by-b}, point a is the result of rule 1, point c is the result of rule 2, and points b and d result from rule 3. The overlap of A and B is the polygon a-b-c-d. Figure~\ref{fig:surface-a-totally-overlaps-surface-b.} shows an overlap where all of the vertices of B are enclosed by A.~ Figure~\ref{fig:figure-formed-from-intercept-overlaps-between} shows an overlap defined only by the intercepts of A and B. Figure~\ref{fig:complex-overlapping-condition} shows a more complex overlap.
 
@@ -325,7 +331,7 @@ Once the vertices are determined, they must be sorted into clockwise order for t
 Area = {\textstyle{1 \over 2}}\sum\limits_{i = 1}^n {({x_i}{y_{i + 1}} - {x_{i + 1}}{y_i})}
 \end{equation}
 
-where (x\(_{1}\),y\(_{1}\)) = (x\(_{1}\), y\(_{1}\))
+where (x\(_{n+1}\),y\(_{n+1}\)) = (x\(_{1}\), y\(_{1}\))
 
 The area is positive if the vertices are counter-clockwise and negative if they are clockwise.
 
@@ -343,10 +349,10 @@ The following convention was adopted:
 \begin{longtable}[c]{@{}ll@{}}
 \caption{  Surface / Area Characteristic / Convention \protect \label{table:surface-area-characteristic-convention}}\\
 \toprule 
-Surface Characteristic & Area Convention \tabularnewline \midrule
+\textbf{Surface Characteristic} & \textbf{Area Convention} \tabularnewline \midrule
 \endhead
-receiving surface & positive (A) \tabularnewline
-overlap between shadow and receiving & negative (B  \&  C) \tabularnewline
+receiving surface & positive (A) \tabularnewline \midrule
+overlap between shadow and receiving & negative (B  \&  C) \tabularnewline \midrule
 overlap between two shadows & positive (D) \tabularnewline
 \bottomrule
 \end{longtable}
@@ -359,7 +365,7 @@ and so on through multiple overlaps where the sign of the overlap area is the pr
 \caption{  Multiple Shadow Overlaps \protect \label{fig:multiple-shadow-overlaps}}
 \end{figure}
 
-Partially transparent shadowing surfaces can also be modeled by giving a transparency (t)to every shadowing polygon. Let tof the receiving polygon be one. Then the tof every overlap of polygons i and jis the product of t\(_{i}\)and t\(_{j}\)The shaded area is then computed by summing A\(_{i}\)·(1 - t\(_{i}\)) for all overlap polygons.
+Partially transparent shadowing surfaces can also be modeled by giving a transparency ($\tau$) to every shadowing polygon. Let $\tau$ of the receiving polygon be one. Then the $\tau$ of every overlap of polygons i and j is the product of $\tau$\(_{i}\)and $\tau$\(_{j}\). The shaded area is then computed by summing A\(_{i}\)·(1 - $\tau$\(_{i}\)) for all overlap polygons.
 
 It is easy to determine the sunlit area of a window once all the shadow and overlap vertices on the wall have been computed. Consider wall 2 of Figure~\ref{fig:overall-shadowing-scheme-depiction}. First, the wall is considered a simple rectangle and the window on it is ignored. The shadow overlapping is performed and the sunlit portion of the gross wall area is computed. Then the window rectangle is overlapped with the shadow to determine its sunlit area. The sunlit area of the window is subtracted from the gross wall sunlit area to determine the net wall sunlit area. During this calculation it is not necessary to recompute the shadows, because they were precisely determined on the wall.
 
@@ -389,9 +395,9 @@ I\(_{s}\) = intensity of sky diffuse radiation
 
 I\(_{g}\) = intensity of ground reflected diffuse radiation
 
-F\(_{s}\) = angle factor between the surface and the sky
+F\(_{ss}\) = angle factor between the surface and the sky
 
-F\(_{g}\) = angle factor between the surface and the ground
+F\(_{sg}\) = angle factor between the surface and the ground
 
 For the surface of a building located on a featureless plain
 
@@ -405,9 +411,9 @@ and
 {F_{sg}} = \frac{{1 - \cos \phi }}{2}
 \end{equation}
 
-If the surface is shaded the program modifies \emph{F\(_{s}\)}by a correction factor that takes into account the radiance distribution of the sky (see ``Shadowing of Sky Diffuse Solar Radiation'').
+If the surface is shaded the program modifies \emph{F\(_{ss}\)} by a correction factor that takes into account the radiance distribution of the sky (see ``Shadowing of Sky Diffuse Solar Radiation'').
 
-Shading of ground diffuse solar radiation is not calculated by the program. It is up to the user to estimate the effect of this shading and modify the input value of \emph{F\(_{g}\)}accordingly.
+Shading of ground diffuse solar radiation is not calculated by the program. It is up to the user to estimate the effect of this shading and modify the input value of \emph{F\(_{sg}\)} accordingly.
 
 \subsection{Solar Distribution}\label{solar-distribution}
 
@@ -482,7 +488,7 @@ where
 
 \paragraph{Interior Diffuse Radiation}\label{interior-diffuse-radiation}
 
-\emph{QS} is assumed to be uniformly distributed throughout the zone. It is calculated as follows. Let \emph{Q\(_{w}\)} be the total diffuse short-wave radiation entering the zone or originating in the zone. Since \emph{Q\(_{w}\)} is ultimately absorbed or transmitted by zone heat transfer surfaces, summing over these surfaces gives the following energy balance equation:
+\emph{QS} is assumed to be uniformly distributed throughout the zone. It is calculated as follows. Let \emph{Q\(_{sw}\)} be the total diffuse short-wave radiation entering the zone or originating in the zone. Since \emph{Q\(_{sw}\)} is ultimately absorbed or transmitted by zone heat transfer surfaces, summing over these surfaces gives the following energy balance equation:
 
 \begin{equation}
 \sum\limits_{i = 1}^{{N_{surf}}} {QS(ZoneNum)*{\alpha_i}{A_i} = {Q_{SW}}(ZoneNum)}
@@ -492,7 +498,7 @@ where
 
 \emph{i} = zone surface number counter
 
-\emph{N\(_{f}\)} = number of heat transfer surfaces in zone
+\emph{N\(_{surf}\)} = number of heat transfer surfaces in zone
 
 \emph{A\(_{i}\)} = surface area {[}m\(^{2}\){]}
 
@@ -510,7 +516,7 @@ where
 VMULT(ZoneNum) = \frac{1}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsIntSur{f_i}*{A_i}} }}{\rm{    [}}{{\rm{m}}^{{\rm{ - 2}}}}]
 \end{equation}
 
-\emph{Q\(_{w}\)} is given by
+\emph{Q\(_{sw}\)} is given by
 
 \begin{equation}
 \begin{array}{l}
@@ -621,13 +627,13 @@ The inside beam solar irradiance factor\protect\hyperlink{ux5fftn4}{{[}4{]}} in 
 
 \emph{i} = exterior window number
 
-\emph{N\(_{n}\) =} number of exterior windows in zone
+\emph{N\(_{extwin}\) =} number of exterior windows in zone
 
 \emph{CosInc\(_{i}\)} = cosine of angle of incidence of beam on exterior window \emph{i}
 
 \emph{TBm\(_{i}\)} = beam-to-beam transmittance of exterior window* i\emph{at}CosInc\(_{i}\)* \protect\hyperlink{ux5fftn5}{{[}5{]}}
 
-\emph{Aoverlap\(_{i}\)(SurfNum)} = beam solar irradiated area of surface \emph{SurfNum} projected back onto the plane of exterior window* i* (the \emph{Aoverlap}'s for an exterior window sum up to the glazed area of the window). These overlap areas (Figure~\ref{fig:vertical-section-through-a-two-zone-building}) are determined with the EnergyPlus shadowing routines by considering a zone's exterior window as a ``sending'' surface and the inside faces of the zone's other surfaces as ``receiving'' surfaces (see ``Shading Module''). The overlap areas for a particular exterior window depend on the sun position, the geometry of the window, the geometry of the interior surfaces, and the location of the window with respect to the interior surfaces.
+\emph{Aoverlap\(_{i}\)(SurfNum)} = beam solar irradiated area of surface \emph{SurfNum} projected back onto the plane of exterior window \emph{i} (the \emph{Aoverlap}'s for an exterior window sum up to the glazed area of the window). These overlap areas (Figure~\ref{fig:vertical-section-through-a-two-zone-building}) are determined with the EnergyPlus shadowing routines by considering a zone's exterior window as a ``sending'' surface and the inside faces of the zone's other surfaces as ``receiving'' surfaces (see ``Shading Module''). The overlap areas for a particular exterior window depend on the sun position, the geometry of the window, the geometry of the interior surfaces, and the location of the window with respect to the interior surfaces.
 
 \emph{AbsIntSurf(SurfNum)} = inside face solar absorptance of surface \emph{SurfNum}
 
@@ -639,9 +645,9 @@ The interior short-wave radiation absorbed by layer \emph{l} (glass, shade or bl
 
 \(\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{ [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}\) where
 
-\(\alpha_{l,back}^{dif}\) = the system diffuse solar absorptance of layer* l* for irradiance from the back side
+\(\alpha_{l,back}^{dif}\) = the system diffuse solar absorptance of layer \emph{l} for irradiance from the back side
 
-\(\alpha_{l,back}^{beam}\) = the system beam solar absorptance of layer* l* for irradiance from the back side
+\(\alpha_{l,back}^{beam}\) = the system beam solar absorptance of layer \emph{l} for irradiance from the back side
 
 \emph{A(SurfNum)} = glazing area {[}m\(^{2}\){]}
 
