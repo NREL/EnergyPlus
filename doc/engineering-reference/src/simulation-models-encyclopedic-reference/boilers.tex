@@ -120,7 +120,7 @@ Essentially the boiler model provides a first order approximation of performance
 
 The control algorithm for a steam boiler is an important issue.~ The user may want the boiler to be undersized and in such a case it will not be able to meet the demand side steam flow request.~ Subsequently the boiler load exceeds the boiler nominal capacity.~ The boiler operates at its nominal capacity but is unable to meet the plant heating demand.~ Pseudo code from EnergyPlus has been used to describe the control logic used in the steam boiler simulation.
 
-*****************************************PSEUDO CODE SECTION STARTS*************************************
+*********************PSEUDO CODE SECTION STARTS***********************
 
 At start of simulation an initial value of steam mass flow rate is calculated.~ This is required to start the flow of steam around the loop.
 
@@ -216,7 +216,7 @@ End\,\,If
 
 End If statement for the boiler load control algorithm.~ This algorithm determines all possible control conditions that might while simulating a system in EnergyPlus.
 
-*****************************************PSEUDO CODE SECTION ENDS****************************************
+*********************PSEUDO CODE SECTION STARTS***********************
 
 If the boiler operating pressure exceeds the maximum allowable boiler pressure, the simulation trips and outputs a warning regarding the same.~ This notifies the user about potential system pressure sizing problems.
 
@@ -231,63 +231,62 @@ It is assumed that the steam boiler operates to maintain a desired temperature, 
 \subsubsection{Nomenclature for Steam Loop}\label{nomenclature-for-steam-loop}
 
 % table 50
-\begin{longtable}[c]{p{3.67in}p{2.31in}}
+\begin{longtable}[c]{p{1.0in}p{4.0in}}
 \caption{  Steam Loop Nomenclature \protect \label{table:steam-loop-nomenclature}}\\
 \toprule 
-\$\{Q\_B\}\$ & Boiler Heat Transfer.~ W. \tabularnewline \midrule
-\endhead
-\$\{Q\_\{B,N\}\}\$ & Boiler Nominal Capacity.~ W. \tabularnewline
-\$\textbackslash,\{O\_\{PLR\}\}\$ & Boiler Operating Part Load Ratio.~ \tabularnewline
-\$\textbackslashDelta \{T\_\{sc\}\}\$ & Degree of subcooling in coil.~ \tabularnewline
-\$\textbackslashDelta \{T\_\{in\_out\}\}\$ & Temperature difference across the steam boiler.~ ºC. \tabularnewline
-\$\{\textbackslashrho\_w\}\$ & Density of condensate entering the pump.~ Kg/m3.~ \tabularnewline
-\$\{Q\_\{Des\}\}\$ & Design Load on the steam coil.~ W. \tabularnewline
-\$\{h\_\{f,\textbackslash,n\}\}\$ & Enthalpy of fluid at point n on the Ts diagram.~ J/kg. \tabularnewline
-\$\{P\_\{Frac\}\}\$ & Fraction of Pump Full Load Power.~ W. \tabularnewline
-\$\{F\_\{m,f\}\}\$ & Fractional Motor Power Lost to Fluid.~ W. \tabularnewline
-\$\{Q\_\{a,l\}\}\$ & Heating load on the Air Loop Steam Coil.~ W. \tabularnewline
-\$\{Q\_\{z,c\}\}\$ & Heating load on the Zone Steam Coil.~ W. \tabularnewline
-\$\{h\_\{fg,\{T\_\{Loop\}\}\}\}\$ ~ & Latent heat of steam at Loop operating Temperature.~ J/kg. \tabularnewline
-\$\{h\_\{fg\}\}\$ & Latent Heat of Steam.~ J/kg. \tabularnewline
-\$\{Q\_\{L,H\}\}\$ & Latent Heat Part of the Heating Coil Load.~ W. \tabularnewline
-\$\textbackslashDelta \{Q\_\{loss\}\}\$ & Loop losses in steam coil.~ W. \tabularnewline
-\$\textbackslashDelta \{T\_\{loop\textbackslash,\textbackslash,\}\}\$ & Loop Temperature Difference. \tabularnewline
-\$\{\textbackslashdot m\_a\}\$ & Mass flow rate for steam coil Kg/s. \tabularnewline
-\$\{\textbackslashdot m\_\{in\}\}\$ & Mass flow rate of steam entering the steam coil .Kg/s. \tabularnewline
-\$\{\textbackslashdot m\_\{a,l\}\}\$ & Mass flow rate of steam for Air loop steam coil Kg/s \tabularnewline
-\$\{\textbackslashdot m\_\{z,c\}\}\$ & Mass flow rate of steam for zone steam coil Kg/s. \tabularnewline
-\$\{\textbackslashdot m\_s\}\$ & Mass flow rate of steam.~ Kg/s. \tabularnewline
-\$\{\textbackslashdot m\_\{loop\}\}\$ & Mass flow rate of steam for the steam loop.~ Kg/s. \tabularnewline
-\$\textbackslashdot m\$ & Mass of condensate entering the pump.~ Kg/s. \tabularnewline
-\$\{\textbackslashdot m\_\{a,\textbackslashmax \}\}\$ ~ & Maximum allowed mass flow rate of air.~ Kg/s \tabularnewline
-\$\{\textbackslashdot m\_\{S,\textbackslashmax \}\}\$ & Maximum Mass flow rate of steam Kg/s \tabularnewline
-\$\{\textbackslashdot m\_\{B,Supply\}\}\$ & Maximum steam mass flow rate supplied by boiler.~ Kg/s. \tabularnewline
-\$\{\textbackslashdot V\_\{w,\textbackslashmax \}\}\textbackslash,\textbackslash,\$ & Maximum Volume flow rate of condensate in pump.~ m   /s. \tabularnewline
-\$\{\textbackslashdot V\_\{w,loop\}\}\$ & Maximum Volume flow rate of condensate in steam loop.~ m   /s. \tabularnewline
-\$\{T\_\{a,\textbackslash,\textbackslash,in,\textbackslash,\textbackslash,\textbackslashmin \}\}\$ & Minimum inlet air temperature possible.~ ºC. \tabularnewline
-\$\{P\_n\}\textbackslash,\textbackslash,\$ & Nominal Power Capacity for condensate pump.~ W. \tabularnewline
-\$\{P\_\{nom\}\}\$ & Nominal power of the pump.~ W. \tabularnewline
-\$\{H\_n\}\$ & Nominal Pump Head.~ M. \tabularnewline
-\$\{\textbackslashdot V\_\{nom\}\}\$ & Nominal volume flow rate through the condensate pump.~ m   /s. \tabularnewline
-\$PLR\$ & Part Load Ratio for condensate pump. \tabularnewline
-\$\{\textbackslasheta\_\{\textbackslashrm\{p\}\}\}\$ & Pump efficiency. \tabularnewline
-\$\{\textbackslasheta\_m\}\$ & Pump Motor Efficiency. \tabularnewline
-\$\{P\_\{\}\}\$ & Pump Power.~ W. \tabularnewline
-\$\{Q\_\{S,H\}\}\$ & Sensible Heat Part of the Heating Coil Load.~ W. \tabularnewline
-\$\{T\_\{sp\}\}\$ & Setpoint Temperature of the zone.~ ºC. \tabularnewline
-\$\{T\_\{a,out,SP\}\}\$ & Setpoint air outlet temperature for the steam coil.~ ºC. \tabularnewline
-\$\{P\_S\}\$ & Shaft power of the pump.~ W. \tabularnewline
-\$\textbackslash,\textbackslash,\{c\_\{p,\textbackslash,a\}\}\$ & Specific Heat Capacity for Air.~ J/Kg K. \tabularnewline
-\$\textbackslash,\textbackslash,\{c\_\{p,\textbackslash,w\}\}\$ & Specific Heat Capacity for Water.~ J/Kg K. \tabularnewline
-\$\{\textbackslasheta\_B\}\$ & Steam Boiler Efficiency. \tabularnewline
-\$\textbackslash,Ta,\textbackslash,i\{n\_\{\}\}\textbackslash,\$ & Temperature of air entering the coil.~ ºC. \tabularnewline
-\$\{T\_a\}\$ & Temperature of air entering the steam coil.~ ºC. \tabularnewline
-\$Ta,out\textbackslash,\textbackslash,\textbackslash,\textbackslash,\textbackslash,\$ & Temperature of air leaving the coil.~ ºC. \tabularnewline
-\$Ts,in\$ & Temperature of steam entering the coil.~ ºC. \tabularnewline
-\$\{F\_t\}\$ & Theoretical Fuel Consumption by the Steam Boiler.~ W. \tabularnewline
-\$\{\textbackslashdot m\_\{coils,R\}\}\$ & Total Mass flow rate requested by all the steam coils.~ Kg/s. \tabularnewline
-\$\textbackslashdot V\$ & Volume of condensate entering the pump.~ m   /s. \tabularnewline
-\$Tw,\textbackslash,out\$ & Water outlet temperature from pump.~ ºC. \tabularnewline
+\({Q_{B}}\) & Boiler Heat Transfer.~ W. \tabularnewline
+\({Q_{B,N}}\) & Boiler Nominal Capacity.~ W. \tabularnewline
+\({O_{PLR}}\) & Boiler Operating Part Load Ratio.~ \tabularnewline
+\(\Delta\)T\(_{sc}}\) & Degree of subcooling in coil.~ \tabularnewline
+\(\Delta\)T\(_{in_out}}\) & Temperature difference across the steam boiler.~ ºC. \tabularnewline
+\(\rho\)\(_{w}}\) & Density of condensate entering the pump.~ Kg/m\(^3\).~ \tabularnewline
+\(Q_{Des}}\) & Design Load on the steam coil.~ W. \tabularnewline
+\(h_{f,n}}\) & Enthalpy of fluid at point n on the Ts diagram.~ J/kg. \tabularnewline
+\(P_{Frac}}\) & Fraction of Pump Full Load Power.~ W. \tabularnewline
+\(F_{m,f}}\) & Fractional Motor Power Lost to Fluid.~ W. \tabularnewline
+\(Q_{a,l}}\) & Heating load on the Air Loop Steam Coil.~ W. \tabularnewline
+\(Q_{z,c}}\) & Heating load on the Zone Steam Coil.~ W. \tabularnewline
+\(h_{fg,T_loop}}\) & Latent heat of steam at Loop operating Temperature.~ J/kg. \tabularnewline
+\(h_{fg}}\) & Latent Heat of Steam.~ J/kg. \tabularnewline
+\(Q_{L,H}}\) & Latent Heat Part of the Heating Coil Load.~ W. \tabularnewline
+\(\Delta\)Q\(_{loss}}\) & Loop losses in steam coil.~ W. \tabularnewline
+\(\Delta\)T\(_{loop}}\) & Loop Temperature Difference. \tabularnewline
+\(\dot m_{a}\) & Mass flow rate for steam coil Kg/s. \tabularnewline
+\(\dot m_{in}\) & Mass flow rate of steam entering the steam coil .Kg/s. \tabularnewline
+\(\dot m_{a,l}\) & Mass flow rate of steam for Air loop steam coil Kg/s \tabularnewline
+\(\dot m_{z,c}\) & Mass flow rate of steam for zone steam coil Kg/s. \tabularnewline
+\(\dot m_{s}\) & Mass flow rate of steam.~ Kg/s. \tabularnewline
+\(\dot m_{loop}\) & Mass flow rate of steam for the steam loop.~ Kg/s. \tabularnewline
+\(\dot m\) & Mass of condensate entering the pump.~ Kg/s. \tabularnewline
+\(\dot m_{a,max}\) & Maximum allowed mass flow rate of air.~ Kg/s \tabularnewline
+\(\dot m_{S,max}\) & Maximum Mass flow rate of steam Kg/s \tabularnewline
+\(\dot m_{B,Supply}\) & Maximum steam mass flow rate supplied by boiler.~ Kg/s. \tabularnewline
+\(\dot V_{w,max}\) & Maximum Volume flow rate of condensate in pump.~ m\(^3\)/s. \tabularnewline
+\(\dot V_{w,loop}\) & Maximum Volume flow rate of condensate in steam loop.~ m\(^3\)/s. \tabularnewline
+\(T_{a,in,min}\) & Minimum inlet air temperature possible.~ ºC. \tabularnewline
+\(P_{n}\) & Nominal Power Capacity for condensate pump.~ W. \tabularnewline
+\(P_{nom}\) & Nominal power of the pump.~ W. \tabularnewline
+\(H_{n}\) & Nominal Pump Head.~ M. \tabularnewline
+\(\dot V_{nom}\) & Nominal volume flow rate through the condensate pump.~ m\(^3\)/s. \tabularnewline
+PLR & Part Load Ratio for condensate pump. \tabularnewline
+\(\eta\)\(_{p}\) & Pump efficiency. \tabularnewline
+\(\eta\)\(_{m}\) & Pump Motor Efficiency. \tabularnewline
+P & Pump Power.~ W. \tabularnewline
+\(Q_{S,H}\) & Sensible Heat Part of the Heating Coil Load.~ W. \tabularnewline
+\(T_{sp}\) & Setpoint Temperature of the zone.~ ºC. \tabularnewline
+\(T_{a,out,SP}\) & Setpoint air outlet temperature for the steam coil.~ ºC. \tabularnewline
+\(P_{S}\) & Shaft power of the pump.~ W. \tabularnewline
+\(c_{p,a}\) & Specific Heat Capacity for Air.~ J/Kg K. \tabularnewline
+\(c_{p,w}\) & Specific Heat Capacity for Water.~ J/Kg K. \tabularnewline
+\(\eta\)\(_{B}\) & Steam Boiler Efficiency. \tabularnewline
+\(T_{a,in}\) & Temperature of air entering the coil.~ ºC. \tabularnewline
+\(T_{a}\) & Temperature of air entering the steam coil.~ ºC. \tabularnewline
+\(T_{a,out}\) & Temperature of air leaving the coil.~ ºC. \tabularnewline
+\(T_{s,in}\) & Temperature of steam entering the coil.~ ºC. \tabularnewline
+\(F_{in}\) & Theoretical Fuel Consumption by the Steam Boiler.~ W. \tabularnewline
+\(\dot m_{coils,R}\) & Total Mass flow rate requested by all the steam coils.~ Kg/s. \tabularnewline
+\(\dot V\) & Volume of condensate entering the pump.~ m\(^3\)/s. \tabularnewline
+\(T_{w,out}\) & Water outlet temperature from pump.~ ºC. \tabularnewline
 \bottomrule
 \end{longtable}
 
