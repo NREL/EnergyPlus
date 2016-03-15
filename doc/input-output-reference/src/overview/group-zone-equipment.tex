@@ -101,18 +101,18 @@ Two example IDF excerpts (one with duct leakage, one without):
 \begin{lstlisting}
 
 ZoneHVAC:AirDistributionUnit,
-      SPACE1-1 ATU,            !- Air Distribution Unit Name
-      SPACE1-1 In Node,        !- Air Dist Unit Outlet Node Name
-      AIRTERMINAL:SINGLEDUCT:VAV:REHEAT,  !- KEY--System Component Type 1
-      SPACE1-1 VAV Reheat;     !- Component Name 1
+      SPACE1-1 ATU,            !- Air Distribution Unit Name
+      SPACE1-1 In Node,        !- Air Dist Unit Outlet Node Name
+      AIRTERMINAL:SINGLEDUCT:VAV:REHEAT,  !- KEY--System Component Type 1
+      SPACE1-1 VAV Reheat;     !- Component Name 1
 
   ZoneHVAC:AirDistributionUnit,
-      SPACE4-1 ATU,            !- Air Distribution Unit Name
-      SPACE4-1 In Node,        !- Air Dist Unit Outlet Node Name
-      AIRTERMINAL:SINGLEDUCT:VAV:REHEAT,  !- KEY--System Component Type 1
-      SPACE4-1 VAV Reheat,     !- Component Name 1
-      0.05,                    !- upstream nominal leakage fraction
-      0.07;                    !- downstream constant leakage fraction
+      SPACE4-1 ATU,            !- Air Distribution Unit Name
+      SPACE4-1 In Node,        !- Air Dist Unit Outlet Node Name
+      AIRTERMINAL:SINGLEDUCT:VAV:REHEAT,  !- KEY--System Component Type 1
+      SPACE4-1 VAV Reheat,     !- Component Name 1
+      0.05,                    !- upstream nominal leakage fraction
+      0.07;                    !- downstream constant leakage fraction
 \end{lstlisting}
 
 \subsection{ZoneHVAC:EquipmentConnections}\label{zonehvacequipmentconnections}
@@ -160,12 +160,12 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 ZoneHVAC:EquipmentConnections,
-      SPACE3-1,              !- Zone Name
-      SPACE3-1 Eq,           !- List Name: Zone Equipment
-      SPACE3-1 In Nodes,     !- List Name: Zone Air Inlet Nodes
-      ,                      !- List Name: Zone Air Exhaust Nodes
-      SPACE3-1 Node,         !- Zone Air Node Name
-      SPACE3-1 Out Node;     !- Zone Return Air Node Name
+      SPACE3-1,              !- Zone Name
+      SPACE3-1 Eq,           !- List Name: Zone Equipment
+      SPACE3-1 In Nodes,     !- List Name: Zone Air Inlet Nodes
+      ,                      !- List Name: Zone Air Exhaust Nodes
+      SPACE3-1 Node,         !- Zone Air Node Name
+      SPACE3-1 Out Node;     !- Zone Return Air Node Name
 \end{lstlisting}
 
 The following HVAC equipment types are allowed as zone equipment. The component matrix shows which coils and fans are allowed with which equipment models.
@@ -250,22 +250,22 @@ Examples of this statement in an IDF are:
 
 \begin{lstlisting}
 
-  ZoneHVAC:EquipmentList,
-      Zone1Equipment,          !- Name
-      ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-      Zone1TermReheat,         !- Zone Equipment 1 Name
-      1,                       !- Zone Equipment 1 Cooling Sequence
-      1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+  ZoneHVAC:EquipmentList,
+      Zone1Equipment,          !- Name
+      ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+      Zone1TermReheat,         !- Zone Equipment 1 Name
+      1,                       !- Zone Equipment 1 Cooling Sequence
+      1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
 
-    ZoneHVAC:EquipmentList,
-      Zone1Equipment,          !- Name
-      AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-      Zone1DirectAir,          !- Zone Equipment 1 Name
-      1,                       !- Zone Equipment 1 Cooling Sequence
-      1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-      ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-      Zone1WTAHP,              !- Zone Equipment 2 Name
-      2,                       !- Zone Equipment 2 Cooling Sequence
-      2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ZoneHVAC:EquipmentList,
+      Zone1Equipment,          !- Name
+      AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
+      Zone1DirectAir,          !- Zone Equipment 1 Name
+      1,                       !- Zone Equipment 1 Cooling Sequence
+      1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+      ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
+      Zone1WTAHP,              !- Zone Equipment 2 Name
+      2,                       !- Zone Equipment 2 Cooling Sequence
+      2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 \end{lstlisting}

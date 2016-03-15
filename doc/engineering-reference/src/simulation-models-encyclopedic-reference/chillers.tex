@@ -866,7 +866,7 @@ To make sure that the exhaust mass flow rate and temperature from microturbine a
 {Q_{Recovery}} = {\dot m_{ExhAir}} \cdot {\rm{}}C{p_{Air}} \cdot {\rm{}}({T_{a,o}} - {T_{Abs,gen,o}})
 \end{equation}
 
-T\(_{ }\) is the minimum temperature required for the proper operation of the double-effect chiller. It will be defaulted to 176°C.
+T\(_{ }\) is the minimum temperature required for the proper operation of the double-effect chiller. It will be defaulted to 176°C.
 
 The electric input to cooling output ratio as function of temperature (\emph{CEIRfT}) curve represents the fraction of electricity to the chiller at full load as it varies with temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature.
 
@@ -1057,7 +1057,7 @@ This chiller's basin heater (for evaporatively-cooled condenser type) operates i
 \begin{figure}[hbtp] % fig 161
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image3175.png}
-\caption{  Diagram of Chiller:Electric with Heat Recovery \protect \label{fig:diagram-of-chiller-electric-with-heat}}
+\caption{  Diagram of Chiller:Electric with Heat Recovery \protect \label{fig:diagram-of-chiller-electric-with-heat}}
 \end{figure}
 
 The algorithm for the heat recovery portion of the chiller needs to be determined from relatively simple inputs to estimate the amount of the heat that is recovered and then send the rest of the heat to the cooling tower. For the chiller models associated with the object Chiller:Electric,~ air- or evaporatively-cooled condensers are allowed to be used with heat recovery and, when used, the condenser specific heat, mass flow rate, and temperatures shown below refer to outdoor air. A condenser air volume flow rate must be specified when using heat recovery with air- or evaporatively-cooled chillers.
@@ -1260,7 +1260,7 @@ where
 
 \emph{T\(_{l}\)}~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{e}\)}\(_{ }\) = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{e}\)}\(_{ }\) = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
@@ -1324,7 +1324,7 @@ where
 
 \({\mathop Q\limits^ \bullet_{evap}}\) ~~~~~~~~ = load to be met by the chiller, W
 
-\emph{PLR\(_{ }\)} = maximum part-load ratio (specified by the user in the input data file)
+\emph{PLR\(_{ }\)} = maximum part-load ratio (specified by the user in the input data file)
 
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g.~hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part load ratio yielding constant electrical power consumption under these conditions. Below the minimum part load ratio, the chiller cycles on and off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part load ratio is less than the minimum part load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
@@ -1582,7 +1582,7 @@ where
 
 \emph{T\(_{l}\)}~~~~~~~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·~~~~~~~~The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
@@ -1592,7 +1592,7 @@ where
 
 \emph{T\(_{l}\)}~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve parameterizes the variation of the energy input ratio (EIR). The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 at the reference leaving condenser water temperature with part-load ratio equal to 1.0. It is recommended that this performance curve be developed using both full- and part-load performance data. The bicubic curve should be valid for the range of condenser water temperatures and part-load ratios anticipated for the simulation (otherwise the program issues warning messages). Either of the following two types of curves can be used.
 
@@ -1610,7 +1610,7 @@ where
 
 \emph{ChillerEIRFPLR} = Energy input to cooling output factor, equal to 1 at the reference leaving condenser water temperature and PLR = 1.0
 
-\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 \emph{PLR}~~~~~ = Part load ratio = (cooling load) / (chiller's available cooling capacity)
 
@@ -1696,7 +1696,7 @@ where
 
 \({\mathop Q\limits^ \bullet_{evap}}\) ~~~~~~~~ = load to be met by the chiller, W
 
-\emph{PLR\(_{ }\)} = maximum part-load ratio (specified by the user in the input data file)
+\emph{PLR\(_{ }\)} = maximum part-load ratio (specified by the user in the input data file)
 
 Note that the maximum part-load ratio (PLR\(_{x}\), specified in the Chiller:Electric:ReformulatedEIR object) used in the equation should be less than or equal to the maximum part-load ratio specified in the ``Energy Input to Cooling Output Ratio Function of Part-Load Ratio'' performance curve object.
 

@@ -123,38 +123,38 @@ The pieces of the definition that designate BuildingSurface:Detailed surfaces as
 
 \begin{lstlisting}
 
-  A5 , \field Outside Boundary Condition
-         \required-field
-         \type choice
-         \key Surface
-         \key Zone
-         \key Outdoors
-         \key Ground
-         \key OtherSideCoefficients
-         \key OtherSideConditionsModel
-    A6,  \field Outside Boundary Condition Object
-         \type object-list
-         \object-list OutFaceEnvNames
-         \note Non-blank only if the field Outside Boundary Condition is Surface, Zone, OtherSideCoefficients,
-         \note or OtherSideConditionsModel
-         \note If Surface, specify name of corresponding surface in adjacent zone or
-         \note specify current surface name for internal partition separating like zones
-         \note If Zone, specify the name of the corresponding zone and
-         \note the program will generate the corresponding interzone surface
-         \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
-         \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
-    A7 , \field Sun Exposure
-         \required-field
-         \type choice
-         \key SunExposed
-         \key NoSun
-         \default SunExposed
-    A8,  \field Wind Exposure
-         \required-field
-         \type choice
-         \key WindExposed
-         \key NoWind
-         \default WindExposed
+  A5 , \field Outside Boundary Condition
+         \required-field
+         \type choice
+         \key Surface
+         \key Zone
+         \key Outdoors
+         \key Ground
+         \key OtherSideCoefficients
+         \key OtherSideConditionsModel
+    A6,  \field Outside Boundary Condition Object
+         \type object-list
+         \object-list OutFaceEnvNames
+         \note Non-blank only if the field Outside Boundary Condition is Surface, Zone, OtherSideCoefficients,
+         \note or OtherSideConditionsModel
+         \note If Surface, specify name of corresponding surface in adjacent zone or
+         \note specify current surface name for internal partition separating like zones
+         \note If Zone, specify the name of the corresponding zone and
+         \note the program will generate the corresponding interzone surface
+         \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
+         \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
+    A7 , \field Sun Exposure
+         \required-field
+         \type choice
+         \key SunExposed
+         \key NoSun
+         \default SunExposed
+    A8,  \field Wind Exposure
+         \required-field
+         \type choice
+         \key WindExposed
+         \key NoWind
+         \default WindExposed
 \end{lstlisting}
 
 Note that subsurfaces (windows, doors) on these base surfaces will inherit the base surface properties listed above. The following examples will use a bit more of the Surface definition to give context.
@@ -165,18 +165,18 @@ Heat Storage Surfaces (Use current Surface name for ExteriorEnvironment), e.g.:
 
 \begin{lstlisting}
 
-BuildingSurface:Detailed,Zn005:Wall006,  !- Base Surface Name
-    Wall,INTERIOR,  !- Class and Construction Name
-    MAINE WING,  !- Zone
-    Surface, Zn005:Wall006,  !- Exterior Conditions and Target
-     NoSun,  !- Solar Exposure
-     NoWind,  !- Wind Exposure
-    0.5000000    ,  !- VF to Ground
-             4, !-Rectangle
-     57.90000    ,   57.79000    ,   10.00000    ,
-     57.90000    ,   57.79000    ,  0.0000000E+00,
-     57.90000    ,   47.79000    ,  0.0000000E+00,
-     57.90000    ,   47.79000    ,   10.00000    ;
+BuildingSurface:Detailed,Zn005:Wall006,  !- Base Surface Name
+    Wall,INTERIOR,  !- Class and Construction Name
+    MAINE WING,  !- Zone
+    Surface, Zn005:Wall006,  !- Exterior Conditions and Target
+     NoSun,  !- Solar Exposure
+     NoWind,  !- Wind Exposure
+    0.5000000    ,  !- VF to Ground
+             4, !-Rectangle
+     57.90000    ,   57.79000    ,   10.00000    ,
+     57.90000    ,   57.79000    ,  0.0000000E+00,
+     57.90000    ,   47.79000    ,  0.0000000E+00,
+     57.90000    ,   47.79000    ,   10.00000    ;
 \end{lstlisting}
 
 Some surfaces divide the temperature controlled space from the outside environment. Surfaces that are both sun and wind exposed (e.g.~exterior walls, exposed floors, roofs) feel the full effect of both solar radiation and outside temperature, and the outside air film resistance for these surfaces changes with wind speed and wind direction. Surfaces that are not sun or wind exposed (a wall to an ``uncontrolled'' space) are not affected by solar radiation, wind speed or direction and have a constant outside convective air film resistance.
@@ -185,18 +185,18 @@ Heat Transfer Surfaces Exposed to the Outside Environment, such as Exterior Wall
 
 \begin{lstlisting}
 
-BuildingSurface:Detailed,Zn005:Wall002,  !- Base Surface Name
-    Wall,EXTERIOR,  !- Class and Construction Name
-    MAINE WING,  !- Zone
-    Outdoors,,  !- Exterior Conditions and Target (if applicable)
-     SunExposed,  !- Solar Exposure
-     WindExposed,  !- Wind Exposure
-    0.5000000    ,  !- VF to Ground
-             4, !-Rectangle
-     77.90000    ,   47.79000    ,   10.00000    ,
-     77.90000    ,   47.79000    ,  0.0000000E+00,
-     77.90000    ,   67.79000    ,  0.0000000E+00,
-     77.90000    ,   67.79000    ,   10.00000    ;
+BuildingSurface:Detailed,Zn005:Wall002,  !- Base Surface Name
+    Wall,EXTERIOR,  !- Class and Construction Name
+    MAINE WING,  !- Zone
+    Outdoors,,  !- Exterior Conditions and Target (if applicable)
+     SunExposed,  !- Solar Exposure
+     WindExposed,  !- Wind Exposure
+    0.5000000    ,  !- VF to Ground
+             4, !-Rectangle
+     77.90000    ,   47.79000    ,   10.00000    ,
+     77.90000    ,   47.79000    ,  0.0000000E+00,
+     77.90000    ,   67.79000    ,  0.0000000E+00,
+     77.90000    ,   67.79000    ,   10.00000    ;
 \end{lstlisting}
 
 Surfaces such as basement walls and slab floors separate the space from the earth surrounding the surfaces. Therefore, the outside surface temperatures become the ground temperatures.
@@ -205,18 +205,18 @@ Heat Transfer Surfaces in Contact with the Ground, such as Basement Walls or Sla
 
 \begin{lstlisting}
 
-BuildingSurface:Detailed,Zn004:Flr001,  !- Base Surface Name
-    Floor,SLAB FLOOR,  !- Class and Construction Name
-    ARIZONA WING,  !- Zone
-    Ground,,  !- Exterior Conditions and Target (if applicable)
-     NoSun,  !- Solar Exposure
-     NoWind,  !- Wind Exposure
-     1.000000    ,  !- VF to Ground
-             4, !-Rectangle
-     38.01000    ,   8.510000    ,  0.0000000E+00,
-     18.01000    ,   8.510000    ,  0.0000000E+00,
-     18.01000    ,   28.51000    ,  0.0000000E+00,
-     38.01000    ,   28.51000    ,  0.0000000E+00;
+BuildingSurface:Detailed,Zn004:Flr001,  !- Base Surface Name
+    Floor,SLAB FLOOR,  !- Class and Construction Name
+    ARIZONA WING,  !- Zone
+    Ground,,  !- Exterior Conditions and Target (if applicable)
+     NoSun,  !- Solar Exposure
+     NoWind,  !- Wind Exposure
+     1.000000    ,  !- VF to Ground
+             4, !-Rectangle
+     38.01000    ,   8.510000    ,  0.0000000E+00,
+     18.01000    ,   8.510000    ,  0.0000000E+00,
+     18.01000    ,   28.51000    ,  0.0000000E+00,
+     38.01000    ,   28.51000    ,  0.0000000E+00;
 \end{lstlisting}
 
 Other surfaces separate zones that may be at different temperatures. These surface types allow heat transfer (by conduction through the walls) from a zone at a higher temperature to a zone at a lower temperature. The location of the heat storage surface in the zone is not important except in specialized solar studies. The surface above (wall to uncontrolled space) would be more correctly modeled as an interzone surface.
@@ -225,19 +225,19 @@ Heat Transfer Surfaces Exposed to Another Zone, such as Interzone walls, ceiling
 
 \begin{lstlisting}
 
-BuildingSurface:Detailed,Zn005:Wall005,  !- Base Surface Name
-    Wall,INTERIOR,  !- Class and Construction Name
-    MAINE WING,  !- Zone
-    Surface,Zn001:Wall009,  !- Exterior Conditions and Target
-     NoSun,  !- Solar Exposure
-     NoWind,  !- Wind Exposure
-    0.5000000    ,  !- VF to Ground
-             4, !-Rectangle
-     57.90000    ,   47.79000    ,   10.00000    ,
-     57.90000    ,   47.79000    ,  0.0000000E+00,
-     67.90000    ,   47.79000    ,  0.0000000E+00,
-     67.90000    ,   47.79000    ,   10.00000    ;
-   
+BuildingSurface:Detailed,Zn005:Wall005,  !- Base Surface Name
+    Wall,INTERIOR,  !- Class and Construction Name
+    MAINE WING,  !- Zone
+    Surface,Zn001:Wall009,  !- Exterior Conditions and Target
+     NoSun,  !- Solar Exposure
+     NoWind,  !- Wind Exposure
+    0.5000000    ,  !- VF to Ground
+             4, !-Rectangle
+     57.90000    ,   47.79000    ,   10.00000    ,
+     57.90000    ,   47.79000    ,  0.0000000E+00,
+     67.90000    ,   47.79000    ,  0.0000000E+00,
+     67.90000    ,   47.79000    ,   10.00000    ;
+   
 \end{lstlisting}
 
 \subsubsection{Step 3.2.~~~~ Define equivalent surfaces as desired.}\label{step-3.2.-define-equivalent-surfaces-as-desired.}

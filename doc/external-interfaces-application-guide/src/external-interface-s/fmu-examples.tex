@@ -116,8 +116,8 @@ To activate the external interface, we use:
 
 \begin{lstlisting}
 
-ExternalInterface,           !- Object to activate the external interface
-   FunctionalMockupUnitImport; !- Name of external interface
+ExternalInterface,           !- Object to activate the external interface
+   FunctionalMockupUnitImport; !- Name of external interface
 \end{lstlisting}
 
 To define the FMU that will be linked to EnergyPlus, we use:
@@ -125,9 +125,9 @@ To define the FMU that will be linked to EnergyPlus, we use:
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport,
-      MoistAir.fmu,            !- FMU Filename
-      15,                       !- FMU Timeout
-      0;                        !- FMU LoggingOn
+      MoistAir.fmu,            !- FMU Filename
+      15,                       !- FMU Timeout
+      0;                        !- FMU LoggingOn
 \end{lstlisting}
 
 To enter output variables from which the external interface read and send to FMUs, we use:
@@ -135,35 +135,35 @@ To enter output variables from which the external interface read and send to FMU
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      Environment,                      !- EnergyPlus Key Value
-      Site Outdoor Air Drybulb Temperature,     !- EnergyPlus Variable Name
-      MoistAir.fmu,                     !- FMU Filename
-      Model1,                           !-FMU Model Name
-      TDryBul;                          !- FMU Model Variable Name
+      Environment,                      !- EnergyPlus Key Value
+      Site Outdoor Air Drybulb Temperature,     !- EnergyPlus Variable Name
+      MoistAir.fmu,                     !- FMU Filename
+      Model1,                           !-FMU Model Name
+      TDryBul;                          !- FMU Model Variable Name
 
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      ZONE ONE,                         !- EnergyPlus Key Value
-      Zone Mean Air Temperature,        !- EnergyPlus Variable Name
-      MoistAir.fmu,                     !- FMU Filename
-      Model1,                           !- FMU Model Name
-      TRooMea;                          !- FMU Model Variable Name
+      ZONE ONE,                         !- EnergyPlus Key Value
+      Zone Mean Air Temperature,        !- EnergyPlus Variable Name
+      MoistAir.fmu,                     !- FMU Filename
+      Model1,                           !- FMU Model Name
+      TRooMea;                          !- FMU Model Variable Name
 
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      Environment,                      !- EnergyPlus Key Value
-      Site Outdoor Air Relative Humidity,      !- EnergyPlus Variable Name
-      MoistAir.fmu,                     !- FMU Filename
-      Model1,                           !- FMU Model Name
-      outRelHum;                        !- FMU Model Variable Name
+      Environment,                      !- EnergyPlus Key Value
+      Site Outdoor Air Relative Humidity,      !- EnergyPlus Variable Name
+      MoistAir.fmu,                     !- FMU Filename
+      Model1,                           !- FMU Model Name
+      outRelHum;                        !- FMU Model Variable Name
 
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      ZONE ONE,                         !- EnergyPlus Key Value
-      Zone Air Relative Humidity,       !- EnergyPlus Variable Name
-      MoistAir.fmu,                     !- FMU Filename
-      Model1,                           !- FMU Model Name
-      rooRelHum;                        !- FMU Model Variable Name
+      ZONE ONE,                         !- EnergyPlus Key Value
+      Zone Air Relative Humidity,       !- EnergyPlus Variable Name
+      MoistAir.fmu,                     !- FMU Filename
+      Model1,                           !- FMU Model Name
+      rooRelHum;                        !- FMU Model Variable Name
 \end{lstlisting}
 
 These output variables need to be specified in the idf file:
@@ -171,27 +171,27 @@ These output variables need to be specified in the idf file:
 \begin{lstlisting}
 
 Output:Variable,
-      Environment,                 !- Key Value
-      Site Outdoor Air Drybulb Temperature,            !- Variable Name
-      TimeStep;                    !- Reporting Frequency
+      Environment,                 !- Key Value
+      Site Outdoor Air Drybulb Temperature,            !- Variable Name
+      TimeStep;                    !- Reporting Frequency
 
 
   Output:Variable,
-      ZONE ONE,                    !- Key Value
-      Zone Mean Air Temperature,   !- Variable Name
-      TimeStep;                    !- Reporting Frequency
+      ZONE ONE,                    !- Key Value
+      Zone Mean Air Temperature,   !- Variable Name
+      TimeStep;                    !- Reporting Frequency
 
 
   Output:Variable,
-      Environment,                 !- Key Value
-      Site Outdoor Air Relative Humidity,   !- Variable Name
-      TimeStep;                    !- Reporting Frequency
+      Environment,                 !- Key Value
+      Site Outdoor Air Relative Humidity,   !- Variable Name
+      TimeStep;                    !- Reporting Frequency
 
 
   Output:Variable,
-      ZONE ONE,                    !- Key Value
-      Zone Air Relative Humidity,  !- Variable Name
-      TimeStep;                    !- Reporting Frequency
+      ZONE ONE,                    !- Key Value
+      Zone Air Relative Humidity,  !- Variable Name
+      TimeStep;                    !- Reporting Frequency
 \end{lstlisting}
 
 To enter schedules to which the external interface writes, we use:
@@ -199,21 +199,21 @@ To enter schedules to which the external interface writes, we use:
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
-      FMU_OthEquSen_ZoneOne,   !- EnergyPlus Variable Name
-      Any Number,              !- Schedule Type Limits Names
-      MoistAir.fmu,            !- FMU Filename
-      Model1,                  !- FMU Model Name
-      QSensible,               !- FMU Model Variable Name
-      0;                       !- Initial Value
+      FMU_OthEquSen_ZoneOne,   !- EnergyPlus Variable Name
+      Any Number,              !- Schedule Type Limits Names
+      MoistAir.fmu,            !- FMU Filename
+      Model1,                  !- FMU Model Name
+      QSensible,               !- FMU Model Variable Name
+      0;                       !- Initial Value
 
 
   ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
-      FMU_OthEquLat_ZoneOne,   !- EnergyPlus Variable Name
-      Any Number,              !- Schedule Type Limits Names
-      MoistAir.fmu,            !- FMU Filename
-      Model1,                  !- FMU Model Name
-      QLatent,                 !- FMU Model Variable Name
-      0;                       !- Initial Value
+      FMU_OthEquLat_ZoneOne,   !- EnergyPlus Variable Name
+      Any Number,              !- Schedule Type Limits Names
+      MoistAir.fmu,            !- FMU Filename
+      Model1,                  !- FMU Model Name
+      QLatent,                 !- FMU Model Variable Name
+      0;                       !- Initial Value
 \end{lstlisting}
 
 This completes the configuration that is required to simulate EnergyPlus with the FMU.
@@ -254,8 +254,8 @@ To activate the external interface, we use:
 
 \begin{lstlisting}
 
-ExternalInterface,           !- Object to activate the external interface
-   FunctionalMockupUnitImport; !- Name of external interface
+ExternalInterface,           !- Object to activate the external interface
+   FunctionalMockupUnitImport; !- Name of external interface
 \end{lstlisting}
 
 To define the FMU that will be linked to EnergyPlus, we use:
@@ -263,9 +263,9 @@ To define the FMU that will be linked to EnergyPlus, we use:
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport,
-      ShadingController.fmu,            !- FMU Filename
-      15,                       !- FMU Timeout in milli-seconds
-      0;                        !- FMU LoggingOn
+      ShadingController.fmu,            !- FMU Filename
+      15,                       !- FMU Timeout in milli-seconds
+      0;                        !- FMU LoggingOn
 \end{lstlisting}
 
 To enter the two output variables from which the external interface read from and send to FMUs, we use:
@@ -273,19 +273,19 @@ To enter the two output variables from which the external interface read from an
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      Zn001:Wall001:Win001,             !- EnergyPlus Key Value
-      Surface Outside Face Incident Solar Radiation Rate per Area,
-      ShadingController.fmu,            !- FMU Filename
-      Model1,                           !- FMU Model Name
-     ISolExt;                          !- FMU Model Variable Name
+      Zn001:Wall001:Win001,             !- EnergyPlus Key Value
+      Surface Outside Face Incident Solar Radiation Rate per Area,
+      ShadingController.fmu,            !- FMU Filename
+      Model1,                           !- FMU Model Name
+     ISolExt;                          !- FMU Model Variable Name
 
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      WEST ZONE,                        !- EnergyPlus Key Value
-      Zone Mean Air Temperature,        !- EnergyPlus Variable Name
-      ShadingController.fmu,            !- FMU Filename
-      Model1,                           !- FMU Model Name
-      TRoo;                             !- FMU Model Variable Name
+      WEST ZONE,                        !- EnergyPlus Key Value
+      Zone Mean Air Temperature,        !- EnergyPlus Variable Name
+      ShadingController.fmu,            !- FMU Filename
+      Model1,                           !- FMU Model Name
+      TRoo;                             !- FMU Model Variable Name
 \end{lstlisting}
 
 These output variables need to be specified in the idf file:
@@ -293,15 +293,15 @@ These output variables need to be specified in the idf file:
 \begin{lstlisting}
 
 Output:Variable,
-      Zn001:Wall001:Win001,               !- Key Value
-      Surface Outside Face Incident Solar Radiation Rate per Area,  !- Var Name
-      TimeStep;                           !- Reporting Frequency
+      Zn001:Wall001:Win001,               !- Key Value
+      Surface Outside Face Incident Solar Radiation Rate per Area,  !- Var Name
+      TimeStep;                           !- Reporting Frequency
 
 
   Output:Variable,
-      WEST ZONE,                          !- Key Value
-      Zone Mean Air Temperature,          !- Variable Name
-      TimeStep;                           !- Reporting Frequency
+      WEST ZONE,                          !- Key Value
+      Zone Mean Air Temperature,          !- Variable Name
+      TimeStep;                           !- Reporting Frequency
 \end{lstlisting}
 
 To enter the actuator that changes the control status of the window with name ``Zn001:Wall001:Win001'', we use:
@@ -309,14 +309,14 @@ To enter the actuator that changes the control status of the window with name ``
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
-  Zn001_Wall001_Win001_Shading_Deploy_Status,  !- EnergyPlus Variable Name
-      Zn001:Wall001:Win001,                !- Actuated Component Unique Name
-      Window Shading Control,                  !- Actuated Component Type
-      Control Status,                      !- Actuated Component Control Type
-      ShadingController.fmu,                   !- FMU Filename
-      Model1,                                  !- FMU Model Name
-      yShade,                                  !- FMU Model Variable Name
-      6;                                       !- Initial Value
+  Zn001_Wall001_Win001_Shading_Deploy_Status,  !- EnergyPlus Variable Name
+      Zn001:Wall001:Win001,                !- Actuated Component Unique Name
+      Window Shading Control,                  !- Actuated Component Type
+      Control Status,                      !- Actuated Component Control Type
+      ShadingController.fmu,                   !- FMU Filename
+      Model1,                                  !- FMU Model Name
+      yShade,                                  !- FMU Model Variable Name
+      6;                                       !- Initial Value
 \end{lstlisting}
 
 ~~~~~ This completes the configuration that is required to simulate EnergyPlus with the FMU.
@@ -357,8 +357,8 @@ To activate the external interface, we use:
 
 \begin{lstlisting}
 
-ExternalInterface,           !- Object to activate the external interface
-   FunctionalMockupUnitImport; !- Name of external interface
+ExternalInterface,           !- Object to activate the external interface
+   FunctionalMockupUnitImport; !- Name of external interface
 \end{lstlisting}
 
 To define the FMU that will be linked to EnergyPlus, we use:
@@ -366,9 +366,9 @@ To define the FMU that will be linked to EnergyPlus, we use:
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport,
-      ShadingController.fmu,            !- FMU Filename
-      15,                       !- FMU Timeout in milli-seconds
-      0;                        !- FMU LoggingOn
+      ShadingController.fmu,            !- FMU Filename
+      15,                       !- FMU Timeout in milli-seconds
+      0;                        !- FMU LoggingOn
 \end{lstlisting}
 
 To enter the two output variables from which the external interface read from and send to FMUs, we use:
@@ -376,19 +376,19 @@ To enter the two output variables from which the external interface read from an
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      Zn001:Wall001:Win001,             !- EnergyPlus Key Value
-      Surface Outside Face Incident Solar Radiation Rate per Area,
-      ShadingController.fmu,            !- FMU Filename
-      Model1,                           !- FMU Model Name
-     ISolExt;                          !- FMU Model Variable Name
+      Zn001:Wall001:Win001,             !- EnergyPlus Key Value
+      Surface Outside Face Incident Solar Radiation Rate per Area,
+      ShadingController.fmu,            !- FMU Filename
+      Model1,                           !- FMU Model Name
+     ISolExt;                          !- FMU Model Variable Name
 
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-      WEST ZONE,                        !- EnergyPlus Key Value
-      Zone Mean Air Temperature,        !- EnergyPlus Variable Name
-      ShadingController.fmu,            !- FMU Filename
-      Model1,                           !- FMU Model Name
-      TRoo;                             !- FMU Model Variable Name
+      WEST ZONE,                        !- EnergyPlus Key Value
+      Zone Mean Air Temperature,        !- EnergyPlus Variable Name
+      ShadingController.fmu,            !- FMU Filename
+      Model1,                           !- FMU Model Name
+      TRoo;                             !- FMU Model Variable Name
 \end{lstlisting}
 
 These output variables need to be specified in the idf file:
@@ -396,15 +396,15 @@ These output variables need to be specified in the idf file:
 \begin{lstlisting}
 
 Output:Variable,
-      Zn001:Wall001:Win001,               !- Key Value
-      Surface Outside Face Incident Solar Radiation Rate per Area,  !- Var Name
-      TimeStep;                           !- Reporting Frequency
+      Zn001:Wall001:Win001,               !- Key Value
+      Surface Outside Face Incident Solar Radiation Rate per Area,  !- Var Name
+      TimeStep;                           !- Reporting Frequency
 
 
   Output:Variable,
-      WEST ZONE,                          !- Key Value
-      Zone Mean Air Temperature,          !- Variable Name
-      TimeStep;                           !- Reporting Frequency
+      WEST ZONE,                          !- Key Value
+      Zone Mean Air Temperature,          !- Variable Name
+      TimeStep;                           !- Reporting Frequency
 \end{lstlisting}
 
 To write data from the external interface to an EnergyPlus EMS variable, we use the following item in idf file:
@@ -412,11 +412,11 @@ To write data from the external interface to an EnergyPlus EMS variable, we use 
 \begin{lstlisting}
 
 ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-      Shade_Signal,            !- EnergyPlus Variable Name
-      ShadingController.fmu,   !- FMU Filename
-      Model1,                  !- FMU Model Name
-      yShade,                  !- FMU Model Variable Name
-      1;                       !- Initial Value
+      Shade_Signal,            !- EnergyPlus Variable Name
+      ShadingController.fmu,   !- FMU Filename
+      Model1,                  !- FMU Model Name
+      yShade,                  !- FMU Model Variable Name
+      1;                       !- Initial Value
 \end{lstlisting}
 
 which declares a variable with name yShade that can be used in an Erl program to actuate the shading control of the window ``Zn001:Wall001:Win001'' as follows:
@@ -424,27 +424,27 @@ which declares a variable with name yShade that can be used in an Erl program to
 \begin{lstlisting}
 
 ! EMS program. The first assignments sets the shading status and converts it into the
-  !              EnergyPlus signal (i.e., replace 1 by 6).
-  !              The second assignment sets yShade to
-  !              an EnergyManagementSystem:OutputVariable
-  !              which will be read by the external interface.
-    EnergyManagementSystem:Program,
-      Set_Shade_Control_State,          !- Name
-      Set Shade_Signal = 6*yShade,      !- Program Line 1
-      Set Shade_Signal_01 = yShade+0.1; !- Program Line 2
+  !              EnergyPlus signal (i.e., replace 1 by 6).
+  !              The second assignment sets yShade to
+  !              an EnergyManagementSystem:OutputVariable
+  !              which will be read by the external interface.
+    EnergyManagementSystem:Program,
+      Set_Shade_Control_State,          !- Name
+      Set Shade_Signal = 6*yShade,      !- Program Line 1
+      Set Shade_Signal_01 = yShade+0.1; !- Program Line 2
 
 
   ! Declare an actuator to which the EnergyManagementSystem:Program will write
-    EnergyManagementSystem:Actuator,
-      Shade_Signal,  !- Name
-      Zn001:Wall001:Win001,             !- Actuated Component Unique Name
-      Window Shading Control,           !- Actuated Component Type
-      Control Status;                   !- Actuated Component Control Type
+    EnergyManagementSystem:Actuator,
+      Shade_Signal,  !- Name
+      Zn001:Wall001:Win001,             !- Actuated Component Unique Name
+      Window Shading Control,           !- Actuated Component Type
+      Control Status;                   !- Actuated Component Control Type
 
 
   ! Declare a global variable to which the EnergyManagementSystem:Program will write
-    EnergyManagementSystem:GlobalVariable,
-      Shade_Signal_01;                  !- Name of Erl variable
+    EnergyManagementSystem:GlobalVariable,
+      Shade_Signal_01;                  !- Name of Erl variable
 \end{lstlisting}
 
 This completes the configuration that is required to simulate EnergyPlus with the FMU.

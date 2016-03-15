@@ -9,33 +9,33 @@ Like the other manager routines in EnergyPlus, \emph{ManageAirLoops} has a very 
 Table 39.~ ManageAirLoop Code
 
 \begin{lstlisting}
-IF (GetInputFlag) THEN  !First time subroutine has been entered
-      CALL GetAirPathData ! Get air loop descriptions from input file
-      GetInputFlag = .false.
-  END IF
+IF (GetInputFlag) THEN  !First time subroutine has been entered
+      CALL GetAirPathData ! Get air loop descriptions from input file
+      GetInputFlag = .false.
+  END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-    ! Initialize air loop related parameters
-  CALL InitAirLoops(FirstHVACIteration)
+    ! Initialize air loop related parameters
+  CALL InitAirLoops(FirstHVACIteration)
 \end{lstlisting}
 
 \begin{lstlisting}
-    ! Call the AirLoop Simulation
-  IF (SysSizingCalc) THEN
-    CALL SizeAirLoops
-  ELSE
-    CALL SimAirLoops(FirstHVACIteration,SimZoneEquipment)
-  END IF
+    ! Call the AirLoop Simulation
+  IF (SysSizingCalc) THEN
+    CALL SizeAirLoops
+  ELSE
+    CALL SimAirLoops(FirstHVACIteration,SimZoneEquipment)
+  END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-  ! No Update
+  ! No Update
 \end{lstlisting}
 
 \begin{lstlisting}
-    ! Report information at the Manage Air Loop Level
-  CALL ReportAirLoops
+    ! Report information at the Manage Air Loop Level
+  CALL ReportAirLoops
 \end{lstlisting}
 
 \begin{enumerate}
@@ -55,7 +55,7 @@ b.  at the start of each environment (design day or simulation run period);
 \end{lstlisting}
 
 \begin{lstlisting}
-c.   before each air loop simulation.
+c.   before each air loop simulation.
 \end{lstlisting}
 
 \begin{enumerate}

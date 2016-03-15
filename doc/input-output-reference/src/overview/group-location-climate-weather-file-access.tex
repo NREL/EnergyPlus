@@ -32,10 +32,10 @@ Units with their abbreviations are shown in Appendix A. And, as shown in an IDF:
 
 \begin{lstlisting}
 Site:Location, DENVER COLORADO, ! Name
-   39.75000,                    ! Latitude {N+ S-}
-  -104.8700,                    ! Longitude {W- E+}
-  -7.000000,                    ! TimeZoneNumber {GMT+/-}
-  1610.26;                      ! Elevation {m}
+   39.75000,                    ! Latitude {N+ S-}
+  -104.8700,                    ! Longitude {W- E+}
+  -7.000000,                    ! TimeZoneNumber {GMT+/-}
+  1610.26;                      ! Elevation {m}
 \end{lstlisting}
 
 Most examples in this document include the comment lines that illustrate each data field's value. However, this is not necessary (though it makes the IDF more readable). The previous example could also be:
@@ -239,68 +239,68 @@ IDF Examples:
 
 \begin{lstlisting}
 ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (WB = >MDB)
-!   .4%, MDB = 35.8°C WB = 24.5°C
+!   .4%, MDB = 35.8°C WB = 24.5°C
 SizingPeriod:DesignDay,
-  Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns WB = >MDB, !- Name
-          7,      !- Month
-         21,      !- Day of Month
-  SummerDesignDay,!- Day Type
-       35.8,      !- Maximum Dry-Bulb Temperature {C}
-         12,      !- Daily Dry-Bulb Temperature Range {C}
-  DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-    Wetbulb,      !- Humidity Condition Type
-       24.5,      !- Wetbulb at Maximum Dry-Bulb {C}
-           ,      !- Humidity Indicating Day Schedule Name
-           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-     97342.,      !- Barometric Pressure {Pa}
-        4.1,      ! Wind Speed {m/s}
-        260,      !- Wind Direction {Degrees; N = 0, S = 180}
-         No,      !- Rain {Yes/No}
-         No,      !- Snow on ground {Yes/No}
-         No,      !- Daylight Savings Time Indicator
-       ASHRAETau, !- Solar Model Indicator
-           ,      !- Beam Solar Day Schedule Name
-           ,      !- Diffuse Solar Day Schedule Name
-      0.588,     !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-      1.653;  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+  Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns WB = >MDB, !- Name
+          7,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       35.8,      !- Maximum Dry-Bulb Temperature {C}
+         12,      !- Daily Dry-Bulb Temperature Range {C}
+  DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       24.5,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     97342.,      !- Barometric Pressure {Pa}
+        4.1,      ! Wind Speed {m/s}
+        260,      !- Wind Direction {Degrees; N = 0, S = 180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.588,     !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      1.653;  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
 SizingPeriod:DesignDay,
-  Denver Centennial Golden Ann Htg 99% Condns DB - sched solar,  !- Name
-  1,                       !- Month
-  13,                      !- Day of Month
-  WinterDesignDay,         !- Day Type
-  -16,                     !- Maximum Dry-Bulb Temperature {C}
-  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
-  ,                        !- Dry-Bulb Temperature Range Modifier Type
-  ,                    !- Dry-Bulb Temperature Range Modifier Schedule Name
-  Wetbulb,                 !- Humidity Condition Type
-  -16,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-  ,                        !- Humidity Indicating Day Schedule Name
-  ,               !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-  83411.,                  !- Barometric Pressure {Pa}
-  2.3,                     !- Wind Speed {m/s}
-  180,                     !- Wind Direction {deg}
-  No,                      !- Rain Indicator
-  No,                      !- Snow Indicator
-  No,                      !- Daylight Saving Time Indicator
-  Schedule,                !- Solar Model Indicator
-  Winter (1/13) Beam Solar,!- Beam Solar Day Schedule Name
-  Winter (1/13) Diffuse Solar;  !- Diffuse Solar Day Schedule Name
+  Denver Centennial Golden Ann Htg 99% Condns DB - sched solar,  !- Name
+  1,                       !- Month
+  13,                      !- Day of Month
+  WinterDesignDay,         !- Day Type
+  -16,                     !- Maximum Dry-Bulb Temperature {C}
+  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+  ,                        !- Dry-Bulb Temperature Range Modifier Type
+  ,                    !- Dry-Bulb Temperature Range Modifier Schedule Name
+  Wetbulb,                 !- Humidity Condition Type
+  -16,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                        !- Humidity Indicating Day Schedule Name
+  ,               !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+  83411.,                  !- Barometric Pressure {Pa}
+  2.3,                     !- Wind Speed {m/s}
+  180,                     !- Wind Direction {deg}
+  No,                      !- Rain Indicator
+  No,                      !- Snow Indicator
+  No,                      !- Daylight Saving Time Indicator
+  Schedule,                !- Solar Model Indicator
+  Winter (1/13) Beam Solar,!- Beam Solar Day Schedule Name
+  Winter (1/13) Diffuse Solar;  !- Diffuse Solar Day Schedule Name
 
 Schedule:Day:Hourly,
-  Winter (1/13) Beam Solar,
-  Any Number,
-  0,0,0,0,0,0,0,190,698,852,892,919,957,953,856,700,213,0,0,0,0,0,0,0;
+  Winter (1/13) Beam Solar,
+  Any Number,
+  0,0,0,0,0,0,0,190,698,852,892,919,957,953,856,700,213,0,0,0,0,0,0,0;
 
 Schedule:Day:Hourly,
-  Winter (1/13) Diffuse Solar,
-  Any Number,
-  0,0,0,0,0,0,0,35,118,116,92,65,40,14,0,0,5,0,0,0,0,0,0,0;
+  Winter (1/13) Diffuse Solar,
+  Any Number,
+  0,0,0,0,0,0,0,35,118,116,92,65,40,14,0,0,5,0,0,0,0,0,0,0;
 \end{lstlisting}
 
 Look at the example files 1Zone\-Un\-controll\-ed\_\-DD\-Changes.idf and 1Zone\-Un\-controlled\_\-DD\-2009 for several examples of specifying Design Day inputs.
@@ -566,33 +566,33 @@ When repeating a period, you might (for whatever reason), choose to have a speci
 And, as shown in an IDF:
 
 \begin{lstlisting}
-RunPeriod,  ! Winter Simulation
-  Winter Simulation,  !- Name
-  12,  !- Begin Month
-  1,  !- Begin Day of Month
-  3,  !- End Month
-  31,  !- End Day of Month
-  UseWeatherFile,  !- Day of Week for Start Day
-  Yes,  !- Use Weather File Holidays and Special Days
-  Yes,  !- Use Weather File Daylight Saving Period
-  No,  !- Apply Weekend Holiday Rule
-  Yes,  !- Use Weather File Rain Indicators
-  Yes;  !- Use Weather File Snow Indicators
+RunPeriod,  ! Winter Simulation
+  Winter Simulation,  !- Name
+  12,  !- Begin Month
+  1,  !- Begin Day of Month
+  3,  !- End Month
+  31,  !- End Day of Month
+  UseWeatherFile,  !- Day of Week for Start Day
+  Yes,  !- Use Weather File Holidays and Special Days
+  Yes,  !- Use Weather File Daylight Saving Period
+  No,  !- Apply Weekend Holiday Rule
+  Yes,  !- Use Weather File Rain Indicators
+  Yes;  !- Use Weather File Snow Indicators
 
 ! Multiple year simulation example
 RunPeriod,
-  Multiple Years,  !- Name
-  1,    !- Begin Month
-  1,    !- Begin Day of Month
-  12,   !- End Month
-  31,   !- End Day of Month
-  UseWeatherFile,  !- Day of Week for Start Day
-  Yes,  !- Use Weather File Holidays and Special Days
-  Yes,  !- Use Weather File Daylight Saving Period
-  No,   !- Apply Weekend Holiday Rule
-  Yes,  !- Use Weather File Rain Indicators
-  Yes,  !- Use Weather File Snow Indicators
-  3;    !- Number of Times Runperiod to be Repeated
+  Multiple Years,  !- Name
+  1,    !- Begin Month
+  1,    !- Begin Day of Month
+  12,   !- End Month
+  31,   !- End Day of Month
+  UseWeatherFile,  !- Day of Week for Start Day
+  Yes,  !- Use Weather File Holidays and Special Days
+  Yes,  !- Use Weather File Daylight Saving Period
+  No,   !- Apply Weekend Holiday Rule
+  Yes,  !- Use Weather File Rain Indicators
+  Yes,  !- Use Weather File Snow Indicators
+  3;    !- Number of Times Runperiod to be Repeated
 \end{lstlisting}
 
 \subsection{RunPeriod:CustomRange}\label{runperiodcustomrange}
@@ -773,36 +773,36 @@ An example of IDF usage (with DesignDay):
 
 \begin{lstlisting}
 SizingPeriod:DesignDay,
-  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
-  32.6,              !- Maximum Dry-Bulb Temperature {C}
-  15.2,              !- Daily Temperature Range {deltaC}
-  15.5,              !- Humidity Indicating Conditions at Maximum Dry-Bulb
-  83411.,            !- Barometric Pressure {Pa}
-  4,                 !- Wind Speed {m/s}
-  120,               !- Wind Direction {deg}
-  1.00,              !- Sky Clearness
-  0,                 !- Rain Indicator
-  0,                 !- Snow Indicator
-  25,                !- Day of Month
-  7,                 !- Month
-  SummerDesignDay,   !- Day Type
-  0,                 !- Daylight Saving Time Indicator
-  WetBulb,           !- Humidity Indicating Type
-  ,                  !- Relative Humidity Day Schedule Name
-  deltaschedule,     !- Dry-Bulb Temperature Range Modifier Type
-  temp range deltas; !- Dry-Bulb Temperature Range Modifier Schedule Name
+  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
+  32.6,              !- Maximum Dry-Bulb Temperature {C}
+  15.2,              !- Daily Temperature Range {deltaC}
+  15.5,              !- Humidity Indicating Conditions at Maximum Dry-Bulb
+  83411.,            !- Barometric Pressure {Pa}
+  4,                 !- Wind Speed {m/s}
+  120,               !- Wind Direction {deg}
+  1.00,              !- Sky Clearness
+  0,                 !- Rain Indicator
+  0,                 !- Snow Indicator
+  25,                !- Day of Month
+  7,                 !- Month
+  SummerDesignDay,   !- Day Type
+  0,                 !- Daylight Saving Time Indicator
+  WetBulb,           !- Humidity Indicating Type
+  ,                  !- Relative Humidity Day Schedule Name
+  deltaschedule,     !- Dry-Bulb Temperature Range Modifier Type
+  temp range deltas; !- Dry-Bulb Temperature Range Modifier Schedule Name
 
 WeatherProperty:SkyTemperature,
-  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier, !- Name
-  ScheduleValue,     !- Calculation Type
-  DaySchedule5;      !- Schedule Name
+  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier, !- Name
+  ScheduleValue,     !- Calculation Type
+  DaySchedule5;      !- Schedule Name
 
 Schedule:Day:Interval,
-  DaySchedule5,      !- Name
-  Temperature,       !- Schedule Type Limits Name
-  Yes,               !- Interpolate to Timestep
-  until: 24:00,      !- Time 1
-  5;                 !- Value Until Time 1
+  DaySchedule5,      !- Name
+  Temperature,       !- Schedule Type Limits Name
+  Yes,               !- Interpolate to Timestep
+  until: 24:00,      !- Time 1
+  5;                 !- Value Until Time 1
 \end{lstlisting}
 
 \subsection{Site:WeatherStation}\label{siteweatherstation}
@@ -866,10 +866,10 @@ Or, in IDF terms, with a building in a town or city:
 
 \begin{lstlisting}
 Site:WeatherStation,
-  30,    !- Wind Sensor Height Above Ground {m}
-  0.33,  !- Wind Speed Profile Exponent {}
-  460,   !- Wind Speed Profile Boundary Layer Thickness {m}
-  30;    !- Air Temperature Sensor Height Above Ground {m}
+  30,    !- Wind Sensor Height Above Ground {m}
+  0.33,  !- Wind Speed Profile Exponent {}
+  460,   !- Wind Speed Profile Boundary Layer Thickness {m}
+  30;    !- Air Temperature Sensor Height Above Ground {m}
 \end{lstlisting}
 
 This would change if you had a different wind speed profile exponent or wind speed profile boundary layer thickness at your site.
@@ -908,9 +908,9 @@ The air temperature gradient coefficient {[}K/m{]} is a research option that all
 
 \begin{lstlisting}
 Site:HeightVariation,
-  0.22,    !- Wind Speed Profile Exponent
-  370,     !- Wind Speed Profile Boundary Layer Thickness {m}
-  0.0065;  !- Air Temperature Gradient Coefficient {deltaC/m}
+  0.22,    !- Wind Speed Profile Exponent
+  370,     !- Wind Speed Profile Boundary Layer Thickness {m}
+  0.0065;  !- Air Temperature Gradient Coefficient {deltaC/m}
 \end{lstlisting}
 
 \subsection{Site:GroundTemperature:BuildingSurface}\label{sitegroundtemperaturebuildingsurface}
@@ -976,7 +976,7 @@ Each numeric field is the monthly deep ground temperature (degrees Celsius) used
 An IDF example:
 
 \begin{lstlisting}
-Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
+Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 \end{lstlisting}
 
 \subsection{Site:GroundTemperature:Undisturbed:FiniteDifference}\label{sitegroundtemperatureundisturbedfinitedifference}
@@ -1244,58 +1244,58 @@ An IDF example of an in-grade slab.
 
 \begin{lstlisting}
 Site:GroundDomain:Slab,
-  IngradeCoupledSlab, !- Name
-  5,                  !- Ground Domain Depth
-  1,                  !- Aspect Ratio
-  5,                  !- Domain Perimeter Offset
-  1.8,                !- Soil Thermal Conductivity
-  3200,               !- Soil Density
-  836,                !- Soil Specific Heat
-  30,                 !- Soil Moisture Content Volume Fraction
-  50,                 !- Soil Moisture Content Volume Fraction at Saturation
-  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-  KATemps,            !- Name of Undisturbed Ground Temperature Object
-  1,                  !- Evapotranspiration Ground Cover Parameter
-  GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-  InGrade,            !- Slab Location (InGrade/OnGrade)
-  Slab Material-In-grade, !- Slab Material Name
-  Yes,                !- Horizontal Insulation
-  Slab Insulation,    !- Horizontal Insulation Material Name
-  Perimeter,          !- Full Horizontal or Perimeter Only
-  1,                  !- Perimeter insulation width
-  Yes,                !- Vertical Insulation
-  Slab Insulation,    !- Vertical Insulation Name
-  2,                  !- Vertical perimeter insulation depth from surface
-  Hourly;             !- Simulation timestep
+  IngradeCoupledSlab, !- Name
+  5,                  !- Ground Domain Depth
+  1,                  !- Aspect Ratio
+  5,                  !- Domain Perimeter Offset
+  1.8,                !- Soil Thermal Conductivity
+  3200,               !- Soil Density
+  836,                !- Soil Specific Heat
+  30,                 !- Soil Moisture Content Volume Fraction
+  50,                 !- Soil Moisture Content Volume Fraction at Saturation
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,            !- Name of Undisturbed Ground Temperature Object
+  1,                  !- Evapotranspiration Ground Cover Parameter
+  GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
+  InGrade,            !- Slab Location (InGrade/OnGrade)
+  Slab Material-In-grade, !- Slab Material Name
+  Yes,                !- Horizontal Insulation
+  Slab Insulation,    !- Horizontal Insulation Material Name
+  Perimeter,          !- Full Horizontal or Perimeter Only
+  1,                  !- Perimeter insulation width
+  Yes,                !- Vertical Insulation
+  Slab Insulation,    !- Vertical Insulation Name
+  2,                  !- Vertical perimeter insulation depth from surface
+  Hourly;             !- Simulation timestep
 \end{lstlisting}
 
 And IDF example of an on-grade slab
 
 \begin{lstlisting}
 Site:GroundDomain:Slab,
-  OngradeCoupledSlab, !- Name
-  5,                  !- Ground Domain Depth {m}
-  1,                  !- Aspect Ratio
-  5,                  !- Domain Perimeter Offset {m}
-  1.8,                !- Soil Thermal Conductivity {W/m-K}
-  3200,               !- Soil Density {kg/m3}
-  836,                !- Soil Specific Heat {J/kg-K}
-  30,                 !- Soil Moisture Content Volume Fraction
-  50,                 !- Soil Moisture Content Volume Fraction at Saturation
-  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-  KATemps;            !- Name of Undisturbed Ground Temperature Object
-  1,                  !- Evapotranspiration Ground Cover Parameter
-  GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-  OnGrade,            !- Slab Location (InGrade/OnGrade)
-  ,                   !- Slab Material Name
-  ,                   !- Horizontal Insulation (Yes/No)
-  ,                   !- Horizontal Insulation Material Name
-  ,                   !- Full Horizontal or Perimeter Only
-  ,                   !- Perimeter insulation width (m)
-  Yes,                !- Vertical Insulation (Yes/No)
-  Slab Insulation,    !- Vertical Insulation Name
-  2,                  !- Vertical perimeter insulation depth from surface
-  Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
+  OngradeCoupledSlab, !- Name
+  5,                  !- Ground Domain Depth {m}
+  1,                  !- Aspect Ratio
+  5,                  !- Domain Perimeter Offset {m}
+  1.8,                !- Soil Thermal Conductivity {W/m-K}
+  3200,               !- Soil Density {kg/m3}
+  836,                !- Soil Specific Heat {J/kg-K}
+  30,                 !- Soil Moisture Content Volume Fraction
+  50,                 !- Soil Moisture Content Volume Fraction at Saturation
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps;            !- Name of Undisturbed Ground Temperature Object
+  1,                  !- Evapotranspiration Ground Cover Parameter
+  GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
+  OnGrade,            !- Slab Location (InGrade/OnGrade)
+  ,                   !- Slab Material Name
+  ,                   !- Horizontal Insulation (Yes/No)
+  ,                   !- Horizontal Insulation Material Name
+  ,                   !- Full Horizontal or Perimeter Only
+  ,                   !- Perimeter insulation width (m)
+  Yes,                !- Vertical Insulation (Yes/No)
+  Slab Insulation,    !- Vertical Insulation Name
+  2,                  !- Vertical perimeter insulation depth from surface
+  Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-015}
@@ -1339,8 +1339,8 @@ Site:GroundDomain:Basement,
   836,                 !- Soil Specific Heat {J/kg-K}
   30,                  !- Soil Moisture Content Volume Fraction {percent}
   50,                  !- Soil Moisture Content Volume Fraction at Saturation {percent}
-  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-  KATemps,             !- Name of Undisturbed Ground Temperature Object
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,             !- Name of Undisturbed Ground Temperature Object
   1,                   !- Evapotranspiration Ground Cover Parameter
   BasementFloorOSCM,   !- Name of Basement Floor Boundary Condition Model
   Yes,                 !- Basement Horizontal Underfloor Insulation Present (Yes/No)
@@ -1498,7 +1498,7 @@ Each numeric field is the monthly ground temperature (degrees Celsius) used for 
 And, the IDF example:
 
 \begin{lstlisting}
-Site:GroundTemperature:FCfactorMethod,  9.5, 3.5, -0.7, -1.7, -0.6, 3.6, 9.3, 14, 18.2, 22.7, 21.2, 16.8;
+Site:GroundTemperature:FCfactorMethod,  9.5, 3.5, -0.7, -1.7, -0.6, 3.6, 9.3, 14, 18.2, 22.7, 21.2, 16.8;
 \end{lstlisting}
 
 \subsection{Site:GroundReflectance}\label{sitegroundreflectance}
@@ -1521,17 +1521,17 @@ And use in an IDF:
 
 \begin{lstlisting}
 Site:GroundReflectance,
-  0.600,     !January Ground Reflectance
-  0.600,     !February Ground Reflectance
-  0.400,     !March Ground Reflectance
-  0.300,     !April Ground Reflectance
-  0.200,     !May Ground Reflectance
-  0.200,     !June Ground Reflectance
-  0.200,     !July Ground Reflectance
-  0.200,     !August Ground Reflectance
-  0.200,     !September Ground Reflectance
-  0.200,     !October Ground Reflectance
-  0.300,     !November Ground Reflectance
+  0.600,     !January Ground Reflectance
+  0.600,     !February Ground Reflectance
+  0.400,     !March Ground Reflectance
+  0.300,     !April Ground Reflectance
+  0.200,     !May Ground Reflectance
+  0.200,     !June Ground Reflectance
+  0.200,     !July Ground Reflectance
+  0.200,     !August Ground Reflectance
+  0.200,     !September Ground Reflectance
+  0.200,     !October Ground Reflectance
+  0.300,     !November Ground Reflectance
   0.400;     !December Ground Reflectance
 \end{lstlisting}
 

@@ -18,13 +18,13 @@ This dataset includes performance curves for air cooled electric EIR chiller (ob
   ! The nomenclature used for the chiller is as follows:
   ! ElectricEIRChiller - Manufacturer's Name - Model - Reference Capacity in kW - Reference COP
   !
-  !                                                      Compressor   Reference    Reference
-  ! Chiller Name                                            Type       Capacity      COP
-  !                                                                    kW (tons)
-  ! ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP      Scroll     34.5 (9.8)      2.67
-  ! ElectricEIRChiller McQuay AGZ013BS 47.1kW/2.67COP      Scroll     47.1 (13.4)     2.67
-  ! ElectricEIRChiller York YCAL0019EE 54.2kW/2.9COP       Scroll     54.2 (15.4)     2.9
-  ! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
+  !                                                      Compressor   Reference    Reference
+  ! Chiller Name                                            Type       Capacity      COP
+  !                                                                    kW (tons)
+  ! ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP      Scroll     34.5 (9.8)      2.67
+  ! ElectricEIRChiller McQuay AGZ013BS 47.1kW/2.67COP      Scroll     47.1 (13.4)     2.67
+  ! ElectricEIRChiller York YCAL0019EE 54.2kW/2.9COP       Scroll     54.2 (15.4)     2.9
+  ! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
 \end{lstlisting}
 
 \subsection{ASHRAE\_2005\_HOF\_Materials.idf}\label{ashraeux5f2005ux5fhofux5fmaterials.idf}
@@ -56,14 +56,14 @@ Knowing the type of chiller that you want to simulate, you can find it and the a
   !
   ! Performance curves developed from information collected over a 10-year period from 1991 to 2001.
   !
-  !                                                      Compressor   Reference  Reference Unloading
-  ! Chiller Name                                            Type       Capacity    COP     Mechanism
-  !                                                                    kW (tons)
+  !                                                      Compressor   Reference  Reference Unloading
+  ! Chiller Name                                            Type       Capacity    COP     Mechanism
+  !                                                                    kW (tons)
   !-------------------------------------------------------------------------------------------------
-  ! ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes    Centrifugal   471 (134)   5.89   Inlet Vanes
-  ! ElectricEIRChiller York YT 563kW/10.61COP/Vanes      Centrifugal   563 (160)   10.61  Inlet Vanes
-  ! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
-  ! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
+  ! ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes    Centrifugal   471 (134)   5.89   Inlet Vanes
+  ! ElectricEIRChiller York YT 563kW/10.61COP/Vanes      Centrifugal   563 (160)   10.61  Inlet Vanes
+  ! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
+  ! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
 \end{lstlisting}
 
 \subsection{CompositeWallConstructions.idf}\label{compositewallconstructions.idf}
@@ -82,36 +82,36 @@ CONSTRUCTION,Composite 2x4 Steel Stud R11,
   ! Area-average R-Value = 8.796 ft2-F-h/Btu (1.548 m2-K/W).
   ! Total wall thickness = 5.00in (0.127m)
   ! Material layer names follow:
-    Composite 2x4 Steel Stud R11 \#3,
-    Composite 2x4 Steel Stud R11 \#2,
-    Composite 2x4 Steel Stud R11 \#1;
+    Composite 2x4 Steel Stud R11 \#3,
+    Composite 2x4 Steel Stud R11 \#2,
+    Composite 2x4 Steel Stud R11 \#1;
   MATERIAL,Composite 2x4 Steel Stud R11 \#1,
-    Smooth,  !- Roughness
-    0.013,   !- Thickness (m)
-    0.720,   !- Conductivity (W/m-K)
-    640.0,   !- Density (kg/m3)
-    1048,    !- Specific Heat (J/kg-K)
-    0.9,     !- Absorptance:Thermal
-    0.7,     !- Absorptance:Solar
-    0.7;     !- Absorptance:Visible
+    Smooth,  !- Roughness
+    0.013,   !- Thickness (m)
+    0.720,   !- Conductivity (W/m-K)
+    640.0,   !- Density (kg/m3)
+    1048,    !- Specific Heat (J/kg-K)
+    0.9,     !- Absorptance:Thermal
+    0.7,     !- Absorptance:Solar
+    0.7;     !- Absorptance:Visible
   MATERIAL,Composite 2x4 Steel Stud R11 \#2,
-    Smooth,  !- Roughness
-    0.089,   !- Thickness (m)
-    0.060,   !- Conductivity (W/m-K)
-    118.223, !- Density (kg/m3)
-    1048,    !- Specific Heat (J/kg-K)
-    0.9,     !- Absorptance:Thermal
-    0.7,     !- Absorptance:Solar
-    0.7;     !- Absorptance:Visible
+    Smooth,  !- Roughness
+    0.089,   !- Thickness (m)
+    0.060,   !- Conductivity (W/m-K)
+    118.223, !- Density (kg/m3)
+    1048,    !- Specific Heat (J/kg-K)
+    0.9,     !- Absorptance:Thermal
+    0.7,     !- Absorptance:Solar
+    0.7;     !- Absorptance:Visible
   MATERIAL,Composite 2x4 Steel Stud R11 \#3,
-    Smooth,  !- Roughness
-    0.025,   !- Thickness (m)
-    0.452,   !- Conductivity (W/m-K)
-    413.782, !- Density (kg/m3)
-    1048,    !- Specific Heat (J/kg-K)
-    0.9,     !- Absorptance:Thermal
-    0.7,     !- Absorptance:Solar
-    0.7;     !- Absorptance:Visible
+    Smooth,  !- Roughness
+    0.025,   !- Thickness (m)
+    0.452,   !- Conductivity (W/m-K)
+    413.782, !- Density (kg/m3)
+    1048,    !- Specific Heat (J/kg-K)
+    0.9,     !- Absorptance:Thermal
+    0.7,     !- Absorptance:Solar
+    0.7;     !- Absorptance:Visible
 \end{lstlisting}
 
 The materials here are \textbf{not} real materials but are ``equivalent'' materials obtained from finite-difference modeling. The thickness, conductivity, density and specific heat values of the material layers for the different constructions have been taken from the ASHRAE report ``Modeling Two- and Three-Dimensional Heat Transfer through Composite Wall and Roof Assemblies in Hourly Energy Simulation Programs (1145-TRP),'' by Enermodal Engineering Limited, Oak Ridge National Laboratory, and the Polish Academy of Sciences, January 2001. EnergyPlus will calculate conduction transfer functions using these materials. The heat transfer based on these conduction transfer functions will then be very close to what would be calculated with a two- or three-dimensional heat transfer calculation.
@@ -167,10 +167,10 @@ CONSTRUCTION,Composite 2x4 Wood Stud R11,
   CONSTRUCTION,Composite Brick Foam 2x4 Steel Stud R11,
   ! ASHRAE 1145-RP Wall Assembly 15
   ! Brick veneer, polystyrene, 2"x4" steel studs at 24" on center with
-  !  between-stud R11 fibreglass insulation.
+  !  between-stud R11 fibreglass insulation.
   ! Studs are 3.5", 16 gauge, 15 flange.
   ! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x4 steel studs and R11 insulation,
-  !  1/2" gypsum board.
+  !  1/2" gypsum board.
   ! Area-average R-Value = 12.792 ft2-F-h/Btu (2.251 m2-K/W).
 
   CONSTRUCTION,Composite 2x6 Steel Stud R19,
@@ -185,16 +185,16 @@ CONSTRUCTION,Composite 2x4 Wood Stud R11,
   ! Polystyrene, 2"x6" steel studs at 24" on center with between-stud R19 fibreglass insulation.
   ! Studs are 5.5", 16 gauge, 15 flange.
   ! Layers are 3/4" concrete stucco,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-  !  1/2" gypsum board.
+  !  1/2" gypsum board.
   ! Area-average R-Value = 15.157 ft2-F-h/Btu (2.668 m2-K/W).
 
   CONSTRUCTION,Composite Brick Foam 2x6 Steel Stud R19,
   ! ASHRAE 1145-RP Wall Assembly 18
   ! Brick veneer, polystyrene, 2"x6" steel studs at 24" on center with
-  !  between-stud R19 fibreglass insulation.
+  !  between-stud R19 fibreglass insulation.
   ! Studs are 5.5", 16 gauge, 15 flange.
   ! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-  !  1/2" gypsum board.
+  !  1/2" gypsum board.
   ! Area-average R-Value = 15.465 ft2-F-h/Btu (2.722 m2-K/W).
 
   CONSTRUCTION,Composite 2-Core Filled Concrete Block Uninsulated,
@@ -206,7 +206,7 @@ CONSTRUCTION,Composite 2x4 Wood Stud R11,
   CONSTRUCTION,Composite 2-Core Filled Concrete Block Insulated,
   ! ASHRAE 1145-RP Wall Assembly 20
   ! Wall system is made of 12" 2-core concrete blocks with 1.875"-thick
-  !  foam inserts in the block cores.
+  !  foam inserts in the block cores.
   ! The remaining core area is filled with poured concrete.
   ! Area-average R-Value = 2.291 ft2-F-h/Btu (0.403 m2-K/W).
 \end{lstlisting}
@@ -231,106 +231,106 @@ Here is a synopsis of the DXCoolingCoil.idf:
   ! below, input fields 'Availability Schedule Name', 'Air Inlet Node Name' and 'Air Outlet Node
   ! Name' need to be defined by the user.
   !
-  !------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
-  !                                                                                         Valve
-  ! Name                           Type     Capacity   Capacity          COP       Type      Type
-  !                                         (tons)     kW (tons)
-  !------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
-  ! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
-  ! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
+  !------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
+  !                                                                                         Valve
+  ! Name                           Type     Capacity   Capacity          COP       Type      Type
+  !                                         (tons)     kW (tons)
+  !------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
+  ! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
+  ! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
 
-    Coil:Cooling:DX:SingleSpeed,
-      Carrier Centurion 50PG06,     !- Name
-      CoolingCoilAvailSched,        !- Availability Schedule Name
-      18276.96,                     !- Rated Total Cooling Capacity {W}
-      0.74,                         !- Rated Sensible Heat Ratio
-      4.15,                         !- Rated COP
-      0.944,                        !- Rated Air Flow Rate {m3/s}
-      ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-      DXCoilAirInletNode,           !- Air Inlet Node Name
-      DXCoilAirOutletNode,          !- Air Outlet Node Name
-      CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-      CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
-      CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
-      CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
-      Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    Coil:Cooling:DX:SingleSpeed,
+      Carrier Centurion 50PG06,     !- Name
+      CoolingCoilAvailSched,        !- Availability Schedule Name
+      18276.96,                     !- Rated Total Cooling Capacity {W}
+      0.74,                         !- Rated Sensible Heat Ratio
+      4.15,                         !- Rated COP
+      0.944,                        !- Rated Air Flow Rate {m3/s}
+      ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+      DXCoilAirInletNode,           !- Air Inlet Node Name
+      DXCoilAirOutletNode,          !- Air Outlet Node Name
+      CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+      CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+      CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
+      CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
+      Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
   ! Curve set (5 Curves):
 
   ! Cooling Capacity Function of Temperature Curve
   ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
 
-    Curve:Biquadratic,
-      CarrierCenturion50PG06CapFT,  !- Name
-      0.9953455,               !- Coefficient1 Constant
-      -0.0118418,              !- Coefficient2 x
-      0.0012277,               !- Coefficient3 x**2
-      0.0030246,               !- Coefficient4 y
-      -0.0000702,              !- Coefficient5 y**2
-      -0.0003685,              !- Coefficient6 x*y
-      12.22,                   !- Minimum Value of x
-      26.67,                   !- Maximum Value of x
-      15.56,                   !- Minimum Value of y
-      51.67,                   !- Maximum Value of y
-      ,                        !- Minimum Curve Output
-      ,                        !- Maximum Curve Output
-      Temperature,             !- Input Unit Type for X
-      Temperature,             !- Input Unit Type for Y
-      Dimensionless;           !- Output Unit Type
+    Curve:Biquadratic,
+      CarrierCenturion50PG06CapFT,  !- Name
+      0.9953455,               !- Coefficient1 Constant
+      -0.0118418,              !- Coefficient2 x
+      0.0012277,               !- Coefficient3 x**2
+      0.0030246,               !- Coefficient4 y
+      -0.0000702,              !- Coefficient5 y**2
+      -0.0003685,              !- Coefficient6 x*y
+      12.22,                   !- Minimum Value of x
+      26.67,                   !- Maximum Value of x
+      15.56,                   !- Minimum Value of y
+      51.67,                   !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
 
   ! EIR Function of Temperature Curve
   ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
 
-    Curve:Biquadratic,
-      CarrierCenturion50PG06EIRFT,  !- Name
-      0.3802131,               !- Coefficient1 Constant
-      0.0199468,               !- Coefficient2 x
-      -0.0006682,              !- Coefficient3 x**2
-      0.0058933,               !- Coefficient4 y
-      0.0004646,               !- Coefficient5 y**2
-      -0.0004072,              !- Coefficient6 x*y
-      12.22,                   !- Minimum Value of x
-      26.67,                   !- Maximum Value of x
-      15.56,                   !- Minimum Value of y
-      51.67,                   !- Maximum Value of y
-      ,                        !- Minimum Curve Output
-      ,                        !- Maximum Curve Output
-      Temperature,             !- Input Unit Type for X
-      Temperature,             !- Input Unit Type for Y
-      Dimensionless;           !- Output Unit Type
+    Curve:Biquadratic,
+      CarrierCenturion50PG06EIRFT,  !- Name
+      0.3802131,               !- Coefficient1 Constant
+      0.0199468,               !- Coefficient2 x
+      -0.0006682,              !- Coefficient3 x**2
+      0.0058933,               !- Coefficient4 y
+      0.0004646,               !- Coefficient5 y**2
+      -0.0004072,              !- Coefficient6 x*y
+      12.22,                   !- Minimum Value of x
+      26.67,                   !- Maximum Value of x
+      15.56,                   !- Minimum Value of y
+      51.67,                   !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
 
   ! Cooling Capacity Function of Flow Fraction Curve
   ! x = Flow Fraction
 
-    Curve:Quadratic,
-      CarrierCenturion50PG06CapFFF,  !- Name
-      0.7705358,               !- Coefficient1 Constant
-      0.2848007,               !- Coefficient2 x
-      -0.0580891,              !- Coefficient3 x**2
-      0.75,                    !- Minimum Value of x
-      1.25;                    !- Maximum Value of x
+    Curve:Quadratic,
+      CarrierCenturion50PG06CapFFF,  !- Name
+      0.7705358,               !- Coefficient1 Constant
+      0.2848007,               !- Coefficient2 x
+      -0.0580891,              !- Coefficient3 x**2
+      0.75,                    !- Minimum Value of x
+      1.25;                    !- Maximum Value of x
 
   ! EIR Function of Flow Fraction Curve
   ! x = Flow Fraction
 
-    Curve:Quadratic,
-      CarrierCenturion50PG06EIRFFF,   !- Name
-      1.3439758,               !- Coefficient1 Constant
-      -0.5111244,              !- Coefficient2 x
-      0.1732549,               !- Coefficient3 x**2
-      0.75,                    !- Minimum Value of x
-      1.25;                    !- Maximum Value of x
+    Curve:Quadratic,
+      CarrierCenturion50PG06EIRFFF,   !- Name
+      1.3439758,               !- Coefficient1 Constant
+      -0.5111244,              !- Coefficient2 x
+      0.1732549,               !- Coefficient3 x**2
+      0.75,                    !- Minimum Value of x
+      1.25;                    !- Maximum Value of x
 
   ! Part Load Fraction Function of Part Load Ratio Curve
   ! x = Part Load Ratio
 
-    Curve:Quadratic,
-      CarrierCenturion50PG06PLFFPLR,   !- Name
-      0.85,                    !- Coefficient1 Constant
-      0.15,                    !- Coefficient2 x
-      0.0,                     !- Coefficient3 x**2
-      0.0,                     !- Minimum Value of x
-      1.0;                     !- Maximum Value of x
+    Curve:Quadratic,
+      CarrierCenturion50PG06PLFFPLR,   !- Name
+      0.85,                    !- Coefficient1 Constant
+      0.15,                    !- Coefficient2 x
+      0.0,                     !- Coefficient3 x**2
+      0.0,                     !- Minimum Value of x
+      1.0;                     !- Maximum Value of x
 \end{lstlisting}
 
 \subsection{ElectricGenerators.idf}\label{electricgenerators.idf}
@@ -1203,50 +1203,50 @@ This dataset includes object types for specific (by manufacturer and type) Refri
 \begin{lstlisting}
 
 Curve:Bicubic,
-      06CC016_R-22_Low_qcurv,  !- Name
-      2.350e+004,              !- Coefficient1 Constant
-      816.7,                   !- Coefficient2 x
-      10.70,                   !- Coefficient3 x**2
-      -28.24,                  !- Coefficient4 y
-      0.1131,                  !- Coefficient5 y**2
-      -0.4553,                 !- Coefficient6 x*y
-      0.05604,                 !- Coefficient7 x**3
-      -0.004120,               !- Coefficient8 y**3
-      -0.006728,               !- Coefficient9 x**2*y
-      0.006782,                !- Coefficient10 x*y**2
-      -40.0,                   !- Minimum Value of x
-      -17.8,                   !- Maximum Value of x
-      10.0,                    !- Minimum Value of y
-      48.9;                    !- Maximum Value of y
+      06CC016_R-22_Low_qcurv,  !- Name
+      2.350e+004,              !- Coefficient1 Constant
+      816.7,                   !- Coefficient2 x
+      10.70,                   !- Coefficient3 x**2
+      -28.24,                  !- Coefficient4 y
+      0.1131,                  !- Coefficient5 y**2
+      -0.4553,                 !- Coefficient6 x*y
+      0.05604,                 !- Coefficient7 x**3
+      -0.004120,               !- Coefficient8 y**3
+      -0.006728,               !- Coefficient9 x**2*y
+      0.006782,                !- Coefficient10 x*y**2
+      -40.0,                   !- Minimum Value of x
+      -17.8,                   !- Maximum Value of x
+      10.0,                    !- Minimum Value of y
+      48.9;                    !- Maximum Value of y
 
-  ! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
-  ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
+  ! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
+  ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
   Curve:Bicubic,
-      06CC016_R-22_Low_pwrcurv,!- Name
-      4018.,                   !- Coefficient1 Constant
-      95.00,                   !- Coefficient2 x
-      1.507,                   !- Coefficient3 x**2
-      5.705,                   !- Coefficient4 y
-      1.247,                   !- Coefficient5 y**2
-      -1.381,                  !- Coefficient6 x*y
-      0.01277,                 !- Coefficient7 x**3
-      -0.007518,               !- Coefficient8 y**3
-      -0.02424,                !- Coefficient9 x**2*y
-      0.02917,                 !- Coefficient10 x*y**2
-      -40.0,                   !- Minimum Value of x
-      -17.8,                   !- Maximum Value of x
-      10.0,                    !- Minimum Value of y
-      48.9;                    !- Maximum Value of y
+      06CC016_R-22_Low_pwrcurv,!- Name
+      4018.,                   !- Coefficient1 Constant
+      95.00,                   !- Coefficient2 x
+      1.507,                   !- Coefficient3 x**2
+      5.705,                   !- Coefficient4 y
+      1.247,                   !- Coefficient5 y**2
+      -1.381,                  !- Coefficient6 x*y
+      0.01277,                 !- Coefficient7 x**3
+      -0.007518,               !- Coefficient8 y**3
+      -0.02424,                !- Coefficient9 x**2*y
+      0.02917,                 !- Coefficient10 x*y**2
+      -40.0,                   !- Minimum Value of x
+      -17.8,                   !- Maximum Value of x
+      10.0,                    !- Minimum Value of y
+      48.9;                    !- Maximum Value of y
 
-  !Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
+  !Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
   Refrigeration:Compressor,
-      Carlyle_R-22_Low_06CC016,!- Name
-      06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
-      06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
-      ,                        !- Rated Superheat {deltaC}
-      18.3,                    !- Compressor Rated Suction Temperature {C}
-      4.4,                     !- Rated Liquid Temperature {C}
-      ;                        !- Compressor Rated Subcooling {C}
+      Carlyle_R-22_Low_06CC016,!- Name
+      06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
+      06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+      ,                        !- Rated Superheat {deltaC}
+      18.3,                    !- Compressor Rated Suction Temperature {C}
+      4.4,                     !- Rated Liquid Temperature {C}
+      ;                        !- Compressor Rated Subcooling {C}
 \end{lstlisting}
 
 \subsection{RooftopPackagedHeatPump.idf}\label{rooftoppackagedheatpump.idf}

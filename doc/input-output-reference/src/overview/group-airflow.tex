@@ -133,40 +133,40 @@ An IDF example:
 \begin{lstlisting}
 
 ZoneInfiltration:DesignFlowRate,
-    Infiltration 1,   !- Name
-    DORM ROOMS AND COMMON AREAS, !- Zone Name
-    Infiltration Sch, !- Schedule Name
-    Flow/Zone,      !- Design Flow Rate Calculation Method
-    2.831685,       !- Design Flow Rate {m3/s}
-    ,               !- Flow per Zone Floor Area {m3/s/m2}
-    ,               !- Flow per Exterior Surface Area {m3/s/m2}
-    ,               !- Air Changes per Hour
-    0.6060000    ,  !- Constant Term Coefficient
-    3.6359996E-02,  !- Temperature Term Coefficient
-    0.1177165    ,  !- Velocity Term Coefficient
-    0.0000000E+00;  !- Velocity Squared Term Coefficient
+    Infiltration 1,   !- Name
+    DORM ROOMS AND COMMON AREAS, !- Zone Name
+    Infiltration Sch, !- Schedule Name
+    Flow/Zone,      !- Design Flow Rate Calculation Method
+    2.831685,       !- Design Flow Rate {m3/s}
+    ,               !- Flow per Zone Floor Area {m3/s/m2}
+    ,               !- Flow per Exterior Surface Area {m3/s/m2}
+    ,               !- Air Changes per Hour
+    0.6060000    ,  !- Constant Term Coefficient
+    3.6359996E-02,  !- Temperature Term Coefficient
+    0.1177165    ,  !- Velocity Term Coefficient
+    0.0000000E+00;  !- Velocity Squared Term Coefficient
 \end{lstlisting}
 
 Global Infiltration example:
 
 \begin{lstlisting}
 
-  ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
+  ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
 
 
-    ZoneInfiltration:DesignFlowRate,
-      OfficeZones Infiltration,       !- Name
-      OfficeZones,             !- Zone or ZoneList Name
-      Infiltration Sch,        !- Schedule Name
-      AirChanges/Hour,         !- Design Flow Rate Calculation Method
-      ,                        !- Design Flow Rate {m3/s}
-      ,                        !- Flow per Zone Floor Area {m3/s-m2}
-      ,                        !- Flow per Exterior Surface Area {m3/s-m2}
-      4.7,                     !- Air Changes per Hour
-      0.6060000,               !- Constant Term Coefficient
-      3.6359996E-02,           !- Temperature Term Coefficient
-      0.1177165,               !- Velocity Term Coefficient
-      0.0000000E+00;           !- Velocity Squared Term Coefficient
+    ZoneInfiltration:DesignFlowRate,
+      OfficeZones Infiltration,       !- Name
+      OfficeZones,             !- Zone or ZoneList Name
+      Infiltration Sch,        !- Schedule Name
+      AirChanges/Hour,         !- Design Flow Rate Calculation Method
+      ,                        !- Design Flow Rate {m3/s}
+      ,                        !- Flow per Zone Floor Area {m3/s-m2}
+      ,                        !- Flow per Exterior Surface Area {m3/s-m2}
+      4.7,                     !- Air Changes per Hour
+      0.6060000,               !- Constant Term Coefficient
+      3.6359996E-02,           !- Temperature Term Coefficient
+      0.1177165,               !- Velocity Term Coefficient
+      0.0000000E+00;           !- Velocity Squared Term Coefficient
 \end{lstlisting}
 
 \subsection{ZoneInfiltration:EffectiveLeakageArea}\label{zoneinfiltrationeffectiveleakagearea}
@@ -218,14 +218,14 @@ An Example IDF object is:
 \begin{lstlisting}
 
 ZoneInfiltration:FlowCoefficient,
-      LIVING ZONE Infil 1,     !- Name
-      LIVING ZONE,             !- Zone Name
-      INF-SCHED,               !- Schedule Name
-      0.05,                    !- Flow Coefficient
-      0.089,                   !- Stack Coefficient
-       0.67  ,                 !- Pressure Exponent
-      0.156 ,                  !- Wind Coefficient
-      0.64;                    !- Shelter Factor
+      LIVING ZONE Infil 1,     !- Name
+      LIVING ZONE,             !- Zone Name
+      INF-SCHED,               !- Schedule Name
+      0.05,                    !- Flow Coefficient
+      0.089,                   !- Stack Coefficient
+       0.67  ,                 !- Pressure Exponent
+      0.156 ,                  !- Wind Coefficient
+      0.64;                    !- Shelter Factor
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-003}
@@ -490,90 +490,90 @@ Two IDF examples are provided below:
 \begin{lstlisting}
 
 ZoneVentilation:DesignFlowRate,
-    Ventilation 1,  !- Name
-    ZONE 2,         !- Zone Name
-    Simple Vent,    !- Schedule Name
-    Flow/Zone,      !- Design Volume Flow Rate calculation method
-    6.131944,       !- Design Volume Flow Rate {m3/s}
-    ,               !- Volume Flow Rate per area {m3/s/m2}
-    ,               !- Volume Flow Rate per person {m3/s/person}
-    ,               !- Air Changes Per Hour
-    INTAKE,         !- Ventilation Type
-    400.0,          !- Fan Pressure Rise{Pa}
-    0.9,            !- Fan Total Efficiency
-    0.6060000    ,  !- Constant Term Coefficient
-    2.0199999E-02,  !- Temperature Term Coefficient
-    5.9800001E-04,  !- Velocity Term Coefficient
-    0.0000000E+00!- Velocity Squared Term Coefficient
-    18.0,           !- Minimum Indoor Temperature {C}
-    ,               !- Minimum Indoor Temperature Schedule Name
-    ,               !- Maximum Indoor Temperature {C}
-    ,               !- Maximum Indoor Temperature Schedule Name
-    1.0;            !- Delta temperature {C}
+    Ventilation 1,  !- Name
+    ZONE 2,         !- Zone Name
+    Simple Vent,    !- Schedule Name
+    Flow/Zone,      !- Design Volume Flow Rate calculation method
+    6.131944,       !- Design Volume Flow Rate {m3/s}
+    ,               !- Volume Flow Rate per area {m3/s/m2}
+    ,               !- Volume Flow Rate per person {m3/s/person}
+    ,               !- Air Changes Per Hour
+    INTAKE,         !- Ventilation Type
+    400.0,          !- Fan Pressure Rise{Pa}
+    0.9,            !- Fan Total Efficiency
+    0.6060000    ,  !- Constant Term Coefficient
+    2.0199999E-02,  !- Temperature Term Coefficient
+    5.9800001E-04,  !- Velocity Term Coefficient
+    0.0000000E+00!- Velocity Squared Term Coefficient
+    18.0,           !- Minimum Indoor Temperature {C}
+    ,               !- Minimum Indoor Temperature Schedule Name
+    ,               !- Maximum Indoor Temperature {C}
+    ,               !- Maximum Indoor Temperature Schedule Name
+    1.0;            !- Delta temperature {C}
 
   ZoneVentilation:DesignFlowRate,
-      SPACE1-1 Ventl 1,        !-Name
-      SPACE1-1,                !- Zone Name
-      NightVentSched,          !- SCHEDULE Name
-      Flow/Zone,               !- Design Volume Flow Rate calculation method
-      .05295,                  !- Design Volume Flow Rate {m3/s}
-      ,                        !- Volume Flow Rate per area {m3/s/m2}
-      ,                        !- Volume Flow Rate per person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      Intake,                  !- Ventilation Type
-      67.,                     !- Fan Pressure Rise
-      .7,                      !- Fan Total Efficiency
-      1,                       !- Constant Term Coefficient
-      0,                       !- Temperature Term Coefficient
-      0,                       !- Velocity Term Coefficient
-      0,                       !- Velocity Squared Term Coefficient
-      ,                        !- Minimum Indoor Temperature {C}
-      MinIndoorTemp,           !- Minimum Indoor Temperature Schedule Name
-      ,                        !- Maximum Indoor Temperature {C}
-      MaxIndoorTemp,           !- Maximum Indoor Temperature Schedule Name
-      ,                        !- Delta Temperature {deltaC}
-      DeltaTemp,               !- Delta Temperature Schedule Name
-     ,                        !- Minimum Outdoor Temperature {C}
-      MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
-      ,                        !- Maximum Outdoor Temperature {C}
-      MaxOutdoorTemp,          !- Maximum Outdoor Temperature Schedule Name
-      40;                      !- Maximum WindSpeed {m/s}
+      SPACE1-1 Ventl 1,        !-Name
+      SPACE1-1,                !- Zone Name
+      NightVentSched,          !- SCHEDULE Name
+      Flow/Zone,               !- Design Volume Flow Rate calculation method
+      .05295,                  !- Design Volume Flow Rate {m3/s}
+      ,                        !- Volume Flow Rate per area {m3/s/m2}
+      ,                        !- Volume Flow Rate per person {m3/s/person}
+      ,                        !- Air Changes Per Hour
+      Intake,                  !- Ventilation Type
+      67.,                     !- Fan Pressure Rise
+      .7,                      !- Fan Total Efficiency
+      1,                       !- Constant Term Coefficient
+      0,                       !- Temperature Term Coefficient
+      0,                       !- Velocity Term Coefficient
+      0,                       !- Velocity Squared Term Coefficient
+      ,                        !- Minimum Indoor Temperature {C}
+      MinIndoorTemp,           !- Minimum Indoor Temperature Schedule Name
+      ,                        !- Maximum Indoor Temperature {C}
+      MaxIndoorTemp,           !- Maximum Indoor Temperature Schedule Name
+      ,                        !- Delta Temperature {deltaC}
+      DeltaTemp,               !- Delta Temperature Schedule Name
+     ,                        !- Minimum Outdoor Temperature {C}
+      MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
+      ,                        !- Maximum Outdoor Temperature {C}
+      MaxOutdoorTemp,          !- Maximum Outdoor Temperature Schedule Name
+      40;                      !- Maximum WindSpeed {m/s}
 \end{lstlisting}
 
 Global Ventilation example:
 
 \begin{lstlisting}
 
-  Zonelist, West-East Zones, West Zone, East Zone;
+  Zonelist, West-East Zones, West Zone, East Zone;
 
 
-    ZoneVentilation:DesignFlowRate,
-      West-East Zones Ventilation,         !- Name
-      West-East Zones,         !- Zone or ZoneList Name
-      VentSched,               !- Schedule Name
-      AirChanges/Hour,         !- Design Flow Rate Calculation Method
-      ,                        !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
-      ,                        !- Flow Rate per Person {m3/s-person}
-      1.7,                        !- Air Changes per Hour
-      Intake,                  !- Ventilation Type
-      67.,                     !- Fan Pressure Rise {Pa}
-      0.7,                     !- Fan Total Efficiency
-      1,                       !- Constant Term Coefficient
-      0,                       !- Temperature Term Coefficient
-      0,                       !- Velocity Term Coefficient
-      0,                       !- Velocity Squared Term Coefficient
-      ,                        !- Minimum Indoor Temperature {C}
-      MinIndoorTemp,           !- Minimum Indoor Temperature Schedule Name
-      ,                        !- Maximum Indoor Temperature {C}
-      MaxIndoorTemp,           !- Maximum Indoor Temperature Schedule Name
-      ,                        !- Delta Temperature {deltaC}
-      DeltaTemp,               !- Delta Temperature Schedule Name
-      ,                        !- Minimum Outdoor Temperature {C}
-      MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
-      ,                        !- Maximum Outdoor Temperature {C}
-      MaxOutdoorTemp,          !- Maximum Outdoor Temperature Schedule Name
-      40;                      !- Maximum Wind Speed {m/s}
+    ZoneVentilation:DesignFlowRate,
+      West-East Zones Ventilation,         !- Name
+      West-East Zones,         !- Zone or ZoneList Name
+      VentSched,               !- Schedule Name
+      AirChanges/Hour,         !- Design Flow Rate Calculation Method
+      ,                        !- Design Flow Rate {m3/s}
+      ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Person {m3/s-person}
+      1.7,                        !- Air Changes per Hour
+      Intake,                  !- Ventilation Type
+      67.,                     !- Fan Pressure Rise {Pa}
+      0.7,                     !- Fan Total Efficiency
+      1,                       !- Constant Term Coefficient
+      0,                       !- Temperature Term Coefficient
+      0,                       !- Velocity Term Coefficient
+      0,                       !- Velocity Squared Term Coefficient
+      ,                        !- Minimum Indoor Temperature {C}
+      MinIndoorTemp,           !- Minimum Indoor Temperature Schedule Name
+      ,                        !- Maximum Indoor Temperature {C}
+      MaxIndoorTemp,           !- Maximum Indoor Temperature Schedule Name
+      ,                        !- Delta Temperature {deltaC}
+      DeltaTemp,               !- Delta Temperature Schedule Name
+      ,                        !- Minimum Outdoor Temperature {C}
+      MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
+      ,                        !- Maximum Outdoor Temperature {C}
+      MaxOutdoorTemp,          !- Maximum Outdoor Temperature Schedule Name
+      40;                      !- Maximum Wind Speed {m/s}
 \end{lstlisting}
 
 \subsection{ZoneVentilation:WindandStackOpenArea}\label{zoneventilationwindandstackopenarea}
@@ -618,7 +618,7 @@ Estimation of this value is difficult; refer to Chapter 16 of the 2009 ASHRAE Ha
 
 ~~~~~ \emph{T\(_{e}\)}~~~~~ = Zone air dry-bulb temperature {[}K{]}
 
-\emph{T\(_{b}\)}\(_{ }\) = Local outdoor air dry-bulb temperature {[}K{]}
+\emph{T\(_{b}\)}\(_{ }\) = Local outdoor air dry-bulb temperature {[}K{]}
 
 The total ventilation rate calculated by this model is the quadrature sum of the wind and stack air flow components:
 
@@ -730,20 +730,20 @@ An IDF example is provided below:
 
 \begin{lstlisting}
 
-  ZoneVentilation:WindandStackOpenArea,
-      ZONE 3 Ventl 1,          !- Name
-      ZONE 3,                  !- Zone Name
-      0.5,                     !- Opening Area {m2}
-      Constant,                !- Opening Area Fraction Schedule Name
-      AutoCalculate,           !- Opening Effectiveness
-      0.0,                     !- Effective Angle {deg}
-      1.0,                     !- Height Difference {m}
-      AutoCalculate,           !- Discharge Coefficient for Opening
-      18.0,                    !- Minimum Indoor Temperature {C}
-      ,                        !- Minimum Indoor Temperature Schedule Name
-      ,                        !- Maximum Indoor Temperature {C}
-      ,                        !- Maximum Indoor Temperature Schedule Name
-      1.0;                     !- Delta Temperature {deltaC}
+  ZoneVentilation:WindandStackOpenArea,
+      ZONE 3 Ventl 1,          !- Name
+      ZONE 3,                  !- Zone Name
+      0.5,                     !- Opening Area {m2}
+      Constant,                !- Opening Area Fraction Schedule Name
+      AutoCalculate,           !- Opening Effectiveness
+      0.0,                     !- Effective Angle {deg}
+      1.0,                     !- Height Difference {m}
+      AutoCalculate,           !- Discharge Coefficient for Opening
+      18.0,                    !- Minimum Indoor Temperature {C}
+      ,                        !- Minimum Indoor Temperature Schedule Name
+      ,                        !- Maximum Indoor Temperature {C}
+      ,                        !- Maximum Indoor Temperature Schedule Name
+      1.0;                     !- Delta Temperature {deltaC}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-002}
@@ -896,11 +896,11 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 ZoneAirBalance:OutdoorAir,
-      ZONE 2 Balance 1,        !- Name
-      ZONE 2,                  !- Zone Name
-      Quadrature,              !- Air Balance Method
-      0.00,                    !- Induced Outdoor Air Due to Unbalanced Duct Leakage {m3/s}
-      Constant;                !- Induced Outdoor Air Schedule Name
+      ZONE 2 Balance 1,        !- Name
+      ZONE 2,                  !- Zone Name
+      Quadrature,              !- Air Balance Method
+      0.00,                    !- Induced Outdoor Air Due to Unbalanced Duct Leakage {m3/s}
+      Constant;                !- Induced Outdoor Air Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-002}
@@ -1109,16 +1109,16 @@ An IDF Example:
 \begin{lstlisting}
 
 ZoneMixing,
-    Kitchen_ZN_1_FLR_1 Exhaust Fanmixing_0,  !- Name
-    Kitchen_ZN_1_FLR_1,  !- Zone Name
-    Hours_of_operation,  !- Schedule Name
-    Flow/Zone,  !- Design Flow Rate Calculation Method
-    1.4540,  !- Design Level
-     ,  !- Volume Flow Rate per Area {m3/s/m2}
-     ,  !- Volume Flow Rate Per Person {m3/s/person}
-     ,  !- Air Changes per Hour {ACH}
-    CAFETERIA_ZN_1_FLR_1,  !- Source Zone Name
-    0.0;  !- Delta Temperature
+    Kitchen_ZN_1_FLR_1 Exhaust Fanmixing_0,  !- Name
+    Kitchen_ZN_1_FLR_1,  !- Zone Name
+    Hours_of_operation,  !- Schedule Name
+    Flow/Zone,  !- Design Flow Rate Calculation Method
+    1.4540,  !- Design Level
+     ,  !- Volume Flow Rate per Area {m3/s/m2}
+     ,  !- Volume Flow Rate Per Person {m3/s/person}
+     ,  !- Air Changes per Hour {ACH}
+    CAFETERIA_ZN_1_FLR_1,  !- Source Zone Name
+    0.0;  !- Delta Temperature
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-000}
@@ -1311,28 +1311,28 @@ An IDF Example:
 \begin{lstlisting}
 
 ZoneCrossMixing,
-      1stFloor-Garage,  !- Name
-      GARAGE,      !- Zone Name
-      Always On,   !- SCHEDULE Name
-      Flow/Zone,               !- Design Flow Rate calculation method
-      0.1,                     !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per Area {m3/s/m2}
-      ,                        !- Flow Rate per Person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      1ST-FLOOR,   !- Source Zone Name
-      1.0;         !- Delta temp
+      1stFloor-Garage,  !- Name
+      GARAGE,      !- Zone Name
+      Always On,   !- SCHEDULE Name
+      Flow/Zone,               !- Design Flow Rate calculation method
+      0.1,                     !- Design Flow Rate {m3/s}
+      ,                        !- Flow Rate per Area {m3/s/m2}
+      ,                        !- Flow Rate per Person {m3/s/person}
+      ,                        !- Air Changes Per Hour
+      1ST-FLOOR,   !- Source Zone Name
+      1.0;         !- Delta temp
 
   ZoneCrossMixing,
-      Garage-1stFloor,  !- Name
-      1ST-FLOOR,   ! Zone Name
-      Always On,   !- SCHEDULE Name
-      flow/zone,               !- Design Flow Rate calculation method
-      0.1,                     !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per area {m3/s/m2}
-      ,                        !- Flow Rate per person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      GARAGE,      ! Source Zone Name
-      1.0;         ! Delta temp
+      Garage-1stFloor,  !- Name
+      1ST-FLOOR,   ! Zone Name
+      Always On,   !- SCHEDULE Name
+      flow/zone,               !- Design Flow Rate calculation method
+      0.1,                     !- Design Flow Rate {m3/s}
+      ,                        !- Flow Rate per area {m3/s/m2}
+      ,                        !- Flow Rate per person {m3/s/person}
+      ,                        !- Air Changes Per Hour
+      GARAGE,      ! Source Zone Name
+      1.0;         ! Delta temp
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-000}
@@ -1460,13 +1460,13 @@ An IDF Example:
 \begin{lstlisting}
 
 ZoneRefrigerationDoorMixing,
-      Freezer1_Cooler1,  !- Name
-      Freezer1,          !- Zone 1 Name
-      Cooler1,           !- Zone 2 Name
-      Freezer1DoorSched, !- Schedule Name
-      1.8,               !- Door height {m}
-      2.3,               !- Door area {m2}
-      StripCurtain;      !- Door protection type
+      Freezer1_Cooler1,  !- Name
+      Freezer1,          !- Zone 1 Name
+      Cooler1,           !- Zone 2 Name
+      Freezer1DoorSched, !- Schedule Name
+      1.8,               !- Door height {m}
+      2.3,               !- Door area {m2}
+      StripCurtain;      !- Door protection type
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-5-000}
@@ -1831,20 +1831,20 @@ Below is an example input for a cooltower.
 \begin{lstlisting}
 
 ZoneCoolTower:Shower
-  Cool Tower 1,         !- Name of cooltowers
-  Zone 1,               !- Zone name
-  Simple Vent,          !- Schedule
-  ,                     !- Name of water supply storage tanks
-  WindDrivenFlow,       !- Flow control type
-  0.0005,               !- Water flow rate from the spray in m3/s
-  ,                     !- schedule for flow rate (optional, non-existent means constant)
-  5.0,                  !- Effective tower height in m
-  1.0,                  !- Exit area in m2
-  10.0,                 !- Maximum supply air volume flow rate in m3/s
-  18.0,                 !- Minimum indoor temperature to prevent overcooling in C
-  0.05,                 !- Fraction of Water loss
-  0.05,                 !- Fraction of flow that goes to outside
-  250.0;                !- Rated power consumption in W
+  Cool Tower 1,         !- Name of cooltowers
+  Zone 1,               !- Zone name
+  Simple Vent,          !- Schedule
+  ,                     !- Name of water supply storage tanks
+  WindDrivenFlow,       !- Flow control type
+  0.0005,               !- Water flow rate from the spray in m3/s
+  ,                     !- schedule for flow rate (optional, non-existent means constant)
+  5.0,                  !- Effective tower height in m
+  1.0,                  !- Exit area in m2
+  10.0,                 !- Maximum supply air volume flow rate in m3/s
+  18.0,                 !- Minimum indoor temperature to prevent overcooling in C
+  0.05,                 !- Fraction of Water loss
+  0.05,                 !- Fraction of flow that goes to outside
+  250.0;                !- Rated power consumption in W
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-000}
@@ -2017,20 +2017,20 @@ An IDF example:
 \begin{lstlisting}
 
 ZoneThermalChimney,
-    ThermalChimney1,               !- Name of Thermal Chimney System
-    ThermalChimneyZone,            !- Name of Thermal Chimney Zone
-    ThermalChimneyAvail,           !- Availability Schedule Name
-    3.5,                           !- Width of the Absorber Wall
-    0.04,                          !- Cross Sectional Area of Air Channel Outlet
-    0.8,                           !- Discharge Coefficient
-    Zone1,                         !- Zone Name 1
-    8.0,                           !- Distance from the Top of the Thermal Chimney to Inlet 1
-    0.8,                           !- Relative Ratios of Air Flow Rates Passing through Zone 1
-    0.02,                          !- Cross Sectional Areas of Air Channel Inlet 1
-    Zone2,                         !- Zone Name 2
-    5.0,                           !- Distance from the Top of the Thermal Chimney to Inlet 2
-    0.2,                           !- Relative Ratios of Air Flow Rates Passing through Zone 2
-    0.02;                          !- Cross Sectional Areas of Air Channel Inlet 2
+    ThermalChimney1,               !- Name of Thermal Chimney System
+    ThermalChimneyZone,            !- Name of Thermal Chimney Zone
+    ThermalChimneyAvail,           !- Availability Schedule Name
+    3.5,                           !- Width of the Absorber Wall
+    0.04,                          !- Cross Sectional Area of Air Channel Outlet
+    0.8,                           !- Discharge Coefficient
+    Zone1,                         !- Zone Name 1
+    8.0,                           !- Distance from the Top of the Thermal Chimney to Inlet 1
+    0.8,                           !- Relative Ratios of Air Flow Rates Passing through Zone 1
+    0.02,                          !- Cross Sectional Areas of Air Channel Inlet 1
+    Zone2,                         !- Zone Name 2
+    5.0,                           !- Distance from the Top of the Thermal Chimney to Inlet 2
+    0.2,                           !- Relative Ratios of Air Flow Rates Passing through Zone 2
+    0.02;                          !- Cross Sectional Areas of Air Channel Inlet 2
 \end{lstlisting}
 
 \subsection{ZoneThermalChimney Outputs}\label{zonethermalchimney-outputs}
@@ -2127,8 +2127,8 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 ZoneAirMassFlowConservation,
-    Yes,                       !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-    AdjustInfiltrationFlow;    !- Infiltration Balancing Method
+    Yes,                       !- Adjust Zone Mixing For Zone Air Mass Flow Balance
+    AdjustInfiltrationFlow;    !- Infiltration Balancing Method
   AllZones;                  !- Infiltration Balancing Zones
 \end{lstlisting}
 

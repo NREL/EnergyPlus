@@ -45,14 +45,14 @@ FullHour, Day, Week & Any \tabularnewline
 \bottomrule
 \end{longtable}
 
-There is also second type of timestep inside EnergyPlus that is known as the System Timestep. This is a variable-length timestep that governs the driving timestep for HVAC and Plant system modeling. The user cannot directly control the system timestep (except by use of the ConvergenceLimits object). When the HVAC portion of the simulation begins its solution for the current zone timestep, it uses the zone timestep as its maximum length but then can reduce the timestep, as necessary, to improve the solution.  The technical details of the approach are explained in the Engineering Documentation under ``Integrated Solution Manager''.
+There is also second type of timestep inside EnergyPlus that is known as the System Timestep. This is a variable-length timestep that governs the driving timestep for HVAC and Plant system modeling. The user cannot directly control the system timestep (except by use of the ConvergenceLimits object). When the HVAC portion of the simulation begins its solution for the current zone timestep, it uses the zone timestep as its maximum length but then can reduce the timestep, as necessary, to improve the solution.  The technical details of the approach are explained in the Engineering Documentation under ``Integrated Solution Manager''.
 
 Users can see the system timestep used if they select the ``detailed'' frequency option on an HVAC output variable (e.g. Zone Air Temperature). To contrast, the ``Zone'' variables will only be reported on the zone timestep (e.g. Zone Mean Air Temperature).
 
 And, the IDF example:
 
 \begin{lstlisting}
-Timestep, 6;  !- Suggested default for most system simulations
+Timestep, 6;  !- Suggested default for most system simulations
 \end{lstlisting}
 
 Suggested defaults are 4 for non-HVAC simulations, 6 for simulations with HVAC, 20 is the minimum for ConductionFiniteDifference and HeatAndMoistureFiniteElement simulations. Green roof (ref: Material:RoofVegetation) also may require more timesteps.
@@ -91,10 +91,10 @@ Use in an IDF:
 
 \begin{lstlisting}
 ConvergenceLimits,
-  0,        !- Minimum System Timestep (0 = same as zone timestep)
-  25,       !- Maximum HVAC Iterations
-  3,        !- Minimum Plant Iterations
-  9;        !- Maximum Plant Iterations
+  0,        !- Minimum System Timestep (0 = same as zone timestep)
+  25,       !- Maximum HVAC Iterations
+  3,        !- Minimum Plant Iterations
+  9;        !- Maximum Plant Iterations
 \end{lstlisting}
 
 \subsection{Building}\label{building}
@@ -202,13 +202,13 @@ The building surfaces are assumed to be diffusely reflecting if they are opaque 
 \begin{figure}[hbtp] % fig 3
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image003.png}
-\caption{  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface. \protect \label{fig:solar-reflection-from-shadowing-surfaces.}}
+\caption{  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface. \protect \label{fig:solar-reflection-from-shadowing-surfaces.}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 4
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image004.png}
-\caption{  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse. \protect \label{fig:solar-reflection-from-building-surfaces-onto}}
+\caption{  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse. \protect \label{fig:solar-reflection-from-building-surfaces-onto}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 5
@@ -224,7 +224,7 @@ This field specifies the number of ``warmup'' days that might be used in the sim
 \begin{lstlisting}
 CheckWarmupConvergence: Loads Initialization, Zone = "MAIN ZONE" did not converge after 30 warmup days.
 See Warmup Convergence Information in .eio file for details
-..Environment(SizingPeriod) = "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB = >MWB"
+..Environment(SizingPeriod) = "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB = >MWB"
 ..Max Temp Comparison = 2.06E-002 vs Temperature Convergence Tolerance = 0.50 – Pass Convergence
 ..Min Temp Comparison = 5.95E-003 vs Temperature Convergence Tolerance = 0.50 – Pass Convergence
 ..Max Cool Load Comparison = 9.5082E-002 vs Loads Convergence Tolerance = 5.00E-002 – Fail Convergence
@@ -243,14 +243,14 @@ An example from an IDF:
 \begin{lstlisting}
 
 Building,
-    PSI HOUSE DORM AND OFFICES,  !- Name
-    36.87000,               !- North Axis {deg}
-    Suburbs,                !- Terrain
-    0.04,                   !- Loads Convergence Tolerance Value
-    0.4000000,              !- Temperature Convergence Tolerance Value {deltaC}
-    FullInteriorAndExterior, !- Solar Distribution
-    40,                     !- Maximum Number of Warmup Days
-    6;                      !- Minimum Number of Warmup Days
+    PSI HOUSE DORM AND OFFICES,  !- Name
+    36.87000,               !- North Axis {deg}
+    Suburbs,                !- Terrain
+    0.04,                   !- Loads Convergence Tolerance Value
+    0.4000000,              !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    40,                     !- Maximum Number of Warmup Days
+    6;                      !- Minimum Number of Warmup Days
 \end{lstlisting}
 
 \subsection{SurfaceConvectionAlgorithm:Inside}\label{surfaceconvectionalgorithminside}
@@ -355,14 +355,14 @@ Four values are allowed to select which solution will be used.
 This field is a bit ``advanced''. It should only be used when the simulation fails AND you cannot determine a cause for the failure. That is, you receive an error similar to:
 
 \begin{lstlisting}
-   ** Severe  ** Temperature out of bounds (202.91) for surface = Wall1
-   **   ~~~   ** in Zone = Zone01
-   **   ~~~   **  Occurrence info = NEW YORK CITY NY SUMMER, 07/21 16:00 - 16:01
-   **   ~~~   ** A temperature out of bounds problem can be caused by several things.  The user
-   **   ~~~   ** should check the weather environment, the level of internal gains with respect
-   **   ~~~   ** to the zone, and the thermal properties of their materials among other things.
-   **   ~~~   ** A common cause is a building with no thermal mass -- all materials with
-   **   ~~~   ** Regular-R definitions.
+   ** Severe  ** Temperature out of bounds (202.91) for surface = Wall1
+   **   ~~~   ** in Zone = Zone01
+   **   ~~~   **  Occurrence info = NEW YORK CITY NY SUMMER, 07/21 16:00 - 16:01
+   **   ~~~   ** A temperature out of bounds problem can be caused by several things.  The user
+   **   ~~~   ** should check the weather environment, the level of internal gains with respect
+   **   ~~~   ** to the zone, and the thermal properties of their materials among other things.
+   **   ~~~   ** A common cause is a building with no thermal mass -- all materials with
+   **   ~~~   ** Regular-R definitions.
 \end{lstlisting}
 
 And, after careful perusal, you cannot find a solution as suggested in the error description. You may then want to enter a higher number than the default for this field.
@@ -421,10 +421,10 @@ An example IDF object follows.
 
 \begin{lstlisting}
 HeatBalanceSettings:ConductionFiniteDifference,
-  FullyImplicitFirstOrder, !- Difference Scheme
-  3.0,                     !- Space Discretization Constant
-  1.0,                     !- Relaxation Factor
-  0.002;                   !- Inside Face Surface Temperature Convergence Criteria
+  FullyImplicitFirstOrder, !- Difference Scheme
+  3.0,                     !- Space Discretization Constant
+  1.0,                     !- Relaxation Factor
+  0.002;                   !- Inside Face Surface Temperature Convergence Criteria
 \end{lstlisting}
 
 \subsection{ZoneAirHeatBalanceAlgorithm}\label{zoneairheatbalancealgorithm}
@@ -469,10 +469,10 @@ An IDF example:
 
 \begin{lstlisting}
 ZoneAirContaminantBalance,
-  Yes,                          !- Carbon Dioxide Concentration
-  Outdoor CO2 Schedule,         !- Outdoor Carbon Dioxide Schedule Name
-  Yes,                          !- Generic Contaminant Concentration
-  Generic Contaminant Schedule; !- Outdoor Generic Contaminant Schedule Name
+  Yes,                          !- Carbon Dioxide Concentration
+  Outdoor CO2 Schedule,         !- Outdoor Carbon Dioxide Schedule Name
+  Yes,                          !- Generic Contaminant Concentration
+  Generic Contaminant Schedule; !- Outdoor Generic Contaminant Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-033}
@@ -586,7 +586,7 @@ In IDF use:
 
 \begin{lstlisting}
 Output:Diagnostics,
-  DisplayExtraWarnings;
+  DisplayExtraWarnings;
 \end{lstlisting}
 
 \subsection{Output:DebuggingData}\label{outputdebuggingdata}
@@ -637,10 +637,10 @@ An IDF Example:
 \begin{lstlisting}
 
 Output:PreprocessorMessage,
-     No Preprocessor Used,     !- preprocessor name
-     Information,              !- error severity
-     Illustrative Message,     !- message line 1
-     No problems for processing;  !- message line 2
+     No Preprocessor Used,     !- preprocessor name
+     Information,              !- error severity
+     Illustrative Message,     !- message line 1
+     No problems for processing;  !- message line 2
 \end{lstlisting}
 
 And would appear in output:
@@ -715,11 +715,11 @@ An IDF example:
 
 \begin{lstlisting}
 SimulationControl,
-  No,                      !- Do Zone Sizing Calculation
-  No,                      !- Do System Sizing Calculation
-  No,                      !- Do Plant Sizing Calculation
-  Yes,                     !- Run Simulation for Sizing Periods
-  Yes,                     !- Run Simulation for Weather File Run Periods
+  No,                      !- Do Zone Sizing Calculation
+  No,                      !- Do System Sizing Calculation
+  No,                      !- Do Plant Sizing Calculation
+  Yes,                     !- Run Simulation for Sizing Periods
+  Yes,                     !- Run Simulation for Weather File Run Periods
   No,                      !- Do HVAC Sizing Simulation for Sizing Periods
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
@@ -738,7 +738,7 @@ An example IDF object that sets the program to use only one thread follows.
 
 \begin{lstlisting}
 ProgramControl,
-  1; !- Number of Threads Allowed
+  1; !- Number of Threads Allowed
 \end{lstlisting}
 
 \subsection{Meter:Custom}\label{metercustom}
@@ -861,47 +861,47 @@ In the following examples, the custom meters are set up to illustrate the capabi
 
 \begin{lstlisting}
 Meter:Custom,
-  MyGeneralLights,         !- Name
-  Electricity,             !- Fuel Type
-  SPACE1-1,                !- Key Name 1
-  Lights Electric Energy,  !- Output Variable or Meter Name 1
-  SPACE2-1,                !- Key Name 2
-  Lights Electric Energy,  !- Output Variable or Meter Name 2
-  SPACE3-1,                !- Key Name 3
-  Lights Electric Energy,  !- Output Variable or Meter Name 3
-  SPACE4-1,                !- Key Name 4
-  Lights Electric Energy,  !- Output Variable or Meter Name 4
-  SPACE5-1,                !- Key Name 5
-  Lights Electric Energy;  !- Output Variable or Meter Name 5
+  MyGeneralLights,         !- Name
+  Electricity,             !- Fuel Type
+  SPACE1-1,                !- Key Name 1
+  Lights Electric Energy,  !- Output Variable or Meter Name 1
+  SPACE2-1,                !- Key Name 2
+  Lights Electric Energy,  !- Output Variable or Meter Name 2
+  SPACE3-1,                !- Key Name 3
+  Lights Electric Energy,  !- Output Variable or Meter Name 3
+  SPACE4-1,                !- Key Name 4
+  Lights Electric Energy,  !- Output Variable or Meter Name 4
+  SPACE5-1,                !- Key Name 5
+  Lights Electric Energy;  !- Output Variable or Meter Name 5
 
 Meter:Custom,
-  MyBuildingElectric,      !- Name
-  Electricity,             !- Fuel Type
-  ,                        !- Key Name #1
-  Electricity:Building;    !- Output Variable or Meter Name #1
+  MyBuildingElectric,      !- Name
+  Electricity,             !- Fuel Type
+  ,                        !- Key Name #1
+  Electricity:Building;    !- Output Variable or Meter Name #1
 
 Meter:CustomDecrement,
-  MyBuildingOther,         !- Name
-  Electricity,             !- Fuel Type
-  Electricity:Building,    !- Source Meter Name
-  ,                        !- Key Name #1
-  MyGeneralLights;         !- Output Variable or Meter Name #1
+  MyBuildingOther,         !- Name
+  Electricity,             !- Fuel Type
+  Electricity:Building,    !- Source Meter Name
+  ,                        !- Key Name #1
+  MyGeneralLights;         !- Output Variable or Meter Name #1
 \end{lstlisting}
 
 For an example of ``generic'' fuel type, one might put the Building Infiltration Heat Loss \& Heat Gain on a set of custom meters:
 
 \begin{lstlisting}
 Meter:Custom,
-  Building Infiltration Heat Loss,          !- Name
-  Generic,                                  !- Fuel Type
-  *,                                        !- Key Name 1
-  Zone Infiltration Total Heat Loss Energy; !- Output Variable Name 1
+  Building Infiltration Heat Loss,          !- Name
+  Generic,                                  !- Fuel Type
+  *,                                        !- Key Name 1
+  Zone Infiltration Total Heat Loss Energy; !- Output Variable Name 1
 
 Meter:Custom,
-  Building Infiltration Heat Gain,          !- Name
-  Generic,                                  !- Fuel Type
-  *,                                        !- Key Name 1
-  Zone Infiltration Total Heat Gain Energy; !- Output Variable Name 1
+  Building Infiltration Heat Gain,          !- Name
+  Generic,                                  !- Fuel Type
+  *,                                        !- Key Name 1
+  Zone Infiltration Total Heat Gain Energy; !- Output Variable Name 1
 \end{lstlisting}
 
 One can then report these values the same way one reports other standard meters.

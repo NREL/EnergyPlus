@@ -319,7 +319,7 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 \begin{figure}[hbtp] % fig 95
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image221.png}
-\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w\$\_\{t\}\$*/*w\$\_\{g\}\$* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.” \protect \label{fig:footprint-of-a-rectangular-building-showing}}
+\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w\$\_\{t\}\$*/*w\$\_\{g\}\$* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.” \protect \label{fig:footprint-of-a-rectangular-building-showing}}
 \end{figure}
 
 \paragraph{Field: Height Dependence of External Node Temperature}\label{field-height-dependence-of-external-node-temperature}
@@ -331,19 +331,19 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:SimulationControl,
-      AirflowNetwork_All,      !- Name
-      MultiZoneWithDistribution,  !- AirflowNetwork Control
-      Input,                   !- Wind Pressure Coefficient Type
-      Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
-      OpeningHeight,           !- Height Selection for Local Wind Speed Calculation
-      LowRise,                 !- Building Type
-      500,                     !- Maximum Number of Iterations {dimensionless}
-      ZeroNodePressures,       !- Initialization Type
-      1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}
-      1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
-      -0.5,                    !- Convergence Acceleration Limit {dimensionless}
-      0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
-      1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+      AirflowNetwork_All,      !- Name
+      MultiZoneWithDistribution,  !- AirflowNetwork Control
+      Input,                   !- Wind Pressure Coefficient Type
+      Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
+      OpeningHeight,           !- Height Selection for Local Wind Speed Calculation
+      LowRise,                 !- Building Type
+      500,                     !- Maximum Number of Iterations {dimensionless}
+      ZeroNodePressures,       !- Initialization Type
+      1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}
+      1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
+      -0.5,                    !- Convergence Acceleration Limit {dimensionless}
+      0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
+      1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
 \end{lstlisting}
 
 AirflowNetwork:Multizone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
@@ -494,20 +494,20 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Zone,
-      RESISTIVE ZONE,          !- Name of Associated Thermal Zone
-      Temperature,             !- Ventilation Control Mode
-      WindowVentSched,         !- Vent Temperature Schedule Name
-      0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
-                               !- {dimensionless}
-      5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
-                               !- Modulating the Venting Open Factor {deltaC}
-      10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
-                               !- Modulating the Venting Open Factor {deltaC}
-      0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
-                               !- the Venting Open Factor {J/kg}
-      300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
-                               !- the Venting Open Factor {J/kg}
-      VentingSched;            !- Venting Availability Schedule Name
+      RESISTIVE ZONE,          !- Name of Associated Thermal Zone
+      Temperature,             !- Ventilation Control Mode
+      WindowVentSched,         !- Vent Temperature Schedule Name
+      0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
+                               !- {dimensionless}
+      5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
+                               !- Modulating the Venting Open Factor {deltaC}
+      10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
+                               !- Modulating the Venting Open Factor {deltaC}
+      0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
+                               !- the Venting Open Factor {J/kg}
+      300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
+                               !- the Venting Open Factor {J/kg}
+      VentingSched;            !- Venting Availability Schedule Name
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Multizone:Surface}\label{airflownetworkmultizonesurface}
@@ -686,41 +686,41 @@ IDF examples are provided below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Surface,
-      Zn001:Wall001,           !- Name of Associated Heat Transfer Surface
-      CR-1,                    !- Leakage Component Name
-      SFacade,                 !- External Node Name
-      1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+      Zn001:Wall001,           !- Name of Associated Heat Transfer Surface
+      CR-1,                    !- Leakage Component Name
+      SFacade,                 !- External Node Name
+      1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-      Zn001:Wall001:Win001,    !- Name of Associated Heat Transfer Surface
-      WiOpen1,                 !- Leakage Component Name
-      SFacade,                 !- External Node Name
-      0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+      Zn001:Wall001:Win001,    !- Name of Associated Heat Transfer Surface
+      WiOpen1,                 !- Leakage Component Name
+      SFacade,                 !- External Node Name
+      0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-      Zn003:Wall003,           !- Name of Associated Heat Transfer Surface
-      Zone3 Exhaust Fan,       !- Leakage Component Name
-      EFacade,                 !- External Node Name
-      1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+      Zn003:Wall003,           !- Name of Associated Heat Transfer Surface
+      Zone3 Exhaust Fan,       !- Leakage Component Name
+      EFacade,                 !- External Node Name
+      1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-      Zn001:Wall001:Win002,    !- Name of Associated Heat Transfer Surface
-      WiOpen2,                 !- Leakage Component Name
-      WFacade,                 !- External Node Name
-  0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
-      Temperature,             !- Ventilation Control Mode
-      WindowVentSched,         !- Vent Temperature Schedule Name
-      0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
-                               !- {dimensionless}
-      5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
-                               !- Modulating the Venting Open Factor {deltaC}
-      10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
-                               !- Modulating the Venting Open Factor {deltaC}
-      0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
-                               !- the Venting Open Factor {J/kg}
-      300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
-                               !- the Venting Open Factor {J/kg}
-      VentingSched;            !- Venting Availability Schedule Name
+      Zn001:Wall001:Win002,    !- Name of Associated Heat Transfer Surface
+      WiOpen2,                 !- Leakage Component Name
+      WFacade,                 !- External Node Name
+  0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+      Temperature,             !- Ventilation Control Mode
+      WindowVentSched,         !- Vent Temperature Schedule Name
+      0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
+                               !- {dimensionless}
+      5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
+                               !- Modulating the Venting Open Factor {deltaC}
+      10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
+                               !- Modulating the Venting Open Factor {deltaC}
+      0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
+                               !- the Venting Open Factor {J/kg}
+      300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
+                               !- the Venting Open Factor {J/kg}
+      VentingSched;            !- Venting Availability Schedule Name
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:ReferenceCrackConditions}\label{airflownetworkmultizonereferencecrackconditions}
@@ -750,10 +750,10 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
-      ReferenceCrackConditions,      !- Name of Reference Crack Conditions
-      20.0,                          !- Reference Temperature for Crack Data {C}
-      101325,                        !- Reference Barometric Pressure for Crack Data {Pa}
-      0.0;                           !- Reference Humidity Ratio for Crack Data {kgWater/kgDryAir}
+      ReferenceCrackConditions,      !- Name of Reference Crack Conditions
+      20.0,                          !- Reference Temperature for Crack Data {C}
+      101325,                        !- Reference Barometric Pressure for Crack Data {Pa}
+      0.0;                           !- Reference Humidity Ratio for Crack Data {kgWater/kgDryAir}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Surface:Crack}\label{airflownetworkmultizonesurfacecrack}
@@ -811,10 +811,10 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Surface:Crack,
-      CR-1,                     !- Name of Surface Crack Component
-      0.01,                     !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
-      0.667,                    !- Air Mass Flow Exponent {dimensionless}
-      ReferenceCrackConditions; !- Reference Crack Conditions
+      CR-1,                     !- Name of Surface Crack Component
+      0.01,                     !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
+      0.667,                    !- Air Mass Flow Exponent {dimensionless}
+      ReferenceCrackConditions; !- Reference Crack Conditions
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}\label{airflownetworkmultizonesurfaceeffectiveleakagearea}
@@ -839,7 +839,7 @@ where
 
 \(\Delta P\) ~~ = Pressure difference across this component {[}Pa{]}
 
-C\(_{ }\) = Discharge coefficient {[}dimensionless{]}
+C\(_{ }\) = Discharge coefficient {[}dimensionless{]}
 
 \begin{itemize}
 \tightlist
@@ -876,11 +876,11 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
-      SurfaceELR,              !- Name of surface effective leakage area component
-      0.07,                    !- Effective leakage area {dimensionless}
-      1.00,                    !- Discharge coefficient {dimensionless}
-      4.0,                     !- Reference pressure difference {Pa}
-      0.65;                    !- Air mass flow exponent {dimensionless}
+      SurfaceELR,              !- Name of surface effective leakage area component
+      0.07,                    !- Effective leakage area {dimensionless}
+      1.00,                    !- Discharge coefficient {dimensionless}
+      4.0,                     !- Reference pressure difference {Pa}
+      0.65;                    !- Air mass flow exponent {dimensionless}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Component:DetailedOpening}\label{airflownetworkmultizonecomponentdetailedopening}
@@ -990,19 +990,19 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Component:DetailedOpening,
-      WiOpen1,                 !- Detailed Opening Name
-      0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
-      0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-      NonPivoted,             !- Type of Large Vertical Opening (LVO)
-      0.0,                     !- Extra crack length for LVO type 1 with multiple openable parts,
-                               !- or Height of pivoting axis for LVO type 2 {m}
-      2,                       !- Number of Sets of Opening Factor Data
-      0.0,                     !- Opening factor 1 {dimensionless}
-      0.5,                     !- Discharge coefficient for opening factor 1 {dimensionless}
-      0.0,                     !- Width factor for opening factor 1 {dimensionless}
-      1.0,                     !- Height factor for opening factor 1 {dimensionless}
-      0.0,                     !- Start height factor for opening factor 1 {dimensionless}
-      1.0,  0.6,  1.0,  1.0,  0.0;  !-  Set of values for opening factor 2
+      WiOpen1,                 !- Detailed Opening Name
+      0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
+      0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
+      NonPivoted,             !- Type of Large Vertical Opening (LVO)
+      0.0,                     !- Extra crack length for LVO type 1 with multiple openable parts,
+                               !- or Height of pivoting axis for LVO type 2 {m}
+      2,                       !- Number of Sets of Opening Factor Data
+      0.0,                     !- Opening factor 1 {dimensionless}
+      0.5,                     !- Discharge coefficient for opening factor 1 {dimensionless}
+      0.0,                     !- Width factor for opening factor 1 {dimensionless}
+      1.0,                     !- Height factor for opening factor 1 {dimensionless}
+      0.0,                     !- Start height factor for opening factor 1 {dimensionless}
+      1.0,  0.6,  1.0,  1.0,  0.0;  !-  Set of values for opening factor 2
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Component:HorizontalOpening}\label{airflownetworkmultizonecomponenthorizontalopening}
@@ -1038,11 +1038,11 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Component:HorizontalOpening,
-      HrOpen,                  !- Name
-      0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
-      0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-      90.0,                    !- Sloping Plane Angle
-      0.2;                     !- Discharge Coefficient
+      HrOpen,                  !- Name
+      0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
+      0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
+      90.0,                    !- Sloping Plane Angle
+      0.2;                     !- Discharge Coefficient
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Component:SimpleOpening}\label{airflownetworkmultizonecomponentsimpleopening}
@@ -1077,12 +1077,12 @@ An IDF example is shown below:
 
 \begin{lstlisting}
 
- AirflowNetwork:MultiZone:Component:SimpleOpening,
-      WiOpen2,                 !- Simple Opening Name
-      0.001,                   !- Air Mass Flow Coefficient When Opening Is Closed {kg/s-m}
-      0.650,                   !- Air Mass Flow Exponent When Opening Is Closed {dimensionless}
-      0.0001,                  !- Minimum density difference for two-way flow (kg/m3)
-      1.0;                     !- Discharge coefficient (dimensionless)
+ AirflowNetwork:MultiZone:Component:SimpleOpening,
+      WiOpen2,                 !- Simple Opening Name
+      0.001,                   !- Air Mass Flow Coefficient When Opening Is Closed {kg/s-m}
+      0.650,                   !- Air Mass Flow Exponent When Opening Is Closed {dimensionless}
+      0.0001,                  !- Minimum density difference for two-way flow (kg/m3)
+      1.0;                     !- Discharge coefficient (dimensionless)
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Component:ZoneExhaustFan}\label{airflownetworkmultizonecomponentzoneexhaustfan}
@@ -1144,10 +1144,10 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
-     Zone3 Exhaust Fan,       !- Name
-     0.01,     !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
-      0.667;    !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off{dimensionless}
-      ReferenceCrackConditions; !- Reference Crack Conditions
+     Zone3 Exhaust Fan,       !- Name
+     0.01,     !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
+      0.667;    !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off{dimensionless}
+      ReferenceCrackConditions; !- Reference Crack Conditions
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:ExternalNode}\label{airflownetworkmultizoneexternalnode}
@@ -1175,29 +1175,29 @@ IDF examples are provided below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:ExternalNode,
-      NFacade,                 !- Name
-      1.524,                   !- External Node Height {m}
-      NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      NFacade,                 !- Name
+      1.524,                   !- External Node Height {m}
+      NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
   AirflowNetwork:MultiZone:ExternalNode,
-      EFacade,                 !- Name
-      1.524,                   !- External Node Height {m}
-      EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      EFacade,                 !- Name
+      1.524,                   !- External Node Height {m}
+      EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
   AirflowNetwork:MultiZone:ExternalNode,
-      SFacade,                 !- Name
-      1.524,                   !- External Node Height {m}
-      SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      SFacade,                 !- Name
+      1.524,                   !- External Node Height {m}
+      SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
   AirflowNetwork:MultiZone:ExternalNode,
-      WFacade,                 !- Name
-      1.524,                   !- External Node Height {m}
-      WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      WFacade,                 !- Name
+      1.524,                   !- External Node Height {m}
+      WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
   AirflowNetwork:MultiZone:ExternalNode,
-      Horizontal,              !- Name
-  3.028,                   !- External Node Height {m}
-  Horizontal_WPCValue;     !- Wind Pressure Coefficient Values Object Name
+      Horizontal,              !- Name
+  3.028,                   !- External Node Height {m}
+  Horizontal_WPCValue;     !- Wind Pressure Coefficient Values Object Name
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:WindPressureCoefficientArray}\label{airflownetworkmultizonewindpressurecoefficientarray}
@@ -1221,19 +1221,19 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:WindPressureCoefficientArray,
-      Every 30 Degrees,        !- WPC Array Name
-      0,                       !- Wind Direction #1 {deg}
-      30,                      !- Wind Direction #2 {deg}
-      60,                      !- Wind Direction #3 {deg}
-      90,                      !- Wind Direction #4 {deg}
-      120,                     !- Wind Direction #5 {deg}
-      150,                     !- Wind Direction #6 {deg}
-      180,                     !- Wind Direction #7 {deg}
-      210,                     !- Wind Direction #8 {deg}
-      240,                     !- Wind Direction #9 {deg}
-      270,                     !- Wind Direction #10 {deg}
-      300,                     !- Wind Direction #11 {deg}
-      330;                     !- Wind Direction #12 {deg}
+      Every 30 Degrees,        !- WPC Array Name
+      0,                       !- Wind Direction #1 {deg}
+      30,                      !- Wind Direction #2 {deg}
+      60,                      !- Wind Direction #3 {deg}
+      90,                      !- Wind Direction #4 {deg}
+      120,                     !- Wind Direction #5 {deg}
+      150,                     !- Wind Direction #6 {deg}
+      180,                     !- Wind Direction #7 {deg}
+      210,                     !- Wind Direction #8 {deg}
+      240,                     !- Wind Direction #9 {deg}
+      270,                     !- Wind Direction #10 {deg}
+      300,                     !- Wind Direction #11 {deg}
+      330;                     !- Wind Direction #12 {deg}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:WindPressureCoefficientValues}\label{airflownetworkmultizonewindpressurecoefficientvalues}
@@ -1278,20 +1278,20 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:WindPressureCoefficientValues,
-      NFacade_WPCValue,        !- Name
-      Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name
-      0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}
-      0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}
-      0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}
-      -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}
-      -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}
-      -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}
-      -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}
-      -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}
-      -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}
-      -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}
-      0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}
-      0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}
+      NFacade_WPCValue,        !- Name
+      Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name
+      0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}
+      0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}
+      0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}
+      -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}
+      -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}
+      -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}
+      -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}
+      -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}
+      -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}
+      -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}
+      0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}
+      0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:OccupantVentilationControl}\label{airflownetworkoccupantventilationcontrol}
@@ -1534,31 +1534,31 @@ IDF examples are provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Node,
-      EquipmentInletNode,      !- Name
-      Zone Equipment Inlet Node,  !- Component Name or Node Name
-      Other,                   !- Component Object Type or Node Type
-      3.0;                     !- Node Height {m}
+      EquipmentInletNode,      !- Name
+      Zone Equipment Inlet Node,  !- Component Name or Node Name
+      Other,                   !- Component Object Type or Node Type
+      3.0;                     !- Node Height {m}
 
 
   AirflowNetwork:Distribution:Node,
-      SupplyMainNode,          !- Name
-      ,                        !- Component Name or Node Name
-      Other,                   !- Component Object Type or Node Type
-      3.0;                     !- Node Height {m}
+      SupplyMainNode,          !- Name
+      ,                        !- Component Name or Node Name
+      Other,                   !- Component Object Type or Node Type
+      3.0;                     !- Node Height {m}
 
 
   AirflowNetwork:Distribution:Node,
-      MainSplitterNode,        !- Name
-      ,                        !- Component Name or Node Name
-      AirLoopHVAC:ZoneSplitter,  !- Component Object Type or Node Type
-      3.0;                     !- Node Height {m}
+      MainSplitterNode,        !- Name
+      ,                        !- Component Name or Node Name
+      AirLoopHVAC:ZoneSplitter,  !- Component Object Type or Node Type
+      3.0;                     !- Node Height {m}
 
 
   AirflowNetwork:Distribution:Node,
-      MainSplitterNode,        !- Name of Node
-      ,                        !- Name of Associated EnergyPlus Node or Object
-      AirLoopHVAC:ZoneSplitter,  !- EnergyPlus Object or Node Type
-      3.0;                     !- Node Height {m}
+      MainSplitterNode,        !- Name of Node
+      ,                        !- Name of Associated EnergyPlus Node or Object
+      AirLoopHVAC:ZoneSplitter,  !- EnergyPlus Object or Node Type
+      3.0;                     !- Node Height {m}
 \end{lstlisting}
 
 The next section describes AirflowNetwork Distribution Components, with 7 available types listed below. All required fields for each component represent a relationship between pressure difference and airflow. The components are referenced in AirflowNetwork:Distribution:Linkage objects.
@@ -1637,15 +1637,15 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:Leak,
-      MainSupplyLeak,          !- Name of Supply or Return Leak
-      0.0001,                  !- Air Mass Flow Coefficient {kg/s}
-      0.65;                    !- Air Mass Flow Exponent {dimensionless}
+      MainSupplyLeak,          !- Name of Supply or Return Leak
+      0.0001,                  !- Air Mass Flow Coefficient {kg/s}
+      0.65;                    !- Air Mass Flow Exponent {dimensionless}
 
 
   AirflowNetwork:Distribution:Component:Leak,
-      ZoneSupplyLeak,          !- Name of Supply or Return Leak
-      0.01,                    !- Air Mass Flow Coefficient {kg/s}
-      0.65;                    !- Air Mass Flow Exponent {dimensionless}
+      ZoneSupplyLeak,          !- Name of Supply or Return Leak
+      0.01,                    !- Air Mass Flow Coefficient {kg/s}
+      0.65;                    !- Air Mass Flow Exponent {dimensionless}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:LeakageRatio}\label{airflownetworkdistributioncomponentleakageratio}
@@ -1713,11 +1713,11 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:LeakageRatio,
-      Zone1SupplyLeakELA,      !- Name of Effective Leakage Ratio
-      0.043527,                !- Effective Leakage Ratio {dimensionless}
-      1.0,                     !- Maximum Flow Rate {m3/s}
-      20.0,                    !- Reference Pressure Difference {Pa}
-      0.65;                    !- Air Mass Flow Exponent {dimensionless}
+      Zone1SupplyLeakELA,      !- Name of Effective Leakage Ratio
+      0.043527,                !- Effective Leakage Ratio {dimensionless}
+      1.0,                     !- Maximum Flow Rate {m3/s}
+      20.0,                    !- Reference Pressure Difference {Pa}
+      0.65;                    !- Air Mass Flow Exponent {dimensionless}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:Duct}\label{airflownetworkdistributioncomponentduct}
@@ -1809,15 +1809,15 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:Duct,
-      MainTruck1,              !- Name of Duct Component
-      3.0,                     !- Duct Length {m}
-      0.6,                     !- Hydraulic Diameter {m}
-      0.2827,                  !- Cross Section Area {m2}
-      0.0009,                  !- Surface Roughness {m}
-      0.01,                    !- Coefficient for local dynamic loss due to fitting {dimensionless}
-      0.772,                   !- Overall heat transmittance coefficient (U value) from air to air
-                               !- {W/m2-K}
-      0.0001;                  !- Overall moisture transmittance coefficient from air to air {kg/m2}
+      MainTruck1,              !- Name of Duct Component
+      3.0,                     !- Duct Length {m}
+      0.6,                     !- Hydraulic Diameter {m}
+      0.2827,                  !- Cross Section Area {m2}
+      0.0009,                  !- Surface Roughness {m}
+      0.01,                    !- Coefficient for local dynamic loss due to fitting {dimensionless}
+      0.772,                   !- Overall heat transmittance coefficient (U value) from air to air
+                               !- {W/m2-K}
+      0.0001;                  !- Overall moisture transmittance coefficient from air to air {kg/m2}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:Fan}\label{airflownetworkdistributioncomponentfan}
@@ -1841,8 +1841,8 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:Fan,
-      Supply Fan 1,            !- Name of Constant Volume Fan
-      Fan:ConstantVolume;  !- Supply fan type
+      Supply Fan 1,            !- Name of Constant Volume Fan
+      Fan:ConstantVolume;  !- Supply fan type
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:Coil}\label{airflownetworkdistributioncomponentcoil}
@@ -1913,17 +1913,17 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:Coil,
-      ACDXCoil 1,                            !- Name of Associated EnergyPlus Coil
-      Coil:Cooling:DX:SingleSpeed,           !- EnergyPlus Coil Type
-      0.1,                                   !- Air Path Length {m}
-  1.00;                                  !- Air Path Hydraulic Diameter {m}
+      ACDXCoil 1,                            !- Name of Associated EnergyPlus Coil
+      Coil:Cooling:DX:SingleSpeed,           !- EnergyPlus Coil Type
+      0.1,                                   !- Air Path Length {m}
+  1.00;                                  !- Air Path Hydraulic Diameter {m}
 
 
   AirflowNetwork:Distribution:Component:Coil,
-      HP Heating Coil 1,                     !- Name of Associated EnergyPlus Coil
-      Coil:Heating:DX:SingleSpeed,           !- EnergyPlus Coil Type
-      0.1,                                   !- Air Path Length {m}
-      1.00;                                  !- Air Path Hydraulic Diameter {m}
+      HP Heating Coil 1,                     !- Name of Associated EnergyPlus Coil
+      Coil:Heating:DX:SingleSpeed,           !- EnergyPlus Coil Type
+      0.1,                                   !- Air Path Length {m}
+      1.00;                                  !- Air Path Hydraulic Diameter {m}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:HeatExchanger}\label{airflownetworkdistributioncomponentheatexchanger}
@@ -1980,17 +1980,17 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:HeatExchanger,
-      OA Heat Recovery 1,      !- HeatExchanger Name
-      HeatExchanger:AirToAir:SensibleAndLatent,  !- HeatExchanger Object Type
-      0.1,                     !- Air Path Length {m}
-      1.00;                    !- Air Path Hydraulic Diameter {m}
+      OA Heat Recovery 1,      !- HeatExchanger Name
+      HeatExchanger:AirToAir:SensibleAndLatent,  !- HeatExchanger Object Type
+      0.1,                     !- Air Path Length {m}
+      1.00;                    !- Air Path Hydraulic Diameter {m}
 
 
   AirflowNetwork:Distribution:Component:HeatExchanger,
-      Desiccant Heat Exchanger 1, !- HeatExchanger Name
-      HeatExchanger:Desiccant:BalancedFlow,  !- HeatExchanger Object Type
-      0.1,                     !- Air Path Length {m}
-      1.00;                    !- Air Path Hydraulic Diameter {m}
+      Desiccant Heat Exchanger 1, !- HeatExchanger Name
+      HeatExchanger:Desiccant:BalancedFlow,  !- HeatExchanger Object Type
+      0.1,                     !- Air Path Length {m}
+      1.00;                    !- Air Path Hydraulic Diameter {m}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:TerminalUnit}\label{airflownetworkdistributioncomponentterminalunit}
@@ -2040,10 +2040,10 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:TerminalUnit,
-      Reheat Zone 1,                    !- Name of Associated Energyplus Terminal Unit
-      AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- EnergyPlus Terminal Unit Type
-      0.1,                              !- Air Path Length {m}
-      0.44;                             !- Air Path Hydraulic Diameter {m}
+      Reheat Zone 1,                    !- Name of Associated Energyplus Terminal Unit
+      AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- EnergyPlus Terminal Unit Type
+      0.1,                              !- Air Path Length {m}
+      0.44;                             !- Air Path Hydraulic Diameter {m}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:ConstantPressureDrop}\label{airflownetworkdistributioncomponentconstantpressuredrop}
@@ -2071,8 +2071,8 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Component:ConstantPressureDrop,
-   SupplyCPDComp, ! Name of Constant Pressure Drop Component
-   1.0;           ! Pressure Difference Across the Component [Pa]
+   SupplyCPDComp, ! Name of Constant Pressure Drop Component
+   1.0;           ! Pressure Difference Across the Component [Pa]
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Linkage}\label{airflownetworkdistributionlinkage}
@@ -2106,11 +2106,11 @@ An IDF example is provided below:
 \begin{lstlisting}
 
 AirflowNetwork:Distribution:Linkage,
-      Main Link 1,             !- Name of Linkage
-      EquipmentInletNode,      !- Node 1 Name
-      SupplyMainNode,          !- Node 2 Name
-      MainTruck1,              !- Component Name
-      Attic Zone;              !- Thermal Zone Name
+      Main Link 1,             !- Name of Linkage
+      EquipmentInletNode,      !- Node 1 Name
+      SupplyMainNode,          !- Node 2 Name
+      MainTruck1,              !- Component Name
+      Attic Zone;              !- Thermal Zone Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-002}

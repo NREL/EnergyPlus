@@ -778,7 +778,7 @@ Where:
 
 A\(_{r}\) ~~~~~~~~~ = Area of the walkin floor, m\(^{2}\)
 
-A\(_{ }\) = Area of surfaces facing Zone n, m\(^{2}\)
+A\(_{ }\) = Area of surfaces facing Zone n, m\(^{2}\)
 
 Q\(_{n}\) ~~~ = Sensible heat transfer through the closed door(s) facing Zone n, W
 
@@ -792,7 +792,7 @@ U\(_{r}\) ~~~~~~~~~ = Thermal conductance of floor, W/m2-K
 
 U\(_{n}\) ~~~~~~~ = Thermal conductance of doors facing Zone n, W/m2-K
 
-U\(_{ }\) = Thermal conductance of surfaces facing Zone n, W/m2-K
+U\(_{ }\) = Thermal conductance of surfaces facing Zone n, W/m2-K
 
 ΔT\(_{n}\) ~~~~~~~~~~ = Difference between walk-in operating temperature and Zone n drybulb temperature, C
 
@@ -824,9 +824,9 @@ Factor\(_{n}\) = Doorway protection factor, = 0 for no protection; = ~ 0.5 for a
 
 g~~~ = ~ Gravitational constant
 
-h\(_{ }\) = ~ enthalpy of the air within the walk in, = ~ f(T\(_{n}\),P\(_{r}\), 90\%RH), J/kg
+h\(_{ }\) = ~ enthalpy of the air within the walk in, = ~ f(T\(_{n}\),P\(_{r}\), 90\%RH), J/kg
 
-h\(_{ }\) = ~ enthalpy of the air in Zone n, J/kg
+h\(_{ }\) = ~ enthalpy of the air in Zone n, J/kg
 
 H\(_{r}\)~~~~~~~~~~~ = ~ Height of door facing Zone n, m
 
@@ -842,23 +842,23 @@ m\(_{r}\) ~~~~~~~~ = Mass of dry air infiltrating into the walk-in, kg/s
 
 m\(_{r}\) ~~~~~~~~ = Mass of water removed from the infiltrating air, kg/s
 
-P\(_{ }\) = ~ Outdoor air pressure, Pa
+P\(_{ }\) = ~ Outdoor air pressure, Pa
 
 SCH\(_{n}\) = value from 0 to 1 indicating whether the system is in the dripdown period
 
-W\(_{ }\) = ~ Humidity ratio of the air within the walk in, = ~ f(T\(_{n}\),P\(_{r}\), 90\%RH), kg/kg
+W\(_{ }\) = ~ Humidity ratio of the air within the walk in, = ~ f(T\(_{n}\),P\(_{r}\), 90\%RH), kg/kg
 
 W\(_{r}\) ~~~~~~ = ~ Humidity ratio of Zone n air, kg/kg
 
 Δh\(_{r}\) ~~~ = ~ Latent heat absorbed to change ice to vapor, J/kg
 
-ρ\(_{ }\) = ~ Density of the air within the walk in = ~ f(T\(_{n}\),P\(_{r}\), 90\%RH), kg/m\(^{3}\)
+ρ\(_{ }\) = ~ Density of the air within the walk in = ~ f(T\(_{n}\),P\(_{r}\), 90\%RH), kg/m\(^{3}\)
 
 ρ\(_{r}\) ~~~~~~~~ = ~ Density of air in Zone n, kg/m\(^{3}\)
 
 The sensible load on the case and the sensible credit to the zone continue throughout the defrost and dripdown periods.~ However, to be consistent with the treatment of refrigerated cases, there is no latent credit to the zone or latent load upon the cooler during the dripdown period. Latent load and latent credit are both based on reducing the infiltrating vapor to ice. The sensible heat exchange between the walk in and the zone is then the total of the heat transfer through the doors and surfaces and the infiltration sensible load. The latent load upon the walkin is converted to the amount of frost added to the coils during each time step.~ This accumulating value is used later to determine the load placed upon the walkin during the defrost cycle.
 
-Q\(_{ }\) ~ = Q\(_{n}\) + Q\(_{n}\) + Q\(_{n}\)
+Q\(_{ }\) ~ = Q\(_{n}\) + Q\(_{n}\) + Q\(_{n}\)
 
 Q\(_{t}\) ~ = - Q\(_{n}\)
 
@@ -868,13 +868,13 @@ Q\(_{s}\)~ = - Q\(_{n}\)
 
 Where:
 
-Q\(_{ }\) ~ = Total sensible heat exchange between the walkin and Zone n, W
+Q\(_{ }\) ~ = Total sensible heat exchange between the walkin and Zone n, W
 
 Q\(_{t}\) ~~~~ = Latent load upon the Zone n, W
 
 Q\(_{s}\) ~~~~~ = Sensible load upon Zone n , W
 
-ΔFrost\(_{ }\) = Change in frost inventory, kg
+ΔFrost\(_{ }\) = Change in frost inventory, kg
 
 Δtime~~~~~~~~~ = Length of time step, s
 
@@ -882,7 +882,7 @@ After the heat exchange with each zone is calculated, the total load on the walk
 
 Q\(_{t}\) = ∑Q\(_{n}\)
 
-Q\(_{ }\) = ∑Q\(_{n}\) + Q\(_{t}\)+ Q\(_{n}\)+ Q\(_{r}\) + Q\(_{+}\) Q\(_{+}\) Q\(_{r}\)
+Q\(_{ }\) = ∑Q\(_{n}\) + Q\(_{t}\)+ Q\(_{n}\)+ Q\(_{r}\) + Q\(_{+}\) Q\(_{+}\) Q\(_{r}\)
 
 Q\(_{l}\) = Q\(_{t}\) + Q\(_{t}\)
 
@@ -904,11 +904,11 @@ Q\(_{g}\) = SCH\(_{g}\)
 
 Where:
 
-Q\(_{ }\) = Refrigeration load due to lighting during current time step, W
+Q\(_{ }\) = Refrigeration load due to lighting during current time step, W
 
 RatedQ\(_{g}\) = Maximum lighting load specified for the walk-in, W
 
-SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
+SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
 
 Q\(_{n}\) ~~~~~~~~~~ = ~ Refrigeration load due to fan power during the current time step, W
 
@@ -916,13 +916,13 @@ Power\(_{n}\) = ~ Rated circulating fan power, W
 
 Power\(_{n}\) = ~ Rated coil fan power, W
 
-SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
+SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
 
 Q\(_{r}\)~~~~~~~~~ = Refrigeration load due to heaters during current time step, W
 
 Power\(_{r}\)~~ = Rated total heater(s) power (including anti-sweat, floor, door, etc.) , W
 
-SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
+SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
 
 Q\(_{g}\)~~~~~~~ = Refrigeration load due to stocking during the time step, W
 
@@ -946,7 +946,7 @@ Q\(_{t}\) ~~~~~~~ = Refrigeration load imposed by defrost heat, W
 
 Capacity\(_{t}\) = Rated defrost power, W
 
-SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
+SCH\(_{ }\) = Scheduled value between 0 and 1 for the current time step
 
 Δfrost ~~~~~~~ = amount of frost melted during time step, kg
 
@@ -1163,13 +1163,13 @@ Several methods of two-stage compression and intercooling have been used.~ For l
 \begin{figure}[hbtp] % fig 281
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6278.png}
-\caption{  Two-Stage Compression System with a Shell-and-Coil Intercooler. \protect \label{fig:two-stage-compression-system-with-a-shell}}
+\caption{  Two-Stage Compression System with a Shell-and-Coil Intercooler. \protect \label{fig:two-stage-compression-system-with-a-shell}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 282
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6279.png}
-\caption{  Two-Stage Compression System with a Flash Intercooler. \protect \label{fig:two-stage-compression-system-with-a-flash}}
+\caption{  Two-Stage Compression System with a Flash Intercooler. \protect \label{fig:two-stage-compression-system-with-a-flash}}
 \end{figure}
 
 For two-stage compression systems with intercooling, there is an optimum intermediate pressure that minimizes the total power consumption of the system.~ In the case of an ideal intercooler in which the refrigerant gas enters the high-stage compressor at the same temperature as it enters the low-stage compressor, the minimum compressor work is achieved using the same pressure ratio across both compressors (Baek et al. 2005).~ Typically, the optimum intermediate pressure is approximated as the geometric mean pressure of the system as follows:
@@ -1230,7 +1230,7 @@ h\(_{t}\)~~~~ = enthalpy leaving the condenser, J/kg
 
 h\(_{d}\)~~~~~~~~ = enthalpy of saturated liquid at the condensing temperature, J/kg
 
-c\(_{ }\) = specific heat of saturated liquid at the condensing temperature, J/kg-C
+c\(_{ }\) = specific heat of saturated liquid at the condensing temperature, J/kg-C
 
 ΔT\(_{g}\)~~~~~~~~~~~ = Amount of subcooling included in condenser rated heat rejection, C
 
@@ -1244,7 +1244,7 @@ The heat rejection capacity of a dry air-cooled condenser object (Refrigeration:
 
 where:
 
-Hrej\(_{ }\) = Manufacturer's rated heat rejected by the condenser (W)
+Hrej\(_{ }\) = Manufacturer's rated heat rejected by the condenser (W)
 
 C\(_{1}\) ~ = Intercept taken from manufacturer's condenser performance data (W)
 
@@ -1566,7 +1566,7 @@ If the capacity is specified and the flow rate is not, then the flow rate is cal
 
 Flow\(_{s}\) = Capacity\(_{d}\)/(C\(_{e}\)*ΔT\(_{e}\))
 
-Flow\(_{ }\) = Flow\(_{s}\) / ρ\(_{e}\)
+Flow\(_{ }\) = Flow\(_{s}\) / ρ\(_{e}\)
 
 If the flow rate is specified and the capacity is not, the capacity is calculated as:
 
@@ -1578,7 +1578,7 @@ Where:
 
 ~ Eta~~ ~~~~~~~~~~~~~~~~~~~ = heat exchanger effectiveness, dimensionless and less than one
 
-~ T\(_{ }\)~~~~~~~~~~~ = heat exchanger brine inlet temperature at rated conditions (C)
+~ T\(_{ }\)~~~~~~~~~~~ = heat exchanger brine inlet temperature at rated conditions (C)
 
 ~ T\(_{d}\) ~~~~~~~~~~~~ = heat exchanger brine outlet temperature at rated conditions (C)
 
@@ -1735,13 +1735,13 @@ EnergyPlus is capable of modeling the transcritical booster refrigeration cycle.
 \begin{figure}[hbtp] % fig 289
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6337.png}
-\caption{  Schematic of the Transcritical CO\$\_\{2\}\$ Booster Refrigeration Cycle. \protect \label{fig:schematic-of-the-transcritical-co_2-booster}}
+\caption{  Schematic of the Transcritical CO\$\_\{2\}\$ Booster Refrigeration Cycle. \protect \label{fig:schematic-of-the-transcritical-co_2-booster}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 290
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6338.png}
-\caption{  Pressure-Enthalpy (*p-H*) Diagram for the Transcritical CO\$\_\{2\}\$ Booster Refrigeration Cycle. \protect \label{fig:pressure-enthalpy-p-h-diagram-for}}
+\caption{  Pressure-Enthalpy (*p-H*) Diagram for the Transcritical CO\$\_\{2\}\$ Booster Refrigeration Cycle. \protect \label{fig:pressure-enthalpy-p-h-diagram-for}}
 \end{figure}
 
 Carbon dioxide exits the gas cooler at Location~1 and passes through the suction line heat exchanger, exiting at Location~2, during which the refrigerant is cooled by the suction gas.~ An intermediate expansion occurs between Locations~2 and~3, and saturated CO\(_{2}\) enters the receiver.~ Saturated liquid CO\(_{2}\) exits the receiver at Location~6, which is then expanded and fed to the medium-temperature loads (between Locations~7 and~8) and the low-temperature loads (between Locations~9 and~10).~ Saturated vapor CO\(_{2}\) exits the receiver bypass at Location~4 and is expanded to the medium-temperature pressure level at Location~5.~ Carbon dioxide vapor exiting the low temperature loads is compressed to the medium-temperature pressure level (Location~10 to 11).~ The CO\(_{2}\) from the discharge of the low pressure compressors, the outlet of the medium-temperature loads and the outlet of the receiver bypass are then combined at Location~13.~ The CO\(_{2}\) suction gas then passes through the suction line heat exchanger where the refrigerant is heated, exiting at Location~14.~ The carbon dioxide is finally compressed to the gas cooler pressure level at Location~15 and heat is rejected to the surroundings in the gas cooler between Locations~15 and~1.
@@ -1785,7 +1785,7 @@ When the compressor discharge conditions are such that the CO\(_{2}\) is in the 
 \begin{figure}[hbtp] % fig 291
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6342.png}
-\caption{  COP of CO\$\_\{2\}\$ Transcritical Cycle vs. Discharge Pressure at Different Gas Cooler Exit Temperatures (Sawalha 2008). \protect \label{fig:cop-of-co_2-transcritical-cycle-vs.-discharge}}
+\caption{  COP of CO\$\_\{2\}\$ Transcritical Cycle vs. Discharge Pressure at Different Gas Cooler Exit Temperatures (Sawalha 2008). \protect \label{fig:cop-of-co_2-transcritical-cycle-vs.-discharge}}
 \end{figure}
 
 Several researchers have developed correlations to determine the optimum gas cooler pressure in CO\(_{2}\) refrigeration systems (Chen and Gu 2005; Ge and Tassou 2011; Kauf 1998; Liao and Zhao 2000; Sawalha 2008).~ Using a similar curve-fitting procedure, the following optimum gas cooler pressure correlations are used in EnergyPlus:

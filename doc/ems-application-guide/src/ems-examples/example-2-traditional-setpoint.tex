@@ -36,147 +36,147 @@ Example input objects that replicate a scheduled setpoint manager using EMS foll
 \begin{lstlisting}
 
 EnergyManagementSystem:Sensor,
-     Seasonal_Reset_SAT_Sched, !Name
-     Seasonal-Reset-Supply-Air-Temp-Sch , ! Output:Variable Index Key Name
-     Schedule Value;   ! Output:Variable or Output:Meter Name
+     Seasonal_Reset_SAT_Sched, !Name
+     Seasonal-Reset-Supply-Air-Temp-Sch , ! Output:Variable Index Key Name
+     Schedule Value;   ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Actuator,
-     VAV_1_SAT_setpoint,                ! Name
-     VAV_1 Supply Equipment Outlet Node,      ! Component Name
-     System Node Setpoint,              ! Component Type
-     Temperature Setpoint;              ! Control Variable
+     VAV_1_SAT_setpoint,                ! Name
+     VAV_1 Supply Equipment Outlet Node,      ! Component Name
+     System Node Setpoint,              ! Component Type
+     Temperature Setpoint;              ! Control Variable
 
 
   EnergyManagementSystem:Program,
-     VAV_1_SchedSetpoint , ! Name
-     SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;
+     VAV_1_SchedSetpoint , ! Name
+     SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;
 
 
   Example input objects that replicate a mixed air setpoint manager using EMS follow.
   EnergyManagementSystem:Sensor,
-     T_VAV1FanIn, !Name
-     VAV_1_HeatC-VAV_1_FanNode , ! Output:Variable Key Name
-     System Node Temperature; ! Output:Variable or Output:Meter Name
+     T_VAV1FanIn, !Name
+     VAV_1_HeatC-VAV_1_FanNode , ! Output:Variable Key Name
+     System Node Temperature; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-     T_VAV1FanOut, !Name
-     VAV_1 Supply Equipment Outlet Node, ! Output:Variable Index Key Name
-     System Node Temperature ; ! Output:Variable or Output:Meter Name
+     T_VAV1FanOut, !Name
+     VAV_1 Supply Equipment Outlet Node, ! Output:Variable Index Key Name
+     System Node Temperature ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Actuator,
-     VAV_1_CoolC_Setpoint,            ! Name
-     VAV_1_CoolC-VAV_1_HeatCNode ,    ! Component Name
-     System Node Setpoint,            ! Component Type
-     Temperature Setpoint;            ! Control Variable
+     VAV_1_CoolC_Setpoint,            ! Name
+     VAV_1_CoolC-VAV_1_HeatCNode ,    ! Component Name
+     System Node Setpoint,            ! Component Type
+     Temperature Setpoint;            ! Control Variable
 
 
   EnergyManagementSystem:Actuator,
-     VAV_1_HeatC_Setpoint,                            ! Name
-     VAV_1_HeatC-VAV_1_FanNode ,                  ! Component Name
-     System Node Setpoint,                          ! Component Type
-     Temperature Setpoint;            ! Control Variable
+     VAV_1_HeatC_Setpoint,                            ! Name
+     VAV_1_HeatC-VAV_1_FanNode ,                  ! Component Name
+     System Node Setpoint,                          ! Component Type
+     Temperature Setpoint;            ! Control Variable
 
 
   EnergyManagementSystem:Actuator,
-     VAV_1_OA_Setpoint,                            ! Name
-     VAV_1_OA-VAV_1_CoolCNode ,                  ! Component Name
-     System Node Setpoint,                          ! Component Type
-     Temperature Setpoint;            ! Control Variable
+     VAV_1_OA_Setpoint,                            ! Name
+     VAV_1_OA-VAV_1_CoolCNode ,                  ! Component Name
+     System Node Setpoint,                          ! Component Type
+     Temperature Setpoint;            ! Control Variable
 
 
 
 
   EnergyManagementSystem:Program,
-     VAV1MixedAirManagers , ! Name
-     SET VAV_1_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),
-     SET VAV_1_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),
-     SET VAV_1_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn);
+     VAV1MixedAirManagers , ! Name
+     SET VAV_1_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),
+     SET VAV_1_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),
+     SET VAV_1_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn);
 
 
   Example input objects for a night cycle availability manager follow.
   EnergyManagementSystem:Actuator,
-    VAV_1_NightCycleStatus,   ! Name
-    VAV_1,                    ! Component Name
-    AirLoopHVAC,              ! Component Type
-    Availability Status;      ! Control Variable
+    VAV_1_NightCycleStatus,   ! Name
+    VAV_1,                    ! Component Name
+    AirLoopHVAC,              ! Component Type
+    Availability Status;      ! Control Variable
 
 
 
 
   EnergyManagementSystem:Sensor,
-    heating_setpoint,                  ! Name
-    HTGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name
-    Schedule Value ; ! Output:Variable or Output:Meter Name
+    heating_setpoint,                  ! Name
+    HTGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name
+    Schedule Value ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-    cooling_setpoint,                  ! Name
-    CLGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name
-    Schedule Value ; ! Output:Variable or Output:Meter Name
+    cooling_setpoint,                  ! Name
+    CLGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name
+    Schedule Value ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-    TzoneVAV1_1,                  ! Name
-    Core_bottom ,         ! Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+    TzoneVAV1_1,                  ! Name
+    Core_bottom ,         ! Output:Variable or Output:Meter Index Key Name
+    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-    TzoneVAV1_2,                  ! Name
-    Perimeter_bot_ZN_3 ,         ! Output:Variable Key Name
-    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+    TzoneVAV1_2,                  ! Name
+    Perimeter_bot_ZN_3 ,         ! Output:Variable Key Name
+    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-    TzoneVAV1_3,                  ! Name
-    Perimeter_bot_ZN_2 ,         ! Output:Variable Key Name
-    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+    TzoneVAV1_3,                  ! Name
+    Perimeter_bot_ZN_2 ,         ! Output:Variable Key Name
+    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-    TzoneVAV1_4,                  ! Name
-    Perimeter_bot_ZN_1 ,         ! Output:Variable Key Name
-    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+    TzoneVAV1_4,                  ! Name
+    Perimeter_bot_ZN_1 ,         ! Output:Variable Key Name
+    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Sensor,
-    TzoneVAV1_5,                  ! Name
-    Perimeter_bot_ZN_4 ,         ! Output:Variable Key Name
-    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+    TzoneVAV1_5,                  ! Name
+    Perimeter_bot_ZN_4 ,         ! Output:Variable Key Name
+    Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Program,
-     VAV_1_NightCycleMGR , ! Name
-     SET Toffset = 0.8333  ,  ! 1.5F
-     SET NoAction = 0.0 ,
-     SET ForceOff = 1.0 ,
-     SET CycleOn = 2.0 ,
-     SET CycleOnZoneFansOnly = 3.0 ,
-     SET VAV1_heating_TurnOn  = heating_setpoint - Toffset ,
-     SET VAV1_heating_TurnOff = heating_setpoint + Toffset ,
-     SET VAV1_cooling_TurnOn  = cooling_setpoint + Toffset ,
-     SET VAV1_cooling_TurnOff = cooling_setpoint - Toffset ,
-     ! find max and min for "cycleOnAny" operation
-     SET Tmin = @MIN TzoneVAV1_1 TzoneVAV1_2  ,
-     SET Tmin = @MIN Tmin        TzoneVAV1_3  ,
-     SET Tmin = @MIN Tmin        TzoneVAV1_4  ,
-     SET Tmin = @MIN Tmin        TzoneVAV1_5  ,
-     SET Tmax = @MAX TzoneVAV1_1 TzoneVAV1_2  ,
-     SET Tmax = @MAX Tmax        TzoneVAV1_3  ,
-     SET Tmax = @MAX Tmax        TzoneVAV1_4  ,
-     SET Tmax = @MAX Tmax        TzoneVAV1_5  ,
-     IF Tmin < VAV1_heating_TurnOn ,
-       SET VAV_1_NightCycleStatus = CycleOn,
-       RETURN,  ! need to exit early or cooling check could also trigger
-     ELSEIF Tmin > VAV1_heating_TurnOff,
-       SET VAV_1_NightCycleStatus = NoAction,
-     ENDIF,
-     IF Tmax > VAV1_cooling_TurnOn,
-       SET VAV_1_NightCycleStatus = CycleOn,
-     ELSEIF Tmax < VAV1_cooling_TurnOff,
-       SET VAV_1_NightCycleStatus = NoAction   ,
-     ENDIF;
+     VAV_1_NightCycleMGR , ! Name
+     SET Toffset = 0.8333  ,  ! 1.5F
+     SET NoAction = 0.0 ,
+     SET ForceOff = 1.0 ,
+     SET CycleOn = 2.0 ,
+     SET CycleOnZoneFansOnly = 3.0 ,
+     SET VAV1_heating_TurnOn  = heating_setpoint - Toffset ,
+     SET VAV1_heating_TurnOff = heating_setpoint + Toffset ,
+     SET VAV1_cooling_TurnOn  = cooling_setpoint + Toffset ,
+     SET VAV1_cooling_TurnOff = cooling_setpoint - Toffset ,
+     ! find max and min for "cycleOnAny" operation
+     SET Tmin = @MIN TzoneVAV1_1 TzoneVAV1_2  ,
+     SET Tmin = @MIN Tmin        TzoneVAV1_3  ,
+     SET Tmin = @MIN Tmin        TzoneVAV1_4  ,
+     SET Tmin = @MIN Tmin        TzoneVAV1_5  ,
+     SET Tmax = @MAX TzoneVAV1_1 TzoneVAV1_2  ,
+     SET Tmax = @MAX Tmax        TzoneVAV1_3  ,
+     SET Tmax = @MAX Tmax        TzoneVAV1_4  ,
+     SET Tmax = @MAX Tmax        TzoneVAV1_5  ,
+     IF Tmin < VAV1_heating_TurnOn ,
+       SET VAV_1_NightCycleStatus = CycleOn,
+       RETURN,  ! need to exit early or cooling check could also trigger
+     ELSEIF Tmin > VAV1_heating_TurnOff,
+       SET VAV_1_NightCycleStatus = NoAction,
+     ENDIF,
+     IF Tmax > VAV1_cooling_TurnOn,
+       SET VAV_1_NightCycleStatus = CycleOn,
+     ELSEIF Tmax < VAV1_cooling_TurnOff,
+       SET VAV_1_NightCycleStatus = NoAction   ,
+     ENDIF;
 \end{lstlisting}

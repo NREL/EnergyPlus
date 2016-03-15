@@ -7,18 +7,18 @@ To show you how simple the specification of a rate can be here is a simple examp
 \begin{lstlisting}
 
 UtilityCost:Tariff,
-    TariffExample1,          ! Name
-    Electricity:Facility,    ! Output Meter Name
-    kWh;               ! Conversion Factor Choice
+    TariffExample1,          ! Name
+    Electricity:Facility,    ! Output Meter Name
+    kWh;               ! Conversion Factor Choice
 
 
   UtilityCost:Charge:Simple,
-    ChargeExample1,          ! Charge Variable Name
-    TariffExample1,          ! Tariff Name
-    totalEnergy,             ! Source Variable
-    Annual,                   ! Season
-    EnergyCharges,           ! Category Variable Name
-    0.08;                    ! Cost Per Unit Value or Variable Name
+    ChargeExample1,          ! Charge Variable Name
+    TariffExample1,          ! Tariff Name
+    totalEnergy,             ! Source Variable
+    Annual,                   ! Season
+    EnergyCharges,           ! Category Variable Name
+    0.08;                    ! Cost Per Unit Value or Variable Name
 \end{lstlisting}
 
 Overall, the goals of the economics section of EnergyPlus are to make simple tariffs easy to model and complex tariffs possible to model.

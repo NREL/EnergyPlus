@@ -10,15 +10,15 @@ A complete simulation of each primary air system -- zone equipment air loop is d
 \end{itemize}
 
 \begin{lstlisting}
-DO WHILE ((SimAirLoops .OR. SimZoneEquipment) .AND. (IterAir.LE.MaxAir) )   IF (SimAirLoops) THEN     CALL ManageAirLoops(FirstHVACIteration,SimAirLoops,SimZoneEquipment)     SimPlantDemandLoops = .TRUE     SimElecCircuits = .TRUE.   END IF
+DO WHILE ((SimAirLoops .OR. SimZoneEquipment) .AND. (IterAir.LE.MaxAir) )   IF (SimAirLoops) THEN     CALL ManageAirLoops(FirstHVACIteration,SimAirLoops,SimZoneEquipment)     SimPlantDemandLoops = .TRUE     SimElecCircuits = .TRUE.   END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-  IF (SimZoneEquipment) THEN     CALL ResolveAirLoopFlowLimits(IterAir+1)     CALL ManageZoneEquipment(FirstHVACIteration,SimZoneEquipment,SimAirLoops)     SimPlantDemandLoops = .TRUE.     SimElecCircuits = .TRUE.   END IF
+  IF (SimZoneEquipment) THEN     CALL ResolveAirLoopFlowLimits(IterAir+1)     CALL ManageZoneEquipment(FirstHVACIteration,SimZoneEquipment,SimAirLoops)     SimPlantDemandLoops = .TRUE.     SimElecCircuits = .TRUE.   END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-  IterAir = IterAir + 1
+  IterAir = IterAir + 1
 \end{lstlisting}
 
 \begin{lstlisting}

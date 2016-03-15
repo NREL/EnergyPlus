@@ -101,9 +101,9 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \begin{lstlisting}
 SurfaceProperty:HeatTransferAlgorithm:MultipleSurface,
-      my exterior wall override,
-      AllExteriorWalls,
-      ConductionFiniteDifference;
+      my exterior wall override,
+      AllExteriorWalls,
+      ConductionFiniteDifference;
 \end{lstlisting}
 
 \subsection{SurfaceProperty:HeatTransferAlgorithm:SurfaceList}\label{surfacepropertyheattransferalgorithmsurfacelist}
@@ -151,12 +151,12 @@ An example IDF object follows.
 \begin{lstlisting}
 
 SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
-      my wall construct override,   !- Name
-      ConductionFiniteDifference,   !- Algorithm
-      Zn001:Wall001,                !- Surface Name 1
-      Zn001:Wall002,                !- Surface Name 2
-      Zn001:Wall003,                !- Surface Name 3
-      Zn001:Wall004;                !- Surface Name 4
+      my wall construct override,   !- Name
+      ConductionFiniteDifference,   !- Algorithm
+      Zn001:Wall001,                !- Surface Name 1
+      Zn001:Wall002,                !- Surface Name 2
+      Zn001:Wall003,                !- Surface Name 3
+      Zn001:Wall004;                !- Surface Name 4
 \end{lstlisting}
 
 \subsection{SurfaceProperty:HeatTransferAlgorithm:Construction}\label{surfacepropertyheattransferalgorithmconstruction}
@@ -204,9 +204,9 @@ An example IDF object follows.
 \begin{lstlisting}
 
 SurfaceProperty:HeatTransferAlgorithm:Construction,
-      my wall construct override,  !- Name
-      ConductionFiniteDifference,  !- Algorithm
-      R13WALL;                     !- Construction Name
+      my wall construct override,  !- Name
+      ConductionFiniteDifference,  !- Algorithm
+      R13WALL;                     !- Construction Name
 \end{lstlisting}
 
 \subsection{SurfaceControl:MoveableInsulation}\label{surfacecontrolmoveableinsulation}
@@ -240,10 +240,10 @@ An example of this syntax implemented in an input file is:
 \begin{lstlisting}
 
 SurfaceControl:MoveableInsulation,
-    Exterior,                      ! Insulation Type
-    Zone001:Wall001,               ! Surface Name
-    TransparentInsulationMaterial, ! Material Name
-    PresentInWinterSchedule;       ! Schedule Name
+    Exterior,                      ! Insulation Type
+    Zone001:Wall001,               ! Surface Name
+    TransparentInsulationMaterial, ! Material Name
+    PresentInWinterSchedule;       ! Schedule Name
 \end{lstlisting}
 
 \subsection{SurfaceProperty:OtherSideCoefficients}\label{surfacepropertyothersidecoefficients}
@@ -349,36 +349,36 @@ Tpast = Other side temperature from previous zone timestep (°C)
 \end{figure}
 
 \begin{lstlisting}
-!  Example input using temperature schedule
+!  Example input using temperature schedule
 SurfaceProperty:OtherSideCoefficients,
-      OSCCoef:Zn005:Wall003,   !- Name
-      0,                       !- Combined Convective/Radiative Film Coefficient {W/m2-K}
-      0.000000,                !- Constant Temperature {C}
-      1.000000,                !- Constant Temperature Coefficient
-      0.000000,                !- External Dry-Bulb Temperature Coefficient
-      0.000000,                !- Ground Temperature Coefficient
-      0.000000,                !- Wind Speed Coefficient
-      0.000000,                !- Zone Air Temperature Coefficient
-      Zn005Wall003OtherSideTempSched;  !- Constant Temperature Schedule Name
+      OSCCoef:Zn005:Wall003,   !- Name
+      0,                       !- Combined Convective/Radiative Film Coefficient {W/m2-K}
+      0.000000,                !- Constant Temperature {C}
+      1.000000,                !- Constant Temperature Coefficient
+      0.000000,                !- External Dry-Bulb Temperature Coefficient
+      0.000000,                !- Ground Temperature Coefficient
+      0.000000,                !- Wind Speed Coefficient
+      0.000000,                !- Zone Air Temperature Coefficient
+      Zn005Wall003OtherSideTempSched;  !- Constant Temperature Schedule Name
 \end{lstlisting}
 
 \begin{lstlisting}
-!  Example input for outside heat transfer coefficient of 1.23, using Tosdb
+!  Example input for outside heat transfer coefficient of 1.23, using Tosdb
 SurfaceProperty:OtherSideCoefficients,
-      OSCCoef:Zn005:Wall004,   !- Name
-      1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
-      0.000000,                !- Constant Temperature {C}
-      0.000000,                !- Constant Temperature Coefficient
-      1.000000,                !- External Dry-Bulb Temperature Coefficient
-      0.000000,                !- Ground Temperature Coefficient
-      0.000000,                !- Wind Speed Coefficient
-      0.000000,                !- Zone Air Temperature Coefficient
-      ,                        !- Constant Temperature Schedule Name
-      No,                      !- Sinusoidal Variation of Constant Temperature Coefficient
-      24,                      !- Period of Sinusoidal Variation {hr}
-      0.,                      !- Previous Other Side Temperature Coefficient
-      ,                        !- Minimum Other Side Temperature Limit {C}
-      ;                        !- Maximum Other Side Temperature Limit {C}
+      OSCCoef:Zn005:Wall004,   !- Name
+      1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
+      0.000000,                !- Constant Temperature {C}
+      0.000000,                !- Constant Temperature Coefficient
+      1.000000,                !- External Dry-Bulb Temperature Coefficient
+      0.000000,                !- Ground Temperature Coefficient
+      0.000000,                !- Wind Speed Coefficient
+      0.000000,                !- Zone Air Temperature Coefficient
+      ,                        !- Constant Temperature Schedule Name
+      No,                      !- Sinusoidal Variation of Constant Temperature Coefficient
+      24,                      !- Period of Sinusoidal Variation {hr}
+      0.,                      !- Previous Other Side Temperature Coefficient
+      ,                        !- Minimum Other Side Temperature Limit {C}
+      ;                        !- Maximum Other Side Temperature Limit {C}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs}
@@ -422,8 +422,8 @@ An example specification is:
 \begin{lstlisting}
 
 SurfaceProperty:OtherSideConditionsModel,
-      UTSC OSCM ZN11,          ! OtherSideConditionsModel Name
-      GapConvectionRadiation; ! Type of Modeling used to determine Boundary Conditions
+      UTSC OSCM ZN11,          ! OtherSideConditionsModel Name
+      GapConvectionRadiation; ! Type of Modeling used to determine Boundary Conditions
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1}
@@ -1049,11 +1049,11 @@ Below is an example input of vapor transfer coefficients for a surface.
 \begin{lstlisting}
 
 SurfaceProperties:VaporCoefficients,
-        South wall,     !- Surface Name
-        Yes,     !- Constant External Vapor Transfer Coefficient
-        0.0000000625,     !- External Vapor Coefficient Value
-        Yes,     !- Constant Internal vapor Transfer Coefficient
-        0.00000002;     !- Internal Vapor Coefficient Value
+        South wall,     !- Surface Name
+        Yes,     !- Constant External Vapor Transfer Coefficient
+        0.0000000625,     !- External Vapor Coefficient Value
+        Yes,     !- Constant Internal vapor Transfer Coefficient
+        0.00000002;     !- Internal Vapor Coefficient Value
 \end{lstlisting}
 
 \subsection{SurfaceProperty:ExteriorNaturalVentedCavity}\label{surfacepropertyexteriornaturalventedcavity}
@@ -1205,21 +1205,21 @@ Example for SurfaceProperty:SolarIncidentInside using a compact schedule:
 
 \begin{lstlisting}
 
-  Schedule:Compact,
-      North Wall SSG,          !- Name
-      Positive Number,         !- Schedule Type Limits Name
-      Through: 12/31,          !- Field 1
-      For: AllDays,            !- Field 2
-      Until: 07:00,10,         !- Field 3
-      Until: 17:00,20,         !- Field 5
-      Until: 24:00,15;         !- Field 7
+  Schedule:Compact,
+      North Wall SSG,          !- Name
+      Positive Number,         !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: AllDays,            !- Field 2
+      Until: 07:00,10,         !- Field 3
+      Until: 17:00,20,         !- Field 5
+      Until: 24:00,15;         !- Field 7
 
 
-    SurfaceProperty:SolarIncidentInside,
-      North Wall Solar Incident,  !- Name
-      Room102 North Wall,         !- Surface Name
-      Room Wall - North,          !- Construction Name
-      North Wall SSG;             !- Schedule Name
+    SurfaceProperty:SolarIncidentInside,
+      North Wall Solar Incident,  !- Name
+      Room102 North Wall,         !- Surface Name
+      Room Wall - North,          !- Construction Name
+      North Wall SSG;             !- Schedule Name
 \end{lstlisting}
 
 \subsection{ComplexFenestrationProperty:SolarAbsorbedLayers}\label{complexfenestrationpropertysolarabsorbedlayers}
@@ -1264,43 +1264,43 @@ Example for ComplexFenestrationProperty:SolarAbsorbedLayers with compact schedul
 
 \begin{lstlisting}
 
-  Schedule:Compact,
-      Layer 1,                 !- Name
-      Positive Number,         !- Schedule Type Limits Name
-      Through: 12/31,          !- Field 1
-      For: AllDays,            !- Field 2
-      Until: 07:00,1,         !- Field 3
-      Until: 17:00,2,         !- Field 5
-      Until: 24:00,1.5;         !- Field 7
+  Schedule:Compact,
+      Layer 1,                 !- Name
+      Positive Number,         !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: AllDays,            !- Field 2
+      Until: 07:00,1,         !- Field 3
+      Until: 17:00,2,         !- Field 5
+      Until: 24:00,1.5;         !- Field 7
 
 
-    Schedule:Compact,
-      Layer 2,                 !- Name
-      Positive Number,         !- Schedule Type Limits Name
-      Through: 12/31,          !- Field 1
-      For: AllDays,            !- Field 2
-      Until: 07:00,0.8,        !- Field 3
-      Until: 17:00,1.2,        !- Field 5
-      Until: 24:00,1.0;        !- Field 7
+    Schedule:Compact,
+      Layer 2,                 !- Name
+      Positive Number,         !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: AllDays,            !- Field 2
+      Until: 07:00,0.8,        !- Field 3
+      Until: 17:00,1.2,        !- Field 5
+      Until: 24:00,1.0;        !- Field 7
 
 
-    Schedule:Compact,
-      Layer 3,                 !- Name
-      Positive Number,         !- Schedule Type Limits Name
-      Through: 12/31,          !- Field 1
-      For: AllDays,            !- Field 2
-      Until: 07:00,1,          !- Field 3
-      Until: 17:00,2.1,        !- Field 5
-      Until: 24:00,1.7;        !- Field 7
+    Schedule:Compact,
+      Layer 3,                 !- Name
+      Positive Number,         !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: AllDays,            !- Field 2
+      Until: 07:00,1,          !- Field 3
+      Until: 17:00,2.1,        !- Field 5
+      Until: 24:00,1.7;        !- Field 7
 
 
-    ComplexFenestrationProperty:SolarAbsorbedLayers,
-      South Window Solar Absorbed Layers, !- Name
-      Room 102 South Window,              !- Fenestration surface name
-      CFS_Glz_2,                          !- Construction Surface name
-      Layer 1,                            !- Absorbed solar energy in layer 1
-      Layer 2,                            !- Absorbed solar energy in layer 2
-      Layer 3;                            !- Absorbed solar energy in layer 3
+    ComplexFenestrationProperty:SolarAbsorbedLayers,
+      South Window Solar Absorbed Layers, !- Name
+      Room 102 South Window,              !- Fenestration surface name
+      CFS_Glz_2,                          !- Construction Surface name
+      Layer 1,                            !- Absorbed solar energy in layer 1
+      Layer 2,                            !- Absorbed solar energy in layer 2
+      Layer 3;                            !- Absorbed solar energy in layer 3
 \end{lstlisting}
 
 \subsection{GeometryTransform}\label{geometrytransform}
@@ -1400,7 +1400,7 @@ An IDF Example:
 
 \begin{lstlisting}
 ZoneProperty:UserViewFactors:bySurfaceName,Lshaped Zone,
-    Lshaped Zone:South Wall,Lshaped Zone:South Wall,0.000000,
-    Lshaped Zone:South Wall,Lshaped Zone:East Wall,0.101310,
+    Lshaped Zone:South Wall,Lshaped Zone:South Wall,0.000000,
+    Lshaped Zone:South Wall,Lshaped Zone:East Wall,0.101310,
   <snip>
 \end{lstlisting}

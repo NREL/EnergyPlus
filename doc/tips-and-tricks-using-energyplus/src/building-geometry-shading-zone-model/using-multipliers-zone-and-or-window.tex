@@ -19,39 +19,39 @@ In the figure above, each ``middle'' zone represents 4 zones.~ The middle ``floo
 \begin{lstlisting}
 
 <snip>
-    Zone,
-      Gnd Center Zone,         !- Name
-      0.0,                     !- Direction of Relative North {deg}
-      8.0, 0.0, 0.0,           !- Origin [X,Y,Z] {m}
-      1,                       !- Type
-      4,                       !- Multiplier
-      autocalculate,           !- Ceiling Height {m}
-      autocalculate;           !- Volume {m3}
+    Zone,
+      Gnd Center Zone,         !- Name
+      0.0,                     !- Direction of Relative North {deg}
+      8.0, 0.0, 0.0,           !- Origin [X,Y,Z] {m}
+      1,                       !- Type
+      4,                       !- Multiplier
+      autocalculate,           !- Ceiling Height {m}
+      autocalculate;           !- Volume {m3}
   <snip>
 
-    ZoneGroup,
-      Mid Floor,               !- Zone Group Name
-      Mid Floor List,          !- Zone List Name
-      8;                       !- Zone List Multiplier
+    ZoneGroup,
+      Mid Floor,               !- Zone Group Name
+      Mid Floor List,          !- Zone List Name
+      8;                       !- Zone List Multiplier
 
 
-    ZoneList,
-      Mid Floor List,          !- Zone List Name
-      Mid West Zone,           !- Zone 1 Name
-      Mid Center Zone,         !- Zone 2 Name
-      Mid East Zone;           !- Zone 3 Name
+    ZoneList,
+      Mid Floor List,          !- Zone List Name
+      Mid West Zone,           !- Zone 1 Name
+      Mid Center Zone,         !- Zone 2 Name
+      Mid East Zone;           !- Zone 3 Name
   <snip>
 
-    Zone,
-      Top Center Zone,         !- Name
-      0.0,                     !- Direction of Relative North {deg}
-      8.0,                     !- X Origin {m}
-      0.0,                     !- Y Origin {m}
-      22.5,                    !- Z Origin {m}
-      1,                       !- Type
-      4,                       !- Multiplier
-      autocalculate,           !- Ceiling Height {m}
-      autocalculate;           !- Volume {m3}
+    Zone,
+      Top Center Zone,         !- Name
+      0.0,                     !- Direction of Relative North {deg}
+      8.0,                     !- X Origin {m}
+      0.0,                     !- Y Origin {m}
+      22.5,                    !- Z Origin {m}
+      1,                       !- Type
+      4,                       !- Multiplier
+      autocalculate,           !- Ceiling Height {m}
+      autocalculate;           !- Volume {m3}
 \end{lstlisting}
 
 For comparison purposes, clones of the middle zones were done.
@@ -98,17 +98,17 @@ To try to pare down the discrepancies shown here, the effects of height that are
 
 \begin{lstlisting}
 
-  Site:WeatherStation,
-      ,          !- Wind Sensor Height Above Ground {m}
-      ,          !- Wind Speed Profile Exponent
-      ,          !- Wind Speed Profile Boundary Layer Thickness {m}
-      0;         !- Air Temperature Sensor Height Above Ground {m}
+  Site:WeatherStation,
+      ,          !- Wind Sensor Height Above Ground {m}
+      ,          !- Wind Speed Profile Exponent
+      ,          !- Wind Speed Profile Boundary Layer Thickness {m}
+      0;         !- Air Temperature Sensor Height Above Ground {m}
 
 
-    Site:HeightVariation,
-      0,         !- Wind Speed Profile Exponent
-      ,          !- Wind Speed Profile Boundary Layer Thickness {m}
-      0;         !- Air Temperature Gradient Coefficient {K/m}
+    Site:HeightVariation,
+      0,         !- Wind Speed Profile Exponent
+      ,          !- Wind Speed Profile Boundary Layer Thickness {m}
+      0;         !- Air Temperature Gradient Coefficient {K/m}
 \end{lstlisting}
 
 Figure 10. Objects removing height from building impacts.

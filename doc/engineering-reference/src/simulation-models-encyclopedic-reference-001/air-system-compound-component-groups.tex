@@ -86,7 +86,7 @@ where:
 
 \emph{h\(_{d}\)} = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
+\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
 
 \emph{HR\(_{n}\)~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air in the control zone
 
@@ -130,7 +130,7 @@ If the fan operates continuously (i.e., when the supply air fan operating mode s
 {{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)
 \end{equation}
 
-where: {\$\mathop m\limits\^{} \bullet \(_{N}\)\(</span>  = air mass flow rate through unitary system when the cooling coil is ON (kg/s) <span>\)\mathop m\limits\^{} \bullet \(_{F}\)\$}~ = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
+where: {\$\mathop m\limits\^{} \bullet \(_{N}\)\(</span>  = air mass flow rate through unitary system when the cooling coil is ON (kg/s) <span>\)\mathop m\limits\^{} \bullet \(_{F}\)\$}~ = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -700,7 +700,7 @@ where:
 
 \emph{h\(_{d}\)} = enthalpy of air exiting the furnace at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
+\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
 
 \emph{HR\(_{n}\)~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
@@ -746,7 +746,7 @@ where:
 
 \({\dot m_{furnace}}\) ~~~~~ ~~~ = air mass flow rate through the furnace (kg/s)
 
-\emph{h\(_{l}\)}\(_{ }\) = enthalpy of air exiting the furnace (J/kg)
+\emph{h\(_{l}\)}\(_{ }\) = enthalpy of air exiting the furnace (J/kg)
 
 \emph{h\(_{e}\)} ~ = enthalpy of air in the control zone (J/kg)
 
@@ -796,7 +796,7 @@ where:
 
 \emph{h\(_{d}\)} = enthalpy of air exiting the furnace at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
+\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
 
 \emph{HR\(_{n}\)~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
@@ -1100,7 +1100,7 @@ At the end of each HVAC simulation time step, this object reports the heating or
 {\dot Q_{latent}} = {\dot Q_{total}} - {\dot Q_{sensible}}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate by the system, W \(_{ }\) = sensible energy transfer rate by the system, W \(_{ }\) = latent energy transfer rate by the system, W
+where: \(_{ }\) = total energy transfer rate by the system, W \(_{ }\) = sensible energy transfer rate by the system, W \(_{ }\) = latent energy transfer rate by the system, W
 
 \emph{h\(_{t}\)}~~~~~~~~~~~~~~~~~~~~~~~ = enthalpy of the air entering the unit at its inlet node, J/kg
 
@@ -1112,7 +1112,7 @@ Since each of these energy transfer rates can be calculated as positive or negat
 
 \begin{array}{l}If\;({{\dot Q}_{total}} < 0.0)\;Then\\\quad {{\dot Q}_{total,cooling}} = ABS({{\dot Q}_{total}})\\\quad {{\dot Q}_{total,heating}} = 0.0\\Else\\\quad {{\dot Q}_{total,cooling}} = 0.0\\\quad {{\dot Q}_{total,heating}} = {{\dot Q}_{total}}\\Endif\end{array}
 
-where: \(_{ }\) = output variable `Unitary System Total Cooling Rate, W' \(_{ }\) = output variable `Unitary System Total Heating Rate, W'
+where: \(_{ }\) = output variable `Unitary System Total Cooling Rate, W' \(_{ }\) = output variable `Unitary System Total Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied by the system are also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -1120,7 +1120,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 {Q_{total,cooling}} = {\dot Q_{total,cooling}}*TimeStepSys*3600
 \end{equation}
 
-where: \(_{ }\) = output variable `Unitary System Total Cooling Energy, J'
+where: \(_{ }\) = output variable `Unitary System Total Cooling Energy, J'
 
 \emph{TimeStepSys}~ = HVAC system simulation time step, hr
 
@@ -1767,7 +1767,7 @@ This system does not need any plant specification and will provide the electric 
 \begin{figure}[hbtp] % fig 231
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5198.png}
-\caption{  Schematic of Packaged DX Cooling Subsystem in Air Loop for a Blow-Thru Application \protect \label{fig:schematic-of-packaged-dx-cooling-subsystem-in}}
+\caption{  Schematic of Packaged DX Cooling Subsystem in Air Loop for a Blow-Thru Application \protect \label{fig:schematic-of-packaged-dx-cooling-subsystem-in}}
 \end{figure}
 
 \subsubsection{Controls}\label{controls-1}
@@ -1916,7 +1916,7 @@ The input object AirLoopHVAC:UnitaryHeatPump:WaterToAir provides a model for a w
 \begin{figure}[hbtp] % fig 234
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5222.png}
-\caption{  Source Side and Load Side Configuration of a BlowThru WateroToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a}}
+\caption{  Source Side and Load Side Configuration of a BlowThru WateroToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a}}
 \end{figure}
 
 There are two different models for water-to-air heat pump cooling and heating coils. Cooling and heating coils are modeled using a Single Speed or Variable Speed Equation Fit model or a Parameter Estimation model. The parameter estimation procedure is quite detailed and the equation fit model is designed to simplify the user inputs. Each model is discussed in short in the following sections. The Variable-Speed Equation Fit model is described in a separate section, as Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit and Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit.
@@ -2174,7 +2174,7 @@ The generalized least square method is used to generate the coefficients. This m
 \begin{figure}[hbtp] % fig 238
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5290.png}
-\caption{  Information Flow Chart for Water-To-Water Heat Pump Equation Fit (Tang 2005) \protect \label{fig:information-flow-chart-for-water-to-water}}
+\caption{  Information Flow Chart for Water-To-Water Heat Pump Equation Fit (Tang 2005) \protect \label{fig:information-flow-chart-for-water-to-water}}
 \end{figure}
 
 \subsection{Parameter Estimation Water-To-Water Heat Pump Model}\label{parameter-estimation-water-to-water-heat-pump-model}
@@ -2206,7 +2206,7 @@ v = Specific volume
 \begin{figure}[hbtp] % fig 239
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5296.png}
-\caption{  Schematic indicator diagram for a reciprocating Compressor(Jin 2002) \protect \label{fig:schematic-indicator-diagram-for-a}}
+\caption{  Schematic indicator diagram for a reciprocating Compressor(Jin 2002) \protect \label{fig:schematic-indicator-diagram-for-a}}
 \end{figure}
 
 Since the refrigerant vapor in the clearance volume as shown in the previous figure goes through a re-expansion procedure, the mass flow rate of the compressor refrigerant is a decreasing function of the pressure ratio.
@@ -2254,7 +2254,7 @@ n~Load side heat transfer coefficient, (UA)\(_{L}\)
 \begin{figure}[hbtp] % fig 240
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5306.png}
-\caption{  Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002) \protect \label{fig:information-flowchart-for-water-to-water-heat}}
+\caption{  Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002) \protect \label{fig:information-flowchart-for-water-to-water-heat}}
 \end{figure}
 
 Where:
@@ -2290,7 +2290,7 @@ Extrapolation beyond the catalog data grants the parameter estimation model an u
 \begin{figure}[hbtp] % fig 241
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5314.png}
-\caption{  Flow diagram of EnergyPlus Water to Water HeatPump implementation \protect \label{fig:flow-diagram-of-energyplus-water-to-water}}
+\caption{  Flow diagram of EnergyPlus Water to Water HeatPump implementation \protect \label{fig:flow-diagram-of-energyplus-water-to-water}}
 \end{figure}
 
 \subsubsection{Control Strategy:}\label{control-strategy}

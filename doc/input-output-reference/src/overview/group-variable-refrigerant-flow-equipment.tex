@@ -410,87 +410,87 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow syste
 \begin{lstlisting}
 
 AirConditioner:VariableRefrigerantFlow,
-    VRF Heat Pump,        !- Heat Pump Name
-    VRFCondAvailSched,    !- Availability Schedule Name
-    autosize,             !- Gross Rated Total Cooling Capacity {W}
-    3.16038,              !- Gross Rated Cooling COP {W}
-    -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
-    43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
-    VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
-    VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
-    VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
-    VRFCoolEIRFT,         !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
-    VRFCoolEIRFTBoundary, !- Cooling Energy Input Ratio Boundary Curve Name
-    VRFCoolEIRFTHi,       !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
-    CoolingEIRLowPLR,     !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
-    CoolingEIRHiPLR,      !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
-    CoolingCombRatio,     !- Cooling Combination Ratio Correction Factor Curve Name
-    VRFCPLFFPLR,          !- Cooling Part-Load Fraction Correlation Curve Name
-    autosize,             !- Gross Rated Heating Capacity {W}
-    ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
-    3.40909,              !- Gross Rated Heating COP
-    -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
-    15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
-    VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
-    VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
-    VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
-    VRFHeatEIRFT,         !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
-    VRFHeatEIRFTBoundary, !- Heating Energy Input Ratio Boundary Curve Name
-    VRFHeatEIRFTHi,       !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
-    WetBulbTemperature,   !- Heating Performance Curve Outdoor Temperature Type
-    HeatingEIRLowPLR,     !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
-    HeatingEIRHiPLR,      !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
-    HeatingCombRatio,     !- Heating Combination Ratio Correction Factor Curve Name
-    VRFCPLFFPLR,          !- Heating Part-Load Fraction Correlation Curve Name
-    0.25,                 !- Minimum Heat Pump Part-Load Ratio
-    SPACE1-1,             !- Zone Name for Master Thermostat Location
-    LoadPriority,         !- Master Thermostat Priority Control Type
-    ,                     !- Thermostat Priority Schedule Name
-    VRF Heat Pump TU List, !- Zone Terminal Unit List Name
-    No,                   !- Heat Pump Waste Heat Recovery
-    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}
-    10,                   !- Vertical Height used for Piping Correction Factor {m}
-    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name
-    -0.000386,            !- Piping Correction Factor for Height in Cooling Mode Coefficient
-    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}
-    ,                     !- Piping Correction Factor for Length in Heating Mode Curve Name
-    ,                     !- Piping Correction Factor for Height in Heating Mode Coefficient
-    15,                   !- Crankcase Heater Power per Compressor {W}
-    3,                    !- Number of Compressors
-    0.33,                 !- Ratio of Compressor Size to Total Compressor Capacity
-    7,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
-    Resistive,            !- Defrost Strategy
-    Timed,                !- Defrost Control
-    ,                     !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
-    ,                     !- Defrost Time Period Fraction
-    autosize,             !- Resistive Defrost Heater Capacity {W}
-    7,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
-    EvaporativelyCooled,  !- Condenser Type
-    MyVRFOANode,          !- Condenser Inlet Node Name
-    ,                     !- Condenser Outlet Node Name
-    ,                     !- Water Condenser Volume Flow Rate
-    ,                     !- Evaporative Condenser Effectiveness {dimensionless}
-    autosize,             !- Evaporative Condenser Air Flow Rate {m3/s}
-    autosize,             !- Evaporative Condenser Pump Rated Power Consumption {W}
-    ,                     !- Supply Water Storage Tank Name
-    200,                  !- Basin Heater Capacity {W/K}
-    ,                     !- Basin Heater Set Point Temperature (C)
-    ,                     !- Basin Heater Operating Schedule Name
-    ,                     !- Fuel Type
-    ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-    ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
-    ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Cooling Capacity Fraction
-    ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
-    ,                     !- Heat Recovery Cooling Energy Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Cooling Energy Fraction
-    ,                     !- Heat Recovery Cooling Energy Time Constant (hr)
-    ,                     !- Heat Recovery Heating Capacity Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Heating Capacity Fraction
-    ,                     !- Heat Recovery Heating Capacity Time Constant (hr)
-    ,                     !- Heat Recovery Heating Energy Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Heating Energy Fraction
-    ;                     !- Heat Recovery Heating Energy Time Constant (hr)
+    VRF Heat Pump,        !- Heat Pump Name
+    VRFCondAvailSched,    !- Availability Schedule Name
+    autosize,             !- Gross Rated Total Cooling Capacity {W}
+    3.16038,              !- Gross Rated Cooling COP {W}
+    -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
+    43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
+    VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
+    VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
+    VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
+    VRFCoolEIRFT,         !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
+    VRFCoolEIRFTBoundary, !- Cooling Energy Input Ratio Boundary Curve Name
+    VRFCoolEIRFTHi,       !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
+    CoolingEIRLowPLR,     !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
+    CoolingEIRHiPLR,      !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
+    CoolingCombRatio,     !- Cooling Combination Ratio Correction Factor Curve Name
+    VRFCPLFFPLR,          !- Cooling Part-Load Fraction Correlation Curve Name
+    autosize,             !- Gross Rated Heating Capacity {W}
+    ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
+    3.40909,              !- Gross Rated Heating COP
+    -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
+    15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
+    VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
+    VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
+    VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
+    VRFHeatEIRFT,         !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
+    VRFHeatEIRFTBoundary, !- Heating Energy Input Ratio Boundary Curve Name
+    VRFHeatEIRFTHi,       !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
+    WetBulbTemperature,   !- Heating Performance Curve Outdoor Temperature Type
+    HeatingEIRLowPLR,     !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
+    HeatingEIRHiPLR,      !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
+    HeatingCombRatio,     !- Heating Combination Ratio Correction Factor Curve Name
+    VRFCPLFFPLR,          !- Heating Part-Load Fraction Correlation Curve Name
+    0.25,                 !- Minimum Heat Pump Part-Load Ratio
+    SPACE1-1,             !- Zone Name for Master Thermostat Location
+    LoadPriority,         !- Master Thermostat Priority Control Type
+    ,                     !- Thermostat Priority Schedule Name
+    VRF Heat Pump TU List, !- Zone Terminal Unit List Name
+    No,                   !- Heat Pump Waste Heat Recovery
+    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}
+    10,                   !- Vertical Height used for Piping Correction Factor {m}
+    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name
+    -0.000386,            !- Piping Correction Factor for Height in Cooling Mode Coefficient
+    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}
+    ,                     !- Piping Correction Factor for Length in Heating Mode Curve Name
+    ,                     !- Piping Correction Factor for Height in Heating Mode Coefficient
+    15,                   !- Crankcase Heater Power per Compressor {W}
+    3,                    !- Number of Compressors
+    0.33,                 !- Ratio of Compressor Size to Total Compressor Capacity
+    7,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+    Resistive,            !- Defrost Strategy
+    Timed,                !- Defrost Control
+    ,                     !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+    ,                     !- Defrost Time Period Fraction
+    autosize,             !- Resistive Defrost Heater Capacity {W}
+    7,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+    EvaporativelyCooled,  !- Condenser Type
+    MyVRFOANode,          !- Condenser Inlet Node Name
+    ,                     !- Condenser Outlet Node Name
+    ,                     !- Water Condenser Volume Flow Rate
+    ,                     !- Evaporative Condenser Effectiveness {dimensionless}
+    autosize,             !- Evaporative Condenser Air Flow Rate {m3/s}
+    autosize,             !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                     !- Supply Water Storage Tank Name
+    200,                  !- Basin Heater Capacity {W/K}
+    ,                     !- Basin Heater Set Point Temperature (C)
+    ,                     !- Basin Heater Operating Schedule Name
+    ,                     !- Fuel Type
+    ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
+    ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+    ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Cooling Capacity Fraction
+    ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
+    ,                     !- Heat Recovery Cooling Energy Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Cooling Energy Fraction
+    ,                     !- Heat Recovery Cooling Energy Time Constant (hr)
+    ,                     !- Heat Recovery Heating Capacity Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Heating Capacity Fraction
+    ,                     !- Heat Recovery Heating Capacity Time Constant (hr)
+    ,                     !- Heat Recovery Heating Energy Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Heating Energy Fraction
+    ;                     !- Heat Recovery Heating Energy Time Constant (hr)
 \end{lstlisting}
 
 \subsection{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}\label{airconditionervariablerefrigerantflowfluidtemperaturecontrol}
@@ -1184,10 +1184,10 @@ Following is an example input for a ZoneTerminalUnitList object.
 \begin{lstlisting}
 
 ZoneTerminalUnitList,
-     VRF Heat Pump TU List, !- Zone Terminal Unit List Name
-     TU3,                   !- Zone Terminal Unit Name 1
-     TU4,                   !- Zone Terminal Unit Name 2
-     TU1,                   !- Zone Terminal Unit Name 3
-     TU2,                   !- Zone Terminal Unit Name 4
-     TU5;                   !- Zone Terminal Unit Name 5
+     VRF Heat Pump TU List, !- Zone Terminal Unit List Name
+     TU3,                   !- Zone Terminal Unit Name 1
+     TU4,                   !- Zone Terminal Unit Name 2
+     TU1,                   !- Zone Terminal Unit Name 3
+     TU2,                   !- Zone Terminal Unit Name 4
+     TU5;                   !- Zone Terminal Unit Name 5
 \end{lstlisting}

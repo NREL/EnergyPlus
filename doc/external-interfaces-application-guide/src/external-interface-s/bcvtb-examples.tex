@@ -155,8 +155,8 @@ To activate the external interface, we use:
 
 \begin{lstlisting}
 
-ExternalInterface,           !- Object to activate the external interface
-   PtolemyServer;              !- Name of external interface
+ExternalInterface,           !- Object to activate the external interface
+   PtolemyServer;              !- Name of external interface
 \end{lstlisting}
 
 To enter schedules to which the external interface writes, we use:
@@ -165,18 +165,18 @@ To enter schedules to which the external interface writes, we use:
 
 ! Cooling schedule. This schedule is set directly by the external interface.
   ! During warm-up and system-sizing, it is fixed at 24 degC.
-    ExternalInterface:Schedule,
-      TSetCoo,                 !- Name
-      Temperature,             !- ScheduleType
-      24;                      !- Initial value, used during warm-up
+    ExternalInterface:Schedule,
+      TSetCoo,                 !- Name
+      Temperature,             !- ScheduleType
+      24;                      !- Initial value, used during warm-up
 
 
   ! Heating schedule. This schedule is set directly by the external interface.
   ! During warm-up and system-sizing, it is fixed at 20 degC.
-    ExternalInterface:Schedule,
-      TSetHea,                 !- Name
-      Temperature,             !- ScheduleType
-      20;                      !- Initial value, used during warm-up
+    ExternalInterface:Schedule,
+      TSetHea,                 !- Name
+      Temperature,             !- ScheduleType
+      20;                      !- Initial value, used during warm-up
 \end{lstlisting}
 
 These schedules can be used as other EnergyPlus schedules. In this example, they are used to change a thermostat setpoint:
@@ -184,9 +184,9 @@ These schedules can be used as other EnergyPlus schedules. In this example, they
 \begin{lstlisting}
 
 ThermostatSetpoint:DualSetpoint,
-      DualSetPoint,            !- Name
-      BCVTB-SP-TH,             !- Heating Setpoint Temperature Schedule Name
-      BCVTB-SP-TC;             !- Cooling Setpoint Temperature Schedule Name
+      DualSetPoint,            !- Name
+      BCVTB-SP-TH,             !- Heating Setpoint Temperature Schedule Name
+      BCVTB-SP-TC;             !- Cooling Setpoint Temperature Schedule Name
 \end{lstlisting}
 
 We also want to read from EnergyPlus output variables, which we declare as
@@ -194,23 +194,23 @@ We also want to read from EnergyPlus output variables, which we declare as
 \begin{lstlisting}
 
 Output:Variable,
-      TSetHea,        !- Key Value
-      Schedule Value, !- Variable Name
-      TimeStep;       !- Reporting Frequency
+      TSetHea,        !- Key Value
+      Schedule Value, !- Variable Name
+      TimeStep;       !- Reporting Frequency
 
 
   Output:Variable,
-      TSetCoo,        !- Key Value
-      Schedule Value, !- Variable Name
-      TimeStep;       !- Reporting Frequency
+      TSetCoo,        !- Key Value
+      Schedule Value, !- Variable Name
+      TimeStep;       !- Reporting Frequency
 \end{lstlisting}
 
 To specify that data should be exchanged every 15 minutes of simulation time, enter in the idf file the section
 
 \begin{lstlisting}
 
-  Timestep,
-      4;          !- Number of Timesteps per Hour
+  Timestep,
+      4;          !- Number of Timesteps per Hour
 \end{lstlisting}
 
 \subsubsection{Creating the configuration file}\label{creating-the-configuration-file}
@@ -222,27 +222,27 @@ Note that we have not yet specified the order of the elements in the signal vect
 <?xml version = "1.0" encoding = "ISO-8859-1"?>
   <!DOCTYPE BCVTB-variables SYSTEM "variables.dtd">
   <BCVTB-variables>
-    <!-- The next two elements send the set points to E+ -->
-    <variable source = "Ptolemy">
-      <EnergyPlus schedule = "TSetHea"/>
-    </variable>
-    <variable source = "Ptolemy">
-      <EnergyPlus schedule = "TSetCoo"/>
-    </variable>
-    <!-- The next two elements receive the outdoor and zone air temperature from E+ -->
-    <variable source = "EnergyPlus">
-     <EnergyPlus name = "ENVIRONMENT" type = "SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "ZSF1" type = "ZONE AIR TEMPERATURE"/>
-    </variable>
-    <!-- The next two elements receive the schedule value as an output from E+ -->
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "TSetHea" type = "Schedule Value"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "TSetCoo" type = "Schedule Value"/>
-    </variable>
+    <!-- The next two elements send the set points to E+ -->
+    <variable source = "Ptolemy">
+      <EnergyPlus schedule = "TSetHea"/>
+    </variable>
+    <variable source = "Ptolemy">
+      <EnergyPlus schedule = "TSetCoo"/>
+    </variable>
+    <!-- The next two elements receive the outdoor and zone air temperature from E+ -->
+    <variable source = "EnergyPlus">
+     <EnergyPlus name = "ENVIRONMENT" type = "SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "ZSF1" type = "ZONE AIR TEMPERATURE"/>
+    </variable>
+    <!-- The next two elements receive the schedule value as an output from E+ -->
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "TSetHea" type = "Schedule Value"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "TSetCoo" type = "Schedule Value"/>
+    </variable>
   </BCVTB-variables>
 \end{lstlisting}
 
@@ -323,8 +323,8 @@ The code below shows how to set up an EnergyPlus file that uses EnergyManagmentS
 
 \begin{lstlisting}
 
-ExternalInterface,           !- Object to activate the external interface
-   PtolemyServer;              !- Name of external interface
+ExternalInterface,           !- Object to activate the external interface
+   PtolemyServer;              !- Name of external interface
 \end{lstlisting}
 
 To declare an actuator that changes the control status of the window with name ``Zn001:Wall001:Win001'', we use:
@@ -332,11 +332,11 @@ To declare an actuator that changes the control status of the window with name `
 \begin{lstlisting}
 
 ExternalInterface:Actuator,
-      Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Name
-      Zn001:Wall001:Win001,    !- Actuated Component Unique Name
-      Window Shading Control,  !- Actuated Component Type
-      Control Status,          !- Actuated Component Control Type
-       ;                       ! initial value
+      Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Name
+      Zn001:Wall001:Win001,    !- Actuated Component Unique Name
+      Window Shading Control,  !- Actuated Component Type
+      Control Status,          !- Actuated Component Control Type
+       ;                       ! initial value
 \end{lstlisting}
 
 Thus, the entry is identical with EnergyManagmentSystem:Actuator, except for the additional optional field that specifies the initial value. If unspecified, then the actuator will only be used during the time stepping, but not during the warm-up and the system sizing. Since actuators always overwrite other objects (such as a schedule), all these objects have values that are defined during the warm-up and the system sizing even if no initial value is specified.
@@ -346,35 +346,35 @@ We also want to read from EnergyPlus the outdoor temperature, the zone air tempe
 \begin{lstlisting}
 
 Output:Variable,
-     Environment,                            !- Key Value
-     Site Outdoor Air Drybulb Temperature,   !- Variable Name
-     timestep;                               !- Reporting Frequency
+     Environment,                            !- Key Value
+     Site Outdoor Air Drybulb Temperature,   !- Variable Name
+     timestep;                               !- Reporting Frequency
 
 
   Output:Variable,
-     *,                                      !- Key Value
-     Zone Mean Air Temperature,              !- Variable Name
-     timestep;                               !- Reporting Frequency
+     *,                                      !- Key Value
+     Zone Mean Air Temperature,              !- Variable Name
+     timestep;                               !- Reporting Frequency
 
 
   Output:Variable,
-     Zn001:Wall001:Win001,                   !- Key Value
-     Surface Outside Face Incident Solar Radiation Rate per Area, !- Var Name
-     timestep;                               !- Reporting Frequency
+     Zn001:Wall001:Win001,                   !- Key Value
+     Surface Outside Face Incident Solar Radiation Rate per Area, !- Var Name
+     timestep;                               !- Reporting Frequency
 
 
   Output:Variable,
-     *,                                      !- Key Value
-     Surface Shading Device Is On Time Fraction,  !- Variable Name
-     timestep;                               !- Reporting Frequency
+     *,                                      !- Key Value
+     Surface Shading Device Is On Time Fraction,  !- Variable Name
+     timestep;                               !- Reporting Frequency
 \end{lstlisting}
 
 To specify that data should be exchanged every 10 minutes of simulation time, we enter in the idf file the section
 
 \begin{lstlisting}
 
-  Timestep,
-      6;          !- Number of Timesteps per Hour
+  Timestep,
+      6;          !- Number of Timesteps per Hour
 \end{lstlisting}
 
 \paragraph{\texorpdfstring{\textbf{Creating the configuration file}}{Creating the configuration file}}\label{creating-the-configuration-file-1}
@@ -386,31 +386,31 @@ Note that we have not yet specified the order of the elements in the signal vect
 <?xml version = "1.0" encoding = "ISO-8859-1"?>
   <!DOCTYPE BCVTB-variables SYSTEM "variables.dtd">
   <BCVTB-variables>
-    <variable source = "EnergyPlus">
-     <EnergyPlus name = "ENVIRONMENT" type = "SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "WEST ZONE" type = "Zone Mean Air Temperature"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "Zn001:Wall001:Win001" type = "Surface Outside Face Incident Solar Radiation Rate per Area"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "Zn001:Wall001:Win001" type = "Surface Shading Device Is On Time Fraction"/>
-    </variable>
-    <variable source = "Ptolemy">
-      <EnergyPlus actuator = "Zn001_Wall001_Win001_Shading_Deploy_Status" />
-    </variable>
+    <variable source = "EnergyPlus">
+     <EnergyPlus name = "ENVIRONMENT" type = "SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "WEST ZONE" type = "Zone Mean Air Temperature"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "Zn001:Wall001:Win001" type = "Surface Outside Face Incident Solar Radiation Rate per Area"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "Zn001:Wall001:Win001" type = "Surface Shading Device Is On Time Fraction"/>
+    </variable>
+    <variable source = "Ptolemy">
+      <EnergyPlus actuator = "Zn001_Wall001_Win001_Shading_Deploy_Status" />
+    </variable>
   </BCVTB-variables>
 \end{lstlisting}
 
 This file specifies that the actor in the BCVTB that calls EnergyPlus has an input vector with one element that will be written to the actuator, and that it has an output vector with four elements that are computed by EnergyPlus and sent to Ptolemy. The order of the elements in each vector is determined by the order in the above XML file. Hence, the output vector that contains the signals computed by EnergyPlus has elements
 
 \begin{lstlisting}
-  ENVIRONMENT (SITE OUTDOOR AIR DRYBULB TEMPERATURE)
-  WEST ZONE (Zone Mean Air Temperature)
-  Zn001:Wall001:Win001 (Surface Outside Face Incident Solar Radiation Rate per Area)
-  Zn001:Wall001:Win001 (Surface Shading Device Is On Time Fraction)
+  ENVIRONMENT (SITE OUTDOOR AIR DRYBULB TEMPERATURE)
+  WEST ZONE (Zone Mean Air Temperature)
+  Zn001:Wall001:Win001 (Surface Outside Face Incident Solar Radiation Rate per Area)
+  Zn001:Wall001:Win001 (Surface Shading Device Is On Time Fraction)
 \end{lstlisting}
 
 The configuration of the Ptolemy model is identical to the configuration in Example 1.
@@ -438,13 +438,13 @@ To write data from the external interface to an EnergyPlus EMS variable, an Ener
 
 \begin{lstlisting}
 
-ExternalInterface,           !- Object to activate the external interface
-     PtolemyServer;            !- Name of external interface
+ExternalInterface,           !- Object to activate the external interface
+     PtolemyServer;            !- Name of external interface
 
 
-    ExternalInterface:Variable,
-      yShade,                  !- Name of Erl variable
-      1;                       !- Initial value
+    ExternalInterface:Variable,
+      yShade,                  !- Name of Erl variable
+      1;                       !- Initial value
 \end{lstlisting}
 
 During the warm-up period and the system-sizing, the variable will be set to its initial value. Afterwards, the value will be assigned from the external interface at each beginning of a zone time step and kept constant during the zone time step. From the point of view of the EMS language, ExternalInterface:Variable can be used like any global variable. Thus, it can be used within any EnergyManagementSystem:Program in the same way as an EnergyManagementSystem:GlobalVariable or an EnergyManagementSystem:Sensor.
@@ -454,27 +454,27 @@ This idf section above activates the external interface and declares a variable 
 \begin{lstlisting}
 
 ! EMS program. The first assignments sets the shading status and converts it into the
-  !              EnergyPlus signal (i.e., replace 1 by 6).
-  !              The second assignment sets yShade to
-  !              an EnergyManagementSystem:OutputVariable
-  !              which will be read by the external interface.
-    EnergyManagementSystem:Program,
-      Set_Shade_Control_State,          !- Name
-      Set Shade_Signal = 6*yShade,      !- Program Line 1
-      Set Shade_Signal_01 = yShade+0.1; !- Program Line 2
+  !              EnergyPlus signal (i.e., replace 1 by 6).
+  !              The second assignment sets yShade to
+  !              an EnergyManagementSystem:OutputVariable
+  !              which will be read by the external interface.
+    EnergyManagementSystem:Program,
+      Set_Shade_Control_State,          !- Name
+      Set Shade_Signal = 6*yShade,      !- Program Line 1
+      Set Shade_Signal_01 = yShade+0.1; !- Program Line 2
 
 
   ! Declare an actuator to which the EnergyManagementSystem:Program will write
-    EnergyManagementSystem:Actuator,
-      Shade_Signal,  !- Name
-      Zn001:Wall001:Win001,             !- Actuated Component Unique Name
-      Window Shading Control,           !- Actuated Component Type
-      Control Status;                   !- Actuated Component Control Type
+    EnergyManagementSystem:Actuator,
+      Shade_Signal,  !- Name
+      Zn001:Wall001:Win001,             !- Actuated Component Unique Name
+      Window Shading Control,           !- Actuated Component Type
+      Control Status;                   !- Actuated Component Control Type
 
 
   ! Declare a global variable to which the EnergyManagementSystem:Program will write
-    EnergyManagementSystem:GlobalVariable,
-      Shade_Signal_01;                  !- Name of Erl variable
+    EnergyManagementSystem:GlobalVariable,
+      Shade_Signal_01;                  !- Name of Erl variable
 \end{lstlisting}
 
 We want to read from EnergyPlus the outdoor temperature, the zone air temperature and the solar radiation that is incident on the window. Thus, we declare
@@ -482,21 +482,21 @@ We want to read from EnergyPlus the outdoor temperature, the zone air temperatur
 \begin{lstlisting}
 
 Output:Variable,
-     Environment,                 !- Key Value
-     Site Outdoor Air Drybulb Temperature,            !- Variable Name
-     timestep;                    !- Reporting Frequency
+     Environment,                 !- Key Value
+     Site Outdoor Air Drybulb Temperature,            !- Variable Name
+     timestep;                    !- Reporting Frequency
 
 
-    Output:Variable,
-    *,                          !- Key Value
-    Zone Mean Air Temperature,  !- Variable Name
-    timestep;                   !- Reporting Frequency
+    Output:Variable,
+    *,                          !- Key Value
+    Zone Mean Air Temperature,  !- Variable Name
+    timestep;                   !- Reporting Frequency
 
 
-    Output:Variable,
-    Zn001:Wall001:Win001,       !- Key Value
-    Surface Outside Face Incident Solar Radiation Rate per Area, !- Var Name
-    timestep;                   !- Reporting Frequency
+    Output:Variable,
+    Zn001:Wall001:Win001,       !- Key Value
+    Surface Outside Face Incident Solar Radiation Rate per Area, !- Var Name
+    timestep;                   !- Reporting Frequency
 \end{lstlisting}
 
 In addition, we want to output the variable ``Erl Shading Control Status'' that has been set up as
@@ -505,19 +505,19 @@ In addition, we want to output the variable ``Erl Shading Control Status'' that 
 
 ! Declare an output variable. This variable is equal to the shahing signal + 0.1
   ! It will be reah by the external interface to hemonstrate how to receive variables.
-    EnergyManagementSystem:OutputVariable,
-      Erl Shahing Control Status,  !- Name
-      Shahe_Signal_01,             !- EMS Variable Name
-      Averageh,                    !- Type of Data in Variable
-      ZoneTimeStep;                !- Uphate Frequency
+    EnergyManagementSystem:OutputVariable,
+      Erl Shahing Control Status,  !- Name
+      Shahe_Signal_01,             !- EMS Variable Name
+      Averageh,                    !- Type of Data in Variable
+      ZoneTimeStep;                !- Uphate Frequency
 \end{lstlisting}
 
 To specify that data should be exchanged every 10 minutes of simulation time, enter in the idf file the section
 
 \begin{lstlisting}
 
-  Timestep,
-      6;          !- Number of Timesteps per Hour
+  Timestep,
+      6;          !- Number of Timesteps per Hour
 \end{lstlisting}
 
 \subsubsection{Creating the configuration file}\label{creating-the-configuration-file-2}
@@ -529,31 +529,31 @@ Note that we have not yet specified the order of the elements in the signal vect
 <?xml version = "1.0" encoding = "ISO-8859-1"?>
   <!DOCTYPE BCVTB-variables SYSTEM "variables.dtd">
   <BCVTB-variables>
-    <variable source = "Ptolemy">
-      <EnergyPlus variable = "yShade"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "ENVIRONMENT" type = "SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "WEST ZONE" type = "Zone Mean Air Temperature"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "Zn001:Wall001:Win001" type = "Surface Outside Face Incident Solar Radiation Rate per Area"/>
-    </variable>
-    <variable source = "EnergyPlus">
-      <EnergyPlus name = "EMS" type = "Erl Shading Control Status"/>
-    </variable>
+    <variable source = "Ptolemy">
+      <EnergyPlus variable = "yShade"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "ENVIRONMENT" type = "SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "WEST ZONE" type = "Zone Mean Air Temperature"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "Zn001:Wall001:Win001" type = "Surface Outside Face Incident Solar Radiation Rate per Area"/>
+    </variable>
+    <variable source = "EnergyPlus">
+      <EnergyPlus name = "EMS" type = "Erl Shading Control Status"/>
+    </variable>
   </BCVTB-variables>
 \end{lstlisting}
 
 This file specifies that the actor in the BCVTB that calls EnergyPlus has an input vector with one element that will be written to the actuator, and that it has an output vector with four elements that are computed by EnergyPlus and sent to Ptolemy. The order of the elements in each vector is determined by the order in the above XML file. Note that the fourth element has the name ``EMS'' because it is an EnergyManagementSystem:OutputVariable. Hence, the output vector that contains the signals computed by EnergyPlus has elements
 
 \begin{lstlisting}
-  ENVIRONMENT (SITE OUTDOOR AIR DRYBULB TEMPERATURE)
-  WEST ZONE (Zone Mean Air Temperature)
-  Zn001:Wall001:Win001 (Surface Outside Face Incident Solar Radiation Rate per Area)
-  EMS (Erl Shading Control Status)
+  ENVIRONMENT (SITE OUTDOOR AIR DRYBULB TEMPERATURE)
+  WEST ZONE (Zone Mean Air Temperature)
+  Zn001:Wall001:Win001 (Surface Outside Face Incident Solar Radiation Rate per Area)
+  EMS (Erl Shading Control Status)
 \end{lstlisting}
 
 The configuration of the Ptolemy model is identical to the configuration in the previous examples.

@@ -26,8 +26,8 @@ Six standard items appear at the start of every EnergyPlus Standard Output File 
 Program Version,EnergyPlus <version number indicated>
 1,5,Environment Title[],Latitude[degrees],Longitude[degrees],Time Zone[],Elevation[m]
 2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1 = yes 0 = no],Hour[],StartMinute[],EndMinute[],DayType
-3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1 = yes 0 = no],DayType  ! When Daily Output variables Requested
-4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Output variables Requested
+3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1 = yes 0 = no],DayType  ! When Daily Output variables Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Output variables Requested
 5,1,Cumulative Days of Simulation[] ! When Run Period Output variables Requested
 \end{lstlisting}
 
@@ -62,7 +62,7 @@ This example illustrates the non-consecutive nature of the ``report codes''. Int
 The data is produced when the actual simulation is performed (after the warmup days unless the Output:Diagnostics requesting ReportDuringWarmup is used). Data output is simpler in format than the data dictionary lines. From the dictionary above:
 
 \begin{lstlisting}
-1,DENVER STAPLETON INTL ARPT ANN HTG 99% CONDNS DB,  39.74,-105.18,  -7.00,1829.00
+1,DENVER STAPLETON INTL ARPT ANN HTG 99% CONDNS DB,  39.74,-105.18,  -7.00,1829.00
 2,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay
 6,-16.
 40,0.0

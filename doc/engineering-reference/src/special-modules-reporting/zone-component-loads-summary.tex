@@ -186,17 +186,17 @@ The following subroutines in the OutputReportTabular module produce the report:
 The ComputeLoadComponentDecayCurve routine determines the heating and cooling decay curves using the following (for cooling but repeated also for heating):
 
 \begin{lstlisting}
-  TimeOfPulse = radiantPulseTimestep(ZoneNum,CoolDesSelected)
-  DO TimeStep = TimeOfPulse, NumOfTimeStepInHour* 24
-    IF (radiantPulseReceived(surfNum,CoolDesSelected) .NE. 0.0) THEN
-      diff = loadConvectedWithPulse(surfNum,TimeStep,CoolDesSelected)
-           - loadConvectedNormal(surfNum,TimeStep,CoolDesSelected)
-      decayCurveCool(surfNum, TimeStep - TimeOfPulse + 1) = -diff /
-          radiantPulseReceived(surfNum,CoolDesSelected)
-    ELSE
-      decayCurveCool(surfNum, TimeStep - TimeOfPulse + 1) = 0.0
-    END IF
-  END DO
+  TimeOfPulse = radiantPulseTimestep(ZoneNum,CoolDesSelected)
+  DO TimeStep = TimeOfPulse, NumOfTimeStepInHour* 24
+    IF (radiantPulseReceived(surfNum,CoolDesSelected) .NE. 0.0) THEN
+      diff = loadConvectedWithPulse(surfNum,TimeStep,CoolDesSelected)
+           - loadConvectedNormal(surfNum,TimeStep,CoolDesSelected)
+      decayCurveCool(surfNum, TimeStep - TimeOfPulse + 1) = -diff /
+          radiantPulseReceived(surfNum,CoolDesSelected)
+    ELSE
+      decayCurveCool(surfNum, TimeStep - TimeOfPulse + 1) = 0.0
+    END IF
+  END DO
 \end{lstlisting}
 
 The ComputeDelayedComponents routine applies the decay curve to the load components. It does the following for the heating and cooling sizing period that was selected and for each zone and each surface in the zone

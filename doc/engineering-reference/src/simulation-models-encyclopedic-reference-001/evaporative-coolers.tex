@@ -9,7 +9,7 @@ The input object EvaporativeCooler:Direct:CelDekPad provides a model of a direct
 \begin{figure}[hbtp] % fig 197
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4789.png}
-\caption{  Direct Stage Evaporative Cooler \protect \label{fig:direct-stage-evaporative-cooler}}
+\caption{  Direct Stage Evaporative Cooler \protect \label{fig:direct-stage-evaporative-cooler}}
 \end{figure}
 
 The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic cooling, and follows a constant enthalpy line on the psychrometric chart; it is shown in the figure below as a process from A to B.~ Since the deviation of the constant wet-bulb line and the constant enthalpy line is small, it is assumed that the wet-bulb temperature is constant across the direct evaporative stage.
@@ -17,7 +17,7 @@ The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic
 \begin{figure}[hbtp] % fig 198
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4790.png}
-\caption{  Psychrometric Chart -- Constant Enthalpy \protect \label{fig:psychrometric-chart-constant-enthalpy}}
+\caption{  Psychrometric Chart -- Constant Enthalpy \protect \label{fig:psychrometric-chart-constant-enthalpy}}
 \end{figure}
 
 If the direct evaporative process were 100\% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.~ The efficiency of the direct evaporative process is less than 100\% and by defining saturation efficiency (ese) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
@@ -59,7 +59,7 @@ The saturation efficiency is usually reported as a function of airflow, pad face
 \begin{figure}[hbtp] % fig 199
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4793.png}
-\caption{  Graph of Saturation Efficiency \protect \label{fig:graph-of-saturation-efficiency}}
+\caption{  Graph of Saturation Efficiency \protect \label{fig:graph-of-saturation-efficiency}}
 \end{figure}
 
 The curve fit for saturation efficiency was obtained using the functions listed below.~ The model uses the air velocity (Airvel) through the pad and the depth of the media (Depth).~ The least squares routine produced the following model that is used for the evaporative cooling rigid media pad.~ The least squares routine produced an eleven-term multi-variate fit using a third order quadratic.
@@ -75,7 +75,7 @@ The input object EvaporativeCooler:Indirect:CelDekPad provides a model of a dry 
 \begin{figure}[hbtp] % fig 200
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4794.png}
-\caption{  Evaporative Cooler -- Indirect Dry Coil \protect \label{fig:evaporative-cooler-indirect-dry-coil}}
+\caption{  Evaporative Cooler -- Indirect Dry Coil \protect \label{fig:evaporative-cooler-indirect-dry-coil}}
 \end{figure}
 
 The process that the secondary air goes through, A to C to D, is shown by the dashed lines in~ the following figure.~ Process A to C is adiabatic cooling in the rigid media pad.~ Then the air enters the shell side of the heat exchanger and is sensibly heated from C to D by the warm supply air passing through the tube side.
@@ -83,7 +83,7 @@ The process that the secondary air goes through, A to C to D, is shown by the da
 \begin{figure}[hbtp] % fig 201
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4795.png}
-\caption{  Secondary Air Process -- Indirect Dry Coil Evap Cooler \protect \label{fig:secondary-air-process-indirect-dry-coil-evap}}
+\caption{  Secondary Air Process -- Indirect Dry Coil Evap Cooler \protect \label{fig:secondary-air-process-indirect-dry-coil-evap}}
 \end{figure}
 
 The advantage of the dry coil heat exchanger is that the heat exchanger does not have the evaporation taking place on the outside of the tubes, thus no mineral deposits are left on the heat exchange surface to reduce the efficiency of the heat exchanger.~ The rigid media pads are designed to flush the mineral deposits to the sump, so the saturation efficiency of the pad stays relatively constant.
@@ -107,7 +107,7 @@ The input object EvaporativeCooler:Indirect:WetCoil provides a model for a wette
 \begin{figure}[hbtp] % fig 202
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4797.png}
-\caption{  Wet Coil Indirect Evaporative Cooler \protect \label{fig:wet-coil-indirect-evaporative-cooler}}
+\caption{  Wet Coil Indirect Evaporative Cooler \protect \label{fig:wet-coil-indirect-evaporative-cooler}}
 \end{figure}
 
 The process that the secondary air goes through, A to C on the following figure, is a path of simultaneous heat and mass transfer, but it does not follow a line of constant enthalpy as in the direct stage.~ The process is not adiabatic due to the heat gain from the supply air flowing through the tubes of the heat exchanger.
@@ -115,7 +115,7 @@ The process that the secondary air goes through, A to C on the following figure,
 \begin{figure}[hbtp] % fig 203
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4798.png}
-\caption{  Secondary Air Process – Indirect Wet Coil Evaporative Cooler \protect \label{fig:secondary-air-process-indirect-wet-coil}}
+\caption{  Secondary Air Process – Indirect Wet Coil Evaporative Cooler \protect \label{fig:secondary-air-process-indirect-wet-coil}}
 \end{figure}
 
 The wet coil heat exchanger can have a higher stage efficiency than the dry coil due to a higher heat transfer rate on the outside of the heat exchanger tubes.~ Over the operating lifetime of the heat exchanger, the vaporization taking place on the heat exchange surface can leave mineral deposits that will decrease the effectiveness of the heat exchanger.
@@ -165,7 +165,7 @@ A two stage cooler can be modeled by combining either a wet coil or the dry coil
 \begin{figure}[hbtp] % fig 204
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4806.png}
-\caption{  Two Stage Evaporative Cooler \protect \label{fig:two-stage-evaporative-cooler}}
+\caption{  Two Stage Evaporative Cooler \protect \label{fig:two-stage-evaporative-cooler}}
 \end{figure}
 
 The thermodynamic process for the supply air is shown below, going from A to B to C.~ The process from A to B is sensible cooling in the indirect stage.~ The process from B to C is simultaneous heat and mass transfer following a constant enthalpy line.~ The air leaving the final stage has a lower dry-bulb and wet-bulb temperature, and an increase in moisture from the direct stage.
@@ -173,7 +173,7 @@ The thermodynamic process for the supply air is shown below, going from A to B t
 \begin{figure}[hbtp] % fig 205
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4807.png}
-\caption{  Thermodynamic Process for Supply Air Through Two Stage Evaporative Cooler \protect \label{fig:thermodynamic-process-for-supply-air-through}}
+\caption{  Thermodynamic Process for Supply Air Through Two Stage Evaporative Cooler \protect \label{fig:thermodynamic-process-for-supply-air-through}}
 \end{figure}
 
 Two stage evaporative coolers can be accomplished by putting the EvaporativeCooler:Direct:CelDekPad, EvaporativeCooler:Indirect:CelDekPad, EvaporativeCooler:Indirect:WetCoil in series in any combination the user desires in the supply air loop.

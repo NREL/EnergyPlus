@@ -521,7 +521,7 @@ where:
 
 \emph{h\(_{d}\)} = enthalpy of air exiting the PTAC at full-load conditions, J/kg
 
-\emph{h\(_{r}\)}\(_{ }\) = enthalpy of zone (exhaust) air, J/kg
+\emph{h\(_{r}\)}\(_{ }\) = enthalpy of zone (exhaust) air, J/kg
 
 \emph{HR\(_{n}\)~~~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTAC exiting air or the zone (exhaust) air
 
@@ -637,7 +637,7 @@ At the end of each HVAC simulation time step, this compound object reports the h
 {\mathop Q\limits^ \bullet_{Latent}} = {\mathop Q\limits^ \bullet_{Total}} - {\mathop Q\limits^ \bullet_{Sensible}}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
 
 \(\mathop m\limits^ \bullet {\,_{SA,\,\,avg}}\) ~~~~~ = average mass flow rate of the supply air stream, kg/s
 
@@ -649,15 +649,15 @@ IF (\({\mathop Q\limits^ \bullet_{Total}}\) \emph{~\textless{} 0.0 )}THEN
 
 ~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalCooling}}\) ~ = ~ ABS (\({\mathop Q\limits^ \bullet_{Total}}\) )
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalHeating}}\) \(_{ }\)~ = ~ \({\mathop Q\limits^ \bullet_{Total}}\)
+~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalHeating}}\) \(_{ }\)~ = ~ \({\mathop Q\limits^ \bullet_{Total}}\)
 
-where: \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Rate, W' \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Heating Rate, W'
+where: \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Rate, W' \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -665,7 +665,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 \,{Q_{TotalCooling}} = \,\,{\mathop Q\limits^ \bullet_{TotalCooling}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Energy, J'
+where: \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -678,7 +678,7 @@ The input object ZoneHVAC:PackagedTerminalHeatPump provides a model for a packag
 \begin{figure}[hbtp] % fig 320
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7215.png}
-\caption{  Schematic of a Packaged Terminal Heat Pump (Draw Through Fan Placement) \protect \label{fig:schematic-of-a-packaged-terminal-heat-pump}}
+\caption{  Schematic of a Packaged Terminal Heat Pump (Draw Through Fan Placement) \protect \label{fig:schematic-of-a-packaged-terminal-heat-pump}}
 \end{figure}
 
 The PTHP conditions a single zone and is controlled by a thermostat located in that zone. The PTHP operates to meet the zone sensible cooling or sensible heating requirements as dictated by the thermostat schedule. The model calculates the required part-load ratio for the heat pump's coils and the supply air fan to meet the cooling/heating requirements. The heating or cooling energy provided by the PTHP is delivered to the zone via the zone air inlet node.
@@ -713,7 +713,7 @@ where:
 
 \emph{h\(_{d}\)} ~ = enthalpy of air exiting the PTHP at full-load conditions, J/kg
 
-\emph{h\(_{r}\)}\(_{ }\) = enthalpy of zone (exhaust) air, J/kg
+\emph{h\(_{r}\)}\(_{ }\) = enthalpy of zone (exhaust) air, J/kg
 
 \emph{HR\(_{n}\)~~~~~~ ~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTHP exiting air or the zone (exhaust) air
 
@@ -829,7 +829,7 @@ At the end of each HVAC simulation time step, this compound object reports the h
 {\dot Q_{Latent}} = {\dot Q_{Total}} - {\dot Q_{Sensible}}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
 
 \(\dot m{\,_{SA,\,\,avg}}\) ~~~~~ = average mass flow rate of the supply air stream, kg/s
 
@@ -841,15 +841,15 @@ IF (\({\dot Q_{Total}}\) \emph{\textless{} 0.0 )}THEN
 
 ~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ ABS (\({\dot Q_{Total}}\) )
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
 
-where: \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Rate, W' \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Heating Rate, W'
+where: \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Rate, W' \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -857,7 +857,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 {Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Energy, J'
+where: \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -870,7 +870,7 @@ The input object ZoneHVAC:WaterToAirHeatPump provides a zone equipment model for
 \begin{figure}[hbtp] % fig 321
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7258.png}
-\caption{  Source Side and Load Side Configuration of a Zone WaterToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a-001}}
+\caption{  Source Side and Load Side Configuration of a Zone WaterToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a-001}}
 \end{figure}
 
 There are two models for zone water-to-air heat pump cooling and heating coils, i.e.~Single-Speed and Variable-Speed Equation Fit models. Cooling and heating coils are modeled using the Equation Fit model described here.
@@ -1161,7 +1161,7 @@ Finally, the following additional output variables are calculated:
 
 where
 
-\emph{Q\(_{ }\)} = output variable `Zone Dehumidifier Sensible Heating Energy {[}J{]}'
+\emph{Q\(_{ }\)} = output variable `Zone Dehumidifier Sensible Heating Energy {[}J{]}'
 
 \emph{E\(_{d}\)} ~ = output variable `Zone Dehumidifier Electric Energy {[}J{]}'
 
@@ -1171,7 +1171,7 @@ where
 
 \emph{m\(_{r}\)} = output variable `Zone Dehumidifier Removed Water Mass {[}kg{]}'
 
-\({\dot V_{_{water,avg}}}\) \emph{\(_{ }\)} = output variable `Zone Dehumidifier Condensate Volume Flow Rate {[}m\(^{3}\)/s{]}'
+\({\dot V_{_{water,avg}}}\) \emph{\(_{ }\)} = output variable `Zone Dehumidifier Condensate Volume Flow Rate {[}m\(^{3}\)/s{]}'
 
 \({V_{_{water}}}\) ~ = output variable `Zone Dehumidifier Condensate Volume {[}m\(^{3}\){]}'
 
@@ -1250,13 +1250,13 @@ The sensible heat transfer rate to the zone by the stand alone ventilator is the
 {\mathop Q\limits^ \bullet_{Sensible}}\, = \,{\mathop {\,m}\limits^ \bullet_{Supply}}{\left( {{h_{SupplyOutlet}}\, - \,{h_{ExhaustInlet}}} \right)_{HR\min }}
 \end{equation}
 
-~where: \(_{ }\) = sensible energy transfer rate to the zone, W
+~where: \(_{ }\) = sensible energy transfer rate to the zone, W
 
 \({\mathop m\limits^ \bullet_{Supply}}\) ~~~~~~ = mass flow rate of the supply air stream, kg/s
 
 \emph{h\(_{t}\)} ~ = enthalpy of the air being supplied to the zone, J/kg
 
-\emph{h\(_{t}\)}\(_{ }\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
+\emph{h\(_{t}\)}\(_{ }\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
 
 \emph{HR\(_{n}\) ~~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
@@ -1280,13 +1280,13 @@ At the end of each HVAC simulation time step, this compound object reports the h
 {\mathop Q\limits^ \bullet_{Latent}}\, = \,\,{\mathop Q\limits^ \bullet_{Total}}\, - \,{\mathop Q\limits^ \bullet_{Sensible}}
 \end{equation}
 
-~where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+~where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
 
 \({\mathop m\limits^ \bullet_{Supply}}\) ~~~~~~ = mass flow rate of the supply air stream, kg/s
 
 \emph{h\(_{t}\)} ~ = enthalpy of the air being supplied to the zone, J/kg
 
-\emph{h\(_{t}\)}\(_{ }\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
+\emph{h\(_{t}\)}\(_{ }\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
 
 \emph{HR\(_{n}\)~~~~~ ~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
@@ -1298,15 +1298,15 @@ IF (\({\dot Q_{Total}}\) \emph{~\textless{} 0.0 )}THEN
 
 ~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ ABS (\({\dot Q_{Total}}\) )
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
 
-where: \(_{ }\) = output variable `Zone Ventilator Total Cooling Rate, W' \(_{ }\) = output variable `Zone Ventilator Total Heating Rate, W'
+where: \(_{ }\) = output variable `Zone Ventilator Total Cooling Rate, W' \(_{ }\) = output variable `Zone Ventilator Total Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -1314,7 +1314,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 {Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Zone Ventilator Total Cooling Energy, J'
+where: \(_{ }\) = output variable `Zone Ventilator Total Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -1496,7 +1496,7 @@ At the end of each HVAC simulation time step, this compound object reports the h
 {\mathop Q\limits^ \bullet_{Latent}} = {\mathop Q\limits^ \bullet_{Total}} - {\mathop Q\limits^ \bullet_{Sensible}}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
 
 \(\mathop m\limits^ \bullet {\,_{SA,\,\,avg}}\) = average mass flow rate of the supply air stream, kg/s
 
@@ -1510,17 +1510,17 @@ IF (\({\dot Q_{Total}}\) \emph{~\textless{} 0.0 )} THEN
 
 ~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ ABS (\({\dot Q_{Total}}\) )
 
-~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
 
-~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
+~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
 
 ENDIF
 
-where: \(_{ }\) = output variable `Zone VRF Air Terminal Total Cooling Rate, W' \(_{ }\) = output variable `Zone VRF Air Terminal Total Heating Rate, W'
+where: \(_{ }\) = output variable `Zone VRF Air Terminal Total Cooling Rate, W' \(_{ }\) = output variable `Zone VRF Air Terminal Total Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -1528,7 +1528,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 {Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Zone VRF Air Terminal Total Cooling Energy, J'
+where: \(_{ }\) = output variable `Zone VRF Air Terminal Total Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -1923,7 +1923,7 @@ Initial condition of inlet air temperature is equal to the ambient air temperatu
 
 % table 87
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{  Nomenclature for Earthtube Model \protect \label{table:nomenclature-for-earthtube-model}}\\
+\caption{  Nomenclature for Earthtube Model \protect \label{table:nomenclature-for-earthtube-model}}\\
 \toprule 
 Variable & Description & Units \tabularnewline \midrule
 \endhead

@@ -6,7 +6,7 @@ As the simulation starts, each module gets called and gets the values from the i
 
 \begin{lstlisting}
 Site:GroundTemperature:BuildingSurface: Some values fall outside the range of 15-25C.
-These values may be inappropriate.  Please consult the Input Output Reference for more details.
+These values may be inappropriate.  Please consult the Input Output Reference for more details.
 \end{lstlisting}
 
 Ground temperatures can have a significant influence on buildings. Values outside the range indicated may give you inaccurate simulation temperatures. Consult the Input Output Reference for more details.
@@ -39,23 +39,23 @@ You have requested reporting for Carbon Equivalent Pollution (output variables) 
 
 \begin{lstlisting}
 BuildingSurface:Detailed = "SURF:xyz", Sun Exposure = "SUNEXPOSED".
- ..This surface is not exposed to External Environment.  Sun exposure has no effect.
+ ..This surface is not exposed to External Environment.  Sun exposure has no effect.
 \end{lstlisting}
 
 The surface has been entered with SunExposed but it is not an exterior/outdoor surface.
 
 \begin{lstlisting}
 GetSurfaceData: InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:
-   Area = 1.4E-002 in Surface = 319767, Zone = 2PAV_CONDIC_LOJA_D
-   Area = 67.0 in Surface = 6C0708, Zone = 3PAV_CONDIC_TEATRO_G
+   Area = 1.4E-002 in Surface = 319767, Zone = 2PAV_CONDIC_LOJA_D
+   Area = 67.0 in Surface = 6C0708, Zone = 3PAV_CONDIC_TEATRO_G
 \end{lstlisting}
 
 Interzone surface areas usually should be matching between the two zones.
 
 \begin{lstlisting}
 GetSurfaceData: InterZone Surface Azimuths do not match as expected.
-   Azimuth = 270.0, Tilt = 90.0, in Surface = 319767, Zone = 2PAV_CONDIC_LOJA_D
-   Azimuth = 180.0, Tilt = 90.0, in Surface = 6C0708, Zone = 3PAV_CONDIC_TEATRO_G
+   Azimuth = 270.0, Tilt = 90.0, in Surface = 319767, Zone = 2PAV_CONDIC_LOJA_D
+   Azimuth = 180.0, Tilt = 90.0, in Surface = 6C0708, Zone = 3PAV_CONDIC_TEATRO_G
 ..surface class of base surface = Wall
 \end{lstlisting}
 

@@ -53,7 +53,7 @@ Objective:~ Learn how to add materials, constructions, and a surface using 3-D c
 \end{itemize}
 
 \begin{lstlisting}
--Hint:  In IDF Editor, View -> Show Classes with Objects Only (or ctl-L) will hide all empty object types from the class list.
+-Hint:  In IDF Editor, View -> Show Classes with Objects Only (or ctl-L) will hide all empty object types from the class list.
 \end{lstlisting}
 
 \begin{itemize}
@@ -202,71 +202,71 @@ This is a listing of new and modified objects created in this Exercise.
 
 \begin{lstlisting}
 WindowMaterial:Glazing,
-    CLEAR 6MM,               !- Name
-    SpectralAverage,         !- Optical Data Type
-    ,                        !- Name of Window Glass Spectral Data Set
-    0.006,                   !- Thickness {m}
-    0.775,                   !- Solar Transmittance at Normal Incidence
-    0.071,                   !- Solar Reflectance at Normal Incidence: Front Side
-    0.071,                   !- Solar Reflectance at Normal Incidence: Back Side
-    0.881,                   !- Visible Transmittance at Normal Incidence
-    0.080,                   !- Visible Reflectance at Normal Incidence: Front Side
-    0.080,                   !- Visible Reflectance at Normal Incidence: Back Side
-    0.0,                     !- IR Transmittance at Normal Incidence
-    0.84,                    !- IR Hemispherical Emissivity: Front Side
-    0.84,                    !- IR Hemispherical Emissivity: Back Side
-    0.9;                     !- Conductivity {W/m-K}
+    CLEAR 6MM,               !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Name of Window Glass Spectral Data Set
+    0.006,                   !- Thickness {m}
+    0.775,                   !- Solar Transmittance at Normal Incidence
+    0.071,                   !- Solar Reflectance at Normal Incidence: Front Side
+    0.071,                   !- Solar Reflectance at Normal Incidence: Back Side
+    0.881,                   !- Visible Transmittance at Normal Incidence
+    0.080,                   !- Visible Reflectance at Normal Incidence: Front Side
+    0.080,                   !- Visible Reflectance at Normal Incidence: Back Side
+    0.0,                     !- IR Transmittance at Normal Incidence
+    0.84,                    !- IR Hemispherical Emissivity: Front Side
+    0.84,                    !- IR Hemispherical Emissivity: Back Side
+    0.9;                     !- Conductivity {W/m-K}
 \end{lstlisting}
 
 \begin{lstlisting}
 WindowMaterial:Gas,
-    AIR 3MM,                 !- Name
-    Air    ,                 !- Gas Type
-    0.0032;                  !- Thickness {m}
+    AIR 3MM,                 !- Name
+    Air    ,                 !- Gas Type
+    0.0032;                  !- Thickness {m}
 \end{lstlisting}
 
 \begin{lstlisting}
 Construction,
-    DOUBLE PANE WINDOW,      !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 3MM,                 !- Layer #2
-    CLEAR 6MM;               !- Layer #3
+    DOUBLE PANE WINDOW,      !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 3MM,                 !- Layer #2
+    CLEAR 6MM;               !- Layer #3
 \end{lstlisting}
 
 \begin{lstlisting}
 FenestrationSurface:Detailed,
-    EAST WINDOW,             !- User Supplied Surface Name
-    WINDOW,                  !- Surface Type
-    DOUBLE PANE WINDOW,      !- Construction Name of the Surface
-    ZONE SURFACE EAST,       !- Base Surface Name
-    ,                        !- OutsideFaceEnvironment Object
-    autocalculate,           !- View Factor to Ground
-    ,                        !- Name of shading control
-    ,                        !- WindowFrameAndDivider Name
-    1,                       !- Multiplier
-    4,                       !- Number of vertices
-    8, 1.5, 2.35,            !- X,Y,Z  1 {m}
-    8, 1.5, 0.35,            !- X,Y,Z  2 {m}
-    8, 4.5, 0.35,            !- X,Y,Z  3 {m}
-    8, 4.5, 2.35;            !- X,Y,Z  4 {m}
+    EAST WINDOW,             !- User Supplied Surface Name
+    WINDOW,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name of the Surface
+    ZONE SURFACE EAST,       !- Base Surface Name
+    ,                        !- OutsideFaceEnvironment Object
+    autocalculate,           !- View Factor to Ground
+    ,                        !- Name of shading control
+    ,                        !- WindowFrameAndDivider Name
+    1,                       !- Multiplier
+    4,                       !- Number of vertices
+    8, 1.5, 2.35,            !- X,Y,Z  1 {m}
+    8, 1.5, 0.35,            !- X,Y,Z  2 {m}
+    8, 4.5, 0.35,            !- X,Y,Z  3 {m}
+    8, 4.5, 2.35;            !- X,Y,Z  4 {m}
 \end{lstlisting}
 
 \begin{lstlisting}
 FenestrationSurface:Detailed,
-    WEST WINDOW,             !- User Supplied Surface Name
-    WINDOW,                  !- Surface Type
-    DOUBLE PANE WINDOW,      !- Construction Name of the Surface
-    ZONE SURFACE WEST,       !- Base Surface Name
-    ,                        !- OutsideFaceEnvironment Object
-    autocalculate,           !- View Factor to Ground
-    ,                        !- Name of shading control
-    ,                        !- WindowFrameAndDivider Name
-    1,                       !- Multiplier
-    4,                       !- Number of Vertices
-    0, 4.5, 2.35,            !- X,Y,Z  1 {m}
-    0, 4.5, 0.35,            !- X,Y,Z  2 {m}
-    0, 1.5, 0.35,            !- X,Y,Z  3 {m}
-    0, 1.5, 2.35;            !- X,Y,Z  4 {m}
+    WEST WINDOW,             !- User Supplied Surface Name
+    WINDOW,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name of the Surface
+    ZONE SURFACE WEST,       !- Base Surface Name
+    ,                        !- OutsideFaceEnvironment Object
+    autocalculate,           !- View Factor to Ground
+    ,                        !- Name of shading control
+    ,                        !- WindowFrameAndDivider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    0, 4.5, 2.35,            !- X,Y,Z  1 {m}
+    0, 4.5, 0.35,            !- X,Y,Z  2 {m}
+    0, 1.5, 0.35,            !- X,Y,Z  3 {m}
+    0, 1.5, 2.35;            !- X,Y,Z  4 {m}
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -275,52 +275,52 @@ Output:Surfaces:List,Details;
 
 \begin{lstlisting}
 Schedule:Compact,
-    Office Lighting,         !- Name
-    Fraction,                !- ScheduleType
-    Through: 12/31,          !- Complex Field #1
-    For: Weekdays SummerDesignDay,  !- Complex Field #2
-    Until: 05:00, 0.05,      !- Complex Field #4
-    Until: 07:00, 0.1,       !- Complex Field #6
-    Until: 08:00, 0.3,       !- Complex Field #8
-    Until: 17:00, 0.9,       !- Complex Field #10
-    Until: 18:00, 0.5,       !- Complex Field #12
-    Until: 20:00, 0.3,       !- Complex Field #14
-    Until: 22:00, 0.2,       !- Complex Field #16
-    Until: 23:00, 0.1,       !- Complex Field #18
-    Until: 24:00, 0.05,      !- Complex Field #20
-    For: Saturday WinterDesignDay,  !- Complex Field #21
-    Until: 06:00, 0.05,      !- Complex Field #23
-    Until: 08:00, 0.1,       !- Complex Field #25
-    Until: 12:00, 0.3,       !- Complex Field #27
-    Until: 17:00, 0.15,      !- Complex Field #29
-    Until: 24:00, 0.05,      !- Complex Field #31
-    For: Sunday Holidays AllOtherDays,  !- Complex Field #32
-    Until: 24:00, 0.05;      !- Complex Field #34
+    Office Lighting,         !- Name
+    Fraction,                !- ScheduleType
+    Through: 12/31,          !- Complex Field #1
+    For: Weekdays SummerDesignDay,  !- Complex Field #2
+    Until: 05:00, 0.05,      !- Complex Field #4
+    Until: 07:00, 0.1,       !- Complex Field #6
+    Until: 08:00, 0.3,       !- Complex Field #8
+    Until: 17:00, 0.9,       !- Complex Field #10
+    Until: 18:00, 0.5,       !- Complex Field #12
+    Until: 20:00, 0.3,       !- Complex Field #14
+    Until: 22:00, 0.2,       !- Complex Field #16
+    Until: 23:00, 0.1,       !- Complex Field #18
+    Until: 24:00, 0.05,      !- Complex Field #20
+    For: Saturday WinterDesignDay,  !- Complex Field #21
+    Until: 06:00, 0.05,      !- Complex Field #23
+    Until: 08:00, 0.1,       !- Complex Field #25
+    Until: 12:00, 0.3,       !- Complex Field #27
+    Until: 17:00, 0.15,      !- Complex Field #29
+    Until: 24:00, 0.05,      !- Complex Field #31
+    For: Sunday Holidays AllOtherDays,  !- Complex Field #32
+    Until: 24:00, 0.05;      !- Complex Field #34
 \end{lstlisting}
 
 \begin{lstlisting}
 ScheduleTypeLimits,
-    Fraction,                !- ScheduleType Name
-    0.0,                     !- Lower Limit Value
-    1.0,                     !- Upper Limit Value
-    CONTINUOUS;              !- Numeric Type
+    Fraction,                !- ScheduleType Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
 \end{lstlisting}
 
 \begin{lstlisting}
 Lights,
-    ZONE ONE Lights,         !- Name
-    ZONE ONE,                !- Zone Name
-    Office Lighting,         !- Schedule Name
-    LightingLevel,           !- Design Level Calculation Method
-    1000,                    !- Lighting Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0,                       !- Return Air Fraction
-    0.72,                    !- Fraction Radiant
-    0.18,                    !- Fraction Visible
-    1,                       !- Fraction Replaceable
-    General,                 !- End-Use Subcategory
-    No;                      !- Return Air Fraction Calculated from Plenum Temperature
+    ZONE ONE Lights,         !- Name
+    ZONE ONE,                !- Zone Name
+    Office Lighting,         !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    1000,                    !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.72,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    1,                       !- Fraction Replaceable
+    General,                 !- End-Use Subcategory
+    No;                      !- Return Air Fraction Calculated from Plenum Temperature
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -329,37 +329,37 @@ Output:Variable,*,Lights Electric Consumption ,hourly;
 
 \begin{lstlisting}
 RunPeriod,
-    1,                       !- Begin Month
-    1,                       !- Begin Day Of Month
-    12,                      !- End Month
-    31,                      !- End Day Of Month
-    UseWeatherFile,          !- Day Of Week For Start Day
-    Yes,                     !- Use WeatherFile Holidays/Special Days
-    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use WeatherFile Rain Indicators
-    Yes,                     !- Use WeatherFile Snow Indicators
-    1;                       !- Number of years of simulation
+    1,                       !- Begin Month
+    1,                       !- Begin Day Of Month
+    12,                      !- End Month
+    31,                      !- End Day Of Month
+    UseWeatherFile,          !- Day Of Week For Start Day
+    Yes,                     !- Use WeatherFile Holidays/Special Days
+    Yes,                     !- Use WeatherFile DaylightSavingPeriod
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use WeatherFile Rain Indicators
+    Yes,                     !- Use WeatherFile Snow Indicators
+    1;                       !- Number of years of simulation
 \end{lstlisting}
 
 \begin{lstlisting}
 Output:Table:SummaryReports,
-    Annual Building Utility Performance Summary,  !- ReportName1
-    Input Verification and Results Summary,  !- ReportName2
-    Climate Summary,         !- ReportName3
-    Envelope Summary;        !- ReportName4
+    Annual Building Utility Performance Summary,  !- ReportName1
+    Input Verification and Results Summary,  !- ReportName2
+    Climate Summary,         !- ReportName3
+    Envelope Summary;        !- ReportName4
 \end{lstlisting}
 
 \begin{lstlisting}
 OutputControl:Table,
-    HTML;                    !- ColumnSeparator
+    HTML;                    !- ColumnSeparator
 \end{lstlisting}
 
 \begin{lstlisting}
 SimulationControl,
-    No,                      !- Do the zone sizing calculation
-    No,                      !- Do the system sizing calculation
-    No,                      !- Do the plant sizing calculation
-    No,                      !- Do the design day simulations
-    Yes;                     !- Do the weather file simulation
+    No,                      !- Do the zone sizing calculation
+    No,                      !- Do the system sizing calculation
+    No,                      !- Do the plant sizing calculation
+    No,                      !- Do the design day simulations
+    Yes;                     !- Do the weather file simulation
 \end{lstlisting}

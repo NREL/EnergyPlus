@@ -100,7 +100,7 @@ The model now distributes the radiant heat additions to the appropriate surfaces
 {q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
 \end{equation}
 
-where \emph{q\(_{ }\)} is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{v}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{e}\)} is radiant heat to the people.
+where \emph{q\(_{ }\)} is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{v}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{e}\)} is radiant heat to the people.
 
 The simulation of radiant heat addition is the same as the water baseboard heater model. The controls are the same as shown in Figure~\ref{fig:variable-flow-low-temperature-radiant-system}.~ Variable Flow Low Temperature Radiant System Controls. After all system time steps have been simulated, an ``average'' zone heat balance calculation is done (similar to the high temperature radiant system). If the unit was scheduled off or there is no steam flow rate through the baseboard unit, then, there will be no heat transfer from the unit. The model assumes no heat storage in the unit itself and thus no residual heat transfer in future system time steps due to heat storage in the steam or metal of the unit.
 
