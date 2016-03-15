@@ -333,6 +333,7 @@ namespace EMSManager {
 		//  INTEGER  :: ProgramNum
 
 		// FLOW:
+		anyProgramRan = false;
 		if ( ! AnyEnergyManagementSystemInModel ) return; // quick return if nothing to do
 
 		if ( iCalledFrom == emsCallFromBeginNewEvironment ) BeginEnvrnInitializeRuntimeLanguage();
@@ -345,7 +346,7 @@ namespace EMSManager {
 		}
 
 		// Run the Erl programs depending on calling point.
-		anyProgramRan = false;
+
 		if ( iCalledFrom != emsCallFromUserDefinedComponentModel ) {
 			for ( ProgramManagerNum = 1; ProgramManagerNum <= NumProgramCallManagers; ++ProgramManagerNum ) {
 

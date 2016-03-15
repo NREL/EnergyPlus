@@ -808,7 +808,7 @@ namespace HVACManager {
 
 		// Before the HVAC simulation, call ManageSetPoints to set all the HVAC
 		// node setpoints
-		bool anyEMSRan;
+		bool anyEMSRan = false;
 		ManageEMS( emsCallFromBeforeHVACManagers, anyEMSRan ); // calling point
 
 		ManageSetPoints();
