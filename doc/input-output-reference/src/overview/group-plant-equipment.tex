@@ -3073,7 +3073,12 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). The available cooling capacity is computed as follows:
 
-\begin{array}{l}CoolFuelInput = \\AvailCoolCap \cdot RunFrac \cdot CFIR \cdot CFIRfT({T_{cw,l}},{T_{cond}}) \cdot CFIRfPLR(CPLR)\end{array}
+\begin{equation}
+\begin{array}{l}
+\rm{CoolFuelInput} = \\
+\rm{AvailCoolCap} \cdot \rm{RunFrac} \cdot \rm{CFIR} \cdot \rm{CFIRfT}( T_{cw,l}, {T_{\rm{cond}}}) \cdot \rm{CFIRfPLR}( \rm{CPLR} )
+\end{array}
+\end{equation}
 
 \paragraph{Field: Fuel Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-fuel-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
@@ -3083,7 +3088,12 @@ The CFIRfT curve represents the fraction of the fuel input to the chiller at ful
 
 The CFIRfPLR curve represents the fraction of the fuel input to the chiller as the load the chiller varies but the operating temperatures remain at the design values. The curve is normalized so that at full load the value of the curve should be 1.0. The curve is usually linear or quadratic. The cooling fuel input to the chiller is computed as follows:
 
-\begin{array}{l}CoolElectricPower = \\NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT({T_{cw,l}},{T_{cond}}) \cdot CEIRfPLR(CPLR)\end{array}
+\begin{equation}
+\begin{array}{l}
+\rm{CoolElectricPower} = \\
+\rm{NomCoolCap} \cdot \rm{RunFrac} \cdot \rm{CEIR} \cdot \rm{CEIRfT}(T_{cw,l}, T_{cond}) \cdot \rm{CEIRfPLR}(\rm{CPLR})
+\end{array}
+\end{equation}
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-2}
 
@@ -3467,7 +3477,12 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). The available cooling capacity is computed as follows:
 
-\begin{array}{l}CoolThermalEnergyInput = AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot \\\quad \quad \quad \quad \quad \quad TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot TeFIRfPLR(CPLR)\end{array}
+\begin{equation}
+\begin{array}{l}
+\rm{CoolThermalEnergyInput} = \rm{AvailCoolCap} \cdot \rm{RunFrac} \cdot \rm{TeFIR} \cdot \\
+\quad \quad \quad \quad \quad \quad \rm{TeFIRfT} \left( T_{cw,l}, T_{cond} \right) \cdot \rm{TeFIRfPLR}( \rm{CPLR} )
+\end{array}
+\end{equation}
 
 \paragraph{Field: Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-thermal-energy-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
@@ -3864,7 +3879,12 @@ BiQuadratic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {
 QuadraticLinear \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot PLR\cdot {T_w} + {A_5}\cdot PL{R^2}\cdot {T_w}
 \end{equation}
 
-\begin{array}{l}Bicubic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}{T_w}^2 + {A_5}PLR\cdot {T_w} + {A_6}PL{R^3}\\\quad \quad \quad \quad \quad \quad \quad  + {A_7}\cdot {T_w}^3 + {A_8}\cdot PL{R^2}\cdot {T_w} + {A_9}\cdot PLR\cdot {T_w}^2\end{array}
+\begin{equation}
+\begin{array}{l}
+  \rm{Bicubic} \to \rm{Eff} = A_0 + A_1 \cdot \rm{PLR} + A_2 \cdot \rm{PLR}^2 + A_3 \cdot T_w + A_4 T_w^2 + A_5 \rm{PLR} \cdot T_w + A_6 \rm{PLR}^3 \\
+  \quad \quad \quad \quad \quad \quad \quad  + A_7 \cdot T_w^3 + A_8 \cdot \rm{PLR}^2 \cdot T_w + A_9 \cdot \rm{PLR} \cdot T_w^2
+\end{array}
+\end{equation}
 
 where
 
@@ -4359,7 +4379,7 @@ This model is an equation-fit model from the catalog data which resembles a blac
 
 \textbf{HeatPump:WaterToWater:ParameterEstimation:Heating}
 
-This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently ``hardwired'' to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\FluidPropertiesRefData.idf.
+This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently ``hardwired'' to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\\FluidPropertiesRefData.idf.
 
 Descriptions and strength of each respective model is available in the following references:
 

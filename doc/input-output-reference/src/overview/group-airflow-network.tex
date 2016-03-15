@@ -778,13 +778,13 @@ Where
 
 where
 
-ρ = Air density at the specific air temperature and humidity ratio conditions {[}kg/m\(^{3}\){]}
+\(\rho\) = Air density at the specific air temperature and humidity ratio conditions {[}kg/m\(^{3}\){]}
 
-ν = Air kinetic viscosity at the specific air temperature condition {[}m\(^{2}\)/s{]}
+\(\nu\) = Air kinetic viscosity at the specific air temperature condition {[}m\(^{2}\)/s{]}
 
-ρ\(_{o}\) = Air density at the reference air conditions provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions {[}kg/m\(^{3}\){]}
+\(\rho_o\) = Air density at the reference air conditions provided by the object Air\-flow\-Net\-work:\-Multi\-Zone:\-Refer\-ence\-Crack\-Con\-ditions specified in the field Reference Crack Conditions {[}kg/m\(^{3}\){]}
 
-ν\(_{o}\) = Air kinetic viscosity at the reference air temperature provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions {[}m\(^{2}\)/s{]}
+\(\nu_o\) = Air kinetic viscosity at the reference air temperature provided by the object Air\-flow\-Net\-work:\-Multi\-Zone:\-Refer\-ence\-Crack\-Con\-ditions specified in the field Reference Crack Conditions {[}m\(^{2}\)/s{]}
 
 Note: The correction factor shown above is use for this particular component as specified.
 
@@ -809,12 +809,11 @@ The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which s
 An IDF example is shown below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:Surface:Crack,
-      CR-1,                     !- Name of Surface Crack Component
-      0.01,                     !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
-      0.667,                    !- Air Mass Flow Exponent {dimensionless}
-      ReferenceCrackConditions; !- Reference Crack Conditions
+  CR-1,                   !- Name of Surface Crack Component
+  0.01,                   !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
+  0.667,                  !- Air Mass Flow Exponent {dimensionless}
+  ReferenceCrackConditio; !- Reference Crack Conditions
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}\label{airflownetworkmultizonesurfaceeffectiveleakagearea}
@@ -829,23 +828,19 @@ five fields. The relationship between pressure and airflow may be expressed as:
 
 where
 
-\(\dot m\) ~~~~ = Air mass flow rate {[}kg/s{]}
+\(\dot m\) = Air mass flow rate {[}kg/s{]}
 
-\emph{ELA}~~ = Effective leakage area {[}m\(^{2}\){]}
+\(\rm{ELA}\) = Effective leakage area {[}m\(^{2}\){]}
 
-ρ~~~~~~ = Air density {[}kg/m\(^{3}\){]}
+\(\rho\) = Air density {[}kg/m\(^{3}\){]}
 
-\(\Delta {P_r}\) ~ = Reference pressure difference {[}Pa{]}
+\(\Delta {P_r}\) = Reference pressure difference {[}Pa{]}
 
-\(\Delta P\) ~~ = Pressure difference across this component {[}Pa{]}
+\(\Delta P\) = Pressure difference across this component {[}Pa{]}
 
-C\(_{ }\) = Discharge coefficient {[}dimensionless{]}
+\(C_{d}\) = Discharge coefficient {[}dimensionless{]}
 
-\begin{itemize}
-\tightlist
-\item
-  ~~~~~ = Air mass flow exponent {[}dimensionless{]}
-\end{itemize}
+\(n\) = Air mass flow exponent {[}dimensionless{]}
 
 \subsubsection{Inputs}\label{inputs-3-003}
 
@@ -869,18 +864,19 @@ This numeric field is used to input the reference pressure difference {[}Pa{]}. 
 
 This numeric field is used to input the pressure difference exponent. The valid range of the exponent is from 0.5 to 1.0, with a default value of 0.65.
 
-Note: There are two common sets of reference conditions: C\(_{d}\) = 1.0 and DP = 4 Pa, or C\(_{d}\) = 0.6 and DP = 10 Pa
+\begin{callout}
+  Note: There are two common sets of reference conditions: \(C_{d}\) = 1.0 and \(\Delta P\) = 4 Pa, or \(C_d\) = 0.6 and \(\Delta P\) = 10 Pa
+\end{callout}
 
 An IDF example is shown below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
-      SurfaceELR,              !- Name of surface effective leakage area component
-      0.07,                    !- Effective leakage area {dimensionless}
-      1.00,                    !- Discharge coefficient {dimensionless}
-      4.0,                     !- Reference pressure difference {Pa}
-      0.65;                    !- Air mass flow exponent {dimensionless}
+  SurfaceELR,           !- Name of surface effective leakage area component
+  0.07,                 !- Effective leakage area {dimensionless}
+  1.00,                 !- Discharge coefficient {dimensionless}
+  4.0,                  !- Reference pressure difference {Pa}
+  0.65;                 !- Air mass flow exponent {dimensionless}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Component:DetailedOpening}\label{airflownetworkmultizonecomponentdetailedopening}
@@ -891,7 +887,7 @@ The AirflowNetwork model assumes that open windows or doors are vertical or clos
 
 It is assumed that the air flow through a window opening is unaffected by the presence of a shading device such as a shade or blind on the window. Also, the calculation of conductive heat transfer and solar gain through a window or door assumes that the window or door is closed.
 
-The AirflowNetwork model does not have a model for bi-directional flow through large horizontal openings. For this reason, \textbf{AirflowNetwork:MultiZone:Component:DetailedOpening should not be used for horizontal openings}. The best modeling technique in this case is to put an AirflowNetwork:MultiZone:Surface:Crack object in a horizontal surface and use a large air mass flow coefficient. Crack flow is assumed to be uni-directional in any given timestep (but can reverse flow direction from timestep to timestep).
+The AirflowNetwork model does not have a model for bi-directional flow through large horizontal openings. For this reason, \textbf{Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Detailed\-Opening should not be used for horizontal openings}. The best modeling technique in this case is to put an Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object in a horizontal surface and use a large air mass flow coefficient. Crack flow is assumed to be uni-directional in any given timestep (but can reverse flow direction from timestep to timestep).
 
 A subsurface multiplier may be used to represent multiple subsurfaces and calculates total air flow when the subsurface (window, glassdoor, or door) is either closed or open. The total airflow across the surface is equal to the airflow based on the surface geometry multiplied by the subsurface multiplier.
 
@@ -899,19 +895,19 @@ A subsurface multiplier may be used to represent multiple subsurfaces and calcul
 
 \paragraph{Field: Name}\label{field-name-4-003}
 
-The name of this AirflowNetwork:MultiZone:Component:DetailedOpening object. It is referenced by an AirflowNetwork:Multizone:Surface object.
+The name of this Air\-flow\-Net\-work:\-Multi\-Zone:\-Com\-ponent:\-Detailed\-Opening object. It is referenced by an Air\-flow\-Net\-work:\-Multi\-zone:\-Surface object.
 
 \paragraph{Field: Air Mass Flow Coefficient When Opening is Closed}\label{field-air-mass-flow-coefficient-when-opening-is-closed}
 
-Crack flow is assumed when the window or door is closed. The units for this air mass flow coefficient (\({C_{Q,\;unit\;length}}\) ) are different from the units for \({C_Q}\) (kg/s at 1 Pa pressure difference) defined in an AirflowNetwork:MultiZone:Surface:Crack object. There is no default but the entered value must be greater than zero. The program will automatically generate four cracks around the perimeter of the window or door--one along the bottom, one along the top, and one on each side. The temperature correction factor used in the AirflowNetwork:MultiZone:Surface:Crack object is not used for this component to calculate air mass flow rate.
+Crack flow is assumed when the window or door is closed. The units for this air mass flow coefficient (\({C_{Q,\;unit\;length}}\) ) are different from the units for \({C_Q}\) (kg/s at 1 Pa pressure difference) defined in an Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object. There is no default but the entered value must be greater than zero. The program will automatically generate four cracks around the perimeter of the window or door--one along the bottom, one along the top, and one on each side. The temperature correction factor used in the Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object is not used for this component to calculate air mass flow rate.
 
 \paragraph{Field: Air Mass Flow Exponent When Opening Is Closed}\label{field-air-mass-flow-exponent-when-opening-is-closed}
 
-Crack flow is assumed when the window or door is closed. In this case, the value of this field is the exponent,* n\emph{, in the crack air flow equation. The valid range for this exponent is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient} (deltaP)\^{}Air Mass Flow Exponent.
+Crack flow is assumed when the window or door is closed. In this case, the value of this field is the exponent, \emph{n}, in the crack air flow equation. The valid range for this exponent is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient (deltaP) Air Mass Flow Exponent.
 
 \paragraph{Field: Type of Rectanguler Large Vertical Opening (LVO)}\label{field-type-of-rectanguler-large-vertical-opening-lvo}
 
-This alpha field specifies the type of rectangular window or door. (Open windows or doors are also called Large Vertical Openings (LVOs). The choices for the opening type are \textbf{NonPivoted} (LVO Type 1) and \textbf{HorizontallyPivoted} (LVO Type 2) with the default being \textbf{NonPivoted}. The NonPivoted type represents a regular window or door. The HorizontallyPivoted type represents a window with a horizontal axis ((i.e., a horizontally-pivoting window) and cannot be used for a door.
+This alpha field specifies the type of rectangular window or door. (Open windows or doors are also called Large Vertical Openings (LVOs). The choices for the opening type are \textbf{NonPivoted} (LVO Type 1) and \textbf{HorizontallyPivoted} (LVO Type 2) with the default being \textbf{NonPivoted}. The NonPivoted type represents a regular window or door. The HorizontallyPivoted type represents a window with a horizontal axis (i.e., a horizontally-pivoting window) and cannot be used for a door.
 
 \paragraph{Field: Extra Crack Length or Height of Pivoting Axis}\label{field-extra-crack-length-or-height-of-pivoting-axis}
 
@@ -925,7 +921,7 @@ For LVO Type 2 (rectangular horizontally-pivoted windows) this field gives the h
 
 This is the number of the following sets of data for opening factor, discharge coefficient, width factor, height factor, and start height factor. From two to four of these sets must be defined. The first set should be for Opening Factor = 0.0 and the last set should be for Opening Factor = 1.0. For example, if only two sets are defined, the first set should be for Opening Factor = 0.0 and the second set should be for Opening Factor = 1.0, as shown below in the IDF example below.
 
-An ``opening factor'' refers to the amount that a window or door is opened. The program linearly interpolates each timestep between the values of discharge coefficient, width factor, etc., in these sets using the opening factor for the window or door for the timestep. (See discussion under the field Window/Door Opening Factor in the AirflowNetwork:Multizone:Zone object for a description of how the AirflowNetwork model determines the time-step value of the opening factor.)
+An ``opening factor'' refers to the amount that a window or door is opened. The program linearly interpolates each timestep between the values of discharge coefficient, width factor, etc., in these sets using the opening factor for the window or door for the timestep. (See discussion under the field Window/Door Opening Factor in the Air\-flow\-Net\-work:\-Multi\-zone:\-Zone object for a description of how the Air\-flow\-Net\-work model determines the time-step value of the opening factor.)
 
 \paragraph{Field Group: Opening Factor, Discharge Coefficient, Width Factor, Height Factor, Start Height Factor}\label{field-group-opening-factor-discharge-coefficient-width-factor-height-factor-start-height-factor}
 
@@ -1111,13 +1107,13 @@ Where
 
 where
 
-ρ = Air density at the specific air temperature and humidity ratio conditions {[}kg/m\(^{3}\){]}
+\(\rho\) = Air density at the specific air temperature and humidity ratio conditions {[}kg/m\(^{3}\){]}
 
-ν = Air kinetic viscosity at the specific air temperature condition {[}m\(^{2}\)/s{]}
+\(\nu\) = Air kinetic viscosity at the specific air temperature condition {[}m\(^{2}\)/s{]}
 
-ρ\(_{o}\) = Air density at the reference air conditions provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions {[}kg/m\(^{3}\){]}
+\(\rho_o\) = Air density at the reference air conditions provided by the object Air\-flow\-Net\-work:\-Multi\-Zone:\-Reference\-Crack\-Con\-ditions specified in the field Reference Crack Conditions {[}kg/m\(^{3}\){]}
 
-ν\(_{o}\) = Air kinetic viscosity at the reference air temperature provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions {[}m\(^{2}\)/s{]}
+\(\nu_o\) = Air kinetic viscosity at the reference air temperature provided by the object Air\-flow\-Net\-work:\-Multi\-Zone:\-Reference\-Crack\-Con\-ditions specified in the field Reference Crack Conditions {[}m\(^{2}\)/s{]}
 
 Note: The correction factor shown above is used when the exhaust fan is off. The airflow direction is based on the pressure difference between the zone and outdoors.
 
@@ -1125,7 +1121,7 @@ Note: The correction factor shown above is used when the exhaust fan is off. The
 
 \paragraph{Field: Name}\label{field-name-7-001}
 
-This is the name for this instance of the AirflowNetwork:MultiZone:Component:ZoneExhaustFan object. This name must be the same name defined in the Fan:ZoneExhaust object. It is referenced by an AirflowNetwork:Multizone:Surface object.
+This is the name for this instance of the Air\-flow\-Net\-work:\-Multi\-Zone:\-Com\-ponent:\-Zone\-Exhaust\-Fan object. This name must be the same name defined in the Fan:\-Zone\-Exhaust object. It is referenced by an Air\-flow\-Net\-work:\-Multi\-zone:\-Sur\-face object.
 
 \paragraph{Field: Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions}\label{field-air-mass-flow-coefficient-when-the-zone-exhaust-fan-is-off-at-reference-conditions}
 
@@ -1608,13 +1604,13 @@ C\(_{T}\) = Temperature correction factor
 
 where
 
-ρ = Air density at the specific air temperature and humidity ratio conditions {[}kg/m\(^{3}\){]}
+\(\rho\) = Air density at the specific air temperature and humidity ratio conditions {[}kg/m\(^{3}\){]}
 
-ν = Air kinetic viscosity at the specific air temperature condition {[}m\(^{2}\)/s{]}
+\(\nu\) = Air kinetic viscosity at the specific air temperature condition {[}m\(^{2}\)/s{]}
 
-ρ\(_{o}\) = Air density at air conditions of 20°C, 0 kg/kg and 101325 Pa {[}kg/m\(^{3}\){]}
+\(\rho_o\) = Air density at air conditions of 20°C, 0 kg/kg and 101325 Pa {[}kg/m\(^{3}\){]}
 
-ν\(_{o}\) = Air kinetic viscosity at an air temperature of 20°C {[}m\(^{2}\)/s{]}
+\(\nu_o\) = Air kinetic viscosity at an air temperature of 20°C {[}m\(^{2}\)/s{]}
 
 Note: The correction factor shown above is use for this particular component as specified.
 
@@ -1635,17 +1631,15 @@ This numeric field is defined as the pressure difference exponent across the com
 An IDF example is provided below:
 
 \begin{lstlisting}
+AirflowNetwork:Distribution:Component:Leak,
+  MainSupplyLeak,       !- Name of Supply or Return Leak
+  0.0001,               !- Air Mass Flow Coefficient {kg/s}
+  0.65;                 !- Air Mass Flow Exponent {dimensionless}
 
 AirflowNetwork:Distribution:Component:Leak,
-      MainSupplyLeak,          !- Name of Supply or Return Leak
-      0.0001,                  !- Air Mass Flow Coefficient {kg/s}
-      0.65;                    !- Air Mass Flow Exponent {dimensionless}
-
-
-  AirflowNetwork:Distribution:Component:Leak,
-      ZoneSupplyLeak,          !- Name of Supply or Return Leak
-      0.01,                    !- Air Mass Flow Coefficient {kg/s}
-      0.65;                    !- Air Mass Flow Exponent {dimensionless}
+  ZoneSupplyLeak,       !- Name of Supply or Return Leak
+  0.01,                 !- Air Mass Flow Coefficient {kg/s}
+  0.65;                 !- Air Mass Flow Exponent {dimensionless}
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Component:LeakageRatio}\label{airflownetworkdistributioncomponentleakageratio}
@@ -1658,13 +1652,13 @@ The leakage ratio component is generally used to define supply and return leaks 
 
 where
 
-r = Air density {[}kg/m\(^{3}\){]}
+\(\rho\) = Air density {[}kg/m\(^{3}\){]}
 
-\(\Delta P\) ~ = Total pressure loss across the element {[}Pa{]}
+\(\Delta P\) = Total pressure loss across the element {[}Pa{]}
 
-n = Air mass flow exponent
+\(n\) = Air mass flow exponent
 
-C\(_{u}\) = Equivalent air mass flow coefficient
+\(C_{u}\) = Equivalent air mass flow coefficient
 
 \begin{equation}
 {C_{equ}}\,\,\,\,\,\, = r*{Q_r}*\rho *{\left( {\Delta {P_r}} \right)^{ - n}}
@@ -1672,13 +1666,13 @@ C\(_{u}\) = Equivalent air mass flow coefficient
 
 where
 
-r = Effective leakage ratio {[}dimensionless{]}
+\(\rho\) = Effective leakage ratio {[}dimensionless{]}
 
-Q\(_{r}\) = Maximum airflow rate {[}m\(^{3}\)/s{]}
+\(Q_{r}\) = Maximum airflow rate {[}m\(^{3}\)/s{]}
 
-\(\Delta {P_r}\) ~ = Reference pressure difference {[}Pa{]}
+\(\Delta {P_r}\) = Reference pressure difference {[}Pa{]}
 
-n = Air mass flow exponent {[}dimensionless{]}
+\(n\) = Air mass flow exponent {[}dimensionless{]}
 
 The above calculation is valid only for a HVAC system using a constant volume supply fan: Fan:ConstantVolume or Fan:OnOff.
 
