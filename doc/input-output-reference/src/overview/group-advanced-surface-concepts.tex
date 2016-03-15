@@ -4,7 +4,7 @@ This group of objects describe concepts applied to heat transfer surfaces that a
 
 \subsection{SurfaceProperty:HeatTransferAlgorithm}\label{surfacepropertyheattransferalgorithm}
 
-This object, and three other related objects, can be used to control which surface heat transfer model is used on specific surfaces.~ The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for specific surfaces.~ This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for a particular surface:
+This object, and three other related objects, can be used to control which surface heat transfer model is used on specific surfaces. The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for specific surfaces. This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for a particular surface:
 
 \begin{itemize}
 \item
@@ -21,11 +21,11 @@ This object, and three other related objects, can be used to control which surfa
 
 \paragraph{Field: Surface Name}\label{field-surface-name}
 
-This is the name of the surface that will be assigned to use the heat transfer algorithm selected in the next field.~ This should be a name of a surface defined elsewhere.
+This is the name of the surface that will be assigned to use the heat transfer algorithm selected in the next field. This should be a name of a surface defined elsewhere.
 
 \paragraph{Field: Algorithm}\label{field-algorithm}
 
-This field is used to determine the heat transfer algorithm that is to be applied to the surface named in the previous field.~ The allowable choices are:
+This field is used to determine the heat transfer algorithm that is to be applied to the surface named in the previous field. The allowable choices are:
 
 \begin{itemize}
 \item
@@ -40,7 +40,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \subsection{SurfaceProperty:HeatTransferAlgorithm:MultipleSurface}\label{surfacepropertyheattransferalgorithmmultiplesurface}
 
-This object can be used to control the surface heat transfer model used for specific types of surfaces.~ The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for specific types of surfaces.~ This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for all surfaces of a particular type:
+This object can be used to control the surface heat transfer model used for specific types of surfaces. The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for specific types of surfaces. This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for all surfaces of a particular type:
 
 \begin{itemize}
 \item
@@ -61,7 +61,7 @@ This is a unique, user-defined name for the object.
 
 \paragraph{Field: Surface Type}\label{field-surface-type}
 
-This field is selects the type of surfaces that are all assigned to use the heat transfer algorithm selected in the next field.~ This field is used with one of the following allowable keywords:
+This field is selects the type of surfaces that are all assigned to use the heat transfer algorithm selected in the next field. This field is used with one of the following allowable keywords:
 
 \begin{itemize}
 \item
@@ -86,7 +86,7 @@ This field is selects the type of surfaces that are all assigned to use the heat
 
 \paragraph{Field: Algorithm}\label{field-algorithm-1}
 
-This field is used to determine the heat transfer algorithm that is to be applied to the surface types in the previous field.~ The allowable choices are:
+This field is used to determine the heat transfer algorithm that is to be applied to the surface types in the previous field. The allowable choices are:
 
 \begin{itemize}
 \item
@@ -100,7 +100,6 @@ This field is used to determine the heat transfer algorithm that is to be applie
 \end{itemize}
 
 \begin{lstlisting}
-
 SurfaceProperty:HeatTransferAlgorithm:MultipleSurface,
       my exterior wall override,
       AllExteriorWalls,
@@ -109,7 +108,7 @@ SurfaceProperty:HeatTransferAlgorithm:MultipleSurface,
 
 \subsection{SurfaceProperty:HeatTransferAlgorithm:SurfaceList}\label{surfacepropertyheattransferalgorithmsurfacelist}
 
-This object can be used to control the surface heat transfer model used for a list of surfaces.~ The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for a list of specific surfaces.~ This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for listed:
+This object can be used to control the surface heat transfer model used for a list of surfaces. The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for a list of specific surfaces. This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for listed:
 
 \begin{itemize}
 \item
@@ -130,7 +129,7 @@ This is a unique, user-defined name for the object.
 
 \paragraph{Field: Algorithm}\label{field-algorithm-2}
 
-This field is used to determine the heat transfer algorithm that is to be applied to the surface listed in the remaining fields.~ The allowable choices are:
+This field is used to determine the heat transfer algorithm that is to be applied to the surface listed in the remaining fields. The allowable choices are:
 
 \begin{itemize}
 \item
@@ -145,7 +144,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \paragraph{Field: Surface Name N}\label{field-surface-name-n}
 
-This is the name of the ``Nth'' surface that will be assigned to use the heat transfer algorithm selected in this object.~ These should be the names of surfaces defined elsewhere. This object is extensible.~ Additional surfaces can be added to extend the object.
+This is the name of the ``Nth'' surface that will be assigned to use the heat transfer algorithm selected in this object. These should be the names of surfaces defined elsewhere. This object is extensible. Additional surfaces can be added to extend the object.
 
 An example IDF object follows.
 
@@ -162,7 +161,7 @@ SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
 
 \subsection{SurfaceProperty:HeatTransferAlgorithm:Construction}\label{surfacepropertyheattransferalgorithmconstruction}
 
-This object can be used to control the surface heat transfer model used for surfaces that have a specific type of construction.~ The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for specific constructions.~ This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for all surfaces with particular type of construction:
+This object can be used to control the surface heat transfer model used for surfaces that have a specific type of construction. The separate object called HeatBalanceAlgorithm is used to control the heat transfer model in an overall way while this object can be used to revise the algorithm selections for specific constructions. This object allows selectively overriding the global setting in HeatBalanceAlgorithm to choose one of the following models for all surfaces with particular type of construction:
 
 \begin{itemize}
 \item
@@ -183,7 +182,7 @@ This is a unique, user-defined name for the object.
 
 \paragraph{Field: Algorithm}\label{field-algorithm-3}
 
-This field is used to determine the heat transfer algorithm that is to be applied to the surfaces with the type of of construction listed in the next field.~ The allowable choices are:
+This field is used to determine the heat transfer algorithm that is to be applied to the surfaces with the type of of construction listed in the next field. The allowable choices are:
 
 \begin{itemize}
 \item
@@ -198,7 +197,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \paragraph{Field: Construction Name}\label{field-construction-name}
 
-This field is the name of a Construction object defined elsewhere.~ All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm slected in the previous field.
+This field is the name of a Construction object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm slected in the previous field.
 
 An example IDF object follows.
 
@@ -253,7 +252,7 @@ By referencing the Other Side Coefficients statement in the surface statements (
 
 other side coefficients have the same effect on all types of heat transfer surfaces. In other words, an interior surface with other side coefficients specified and an exterior wall with identical other side coefficients specified are simulated exactly the same. A surface that uses other side coefficients should be thought of as a new or separate type of surface. All heat transfer surfaces are simulated in the same manner through conduction transfer functions. The only difference between the various types of heat transfer surfaces is the environment on the other side of the surface. For example, the other side environment of an exterior surface is the outdoor environment. For an interior surface, the temperature of the outer plane of the surface is set equal to the temperature of the inner plane of the surface. Similarly, a surface with other side coefficients specified will allow the user to control the other side environment.
 
-Heat transfer through a surface is an extremely important component in the calculation of zone loads. The information to calculate this heat transfer is readily available if the surface is exposed to the outdoor environment or to another zone that is being simulated. Occasionally, a user will want to model the heat transfer through a surface that is adjacent to an area that is not included in the EnergyPlus model.~ For example, an office area is attached to a warehouse and the user is only interested in simulating the office area. An interior surface with other side coefficients specified could be used to control the environment on the other side of the surface, thereby accounting for the heat transfer through the adjoining surface.
+Heat transfer through a surface is an extremely important component in the calculation of zone loads. The information to calculate this heat transfer is readily available if the surface is exposed to the outdoor environment or to another zone that is being simulated. Occasionally, a user will want to model the heat transfer through a surface that is adjacent to an area that is not included in the EnergyPlus model. For example, an office area is attached to a warehouse and the user is only interested in simulating the office area. An interior surface with other side coefficients specified could be used to control the environment on the other side of the surface, thereby accounting for the heat transfer through the adjoining surface.
 
 Other Side Coefficients affects the ``other side'' of a surface as described below. Each coefficient has a special meaning. You may enter a 0 or blank if you are not using a particular coefficient. Note that there are two potential ways to use other side coefficients. Either they are used to set the temperature of the exterior side surface directly (if the combined convective/radiative coefficient below is less than or equal to zero) or to set both the film coefficient (positive value for the combined convective/radiative coefficient below) and the outside air temperature.
 
@@ -297,17 +296,17 @@ This field is used to supply a schedule name. That schedule will supply the ``co
 
 \paragraph{Field: Sinusoidal Variation of Constant Temperature Coefficient}\label{field-sinusoidal-variation-of-constant-temperature-coefficient}
 
-This field is optional and can be used to define an alternate method of prescribing the coefficient that is applied to the constant temperature (see the fields Constant Temperature and Constant Temperature Coefficient).~ This parameter is shown as ``C2'' in the equation below.~ If this field is omitted, left blank, or set to ``No,'' then C2 is a constant (defined in the field Constant Temperature Coefficient).~ However if this is set to ``Yes,'' then the value of C2 varies with a unitary sine wave in the following way:
+This field is optional and can be used to define an alternate method of prescribing the coefficient that is applied to the constant temperature (see the fields Constant Temperature and Constant Temperature Coefficient). This parameter is shown as ``C2'' in the equation below. If this field is omitted, left blank, or set to ``No,'' then C2 is a constant (defined in the field Constant Temperature Coefficient). However if this is set to ``Yes,'' then the value of C2 varies with a unitary sine wave in the following way:
 
 \begin{equation}
 C2 = Sin\left( {2\pi \frac{{\left( {time\,of\,day} \right)}}{{\left( {period} \right)}}} \right)
 \end{equation}
 
-The value for ``period'' is controlled in the following field.~ The value for ``time of day'' is based on the zone timestep and is in units of hours.~ The sine function here uses input as radians.~ When using this option, the value for C2 will vary between -1.0 and 1.0 and the value put in the field Constant Temperature Coefficient is not used.~ This option cannot be used at the same time as scheduling a constant temperature with the previous field.
+The value for ``period'' is controlled in the following field. The value for ``time of day'' is based on the zone timestep and is in units of hours. The sine function here uses input as radians. When using this option, the value for C2 will vary between -1.0 and 1.0 and the value put in the field Constant Temperature Coefficient is not used. This option cannot be used at the same time as scheduling a constant temperature with the previous field.
 
 \paragraph{Field: Period of Sinusoidal Variation}\label{field-period-of-sinusoidal-variation}
 
-This field is used to define the period of the sine wave when using the Sinusodial Variation of Constant Temperature Coefficient capability selected in the previous field.~ This field is the time period of the sine wave in units of hours.~ The default is 24 hours and provides a diurnal sine wave.~ The value entered here is ``period'' in the equation in the previous field.
+This field is used to define the period of the sine wave when using the Sinusodial Variation of Constant Temperature Coefficient capability selected in the previous field. This field is the time period of the sine wave in units of hours. The default is 24 hours and provides a diurnal sine wave. The value entered here is ``period'' in the equation in the previous field.
 
 \paragraph{Field: Previous Other Side Temperature Coefficient}\label{field-previous-other-side-temperature-coefficient}
 
@@ -333,15 +332,15 @@ T = Outside Air Temperature when C1 (Combined convective/radiative film Coeff) \
 
 T = Exterior Surface Temperature when C1 (Combined convective/radiative film Coeff) \textless{} = 0
 
-Tzone~ = Temperature of the zone being simulated (°C)
+Tzone = Temperature of the zone being simulated (°C)
 
-Toadb~ = Dry-bulb temperature of the outdoor air (°C)
+Toadb = Dry-bulb temperature of the outdoor air (°C)
 
-Tgrnd~ = Temperature of the ground (°C) from Site:GroundTemperature:BuildingSurface
+Tgrnd = Temperature of the ground (°C) from Site:GroundTemperature:BuildingSurface
 
-Wspd~ = Outdoor wind speed (m/sec)
+Wspd = Outdoor wind speed (m/sec)
 
-Tpast~ = Other side temperature from previous zone timestep (°C)
+Tpast = Other side temperature from previous zone timestep (°C)
 
 \begin{figure}[hbtp] % fig 41
 \centering
@@ -350,9 +349,8 @@ Tpast~ = Other side temperature from previous zone timestep (°C)
 \end{figure}
 
 \begin{lstlisting}
-
 !  Example input using temperature schedule
-  SurfaceProperty:OtherSideCoefficients,
+SurfaceProperty:OtherSideCoefficients,
       OSCCoef:Zn005:Wall003,   !- Name
       0,                       !- Combined Convective/Radiative Film Coefficient {W/m2-K}
       0.000000,                !- Constant Temperature {C}
@@ -362,10 +360,11 @@ Tpast~ = Other side temperature from previous zone timestep (°C)
       0.000000,                !- Wind Speed Coefficient
       0.000000,                !- Zone Air Temperature Coefficient
       Zn005Wall003OtherSideTempSched;  !- Constant Temperature Schedule Name
+\end{lstlisting}
 
-
-  !  Example input for outside heat transfer coefficient of 1.23, using Tosdb
-  SurfaceProperty:OtherSideCoefficients,
+\begin{lstlisting}
+!  Example input for outside heat transfer coefficient of 1.23, using Tosdb
+SurfaceProperty:OtherSideCoefficients,
       OSCCoef:Zn005:Wall004,   !- Name
       1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
       0.000000,                !- Constant Temperature {C}
@@ -384,7 +383,9 @@ Tpast~ = Other side temperature from previous zone timestep (°C)
 
 \subsubsection{Outputs}\label{outputs}
 
+\begin{lstlisting}
 Zone,Average,Surface Other Side Coefficients Exterior Air Drybulb Temperature
+\end{lstlisting}
 
 \paragraph{Surface Other Side Coefficients Exterior Air Drybulb Temperature {[}C{]}}\label{surface-other-side-coefficients-exterior-air-drybulb-temperature-c}
 
@@ -392,13 +393,13 @@ This is the air temperature applied to the other side of the surface.
 
 \subsection{SurfaceProperty:OtherSideConditionsModel}\label{surfacepropertyothersideconditionsmodel}
 
-By referencing the Other Side Conditions Model statement in the surface statements (i.e.~Outside Boundary Condition), the boundary conditions for the outer plane of the mass wall can be connected to the appropriate model for various multi-skin components. The types of multi-skin components that use this object include systems that are mounted to the outside surface using standoffs that create a small air gap -- see Figure~\ref{fig:illustration-for-other-side-conditions-model}. This type of modeling allows using the usual heat transfer calculations for the underlying surface with other types of multi-skin~ component models that are available including: unglazed transpired solar collectors, ventilated photovoltaic panels, and naturally ventilated facades.
+By referencing the Other Side Conditions Model statement in the surface statements (i.e.~Outside Boundary Condition), the boundary conditions for the outer plane of the mass wall can be connected to the appropriate model for various multi-skin components. The types of multi-skin components that use this object include systems that are mounted to the outside surface using standoffs that create a small air gap -- see Figure~\ref{fig:illustration-for-other-side-conditions-model}. This type of modeling allows using the usual heat transfer calculations for the underlying surface with other types of multi-skin component models that are available including: unglazed transpired solar collectors, ventilated photovoltaic panels, and naturally ventilated facades.
 
 The boundary condition values are determined dynamically by the program using internal component models. If you want to define other side surface temperatures or convection conditions, then use SurfaceProperty:OtherSideCoefficients instead of this object.
 
 It should be noted that when other side conditions models are used, solar effects are removed from the surface's outside face heat balance, but are used in modeling the component adjacent to that surface.
 
-In addition, the other side conditions model has been modified to include underground piping system interaction.~ The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces.~ In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+In addition, the other side conditions model has been modified to include underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
 
 \subsubsection{Inputs}\label{inputs-5}
 
@@ -427,16 +428,12 @@ SurfaceProperty:OtherSideConditionsModel,
 
 \subsubsection{Outputs}\label{outputs-1}
 
-\begin{itemize}
-\item
-  Zone,Average,Surface Other Side Conditions Modeled Convection Air Temperature {[}C{]}
-\item
-  Zone,Average,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient {[}W/m2-K{]}
-\item
-  Zone,Average,Surface Other Side Conditions Modeled Radiation Temperature {[}C{]}
-\item
-  Zone,Average,Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient {[}W/m2-K{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Average,Surface Other Side Conditions Modeled Convection Air Temperature [C]
+Zone,Average,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Other Side Conditions Modeled Radiation Temperature [C]
+Zone,Average,Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]
+\end{lstlisting}
 
 \paragraph{Surface Other Side Conditions Modeled Convection Air Temperature {[}C{]}}\label{surface-other-side-conditions-modeled-convection-air-temperature-c}
 
@@ -466,7 +463,7 @@ A unique name for the object.
 
 \paragraph{Field: Simple Buoyancy Vertical Wall Equation Source}\label{field-simple-buoyancy-vertical-wall-equation-source}
 
-Applies to zone with no HVAC or when HVAC is off.~ This is for vertical walls.~ The key choice options include:~ FohannoPolidoriVerticalWall, ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, KhalifaEq6NonHeatedWalls FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve
+Applies to zone with no HVAC or when HVAC is off. This is for vertical walls. The key choice options include: FohannoPolidoriVerticalWall, ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, KhalifaEq6NonHeatedWalls FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve
 
 \paragraph{Field: Simple Buoyancy Vertical Wall User Curve Name}\label{field-simple-buoyancy-vertical-wall-user-curve-name}
 
@@ -474,7 +471,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Simple Buoyancy Stable Horizontal Equation Source}\label{field-simple-buoyancy-stable-horizontal-equation-source}
 
-Applies to zone with no HVAC or when HVAC is off.~ This is for horizontal surfaces with heat flow directed for stable thermal stratification.~ The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
+Applies to zone with no HVAC or when HVAC is off. This is for horizontal surfaces with heat flow directed for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
 
 \paragraph{Field: Simple Buoyancy Stable Horizontal Equation User Curve Name}\label{field-simple-buoyancy-stable-horizontal-equation-user-curve-name}
 
@@ -482,7 +479,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Simple Buoyancy Unstable Horizontal Equation Source}\label{field-simple-buoyancy-unstable-horizontal-equation-source}
 
-Applies to zone with no HVAC or when HVAC is off. This is for passive horizontal surfaces with heat flow for unstable thermal stratification.~ The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+Applies to zone with no HVAC or when HVAC is off. This is for passive horizontal surfaces with heat flow for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Simple Buoyancy Unstable Horizontal Equation User Curve Name}\label{field-simple-buoyancy-unstable-horizontal-equation-user-curve-name}
 
@@ -490,7 +487,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Simple Buoyancy Stable Tilted Equation Source}\label{field-simple-buoyancy-stable-tilted-equation-source}
 
-Applies to zone with no HVAC or when HVAC is off.~ This is for tilted surfaces with heat flow for stable thermal stratification.~ The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
+Applies to zone with no HVAC or when HVAC is off. This is for tilted surfaces with heat flow for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
 
 \paragraph{Field: Simple Buoyancy Stable Tilted Equation User Curve Name}\label{field-simple-buoyancy-stable-tilted-equation-user-curve-name}
 
@@ -498,7 +495,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Simple Buoyancy Unstable Tilted Equation Source}\label{field-simple-buoyancy-unstable-tilted-equation-source}
 
-Applies to zone with no HVAC or when HVAC is off.~ This is for tilted surfaces with heat flow for unstable thermal stratification.~ The key choices include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+Applies to zone with no HVAC or when HVAC is off. This is for tilted surfaces with heat flow for unstable thermal stratification. The key choices include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Simple Buoyancy Unstable Tilted Equation User Curve Name}\label{field-simple-buoyancy-unstable-tilted-equation-user-curve-name}
 
@@ -506,7 +503,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Simple Buoyancy Windows Equation Source}\label{field-simple-buoyancy-windows-equation-source}
 
-Applies to zone with no HVAC or when HVAC is off.~ This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, KaradagChilledCeiling, ISO15099Windows, or UserCurve.
+Applies to zone with no HVAC or when HVAC is off. This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, KaradagChilledCeiling, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Simple Buoyancy Windows Equation User Curve Name}\label{field-simple-buoyancy-windows-equation-user-curve-name}
 
@@ -514,7 +511,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Vertical Wall Equation Source}\label{field-floor-heat-ceiling-cool-vertical-wall-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling.~ This is for vertical walls.~ The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for vertical walls. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name}\label{field-floor-heat-ceiling-cool-vertical-wall-equation-user-curve-name}
 
@@ -522,7 +519,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Stable Horizontal Equation Source}\label{field-floor-heat-ceiling-cool-stable-horizontal-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling. This is for passive horizontal surfaces with heat flow for stable thermal stratification.~ The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for passive horizontal surfaces with heat flow for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name}\label{field-floor-heat-ceiling-cool-stable-horizontal-equation-user-curve-name}
 
@@ -530,7 +527,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Unstable Horizontal Equation Source}\label{field-floor-heat-ceiling-cool-unstable-horizontal-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling. This is for passive horizontal surfaces with heat flow for unstable thermal stratification.~ The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, KhalifaEq4CeilingAwayFromHeat, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for passive horizontal surfaces with heat flow for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, KhalifaEq4CeilingAwayFromHeat, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name}\label{field-floor-heat-ceiling-cool-unstable-horizontal-equation-user-curve-name}
 
@@ -538,7 +535,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Heated Floor Equation Source}\label{field-floor-heat-ceiling-cool-heated-floor-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling.~ This is for a floor with active heating elements.~ The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, AwbiHattonHeatedFloor, or UserCurve
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for a floor with active heating elements. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, AwbiHattonHeatedFloor, or UserCurve
 
 \paragraph{Field: Floor Heat Ceiling Cool Heated Floor Equation User Curve Name}\label{field-floor-heat-ceiling-cool-heated-floor-equation-user-curve-name}
 
@@ -546,7 +543,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Chilled Ceiling Equation Source}\label{field-floor-heat-ceiling-cool-chilled-ceiling-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling. This is for a ceiling with active cooling elements. The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, KaradagChilledCeiling, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for a ceiling with active cooling elements. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, KaradagChilledCeiling, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name}\label{field-floor-heat-ceiling-cool-chilled-ceiling-equation-user-curve-name}
 
@@ -554,7 +551,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Stable Tilted Equation Source}\label{field-floor-heat-ceiling-cool-stable-tilted-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling. This is for tilted surfaces with heat flow for stable thermal stratification.~ The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, ISO15099Windows, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for tilted surfaces with heat flow for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name}\label{field-floor-heat-ceiling-cool-stable-tilted-equation-user-curve-name}
 
@@ -562,7 +559,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Unstable Tilted Equation Source}\label{field-floor-heat-ceiling-cool-unstable-tilted-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling.~ This is for tilted surfaces with heat flow for unstable thermal stratification.~ The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, ISO15099Windows, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for tilted surfaces with heat flow for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name}\label{field-floor-heat-ceiling-cool-unstable-tilted-equation-user-curve-name}
 
@@ -570,7 +567,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Floor Heat Ceiling Cool Window Equation Source}\label{field-floor-heat-ceiling-cool-window-equation-source}
 
-Applies to zone with in-floor heating and/or in-ceiling cooling. This is for all window surfaces.~ The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, ISO15099Windows, or UserCurve.
+Applies to zone with in-floor heating and/or in-ceiling cooling. This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Floor Heat Ceiling Cool Window Equation User Curve Name}\label{field-floor-heat-ceiling-cool-window-equation-user-curve-name}
 
@@ -578,7 +575,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wall Panel Heating Vertical Wall Equation Source}\label{field-wall-panel-heating-vertical-wall-equation-source}
 
-Applies to zone with in-wall panel heating. This is for vertical walls that are not actively heated.~ The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq6NonHeatedWalls, FohannoPolidoriVerticalWall, AlamdariHammondVerticalWall, ISO15099Windows, or UserCurve.
+Applies to zone with in-wall panel heating. This is for vertical walls that are not actively heated. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq6NonHeatedWalls, FohannoPolidoriVerticalWall, AlamdariHammondVerticalWall, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Wall Panel Heating Vertical Wall Equation User Curve Name}\label{field-wall-panel-heating-vertical-wall-equation-user-curve-name}
 
@@ -586,7 +583,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wall Panel Heating Heated Wall Equation Source}\label{field-wall-panel-heating-heated-wall-equation-source}
 
-Applies to zone with in-wall panel heating. This is for vertical walls that are being actively heated.~ The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq5WallNearHeat, AwbiHattonHeatedWall, FohannoPolidoriVerticalWall, AlamdariHammondVerticalWall, or UserCurve.
+Applies to zone with in-wall panel heating. This is for vertical walls that are being actively heated. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq5WallNearHeat, AwbiHattonHeatedWall, FohannoPolidoriVerticalWall, AlamdariHammondVerticalWall, or UserCurve.
 
 \paragraph{Field: Wall Panel Heating Heated Wall Equation User Curve Name}\label{field-wall-panel-heating-heated-wall-equation-user-curve-name}
 
@@ -610,7 +607,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wall Panel Heating Stable Tilted Equation Source}\label{field-wall-panel-heating-stable-tilted-equation-source}
 
-Applies to zone with in-wall panel heating. This is for tilted surfaces with heat flow for stable thermal stratification.~ The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, ISO15099Windows, or UserCurve.
+Applies to zone with in-wall panel heating. This is for tilted surfaces with heat flow for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Wall Panel Heating Stable Tilted Equation User Curve Name}\label{field-wall-panel-heating-stable-tilted-equation-user-curve-name}
 
@@ -618,7 +615,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wall Panel Heating Unstable Tilted Equation Source}\label{field-wall-panel-heating-unstable-tilted-equation-source}
 
-Applies to zone with in-wall panel heating. This is for tilted surfaces with heat flow for unstable thermal stratification. The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, ISO15099Windows, or UserCurve.
+Applies to zone with in-wall panel heating. This is for tilted surfaces with heat flow for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Wall Panel Heating Unstable Tilted Equation User Curve Name}\label{field-wall-panel-heating-unstable-tilted-equation-user-curve-name}
 
@@ -626,7 +623,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wall Panel Heating Window Equation Source}\label{field-wall-panel-heating-window-equation-source}
 
-Applies to zone with in-wall panel heating. This is for all window surfaces.~ The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
+Applies to zone with in-wall panel heating. This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Wall Panel Heating Window Equation User Curve Name}\label{field-wall-panel-heating-window-equation-user-curve-name}
 
@@ -634,7 +631,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Vertical Wall Equation Source}\label{field-convective-zone-heater-vertical-wall-equation-source}
 
-Applies to zone with convective heater.~ This is for vertical walls not directly affected by heater.~ The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, KhalifaEq6NonHeatedWalls, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve
+Applies to zone with convective heater. This is for vertical walls not directly affected by heater. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, KhalifaEq6NonHeatedWalls, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve
 
 \paragraph{Field: Convective Zone Heater Vertical Wall Equation User Curve Name}\label{field-convective-zone-heater-vertical-wall-equation-user-curve-name}
 
@@ -642,7 +639,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Vertical Walls Near Heater Equation Source}\label{field-convective-zone-heater-vertical-walls-near-heater-equation-source}
 
-Applies to zone with convective heater. This is for vertical walls that are directly affected by heater. Walls are considered ``near'' when listed in field set for Fraction of Radiant Energy to Surface.~ The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq5WallNearHeat, AwbiHattonHeatedWall, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
+Applies to zone with convective heater. This is for vertical walls that are directly affected by heater. Walls are considered ``near'' when listed in field set for Fraction of Radiant Energy to Surface. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq5WallNearHeat, AwbiHattonHeatedWall, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name}\label{field-convective-zone-heater-vertical-walls-near-heater-equation-user-curve-name}
 
@@ -650,7 +647,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Stable Horizontal Equation Source}\label{field-convective-zone-heater-stable-horizontal-equation-source}
 
-Applies to zone with convective heater.~ This is for horizontal surfaces with heat flow directed for stable thermal stratification. The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
+Applies to zone with convective heater. This is for horizontal surfaces with heat flow directed for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
 
 \paragraph{Field: Convective Zone Heater Stable Horizontal Equation User Curve Name}\label{field-convective-zone-heater-stable-horizontal-equation-user-curve-name}
 
@@ -658,7 +655,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Unstable Horizontal Equation Source}\label{field-convective-zone-heater-unstable-horizontal-equation-source}
 
-Applies to zone with convective heater.~ This is for horizontal surfaces with heat flow directed for unstable thermal stratification.~ The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, KhalifaEq4CeilingAwayFromHeat, KhalifaEq7Ceiling, or UserCurve.
+Applies to zone with convective heater. This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, KhalifaEq4CeilingAwayFromHeat, KhalifaEq7Ceiling, or UserCurve.
 
 \paragraph{Field: Convective Zone Heater Unstable Horizontal Equation User Curve Name}\label{field-convective-zone-heater-unstable-horizontal-equation-user-curve-name}
 
@@ -666,7 +663,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Stable Tilted Equation Source}\label{field-convective-zone-heater-stable-tilted-equation-source}
 
-Applies to zone with convective heater.~ This is for tilted surfaces with heat flow for stable thermal stratification. The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
+Applies to zone with convective heater. This is for tilted surfaces with heat flow for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
 
 \paragraph{Field: Convective Zone Heater Stable Tilted Equation User Curve Name}\label{field-convective-zone-heater-stable-tilted-equation-user-curve-name}
 
@@ -674,7 +671,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Unstable Tilted Equation Source}\label{field-convective-zone-heater-unstable-tilted-equation-source}
 
-Applies to zone with convective heater.~ This is for tilted surfaces with heat flow for unstable thermal stratification.~ The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+Applies to zone with convective heater. This is for tilted surfaces with heat flow for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Convective Zone Heater Unstable Tilted Equation User Curve Name}\label{field-convective-zone-heater-unstable-tilted-equation-user-curve-name}
 
@@ -682,7 +679,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Convective Zone Heater Windows Equation Source}\label{field-convective-zone-heater-windows-equation-source}
 
-Applies to zone with convective heater.~ This is for all window surfaces. The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
+Applies to zone with convective heater. This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Convective Zone Heater Windows Equation User Curve Name}\label{field-convective-zone-heater-windows-equation-user-curve-name}
 
@@ -690,7 +687,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Central Air Diffuser Wall Equation Source}\label{field-central-air-diffuser-wall-equation-source}
 
-Applies to zone with mechanical forced central air with diffusers. This is for all wall surfaces.~ The key choice options include:~ ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, AlamdariHammondVerticalWall, BeausoleilMorrisonMixedAssistedWall, BeausoleilMorrisonMixedOpposingWall, FohannoPolidoriVerticalWall, ISO15099Windows, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
+Applies to zone with mechanical forced central air with diffusers. This is for all wall surfaces. The key choice options include: ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, AlamdariHammondVerticalWall, BeausoleilMorrisonMixedAssistedWall, BeausoleilMorrisonMixedOpposingWall, FohannoPolidoriVerticalWall, ISO15099Windows, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
 
 \paragraph{Field: Central Air Diffuser Wall Equation User Curve Name}\label{field-central-air-diffuser-wall-equation-user-curve-name}
 
@@ -698,7 +695,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Central Air Diffuser Ceiling Equation Source}\label{field-central-air-diffuser-ceiling-equation-source}
 
-Applies to zone with mechanical forced central air with diffusers.~ This is for all ceiling surfaces.~ The key choice options include:~ FisherPedersenCeilingDiffuserCeiling, BeausoleilMorrisonMixedStableCeiling, BeausoleilMorrisonMixedUnstableCeiling, or UserCurve.
+Applies to zone with mechanical forced central air with diffusers. This is for all ceiling surfaces. The key choice options include: FisherPedersenCeilingDiffuserCeiling, BeausoleilMorrisonMixedStableCeiling, BeausoleilMorrisonMixedUnstableCeiling, or UserCurve.
 
 \paragraph{Field: Central Air Diffuser Ceiling Equation User Curve Name}\label{field-central-air-diffuser-ceiling-equation-user-curve-name}
 
@@ -706,7 +703,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Central Air Diffuser Floor Equation Source}\label{field-central-air-diffuser-floor-equation-source}
 
-Applies to zone with mechanical forced central air with diffusers.~ This is for all floor surfaces. The key choice options include:~ FisherPedersenCeilingDiffuserFloor, BeausoleilMorrisonMixedStableFloor, BeausoleilMorrisonMixedUnstableFloor, GoldsteinNovoselacCeilingDiffuserFloor, or UserCurve.
+Applies to zone with mechanical forced central air with diffusers. This is for all floor surfaces. The key choice options include: FisherPedersenCeilingDiffuserFloor, BeausoleilMorrisonMixedStableFloor, BeausoleilMorrisonMixedUnstableFloor, GoldsteinNovoselacCeilingDiffuserFloor, or UserCurve.
 
 \paragraph{Field: Central Air Diffuser Floor Equation User Curve Name}\label{field-central-air-diffuser-floor-equation-user-curve-name}
 
@@ -714,7 +711,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Central Air Diffuser Window Equation Source}\label{field-central-air-diffuser-window-equation-source}
 
-Applies to zone with mechanical forced central air with diffusers.~ This is for all window surfaces.~ The key choice options include:~ ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, BeausoleilMorrisonMixedAssistedWall, BeausoleilMorrisonMixedOpposingWall, FohannoPolidoriVerticalWall, AlamdariHammondVerticalWall, ISO15099Windows, GoldsteinNovoselacCeilingDiffuserWindow, or UserCurve.
+Applies to zone with mechanical forced central air with diffusers. This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, BeausoleilMorrisonMixedAssistedWall, BeausoleilMorrisonMixedOpposingWall, FohannoPolidoriVerticalWall, AlamdariHammondVerticalWall, ISO15099Windows, GoldsteinNovoselacCeilingDiffuserWindow, or UserCurve.
 
 \paragraph{Field: Central Air Diffuser Window Equation User Curve Name}\label{field-central-air-diffuser-window-equation-user-curve-name}
 
@@ -738,7 +735,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mechanical Zone Fan Circulation Unstable Horizontal Equation Source}\label{field-mechanical-zone-fan-circulation-unstable-horizontal-equation-source}
 
-The key choice options include:~ KhalifaEq4CeilingAwayFromHeat, WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+The key choice options include: KhalifaEq4CeilingAwayFromHeat, WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name}\label{field-mechanical-zone-fan-circulation-unstable-horizontal-equation-user-curve-name}
 
@@ -746,7 +743,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mechanical Zone Fan Circulation Stable Tilted Equation Source}\label{field-mechanical-zone-fan-circulation-stable-tilted-equation-source}
 
-The key choice options include:~ WaltonStableHorizontalOrTilt or UserCurve
+The key choice options include: WaltonStableHorizontalOrTilt or UserCurve
 
 \paragraph{Field Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name}\label{field-mechanical-zone-fan-circulation-stable-tilted-equation-user-curve-name}
 
@@ -754,7 +751,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mechanical Zone Fan Circulation Unstable Tilted Equation Source}\label{field-mechanical-zone-fan-circulation-unstable-tilted-equation-source}
 
-The key choice options include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name}\label{field-mechanical-zone-fan-circulation-unstable-tilted-equation-user-curve-name}
 
@@ -762,7 +759,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mechanical Zone Fan Circulation Window Equation Source}\label{field-mechanical-zone-fan-circulation-window-equation-source}
 
-The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ISO15099Windows, GoldsteinNovoselacCeilingDiffuserWindow, or UserCurve.
+The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ISO15099Windows, GoldsteinNovoselacCeilingDiffuserWindow, or UserCurve.
 
 \paragraph{Field: Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name}\label{field-mechanical-zone-fan-circulation-unstable-tilted-equation-user-curve-name-1}
 
@@ -770,7 +767,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Buoyancy Assisting Flow on Walls Equation Source}\label{field-mixed-regime-buoyancy-assisting-flow-on-walls-equation-source}
 
-The key choice options include:~ BeausoleilMorrisonMixedAssistedWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve.
+The key choice options include: BeausoleilMorrisonMixedAssistedWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve.
 
 \paragraph{Field: Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name}\label{field-mixed-regime-buoyancy-assisting-flow-on-walls-equation-user-curve-name}
 
@@ -778,7 +775,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation Source}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-source}
 
-The key choice options include:~ BeausoleilMorrisonMixedOpposingWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
+The key choice options include: BeausoleilMorrisonMixedOpposingWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
 
 \paragraph{Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation User Curve Name}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-user-curve-name}
 
@@ -786,7 +783,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Stable Floor Equation Source}\label{field-mixed-regime-stable-floor-equation-source}
 
-The key choice options include:~ BeausoleilMorrisonMixedStableFloor, WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
+The key choice options include: BeausoleilMorrisonMixedStableFloor, WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
 
 \paragraph{Field: Mixed Regime Stable Floor Equation User Curve Name}\label{field-mixed-regime-stable-floor-equation-user-curve-name}
 
@@ -794,7 +791,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Unstable Floor Equation Source}\label{field-mixed-regime-unstable-floor-equation-source}
 
-The key choice options include:~ BeausoleilMorrisonMixedUnstableFloor, WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+The key choice options include: BeausoleilMorrisonMixedUnstableFloor, WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Mixed Regime Unstable Floor Equation User Curve Name}\label{field-mixed-regime-unstable-floor-equation-user-curve-name}
 
@@ -802,7 +799,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Stable Ceiling Equation Source}\label{field-mixed-regime-stable-ceiling-equation-source}
 
-The key choice options include:~ BeausoleilMorrisonMixedStableCeiling, WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
+The key choice options include: BeausoleilMorrisonMixedStableCeiling, WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve.
 
 \paragraph{Field: Mixed Regime Stable Ceiling Equation User Curve Name}\label{field-mixed-regime-stable-ceiling-equation-user-curve-name}
 
@@ -810,7 +807,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Unstable Ceiling Equation Source}\label{field-mixed-regime-unstable-ceiling-equation-source}
 
-The key choice options include:~ BeausoleilMorrisonMixedUnstableCeiling, WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
+The key choice options include: BeausoleilMorrisonMixedUnstableCeiling, WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
 \paragraph{Field: Mixed Regime Unstable Ceiling Equation User Curve Name}\label{field-mixed-regime-unstable-ceiling-equation-user-curve-name}
 
@@ -818,7 +815,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Mixed Regime Window Equation Source}\label{field-mixed-regime-window-equation-source}
 
-The key choice options include:~ GoldsteinNovoselacCeilingDiffuserWindow, ISO15099Windows, or UserCurve.
+The key choice options include: GoldsteinNovoselacCeilingDiffuserWindow, ISO15099Windows, or UserCurve.
 
 \paragraph{Field: Mixed Regime Window Equation User Curve Name}\label{field-mixed-regime-window-equation-user-curve-name}
 
@@ -844,7 +841,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wind Convection Leeward Vertical Wall Equation Source}\label{field-wind-convection-leeward-vertical-wall-equation-source}
 
-This is for just the wind-driven component of the total convection coefficient. The key choice options include:~ SimpleCombined, TARPLeeward, MoWiTTLeeward, DOE2Leeward, Emmel, NusseltJurges, McAdams, Mitchell, or UserCurve.
+This is for just the wind-driven component of the total convection coefficient. The key choice options include: SimpleCombined, TARPLeeward, MoWiTTLeeward, DOE2Leeward, Emmel, NusseltJurges, McAdams, Mitchell, or UserCurve.
 
 \paragraph{Field: Wind Convection Leeward Vertical Wall Equation User Curve Name}\label{field-wind-convection-leeward-vertical-wall-equation-user-curve-name}
 
@@ -852,7 +849,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Wind Convection Horizontal Roof Equation Source}\label{field-wind-convection-horizontal-roof-equation-source}
 
-This is for just the wind-driven component of the total convection coefficient. The key choice options include:~ SimpleCombined, TARPWindward, MoWiTTWindward, DOE2Windward, NusseltJurges, McAdams, Mitchell, Blocken, Emmel, ClearRoof, or UserCurve.
+This is for just the wind-driven component of the total convection coefficient. The key choice options include: SimpleCombined, TARPWindward, MoWiTTWindward, DOE2Windward, NusseltJurges, McAdams, Mitchell, Blocken, Emmel, ClearRoof, or UserCurve.
 
 \paragraph{Field: Wind Convection Horizontal Roof User Curve Name}\label{field-wind-convection-horizontal-roof-user-curve-name}
 
@@ -860,7 +857,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Natural Convection Vertical Wall Equation Source}\label{field-natural-convection-vertical-wall-equation-source}
 
-This is for just the natural convection portion of the total film coefficient. This is for vertical walls. The key choice options include:~ ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ISO15099Windows, UserCurve, or None.
+This is for just the natural convection portion of the total film coefficient. This is for vertical walls. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ISO15099Windows, UserCurve, or None.
 
 \paragraph{Field: Natural Convection Vertical Wall Equation User Curve Name}\label{field-natural-convection-vertical-wall-equation-user-curve-name}
 
@@ -868,7 +865,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Natural Convection Stable Horizontal Equation Source}\label{field-natural-convection-stable-horizontal-equation-source}
 
-This is for just the natural convection portion of the total film coefficient.~ This is for horizontal surfaces with heat flow directed for stable thermal stratification.~ The key choice options include:~ WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, UserCurve, or None.
+This is for just the natural convection portion of the total film coefficient. This is for horizontal surfaces with heat flow directed for stable thermal stratification. The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, UserCurve, or None.
 
 \paragraph{Field: Natural Convection Stable Horizontal Equation User Curve Name}\label{field-natural-convection-stable-horizontal-equation-user-curve-name}
 
@@ -876,7 +873,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Natural Convection Unstable Horizontal Equation Source}\label{field-natural-convection-unstable-horizontal-equation-source}
 
-This is for just the natural convection portion of the total film coefficient.~ This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice optios include:~ WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
+This is for just the natural convection portion of the total film coefficient. This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice optios include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
 
 \paragraph{Field: Natural Convection Unstable Horizontal Equation User Curve Name}\label{field-natural-convection-unstable-horizontal-equation-user-curve-name}
 
@@ -894,7 +891,7 @@ Unique name of input object.
 
 \paragraph{Field: Reference Temperature for Convection Heat Transfer}\label{field-reference-temperature-for-convection-heat-transfer}
 
-This field controls the nature of the reference temperature used with convection coefficient when calculating the heat flow at the surface. Select one of the three choices:~ MeanAirTemperature, AdjacentAirTemperature,~ SupplyAirTemperature.~ MeanAirTemperature is the typical application for the classic convection model used with the complete mixing of room air.~ AdjacentAirTemperature applies when used with Roomair models that account for temperature variations within the zone air and directs the model to use the temperature near the surface rather than the average for the entire zone.~ SupplyAirTemperature directs the model to use the supply air conditions for the heat transfer conditions.
+This field controls the nature of the reference temperature used with convection coefficient when calculating the heat flow at the surface. Select one of the three choices: MeanAirTemperature, AdjacentAirTemperature, SupplyAirTemperature. MeanAirTemperature is the typical application for the classic convection model used with the complete mixing of room air. AdjacentAirTemperature applies when used with Roomair models that account for temperature variations within the zone air and directs the model to use the temperature near the surface rather than the average for the entire zone. SupplyAirTemperature directs the model to use the supply air conditions for the heat transfer conditions.
 
 \paragraph{Field: Hc Function of Temperature Difference Curve Name}\label{field-hc-function-of-temperature-difference-curve-name}
 
@@ -902,7 +899,7 @@ This field contains the name of separate performance curve or table object that 
 
 \paragraph{Field: Hc Function of Temperature Difference Divided by Height Curve Name}\label{field-hc-function-of-temperature-difference-divided-by-height-curve-name}
 
-This field contains the name of separate performance curve or table object that describes \emph{h\(_{c}\)}, the convection coefficient, as a function of temperature difference divided by height. The curve's ``x'' is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m).~ For an inside face, the vertical length scale is the zone's interior height.
+This field contains the name of separate performance curve or table object that describes \emph{h\(_{c}\)}, the convection coefficient, as a function of temperature difference divided by height. The curve's ``x'' is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m). For an inside face, the vertical length scale is the zone's interior height.
 
 \paragraph{Field: Hc Function of Air Change Rate Curve Name}\label{field-hc-function-of-air-change-rate-curve-name}
 
@@ -924,7 +921,7 @@ Unique name of input object.
 
 \paragraph{Field: Wind Speed Type for Curve}\label{field-wind-speed-type-for-curve}
 
-This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field.~ There are for key choice options. ``WeatherFile'' directs~ using the unmodified value from the epw file or design weather data.~ ``HeightAdjust'' uses the value from the epw file modified for height above ground, as determined by the z cooridinate, using the site terrain and weather station information.~ ``ParallelComponent'' uses the value from the epw file modified to take just the velocity component that is parallel to the surface.~ ``ParallelComponentHeightAdjust'' uses the height adjusted wind velocity and then computes the parallel component.
+This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field. There are for key choice options. ``WeatherFile'' directs using the unmodified value from the epw file or design weather data. ``HeightAdjust'' uses the value from the epw file modified for height above ground, as determined by the z cooridinate, using the site terrain and weather station information. ``ParallelComponent'' uses the value from the epw file modified to take just the velocity component that is parallel to the surface. ``ParallelComponentHeightAdjust'' uses the height adjusted wind velocity and then computes the parallel component.
 
 \paragraph{Field: Hf Function of Wind Speed Curve Name}\label{field-hf-function-of-wind-speed-curve-name}
 
@@ -936,15 +933,17 @@ This field contains the name of separate performance curve or table object that 
 
 \paragraph{Field: Hc Function of Temperature Difference Divided by Height Curve Name}\label{field-hc-function-of-temperature-difference-divided-by-height-curve-name-1}
 
-This field contains the name of separate performance curve or table object that describes \emph{h\(_{n}\)}, the natural convection coefficient, as a function of temperature difference divided by height. Curve's ``x'' is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m).~ For an outside face the vertical length scale is the exterior facade's overall height.
+This field contains the name of separate performance curve or table object that describes \emph{h\(_{n}\)}, the natural convection coefficient, as a function of temperature difference divided by height. Curve's ``x'' is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m). For an outside face the vertical length scale is the exterior facade's overall height.
 
 \subsection{SurfaceProperty:ConvectionCoefficients}\label{surfacepropertyconvectioncoefficients}
 
-The convection coefficients of each surface, both exterior and interior, are automatically calculated during EnergyPlus execution. These calculations are ``governed'' by other objects such as the SurfaceConvectionAlgorithm:Inside (overall default), the Zone object's field called Zone Inside Convection Algorithm (Zone Default), the~ and the SurfaceConvectionAlgorithm:Outside (overall default), and/or the Zone object's field called Zone Outside Convection Algorithm (Zone Default). Usually, that will be enough flexibility for most users. However, if you need to match pre-existing convection coefficients (from another program) or are trying to match a test suite of results, you may wish to use the ``override'' convection coefficients in the following object. This object allows for a single surface to be given specific convection coefficients.
+The convection coefficients of each surface, both exterior and interior, are automatically calculated during EnergyPlus execution. These calculations are ``governed'' by other objects such as the SurfaceConvectionAlgorithm:Inside (overall default), the Zone object's field called Zone Inside Convection Algorithm (Zone Default), the and the SurfaceConvectionAlgorithm:Outside (overall default), and/or the Zone object's field called Zone Outside Convection Algorithm (Zone Default). Usually, that will be enough flexibility for most users. However, if you need to match pre-existing convection coefficients (from another program) or are trying to match a test suite of results, you may wish to use the ``override'' convection coefficients in the following object. This object allows for a single surface to be given specific convection coefficients.
 
 Note that using these in conjunction, in particular, the ``Simple'' option on either the Outside Convection Algorithm or the Zone Outside Convection Algorithm field will result in a combined coefficient regardless of choice chosen here.
 
+\begin{callout}
 Note that surfaces with ``SurfaceProperty:OtherSideCoefficients'' cannot use this object with the ``outside'' coefficient -- attempting to do so will cause a severe error; SurfaceProperty:OtherSideCoefficients surfaces can apply an ``inside'' coefficient. And, surfaces with ``Ground'' exposure do not use the ``outside'' coefficient that might be supplied here. Note, too, that some lower boundaries are used regardless by certain surface types (i.e.~Window) or certain algorithm types.
+\end{callout}
 
 \subsubsection{Inputs}\label{inputs-10}
 
@@ -966,11 +965,11 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 
 \paragraph{Field: Convection Coefficient 2 Type}\label{field-convection-coefficient-2-type}
 
-The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.~ The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
+The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied. The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside, SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-\begin{longtable}[c]{p{3.49in}p{2.5in}}
+\begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Key choice & Applies to Insihe or Outsihe \tabularnewline \midrule
+Key choice & Applies to Inside or Outside \tabularnewline \midrule
 \endhead
 Value & Both \tabularnewline
 Schedule & Both \tabularnewline
@@ -980,7 +979,7 @@ TARP & Both \tabularnewline
 DOE-2 & Outside \tabularnewline
 MoWitt & Outside \tabularnewline
 AdaptiveConvectionAlgorithm & Both \tabularnewline
-ASHRAEVerticalWall~~~ & Both \tabularnewline
+ASHRAEVerticalWall & Both \tabularnewline
 WaltonUnstableHorizontalOrTilt & Both \tabularnewline
 WaltonStableHorizontalOrTilt & Both \tabularnewline
 FisherPedersenCeilingDiffuserWalls & Inside \tabularnewline
@@ -1002,13 +1001,13 @@ BeausoleilMorrisonMixedStableFloor & Inside \tabularnewline
 BeausoleilMorrisonMixedUnstableFloor & Inside \tabularnewline
 BeausoleilMorrisonMixedStableCeiling & Inside \tabularnewline
 BeausoleilMorrisonMixedUnstableCeiling & Inside \tabularnewline
-FohannoPolidoriVerticalWall~~~~~~ & Both \tabularnewline
+FohannoPolidoriVerticalWall & Both \tabularnewline
 KaradagChilledCeiling & Inside \tabularnewline
 ISO15099Windows & Inside \tabularnewline
 GoldsteinNovoselacCeilingDiffuserWindow & Inside \tabularnewline
 GoldsteinNovoselacCeilingDiffuserWalls & Inside \tabularnewline
 GoldsteinNovoselacCeilingDiffuserFloor & Inside \tabularnewline
-SimpleCombined~~~~~ & Outside \tabularnewline
+SimpleCombined & Outside \tabularnewline
 NusseltJurges & Outside \tabularnewline
 McAdams & Outside \tabularnewline
 Mitchell & Outside \tabularnewline
@@ -1021,7 +1020,7 @@ UserCurve & Both \tabularnewline
 
 \subsection{SurfaceProperties:VaporCoefficients}\label{surfacepropertiesvaporcoefficients}
 
-Advanced/Research Usage:.The internal and external vapor transfer coefficients that are used by the CombinedHeatAndMoistureFiniteElement model are automatically calculated during EnergyPlus execution using information on the convection coefficients. However it is sometimes useful to be able to ``override'' the calculation and set fixed values of vapor transfer coefficient for a single surface. These coefficients are only used by the CombinedHeatAndMoistureFiniteElement model and will be ignored by other solution algorithms.
+Advanced/Research Usage: The internal and external vapor transfer coefficients that are used by the CombinedHeatAndMoistureFiniteElement model are automatically calculated during EnergyPlus execution using information on the convection coefficients. However it is sometimes useful to be able to ``override'' the calculation and set fixed values of vapor transfer coefficient for a single surface. These coefficients are only used by the CombinedHeatAndMoistureFiniteElement model and will be ignored by other solution algorithms.
 
 \subsubsection{Inputs}\label{inputs-11}
 
@@ -1108,18 +1107,18 @@ This field is used to describe the relative roughness of the baffle material. Th
 This field is used to enter a value for the coefficient used to determine natural air exchanges from wind. Wind will cause exterior air to move in and out of the cavity. Cv is an arbitrary coefficient used to model the effectiveness of openings and depends on opening geometry and the orientation with respect to the wind. Cv should probably be in the range 0.05 to 0.65. Increasing Cv will increase the amount of natural ventilation. The following equation shows how Cv is used in the program to predict the volumetric flow rate due to wind:
 
 \begin{equation}
-{{\rm{\dot \rlap{--} V}}_{{\rm{wind}}}} = {C_v}{A_{in}}{U_\infty }
+  \dot{V}_{\rm{wind}} = C_v A_{\rm{in}} U_{\infty}
 \end{equation}
 
 \paragraph{Field: Discharge Coefficient for Openings with Respect to Buoyancy Driven Flow}\label{field-discharge-coefficient-for-openings-with-respect-to-buoyancy-driven-flow}
 
 This field is used to enter a value for the coefficient used to determine natural air exchanges from buoyancy. Stack or buoyancy effects will cause exterior air to move in and out of the cavity. Cd is an arbitrary discharge coefficient that depends on the geometry of the opening. Cd should probably be in the range 0.1 to 1.0. Increasing Cd will increase the amount of natural ventilation. The following equations show how Cd is used in the program to predict the volume flow rate due to buoyancy:
 
-\(\dot{V}_{thermal} = C_D A_{in} \sqrt 2 g \Delta H_{NPL} \left( T_{a,cav} - T_{amb} \right) / T_{a,cav}\) ~ (if \(T_{a,cav} > T_{amb}\) )
+\(\dot{V}_{thermal} = C_D A_{in} \sqrt 2 g \Delta H_{NPL} \left( T_{a,cav} - T_{amb} \right) / T_{a,cav}\) (if \(T_{a,cav} > T_{amb}\) )
 
-\(\dot{V}_{\text{thermal}} = C_D A_{in} \sqrt 2 g \Delta H_{NPL} \left( T_{amb} - T_{a,cav} \right) / T_{amb}\) ~ (if \(T_{amb} > T_{a,cav}\) ~and baffle is vertical)
+\(\dot{V}_{\text{thermal}} = C_D A_{in} \sqrt 2 g \Delta H_{NPL} \left( T_{amb} - T_{a,cav} \right) / T_{amb}\) (if \(T_{amb} > T_{a,cav}\) and baffle is vertical)
 
-where \(\Delta {H_{NPL}}\) ~is the value input into the field above for the height scale for buoyancy-driven ventilation.
+where \(\Delta {H_{NPL}}\) is the value input into the field above for the height scale for buoyancy-driven ventilation.
 
 \paragraph{Field(s): Surface \textless{}1 thru x\textgreater{} Name}\label{fields-surface-1-thru-x-name}
 
@@ -1128,7 +1127,6 @@ The remaining fields are used to name the \textbf{BuildingSurface:Detailed} obje
 An example IDF entry is
 
 \begin{lstlisting}
-
 SurfaceProperty:ExteriorNaturalVentedCavity,
   PVRoofPaverExtVentCav1 ,   ! Name
   PVRoofPaverSystem1,        ! OtherSideConditionsModel Object Name
@@ -1148,20 +1146,14 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
 
 In addition to related output that can be obtained for all surfaces, these outputs are available for exterior naturally vented cavity configurations:
 
-\begin{itemize}
-\item
-  HVAC,Average, Surface Exterior Cavity Air Drybulb Temperature {[}C{]}
-\item
-  HVAC,Average, Surface Exterior Cavity Baffle Surface Temperature {[}C{]}
-\item
-  HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Air Change Rate {[}ACH{]}
-\item
-  HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average, Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average, Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate {[}kg/s{]}
-\end{itemize}
+\begin{lstlisting}
+HVAC,Average, Surface Exterior Cavity Air Drybulb Temperature [C]
+HVAC,Average, Surface Exterior Cavity Baffle Surface Temperature [C]
+HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Air Change Rate [ACH]
+HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate [kg/s]
+HVAC,Average, Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate [kg/s]
+HVAC,Average, Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]
+\end{lstlisting}
 
 \paragraph{Surface Exterior Cavity Air Drybulb Temperature {[}C{]}}\label{surface-exterior-cavity-air-drybulb-temperature-c}
 
@@ -1195,7 +1187,7 @@ This object can be used as an alternative to the standard (automatic) EnergyPlus
 
 \paragraph{Field: Name}\label{field-name-10}
 
-The name of the SurfaceProperty:SolarIncidentInside object~ Must be unique between all SurfaceProperty:SolarIncidentInside objects.
+The name of the SurfaceProperty:SolarIncidentInside object Must be unique between all SurfaceProperty:SolarIncidentInside objects.
 
 \paragraph{Field: Surface Name}\label{field-surface-name-4}
 
@@ -1203,11 +1195,11 @@ The building surface associated with this object (ref BuildingSurface:Detailed).
 
 \paragraph{Field: Construction Name}\label{field-construction-name-1}
 
-The building construction associated with this object (ref Construction).~ It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
+The building construction associated with this object (ref Construction). It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
 
 \paragraph{Field: Inside Surface Incident Sun Solar Radiation Schedule Name}\label{field-inside-surface-incident-sun-solar-radiation-schedule-name}
 
-This field specifies the name of a schedule that contains the values for incident solar radiation.~ Values from the schedule data will be used to replace the absorbed solar radiation that would normally be calculated by EnergyPlus.~ Units in the external schedule file must be W/m\(^{2}\).
+This field specifies the name of a schedule that contains the values for incident solar radiation. Values from the schedule data will be used to replace the absorbed solar radiation that would normally be calculated by EnergyPlus. Units in the external schedule file must be W/m\(^{2}\).
 
 Example for SurfaceProperty:SolarIncidentInside using a compact schedule:
 
@@ -1232,41 +1224,41 @@ Example for SurfaceProperty:SolarIncidentInside using a compact schedule:
 
 \subsection{ComplexFenestrationProperty:SolarAbsorbedLayers}\label{complexfenestrationpropertysolarabsorbedlayers}
 
-This object can be used as an alternative to the standard (automatic) EnergyPlus calculation of the solar radiation absorbed by fenestration systems in the building.~ Using this method, the normal EnergyPlus calculation is replaced with a schedule of solar absorptance values that are calculated outside the program.
+This object can be used as an alternative to the standard (automatic) EnergyPlus calculation of the solar radiation absorbed by fenestration systems in the building. Using this method, the normal EnergyPlus calculation is replaced with a schedule of solar absorptance values that are calculated outside the program.
 
 \subsubsection{Inputs}\label{inputs-14}
 
 \paragraph{Field: Name}\label{field-name-11}
 
-The name of the ComplexFenestrationProperty:SolarAbsorbedLayers object~ Must be unique between all ComplexFenestrationProperty:SolarAbsorbedLayers objects.
+The name of the ComplexFenestrationProperty:SolarAbsorbedLayers object Must be unique between all ComplexFenestrationProperty:SolarAbsorbedLayers objects.
 
 \paragraph{Field: Fenestration Surface}\label{field-fenestration-surface}
 
-The fenestration surface associated with this object (ref FenestrationSurface:Detailed).~ Values from the schedule data will be used to replace the absorbed solar radiation in the fenestration layers that would normally be calculated by EnergyPlus.~ Value units in the schedule must be W/m\(^{2}\).
+The fenestration surface associated with this object (ref FenestrationSurface:Detailed). Values from the schedule data will be used to replace the absorbed solar radiation in the fenestration layers that would normally be calculated by EnergyPlus. Value units in the schedule must be W/m\(^{2}\).
 
 \paragraph{Field: Construction Name}\label{field-construction-name-2}
 
-The building construction associated with this object (ref Construction).~ It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
+The building construction associated with this object (ref Construction). It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
 
 \paragraph{Field: Layer 1 Solar Radiation Absorbed Schedule Name}\label{field-layer-1-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains the absorbed solar radiation values in units of W/m\(^{2}\).~ Values from the schedule are used for the absorbed solar radiation of the first (outside) layer .
+Specifies the name of a schedule that contains the absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the first (outside) layer .
 
 \paragraph{Field: Layer 2 Solar Radiation Absorbed Schedule Name}\label{field-layer-2-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\).~ Values from the schedule are used for the absorbed solar radiation of the second layer .
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the second layer .
 
 \paragraph{Field: Layer 3 Solar Radiation Absorbed Schedule Name}\label{field-layer-3-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\).~ Values from the schedule are used for the absorbed solar radiation for the third layer .
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation for the third layer .
 
 \paragraph{Field: Layer 4 Solar Radiation Absorbed Schedule Name}\label{field-layer-4-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\).~ Values from the schedule are used for the absorbed solar radiation of the fourth layer.
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the fourth layer.
 
 \paragraph{Field: Layer 5 Solar Radiation Absorbed Schedule Name}\label{field-layer-5-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\).~ Values from the schedule are used for the absorbed solar radiation of the fifth layer .
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the fifth layer .
 
 Example for ComplexFenestrationProperty:SolarAbsorbedLayers with compact schedules:
 
@@ -1337,7 +1329,7 @@ The object doesn't create any specific output, but the results of using it can b
 
 This field specifies the plane that the geometry transform should act on. It is currently restricted to altering the horizontal footprint of a building and must be set to ``XY.''
 
-\paragraph{Field: Current~ Aspect Ratio}\label{field-current-aspect-ratio}
+\paragraph{Field: Current Aspect Ratio}\label{field-current-aspect-ratio}
 
 This field specifies the aspect ratio of the building geometry described in the rest of the input file. It is used to scale the new aspect ratio. If this field is set to 1.0, then the altered building will not necessarily have the new aspect ratio defined in the next field.
 
@@ -1347,7 +1339,7 @@ This field specifies the aspect ratio that the building described in the rest of
 
 \subsection{Zone Property View Factors}\label{zone-property-view-factors}
 
-EnergyPlus has two options for specifying the thermal radiation exchange view factors between surfaces in a zone: the approximate option and the user input option.~ Because the actual geometric arrangement within a zone is very complex, the approximate method of including thermal mass and other forced exchanges is more realistic than trying to come up with ``exact'' view factors. However, in some research situations it might be desirable to have control of the view factors used. For this reason, a user input mode has been included in EnergyPlus. The two modes are described in the next sections.
+EnergyPlus has two options for specifying the thermal radiation exchange view factors between surfaces in a zone: the approximate option and the user input option. Because the actual geometric arrangement within a zone is very complex, the approximate method of including thermal mass and other forced exchanges is more realistic than trying to come up with ``exact'' view factors. However, in some research situations it might be desirable to have control of the view factors used. For this reason, a user input mode has been included in EnergyPlus. The two modes are described in the next sections.
 
 \subsubsection{Approximate Option}\label{approximate-option}
 
@@ -1359,21 +1351,24 @@ Note that this does not take into account that surfaces may be ``around the corn
 
 To summarize, using the Surface ``Class'', the approximate view factors have:
 
-1.~~~~~No surface sees itself.
+\begin{enumerate}
+  \item
+    No surface sees itself.
+  \item
+    No Floor sees another floor.
+  \item
+    All other surface types see Internal Mass.
+  \item
+    All other surface types see floors.
+  \item
+    Floors always see ceilings.
+  \item
+    Floors always see roofs.
+  \item
+    All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other.
+\end{enumerate}
 
-2.~~~~No Floor sees another floor.
-
-3.~~~~All other surface types see Internal Mass.
-
-4.~~~~All other surface types see floors.
-
-5.~~~~Floors always see ceilings.
-
-6.~~~~Floors always see roofs.
-
-7.~~~~All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other.
-
-If geometry is correct, conditions 1,3, and 7 should take care of all surfaces, but the other conditions supply common sense when the geometry is incorrect. More information about the EnergyPlus view factor calculation is contained in the Engineering Reference document.
+If geometry is correct, conditions 1, 3, and 7 should take care of all surfaces, but the other conditions supply common sense when the geometry is incorrect. More information about the EnergyPlus view factor calculation is contained in the Engineering Reference document.
 
 \subsubsection{User Input View Factors}\label{user-input-view-factors}
 
@@ -1404,7 +1399,6 @@ This value is the view factor for ``from Surface'' to ``to Surface''.
 An IDF Example:
 
 \begin{lstlisting}
-
 ZoneProperty:UserViewFactors:bySurfaceName,Lshaped Zone,
     Lshaped Zone:South Wall,Lshaped Zone:South Wall,0.000000,
     Lshaped Zone:South Wall,Lshaped Zone:East Wall,0.101310,

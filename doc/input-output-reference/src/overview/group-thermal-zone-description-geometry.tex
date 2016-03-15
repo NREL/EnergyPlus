@@ -4587,14 +4587,13 @@ The name of a schedule with values between 0.0 and 1.0. The timestep value of th
 \begin{figure}[hbtp] % fig 39
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image065.png}
-\caption{Gap airflow configurations for airflow windows. (a) **Air exhaust window**: Airflow Source = InsideAir, Airflow Destination = OutsideAir; (b) **Indoor air curtain window**: Airflow Source = InsideAir, Airflow Destination = InsideAir; (c) **Air supply window**: Airflow Source = OutsideAir, Airflow Destination = InsideAir; (d) **Outdoor air curtain window**: Airflow Source = OutsideAir, Airflow Destination = OutsideAir; (e) **Airflow to Return Air**: Airflow Source = InsideAir, Airflow Destination = ReturnAir. Based on “Active facades,” Version no. 1, Belgian Building Research Institute, June 2002. \protect \label{fig:gap-airflow-configurations-for-airflow}}
+  \caption{Gap airflow configurations for airflow windows. (a) \textbf{Air exhaust window}: Airflow Source = InsideAir, Airflow Destination = OutsideAir; (b) \textbf{Indoor air curtain window}: Airflow Source = InsideAir, Airflow Destination = InsideAir; (c) \textbf{Air supply window}: Airflow Source = OutsideAir, Airflow Destination = InsideAir; (d) \textbf{Outdoor air curtain window}: Airflow Source = OutsideAir, Airflow Destination = OutsideAir; (e) \textbf{Airflow to Return Air}: Airflow Source = InsideAir, Airflow Destination = ReturnAir. Based on ``Active facades,'' Version no. 1, Belgian Building Research Institute, June 2002. \protect \label{fig:gap-airflow-configurations-for-airflow}}
 \end{figure}
 
 An IDF example: window with a constant airflow from inside to outside at 0.008 m\(^{3}\)/s-m.
 
 \begin{lstlisting}
-
- WindowProperty:AirflowControl,   !- Used to control forced airflow through a gap between glass layers
+WindowProperty:AirflowControl,   !- Used to control forced airflow through a gap between glass layers
       Zn001:Wall001:Win002,   !- Name of Associated Window
       InsideAir,              !- Airflow Source
       OutsideAir,             !- Airflow Destination
@@ -4677,7 +4676,6 @@ In the northern hemisphere, the month the storm window is put on is generally gr
 An IDF example of WindowProperty:StormWindow. The storm window is put in place on October 15 and removed on May 1.
 
 \begin{lstlisting}
-
 WindowProperty:StormWindow,
    Window1, !- Name of Window to Which Storm Window Glass Layer is Applied
    GlassA,  !- Name of Material:WindowGlass or MATERIAL:WindowGlass:AltInput that is the storm window layer
@@ -4690,7 +4688,9 @@ WindowProperty:StormWindow,
 
 \subsection{Importing Windows from WINDOW program}\label{importing-windows-from-window-program}
 
+\begin{callout}
 WINDOW v6.3 and later is capable of writing IDF excerpts for Window data. This is the preferred method as no external file is necessary. See the Tips document for details on obtaining the IDF excerpt.
+\end{callout}
 
 The WINDOW program calculates the U-value, Solar Heat Gain Coefficient, solar transmission/absorption characteristics, visible transmission characteristics and other properties of a window under standard indoor and outdoor conditions. WINDOW treats the whole window system---glazing, frame and divider. A sub-program of WINDOW called THERM uses a 2-D finite element calculation to determine the effective conductance of frame, divider and edge-of-glass elements. Another sub-program, OPTICS, determines the solar-optical properties of glazing, including laminates and coated glass.
 
@@ -4714,7 +4714,9 @@ There are four methods for inputting window constructions in EnergyPlus:
   import WINDOW report containing layer-by-layer calculated values and overall glazing system angular values.
 \end{enumerate}
 
-\textbf{Note: When using method 4, the overall glazing system angular dependent properties, including Tsol, Abs, Rfsol, Rbsol, Tvis, Rfvis, and Rbvis, are not used by EnergyPlus. Therefore, methods 1 and 2 and preferably 3 are recommended.}
+\begin{callout}
+  \warning{Note: When using method 4, the overall glazing system angular dependent properties, including Tsol, Abs, Rfsol, Rbsol, Tvis, Rfvis, and Rbvis, are not used by EnergyPlus. Therefore, methods 1 and 2 and preferably 3 are recommended.}
+\end{callout}
 
 \begin{itemize}
 \item
@@ -4737,44 +4739,30 @@ If there is a window called ConstructionName on the Window data file, the data f
 
 In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:
 
-\begin{itemize}
-\item
-  Zone,Sum,Zone Total Internal Radiant Heating Energy {[}J{]}
-\item
-  Zone,Sum,Zone Total Internal Visible Radiation Heating Energy {[}J{]}
-\item
-  Zone,Sum,Zone Total Internal Convective Heating Energy {[}J{]}
-\item
-  Zone,Sum,Zone Total Internal Latent Gain Energy {[}J{]}
-\item
-  Zone,Sum,Zone Total Internal Total Heating Energy {[}J{]}
-\item
-  Zone,Average,Zone Mean Air Temperature {[}C{]}
-\item
-  HVAC,Average,Zone Air Temperature {[}C{]}
-\item
-  Zone,Average,Zone Mean Radiant Temperature {[}C{]}
-\item
-  Zone,Average,Zone Operative Temperature {[}C{]}
-\item
-  HVAC,Sum,Zone Air System Sensible Heating Energy {[}J{]}
-\item
-  HVAC,Sum,Zone Air System Sensible Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Zone Air System Sensible Heating Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air System Sensible Cooling Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}
-\item
-  HVAC,Average,Zone Air Relative Humidity{[}\%{]}
-\item
-  Two of these are of particular interest:
-\item
-  Zone,Average,Zone Mean Air Temperature {[}C{]}
-\item
-  HVAC,Average,Zone Air Temperature {[}C{]}
-\end{itemize}
+\begin{lstlisting}
+Zone,Sum,Zone Total Internal Radiant Heating Energy [J]
+Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]
+Zone,Sum,Zone Total Internal Convective Heating Energy [J]
+Zone,Sum,Zone Total Internal Latent Gain Energy [J]
+Zone,Sum,Zone Total Internal Total Heating Energy [J]
+Zone,Average,Zone Mean Air Temperature [C]
+HVAC,Average,Zone Air Temperature [C]
+Zone,Average,Zone Mean Radiant Temperature [C]
+Zone,Average,Zone Operative Temperature [C]
+HVAC,Sum,Zone Air System Sensible Heating Energy [J]
+HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
+HVAC,Average,Zone Air System Sensible Heating Rate [W]
+HVAC,Average,Zone Air System Sensible Cooling Rate [W]
+HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]
+HVAC,Average,Zone Air Relative Humidity[%]
+\end{lstlisting}
+
+Two of these are of particular interest:
+
+\begin{lstlisting}
+Zone,Average,Zone Mean Air Temperature [C]
+HVAC,Average,Zone Air Temperature [C]
+\end{lstlisting}
 
 These two variable outputs are/should be identical. However, note that they can be reported at different time intervals. ``Zone Mean Air Temperature'' is only available on the Zone/HB timestep (Number of Timesteps per Hour) whereas ``Zone Air Temperature'' can be reported at the HVAC timestep (which can vary).
 
@@ -4786,21 +4774,23 @@ From the code definition, the zone mean air temperature is the average temperatu
 
 This is very similar to the mean air temperature in the last field. The ``well stirred'' model for the zone is the basis, but this temperature is also available at the ``detailed'' system timestep.
 
-\subsubsection{Zone~ Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c-1}
+\subsubsection{Zone Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c-1}
 
 The Mean Radiant Temperature (MRT) in degrees Celsius of a space is really the measure of the combined effects of temperatures of surfaces within that space. The larger the surface area and the closer one is to it, the more effect the surface temperature of that surface has on each other. The MRT is the measure of all these surface areas and temperatures.
 
 \subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c-1}
 
-Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT),~ OT = 0.5*MAT + 0.5*MRT.~ This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
+Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
 
 \subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j-1}
 
-This field represents the sensible heating energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. . This field is not multiplied by zone or group multipliers.
+This field represents the sensible heating energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
+\begin{callout}
 Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
 
 Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variable will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
+\end{callout}
 
 \subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j-1}
 

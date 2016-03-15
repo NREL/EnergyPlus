@@ -803,36 +803,39 @@ This feature requires that the coefficients described below be determined from m
 
 If ``Return Air Fraction Is Calculated from Plenum Temperature'' = Yes, the return air fraction is calculated \emph{each timestep} from the following empirical correlation:
 
-(Return Air Fraction)\(_{d}\) = C\(_{1}\) -- C\(_{2}\) x T\(_{m}\)
+\begin{equation}
+  (\rm{Return Air Fraction})_{\rm{calculated}} = C_{1} - C_{2} \times T_{\rm{plenum}}
+\end{equation}
 
-where T\(_{m}\) is the previous-time-step value of the return plenum air temperature (C),
+where T\(_{\rm{plenum}}\) is the previous-time-step value of the return plenum air temperature (C),
 
-and C\(_{1}\) and C\(_{2}\)~ are the values of the coefficients entered in the next two fields.
+and C\(_{1}\) and C\(_{2}\) are the values of the coefficients entered in the next two fields.
 
-To compensate for the change in the return air fraction relative to its input value, the program modifies Fraction Radiant and f\(_{d}\) by a scale factor such that
+To compensate for the change in the return air fraction relative to its input value, the program modifies Fraction Radiant and f\(_{\rm{convected}}\) by a scale factor such that
 
-(Return Air Fraction)\(_{d}\) + (Fraction Radiant)\(_{d}\)+ (f\(_{d}\))\(_{d}\) + (Fraction Visible)\(_{t}\) = 1.0
+\begin{equation}
+  (\rm{Return Air Fraction})_{\rm{calculated}} + (\rm{Fraction Radiant})_{\rm{modified}} + (f_{\rm{convected}})_{\rm{modified}} + (\rm{Fraction Visible})_{\rm{input}} = 1.0
+\end{equation}
 
 It is assumed that Fraction Visible is a constant equal to its input value.
 
 \paragraph{Field: Return Air Fraction Function of Plenum Temperature Coefficient 1}\label{field-return-air-fraction-function-of-plenum-temperature-coefficient-1}
 
-The coefficient C\(_{1}\) in the equation for (Return Air Fraction)\(_{d}\).
+The coefficient C\(_{1}\) in the equation for (Return Air Fraction)\(_{calculated}\).
 
 \paragraph{Field: Return Air Fraction Function of Plenum Temperature Coefficient 2}\label{field-return-air-fraction-function-of-plenum-temperature-coefficient-2}
 
-The coefficient C\(_{2}\)~ in the equation for (Return Air Fraction)\(_{d}\). Its units are 1/\(^{O}\)C.
+The coefficient C\(_{2}\) in the equation for (Return Air Fraction)\(_{calculated}\). Its units are 1/\(^{O}\)C.
 
 \begin{figure}[hbtp] % fig 52
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image087.png}
-\caption{Vertical section through a zone and its return air plenum showing recessed lighting (not to scale). The heat from lights is divided into four fractions, three of which—ReturnAirFraction, FractionRadiant and FractionConvected—depend on plenum air temperature. \protect \label{fig:vertical-section-through-a-zone-and-its}}
+\caption{Vertical section through a zone and its return air plenum showing recessed lighting (not to scale). The heat from lights is divided into four fractions, three of which --- ReturnAirFraction, FractionRadiant and FractionConvected --- depend on plenum air temperature. \protect \label{fig:vertical-section-through-a-zone-and-its}}
 \end{figure}
 
 An IDF example:
 
 \begin{lstlisting}
-
 Lights,
       RIGHT FORK Lights 1,     !- Name
       RIGHT FORK,              !- Zone Name
@@ -1095,7 +1098,9 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The electrical input to the equipment ultimately appears as heat that contributes to zone loads. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Fraction Latent, Fraction Radiant and Fraction Lost. A fourth, defined as the fraction of the heat from electric equipment convected to the zone air, is calculated by the program as:
 
-f\(_{d}\) = 1.0 -- (Fraction Latent + Fraction Radiant + Fraction Lost)
+\begin{equation}
+  f_{\rm{convected}} = 1.0 - (\rm{Fraction Latent} + \rm{Fraction Radiant} + \rm{Fraction Lost})
+\end{equation}
 
 You will get an error message if Fraction Latent + Fraction Radiant + Fraction Lost exceeds 1.0.
 
@@ -1216,7 +1221,9 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The fuel input to the equipment ultimately appears as heat that contributes to zone loads. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Fraction Latent, Fraction Radiant and Fraction Lost. A fourth, defined as the fraction of the heat from gas equipment convected to the zone air, is calculated by the program as:
 
-f\(_{d}\) = 1.0 -- (Fraction Latent + Fraction Radiant + Fraction Lost)
+\begin{equation}
+  f_{convected} = 1.0 - (\rm{Fraction Latent} + \rm{Fraction Radiant} + \rm{Fraction Lost})
+\end{equation}
 
 You will get an error message if Fraction Latent + Fraction Radiant + Fraction Lost exceeds 1.0.
 
@@ -1342,7 +1349,9 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The fuel input to the equipment ultimately appears as heat that contributes to zone loads. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Fraction Latent, Fraction Radiant and Fraction Lost. A fourth, defined as the fraction of the heat from hot water equipment convected to the zone air, is calculated by the program as:
 
-f\(_{d}\) = 1.0 -- (Fraction Latent + Fraction Radiant + Fraction Lost)
+\begin{equation}
+  f_{\rm{convected}} = 1.0 - (\rm{Fraction Latent} + \rm{Fraction Radiant} + \rm{Fraction Lost})
+\end{equation}
 
 You will get an error message if Fraction Latent + Fraction Radiant + Fraction Lost exceeds 1.0.
 
@@ -1365,38 +1374,36 @@ Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``C
 IDF Examples:
 
 \begin{lstlisting}
-
 HotWaterEquipment,
-      SPACE2-1 HWEq 1,         !- Name
-      SPACE2-1,                !- Zone Name
-      EQUIP-1,                 !- SCHEDULE Name
-      EquipmentLevel,         !- Design Level calculation method
-      300,                     !- Design Level {W}
-      ,                        !- Power per Zone Floor Area {watts/m2}
-      ,                        !- Power per Person {watts/person}
-      0.2,                     !- Fraction Latent
-      0.1,                     !- Fraction Radiant
-      0.5,                     !- Fraction Lost
-      Dishwashing;             !- End-Use Subcategory
+  SPACE2-1 HWEq 1,    !- Name
+  SPACE2-1,           !- Zone Name
+  EQUIP-1,            !- SCHEDULE Name
+  EquipmentLevel,     !- Design Level calculation method
+  300,                !- Design Level {W}
+  ,                   !- Power per Zone Floor Area {watts/m2}
+  ,                   !- Power per Person {watts/person}
+  0.2,                !- Fraction Latent
+  0.1,                !- Fraction Radiant
+  0.5,                !- Fraction Lost
+  Dishwashing;        !- End-Use Subcategory
 \end{lstlisting}
 
 Global Hot Water Equipment example:
 
 \begin{lstlisting}
+ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
 
-  ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
-
-    HotWaterEquipment,
-      Office Zones with Hot Water Equipment,       !- Name
-      OfficeZones,             !- Zone Name
-      HotWater Eq Sch,         !- Schedule Name
-      Watts/Area,              !- Design Level Calculation Method
-      ,                        !- Design Level {W}
-      50,                      !- Power per Zone Floor Area {W/m2}
-      ,                        !- Power per Person {W/Person}
-      0.0000000E+00,           !- Fraction Latent
-      0.3000000,               !- Fraction Radiant
-      0.0000000E+00;           !- Fraction Lost
+HotWaterEquipment,
+  Office Zones with HoWater Equipment,!- Name
+  OfficeZones,                        !- Zone Name
+  HotWater Eq Sch,                    !- Schedule Name
+  Watts/Area,                         !- Design Level Calculation Method
+  ,                                   !- Design Level {W}
+  50,                                 !- Power per Zone Floor Area {W/m2}
+  ,                                   !- Power per Person {W/Person}
+  0.0000000E+00,                      !- Fraction Latent
+  0.3000000,                          !- Fraction Radiant
+  0.0000000E+00;                      !- Fraction Lost
 \end{lstlisting}
 
 \subsection{SteamEquipment}\label{steamequipment}
@@ -1461,7 +1468,9 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The fuel input to the equipment ultimately appears as heat that contributes to zone loads. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Fraction Latent, Fraction Radiant and Fraction Lost. A fourth, defined as the fraction of the heat from steam equipment convected to the zone air, is calculated by the program as:
 
-f\(_{d}\) = 1.0 -- (Fraction Latent + Fraction Radiant + Fraction Lost)
+\begin{equation}
+  f_{\rm{convected}}\) = 1.0 - (\rm{Fraction Latent} + \rm{Fraction Radiant} + \rm{Fraction Lost})
+\end{equation}
 
 You will get an error message if Fraction Latent + Fraction Radiant + Fraction Lost exceeds 1.0.
 
@@ -2672,9 +2681,9 @@ ZONE,Average, Generic Air Contaminant Constant Source Generation Volume Flow Rat
 
 This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:Constant object. The generation rate is a sum of generation and removal rates. The zone air generic contaminant level at the previous zone time step is used in the removal rate calculation.
 
-\subsection{SurfaceContaminantSourceAndSink:Generic:PressureDriven}\label{surfacecontaminantsourceandsinkgenericpressuredriven}
+\subsection{Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Pressure\-Driven}\label{surfacecontaminantsourceandsinkgenericpressuredriven}
 
-The SurfaceContaminantSourceAndSink:Generic:PressureDriven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
+The Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Pressure\-Driven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
 
 \begin{equation}
 {S_f}(t) = {H_f}(t)*{F_G}*{\left( {{P_j} - {P_i}} \right)^n}
@@ -2715,28 +2724,31 @@ This field denotes the flow power exponent,* n*, in the contaminant source equat
 An IDF example is provided below:
 
 \begin{lstlisting}
-
-  SurfaceContaminantSourceAndSink:Generic:PressureDriven,
-      WEST ZONE GC BLD,       !- Name
-      Zn001:Wall001,          !- Surface Name
-      1.0E-6,                 !- Design Generation Rate Coefficient {m3/s}
-      GC Source Schedule,     !- Generation Schedule Name
-      0.5;                    !- Generation Exponent
+SurfaceContaminantSourceAndSink:Generic:PressureDriven,
+  WEST ZONE GC BLD,     !- Name
+  Zn001:Wall001,        !- Surface Name
+  1.0E-6,               !- Design Generation Rate Coefficient {m3/s}
+  GC Source Schedule,   !- Generation Schedule Name
+  0.5;                  !- Generation Exponent
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-8-003}
 
-When a SurfaceContaminantSourceAndSink:Generic:PressureDriven object is specified, the following output variables are available:
+When a Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Pressure\-Driven object is specified, the following output variables are available:
 
-ZONE,Average,Generic Air Contaminant Pressure Driven Generation Volume Flow Rate {[}m3/s{]}
+\begin{itemize}
+  \tightlist
+  \item
+    ZONE,Average,Generic Air Contaminant Pressure Driven Generation Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Generic Air Contaminant Pressure Driven Generation Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-pressure-driven-generation-volume-flow-rate-m3s}
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:PressureDriven object.
+This output is the average generic contaminant generation rate from each Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Pressure\-Driven object.
 
 \subsection{ZoneContaminantSourceAndSink:Generic:CutoffModel}\label{zonecontaminantsourceandsinkgenericcutoffmodel}
 
-The ZoneContaminantSourceAndSink:Generic contaminant:CutoffModel object specifies the generic contaminant generation rate based on the cutoff concentration model. The basic equation used to calculate generic contaminant source for the pressure driven constant model is given below:
+The Zone\-Contaminant\-Source\-And\-Sink:\-Generic contaminant:CutoffModel object specifies the generic contaminant generation rate based on the cutoff concentration model. The basic equation used to calculate generic contaminant source for the pressure driven constant model is given below:
 
 \begin{equation}
 {S_f}(t) = \left\{ \begin{array}{l}{G_f}(t)*{F_G}*\left( {1 - \frac{{{C_f}(t)}}{{{C_{cutoff}}}}} \right)\;\;\;\;\;{C_f} < {C_{cutoff}}\\0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;{C_f} \ge {C_{cutoff}}\end{array} \right\}
@@ -2744,15 +2756,15 @@ The ZoneContaminantSourceAndSink:Generic contaminant:CutoffModel object specifie
 
 where
 
-\emph{S\(_{f}\)} \(_{ }\) = Generic contaminant source strength {[}m\(^{3}\)/s{]}
+\emph{S\(_{f}\)} = Generic contaminant source strength {[}m\(^{3}\)/s{]}
 
-\emph{G\(_{f}\)} \(_{ }\) = Generic contaminant generation rate {[}m\(^{3}\)/s{]}
+\emph{G\(_{f}\)} = Generic contaminant generation rate {[}m\(^{3}\)/s{]}
 
-\emph{F\(_{G}\)} \(_{ }\) = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
+\emph{F\(_{G}\)} = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
 
-\emph{C\(_{f}\)} ~~~~~~~~~ = Cutoff concentration at which emission ceases {[}ppm{]}
+\emph{C\(_{cutoff}\)} = Cutoff concentration at which emission ceases {[}ppm{]}
 
-\emph{C\(_{f}\)} \(_{ }\) = Generic contaminant concentration value at a given previous time step {[}ppm{]}
+\emph{C\(_{f}\)} = Generic contaminant concentration value at a given previous time step {[}ppm{]}
 
 \subsubsection{Inputs}\label{inputs-13-006}
 
@@ -2778,12 +2790,9 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 This field is the generic contaminant cutoff concentration level where the source ceases its emission.
 
-\textbf{~}
-
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 ZoneContaminantSourceAndSink:Generic:CutoffModel,
       NORTH ZONE GC CutoffModel,          !- Name
       NORTH ZONE,             !- Zone Name
@@ -2800,7 +2809,7 @@ ZONE,Average, Generic Air Contaminant Cutoff Model Generation Volume Flow Rate {
 
 \paragraph{Generic Air Contaminant Cutoff Model Generation Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-cutoff-model-generation-volume-flow-rate-m3s}
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:CutoffModel object.
+This output is the average generic contaminant generation rate from each Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Cutoff\-Model object.
 
 \subsection{ZoneContaminantSourceAndSink:Generic:DecaySource}\label{zonecontaminantsourceandsinkgenericdecaysource}
 
@@ -2818,9 +2827,9 @@ where
 
 \emph{F\(_{G}\)} \(_{ }\) = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
 
-t ~~~ = Time since the start of emission {[}second{]}
+t = Time since the start of emission {[}second{]}
 
-\emph{t\(_{c}\)} ~~ = Decay time constant {[}second{]}
+\emph{t\(_{c}\)} = Decay time constant {[}second{]}
 
 \subsubsection{Inputs}\label{inputs-14-006}
 
@@ -2849,34 +2858,37 @@ Note: The variable t, time since the start of emission, will be reset to zero, w
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 ZoneContaminantSourceAndSink:Generic:DecaySource,
-      WEST ZONE GC DecaySource,           !- Name
-      WEST ZONE,              !- Zone Name
-      1.0E-5,                 !- Initial Emission Rate {m3/s}
-      GC Source Schedule,     !- Schedule Name
-      100000;                 !- Delay Time Constant {s}
+  WEST ZONE GC DecaySour, !- Name
+  WEST ZONE,              !- Zone Name
+  1.0E-5,                 !- Initial Emission Rate {m3/s}
+  GC Source Schedule,     !- Schedule Name
+  100000;                 !- Delay Time Constant {s}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-10-003}
 
 When a ZoneContaminantSourceAndSink:Generic:DecaySource object is specified, the following output variables are available:
 
-Zone,Average,Generic Air Contaminant Decay Model Generation Volume Flow Rate {[}m3/s{]}
-
-Zone,Average,Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time {[}s{]}
+\begin{itemize}
+    \tightlist
+  \item
+    Zone,Average,Generic Air Contaminant Decay Model Generation Volume Flow Rate {[}m3/s{]}
+  \item
+    Zone,Average,Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time {[}s{]}
+\end{itemize}
 
 \paragraph{Generic Air Contaminant Decay Model Generation Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-decay-model-generation-volume-flow-rate-m3s}
 
-This output is the average generic contaminant decay rate from each SurfaceContaminantSourceAndSink:Generic:DecaySource object.
+This output is the average generic contaminant decay rate from each Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Decay\-Source object.
 
 \paragraph{Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time {[}s{]}}\label{generic-air-contaminant-decay-model-generation-emission-start-elapsed-time-s}
 
 This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the egenration schedule value is zero.
 
-\subsection{SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion}\label{surfacecontaminantsourceandsinkgenericboundarylayerdiffusion}
+\subsection{Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Boundary\-Layer\-Diffusion}\label{surfacecontaminantsourceandsinkgenericboundarylayerdiffusion}
 
-The SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
+The Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Boundary\-Layer\-Diffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
 
 The boundary layer diffusion controlled reversible sink/source model with a linear sorption isotherm follows the descriptions presented in {[}Axley 1991{]}. The boundary layer refers to the region above the surface of a material through which a concentration gradient exists between the near-surface concentration and the air-phase concentration. The rate at which a contaminant is transferred onto a surface (sink) is defined as:
 
@@ -2886,17 +2898,17 @@ The boundary layer diffusion controlled reversible sink/source model with a line
 
 where
 
-\emph{h} ~~ = Average film mass transfer coefficient over the sink {[}m/s{]}
+\emph{h} = Average film mass transfer coefficient over the sink {[}m/s{]}
 
-\emph{r} ~~ = Film density of air {[}kg/m\(^{3}\){]}
+\emph{r} = Film density of air {[}kg/m\(^{3}\){]}
 
-\emph{A} ~~ = Surface area of the adsorbent {[}m\(^{2}\){]}
+\emph{A} = Surface area of the adsorbent {[}m\(^{2}\){]}
 
-\emph{C\(_{f}\)} ~ = Concentration in the air at the previous time step {[}ppm{]}
+\emph{C\(_{f}\)} = Concentration in the air at the previous time step {[}ppm{]}
 
-\emph{C\(_{s}\)} ~ = Concentration in the adsorbent {[}ppm{]}
+\emph{C\(_{s}\)} = Concentration in the adsorbent {[}ppm{]}
 
-\emph{k} ~~ = Henry adsorption constant or partition coefficient {[}dimensionless{]}
+\emph{k} = Henry adsorption constant or partition coefficient {[}dimensionless{]}
 
 \subsubsection{Inputs}\label{inputs-15-006}
 
@@ -2936,9 +2948,13 @@ SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
 
 When a SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object is specified, the following output variables are available:
 
-ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate {[}m3/s{]}
-
-ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration {[}ppm{]}
+\begin{itemize}
+  \tightlist
+  \item
+    ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate {[}m3/s{]}
+  \item
+    ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration {[}ppm{]}
+\end{itemize}
 
 \paragraph{Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-boundary-layer-diffusion-generation-volume-flow-rate-m3s}
 
@@ -2960,17 +2976,17 @@ The deposition velocity model provides for the input of a sink's characteristic 
 
 where
 
-S\(_{f}\)(\emph{t})~~~~~~~~~~~ = Removal rate at time t {[}m\(^{3}\)/s{]}
+S\(_{f}\)(\emph{t}) = Removal rate at time t {[}m\(^{3}\)/s{]}
 
-\emph{n\(_{d}\)} ~~ = Deposition velocity {[}m/s{]}
+\emph{n\(_{d}\)} = Deposition velocity {[}m/s{]}
 
-\emph{A\(_{s}\)}~~ = Deposition surface area {[}m\(^{2}\){]}
+\emph{A\(_{s}\)} = Deposition surface area {[}m\(^{2}\){]}
 
-\emph{m}~~ = Element multiplier {[}dimensionless{]}
+\emph{m} = Element multiplier {[}dimensionless{]}
 
-\emph{C}\(_{f}\)(\emph{t})~~~~~~~~~~~ = Concentration of contaminant generic contaminant at the previous time step {[}ppm{]}
+\emph{C}\(_{f}\)(\emph{t}) = Concentration of contaminant generic contaminant at the previous time step {[}ppm{]}
 
-F\(_{R}\)~~ = Schedule or control signal value at time \emph{t} {[}-{]}
+F\(_{R}\) = Schedule or control signal value at time \emph{t} {[}-{]}
 
 \subsubsection{Inputs}\label{inputs-16-005}
 
@@ -3003,19 +3019,21 @@ SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
 
 \subsubsection{Outputs}\label{outputs-12-003}
 
-The following output variables are available when the SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink
+The following output variables are available when the Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Velocity\-Sink object is specified.
 
-object is specified.
-
-ZONE,Average, Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate {[}m3/s{]}
+\begin{itemize}
+    \tightlist
+  \item
+    ZONE,Average, Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-deposition-velocity-removal-volume-flow-rate-m3s}
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink object.
+This output is the average generic contaminant generation rate from each Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Velocity\-Sink object.
 
 \subsection{ZoneContaminantSourceAndSink:Generic:DepositionRateSink}\label{zonecontaminantsourceandsinkgenericdepositionratesink}
 
-The ZoneContaminantSourceAndSink:Generic:DepositionRateSink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
+The Zone\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Rate\-Sink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
 
 The deposition rate model provides for the input of a sink's characteristic in the familiar term of deposition rate in a zone. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition rate model equation is:
 
@@ -3025,17 +3043,17 @@ The deposition rate model provides for the input of a sink's characteristic in t
 
 Where
 
-S\(_{f}\)(\emph{t})~~~~~~~~~~~ = Removal rate at time t {[}m\(^{3}\)/s{]}
+S\(_{f}\)(\emph{t}) = Removal rate at time t {[}m\(^{3}\)/s{]}
 
-\emph{k\(_{d}\)}~~ = Deposition rate {[}1/T{]}
+\emph{k\(_{d}\)} = Deposition rate {[}1/T{]}
 
-\emph{V\(_{z}\)}~~ = Zone volume {[}m\(^{3}\){]}
+\emph{V\(_{z}\)} = Zone volume {[}m\(^{3}\){]}
 
-\emph{m}~~ = Element multiplier {[}dimensionless{]}
+\emph{m} = Element multiplier {[}dimensionless{]}
 
-\emph{C}\(_{f}\)(\emph{t})~~~~~~~~~~~ = Concentration of generic contaminant at the previous time \emph{step} {[}ppm{]}
+\emph{C}\(_{f}\)(\emph{t}) = Concentration of generic contaminant at the previous time \emph{step} {[}ppm{]}
 
-F\(_{R}\)~~ = Schedule or control signal value at time \emph{t} {[}dimensionless{]}
+F\(_{R}\) = Schedule or control signal value at time \emph{t} {[}dimensionless{]}
 
 \subsubsection{Inputs}\label{inputs-17-003}
 
@@ -3058,23 +3076,26 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
-      NORTH ZONE GC DRS,      !- Name
-      NORTH ZONE,             !- Zone Name
-      1.0E-5,                 !- Deposition Rate {m3/s}
-      GC Source Schedule;     !- Schedule Name
+  NORTH ZONE GC DRS,  !- Name
+  NORTH ZONE,         !- Zone Name
+  1.0E-5,             !- Deposition Rate {m3/s}
+  GC Source Schedule; !- Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-13-002}
 
 When the ZoneContaminantSourceAndSink:Generic:DepositionRateSink object is specified, the following output variables are available:
 
-ZONE,Average, Generic Air Contaminant Deposition Rate Removal Volume Flow Rate {[}m3/s{]}
+\begin{itemize}
+    \tightlist
+  \item
+    ZONE,Average, Generic Air Contaminant Deposition Rate Removal Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Generic Air Contaminant Deposition Rate Removal Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-deposition-rate-removal-volume-flow-rate-m3s}
 
-This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:DepositionRateSink object.
+This output is the average generic contaminant generation rate from each Zone\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Rate\-Sink object.
 
 \subsection{ZoneBaseboard:OutdoorTemperatureControlled}\label{zonebaseboardoutdoortemperaturecontrolled}
 
@@ -3082,9 +3103,12 @@ This object specifies outside temperature-controlled (OTC) baseboard heating. Th
 
 \textbf{Example:}
 
-Temperature High = 10 C~~~~ Capacity High = 100,000 W
-
-Temperature Low = 0 C~~~~~~~ Capacity Low~ = 500,000 W
+\begin{center}
+  \begin{tabular}{@{}ll@{}}
+    Temperature High = 10 C & Capacity High = 100,000 W \\
+    Temperature Low = 0 C & Capacity Low = 500,000 W
+  \end{tabular}
+\end{center}
 
 % table 16
 \begin{longtable}[c]{@{}ll@{}}
@@ -3099,8 +3123,7 @@ Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline \midrule
 4 & 340,000 \tabularnewline
 2 & 420,000 \tabularnewline
 0 & 500,000 \tabularnewline
-<  0 & 500,000 \tabularnewline
-~ & ~ \tabularnewline
+< 0 & 500,000 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3149,27 +3172,25 @@ This is heating setpoint temperature in the zone where the unit serves. This is 
 An IDF example:
 
 \begin{lstlisting}
-
 ZoneBaseboard:OutdoorTemperatureControlled,
-      SPACE4-1 BBHeat 1,       !- Name
-      SPACE4-1,                !- Zone Name
-      EQUIP-1,                 !- SCHEDULE Name
-      1500,                    !- Capacity at low temperature {W}
-      0,                       !- Low Temperature {C}
-      500,                     !- Capacity at high temperature {W}
-      10,                      !- High Temperature {C}
-      0.5,                     !- Fraction Radiant
-      Baseboard Heat,          !- End-Use Subcategory
-      20;                      !- Design Zone Heating Setpoint
+  SPACE4-1 BBHeat 1,  !- Name
+  SPACE4-1,           !- Zone Name
+  EQUIP-1,            !- SCHEDULE Name
+  1500,               !- Capacity at low temperature {W}
+  0,                  !- Low Temperature {C}
+  500,                !- Capacity at high temperature {W}
+  10,                 !- High Temperature {C}
+  0.5,                !- Fraction Radiant
+  Baseboard Heat,     !- End-Use Subcategory
+  20;                 !- Design Zone Heating Setpoint {C}
 \end{lstlisting}
-
-\{C\}
 
 \subsubsection{Outputs}\label{outputs-14-002}
 
 ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for individual objects and for zone totals. The following outputs are available:
 
 \begin{itemize}
+\tightlist
 \item
   Zone,Average,Baseboard Electric Power {[}W{]}
 \item
@@ -3216,45 +3237,45 @@ The outdoor temperature controlled baseboard heat option is assumed to be fueled
 
 \paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j}
 
-These output variables are the amount of radiant heat gain for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+These output variables are the amount of radiant heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
 \paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w}
 
 \paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j}
 
-These output variables are the amount of convective heat gain for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
+These output variables are the amount of convective heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
 
 \paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w}
 
 \paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j}
 
-These output variables are the amount of heat gain for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
 \paragraph{Zone Baseboard Electric Power {[}W{]}}\label{zone-baseboard-electric-power-w}
 
-This field is the electric power for all ZoneBaseboard:OutdoorTemperatureControlled objects within the zone in Watts.
+This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts.
 
 \paragraph{Zone Baseboard Electric Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
 
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. However, this amount is also shown in the Electricity meters that are associated with the zone -- Electricity:Facility, Electricity:Buidling, Electricity:Zone:\textless{}Zone Name\textgreater{}, and InteriorEquipment:Electricity.
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. However, this amount is also shown in the Electricity meters that are associated with the zone -- Electricity:\-Facility, Electricity:\-Buidling, Electricity:\-Zone:\-\textless{}Zone Name\textgreater{}, and Interior\-Equipment:\-Electricity.
 
 \paragraph{Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
 
 \paragraph{Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
 
-These output variables are the amount of radiant heat gain for all ZoneBaseboard:OutdoorTemperatureControlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
 \paragraph{Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
 
 \paragraph{Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
 
-These output variables are the amount of convective heat gain for all ZoneBaseboard:OutdoorTemperatureControlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
+These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
 
 \paragraph{Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
 
 \paragraph{Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
 
-These output variables are the amount of heat gain for all ZoneBaseboard:OutdoorTemperatureControlled objects within the zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
 \subsubsection{Outputs}\label{outputs-15-001}
 
@@ -3266,15 +3287,15 @@ As described in each of the equipment sections, values for specific equipments w
 \toprule 
 Meter Name & Scope & Equipment Specfics \tabularnewline \midrule
 \endhead
-Electricity:Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:Zone: < Zone Name > & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
-InteriorEquipment:Electricity & AllZones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-< End-Use Subcategory > :InteriorEquipment:Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Gas:Facility & Entire Facility & Gas Equipment \tabularnewline
-Gas:Building & All Zones & Gas Equipment \tabularnewline
-Gas:Zone: < Zone Name > & Specific Zone & Gas Equipment \tabularnewline
-InteriorEquipment:Gas & AllZones & Gas Equipment \tabularnewline
-< End-Use Subcategory > :InteriorEquipment:Gas & Specific Subcategory & Gas Equipment \tabularnewline
+Electricity:\-Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Electricity:\-Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Electricity:\-Zone: < Zone Name > & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Interior\-Equipment:\-Electricity & AllZones & Electric Equipment, OTC Baseboard Heat \tabularnewline
+< End-Use Subcategory > :\-Interior\-Equipment:\-Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Gas:\-Facility & Entire Facility & Gas Equipment \tabularnewline
+Gas:\-Building & All Zones & Gas Equipment \tabularnewline
+Gas:\-Zone: < Zone Name > & Specific Zone & Gas Equipment \tabularnewline
+Interior\-Equipment:\-Gas & AllZones & Gas Equipment \tabularnewline
+< End-Use Subcategory > :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
 \bottomrule
 \end{longtable}
