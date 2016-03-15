@@ -511,6 +511,7 @@ namespace DirectAirManager {
 				} else {
 					Node( ZoneNode ).MassFlowRate = 0.0;
 					Node( ZoneNode ).MassFlowRateMaxAvail = 0.0;
+					Node( ZoneNode ).MassFlowRateMinAvail = 0.0;
 				}
 			} else { // EMS override on
 				Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).EMSMassFlowRateValue;
