@@ -10661,12 +10661,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
-		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( MSHPMassFlowRateHigh == 0.0 ) ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
-			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
-			ShowContinueErrorTimeStamp( "" );
-			ShowContinueError( "AirMassFlow = " + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio = " + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow = " + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh = " + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-			ShowFatalError( "Preceding condition(s) causes termination." );
+			if ( MSHPMassFlowRateLow == 0.0 && SpeedNum > 1 ) {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ",SpeedNum=" + RoundSigDigits( double( SpeedNum ), 0 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			} else {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			}
 		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
 			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
@@ -10880,9 +10887,13 @@ Label50: ;
 					OutletAirHumRat = HSOutletAirHumRat;
 					OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
 				} else {
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
-					// Average outlet HR
-					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
+					if ( FanOpMode == ContFanCycCoil ) {
+						Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
+						// Average outlet HR
+						OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
+					} else {
+						OutletAirHumRat = ( HSOutletAirHumRat * SpeedRatio ) + ( LSOutletAirHumRat * ( 1.0 - SpeedRatio ) );
+					}
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
@@ -10934,7 +10945,7 @@ Label50: ;
 				DXCoil( DXCoilNum ).OutletAirTemp = OutletAirDryBulbTemp;
 				DXCoil( DXCoilNum ).CrankcaseHeaterPower = 0.0;
 
-			} else if ( CycRatio > 0.0 || ( CycRatio > 0.0 && SingleMode == 1 ) ) {
+			} else if ( CycRatio > 0.0 ) {
 
 				if ( FanOpMode == CycFanCycCoil ) AirMassFlow /= CycRatio;
 				if ( FanOpMode == ContFanCycCoil ) AirMassFlow = MSHPMassFlowRateHigh;
@@ -11309,12 +11320,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
-		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( MSHPMassFlowRateHigh == 0.0 ) ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
-			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
-			ShowContinueErrorTimeStamp( "" );
-			ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-			ShowFatalError( "Preceding condition(s) causes termination." );
+			if ( MSHPMassFlowRateLow == 0.0 && SpeedNum > 1 ) {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ",SpeedNum=" + RoundSigDigits( double( SpeedNum ), 0 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			} else {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			}
 		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
 			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );

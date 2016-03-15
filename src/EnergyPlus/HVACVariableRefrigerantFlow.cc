@@ -6271,7 +6271,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 LoadToCoolingSP; // thermostat load to cooling setpoint (W)
 		Real64 LoadToHeatingSP; // thermostat load to heating setpoint (W)
 		Real64 TempOutput; // terminal unit output [W]
-		int FanOpMode; // TU fan operating mode
 
 		MaxDeltaT = 0.0;
 		MinDeltaT = 0.0;
@@ -6325,12 +6324,15 @@ namespace HVACVariableRefrigerantFlow {
 					SPTempLo = ZoneThermostatSetPointLo( ThisZoneNum );
 					{ auto const SELECT_CASE_var( TempControlType( ThisZoneNum ) );
 					if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+					// MaxDeltaT denotes cooling, MinDeltaT denotes heating
 					} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-						ZoneDeltaT = max( 0.0, SPTempLo - ZT( ThisZoneNum ) );
-						MaxDeltaT( VRFCond ) = max( MaxDeltaT( VRFCond ), ZoneDeltaT );
-					} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-						ZoneDeltaT = min( 0.0, SPTempHi - ZT( ThisZoneNum ) );
+						// if heating load, ZoneDeltaT will be negative
+						ZoneDeltaT = min( 0.0, ZT( ThisZoneNum ) - SPTempLo );
 						MinDeltaT( VRFCond ) = min( MinDeltaT( VRFCond ), ZoneDeltaT );
+					} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+						// if cooling load, ZoneDeltaT will be positive
+						ZoneDeltaT = max( 0.0, ZT( ThisZoneNum ) - SPTempHi );
+						MaxDeltaT( VRFCond ) = max( MaxDeltaT( VRFCond ), ZoneDeltaT );
 					} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
 						ZoneDeltaT = ZT( ThisZoneNum ) - SPTempHi; //- SPTempHi and SPTempLo are same value
 						if ( ZoneDeltaT > 0.0 ) {
@@ -6472,26 +6474,10 @@ namespace HVACVariableRefrigerantFlow {
 		// Determine operating mode based on VRF type and thermostat control selection
 		{ auto const SELECT_CASE_var( VRF( VRFCond ).ThermostatPriority );
 		if ( SELECT_CASE_var == ThermostatOffsetPriority ) {
-			TUIndex = VRF( VRFCond ).MasterZoneTUIndex;
-			if ( VRFTU( TUIndex ).FanOpModeSchedPtr > 0 ) {
-				if ( GetCurrentScheduleValue( VRFTU( TUIndex ).FanOpModeSchedPtr ) == 0.0 ) {
-					FanOpMode = CycFanCycCoil;
-				} else {
-					FanOpMode = ContFanCycCoil;
-				}
-			}
 			if ( MaxDeltaT( VRFCond ) > std::abs( MinDeltaT( VRFCond ) ) && MaxDeltaT( VRFCond ) > 0.0 ) {
 				HeatingLoad( VRFCond ) = false;
 				CoolingLoad( VRFCond ) = true;
 			} else if ( MaxDeltaT( VRFCond ) < std::abs( MinDeltaT( VRFCond ) ) && MinDeltaT( VRFCond ) < 0.0 ) {
-				HeatingLoad( VRFCond ) = true;
-				CoolingLoad( VRFCond ) = false;
-				// assuming if constant fan mode then previous operating mode will be needed
-				// could actually run the master zone TU to see if overshoot occurs, but seems overkill
-			} else if ( FanOpMode == ContFanCycCoil && LastModeCooling( VRFCond ) ) {
-				HeatingLoad( VRFCond ) = false;
-				CoolingLoad( VRFCond ) = true;
-			} else if ( FanOpMode == ContFanCycCoil && LastModeHeating( VRFCond ) ) {
 				HeatingLoad( VRFCond ) = true;
 				CoolingLoad( VRFCond ) = false;
 			} else {
