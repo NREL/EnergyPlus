@@ -5308,8 +5308,8 @@ namespace SurfaceGeometry {
 						SurfaceTmp( SurfNum ).Tilt = TiltAngle;
 						// There is a question here whether left and right fins should have different azimuth angles.
 						// the next line with a "-" is identical to above calculation for left fin (line 5212). Using a "+" makes the azimuth angle make sense.
-						// SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth - ( 180.0 - rNumericArgs( 9 ) );
-						SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth + ( 180.0 - rNumericArgs( 9 ) );
+						SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth - ( 180.0 - rNumericArgs( 9 ) );
+						// SurfaceTmp( SurfNum ).Azimuth = SurfaceTmp( Found ).Azimuth + ( 180.0 - rNumericArgs( 9 ) );
 						if ( SurfaceTmp( SurfNum ).Azimuth < 0.0 ) SurfaceTmp( SurfNum ).Azimuth += 360.0;
 						SurfaceTmp( SurfNum ).CosAzim = std::cos( SurfaceTmp( SurfNum ).Azimuth * DegToRadians );
 						SurfaceTmp( SurfNum ).SinAzim = std::sin( SurfaceTmp( SurfNum ).Azimuth * DegToRadians );
