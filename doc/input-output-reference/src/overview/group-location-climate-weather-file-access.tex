@@ -213,7 +213,7 @@ This field specifies whether to consider this day to be a Daylight Saving Day. Y
 
 \paragraph{Field: Solar Model Indicator}\label{field-solar-model-indicator}
 
-This field allows the user to select \textbf{ASHRAEClearSky, ASHRAETau, ZhangHuang, or Schedule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAEClearSky and ZhangHuang use the Clearness value as part of their calculations. ASHRAETau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
+This field allows the user to select \textbf{ASHRAE\-Clear\-Sky, ASHRAE\-Tau, Zhang\-Huang, or Sche\-dule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAE\-Clear\-Sky and Zhang\-Huang use the Clearness value as part of their calculations. ASHRAE\-Tau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
 
 \paragraph{Field: Beam Solar Day Schedule Name}\label{field-beam-solar-day-schedule-name}
 
@@ -303,7 +303,7 @@ Schedule:Day:Hourly,
   0,0,0,0,0,0,0,35,118,116,92,65,40,14,0,0,5,0,0,0,0,0,0,0;
 \end{lstlisting}
 
-Look at the example files 1ZoneUncontrolled\_DDChanges.idf and 1ZoneUncontrolled\_DD2009 for several examples of specifying Design Day inputs.
+Look at the example files 1Zone\-Un\-controll\-ed\_\-DD\-Changes.idf and 1Zone\-Un\-controlled\_\-DD\-2009 for several examples of specifying Design Day inputs.
 
 \subsubsection{Outputs}\label{outputs-018}
 
@@ -317,9 +317,9 @@ For the schedule fields in the object, several output variables can be used:
 \item
   Zone,Average,Sizing Period Site Humidity Condition Schedule Value {[}\%{]}
 \item
-  Zone,Average,Sizing Period Site Humidity Condition Schedule Value \protect\hyperlink{section-1}{}
+  Zone,Average,Sizing Period Site Humidity Condition Schedule Value {[]}
 \item
-  Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value \protect\hyperlink{section-1}{}
+  Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[]}
 \item
   Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[}deltaC{]}
 \item
@@ -338,11 +338,11 @@ This schedule value is active when any Design Day objects have / use the solar s
 
 \paragraph{Sizing Period Site Humidity Condition Schedule Value {[}\%{]}}\label{sizing-period-site-humidity-condition-schedule-value}
 
-\paragraph{\texorpdfstring{Sizing Period Site Humidity Condition Schedule Value \protect\hyperlink{section-1}{}}{Sizing Period Site Humidity Condition Schedule Value }}\label{sizing-period-site-humidity-condition-schedule-value-1}
+\paragraph{\texorpdfstring{Sizing Period Site Humidity Condition Schedule Value {[]}}{Sizing Period Site Humidity Condition Schedule Value }}\label{sizing-period-site-humidity-condition-schedule-value-1}
 
 This schedule value is active when any Design Day objects have / use the humidity schedule option. For those objects that don't have this option, the value will be displayed as -999.
 
-\paragraph{\texorpdfstring{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value \protect\hyperlink{section-1}{}}{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value }}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value}
+\paragraph{\texorpdfstring{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[]}}{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value }}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value}
 
 \paragraph{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[}deltaC{]}}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value-deltac}
 
@@ -358,11 +358,11 @@ This schedule value is active when any Design Day objects have / use the Weather
 
 \subsection{Longer Design Periods}\label{longer-design-periods}
 
-Some features may benefit by using a longer design weather period for sizing or loads calculations. Longer design periods may be created by using the \textbf{SizingPeriod:WeatherFileDays} or \textbf{SizingPeriod:WeatherFileConditionType} objects. These two objects allow for selections from an attached weather file to be used in the sizing calculations.
+Some features may benefit by using a longer design weather period for sizing or loads calculations. Longer design periods may be created by using the \textbf{Si\-zing\-Period:\-Weather\-File\-Days} or \textbf{Si\-zing\-Period:\-Weather\-File\-Con\-dition\-Type} objects. These two objects allow for selections from an attached weather file to be used in the sizing calculations.
 
-\subsection{SizingPeriod:WeatherFileDays}\label{sizingperiodweatherfiledays}
+\subsection{Sizing\-Period:\-Weather\-File\-Days}\label{sizingperiodweatherfiledays}
 
-The SizingPeriod:WeatherFileDays object describes using a selected period from the ``attached'' weather file to be used in load calculations or sizing equipment. The period selected can be as small as a single day or larger. Multiple periods may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
+The Sizing\-Period:\-Weather\-File\-Days object describes using a selected period from the ``attached'' weather file to be used in load calculations or sizing equipment. The period selected can be as small as a single day or larger. Multiple periods may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
 
 \subsubsection{Inputs}\label{inputs-2-022}
 
@@ -418,7 +418,7 @@ SizingPeriod:WeatherFileDays,
   No;                                   !- Use Weather File Rain and Snow Indicators
 \end{lstlisting}
 
-\subsection{SizingPeriod:WeatherFileConditionType}\label{sizingperiodweatherfileconditiontype}
+\subsection{Sizing\-Period:\-Weather\-File\-Con\-dition\-Type}\label{sizingperiodweatherfileconditiontype}
 
 When the EPW files are created, a heuristic procedure identifies extreme and typical periods in the actual weather file. This object will allow one of those periods to be selected for sizing or load calculations (typically). Multiple objects may be input. While this object may be used for sizing calculations, you should also consider using design days that represent more long term extremes or conditions.
 
@@ -1605,7 +1605,7 @@ If the calculation method is Correlation, this field is used in the calculation 
 
 \paragraph{Field: Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{field-maximum-difference-in-monthly-average-outdoor-air-temperatures}
 
-If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures {[}∆C{]}. If the calculation method is Schedule, this field is ignored.
+If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures {[}\(\Delta\)C{]}. If the calculation method is Schedule, this field is ignored.
 
 \begin{lstlisting}
 Site:WaterMainsTemperature,
@@ -1826,9 +1826,9 @@ Variables related to ambient environment data are available at timestep and high
 \item
   Zone,Average,Site Solar Hour Angle {[}deg{]}
 \item
-  Zone,Average,Site Rain Status \protect\hyperlink{section-1}{}
+  Zone,Average,Site Rain Status {[]}
 \item
-  Zone,Average,Site Snow on Ground Status \protect\hyperlink{section-1}{}
+  Zone,Average,Site Snow on Ground Status {[]}
 \item
   Zone,Average,Site Exterior Horizontal Sky Illuminance {[}lux{]}
 \item
@@ -1840,13 +1840,13 @@ Variables related to ambient environment data are available at timestep and high
 \item
   Zone,Average,Site Beam Solar Radiation Luminous Efficacy {[}lum/W{]}
 \item
-  Zone,Average,Site Daylighting Model Sky Clearness \protect\hyperlink{section-1}{}
+  Zone,Average,Site Daylighting Model Sky Clearness {[]}
 \item
-  Zone,Average,Sky Brightness for Daylighting Calculation \protect\hyperlink{section-1}{}
+  Zone,Average,Sky Brightness for Daylighting Calculation {[]}
 \item
-  Zone,Average,Site Daylight Saving Time Status \protect\hyperlink{section-1}{}
+  Zone,Average,Site Daylight Saving Time Status {[]}
 \item
-  Zone,Average,Site Day Type Index \protect\hyperlink{section-1}{}
+  Zone,Average,Site Day Type Index {[]}
 \item
   Zone,Average,Site Mains Water Temperature {[}C{]}
 \item
@@ -1988,19 +1988,19 @@ Unit of Angle & Equivalent time \tabularnewline \midrule
 \bottomrule
 \end{longtable}
 
-\paragraph{\texorpdfstring{Site Rain Status \protect\hyperlink{section-1}{}}{Site Rain Status }}\label{site-rain-status}
+\paragraph{\texorpdfstring{Site Rain Status {[]}}{Site Rain Status }}\label{site-rain-status}
 
 This field shows whether or not (1 = yes, 0 = no) the weather shows ``raining''. For a Design Day, one can denote rain for the entire day but not timestep by timestep. Weather files may indicate rain for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that it was raining during each timestep of that period.
 
-\paragraph{\texorpdfstring{Site Snow on Ground Status \protect\hyperlink{section-1}{}}{Site Snow on Ground Status }}\label{site-snow-on-ground-status}
+\paragraph{\texorpdfstring{Site Snow on Ground Status {[]}}{Site Snow on Ground Status }}\label{site-snow-on-ground-status}
 
 This field shows whether or not (1 = yes, 0 = no) the weather shows ``snow on the ground''. For a Design Day, one can denote snow for the entire day but not timestep by timestep. Weather files may indicate snow (snow depth) for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that there was snow on the ground during each timestep of that period.
 
-\paragraph{\texorpdfstring{Site Daylight Saving Time Status \protect\hyperlink{section-1}{}}{Site Daylight Saving Time Status }}\label{site-daylight-saving-time-status}
+\paragraph{\texorpdfstring{Site Daylight Saving Time Status {[]}}{Site Daylight Saving Time Status }}\label{site-daylight-saving-time-status}
 
 This field shows when daylight saving time (1 = yes, 0 = no) is in effect. Though shown as an average variable, this value is only set on a daily basis.
 
-\paragraph{\texorpdfstring{Site Day Type Index \protect\hyperlink{section-1}{}}{Site Day Type Index }}\label{site-day-type-index}
+\paragraph{\texorpdfstring{Site Day Type Index {[]}}{Site Day Type Index }}\label{site-day-type-index}
 
 This field shows what ``day type'' the current day is. Daytypes are (1 = Sunday, 2 = Monday, etc.) with Holiday = 8, SummerDesignDay = 9, WinterDesignDay = 10, CustomDay1 = 11, CustomDay2 = 12. Though shown as an average variable, this value is only set on a daily basis.
 

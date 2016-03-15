@@ -189,9 +189,9 @@ Note: Using the reflection calculations can be very time-consuming. Even error-p
 
 If using reflections, the program calculates beam and sky solar radiation that is reflected from exterior surfaces and then strikes the building. These reflecting surfaces fall into three categories:
 
-1) \textbf{Shadowing surfaces}. These are surfaces like overhangs or neighboring buildings entered with Shading:Site, Shading:Building, Shading:Site:Detailed, Shading:Building:Detailed, Shading:Overhang, Shading:Overhang:Projection, Shading:Fin, Shading:Fin:Projection or Shading:Zone:Detailed objects. See Figure~\ref{fig:solar-reflection-from-shadowing-surfaces.}.
+1) \textbf{Shadowing surfaces}. These are surfaces like overhangs or neighboring buildings entered with Shad\-ing:\-Site, Shad\-ing:\-Build\-ing, Shad\-ing:\-Site:\-Detailed, Shad\-ing:\-Build\-ing:\-Detailed, Shad\-ing:\-Over\-hang, Shad\-ing:\-Over\-hang:Pro\-jection, Shad\-ing:\-Fin, Shad\-ing:\-Fin:\-Pro\-jection or Shad\-ing:\-Zone:\-Detailed objects. See Figure~\ref{fig:solar-reflection-from-shadowing-surfaces.}.
 
-These surfaces can have diffuse and/or specular (beam-to-beam) reflectance values that are specified with the ShadingProperty:Reflectance object which specifies those parameters. They have a default value of .2 for both visible and diffuse reflection.
+These surfaces can have diffuse and/or specular (beam-to-beam) reflectance values that are specified with the Shad\-ing\-Property:\-Re\-flectance object which specifies those parameters. They have a default value of .2 for both visible and diffuse reflection.
 
 2) \textbf{Exterior building surfaces}. In this case one section of the building reflects solar radiation onto another section (and vice-versa). See Figure~\ref{fig:solar-reflection-from-building-surfaces-onto}.
 
@@ -697,7 +697,7 @@ Input is Yes or No. The default is No. Unlike Zone and System Sizing, Plant Sizi
 
 \paragraph{Field: Run Simulation for Sizing Periods}\label{field-run-simulation-for-sizing-periods}
 
-Input is Yes or No. The default is Yes. Yes implies that the simulation will be run on all the included SizingPeriod objects (i.e., SizingPeriod:DesignDay, SizingPeriod:WeatherFileDays, and SizingPeriod:WeatherFileConditionType). Note that each SizingPeriod object constitutes an ``environment'' and warmup convergence (see earlier topic under the Building object) will occur for each.
+Input is Yes or No. The default is Yes. Yes implies that the simulation will be run on all the included SizingPeriod objects (i.e., Sizing\-Period:\-Design\-Day, Sizing\-Period:\-Weather\-File\-Days, and Sizing\-Period:\-Weather\-File\-Condition\-Type). Note that each Sizing\-Period object constitutes an ``environment'' and warmup convergence (see earlier topic under the Building object) will occur for each.
 
 \paragraph{Field: Run Simulation for Weather File Run Periods}\label{field-run-simulation-for-weather-file-run-periods}
 

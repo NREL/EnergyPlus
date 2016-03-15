@@ -297,11 +297,11 @@ CoolingTower:SingleSpeed,
 \item
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Cooling Tower Bypass Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Bypass Fraction {[]}
 \item
-  HVAC,Average,Cooling Tower Fan Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Fan Cycling Ratio {[]}
 \item
-  HVAC,Average,Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Operating Cells Count {[]}
 \end{itemize}
 
 A tower uses either mains water or storage tank for make-up water.
@@ -419,15 +419,15 @@ These are the rate and volume of water provided by the Water Storage Tank.
 
 These are the rate and volume of water the Storage Tank connections was not able to provide. The starved water is assumed to come from the mains. The tower's operation is not affected by a lack of storage tank water.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Cycling Ratio \protect\hyperlink{section-1}{}}{Cooling Tower Fan Cycling Ratio }}\label{cooling-tower-fan-cycling-ratio}
+\paragraph{\texorpdfstring{Cooling Tower Fan Cycling Ratio {[]}}{Cooling Tower Fan Cycling Ratio }}\label{cooling-tower-fan-cycling-ratio}
 
 This represents the fraction of a time-step when tower fan is on.
 
-\paragraph{\texorpdfstring{Cooling Tower Bypass Fraction \protect\hyperlink{section-1}{}}{Cooling Tower Bypass Fraction }}\label{cooling-tower-bypass-fraction}
+\paragraph{\texorpdfstring{Cooling Tower Bypass Fraction {[]}}{Cooling Tower Bypass Fraction }}\label{cooling-tower-bypass-fraction}
 
 This represents the fraction of a fluid bypassing the tower when a mixture of the tower fluid and tower return water is able to meet the set point temperature.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count}
+\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count}
 
 This represents the number of cells operating at each time step.
 
@@ -782,13 +782,13 @@ CoolingTower:TwoSpeed,
 \item
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Cooling Tower Fan Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Fan Cycling Ratio {[]}
 \item
-  HVAC,Average,Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Operating Cells Count {[]}
 \item
-  HVAC,Average,Cooling Tower Fan Speed Level \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Fan Speed Level {[]}
 \item
-  HVAC,Average,Cooling Tower Bypass Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Bypass Fraction {[]}
 \end{itemize}
 
 A tower uses either mains water or storage tank for make-up water.
@@ -904,15 +904,15 @@ These are the rate and volume of water provided by the Water Storage Tank.
 
 These are the rate and volume of water the Storage Tank connections was not able to provide. The starved water is assumed to come from the mains. The tower's operation is not affected by a lack of storage tank water.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Cycling Ratio \protect\hyperlink{section-1}{}}{Cooling Tower Fan Cycling Ratio }}\label{cooling-tower-fan-cycling-ratio-1}
+\paragraph{\texorpdfstring{Cooling Tower Fan Cycling Ratio {[]}}{Cooling Tower Fan Cycling Ratio }}\label{cooling-tower-fan-cycling-ratio-1}
 
 This represents the fraction of a time-step when tower fan is on. The fan can cycle at both speeds.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-1}
+\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-1}
 
 This represents the number of cells operating at each time step.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Speed Level \protect\hyperlink{section-1}{}}{Cooling Tower Fan Speed Level }}\label{cooling-tower-fan-speed-level}
+\paragraph{\texorpdfstring{Cooling Tower Fan Speed Level {[]}}{Cooling Tower Fan Speed Level }}\label{cooling-tower-fan-speed-level}
 
 This represents the fan speed operating at each time step: 2 for High Speed, 1 for Low Speed, and 0 when the fan is OFF.
 
@@ -1189,9 +1189,9 @@ An example IDF specification follows.
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
-  HVAC,Average,Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Operating Cells Count {[]}
 \item
-  HVAC,Average,Cooling Tower Fan Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Fan Speed Ratio {[]}
 \end{itemize}
 
 A tower uses either mains water or storage tank for make-up water.
@@ -1269,7 +1269,7 @@ These outputs are the tower water inlet and outlet temperatures, and mass flow r
 
 This output is the air flow ratio.~ The current air flow rate divided by the design air flow rate with values from 0.0 to 1.0.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-2}
+\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-2}
 
 This represents the number of cells operating at each time step.
 
@@ -1596,7 +1596,7 @@ IF specified:
 
 These outputs are the electric power input to the tower fan. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Cooling Tower Fan Part Load Ratio }}\label{cooling-tower-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Cooling Tower Fan Part Load Ratio {[]}}{Cooling Tower Fan Part Load Ratio }}\label{cooling-tower-fan-part-load-ratio}
 
 This is the on/off cycling rate of the tower fan when free convection cannot meet the set point temperature and the tower capacity at the minimum air flow rate ratio drives the tower exiting water temperature below the set point temperature. The fan part-load ratio is calculated as the ratio of the exiting water temperature in the free convection regime minus the exiting water temperature set point divided by the exiting water temperature in the free convection regime minus the exiting water temperature at the minimum air flow rate ratio. If tower air flow is at or above the minimum air flow rate ratio, then the tower fan part-load ratio is 1.0.
 
@@ -1612,7 +1612,7 @@ This is the rate at which heat is removed from the condenser water loop by the t
 
 These outputs are the tower water inlet and outlet temperatures, and mass flow rate of the circulating condenser water loop.
 
-\paragraph{\texorpdfstring{Cooling Tower Air Flow Rate Ratio \protect\hyperlink{section-1}{}}{Cooling Tower Air Flow Rate Ratio }}\label{cooling-tower-air-flow-rate-ratio}
+\paragraph{\texorpdfstring{Cooling Tower Air Flow Rate Ratio {[]}}{Cooling Tower Air Flow Rate Ratio }}\label{cooling-tower-air-flow-rate-ratio}
 
 This is the ratio of air flow through the tower to the design air flow rate. During times when the tower can maintain the condenser loop set point temperature using free convection (when the fan in not operating), the air flow rate ratio is assumed to be equal to the field Fraction of Tower Capacity in Free Convection Regime. During times when the fan cycles on/off to maintain the outlet water set point temperature, the air flow rate ratio is calculated as the summation of Fan Part-Load Ratio multiplied by the Minimum Air Flow Rate Ratio and (1.0 - Fan Part-Load Ratio) multiplied by the fraction of Tower Capacity in Free Convection Regime.
 
@@ -1658,7 +1658,7 @@ These are the rate and volume of water provided by the Water Storage Tank.
 
 These are the rate and volume of water the Storage Tank connections was not able to provide. The starved water is assumed to come from the mains. The tower's operation is not affected by a lack of storage tank water.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count \protect\hyperlink{section-1}{}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-3}
+\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-3}
 
 This represents the number of cells operating at each time step.
 
@@ -2113,7 +2113,7 @@ EvaporativeFluidCooler:SingleSpeed,
 \item
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Cooling Tower Bypass Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Cooling Tower Bypass Fraction {[]}
 \item
   HVAC,Average,Cooling Tower Make Up Water Volume Flow Rate {[}m3/s{]}
 \item
@@ -2171,7 +2171,7 @@ The fluid temperature at the fluid cooler outlet in degrees Celsius.
 
 The average fluid mass flow rate through the fluid cooler in kg/s for the time step being reported.
 
-\paragraph{\texorpdfstring{Cooling Tower Bypass Fraction \protect\hyperlink{section-1}{}}{Cooling Tower Bypass Fraction }}\label{cooling-tower-bypass-fraction-1}
+\paragraph{\texorpdfstring{Cooling Tower Bypass Fraction {[]}}{Cooling Tower Bypass Fraction }}\label{cooling-tower-bypass-fraction-1}
 
 This output is the average fluid bypass fraction for the time step being reported. See Capacity Control input field.
 
@@ -3822,6 +3822,6 @@ This is the temperature, in degrees Celsius, of the fluid leaving the heat excha
 
 This output is a numeric flag that indicates whether or not the heat exchanger was operating or not.~ If the value is 0, then the heat exchanger was not operating.~ If the value is 1, then the heat was operating.
 
-\paragraph{\texorpdfstring{Fluid Heat Exchanger Effectiveness \protect\hyperlink{section-1}{}}{Fluid Heat Exchanger Effectiveness }}\label{fluid-heat-exchanger-effectiveness}
+\paragraph{\texorpdfstring{Fluid Heat Exchanger Effectiveness {[]}}{Fluid Heat Exchanger Effectiveness }}\label{fluid-heat-exchanger-effectiveness}
 
 This output is the calculated heat exchanger effectiveness (non-dimensional).~ It is an intermediate value in the NTU model calculations for heat flow rate.~ Values range between 0 and 1.0.~ A value of 1.0 indicates ideal heat transfer.

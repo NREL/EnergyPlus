@@ -145,7 +145,7 @@ ElectricLoadCenter:Transformer,
 
 \begin{itemize}
 \item
-  HVAC,Average,Transformer Efficiency\protect\hyperlink{section-1}{}
+  HVAC,Average,Transformer Efficiency{[]}
 \item
   HVAC,Average,Transformer Output Electric Power{[}W{]}
 \item
@@ -805,7 +805,7 @@ Each inverter can report the following seven output variables.
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Inverter DC to AC Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Inverter DC to AC Efficiency {[]}
 \item
   HVAC,Average,Inverter DC Input Electric Power {[}W{]}
 \item
@@ -830,7 +830,7 @@ Each inverter can report the following seven output variables.
   HVAC,Sum,Inverter Ancillary AC Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Inverter DC to AC Efficiency \protect\hyperlink{section-1}{}}{Inverter DC to AC Efficiency }}\label{inverter-dc-to-ac-efficiency}
+\paragraph{\texorpdfstring{Inverter DC to AC Efficiency {[]}}{Inverter DC to AC Efficiency }}\label{inverter-dc-to-ac-efficiency}
 
 This is the efficiency with which DC power is converted to AC power by the inverter.
 
@@ -917,7 +917,7 @@ Each converter can report the following output variables
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Converter AC to DC Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Converter AC to DC Efficiency {[]}
 \item
   HVAC,Average,Converter AC Input Electric Power {[}W{]}
 \item
@@ -942,7 +942,7 @@ Each converter can report the following output variables
   HVAC,Sum,Converter Ancillary AC Electric Energy {[}J{]}
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Converter AC to DC Efficiency \protect\hyperlink{section-1}{}}{Converter AC to DC Efficiency }}\label{converter-ac-to-dc-efficiency}
+\subsubsection{\texorpdfstring{Converter AC to DC Efficiency {[]}}{Converter AC to DC Efficiency }}\label{converter-ac-to-dc-efficiency}
 
 This is the efficiency with which AC power is converted to DC power by the converter
 
@@ -1268,11 +1268,11 @@ ElectricLoadCenter:Storage:Battery,
 
 \begin{itemize}
 \item
-  HVAC,Average, Electric Storage Operating Mode Index \protect\hyperlink{section-1}{}
+  HVAC,Average, Electric Storage Operating Mode Index {[]}
 \item
   HVAC,Average,Electric Storage Charge State{[}Ah{]}
 \item
-  HVAC,Average, Electric Storage Charge Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average, Electric Storage Charge Fraction {[]}
 \item
   HVAC,Average,Electric Storage Charge Power{[}W{]}
 \item
@@ -1288,14 +1288,14 @@ ElectricLoadCenter:Storage:Battery,
 \item
   HVAC,Average,Electric Storage Thermal Loss Rate {[}W{]}
 \item
-  HVAC,Average, Electric Storage Degradation Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average, Electric Storage Degradation Fraction {[]}
 \item
   HVAC,Sum,Electric Storage Production Decrement Energy {[}J{]}
 \item
   HVAC,Sum,Electric Storage Thermal Loss Energy {[}J{]}
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Electric Storage Operating Mode Index \protect\hyperlink{section-1}{}}{Electric Storage Operating Mode Index }}\label{electric-storage-operating-mode-index}
+\subsubsection{\texorpdfstring{Electric Storage Operating Mode Index {[]}}{Electric Storage Operating Mode Index }}\label{electric-storage-operating-mode-index}
 
 This output reports the battery mode of operation: 0 for idle; 1 for discharging; 2 for charging. It is expected that more operation modes would be added when a smart and active power dispatch controller is used in future.
 
@@ -1303,7 +1303,7 @@ This output reports the battery mode of operation: 0 for idle; 1 for discharging
 
 The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
 
-\subsubsection{\texorpdfstring{Electric Storage Charge Fraction \protect\hyperlink{section-1}{}}{Electric Storage Charge Fraction }}\label{electric-storage-charge-fraction}
+\subsubsection{\texorpdfstring{Electric Storage Charge Fraction {[]}}{Electric Storage Charge Fraction }}\label{electric-storage-charge-fraction}
 
 This output is the ratio between the electrical storage state of charge and the maximum capacity.
 
@@ -1337,7 +1337,7 @@ This output is the total terminal voltage of the battery bank.
 
 These outputs are the thermal power or energy losses from both charging and drawing electrical power in or out of the storage device. These losses are due to the battery internal resistance in charging and discharging.
 
-\subsubsection{\texorpdfstring{Electric Storage Degradation Fraction \protect\hyperlink{section-1}{}}{Electric Storage Degradation Fraction }}\label{electric-storage-degradation-fraction}
+\subsubsection{\texorpdfstring{Electric Storage Degradation Fraction {[]}}{Electric Storage Degradation Fraction }}\label{electric-storage-degradation-fraction}
 
 This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that the 40\% of the battery life is used up, so the battery needs to be replaced every two and a half years.
 
@@ -2251,7 +2251,7 @@ This output variable is the average electric power produced by the generator in 
 
 This output variable is the electric energy produced by the generator in Joules for the timestep being reported. This output is also added to a meter with Resource Type = ElectricityProduced, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). This is the net electric energy produced, accounting for ancillary electric consumption during generator operation.
 
-\paragraph{\texorpdfstring{Generator LHV Basis Electric Efficiency \protect\hyperlink{section-1}{}}{Generator LHV Basis Electric Efficiency }}\label{generator-lhv-basis-electric-efficiency}
+\paragraph{\texorpdfstring{Generator LHV Basis Electric Efficiency {[]}}{Generator LHV Basis Electric Efficiency }}\label{generator-lhv-basis-electric-efficiency}
 
 This output variable is the average electric efficiency of the generator (lower heating value basis) for the timestep being reported. The electric efficiency is the Generator Produced Electric Power in Watts divided by the generator s fuel energy consumption rate in Watts (lower heating value basis).
 
@@ -2575,9 +2575,9 @@ Generator:MicroCHP:NonNormalizedParameters,
 \item
   HVAC,Sum,Generator Produced Electric Energy {[}J{]}
 \item
-  HVAC,Average,Generator Electric Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Generator Electric Efficiency {[]}
 \item
-  HVAC,Average,Generator Thermal Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Generator Thermal Efficiency {[]}
 \item
   HVAC,Average,Generator Gross Input Heat Rate {[}W{]}
 \item
@@ -2648,11 +2648,11 @@ This report is the net electrical power produced by the generator in watts.
 
 This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
-\paragraph{\texorpdfstring{Generator Electric Efficiency \protect\hyperlink{section-1}{}}{Generator Electric Efficiency }}\label{generator-electric-efficiency}
+\paragraph{\texorpdfstring{Generator Electric Efficiency {[]}}{Generator Electric Efficiency }}\label{generator-electric-efficiency}
 
 This is the result for electrical efficiency.
 
-\paragraph{\texorpdfstring{Generator Thermal Efficiency \protect\hyperlink{section-1}{}}{Generator Thermal Efficiency }}\label{generator-thermal-efficiency}
+\paragraph{\texorpdfstring{Generator Thermal Efficiency {[]}}{Generator Thermal Efficiency }}\label{generator-thermal-efficiency}
 
 This is the result for thermal efficiency.
 
@@ -2943,7 +2943,7 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Average,Generator Produced DC Electric Power {[}W{]}
 \item
-  HVAC,Average,Generator DC Power Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Generator DC Power Efficiency {[]}
 \item
   HVAC,Average,Generator Electric Storage Charge State {[}J{]}
 \item
@@ -2967,9 +2967,9 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Average,Generator Zone Radiation Heat Transfer Rate {[}W{]}
 \item
-  HVAC,Sum, Generator Fuel Cell Model Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
-  HVAC,Sum,Generator Regula Falsi Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,Generator Regula Falsi Iteration Count {[]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -3092,7 +3092,7 @@ This variable provides the results for the power losses associated with ineffici
 
 This variable provides the results for \({P_{el}}\) , which is the net DC electrical power produced by the fuel cell power module.
 
-\paragraph{\texorpdfstring{Generator DC Power Efficiency \protect\hyperlink{section-1}{}}{Generator DC Power Efficiency }}\label{generator-dc-power-efficiency}
+\paragraph{\texorpdfstring{Generator DC Power Efficiency {[]}}{Generator DC Power Efficiency }}\label{generator-dc-power-efficiency}
 
 This variable provides the results for \({\varepsilon_{el}}\) , which is the electrical efficiency of the fuel cell power module.
 
@@ -3124,11 +3124,11 @@ This variable provides the results for \({P_{el,ancillaries - AC}}\) , which is 
 
 This variable provides the results for the energy used by AC ancillaries. It is also added to the appropriate meters.
 
-\paragraph{\texorpdfstring{Generator Fuel Cell Model Iteration Count \protect\hyperlink{section-1}{}}{Generator Fuel Cell Model Iteration Count }}\label{generator-fuel-cell-model-iteration-count}
+\paragraph{\texorpdfstring{Generator Fuel Cell Model Iteration Count {[]}}{Generator Fuel Cell Model Iteration Count }}\label{generator-fuel-cell-model-iteration-count}
 
 This variable provides information on the numerical method used to calculate the FC model. EnergyPlus uses a sequential substitution iterative algorithm to solve the main heat balance equation for the FC model. This output variable indicates the number of iterations needed to converge.
 
-\paragraph{\texorpdfstring{Generator Regula Falsi Iteration Count \protect\hyperlink{section-1}{}}{Generator Regula Falsi Iteration Count }}\label{generator-regula-falsi-iteration-count}
+\paragraph{\texorpdfstring{Generator Regula Falsi Iteration Count {[]}}{Generator Regula Falsi Iteration Count }}\label{generator-regula-falsi-iteration-count}
 
 This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A Regula Falsi numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the Regula Falsi method to converge.
 
@@ -3136,7 +3136,7 @@ This variable provides information on the numerical method used to calculate pro
 
 This is the temperature of the exiting gas for heat recovery in C.
 
-\paragraph{\texorpdfstring{Generator Heat Recovery Exit Gas H2O Vapor Fraction \protect\hyperlink{section-1}{}}{Generator Heat Recovery Exit Gas H2O Vapor Fraction }}\label{generator-heat-recovery-exit-gas-h2o-vapor-fraction}
+\paragraph{\texorpdfstring{Generator Heat Recovery Exit Gas H2O Vapor Fraction {[]}}{Generator Heat Recovery Exit Gas H2O Vapor Fraction }}\label{generator-heat-recovery-exit-gas-h2o-vapor-fraction}
 
 This is the water vapor fraction in the exit gas.
 
@@ -4210,7 +4210,7 @@ Using the Generator:PV:Simple object makes a number of output variables availabl
 \item
   HVAC,Average,Generator PV Open Circuit Voltage {[}V{]}
 \item
-  HVAC,Average,Generator PV Array Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Generator PV Array Efficiency {[]}
 \end{itemize}
 
 \paragraph{Generator Produced DC Electric Power {[}W{]}}\label{generator-produced-dc-electric-power-w-2}
@@ -4221,7 +4221,7 @@ This output variable is the power of DC electricity produced by the PV array in 
 
 This output variable is the energy in DC electricity produced by the PV array, in Joules.
 
-\paragraph{\texorpdfstring{Generator PV Array Efficiency \protect\hyperlink{section-1}{}}{Generator PV Array Efficiency }}\label{generator-pv-array-efficiency}
+\paragraph{\texorpdfstring{Generator PV Array Efficiency {[]}}{Generator PV Array Efficiency }}\label{generator-pv-array-efficiency}
 
 This output variable is the resulting efficiency of the PV array .
 
@@ -4677,7 +4677,7 @@ PhotovoltaicPerformance:Sandia,
 
 When using EpMacro with an typical installation of EnergyPlus, the above entry can be included in an input file by adding the following two lines to an input macro file (*.imf).
 
-\#\#include C:\textbackslash{}EnergyPlus\textbackslash{}MacroDataSets\textbackslash{}SandiaPVdata.imf ASE-50-ATF-17\_45\protect\hyperlink{section-1}{}
+\#\#include C:\textbackslash{}EnergyPlus\textbackslash{}MacroDataSets\textbackslash{}SandiaPVdata.imf ASE-50-ATF-17\_45{[]}
 
 \subsection{Generator:WindTurbine}\label{generatorwindturbine}
 
@@ -4872,9 +4872,9 @@ Generator:WindTurbine,
 \item
   HVAC,Average, Generator Turbine Local Air Density {[}kg/m3{]}
 \item
-  HVAC,Average, Generator Turbine Power Coefficient \protect\hyperlink{section-1}{}
+  HVAC,Average, Generator Turbine Power Coefficient {[]}
 \item
-  HVAC,Average, Generator Turbine Tip Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Generator Turbine Tip Speed Ratio {[]}
 \item
   HVAC,Average, Generator Turbine Chordal Component Velocity {[}m/s{]}
 \item
@@ -4901,11 +4901,11 @@ This report is the local wind speed at the specific height of the wind turbine.
 
 This report is the local density of the air at the specific height of the wind turbine.
 
-\paragraph{\texorpdfstring{Generator Turbine Tip Speed Ratio \protect\hyperlink{section-1}{}}{Generator Turbine Tip Speed Ratio }}\label{generator-turbine-tip-speed-ratio}
+\paragraph{\texorpdfstring{Generator Turbine Tip Speed Ratio {[]}}{Generator Turbine Tip Speed Ratio }}\label{generator-turbine-tip-speed-ratio}
 
 This report is the ratio between the rotational speed of the tip of the blades and the ambient wind speed at the height of the hub or pole of the wind turbine.
 
-\paragraph{\texorpdfstring{Generator Turbine Power Coefficient \protect\hyperlink{section-1}{}}{Generator Turbine Power Coefficient }}\label{generator-turbine-power-coefficient}
+\paragraph{\texorpdfstring{Generator Turbine Power Coefficient {[]}}{Generator Turbine Power Coefficient }}\label{generator-turbine-power-coefficient}
 
 This report represents the efficiency of the power extraction from the ambient wind of the wind turbine. It is function of the tip speed ratio and pitch angle. It is only valid for HAWT systems.
 

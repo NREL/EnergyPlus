@@ -1910,7 +1910,7 @@ An example IDF with a ventilated slab is shown below.
 \item
   HVAC,Average,Zone Ventilated Slab Fan Outlet Air Temperature {[}C{]}
 \item
-  HVAC,Average,Zone Ventilated Slab Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Ventilated Slab Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Ventilated Slab Radiant Heating Rate~ {[}W{]}}\label{zone-ventilated-slab-radiant-heating-rate-w}
@@ -1993,7 +1993,7 @@ This field reports the temperature of air leaving the zone in Celsius. When syst
 
 This field reports the fan outlet air temperature for the ventilated slab system in Celsius.
 
-\paragraph{\texorpdfstring{Zone Ventilated Slab Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Ventilated Slab Fan Availability Status }}\label{zone-ventilated-slab-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Ventilated Slab Fan Availability Status {[]}}{Zone Ventilated Slab Fan Availability Status }}\label{zone-ventilated-slab-fan-availability-status}
 
 This is the availability status of the ventilated slab fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the ventilated slab object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 

@@ -325,36 +325,36 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
 
 \begin{itemize}
 \item
-  HVAC,Average,Air System Outdoor Air Economizer Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air Economizer Status {[]}
 \item
-  HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Status {[]}
 \item
-  HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status {[]}
 \item
   HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature {[}C{]}
 \item
-  HVAC,Average,Air System Outdoor Air High Humidity Control Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air High Humidity Control Status {[]}
 \item
-  HVAC,Average,Air System Outdoor Air Flow Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air Flow Fraction {[]}
 \item
-  HVAC,Average,Air System Outdoor Air Minimum Flow Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air Minimum Flow Fraction {[]}
 \item
   HVAC,Average,Air System Outdoor Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Air System Mixed Air Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Air System Outdoor Air Maximum Flow Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Air System Outdoor Air Maximum Flow Fraction {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Economizer Status \protect\hyperlink{section-1}{}}{Air System Outdoor Air Economizer Status }}\label{air-system-outdoor-air-economizer-status}
+\paragraph{\texorpdfstring{Air System Outdoor Air Economizer Status {[]}}{Air System Outdoor Air Economizer Status }}\label{air-system-outdoor-air-economizer-status}
 
 Reports the average operating status of an air economizer over the reporting interval. The economizer status is set to 1 when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded). While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point tempeature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation or NoEconomizer (Economizer Control Type) is specified.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Heat Recovery Bypass Status \protect\hyperlink{section-1}{}}{Air System Outdoor Air Heat Recovery Bypass Status }}\label{air-system-outdoor-air-heat-recovery-bypass-status}
+\paragraph{\texorpdfstring{Air System Outdoor Air Heat Recovery Bypass Status {[]}}{Air System Outdoor Air Heat Recovery Bypass Status }}\label{air-system-outdoor-air-heat-recovery-bypass-status}
 
 This indicates if the controls have determined if the bypass mode for heat recovery is in effect or not.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status \protect\hyperlink{section-1}{}}{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status }}\label{air-system-outdoor-air-heat-recovery-bypass-heating-coil-activity-status}
+\paragraph{\texorpdfstring{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status {[]}}{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status }}\label{air-system-outdoor-air-heat-recovery-bypass-heating-coil-activity-status}
 
 Reports the operating status of any heating coil in the air loop. If the heating coil is active, the heat exchanger will be activated (no air bypassed) and the heating energy will be reduced or eliminated. While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point temperature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation. This output variable is only available when using Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
@@ -362,15 +362,15 @@ Reports the operating status of any heating coil in the air loop. If the heating
 
 Reports the outdoor air mixer s mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer s inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer s mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recvoery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air High Humidity Control Status \protect\hyperlink{section-1}{}}{Air System Outdoor Air High Humidity Control Status }}\label{air-system-outdoor-air-high-humidity-control-status}
+\paragraph{\texorpdfstring{Air System Outdoor Air High Humidity Control Status {[]}}{Air System Outdoor Air High Humidity Control Status }}\label{air-system-outdoor-air-high-humidity-control-status}
 
 Reports the average operating status of the controller s high humidity control over the reporting interval. The high humidity control status is set to 1 when the controller determines that a zone high humidity condition exists \emph{according to the settings specified in the controller}. This variable is set to 0 if conditions disable high humidity control operation or High Humidity Control is specified as No.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Flow Fraction \protect\hyperlink{section-1}{}}{Air System Outdoor Air Flow Fraction }}\label{air-system-outdoor-air-flow-fraction}
+\paragraph{\texorpdfstring{Air System Outdoor Air Flow Fraction {[]}}{Air System Outdoor Air Flow Fraction }}\label{air-system-outdoor-air-flow-fraction}
 
 Reports the average actual outdoor air fraction for the outdoor air controller over the reporting interval.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Minimum Flow Fraction \protect\hyperlink{section-1}{}}{Air System Outdoor Air Minimum Flow Fraction }}\label{air-system-outdoor-air-minimum-flow-fraction}
+\paragraph{\texorpdfstring{Air System Outdoor Air Minimum Flow Fraction {[]}}{Air System Outdoor Air Minimum Flow Fraction }}\label{air-system-outdoor-air-minimum-flow-fraction}
 
 Reports the average minimum limit of the outdoor air fraction for the outdoor air controller over the reporting interval.
 
@@ -382,7 +382,7 @@ Reports the average outdoor air mass flow rate introduced by the outdoor air con
 
 Reports the average mixed air mass flow rate of the HVAC air loop associated with this outdoor air controller over the reporting interval.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Maximum Flow Fraction \protect\hyperlink{section-1}{}}{Air System Outdoor Air Maximum Flow Fraction }}\label{air-system-outdoor-air-maximum-flow-fraction}
+\paragraph{\texorpdfstring{Air System Outdoor Air Maximum Flow Fraction {[]}}{Air System Outdoor Air Maximum Flow Fraction }}\label{air-system-outdoor-air-maximum-flow-fraction}
 
 Reports the average maximum limit of the outdoor air fraction for the outdoor air controller over the reporting interval. The maximum flow fraction is used to prevent DX cooling coils from freezing, specified by ASHRAE Stadard 90.1. This output variable is available when a corresponding SetpointManager:MixedAir object specifies optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node.
 

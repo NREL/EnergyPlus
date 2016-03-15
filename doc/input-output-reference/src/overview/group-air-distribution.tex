@@ -73,30 +73,30 @@ AirLoopHVAC,
 \item
   HVAC,Average,Air System Simulation Cycle On Off Status
 \item
-  HVAC,Sum,HVAC System Solver Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,HVAC System Solver Iteration Count {[]}
 \item
-  HVAC,Sum,Air System Solver Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,Air System Solver Iteration Count {[]}
 \item
-  HVAC,Sum,Air System Simulation Maximum Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,Air System Simulation Maximum Iteration Count {[]}
 \item
-  HVAC,Sum,Air System Simulation Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,Air System Simulation Iteration Count {[]}
 \item
-  HVAC,Sum,Air System Component Model Simulation Calls \protect\hyperlink{section-1}{}
+  HVAC,Sum,Air System Component Model Simulation Calls {[]}
 \end{itemize}
 
 \paragraph{Air System Simulation Cycle On Off Status}\label{air-system-simulation-cycle-on-off-status}
 
 This field is the availability status of an AirLoopHVAC. This status flag is a result of the calculations made by the System Availability Manager(s) listed in a System Availability Manager List. When a single availability manager is used in a System Availability Manager List, this is also the availability status reported by the specific availability manager (Ref. System Availability Manager Outputs). When multiple availability managers are used in a System Availability Manager List, the loop availability status is determine by the rules associated with AirLoopHVACs (see rules described for Group -- System Availability Managers). The control status outputs are represented using integers 0 through 3.. These integers represent \emph{NoAction} (0), \emph{ForceOff} (1), \emph{CycleOn} (2), and \emph{CycleOnZoneFansOnly} (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-\paragraph{\texorpdfstring{HVAC System Solver Iteration Count \protect\hyperlink{section-1}{}}{HVAC System Solver Iteration Count }}\label{hvac-system-solver-iteration-count}
+\paragraph{\texorpdfstring{HVAC System Solver Iteration Count {[]}}{HVAC System Solver Iteration Count }}\label{hvac-system-solver-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Solver Iteration Count \protect\hyperlink{section-1}{}}{Air System Solver Iteration Count }}\label{air-system-solver-iteration-count}
+\paragraph{\texorpdfstring{Air System Solver Iteration Count {[]}}{Air System Solver Iteration Count }}\label{air-system-solver-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Simulation Maximum Iteration Count \protect\hyperlink{section-1}{}}{Air System Simulation Maximum Iteration Count }}\label{air-system-simulation-maximum-iteration-count}
+\paragraph{\texorpdfstring{Air System Simulation Maximum Iteration Count {[]}}{Air System Simulation Maximum Iteration Count }}\label{air-system-simulation-maximum-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Simulation Iteration Count \protect\hyperlink{section-1}{}}{Air System Simulation Iteration Count }}\label{air-system-simulation-iteration-count}
+\paragraph{\texorpdfstring{Air System Simulation Iteration Count {[]}}{Air System Simulation Iteration Count }}\label{air-system-simulation-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Component Model Simulation Calls \protect\hyperlink{section-1}{}}{Air System Component Model Simulation Calls }}\label{air-system-component-model-simulation-calls}
+\paragraph{\texorpdfstring{Air System Component Model Simulation Calls {[]}}{Air System Component Model Simulation Calls }}\label{air-system-component-model-simulation-calls}
 
 These variables are simply counters of how many iterations were executed. The count for any given HVAC time step will be the iterations executed before convergence was achieved, or the max allowed in which case the simulation throws a warning and proceeds to the next time step.
 

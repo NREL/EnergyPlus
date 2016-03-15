@@ -389,13 +389,13 @@ Output:Variable, * , Zone Air Temperature, hourly;
 Output:Variable, * , Zone Air Temperature;  ! same as previous line
 \end{lstlisting}
 
-\subsection{Output:Meter and Output:Meter:MeterFileOnly}\label{outputmeter-and-outputmetermeterfileonly}
+\subsection{Output:\-Meter and Output:\-Meter:\-Meter\-File\-Only}\label{outputmeter-and-outputmetermeterfileonly}
 
-\subsection{Output:Meter:Cumulative and Output:Meter:Cumulative:MeterFileOnly}\label{outputmetercumulative-and-outputmetercumulativemeterfileonly}
+\subsection{Output:\-Meter:\-Cumulative and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only}\label{outputmetercumulative-and-outputmetercumulativemeterfileonly}
 
 Appropriate variables are grouped onto ``meters'' for reporting purposes.~ (The meters available are listed in the eplusout.mdd file, see Variable Dictionary Report section.) If the ``Output:Meter'' input object is used, these results written out to both the \textbf{eplusout.eso} and \textbf{eplusout.mtr} files. This allows easy graphing and comparison with ``normal'' values (such as Zone Temperature or Outdoor Temperature). If the ``Output:Meter:MeterFileOnly'' input object is used, then the values results written out to only the \textbf{eplusout.mtr} file. The \textbf{eplusout.mtr} file has the same structure as the \textbf{eplusout.eso} file. A companion file, the \textbf{eplusout.mtd} file, contains a detailed list and explanation of all meters for a given run and the component values that are accumulated on each meter.
 
-The cumulative meter outputs (Output:Meter:Cumulative and ~Output:Meter:Cumulative:MeterFileOnly) use the same meter names but the output is cumulative for the reporting (for each environment). That is, if the reporting frequency for the cumulative meter output is hourly, then hour 1 value will be that for hour 1, hour 2 value will be hour1 + hour2, etc. In other words, the end value for a cumulative meter reporting should be identical if you reported the value of the meter at the RunPeriod frequency.
+The cumulative meter outputs (Output:Meter:Cumulative and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only) use the same meter names but the output is cumulative for the reporting (for each environment). That is, if the reporting frequency for the cumulative meter output is hourly, then hour 1 value will be that for hour 1, hour 2 value will be hour1 + hour2, etc. In other words, the end value for a cumulative meter reporting should be identical if you reported the value of the meter at the RunPeriod frequency.
 
 \subsubsection{Field: Name}\label{field-name-1-036}
 

@@ -278,7 +278,7 @@ An example of this object in an IDF is:
 \item
   HVAC,Sum,Zone Ideal Loads Heat Recovery Active Time {[}hr{]}
 \item
-  HVAC,Average,Zone Ideal Loads Hybrid Ventilation Available Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Ideal Loads Hybrid Ventilation Available Status {[]}
 \item
   HVAC,Average,Zone Ideal Loads Outdoor Air Mass Flow Rate {[}kg/s{]}
 \item
@@ -457,7 +457,7 @@ Hours when the Ideal Loads economizer increased the outdoor air flow rate above 
 
 Hours when the Ideal Loads heat recovery was actively heating or cooling the outdoor air stream.
 
-\paragraph{\texorpdfstring{Zone Ideal Loads Hybrid Ventilation Available Status \protect\hyperlink{section-1}{}}{Zone Ideal Loads Hybrid Ventilation Available Status }}\label{zone-ideal-loads-hybrid-ventilation-available-status}
+\paragraph{\texorpdfstring{Zone Ideal Loads Hybrid Ventilation Available Status {[]}}{Zone Ideal Loads Hybrid Ventilation Available Status }}\label{zone-ideal-loads-hybrid-ventilation-available-status}
 
 This is the availability status of the ideal loads object as set by the hybrid ventilation manager. Rules to determine the availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 and 1. These integers represent NoAction (0) and ForceOff (1). When the availability status is ForceOff, the unit is turned off regardless of its availability schedule. The other status flag i.e.~NoAction does not control the unit and the controls of the unit turn it back on. Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -818,17 +818,17 @@ An example input for a fan coil unit, including its constituent components, is s
 \item
   HVAC,Sum,Fan Coil Fan Electric Energy {[}J{]}
 \item
-  HVAC,Average,Fan Coil Runtime Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Fan Coil Runtime Fraction {[]}
 \item
-  HVAC,Average, Fan Coil Fan Speed Level \protect\hyperlink{section-1}{}
+  HVAC,Average, Fan Coil Fan Speed Level {[]}
 \item
-  HVAC,Average, Fan Coil Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Fan Coil Part Load Ratio {[]}
 \item
-  HVAC,Average, Fan Coil Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average, Fan Coil Availability Status {[]}
 \item
-  HVAC,Average, Fan Coil Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Fan Coil Part Load Ratio {[]}
 \item
-  HVAC,Average, Fan Coil Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Fan Coil Speed Ratio {[]}
 \end{itemize}
 
 \paragraph{Fan Coil Heating Rate {[}W{]}}\label{fan-coil-heating-rate-w}
@@ -863,23 +863,23 @@ This field reports the electricity consumption rate of the fan coil unit in Watt
 
 This field is the electricity consumption of the fan coil unit in Joules over the timestep being reported.
 
-\paragraph{\texorpdfstring{Fan Coil Runtime Fraction\protect\hyperlink{section-1}{}}{Fan Coil Runtime Fraction}}\label{fan-coil-runtime-fraction}
+\paragraph{\texorpdfstring{Fan Coil Runtime Fraction{[]}}{Fan Coil Runtime Fraction}}\label{fan-coil-runtime-fraction}
 
 This field is the fraction of the system timestep the fan coil unit is running for the \emph{CyclingFan} capacity control method.~ This variable is defined only for the \emph{CyclingFan} capacity control method.
 
-\paragraph{\texorpdfstring{Fan Coil Fan Speed Level \protect\hyperlink{section-1}{}}{Fan Coil Fan Speed Level }}\label{fan-coil-fan-speed-level}
+\paragraph{\texorpdfstring{Fan Coil Fan Speed Level {[]}}{Fan Coil Fan Speed Level }}\label{fan-coil-fan-speed-level}
 
 This field is indicates the speed chosen for the fan in the \emph{CyclingFan} and \emph{MultiSpeedFan} capacity control methods.~ A value of `0' means that the unit is off, `1' the fan is running at its low speed, `2' medium speed, and `3' high speed (maximum). This variable is defined only for the \emph{CyclingFan} and \emph{MultiSpeedFan} capacity control methods.
 
-\paragraph{\texorpdfstring{Fan Coil Part Load Ratio \protect\hyperlink{section-1}{}}{Fan Coil Part Load Ratio }}\label{fan-coil-part-load-ratio}
+\paragraph{\texorpdfstring{Fan Coil Part Load Ratio {[]}}{Fan Coil Part Load Ratio }}\label{fan-coil-part-load-ratio}
 
 When the capacity control method is \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow,} this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for \emph{VariableFanVariableFlow}, \emph{VariableFanConstantFlow} or \emph{MultiSpeedFan} capacity control methods. The unit part load ratio is applicable to \emph{MultiSpeedFan} only when the fan speed level selected is the minimum (Speed 1).
 
-\paragraph{\texorpdfstring{Fan Coil Availability Status \protect\hyperlink{section-1}{}}{Fan Coil Availability Status }}\label{fan-coil-availability-status}
+\paragraph{\texorpdfstring{Fan Coil Availability Status {[]}}{Fan Coil Availability Status }}\label{fan-coil-availability-status}
 
 This is the availability status of the fan coil unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the fan coil unit~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-\paragraph{\texorpdfstring{Fan Coil Speed Ratio \protect\hyperlink{section-1}{}}{Fan Coil Speed Ratio }}\label{fan-coil-speed-ratio}
+\paragraph{\texorpdfstring{Fan Coil Speed Ratio {[]}}{Fan Coil Speed Ratio }}\label{fan-coil-speed-ratio}
 
 This output variable is the ratio of time in a system timestep that the fan coil unit is at rated speed between two consecutive speed levels ( {[}load -- Capacity at Fan Speed i-1{]} / {[}Capacity at Fan Speed i -- Capacity at Fan Speed i-1{]}). The fan speed ratio has minimum value of 0.0, and a maximum value of 1.0 and any value in between as it is averaged over the timestep. The value is 0.0 during Speed Level 1 operation. Hydronic FanCoil units speed ratio depends on the fan speed and current load. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep.
 
@@ -1161,9 +1161,9 @@ ZoneHVAC:UnitVentilator,
 \item
   HVAC,Sum,Zone Unit Ventilator Fan Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone Unit Ventilator Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Unit Ventilator Fan Availability Status {[]}
 \item
-  HVAC,Average, Zone Unit Ventilator Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone Unit Ventilator Fan Part Load Ratio {[]}
 \end{itemize}
 
 \paragraph{Zone Unit Ventilator Heating Rate {[}W{]}}\label{zone-unit-ventilator-heating-rate-w}
@@ -1198,11 +1198,11 @@ This field reports the electric power consumption rate of the fan of the unit ve
 
 This field reports the electric power consumed by the fan of the unit ventilator over the timestep in Joules.
 
-\paragraph{\texorpdfstring{Zone Unit Ventilator Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Unit Ventilator Fan Availability Status }}\label{zone-unit-ventilator-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Unit Ventilator Fan Availability Status {[]}}{Zone Unit Ventilator Fan Availability Status }}\label{zone-unit-ventilator-fan-availability-status}
 
 This is the availability status of the unit ventilator fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the unit ventilator~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-\paragraph{\texorpdfstring{Zone Unit Ventilator Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Unit Ventilator Fan Part Load Ratio }}\label{zone-unit-ventilator-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Unit Ventilator Fan Part Load Ratio {[]}}{Zone Unit Ventilator Fan Part Load Ratio }}\label{zone-unit-ventilator-fan-part-load-ratio}
 
 This is the fan's part load ratio for the report timestep during which the fan had operated. This variable is available for OnOff supply air fan type only.
 
@@ -1373,9 +1373,9 @@ ZoneHVAC:UnitHeater,
 \item
   HVAC,Sum,Zone Unit Heater Fan Electric Energy {[}J{]}
 \item
-  HVAC,Average, Zone Unit Heater Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone Unit Heater Fan Availability Status {[]}
 \item
-  HVAC,Average, Zone Unit Heater Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone Unit Heater Fan Part Load Ratio {[]}
 \end{itemize}
 
 \paragraph{Zone Unit Heater Heating Rate {[}W{]}}\label{zone-unit-heater-heating-rate-w}
@@ -1394,11 +1394,11 @@ This field reports the electric power consumption rate of the fan of the unit he
 
 This field reports the electric power consumed by the fan of the unit heater over the timestep in Joules.
 
-\paragraph{\texorpdfstring{Zone Unit Heater Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Unit Heater Fan Availability Status }}\label{zone-unit-heater-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Unit Heater Fan Availability Status {[]}}{Zone Unit Heater Fan Availability Status }}\label{zone-unit-heater-fan-availability-status}
 
 This is the availability status of the unit heater fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the unit heater~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-\paragraph{\texorpdfstring{Zone Unit Heater Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Unit Heater Fan Part Load Ratio }}\label{zone-unit-heater-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Unit Heater Fan Part Load Ratio {[]}}{Zone Unit Heater Fan Part Load Ratio }}\label{zone-unit-heater-fan-part-load-ratio}
 
 This is the fan's part load ratio for the report timestep during which the fan had operated. This variable is available for OnOff supply air fan type only.
 
@@ -1535,9 +1535,9 @@ ZoneHVAC:EvaporativeCoolerUnit,
 \item
   HVAC,Sum,Zone Evaporative Cooler Unit Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Evaporative Cooler Unit Fan Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Evaporative Cooler Unit Fan Speed Ratio {[]}
 \item
-  HVAC,Average,Zone Evaporative Cooler Unit Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Evaporative Cooler Unit Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Evaporative Cooler Unit Total Cooling Rate {[}W{]}}\label{zone-evaporative-cooler-unit-total-cooling-rate-w}
@@ -1572,11 +1572,11 @@ This output is the latent heat extraction (dehumidification) rate of the zone ev
 
 This output is the latent heat extraction (dehumidification) of the zone evaporative cooler unit to the zone it is serving in Joules.~ This value is calculated as the difference between the total cooling energy and the sensible cooling energy.
 
-\paragraph{\texorpdfstring{Zone Evaporative Cooler Unit Fan Speed Ratio \protect\hyperlink{section-1}{}}{Zone Evaporative Cooler Unit Fan Speed Ratio }}\label{zone-evaporative-cooler-unit-fan-speed-ratio}
+\paragraph{\texorpdfstring{Zone Evaporative Cooler Unit Fan Speed Ratio {[]}}{Zone Evaporative Cooler Unit Fan Speed Ratio }}\label{zone-evaporative-cooler-unit-fan-speed-ratio}
 
 This output is the speed ratio of the fan for the zone evaporative cooler unit.~ The speed ratio is defined as the current supply air mass flow rate divided by the design air mass flow rate.
 
-\paragraph{\texorpdfstring{Zone Evaporative Cooler Unit Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Evaporative Cooler Unit Fan Availability Status }}\label{zone-evaporative-cooler-unit-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Evaporative Cooler Unit Fan Availability Status {[]}}{Zone Evaporative Cooler Unit Fan Availability Status }}\label{zone-evaporative-cooler-unit-fan-availability-status}
 
 This output is the availability status of the zone evaporative cooler unit's fan.~ This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object.~ The AvailabilityManagerAssignmentList is an optional input in the zone evaporative cooler object.~ When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific manager.~ For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager)), rules to determine fan availability status are described in the section on system availability managers.~ The control status outputs are represented using integers 0 through 3.~ These integers represent NoAction (0), ForceOff (1), CycleOn(2), and CycleOneZoneFansOnly (3).~ It is recommend to report this output at the ``Detailed'' frequency because the integer status flags do not average out to meaningful values.
 
@@ -1737,7 +1737,7 @@ ZoneHVAC:OutdoorAirUnit,
 \item
   HVAC,Average, Zone Outdoor Air Unit Air Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average, Zone Outdoor Air Unit Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone Outdoor Air Unit Fan Availability Status {[]}
 \item
   Zone Outdoor Air Unit Latent Cooling Energy
 \end{itemize}
@@ -1794,7 +1794,7 @@ This field reports the electric power consumed by the fan of the outdoor air uni
 
 This field reports the air mass flow rate of the zone outdoor air unit Outdoor Air Unit~ in kilograms per second.
 
-\paragraph{\texorpdfstring{Zone Outdoor Air Unit Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Outdoor Air Unit Fan Availability Status }}\label{zone-outdoor-air-unit-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Outdoor Air Unit Fan Availability Status {[]}}{Zone Outdoor Air Unit Fan Availability Status }}\label{zone-outdoor-air-unit-fan-availability-status}
 
 This is the availability status of the outdoor air unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the outdoor air unit~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -2025,11 +2025,11 @@ ZoneHVAC:WindowAirConditioner,
 \item
   HVAC,Sum,Zone Window Air Conditioner Electric Energy {[}J{]}
 \item
-  HVAC,Average, Zone Window Air Conditioner Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone Window Air Conditioner Fan Part Load Ratio {[]}
 \item
-  HVAC,Average, Zone Window Air Conditioner Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone Window Air Conditioner Compressor Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Window Air Conditioner Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Window Air Conditioner Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Window Air Conditioner Total Cooling Rate {[}W{]}}\label{zone-window-air-conditioner-total-cooling-rate-w}
@@ -2064,15 +2064,15 @@ This output is the electricity consumption rate of the window air conditioner un
 
 This output is the electricity consumption of the window air conditioner unit in Joules for the time period being reported. The consumption includes electricity used by the compressor and the fans (indoor supply air fan and the condenser fan).
 
-\paragraph{\texorpdfstring{Zone Window Air Conditioner Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Window Air Conditioner Fan Part Load Ratio }}\label{zone-window-air-conditioner-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Window Air Conditioner Fan Part Load Ratio {[]}}{Zone Window Air Conditioner Fan Part Load Ratio }}\label{zone-window-air-conditioner-fan-part-load-ratio}
 
 This is the fan's part load ratio for the report timestep during which the fan had operated.
 
-\paragraph{\texorpdfstring{Zone Window Air Conditioner Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Window Air Conditioner Compressor Part Load Ratio }}\label{zone-window-air-conditioner-compressor-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Window Air Conditioner Compressor Part Load Ratio {[]}}{Zone Window Air Conditioner Compressor Part Load Ratio }}\label{zone-window-air-conditioner-compressor-part-load-ratio}
 
 This is the part load ratio of the report timestep during which the DX unit compressor had operated.
 
-\textbf{\emph{Zone Window Air Conditioner Fan Availability Status \protect\hyperlink{section-1}{}}}
+\textbf{\emph{Zone Window Air Conditioner Fan Availability Status {[]}}}
 
 This is the availability status of the window air conditioner fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the window air conditioner object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -2331,11 +2331,11 @@ ZoneHVAC:PackagedTerminalAirConditioner,
 \item
   HVAC,Sum,Zone Packaged Terminal Air Conditioner Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Packaged Terminal Air Conditioner Total Heating Rate {[}W{]}}\label{zone-packaged-terminal-air-conditioner-total-heating-rate-w}
@@ -2394,15 +2394,15 @@ This output field is the electricity consumption rate of the packaged terminal a
 
 This output field is the electricity consumption of the packaged terminal air conditioner in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the heating coil (includes electricity consumption for electric heating coil or parasitic electricity consumption for non-electric coils). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Packaged Terminal Air Conditioner Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Packaged Terminal Air Conditioner Fan Part Load Ratio }}\label{zone-packaged-terminal-air-conditioner-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Packaged Terminal Air Conditioner Fan Part Load Ratio {[]}}{Zone Packaged Terminal Air Conditioner Fan Part Load Ratio }}\label{zone-packaged-terminal-air-conditioner-fan-part-load-ratio}
 
 This output field is the part-load ratio of the fan. The fan part-load ratio is defined as the average supply air mass flow rate divided by the maximum supply air mass flow rate. The maximum supply air mass flow rate depends on whether heating, cooling, or no heating or cooling is required during the timestep. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio }}\label{zone-packaged-terminal-air-conditioner-compressor-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio {[]}}{Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio }}\label{zone-packaged-terminal-air-conditioner-compressor-part-load-ratio}
 
 This output field is the part-load ratio used by the coils (cooling and heating). Part-load ratio is defined as the total coil load divided by the coil steady-state capacity. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Packaged Terminal Air Conditioner Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Packaged Terminal Air Conditioner Fan Availability Status }}\label{zone-packaged-terminal-air-conditioner-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Packaged Terminal Air Conditioner Fan Availability Status {[]}}{Zone Packaged Terminal Air Conditioner Fan Availability Status }}\label{zone-packaged-terminal-air-conditioner-fan-availability-status}
 
 This is the availability status of the packaged terminal air conditioner fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the packaged terminal air conditioner~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -2733,11 +2733,11 @@ ZoneHVAC:PackagedTerminalHeatPump,
 \item
   HVAC,Sum,Zone Packaged Terminal Heat Pump Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone Packaged Terminal Heat Pump Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Packaged Terminal Heat Pump Fan Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Packaged Terminal Heat Pump Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Packaged Terminal Heat Pump Compressor Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Packaged Terminal Heat Pump Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Packaged Terminal Heat Pump Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Packaged Terminal Heat Pump Total Heating Rate {[}W{]}}\label{zone-packaged-terminal-heat-pump-total-heating-rate-w}
@@ -2796,15 +2796,15 @@ This output field is the electricity consumption rate of the packaged terminal h
 
 This output field is the electricity consumption of the packaged terminal heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Packaged Terminal Heat Pump Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Packaged Terminal Heat Pump Fan Part Load Ratio }}\label{zone-packaged-terminal-heat-pump-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Packaged Terminal Heat Pump Fan Part Load Ratio {[]}}{Zone Packaged Terminal Heat Pump Fan Part Load Ratio }}\label{zone-packaged-terminal-heat-pump-fan-part-load-ratio}
 
 This output field is the part-load ratio of the fan. The fan part-load ratio is defined as the average supply air mass flow rate divided by the maximum supply air mass flow rate. The maximum supply air mass flow rate depends on whether heating, cooling, or no heating or cooling is required during the timestep. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Packaged Terminal Heat Pump Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Packaged Terminal Heat Pump Compressor Part Load Ratio }}\label{zone-packaged-terminal-heat-pump-compressor-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Packaged Terminal Heat Pump Compressor Part Load Ratio {[]}}{Zone Packaged Terminal Heat Pump Compressor Part Load Ratio }}\label{zone-packaged-terminal-heat-pump-compressor-part-load-ratio}
 
 This output field is the part-load ratio of the compressor used by the DX coils (cooling and heating). Compressor part-load ratio is defined as the total coil load divided by the coil steady-state capacity. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Packaged Terminal Heat Pump Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Packaged Terminal Heat Pump Fan Availability Status }}\label{zone-packaged-terminal-heat-pump-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Packaged Terminal Heat Pump Fan Availability Status {[]}}{Zone Packaged Terminal Heat Pump Fan Availability Status }}\label{zone-packaged-terminal-heat-pump-fan-availability-status}
 
 This is the availability status of the packaged terminal heat pump~ fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the packaged terminal heat pump~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -3232,11 +3232,11 @@ ZoneHVAC:WaterToAirHeatPump,
 \item
   HVAC,Sum,Zone Water to Air Heat Pump Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone Water to Air Heat Pump Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Water to Air Heat Pump Fan Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Water to Air Heat Pump Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Water to Air Heat Pump Compressor Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Water to Air Heat Pump Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Water to Air Heat Pump Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Water to Air Heat Pump Total Heating Rate {[}W{]}}\label{zone-water-to-air-heat-pump-total-heating-rate-w}
@@ -3295,15 +3295,15 @@ This output field is the electricity consumption rate of the Water to Air Heat P
 
 This output field is the electricity consumption of the Water to Air Heat Pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported.
 
-\paragraph{\texorpdfstring{Zone Water to Air Heat Pump Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Water to Air Heat Pump Fan Part Load Ratio }}\label{zone-water-to-air-heat-pump-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Water to Air Heat Pump Fan Part Load Ratio {[]}}{Zone Water to Air Heat Pump Fan Part Load Ratio }}\label{zone-water-to-air-heat-pump-fan-part-load-ratio}
 
 This output field is the part-load ratio of the fan. The fan part-load ratio is defined as the average supply air mass flow rate divided by the maximum supply air mass flow rate. The maximum supply air mass flow rate depends on whether heating, cooling, or no heating or cooling is required during the time step. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{Zone Water to Air Heat Pump Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Water to Air Heat Pump Compressor Part Load Ratio }}\label{zone-water-to-air-heat-pump-compressor-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Water to Air Heat Pump Compressor Part Load Ratio {[]}}{Zone Water to Air Heat Pump Compressor Part Load Ratio }}\label{zone-water-to-air-heat-pump-compressor-part-load-ratio}
 
 This output field is the part-load ratio of the compressor used by the DX coils (cooling and heating). Compressor part-load ratio is defined as the total coil load divided by the coil steady-state capacity. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{Zone Water to Air Heat Pump Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Water to Air Heat Pump Fan Availability Status }}\label{zone-water-to-air-heat-pump-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Water to Air Heat Pump Fan Availability Status {[]}}{Zone Water to Air Heat Pump Fan Availability Status }}\label{zone-water-to-air-heat-pump-fan-availability-status}
 
 This is the availability status of the zone water source heat pump~ fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the zone water source heat pump~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -3439,9 +3439,9 @@ Following is an example input for a zone DX dehumidifier object. A ZoneControl:H
 \item
   HVAC,Sum,Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone Dehumidifier Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Dehumidifier Part Load Ratio {[]}
 \item
-  HVAC,Average,Zone Dehumidifier Runtime Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Dehumidifier Runtime Fraction {[]}
 \item
   HVAC,Average,Zone Dehumidifier Outlet Air Temperature {[}C{]}
 \end{itemize}
@@ -3483,11 +3483,11 @@ These outputs are the electric power and electric consumption of the dehumidifie
 
 These outputs are the parasitic electric power and electric consumption for controls or other electrical devices associated with the dehumidifier. This parasitic electric load is consumed whenever the dehumidifier is available to operate, but is not operating. The model assumes that this parasitic power contributes to heating the zone air (i.e., affects the zone air heat balance). These outputs values are included in the Zone Dehumidifier Electric Power and Zone Dehumidifier Electric Energy output variables.
 
-\paragraph{\texorpdfstring{Zone Dehumidifier Part Load Ratio \protect\hyperlink{section-1}{}}{Zone Dehumidifier Part Load Ratio }}\label{zone-dehumidifier-part-load-ratio}
+\paragraph{\texorpdfstring{Zone Dehumidifier Part Load Ratio {[]}}{Zone Dehumidifier Part Load Ratio }}\label{zone-dehumidifier-part-load-ratio}
 
 This output field is the part-load ratio for the dehumidifier. Part-load ratio is defined as the water removal load to be met (kg/s) divided by the dehumidifier's water removal rate (kg/s) at the current operating conditions. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Dehumidifier Runtime Fraction \protect\hyperlink{section-1}{}}{Zone Dehumidifier Runtime Fraction }}\label{zone-dehumidifier-runtime-fraction}
+\paragraph{\texorpdfstring{Zone Dehumidifier Runtime Fraction {[]}}{Zone Dehumidifier Runtime Fraction }}\label{zone-dehumidifier-runtime-fraction}
 
 This output field is the runtime fraction for the dehumidifier. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
@@ -3764,7 +3764,7 @@ ZoneHVAC:EnergyRecoveryVentilator,
 \item
   HVAC,Sum,Zone Ventilator Latent Heating Energy {[}J{]}
 \item
-  HVAC,Average,Zone Ventilator Supply Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Zone Ventilator Supply Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone Ventilator Electric Power {[}W{]}}\label{zone-ventilator-electric-power-w}
@@ -3823,7 +3823,7 @@ This output is the latent heat addition (humidification) rate of the stand alone
 
 This output is the latent heat addition (humidification) of the stand alone energy recovery ventilator to the zone in Joules over the timestep being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the stand alone ERV. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat addition only) are summed for the timestep being reported.
 
-\paragraph{\texorpdfstring{Zone Ventilator Supply Fan Availability Status \protect\hyperlink{section-1}{}}{Zone Ventilator Supply Fan Availability Status }}\label{zone-ventilator-supply-fan-availability-status}
+\paragraph{\texorpdfstring{Zone Ventilator Supply Fan Availability Status {[]}}{Zone Ventilator Supply Fan Availability Status }}\label{zone-ventilator-supply-fan-availability-status}
 
 This is the availability status of the Stand Alone ERV~ fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Stand Alone ERV~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
@@ -4011,7 +4011,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
 \item
   HVAC,Sum,Zone VRF Air Terminal Heating Electric Energy {[}J{]}
 \item
-  HVAC,Average, Zone VRF Air Terminal Fan Availability Status \protect\hyperlink{section-1}{}
+  HVAC,Average, Zone VRF Air Terminal Fan Availability Status {[]}
 \end{itemize}
 
 \paragraph{Zone VRF Air Terminal Total Cooling Rate {[}W{]}}\label{zone-vrf-air-terminal-total-cooling-rate-w}
@@ -4078,6 +4078,6 @@ This output field is the parasitic electricity consumption rate of the zone term
 
 This output field is the electricity consumption of the zone terminal unit in Joules for the time period being reported. The consumption includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. The terminal unit parasitic on and off electricity consumption is reported in this heating output variable when the unit operates in heating mode or the most recent operation was for heating. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Zone VRF Air Terminal Fan Availability Status \protect\hyperlink{section-1}{}}{Zone VRF Air Terminal Fan Availability Status }}\label{zone-vrf-air-terminal-fan-availability-status}
+\paragraph{\texorpdfstring{Zone VRF Air Terminal Fan Availability Status {[]}}{Zone VRF Air Terminal Fan Availability Status }}\label{zone-vrf-air-terminal-fan-availability-status}
 
 This is the availability status of the Zone Terminal Unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Zone Terminal Unit object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.

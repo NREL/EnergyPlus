@@ -2148,7 +2148,7 @@ Current ZoneAirMassFlowConservation output variables (only applicable variables 
 \item
   HVAC, Average, Zone Air Mass Balance Mixing Source Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC, Average, Zone Infiltration Air Mass Flow Balance Status, \protect\hyperlink{section-1}{}
+  HVAC, Average, Zone Infiltration Air Mass Flow Balance Status, {[]}
 \item
   HVAC, Average, Zone Mass Balance Infiltration Air Mass Flow Rate, {[}kg/s{]}
 \end{itemize}
@@ -2173,7 +2173,7 @@ This output variable represents the total zone mixing air mass flow rate of a re
 
 This output variable represents the total zone mixing source air mass flow rate of a source zone feeding one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single source zone.
 
-\paragraph{\texorpdfstring{Zone Air Mass Balance Infiltration Status \protect\hyperlink{section-1}{}}{Zone Air Mass Balance Infiltration Status }}\label{zone-air-mass-balance-infiltration-status}
+\paragraph{\texorpdfstring{Zone Air Mass Balance Infiltration Status {[]}}{Zone Air Mass Balance Infiltration Status }}\label{zone-air-mass-balance-infiltration-status}
 
 This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either \textbf{0} or \textbf{1}.~ If the value of this report variable is \textbf{0} then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for the current timestep.~ If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
 

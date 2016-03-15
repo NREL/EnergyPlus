@@ -294,7 +294,7 @@ IF THE RACK SERVES REFRIGERATION CHILLERS
 \item
   HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Air Chiller System Compressor Runtime Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Refrigeration Air Chiller System Compressor Runtime Fraction {[]}
 \item
   HVAC,Average, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Power {[}W{]}
 \item
@@ -359,7 +359,7 @@ This output is the electric power input to the rack compressor(s) in Watts.
 
 This is the electricity consumption of the rack compressor(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Refrigeration Compressor Runtime Fraction \protect\hyperlink{section-1}{}}{Refrigeration Compressor Runtime Fraction }}\label{refrigeration-compressor-runtime-fraction}
+\paragraph{\texorpdfstring{Refrigeration Compressor Runtime Fraction {[]}}{Refrigeration Compressor Runtime Fraction }}\label{refrigeration-compressor-runtime-fraction}
 
 This is the runtime operating ratio for the compressor.
 
@@ -433,7 +433,7 @@ This output is the electric power input to the rack compressor(s) in Watts.
 
 This is the electricity consumption of the rack compressor(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Refrigeration Air Chiller System Compressor Runtime Fraction \protect\hyperlink{section-1}{}}{Refrigeration Air Chiller System Compressor Runtime Fraction }}\label{refrigeration-air-chiller-system-compressor-runtime-fraction}
+\paragraph{\texorpdfstring{Refrigeration Air Chiller System Compressor Runtime Fraction {[]}}{Refrigeration Air Chiller System Compressor Runtime Fraction }}\label{refrigeration-air-chiller-system-compressor-runtime-fraction}
 
 This is the runtime fraction for the compressor serving air chillers.
 
@@ -805,7 +805,7 @@ The following is an example input for a refrigerated case.
 \item
   Zone,Sum,Refrigeration Case Lighting Electric Energy {[}J{]}
 \item
-  Zone,Average,Refrigeration Case Latent Credit Curve Value \protect\hyperlink{section-1}{}
+  Zone,Average,Refrigeration Case Latent Credit Curve Value {[]}
 \end{itemize}
 
 If case defrost type is Electric, Hot-Gas, or Hot-Brine with Temperature Termination
@@ -924,7 +924,7 @@ This field is the electricity consumption of the refrigerated case lights in Jou
 
 This field is the output of the Defrost Energy Correction Curve which denotes the variation in defrost energy at off-rated conditions. The output of the defrost energy correction curve directly impacts the energy used during the defrost time period. It does not, however, impact the duration of the defrost period. This output is available only for Electric with Temperature Termination, Hot-Gas with Temperature Termination, or Hot-Brine with Temperature Termination case defrost types.
 
-\paragraph{\texorpdfstring{Refrigeration Case Latent Credit Curve Value \protect\hyperlink{section-1}{}}{Refrigeration Case Latent Credit Curve Value }}\label{refrigeration-case-latent-credit-curve-value}
+\paragraph{\texorpdfstring{Refrigeration Case Latent Credit Curve Value {[]}}{Refrigeration Case Latent Credit Curve Value }}\label{refrigeration-case-latent-credit-curve-value}
 
 This field is the output of the Latent Case Credit Curve which denotes the variation in latent case credits at off-rated conditions. The output of the latent case credit curve directly impacts the amount of frost formation on the refrigerated case evaporator coil and the requirement for defrost.
 
@@ -2244,7 +2244,7 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS:
 \item
   Zone,Sum,Refrigeration Compressor Heat Transfer Energy {[}J{]}
 \item
-  Zone,Sum,Refrigeration Compressor Run Time~Fraction \protect\hyperlink{section-1}{}
+  Zone,Sum,Refrigeration Compressor Run Time~Fraction {[]}
 \end{itemize}
 
 THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
@@ -2259,7 +2259,7 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 \item
   HVAC,Sum,Refrigeration Air Chiller System Compressor Heat Transfer Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Chiller Compressor Run TimeFraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Refrigeration Chiller Compressor Run TimeFraction {[]}
 \end{itemize}
 
 \paragraph{THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS}\label{the-following-outputs-are-available-for-systems-that-serve-cases-andor-walkins-1}
@@ -2280,7 +2280,7 @@ This output is the heat removed from the refrigerated cases by the compressor in
 
 This is the heat removed from the refrigerated cases by the compressor in Joules for the timestep being reported.
 
-\paragraph{\texorpdfstring{Refrigeration Compressor Run Time~ Fraction \protect\hyperlink{section-1}{}}{Refrigeration Compressor Run Time~ Fraction }}\label{refrigeration-compressor-run-time-fraction}
+\paragraph{\texorpdfstring{Refrigeration Compressor Run Time~ Fraction {[]}}{Refrigeration Compressor Run Time~ Fraction }}\label{refrigeration-compressor-run-time-fraction}
 
 This is the fraction of the time step when the compressor ran to meet the load.~ It is a value between 0.0 and 1.0.
 
@@ -2302,7 +2302,7 @@ This output is the heat removed from the refrigerated cases by the compressor in
 
 This is the heat removed from the refrigerated cases by the compressor in Joules for the timestep being reported.
 
-\paragraph{\texorpdfstring{Refrigeration Chiller Compressor Run Time~ Fraction \protect\hyperlink{section-1}{}}{Refrigeration Chiller Compressor Run Time~ Fraction }}\label{refrigeration-chiller-compressor-run-time-fraction}
+\paragraph{\texorpdfstring{Refrigeration Chiller Compressor Run Time~ Fraction {[]}}{Refrigeration Chiller Compressor Run Time~ Fraction }}\label{refrigeration-chiller-compressor-run-time-fraction}
 
 This is the fraction of the time step when the compressor ran to meet the load.~ It is a value between 0.0 and 1.0.
 
@@ -4167,7 +4167,7 @@ The following is an example input for a refrigeration air chiller.
 \item
   HVAC,Sum,Refrigeration Zone Air Chiller Heater Electric Energy {[}J{]}
 \item
-  HVAC,Average,Refrigeration Zone Air Chiller Sensible Heat Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Refrigeration Zone Air Chiller Sensible Heat Ratio {[]}
 \item
   HVAC,Average,Refrigeration Zone Air Chiller Frost Accumulation Mass {[}kg{]}
 \item
