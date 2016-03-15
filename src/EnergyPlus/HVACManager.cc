@@ -389,7 +389,8 @@ namespace HVACManager {
 		NumOfSysTimeSteps = 1;
 		FracTimeStepZone = TimeStepSys / TimeStepZone;
 
-		ManageEMS( emsCallFromBeginTimestepBeforePredictor ); //calling point
+		bool anyEMSRan;
+		ManageEMS( emsCallFromBeginTimestepBeforePredictor, anyEMSRan ); //calling point
 
 		SetOutAirNodes();
 
@@ -512,7 +513,7 @@ namespace HVACManager {
 			// Update the plant and condenser loop capacitance model temperature history.
 			UpdateNodeThermalHistory();
 
-			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting ); // EMS calling point
+			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
 
 			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
@@ -582,7 +583,7 @@ namespace HVACManager {
 				}
 				UpdateDataandReport( HVACTSReporting );
 			}
-			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting ); // EMS calling point
+			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan ); // EMS calling point
 			//UPDATE SYSTEM CLOCKS
 			SysTimeElapsed += TimeStepSys;
 
@@ -807,8 +808,8 @@ namespace HVACManager {
 
 		// Before the HVAC simulation, call ManageSetPoints to set all the HVAC
 		// node setpoints
-
-		ManageEMS( emsCallFromBeforeHVACManagers ); // calling point
+		bool anyEMSRan;
+		ManageEMS( emsCallFromBeforeHVACManagers, anyEMSRan ); // calling point
 
 		ManageSetPoints();
 
@@ -819,7 +820,7 @@ namespace HVACManager {
 		// the system on/off flags
 		ManageSystemAvailability();
 
-		ManageEMS( emsCallFromAfterHVACManagers ); // calling point
+		ManageEMS( emsCallFromAfterHVACManagers, anyEMSRan ); // calling point
 
 		// first explicitly call each system type with FirstHVACIteration,
 
@@ -833,6 +834,7 @@ namespace HVACManager {
 		SetAllPlantSimFlagsToValue( true ); //set so loop to simulate at least once on non-first hvac
 
 		FirstHVACIteration = false;
+		ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 		// then iterate among all systems after first HVAC iteration is over
 
@@ -840,17 +842,23 @@ namespace HVACManager {
 		// true, then specific components must be resimulated.
 		while ( ( SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag ) && ( HVACManageIteration <= MaxIter ) ) {
 
-			ManageEMS( emsCallFromHVACIterationLoop ); // calling point id
+
 
 			// Manages the various component simulations
 			SimSelectedEquipment( SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag, FirstHVACIteration, SimWithPlantFlowUnlocked );
 
+			ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 			// Eventually, when all of the flags are set to false, the
 			// simulation has converged for this system time step.
 
 			UpdateZoneInletConvergenceLog();
 
 			++HVACManageIteration; // Increment the iteration counter
+
+			if ( anyEMSRan && HVACManageIteration == 1 ) {
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
+				SimAirLoopsFlag = true;
+			}
 
 		}
 		if ( AnyPlantInModel ) {

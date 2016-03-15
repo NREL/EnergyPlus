@@ -159,9 +159,10 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
 		EMSManager::FinishProcessingUserInput = true;
 
-		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation );
+		bool anyRan;
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
 
-		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment );
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 
 		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
@@ -339,8 +340,9 @@ TEST_F( EnergyPlusFixture, Test_EMSLogic ) {
 
 	EMSManager::CheckIfAnyEMS();
 	EMSManager::FinishProcessingUserInput = true;
-	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation );
-	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment );
+	bool anyRan;
+	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 
 	EXPECT_NEAR( DataLoopNode::Node( 1 ).TempSetPoint, 11.0, 0.0000001 );
@@ -351,7 +353,7 @@ TEST_F( EnergyPlusFixture, Test_EMSLogic ) {
 	EXPECT_NEAR( DataLoopNode::Node( 6 ).TempSetPoint, 16.0, 0.0000001 );
 	EXPECT_NEAR( DataLoopNode::Node( 7 ).TempSetPoint, 17.0, 0.0000001 );
 
-	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor );
+	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
 
 
 	EXPECT_NEAR( DataLoopNode::Node( 1 ).TempSetPoint, 21.0, 0.0000001 );
@@ -409,8 +411,9 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 
 	EMSManager::CheckIfAnyEMS();
 	EMSManager::FinishProcessingUserInput = true;
-	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation );
-	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment );
+	bool anyRan;
+	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 
 	EXPECT_NEAR( DataLoopNode::Node( 1 ).TempSetPoint, 1.0, 0.0000001 );
