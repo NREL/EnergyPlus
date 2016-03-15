@@ -1691,9 +1691,17 @@ For the example of beam transmittance, the incident solar beam strikes the scree
 \caption{Screen/Glass System Transmittance Equation Schematic. \protect \label{fig:screenglass-system-transmittance-equation}}
 \end{figure}
 
-The screen/glass system transmittance equation shown in the figure above is repeated here in an alternate format to emphasize the recurring nature of the infinite series. This equation represents the final solar beam transmittance equation for the screen/glass combination. The recurring terms are shown as a summation of a quantity raised to the n power, with n ranging from 0 to infinity. Since the quantity \(R_{gl}^{dif}R_{sc}^{dif,dif}\) ~is less than 1, the summation \(\sum\limits_{n = 0}^\infty {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}}\) converges and can be expressed as \({\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 {\left( {1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}} \right)}}}\). Since the reflected (scattered) transmittance of incident solar beam (\(T_{sc}^{dir,dif}\) ) and the diffusely reflecting beam \(T_{sc}^{dir,dir}R_{gl,f}^{dir}R_{sc}^{dir,dif}\) ~are both assumed to be hemispherically diffuse radiation, the reflected (scattered) transmittance of incident solar beam is added to the infinite series as shown below.
+The screen/glass system transmittance equation shown in the figure above is repeated here in an alternate format to emphasize the recurring nature of the infinite series. This equation represents the final solar beam transmittance equation for the screen/glass combination. The recurring terms are shown as a summation of a quantity raised to the n power, with n ranging from 0 to infinity. Since the quantity \(R_{gl}^{dif}R_{sc}^{dif,dif}\) ~is less than 1, the summation \(\sum\limits_{n = 0}^\infty {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}}\) converges and can be expressed as 
 
-\begin{array}{l}T_{sys}^{dir,all}(\alpha ',\varphi ',\phi ) = T_{sc}^{dir,dir}(\alpha ',\varphi ')T_{gl}^{dir}\left( \phi  \right) + (T_{sc}^{dir,dir}(\alpha ',\varphi ')R_{gl,f}^{dir}R_{sc}^{dir,dif}(\alpha ',\varphi ') + T_{sc}^{dir,dif}(\alpha ',\varphi '))T_{gl}^{dif}\sum\limits_{n = 0}^\infty  {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}} \\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; - or - \end{array}
+\begin{equation}
+\({\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 {\left( {1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}} \right)}}}\) 
+\end{equation}
+
+Since the reflected (scattered) transmittance of incident solar beam (\(T_{sc}^{dir,dif}\)) and the diffusely reflecting beam \(T_{sc}^{dir,dir}R_{gl,f}^{dir}R_{sc}^{dir,dif}\) ~are both assumed to be hemispherically diffuse radiation, the reflected (scattered) transmittance of incident solar beam is added to the infinite series as shown below.
+
+\begin{array}{l}
+T_{sys}^{dir,all}(\alpha ',\varphi ',\phi ) = T_{sc}^{dir,dir}(\alpha ',\varphi ')T_{gl}^{dir}\left( \phi  \right) + (T_{sc}^{dir,dir}(\alpha ',\varphi ')R_{gl,f}^{dir}R_{sc}^{dir,dif}(\alpha ',\varphi ') &+ T_{sc}^{dir,dif}(\alpha ',\varphi '))T_{gl}^{dif}\sum\limits_{n = 0}^\infty  {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}} \\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; - or - 
+\end{array}
 
 \begin{equation}
 T_{sys}^{dir,all}(\alpha ',\varphi ',\phi ) = T_{sc}^{dir,dir}(\alpha ',\varphi ')T_{gl}^{dir}\left( \phi  \right) + \frac{{(T_{sc}^{dir,dir}(\alpha ',\varphi ')R_{gl,f}^{dir}R_{sc}^{dir,dif}(\alpha ',\varphi ') + T_{sc}^{dir,dif}(\alpha ',\varphi '))T_{gl}^{dif}}}{{1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}}}
