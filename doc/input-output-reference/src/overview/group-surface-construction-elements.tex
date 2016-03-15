@@ -1905,7 +1905,7 @@ Effective long-wave emissivity. Assumed same on both sides of shade. We can appr
 {\varepsilon_{{\rm{eff}}}} \approx \varepsilon \left( {1 - \eta } \right)
 \end{equation}
 
-For most non-metallic materials \emph{ε}is about 0.9.
+For most non-metallic materials \(\varepsilon\) is about 0.9.
 
 \paragraph{Field: Thermal Transmittance}\label{field-thermal-transmittance}
 
@@ -2473,9 +2473,9 @@ Commercially-available gray scale or grayscale reflecting chart references can b
 
 \paragraph{Field: Thermal Hemispherical Emissivity}\label{field-thermal-hemispherical-emissivity-1}
 
-Long-wave emissivity \emph{ε} of the screen material itself (not the effective value for the overall screen ``assembly'' including open spaces between the screen material). The emissivity is assumed to be the same for both sides of the screen.
+Long-wave emissivity \(\varepsilon\) of the screen material itself (not the effective value for the overall screen ``assembly'' including open spaces between the screen material). The emissivity is assumed to be the same for both sides of the screen.
 
-For most non-metallic materials, \emph{ε}is about 0.9. For metallic materials, \emph{ε}is dependent on material, its surface condition, and temperature. Typical values for metallic materials range from 0.05 -- 0.1 with lower values representing a more finished surface (e.g.~low oxidation, polished surface). Material emissivities may be found in Table~\ref{table:atmospheric-variables-at-two-different} from the 2005 ASHRAE Handbook of Fundamentals, page 3.9. The value for this input field must be between 0 and 1, with a default value of 0.9 if this field is left blank.
+For most non-metallic materials, \(\varepsilon\) is about 0.9. For metallic materials, \(\varepsilon\) is dependent on material, its surface condition, and temperature. Typical values for metallic materials range from 0.05 -- 0.1 with lower values representing a more finished surface (e.g.~low oxidation, polished surface). Material emissivities may be found in Table~\ref{table:atmospheric-variables-at-two-different} from the 2005 ASHRAE Handbook of Fundamentals, page 3.9. The value for this input field must be between 0 and 1, with a default value of 0.9 if this field is left blank.
 
 \paragraph{Field: Conductivity}\label{field-conductivity-5}
 
@@ -2705,31 +2705,26 @@ This value is the length of the pleated section of the draped fabric, s(m). If t
 An IDF example for this object is shown below:
 
 \begin{lstlisting}
-
 WindowMaterial:Drape:EquivalentLayer,
-    Drape02,            !- Name
-    0.14,               !- Shade Beam-Beam Solar Transmittance
-    0.10,               !- Front Side Shade Beam-Diffuse Solar Transmittance
-    0.10,               !- Back Side Shade Beam-Diffuse Solar Transmittance
-    0.40,               !- Front Side Shade Beam-Diffuse Solar Reflectance
-    0.50,               !- Back Side Shade Beam-Diffuse Solar Reflectance
-    0.0,                !- Shade Beam-Beam Visible Transmittance
-    0.0,                !- Shade Beam-Diffuse Visible Transmittance
-    0.0,                !- Shade Beam-Diffuse Visible Reflectance
-    0.10,               !- Shade Material Infrared Transmittance
-    0.90,               !- Front Side Shade Material Infrared Emissivity
-    0.80,               !- Back Side Shade Material Infrared Emissivity
-    0.01,               !- Width of Pleated Fabric
-    0.025;              !- Length of Pleated Fabric
+  Drape02,            !- Name
+  0.14,               !- Shade Beam-Beam Solar Transmittance
+  0.10,               !- Front Side Shade Beam-Diffuse Solar Transmittance
+  0.10,               !- Back Side Shade Beam-Diffuse Solar Transmittance
+  0.40,               !- Front Side Shade Beam-Diffuse Solar Reflectance
+  0.50,               !- Back Side Shade Beam-Diffuse Solar Reflectance
+  0.0,                !- Shade Beam-Beam Visible Transmittance
+  0.0,                !- Shade Beam-Diffuse Visible Transmittance
+  0.0,                !- Shade Beam-Diffuse Visible Reflectance
+  0.10,               !- Shade Material Infrared Transmittance
+  0.90,               !- Front Side Shade Material Infrared Emissivity
+  0.80,               !- Back Side Shade Material Infrared Emissivity
+  0.01,               !- Width of Pleated Fabric
+  0.025;              !- Length of Pleated Fabric
 \end{lstlisting}
 
 \subsection{WindowMaterial:Blind:EquivalentLayer}\label{windowmaterialblindequivalentlayer}
 
-This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon.~ Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown \includegraphics{media/image046.svg}
-
-Figure~\ref{fig:geometry-and-properties-used-for-venetian}. Geometry and Properties used for venetian blind analysis
-
-.~ Likewise, effective longwave properties are obtained for the layer knowing longwave properties of the slats.
+This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon. Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown in Figure~\ref{fig:geometry-and-properties-used-for-venetian}. Likewise, effective longwave properties are obtained for the layer knowing longwave properties of the slats.
 
 \begin{figure}[hbtp] % fig 22
 \centering
@@ -2747,7 +2742,7 @@ Name of the venetian blind. It is referenced as an inside, outside or in between
 
 \paragraph{Field: Slat Orientation}\label{field-slat-orientation-1}
 
-The choices are Horizontal and Vertical. ``Horizontal'' means the slats are parallel to the bottom of the window; this is the same as saying that the slats are parallel to the X-axis of the window. ``Vertical'' means the slats are parallel to Y-axis of the window. ~The default is ``Horizontal''.
+The choices are Horizontal and Vertical. ``Horizontal'' means the slats are parallel to the bottom of the window; this is the same as saying that the slats are parallel to the X-axis of the window. ``Vertical'' means the slats are parallel to Y-axis of the window. The default is ``Horizontal''.
 
 \paragraph{Field: Slat Width}\label{field-slat-width-2}
 
