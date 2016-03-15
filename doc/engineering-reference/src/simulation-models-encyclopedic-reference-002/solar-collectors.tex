@@ -208,7 +208,7 @@ The integral-collector-storage (ICS) solar collector is represented using two tr
 
 Where,
 
-\emph{m\(_{p}\)C\(_{p}\)}\(_{ }\) = thermal capacity of the absorber surface, J/°C
+\emph{m\(_{p}\)C\(_{p}\)}\(_{ }\) = thermal capacity of the absorber surface, J/°C
 
 A~~~~~~~ = collector gross area, m\(^{2}\)
 
@@ -897,7 +897,7 @@ Observe that for the passive case, we do not use the heat exchanger relations to
 \begin{figure}[hbtp] % fig 299
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6620.png}
-\caption{  Transpired Collector Heat Balance \protect \label{fig:transpired-collector-heat-balance}}
+\caption{  Transpired Collector Heat Balance \protect \label{fig:transpired-collector-heat-balance}}
 \end{figure}
 
 When the UTSC is active, the heat balance on the collector surface control volume is:
@@ -906,11 +906,11 @@ When the UTSC is active, the heat balance on the collector surface control volum
 {q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,wind}} - {q''_{HX}} + {q''_{LWR,plen}} + {q''_{source}} = 0
 \end{equation}
 
-where: \(_{ }\)is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
+where: \(_{ }\)is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
 
 \({q''_{LWR,Env}}\) ~is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
 
-\({q''_{conv,wind}}\) ~is surface convection flux exchange with outdoor air under high wind and rain conditions.~ Note that this term is usually assumed to be zero in UTSC model development but we add the term to allow for deteriorated performance of the UTSC under poor conditions. \(_{ }\) is heat exchanger flux from collector to incoming outdoor air. \(_{ }\)is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
+\({q''_{conv,wind}}\) ~is surface convection flux exchange with outdoor air under high wind and rain conditions.~ Note that this term is usually assumed to be zero in UTSC model development but we add the term to allow for deteriorated performance of the UTSC under poor conditions. \(_{ }\) is heat exchanger flux from collector to incoming outdoor air. \(_{ }\)is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
 
 \({q''_{source}}\) ~is a source/sink term that accounts for energy exported out of the control volume when the collecter's absorber plate is a hybrid device such as a photovoltaic panel.
 
@@ -920,13 +920,13 @@ While the heat balance on the passive collector surface control volume is:
 {q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,Env}} + {q''_{LWR,plen}} + {q''_{conv,plen}} + {q''_{source}} = 0
 \end{equation}
 
-where: \(_{ }\) = surface convection flux exchange with outdoor air. \(_{ }\) = surface convection flux exchange with plenum air.
+where: \(_{ }\) = surface convection flux exchange with outdoor air. \(_{ }\) = surface convection flux exchange with plenum air.
 
 All terms are positive for net flux to the collector except the heat exchanger term, which is taken to be positive in the direction from collector to incoming air stream.~ Each of these heat balance components is introduced briefly below.
 
 \subsubsection{External SW Radiation}\label{external-sw-radiation-000}
 
-\(_{ }\)~is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.
+\(_{ }\)~is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.
 
 \subsubsection{External LW Radiation}\label{external-lw-radiation-000}
 
@@ -934,11 +934,11 @@ All terms are positive for net flux to the collector except the heat exchanger t
 
 \subsubsection{External Convection}\label{external-convection-000}
 
-\(_{ }\)is modeled using the classical formulation: \({q''_{conv}}\) ~\(_{ }\) = h\(_{o}\)(T\(_{r}\) - T\(_{o}\)) where h\(_{o}\), is the convection coefficient.~ This coefficient will differ depending on whether or not the UTSC is active or passive.~ When the UTSC is passive, h\(_{o}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ When the UTSC is active, the special suction airflow situation of a transpired collector during operation means that h\(_{o}\) is often zero because the suction situation can eliminate mass transport away from the collector.~ However when the winds are high, the strong turbulence and highly varying pressures can cause the suction flow situation to breakdown.~ Therefore, we include the \({q''_{conv,wind}}\) ~term in the heat balance and use a special coefficient \({h_{c,wind}}\) ~to model this lost heat transfer.~ In addition, when it is raining outside, we assume the collector gets wet and model the enhanced surface heat transfer using a large value for \({h_{c,wind}}\) .
+\(_{ }\)is modeled using the classical formulation: \({q''_{conv}}\) ~\(_{ }\) = h\(_{o}\)(T\(_{r}\) - T\(_{o}\)) where h\(_{o}\), is the convection coefficient.~ This coefficient will differ depending on whether or not the UTSC is active or passive.~ When the UTSC is passive, h\(_{o}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ When the UTSC is active, the special suction airflow situation of a transpired collector during operation means that h\(_{o}\) is often zero because the suction situation can eliminate mass transport away from the collector.~ However when the winds are high, the strong turbulence and highly varying pressures can cause the suction flow situation to breakdown.~ Therefore, we include the \({q''_{conv,wind}}\) ~term in the heat balance and use a special coefficient \({h_{c,wind}}\) ~to model this lost heat transfer.~ In addition, when it is raining outside, we assume the collector gets wet and model the enhanced surface heat transfer using a large value for \({h_{c,wind}}\) .
 
 \subsubsection{Heat Exchanger}\label{heat-exchanger}
 
-\(_{ }\)is modeled using the classical formulation \({q''_{HX}} = \frac{{\dot m{c_p}({T_{a,HX}} - {T_{amb}})}}{A}\) \(_{ }\)where \({T_{{\rm{a,HX}}}}\) ~is determined using correlations described above.~ When the UTSC is active, the air mass flow is determined from the operation of the outdoor air mixer component.~ When the UTSC is off, this term is zero.
+\(_{ }\)is modeled using the classical formulation \({q''_{HX}} = \frac{{\dot m{c_p}({T_{a,HX}} - {T_{amb}})}}{A}\) \(_{ }\)where \({T_{{\rm{a,HX}}}}\) ~is determined using correlations described above.~ When the UTSC is active, the air mass flow is determined from the operation of the outdoor air mixer component.~ When the UTSC is off, this term is zero.
 
 \subsubsection{Plenum LW Radation}\label{plenum-lw-radation}
 
@@ -946,7 +946,7 @@ All terms are positive for net flux to the collector except the heat exchanger t
 
 \subsubsection{Plenum Convection}\label{plenum-convection}
 
-\(_{ }\)is modeled using the classical formulation: \({q''_{conv}}\) ~\(_{ }\) = h\(_{p}\)(T\(_{r}\) - T\(_{o}\)) where h\(_{p}\), is the convection coefficient.~ This coefficient is taken as zero when the UTSC is operating because of the suction airflow situation.~ When the UTSC is off, the value for h\(_{p}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+\(_{ }\)is modeled using the classical formulation: \({q''_{conv}}\) ~\(_{ }\) = h\(_{p}\)(T\(_{r}\) - T\(_{o}\)) where h\(_{p}\), is the convection coefficient.~ This coefficient is taken as zero when the UTSC is operating because of the suction airflow situation.~ When the UTSC is off, the value for h\(_{p}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
 Substituting models into and solving for \({T_{s,coll}}\) ~yields the following equation when the UTSC is active (``on''):
 
@@ -1003,18 +1003,18 @@ Note that we have formulated the control volumes with slight differences for the
 \begin{figure}[hbtp] % fig 300
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6664.png}
-\caption{  Transpired Collector Plenum Air Heat Balance \protect \label{fig:transpired-collector-plenum-air-heat-balance}}
+\caption{  Transpired Collector Plenum Air Heat Balance \protect \label{fig:transpired-collector-plenum-air-heat-balance}}
 \end{figure}
 
 When the UTSC is active, the heat balance on the plenum air control volume is:
 
 \begin{equation}
-{\dot Q_{air}} + {\dot Q_{co}}_{} = 0
+  \dot{Q}_{air} + \dot{Q}_{co} = 0
 \end{equation}
 
 where,
 
-\({\dot Q_{air}}\) is the net rate of energy added by suction air convecting through the control volume. \(_{ }\)~is the net rate of energy added by surface convection heat transfer with the underlying surface.
+\({\dot Q_{air}}\) is the net rate of energy added by suction air convecting through the control volume. \(_{ }\)~is the net rate of energy added by surface convection heat transfer with the underlying surface.
 
 When the UTSC is passive, the heat balance on the plenum air control volume is:
 

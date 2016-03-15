@@ -100,11 +100,24 @@ where
 
 Incorporating all of these equations into the original differential equation,
 
-\begin{array}{c}m{c_p}\frac{{dT}}{{dt}} = {q_{heater}} + {q_{oncyc}} + {q_{offcyc}} + U{A_{oncyc}}\left( {{T_{amb}} - T} \right) + U{A_{offcyc}}\left( {{T_{amb}} - T} \right)\\ + {\varepsilon_{use}}{{\dot m}_{use}}{c_p}\left( {{T_{use}} - T} \right) + {\varepsilon_{source}}{{\dot m}_{source}}{c_p}\left( {{T_{source}} - T} \right)\end{array}
+\begin{equation}
+  \begin{array}{ll}
+    mC_p\frac{dT}{dt} &= q_{heater} + q_{oncyc} + q_{offcyc} + UA_{oncyc} \PB{T_{amb} - T} + UA_{offcyc} \PB{T_{amb} - T} \\ 
+                      &+ \varepsilon_{use}\dot{m}_{use}C_p \PB{T_{use} - T} + \varepsilon_{source}\dot{m}_{source}C_p \PB{T_{source} - T}
+  \end{array}
+\end{equation}
 
 Associating terms not dependent on temperature \emph{T} and terms dependent on temperature \emph{T} yields:
 
-\begin{array}{c}\frac{{dT}}{{dt}} = \left[ {\frac{1}{{m{c_p}}}\left( \begin{array}{l}{q_{heater}} + {q_{oncyc}} + {q_{offcyc}} + U{A_{oncyc}}{T_{amb}} + U{A_{offcyc}}{T_{amb}}\\ + {\varepsilon_{use}}{{\dot m}_{use}}{c_p}{T_{use}} + {\varepsilon_{source}}{{\dot m}_{source}}{c_p}{T_{source}}\end{array} \right)} \right]\\ + \left[ {\frac{{ - 1}}{{m{c_p}}}\left( {U{A_{oncyc}} + U{A_{offcyc}} + {\varepsilon_{use}}{{\dot m}_{use}}{c_p} + {\varepsilon_{source}}{{\dot m}_{source}}{c_p}} \right)} \right]T\end{array}
+\begin{equation}
+  \begin{array}{ll}
+    \frac{dT}{dt} &= \RB{\frac{1}{mC_p}\PB{\begin{array}{c}
+                                             q_{heater}+q_{oncyc}+q_{offcyc}+UA_{oncyc}T_{amb}+UA_{offcyc}T_{amb} \\
+                                             + \varepsilon_{use}\dot{m}_{use}C_pT_{use} + \varepsilon_{source}\dot{m}_{source}C_pT_{source}
+                                           \end{array}}} \\
+                  &+ \RB{\frac{-1}{mC_p}\PB{UA_{oncyc} + UA_{offcyc}+\varepsilon_{use}\dot{m}_{use}C_p+\varepsilon_{source}\dot{m}_{source}C_p}}T
+  \end{array}
+\end{equation}
 
 The differential equation now has the form
 
@@ -493,7 +506,12 @@ where
 
 The net heat transfer rate \emph{q\(_{t}\)} is the sum of gains and losses due to multiple heat transfer pathways.
 
-\begin{array}{l}{q_{net,n}} = {q_{heater,n}} + {q_{oncycpara,n}} + {q_{offcycpara,n}} + {q_{oncycloss,n}} + {q_{offcycloss,n}}\\ + {q_{cond,n}} + {q_{use,n}} + {q_{source,n}} + {q_{flow,n}} + {q_{invmix,n}}\end{array}
+\begin{equation}
+  \begin{array}{ll}
+    q_{net,n} &= q_{heater,n} + q_{oncycpara,n} + q_{offcycpara,n} + q_{oncycloss,n} + q_{offcycloss,n} \\ 
+              &+ q_{cond,n} + q_{use,n} + q_{source,n} + q_{flow,n} + q_{invmix,n}
+  \end{array}
+\end{equation}
 
 where
 
@@ -629,9 +647,9 @@ The use and source fluid steam outlet temperatures calculation procedure depends
 
 ~where,
 
-\emph{T\(_{t}\)}\(_{ }\) = outlet fluid temperature of the use side plant connections
+\emph{T\(_{t}\)}\(_{ }\) = outlet fluid temperature of the use side plant connections
 
-\emph{T\(_{t}\)}\(_{ }\) = outlet fluid temperature of the source side plant connections
+\emph{T\(_{t}\)}\(_{ }\) = outlet fluid temperature of the source side plant connections
 
 \subsubsection{Numerical Solution}\label{numerical-solution}
 
@@ -673,9 +691,11 @@ Some inputs for water heaters can be autosized using the input object WaterHeate
 
 The volume a water heater can be sized in the following ways depending on the design method chosen by the user.
 
-·~~~~~~~~Peak Draw.~ The volume is determined from the loop design flow rate.~ The water heater is positioned on the supply side of a plant loop.~ After the plant sizing routines have run, the model~ obtains the design flow rate for all components on the demand side.~ The tank volume is then: \(V = {\dot V_{loop.des}}*{t_{draw}}\) ,
+\begin{itemize}
+  \item Peak Draw. The volume is determined from the loop design flow rate.~ The water heater is positioned on the supply side of a plant loop.~ After the plant sizing routines have run, the model~ obtains the design flow rate for all components on the demand side.~ The tank volume is then: \(V = {\dot V_{loop.des}}*{t_{draw}}\) ,
 
-·~~~~~~~~Residential HUD-FHA Minimum.~ The volume is determined from a set of rules defined by the table below.~ This is from Chapter 48 of 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.~ (also used in the Building America Benchmark).
+  \item Residential HUD-FHA Minimum. The volume is determined from a set of rules defined by the table below.~ This is from Chapter 48 of 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.~ (also used in the Building America Benchmark).
+\end{itemize}
 
 % table 85
 \begin{longtable}[c]{p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}}
@@ -694,21 +714,27 @@ Burner (kW) & 2.5 & 3.5 & 4.5 & 5.5 & 4.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 
 \bottomrule
 \end{longtable}
 
-·~~~~~~~~Per Person.~ The tank volume is determined by summing the design level of people in the model and multiplying by a user-entered volume per person factor.
+\begin{itemize}
+  \item Per Person. The tank volume is determined by summing the design level of people in the model and multiplying by a user-entered volume per person factor.
 
-·~~~~~~~~Per Floor Area.~ The tank volume is determined by summing the floor area in all the zones in the model and multiplying by a user-entered volume per floor area factor.
+  \item Per Floor Area. The tank volume is determined by summing the floor area in all the zones in the model and multiplying by a user-entered volume per floor area factor.
 
-·~~~~~~~~Per Unit.~ The tank volume is determined by multiplying a user-entered volume per unit and a user-entered number of units.
+  \item Per Unit. The tank volume is determined by multiplying a user-entered volume per unit and a user-entered number of units.
 
-·~~~~~~~~Per Solar Collector Area.~ The tank volume is determined by summing the collector area in all the hot water solar collectors in the model and multiplying by a user-entered volume per collector area factor.
+  \item Per Solar Collector Area. The tank volume is determined by summing the collector area in all the hot water solar collectors in the model and multiplying by a user-entered volume per collector area factor.
+\end{itemize}
 
 \subsubsection{Autosizing Heater Capacity}\label{autosizing-heater-capacity}
 
 The heater capacity can be sized in the following ways depending on the design method chosen by the user.
 
-·~~~~~~~~Peak Draw.~ The heater capacity is determined from the tank volume, assumed start and finish temperatures and a user defined time for recovery.~ The heater capacity is then
+\begin{itemize}
+  \item Peak Draw. The heater capacity is determined from the tank volume, assumed start and finish temperatures and a user defined time for recovery.~ The heater capacity is then
+\end{itemize}
 
-\($\)\$ \({q_{heat}} = V\rho \,{c_p}({T_{finish}} - {T_{start}})\)
+\begin{equation}
+  q_{heat} = V\rho C_p \PB{T_{finish} - T_{start}}
+\end{equation}
 
 where,
 
@@ -730,7 +756,9 @@ where,
 
 ·~~~~~~~~Per Floor Area.~ The heater capacity is determined by summing the floor area in all the zones in the model and using a user-entered factor for recovery capacity per floor area.~ The heater capacity is then:
 
-\($\)\$ \({q_{heat}} = \frac{{{A_{floors}}{f_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} eryPerFloorArea}}({T_{finish}} - {T_{start}})\rho \,{c_p}}}{{3600}}\)
+\begin{equation}
+  q_{heat} = \frac{A_{floors}f_{RecoveryPerFloorArea}\PB{T_{finish} - T_{start}}\rho C_p}{3600}
+\end{equation}
 
 ·~~~~~~~~Per Unit.~ The heater capacity is determined from a user-entered Recovery Capacity per unit and a user-entered number of units.~ The heater capacity is then:
 

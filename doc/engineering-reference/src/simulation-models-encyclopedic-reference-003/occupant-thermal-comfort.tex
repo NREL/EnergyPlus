@@ -56,7 +56,7 @@ One more consideration is important in dealing with thermal comfort - the effect
 
 % table 78
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\caption{  General Nomenclature list for Thermal Comfort Models \protect \label{table:general-nomenclature-list-for-thermal-comfort}}\\
+\caption{  General Nomenclature list for Thermal Comfort Models \protect \label{table:general-nomenclature-list-for-thermal-comfort}}\\
 \toprule 
 Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
 \endhead
@@ -81,7 +81,7 @@ Many researchers have been exploring ways to predict the thermal sensation of pe
 
 % table 79
 \begin{longtable}[c]{@{}ll@{}}
-\caption{  Seven point Thermal Sensation Scale \protect \label{table:seven-point-thermal-sensation-scale}}\\
+\caption{  Seven point Thermal Sensation Scale \protect \label{table:seven-point-thermal-sensation-scale}}\\
 \toprule 
 Sensation & Description \tabularnewline \midrule
 \endhead
@@ -97,7 +97,7 @@ Sensation & Description \tabularnewline \midrule
 
 % table 80
 \begin{longtable}[c]{@{}ll@{}}
-\caption{  Nine point Thermal Sensation Scale \protect \label{table:nine-point-thermal-sensation-scale}}\\
+\caption{  Nine point Thermal Sensation Scale \protect \label{table:nine-point-thermal-sensation-scale}}\\
 \toprule 
 Sensation Value & Description \tabularnewline \midrule
 \endhead
@@ -129,7 +129,7 @@ Fanger's Comfort model was the first one developed. It was published first in 19
 
 % table 81
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\caption{  Nomenclature list for Fanger model \protect \label{table:nomenclature-list-for-fanger-model}}\\
+\caption{  Nomenclature list for Fanger model \protect \label{table:nomenclature-list-for-fanger-model}}\\
 \toprule 
 Mathematical variable & Description & Units & Range & FORTRAN variable \tabularnewline \midrule
 \endhead
@@ -226,7 +226,7 @@ The Pierce Two-Node model was developed at the John B. Pierce Foundation at Yale
 
 % table 82
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\caption{  Nomenclature list for Pierce Two-Node model \protect \label{table:nomenclature-list-for-pierce-two-node-model}}\\
+\caption{  Nomenclature list for Pierce Two-Node model \protect \label{table:nomenclature-list-for-pierce-two-node-model}}\\
 \toprule 
 Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
 \endhead
@@ -512,7 +512,7 @@ The KSU two-node model, developed at Kansas State University, was published in 1
 
 % table 83
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\caption{  Nomenclature list for KSU Two-Node model \protect \label{table:nomenclature-list-for-ksu-two-node-model}}\\
+\caption{  Nomenclature list for KSU Two-Node model \protect \label{table:nomenclature-list-for-ksu-two-node-model}}\\
 \toprule 
 Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
 \endhead
@@ -620,7 +620,9 @@ EvapHeatLossMax = 2.2*Hc*(SkinVapPress - VapPress)*CloPermeatEff
 
 Here, control signals, based on setpoint temperatures in the skin and core, are introduced into passive system equations and these equations are integrated numerically for small time increments or small increments in core and skin temperature. The control signals modulate the thermoregulatory mechanism and regulate the peripheral blood flow, the sweat rate, and the increase of metabolic heat by active muscle shivering. The development of the controlling functions of skin conductance (KS), sweat rate (E\(_{w}\)), and shivering (M\(_{v}\)) is based on their correlation with the deviations in skin and core temperatures from their setpoints.
 
-\begin{array}{l}KS = 5.3 + [6.75 + 42.45({T_{cr}} - 36.98) + 8.15{({T_{cr}} - 35.15)^{0.8}}({T_{sk}} - 33.8)]\\/[1.0 + 0.4(32.1 - {T_{sk}})]\end{array}
+\begin{equation}
+  KS = 5.3 + \frac{6.75+42.45\PB{T_{cr}-36.98}+8.15\PB{T_{cr}-35.15}^{0.8}\PB{T_{sk}-33.8}}{1+0.4\PB{32.1-T_{sk}}}
+\end{equation}
 
 SkinCndctDilation = 42.45*CoreSignalWarmMax \&
 
@@ -634,7 +636,9 @@ SkinCndctConstriction = 1.0 + 0.4*SkinSignalColdMax
 
 ThermCndct = 5.3+(6.75+SkinCndctDilation)/SkinCndctConstriction
 
-\begin{array}{l}{E_{sw}} = \phi  \times [260({T_{cr}} - 36.9) + 26({T_{sk}} - 33.8)]\exp [({T_{sk}} - 33.8)/8.5]\\/[1.0 + 0.05{(33.37 - {T_{sk}})^{2.4}}]\end{array}
+\begin{equation}
+  E_{sw} = \phi \frac{\RB{260\PB{T_{cr} - 36.9} + 26\PB{T_{sk} - 33.8}} \exp\RB{\PB{T_{sk} - 33.8}/8.5}}{1.0 + 0.05\PB{33.37 - T_{sk}}^{2.4}}
+\end{equation}
 
 WeighFac = 260.+70.*AcclPattern
 
@@ -824,7 +828,7 @@ In most building energy simulations, thermal comfort condition is calculated bas
 
 The model proposed to ASHRAE 55 is described below.
 
-For t\(_{ }\) \textless{} -5°C, \({I_{cl}} = 1\) .00
+For t\(_{ }\) \textless{} -5°C, \({I_{cl}} = 1\) .00
 
 For -5°C ≤ t\(_{)}\) \textless{} 5°C, \({I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}\)
 
@@ -864,7 +868,7 @@ There are three options to calculate mean radiant temperature in the thermal com
 
 % table 84
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\caption{  Nomenclature and variable list for MRT calculation \protect \label{table:nomenclature-and-variable-list-for-mrt}}\\
+\caption{  Nomenclature and variable list for MRT calculation \protect \label{table:nomenclature-and-variable-list-for-mrt}}\\
 \toprule 
 Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
 \endhead
