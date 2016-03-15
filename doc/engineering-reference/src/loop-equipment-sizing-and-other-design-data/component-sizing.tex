@@ -809,7 +809,8 @@ The design inlet air temperature depends on whether the coil is being sized for 
 
 \paragraph{Zone Coils}\label{zone-coils-2}
 
-If the coil is part of an \emph{AirTerminal:SingleDuct:*} unit (e.g., \emph{AirTerminal:SingleDuct:ConstantVolume:Reheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:SingleDuct:SeriesPIU:Reheat, etc.)}, the maximum steam flow rate is set equal to the terminal unit's maximum steam flow rate. Otherwise (e.g., the zone-level coil is part of \emph{ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:UnitVentilator, ZoneHVAC:UnitHeater or ZoneHVAC:VentilatedSlab}) the calculation is similar to that at the system level. A design load is calculated:
+If the coil is part of an \emph{AirTerminal:SingleDuct:*} unit \\
+(e.g., \emph{AirTerminal:SingleDuct:ConstantVolume:Reheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:SingleDuct:SeriesPIU:Reheat, etc.)}, the maximum steam flow rate is set equal to the terminal unit's maximum steam flow rate. Otherwise (e.g., the zone-level coil is part of \emph{ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:UnitVentilator, ZoneHVAC:UnitHeater or ZoneHVAC:VentilatedSlab}) the calculation is similar to that at the system level. A design load is calculated:
 
 \begin{equation}
 Loa{d_{coil,des}} = {\dot m_{air,des}}({c_{p,air}})({T_{air,coil,des,out}} - {T_{air,coil,des,in}})
@@ -2317,7 +2318,10 @@ where
 The solution of the following regression equation is used, assuming saturation effectiveness of 70\% and face air velocity of 3m/s:
 
 \begin{equation}
-\epsilon = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV - 1.48241VD^2 - 0.018992 D V^3 + 1.13137D^3V + 0.0327622 D^2V^3 - 0.145384D^3 V^2
+\begin{split}
+\epsilon =& 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV - 1.48241VD^2 \\
+&- 0.018992 D V^3 + 1.13137D^3V + 0.0327622 D^2V^3 - 0.145384D^3 V^2
+\end{split}
 \end{equation}
 
 where

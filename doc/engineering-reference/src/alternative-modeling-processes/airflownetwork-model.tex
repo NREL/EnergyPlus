@@ -6,7 +6,7 @@ The AirflowNetwork model provides the ability to simulate the performance of an 
 
 \subsection{Model Description}\label{model-description-001}
 
-The input object AirflowNetwork:SimulationControl provides access to the airflow network method, which consists of a set of nodes connected by airflow components through linkages. The objects AirflowNetwork:Multizone:Zone,~ AirflowNetwork:Multizone:ExternalNode, and AirflowNetwork:Distribution:Node represent airflow nodes. The objects AirflowNetwork:Multizone:Surface and AirflowNetwork:Distribution:Linkage represent airflow linkages. The other objects with a relationship between pressure and airflow represent airflow components.
+The input object AirflowNetwork:SimulationControl provides access to the airflow network method, which consists of a set of nodes connected by airflow components through linkages. The objects AirflowNetwork:Multizone:Zone, AirflowNetwork:Multizone:ExternalNode, and AirflowNetwork:Distribution:Node represent airflow nodes. The objects AirflowNetwork:Multizone:Surface and AirflowNetwork:Distribution:Linkage represent airflow linkages. The other objects with a relationship between pressure and airflow represent airflow components.
 
 The AirflowNetwork model consists of three sequential steps:
 
@@ -41,7 +41,7 @@ where
 
 \emph{C\(_{i}\)}~ = Air mass flow coefficient {[}m\(^{3}\){]}
 
-\(\Delta P\) \(_{ }\) = Pressure difference across the i-th linkage {[}Pa{]}
+\(\Delta P\) \(_{ }\) = Pressure difference across the i-th linkage {[}Pa{]}
 
 \emph{µ~~~}~~~~~~~~~~~ = Air viscosity {[}Pa-s{]}
 
@@ -89,13 +89,13 @@ By rearranging terms and adding wind pressure impacts, the above equation may be
 
 where
 
-\emph{P\(_{n}\), P\(_{m}\)} \(_{ }\) = Total pressures at nodes n and m {[}Pa{]}
+\emph{P\(_{n}\), P\(_{m}\)} \(_{ }\) = Total pressures at nodes n and m {[}Pa{]}
 
 \emph{P\(_{S}\)}~~~~~~~~~~~~~ = Pressure difference due to density and height differences {[}Pa{]}
 
-\emph{P\(_{ }\)}~~~~~~~~~~~ = Pressure difference due to wind {[}Pa{]}
+\emph{P\(_{ }\)}~~~~~~~~~~~ = Pressure difference due to wind {[}Pa{]}
 
-The Input Output Reference provides the relationship between airflow and pressure for the most of the components (Ref.AirflowNetwork Model). The relationship between airflow and pressure for the AirflowNetwork:Multizone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:SimpleOpening, and AirflowNetwork:Multizone:Component:HorizontalOpening objects are provided in detail in this reference.
+The Input Output Reference provides the relationship between airflow and pressure for the most of the components (Ref.AirflowNetwork Model). The relationship between airflow and pressure for the AirflowNetwork:Multizone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:SimpleOpening, and \\ AirflowNetwork:Multizone:Component:HorizontalOpening objects are provided in detail in this reference.
 
 \begin{figure}[hbtp] % fig 147
 \centering
@@ -180,7 +180,7 @@ The above calculation procedure is used for a normal rectangular window. For a h
 \begin{figure}[hbtp] % fig 148
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2703.png}
-\caption{  Schematic drawing of a horizontally-pivoted window \protect \label{fig:schematic-drawing-of-a-horizontally-pivoted}}
+\caption{  Schematic drawing of a horizontally-pivoted window \protect \label{fig:schematic-drawing-of-a-horizontally-pivoted}}
 \end{figure}
 
 The opening angle α (0-90°) is linearly proportional to the window opening factor (0-1.0). An opening factor of 1.0 is equal to an opening angle of 90°. The heights in the pivoted area are expressed as:
@@ -225,9 +225,9 @@ Pn\left( y \right) = {P_{0n}} - {\rho_n}gy
 
 where
 
-\emph{P\(_{n}\), P\(_{m}\)~ = \(_{ }\)}pressure at nodes (zones) n and m at y = 0, the reference elevation of the opening {[}Pa{]}
+\emph{P\(_{n}\), P\(_{m}\)~ = \(_{ }\)}pressure at nodes (zones) n and m at y = 0, the reference elevation of the opening {[}Pa{]}
 
-\emph{ρ\(_{n}\), ρ\(_{m}\)\(_{ }\)~ =}air densities of zones n and m {[}kg/m\(^{3}\){]}
+\emph{ρ\(_{n}\), ρ\(_{m}\)\(_{ }\)~ =}air densities of zones n and m {[}kg/m\(^{3}\){]}
 
 \emph{P\(_{n}\), P\(_{m}\)~ =}reference pressures of zones n and m {[}Pa{]}
 
@@ -239,7 +239,7 @@ v(y) = {C_d}\sqrt {2\frac{{{P_n}(y) - {P_m}(y)}}{\rho }}
 
 ~where
 
-\emph{C\(_{d}\)}\(_{ }\) = discharge coefficient {[}dimensionless{]}
+\emph{C\(_{d}\)}\(_{ }\) = discharge coefficient {[}dimensionless{]}
 
 \emph{ρ}~~ = density of the air going through the opening {[}kg/m\(^{3}\){]}
 
@@ -315,7 +315,7 @@ where:
 
 A~~~ = Opening area {[}m\(^{2}\){]}
 
-C\(_{ }\) = Discharge coefficient {[}Dimensionless{]}
+C\(_{ }\) = Discharge coefficient {[}Dimensionless{]}
 
 ρ\(_{e}\) = Average air density between the lower and upper zones {[}Pa{]}
 
@@ -339,7 +339,7 @@ where\textbf{:}
 
 A~~~ = Opening area {[}m\(^{2}\){]}
 
-C\(_{ }\) = Discharge coefficient {[}Dimensionless{]}
+C\(_{ }\) = Discharge coefficient {[}Dimensionless{]}
 
 ρ\(_{e}\) = Average air density between the lower and upper zones {[}Pa{]}
 
@@ -359,7 +359,7 @@ where:
 
 g~~~ = Gravity acceleration {[}m/s\(^{2}\){]}
 
-D\(_{ }\) = Hydraulic diameter {[}m{]}
+D\(_{ }\) = Hydraulic diameter {[}m{]}
 
 ρ\(_{e}\) = Average air density between the lower and upper zones {[}kg/m\(^{3}\){]}
 
@@ -379,7 +379,7 @@ where:
 
 g~~~ = Gravity acceleration {[}m/s\(^{2}\){]}
 
-D\(_{ }\) = Hydraulic diameter {[}m{]}
+D\(_{ }\) = Hydraulic diameter {[}m{]}
 
 A~~~ = Opening area {[}m\(^{2}\){]}
 
@@ -439,7 +439,7 @@ where:
 
 A~~~ = Opening area {[}m\(^{2}\){]}
 
-C\(_{ }\) = Discharge coefficient {[}dimensionless{]}
+C\(_{ }\) = Discharge coefficient {[}dimensionless{]}
 
 Ρ\(_{e}\) = Average air density between the lower and upper zones {[}Pa{]}
 
@@ -487,7 +487,7 @@ Figure~\ref{fig:flow-rates-at-different-pressure-differences} demonstrates possi
 
 % table 49
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{  Legend Description \protect \label{table:legend-description}}\\
+\caption{  Legend Description \protect \label{table:legend-description}}\\
 \toprule 
 Legend & Description \tabularnewline \midrule
 \endhead
@@ -516,7 +516,7 @@ The wind pressure is determined by Bernoulli's equation, assuming no height chan
 
 where:
 
-\emph{p\(_{ }\)}~~~~~~~~~~~ = Wind surface pressure relative to static pressure in undisturbed flow {[}Pa{]}
+\emph{p\(_{ }\)}~~~~~~~~~~~ = Wind surface pressure relative to static pressure in undisturbed flow {[}Pa{]}
 
 \emph{ρ}~~~~~~~~~~~~~~~ = Air density {[}kg/m\(^{3}\){]}
 
@@ -596,9 +596,9 @@ where
 
 \emph{C\(_{n}\)}~ = Correction value at the n\(_{h}\) node {[}Pa{]}
 
-\emph{P\(_{n}\)} \(_{ }\) = Estimated pressure at the n\(_{h}\) node {[}Pa{]}
+\emph{P\(_{n}\)} \(_{ }\) = Estimated pressure at the n\(_{h}\) node {[}Pa{]}
 
-\emph{P\(_{n}\)\(^{*}\)}\(_{ }\) = Corrected pressure at the n\(_{h}\) node used in the next iteration {[}Pa{]}
+\emph{P\(_{n}\)\(^{*}\)}\(_{ }\) = Corrected pressure at the n\(_{h}\) node used in the next iteration {[}Pa{]}
 
 This method is similar to a Steffensen iteration (Conte and de Boor 1972) which is used as a fixed-point iteration method for individual nonlinear equations.
 
@@ -632,7 +632,7 @@ U = \frac{1}{{\frac{1}{{{h_i}}} + \frac{1}{{{h_o}}} + \sum {\frac{{{t_j}}}{{{k_j
 
 \emph{h\(_{i}\)}~~~~~~~~ = Inside heat transfer coefficient {[}W/m\(^{2}\)•K{]}
 
-\emph{h\(_{o}\)}\(_{ }\) = Outside heat transfer coefficient {[}W/m\(^{2}\)•K{]}
+\emph{h\(_{o}\)}\(_{ }\) = Outside heat transfer coefficient {[}W/m\(^{2}\)•K{]}
 
 \emph{t\(_{j}\)}~~~~~~~~~ = Thickness at j-th layer {[}m{]}
 
@@ -700,9 +700,9 @@ where
 {U_m} = \frac{1}{{\frac{1}{{{h_{m,i}}}} + \frac{1}{{{h_{m,o}}}} + \sum {\frac{{{t_j}}}{{{D_j}}}} }}
 \end{equation}
 
-\emph{h\(_{i}\)} \(_{ }\) ~~~~~~~~~~~ = Inside moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
+\emph{h\(_{i}\)} \(_{ }\) ~~~~~~~~~~~ = Inside moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
 
-\emph{h\(_{ }\)}\(_{ }\) = Outside moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
+\emph{h\(_{ }\)}\(_{ }\) = Outside moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
 
 \emph{t\(_{j}\)}~~~~~~~~~~~~~~~ = Thickness at j-th layer {[}m{]}
 
@@ -718,7 +718,7 @@ where
 
 \emph{W\(_{i}\)}~~~~~~~~~~~~~ = Inlet air humidity ratio {[}kg/kg{]}
 
-\emph{W\(_{ }\)}~~~~~~~~~~~ = Outlet air humidity ratio {[}kg/kg{]}
+\emph{W\(_{ }\)}~~~~~~~~~~~ = Outlet air humidity ratio {[}kg/kg{]}
 
 \emph{A}~~~~~~~~~~~~~~~ = Surface area (Perimeter * Length) {[}m\(^{2}\){]}
 
@@ -898,9 +898,10 @@ The loads calculated by the AirflowNetwork model are integrated into the EnergyP
 
 The revised zone temperature update equation becomes:
 
+{\scriptsize
 \begin{equation}
 T_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {\mathop {{Q_i}}\limits^ \bullet  }  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + MCPTairflow + {{\mathop m\limits^ \bullet  }_{sys}}{C_p}{T_{{\rm{supply}}}} + QADS,z - \left( {\frac{{{C_z}}}{{\delta t}}} \right)\left( { - 3T_z^{t - \delta t} + \frac{3}{2}T_z^{t - 2\delta t} - \frac{1}{3}T_z^{t - 3\delta t}} \right)}}{{\left( {\frac{{11}}{6}} \right)\frac{{{C_z}}}{{\delta t}} + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} A + MCPairflow + {{\mathop m\limits^ \bullet  }_{sys}}C}}
-\end{equation}
+\end{equation}}
 
 Where MCPT\(_{w}\) is the sum of mass flow rate multiplied by specific heat and temperature for infiltration and mixing, Q\(_{z}\) is the added total sensible load in the zone due to Air Distribution System losses, and MCP\(_{w}\) is the sum of mass flow rate multiplied by specific heat for infiltration and mixing as calculated in the AirflowNetwork model described above.
 
@@ -910,7 +911,7 @@ The revised coefficient (B) used in the zone humidity ratio calculation is shown
 B = \sum {k{g_{mas{s_{{\rm{Sched Loads}}}}}}}  + M{W_{airflow}} + {\dot m_{sy{s_{in}}}}{W_{sys}} + \sum\limits_{i = 1}^{surfs} {{A_i}{h_{mi}}{\rho_{ai{r_z}}}{W_{surf{s_i}}}}  + QADS,m,z
 \end{equation}
 
-Where MW\(_{w}\) is the sum of mass flow rate multiplied by humidity ratio for infiltration and mixing and Q\(_{ }\)is the added total latent (moisture) load in the zone due to Air Distribution System losses from the AirflowNetwork model described above. This coefficient is used in the prediction of moisture as described in the section ``Moisture Predictor-Corrector'' found elsewhere in this document.
+Where MW\(_{w}\) is the sum of mass flow rate multiplied by humidity ratio for infiltration and mixing and Q\(_{ }\)is the added total latent (moisture) load in the zone due to Air Distribution System losses from the AirflowNetwork model described above. This coefficient is used in the prediction of moisture as described in the section ``Moisture Predictor-Corrector'' found elsewhere in this document.
 
 \subsection{Model Output}\label{model-output}
 

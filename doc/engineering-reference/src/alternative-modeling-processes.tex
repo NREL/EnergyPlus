@@ -27,9 +27,10 @@ The room air models are coupled to the heat balance routines using the framework
 
 The inside face temperature calculation is modified by rewriting the zone air temperature, \emph{T\(_{a}\)}, with an additional subscript, \emph{i}, for the surface index (\({T_{{a_j}}} \to {T_{{a_{i,j}}}}\) or \({T_{{a_{}}}} \to {T_{{a_i}}}\) ).~ The inside face heat balance is solved for its surface temperature using,
 
+{\scriptsize
 \begin{equation}
 {T_{{s_{i,j}}}} = \frac{{{T_{s{o_{i,j}}}}{Y_{i,o}} + \sum\limits_{k = 1}^{nz} {{T_{s{o_{i,j - k}}}}} {Y_{i,k}} - \sum\limits_{k = 1}^{nz} {{T_{{s_{i,j - k}}}}} {Z_{i,k}} + \sum\limits_{k = 1}^{nq} {{\Phi_{i,k}}{{q''}_{k{i_{i,j - k}}}} + {T_{{a_{i,j}}}}{h_{{c_{i,j}}}} + {{q''}_{LWS}} + {{q''}_{LWX}} + {{q''}_{SW}} + {{q''}_{sol}}} }}{{{Z_{i,o}} + {h_{{c_{i,j}}}}}}
-\end{equation}
+\end{equation}}
 
 where, ~~~~~~~ \emph{T\(_{s}\)} ~~~~~~~ is the inside face temperature
 
@@ -43,7 +44,7 @@ where, ~~~~~~~ \emph{T\(_{s}\)} ~~~~~~~ is the inside face temperature
 
 ~~~~~ \emph{Y\(_{i}\) ~~~~~~~} are the cross CTF coefficients
 
-~~~~~ \emph{Z\(_{ }\)} are the inside CTF coefficients
+~~~~~ \emph{Z\(_{ }\)} are the inside CTF coefficients
 
 ~~~~~ \emph{Φ\(_{i}\)} ~~~~~~~ are the flux CTF coefficients
 
@@ -172,7 +173,7 @@ where \emph{H\(_{n}\)} is the distance between the air system return and the flo
 \begin{figure}[hbtp] % fig 132
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2341.svg.png}
-\caption{  Height versus temperature schematic for Mundt model \protect \label{fig:height-versus-temperature-schematic-for-mundt}}
+\caption{  Height versus temperature schematic for Mundt model \protect \label{fig:height-versus-temperature-schematic-for-mundt}}
 \end{figure}
 
 The constant slope allows obtaining temperatures at any vertical location using,
@@ -393,14 +394,16 @@ During the surface loop, once the h\(_{c}\)~for a surface is calculated, the app
 
 The calculation of~ subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
 
+{\scriptsize
 \begin{equation}
 T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + MCP_{tot})
-\end{equation}
+\end{equation}}
 
+{\scriptsize
 \begin{array}{l}
     T_{oc} = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + T_{fl} \cdot MCP_{tot}) / (11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})
     T_{mx} = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
-  \end{array}
+  \end{array}}
 
 Here \({C_{air,fl}}\) , \({C_{air,oc}}\) , and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
 
@@ -430,9 +433,10 @@ Then the code iterates over these steps.
 
 1.~~~~Calculate \emph{T\(_{g}\)} using
 
+{\scriptsize
 \begin{equation}
 T_{avg} = (C_{air,z} \cdot (3 \cdot T_{ - 1,z} - (3/2) \cdot T_{ - 2,z} + (1/3) \cdot T_{ - 3,z}) + \dot Q_{tot,conv} + HAT_{oc} + HAT_{mx} + HAT_{fl} + MCPT_{tot}) / ((11/6) \cdot C_{air,z} + HA_{oc} + HA_{mx} + HA_{fl} + MCP_{tot})
-\end{equation}
+\end{equation}}
 
 \begin{equation}
 {T_{mx}} = {T_{avg}}
@@ -761,7 +765,10 @@ The UCSD UFI model is controlled by the subroutine \emph{ManageUCSDUFModels} whi
 The calculation is done in subroutine \emph{CalcUCSDUI}. First we calculate the convective heat gain going into the upper and lower regions.
 
 \begin{equation}
-\dot Q_{ocz} = \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} + \dot Q_{bb,conv} + \dot Q_{waterheater,conv} + \dot Q_{fuelcell,conv}
+\begin{split}
+\dot Q_{ocz} =& \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} \\
+&+ \dot Q_{bb,conv} + \dot Q_{waterheater,conv} + \dot Q_{fuelcell,conv}
+\end{split}
 \end{equation}
 
 \begin{equation}
@@ -867,8 +874,8 @@ During the surface loop, once the h\(_{c}\)~for a surface is calculated, the app
 The calculation of~ subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
 
 \begin{array}{cl}
-    T_{oc} & = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot}) / ((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot}) \\
-    T_{mx} & = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
+    T_{oc} & = \frac{(C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot})} {((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})} \\
+    T_{mx} & = \frac{(C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot})} {((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})}
   \end{array}
 
 Here \({C_{air,oc}}\) ~and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
@@ -1058,7 +1065,10 @@ The UCSD UFE model is controlled by the subroutine \emph{ManageUCSDUFModels} whi
 The calculation is done in subroutine \emph{CalcUCSDUEI}. First we calculate the convective heat gain going into the upper and lower regions.
 
 \begin{equation}
-\dot Q_{ocz} = \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} + \dot Q_{bb,conv} + \dot Q_{waterheater,conv} + \dot Q_{fuelcell,conv}
+\begin{split}
+\dot Q_{ocz} =& \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} \\
+&+ \dot Q_{bb,conv} + \dot Q_{waterheater,conv} + \dot Q_{fuelcell,conv}
+\end{split}
 \end{equation}
 
 \begin{equation}
@@ -1159,11 +1169,11 @@ During the surface loop, once the h\(_{c}\)~for a surface is calculated, the app
 
 The calculation of~ subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
 
-\begin{array}{rl}
-  T_{oc} & = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot})/((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot}) \\
-  T_{mx} & = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot})/((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
- \end{array}
-
+\begin{array}{cl}
+    T_{oc} & = \frac{(C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot})} {((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})} \\
+    T_{mx} & = \frac{(C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot})} {((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})}
+  \end{array}
+  
 Here \({C_{air,oc}}\) ~and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
 
 \begin{equation}
@@ -1479,37 +1489,37 @@ RANGE (max:min ratio) \tabularnewline
 \end{longtable}
 
 % table 45
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\begin{longtable}[c]{p{1.25in}p{0.5in}p{0.5in}p{3.0in}}
 \caption{Definitions of output variables \protect \label{table:definitions-of-output-variables}}\\
 \toprule 
 Output variable & Symbol & Units & Definition \tabularnewline \midrule
 \endhead
-Jet velocity & \$\{U\_J\}\$ & m/s & Volume-averaged jet region velocity. The averaging volume is bounded at each x along the room depth by the line in the y-z plane where the jet velocity drops to 50\% of its maximum centerline value. \tabularnewline
-Recirculation zone velocity & \$\{U\_R\}\$ & m/s & Area-averaged velocity in the y-z plane with maximum flow. The averaging area is the recirculation part of the room cross-section. Typically the plane of maximum flow occurs at x~\textbackslash\~{}~2D/3 (D/3 before the outlet). \tabularnewline
-Recirculation zone flow rate & \$\{Q\_R\}\$ & m  /s & Total flow rate for the recirculation regions in the plane of maximum flow (see above). \tabularnewline
-Jet temperature rise & \$\textbackslashDelta \{T\_J\}\$ & °C & Volume-averaged temperature variations in the jet region, over the same volume used to define the jet velocity average. \tabularnewline
-Recirculation zone temperature rise & \$\textbackslashDelta \{T\_R\}\$ & °C & Volume-average temperature variations in the recirculation region. The average is calculated over the cuboidal volume placed in each recirculation containing the volumetric sensible heat gains (see main text). \tabularnewline
+Jet velocity & U\(_J\) & m/s & Volume-averaged jet region velocity. The averaging volume is bounded at each x along the room depth by the line in the y-z plane where the jet velocity drops to 50\% of its maximum centerline value. \tabularnewline
+Recirculation zone velocity & U\(_R\) & m/s & Area-averaged velocity in the y-z plane with maximum flow. The averaging area is the recirculation part of the room cross-section. Typically the plane of maximum flow occurs at x~\textbackslash\~{}~2D/3 (D/3 before the outlet). \tabularnewline
+Recirculation zone flow rate & Q\(_R\) & m  /s & Total flow rate for the recirculation regions in the plane of maximum flow (see above). \tabularnewline
+Jet temperature rise & $\Delta$T\(_J\) & °C & Volume-averaged temperature variations in the jet region, over the same volume used to define the jet velocity average. \tabularnewline
+Recirculation zone temperature rise & $\Delta$T\(_R\) & °C & Volume-average temperature variations in the recirculation region. The average is calculated over the cuboidal volume placed in each recirculation containing the volumetric sensible heat gains (see main text). \tabularnewline
 \bottomrule
 \end{longtable}
 
 See also Figure~\ref{fig:jet-and-recirculation-regions-in-typical}. Note the \emph{x}-coordinate is along the room, the \emph{y}-coordinate is across the room and the \emph{z}-coordinate is vertical.
 
 % table 46
-\begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
+\begin{longtable}[c]{p{1.0in}p{0.5in}p{2.0in}p{0.5in}p{0.5in}p{0.5in}}
 \caption{Correlation formulae in the form Y = aX + b \protect \label{table:correlation-formulae-in-the-form-y-ax-+-b}}\\
 \toprule 
-~ & Y & X & a & b & R \tabularnewline \midrule
+~ & Y & X & a & b & R\(^2\) \tabularnewline \midrule
 \endhead
-Jet velocity & \$\{U\_J\}/\{U\_\{in\}\}\$ & \$\textbackslashsqrt \{\{A\_\{in\}\}/\{A\_\{RM\}\}\} \textbackslashcdot \textbackslashleft( \{\{V\_\{J,m\}\}/\{U\_\{in\}\}\} \textbackslashright)\$ & 1.6173 & 0.1466 & 0.8343 \tabularnewline
-Recirculation zone velocity & \$\{U\_R\}/\{U\_\{in\}\}\$ & \$\textbackslashsqrt \{\{A\_\{in\}\}/\{A\_\{RM\}\}\} \textbackslashcdot \textbackslashleft( \{\{V\_\{J,m\}\}/\{U\_\{in\}\}\} \textbackslashright)\$ & 0.8911 & 0.0393 & 0.6464 \tabularnewline
-Recirculation zone flow rate & \$\{Q\_R\}/\{U\_\{in\}\}\$ & \$\textbackslashsqrt \{\{A\_\{in\}\}\{A\_\{RM\}\}\} \textbackslashcdot \textbackslashleft( \{\{V\_\{J,m\}\}/\{U\_\{in\}\}\} \textbackslashright)\$ & 0.4444 & 0.1751 & 0.6761 \tabularnewline
-Jet temperature rise & \$\textbackslashDelta \{T\_J\}\$ & \$\textbackslashfrac\{\{q'\{'\_\{RM\}\}\}\}\{\{\textbackslashrho \{c\_p\}\{Q\_\{in\}\}\}\}\$ & 0.8254 & 0 & n/a \tabularnewline
-Recirculation zone temperature rise & \$\textbackslashDelta \{T\_R\}\$ & \$\textbackslashfrac\{\{q'\{'\_\{RM\}\}\}\}\{\{\textbackslashrho \{c\_p\}\{Q\_\{in\}\}\}\}\$ & 1.2734 & 0 & n/a \tabularnewline
+Jet velocity & U\(_J\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in})$ & 1.6173 & 0.1466 & 0.8343 \tabularnewline
+Recirculation zone velocity & U\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in})$ & 0.8911 & 0.0393 & 0.6464 \tabularnewline
+Recirculation zone flow rate & Q\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in})$ & 0.4444 & 0.1751 & 0.6761 \tabularnewline
+Jet temperature rise & $\Delta$T\(_J\) & $\frac{q''_{RM}}{\rho {c_p}{Q_{in}}}$ & 0.8254 & 0 & n/a \tabularnewline
+Recirculation zone temperature rise & $\Delta$T\(_R\) & $\frac{q''_{RM}}{\rho {c_p}{Q_{in}}}$ & 1.2734 & 0 & n/a \tabularnewline
 \bottomrule
 \end{longtable}
 
 % table 47
-\begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+\begin{longtable}[c]{p{0.5in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
 \caption{Accuracy of correlation formulae in predicting test case results \protect \label{table:accuracy-of-correlation-formulae-in}}\\
 \toprule 
 Cases & Errors (\%) \tabularnewline \midrule
@@ -1535,17 +1545,29 @@ Average & 8 & 17 & 19 & 9 & 6 \tabularnewline
 
 In each case the error is the percentage difference between the given correlation prediction and the test case result obtained from CFD, i.e.~100*\textbar{}(correlation prediction -- CFD)/CFD\textbar{}.
 
-\(\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({U_J}/{U_{in}}\) \includegraphics{media/image2652.png}
+\(\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({U_J}/{U_{in}}\) 
 
-Figure 140. Jet velocity correlation.
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2652.png}
+\caption{Jet velocity correlation. \protect \label{fig:jet-veolicty-correlation}}
+\end{figure}
 
-\(\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({U_R}/{U_{in}}\) \includegraphics{media/image2655.png}
+\(\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({U_R}/{U_{in}}\) 
 
-Figure 141. Recirculation region velocity correlation.
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2655.png}
+\caption{Recirculation region velocity correlation. \protect \label{fig:recirculation-region-velocity}}
+\end{figure}
 
-\(\sqrt {{A_{in}}{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({Q_R}/{U_{in}}\) \includegraphics{media/image2658.png}
+\(\sqrt {{A_{in}}{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({Q_R}/{U_{in}}\) 
 
-Figure 142. Recirculation region flow rate.
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2658.png}
+\caption{Recirculation region flow rate. \protect \label{fig:recirculation-region-flow-rate}}
+\end{figure}
 
 \subsubsection{Wind angle effects}\label{wind-angle-effects}
 
@@ -1702,43 +1724,43 @@ For simplicity the heat gains are considered to be evenly distributed along the 
 \end{equation}
 
 % table 48
-\begin{longtable}[c]{p{1.72in}p{1.5in}p{2.77in}}
+\begin{longtable}[c]{p{1.0in}p{1.0in}p{3.5in}}
 \caption{List of variables for CV model \protect \label{table:list-of-variables-for-cv-model}}\\
 \toprule 
 Symbol & Units & Description \tabularnewline \midrule
 \endhead
 a & - & Slope of correlation line of best fit \tabularnewline
-A & m & Inlet area \tabularnewline
-A & m & Room cross-sectional area \tabularnewline
+A\(_{in}\) & m\(^2\) & Inlet area \tabularnewline
+A\(_{RM}\) & m\(^2\) & Room cross-sectional area \tabularnewline
 b & - & Intercept of correlation line of best fit \tabularnewline
-c & J/kg/K & Specific heat capacity of air \tabularnewline
-C & - & Confinement scaling factor, (A  /A  ) \tabularnewline
-C & - & Correlation constant for jet velocity \tabularnewline
-C & - & Correlation constant for recirculation velocity \tabularnewline
-C & - & Correlation constant for recirculation flow rate \tabularnewline
+c\(_{p}\) & J/kg/K & Specific heat capacity of air \tabularnewline
+C\(_{RM}\) & - & Confinement scaling factor, (A\(_{in}\)/A\(_{RM}\))\(^{1/2}\) \tabularnewline
+C\(_{1}\) & - & Correlation constant for jet velocity \tabularnewline
+C\(_{2}\) & - & Correlation constant for recirculation velocity \tabularnewline
+C\(_{3}\) & - & Correlation constant for recirculation flow rate \tabularnewline
 D & m & Room depth, distance between inlet and outlet facades \tabularnewline
 D* & m & Effective room depth adjusted for wind angle \tabularnewline
 H & m & Room height \tabularnewline
-~~~~~~~~~~~ \$q'\{'\_\{RM\}\}\$ & W & Total heat input from internal heat sources \tabularnewline
-Q & m  /s & Inlet flow rate, A   U \tabularnewline
-~~~~~~~~~~~ \$\{Q\_R\}\$ & m  /s & Maximum recirculation region flow rate \tabularnewline
-U & m/s & Inlet velocity, average over inlet area \tabularnewline
-U & m/s & Maximum centerline velocity of jet \tabularnewline
-U & m/s & Uniform inlet velocity of jet \tabularnewline
-~~~~~~~~~~~ \$\{U\_J\}\$ & m/s & Volume-averaged jet velocity \tabularnewline
-~~~~~~~~~~~ \$\{U\_R\}\$ & m/s & Average recirculation region velocity over plane of maximum flow \tabularnewline
+q\(^{''}_{RM}\) & W & Total heat input from internal heat sources \tabularnewline
+Q\(_{in}\) & m\(^3\)/s & Inlet flow rate, A\(_{in}\)U\(_{in}\) \tabularnewline
+Q\(_R\) & m\(^3\)/s & Maximum recirculation region flow rate \tabularnewline
+U\(_{in}\) & m/s & Inlet velocity, average over inlet area \tabularnewline
+U\(_{m}\) & m/s & Maximum centerline velocity of jet \tabularnewline
+U\(_{o}\) & m/s & Uniform inlet velocity of jet \tabularnewline
+U\(_{J}\) & m/s & Volume-averaged jet velocity \tabularnewline
+U\(_{R}\) & m/s & Average recirculation region velocity over plane of maximum flow \tabularnewline
 V & m/s & Velocity scale \tabularnewline
-V & m/s & Average of U   over room depth \tabularnewline
+V\(_{J,m}\) & m/s & Average of U\(_{m}\) over room depth \tabularnewline
 W & m & Room width \tabularnewline
-x & m & Coordinate along room depth, 0 ≤ x ≤ D \tabularnewline
+x & m & Coordinate along room depth, 0 $\leq$ x $\leq$ D \tabularnewline
 x' & - & Non-dimensional x-coordinate, x/D \tabularnewline
 X & m/s & Velocity correlation parameter \tabularnewline
 Y & m & Lateral coordinate across room width \tabularnewline
 Z & m & Vertical coordinate \tabularnewline
-~~~~~~~~~~~ \$\textbackslashDelta \{T\_J\}\$ & °C & Average jet temperature variation \tabularnewline
-\$\textbackslashDelta \{T\_R\}\$ & °C & Average recirculation region temperature variation \tabularnewline
-r & kg/m & Density of air \tabularnewline
-φ & ° & Wind direction relative to façade normal \tabularnewline
+$\Delta$T\(_{J}\) & °C & Average jet temperature variation \tabularnewline
+$\Delta$T\(_{R}\) & °C & Average recirculation region temperature variation \tabularnewline
+r & kg/m\(^3\) & Density of air \tabularnewline
+$\varphi$ & ° & Wind direction relative to façade normal \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1789,7 +1811,10 @@ Governing equations for each RoomAirflowNetwork node are described below:
 Energy balance equation
 
 \begin{equation}
-{F_i}{C_{z,i}}\frac{{d{T_{z,i}}}}{{dt}} = \sum\limits_{j = 1}^{{N_{i,g}}} {{F_{gain,j}{\dot Q}_{i,j}}}  + \sum\limits_{j = 1}^{{N_{i,sur}}} {{h_{i,j}}} {A_j}\left( {{T_{s,j}} - {T_{z,i}}} \right) + \sum\limits_{j = 1}^{{N_{i,AFN}}} {{{\dot m}_{AFN i,j}}} {C_p}\left( {{T_{z,j}} - {T_{z,i}}} \right)\, + \sum\limits_{j = 1}^{{N_{i,HVAC}}} {{{F_{HVAC,j}}{\dot m}_{sup,i,j}}} {C_p}\left( {{T_{sup_j}} - {T_{z,i}}} \right)
+\begin{split}
+{F_i}{C_{z,i}}\frac{{d{T_{z,i}}}}{{dt}} =& \sum\limits_{j = 1}^{{N_{i,g}}} {{F_{gain,j}{\dot Q}_{i,j}}}  + \sum\limits_{j = 1}^{{N_{i,sur}}} {{h_{i,j}}} {A_j}\left( {{T_{s,j}} - {T_{z,i}}} \right) + \sum\limits_{j = 1}^{{N_{i,AFN}}} {{{\dot m}_{AFN i,j}}} {C_p}\left( {{T_{z,j}} - {T_{z,i}}} \right)\, \\
+&+ \sum\limits_{j = 1}^{{N_{i,HVAC}}} {{{F_{HVAC,j}}{\dot m}_{sup,i,j}}} {C_p}\left( {{T_{sup_j}} - {T_{z,i}}} \right)
+\end{split}
 \end{equation}
 
 where:
@@ -1808,9 +1833,9 @@ V = Zone air volume
 
 T\(_{i}\) = Air temperature at the ith zone RoomAir node
 
-N\(_{g}\) = The number of internal gains for the ith node, defined in the RoomAir:Node:Airflownetwork:InternalGains object
+N\(_{g}\) = The number of internal gains for the ith node, defined in the \\ RoomAir:Node:Airflownetwork:InternalGains object
 
-F\(_{j}\) = Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
+F\(_{j}\) = Fraction of internal gain from jth internal gain object defined in the \\ RoomAir:Node:Airflownetwork:InternalGains object
 
 \({\dot Q}_{i,j}\) = The amount of internal sensible gain at the jth internal gain object and ith node.
 
@@ -1847,7 +1872,10 @@ T\(_{j}\) = Supply air temperature at the jth HVAC equipment
 Moisture balance equation
 
 \begin{equation}
-{F_i}{M_{z,i}}\frac{{d{W_{z,i}}}}{{dt}} = \sum\limits_{j = 1}^{{N_{i,g}}} {{F_{gain,j}{\dot Q}_{i,j}}}  + \sum\limits_{j = 1}^{{N_{i,sur}}} {{h_{M,j}}} {A_j}\left( {{W_{s,j}} - {W_{z,i}}} \right) + \sum\limits_{j = 1}^{{N_{i,AFN}}} {{{\dot m}_{AFN i,j}}} \left( {{W_{z,j}} - {W_{z,i}}} \right)\, + \sum\limits_{j = 1}^{{N_{i,HVAC}}} {{{F_{HVAC,j}}{\dot m}_{sup,i,j}}} \left( {{W_{sup_j}} - {W_{z,i}}} \right)
+\begin{split}
+{F_i}{M_{z,i}}\frac{{d{W_{z,i}}}}{{dt}} =& \sum\limits_{j = 1}^{{N_{i,g}}} {{F_{gain,j}{\dot Q}_{i,j}}}  + \sum\limits_{j = 1}^{{N_{i,sur}}} {{h_{M,j}}} {A_j}\left( {{W_{s,j}} - {W_{z,i}}} \right) + \sum\limits_{j = 1}^{{N_{i,AFN}}} {{{\dot m}_{AFN i,j}}} \left( {{W_{z,j}} - {W_{z,i}}} \right)\, \\
+&+ \sum\limits_{j = 1}^{{N_{i,HVAC}}} {{{F_{HVAC,j}}{\dot m}_{sup,i,j}}} \left( {{W_{sup_j}} - {W_{z,i}}} \right)
+\end{split}
 \end{equation}
 
 where:
@@ -1862,9 +1890,9 @@ V = Zone air volume
 
 W\(_{i}\) = Air humidity ratio at the ith zone RoomAir node
 
-N\(_{g}\) = The number of internal gains for the ith node, defined in the RoomAir:Node:Airflownetwork:InternalGains object
+N\(_{g}\) = The number of internal gains for the ith node, defined in the \\ RoomAir:Node:Airflownetwork:InternalGains object
 
-F\(_{j}\) = Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
+F\(_{j}\) = Fraction of internal gain from jth internal gain object defined in the \\ RoomAir:Node:Airflownetwork:InternalGains object
 
 \({\dot Q}_{i,j}\) = The amount of internal latent gain at the jth internal gain object and ith node.
 

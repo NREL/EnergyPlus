@@ -38,15 +38,19 @@ The X, Y, and Z coordinates, in the same coordinate system, of the second daylig
 
 The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the First Reference Point. If there is only one reference point then a fraction equal to
 
-1.0~- (Fraction of Zone Controlled by First Reference Point)
+\begin{equation}
+  1.0 - (\rm{Fraction of Zone Controlled by First Reference Point})
+\end{equation}
 
-~is assumed to have no lighting control.
+is assumed to have no lighting control.
 
 \paragraph{Field: Fraction of Zone Controlled by Second Reference Point}\label{field-fraction-of-zone-controlled-by-second-reference-point}
 
 The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the Second Reference Point. Required if Total Daylighting Reference Points = 2. A fraction equal to
 
-1.0 -- ({[}Fraction of Zone Controlled by First Reference Point{]} + {[}Fraction of Zone Controlled by Second Reference Point{]})
+\begin{equation}
+  1.0 - ([\rm{Fraction of Zone Controlled by First Reference Point}] + [\rm{Fraction of Zone Controlled by Second Reference Point}])
+\end{equation}
 
 is assumed to have no lighting control.
 
@@ -96,13 +100,12 @@ The following table gives recommended values of Maximum Allowable Discomfort Gla
 
 % table 19
 \begin{longtable}[c]{p{3.64in}p{2.35in}}
-\caption{Recommended Values -- Discomfort Glare Index \protect \label{table:recommended-values-discomfort-glare-index}}\\
+  \caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \protect \label{table:recommended-values-discomfort-glare-index}}\\
 \toprule 
-Recommended Values of Maximum Allowable Discomfort Glare Index \tabularnewline \midrule
+Activity or Zone Type & Maximum Allowable DGI \tabularnewline \midrule
 \endhead
-Activity or zone type & Maximum Allowable Discomfort Glare Index \tabularnewline
 Art Galleries & 16 \tabularnewline
-Factories &  \tabularnewline
+Factories & -- \tabularnewline
 Rough work & 28 \tabularnewline
 Engine assembly & 26 \tabularnewline
 Fine assembly & 24 \tabularnewline
@@ -152,25 +155,24 @@ This alpha field is optional and may be used to define the name of a schedule th
 An IDF example:
 
 \begin{lstlisting}
-
 Daylighting:Controls, ! Zone Name
-      1,                ! Total Daylighting Reference Points
-      3.048,3.048,0.9,  ! X,Y,Z coordinates of first reference point {m}
-      0.0,0.0,0.0,      ! X,Y,Z coordinates of second reference point, if present {m}
-      0.99,             ! Fraction of zone controlled by first reference point
-      0.0,              ! Fraction of zone controlled by second reference point, if present
-      500.,             ! Illuminance setpoint at first reference point {lux}
-      500.,             ! Illuminance setpoint at second reference point, if present {lux}
-      1,                ! Lighting control type {1 = continuous,2 = stepped,3 = continuous/off}
-      180.0,            ! Azimuth angle of view direction for glare calculation {deg},
-                        !   measured clockwise from zone y-axis. Value of 180 gives view
-                        !   (from reference point) that is directly at window, maximizing glare.
-      20.0,             ! Maximum discomfort glare index for window shade control
-      0.3,              ! Minimum input power fraction for continuous dimming control
-      0.2,              ! Minimum light output fraction for continuous dimming control
-      0,                ! Number of steps, excluding off, for stepped control
-      1.0;              ! Probability electric lighting will be reset when needed (used only
-                        !   for stepped control, to simulate manual on/off control)
+  1,                  ! Total Daylighting Reference Points
+  3.048,3.048,0.9,    ! X,Y,Z coordinates of first reference point {m}
+  0.0,0.0,0.0,        ! X,Y,Z coordinates of second reference point, if present {m}
+  0.99,               ! Fraction of zone controlled by first reference point
+  0.0,                ! Fraction of zone controlled by second reference point, if present
+  500.,               ! Illuminance setpoint at first reference point {lux}
+  500.,               ! Illuminance setpoint at second reference point, if present {lux}
+  1,                  ! Lighting control type {1 = continuous,2 = stepped,3 = continuous/off}
+  180.0,              ! Azimuth angle of view direction for glare calculation {deg},
+                      !   measured clockwise from zone y-axis. Value of 180 gives view
+                      !   (from reference point) that is directly at window, maximizing glare.
+  20.0,               ! Maximum discomfort glare index for window shade control
+  0.3,                ! Minimum input power fraction for continuous dimming control
+  0.2,                ! Minimum light output fraction for continuous dimming control
+  0,                  ! Number of steps, excluding off, for stepped control
+  1.0;                ! Probability electric lighting will be reset when needed (used only
+                      !   for stepped control, to simulate manual on/off control)
 \end{lstlisting}
 
 \subsection{Guidelines for Daylighting Modeling (Detailed Method)}\label{guidelines-for-daylighting-modeling-detailed-method}
@@ -219,11 +221,14 @@ The detailed daylighting calculation allows a thermal zone to be divided into tw
 
 The daylighting calculation accounts for the presence of exterior obstructions in determining the amount of light that strikes the windows. For daylighting purposes exterior obstructions fall into three categories:
 
-(1)~~Fins, overhangs, trees, neighboring buildings, etc., entered with the objects Shading:Zone:Detailed, Shading:Site:Detailed, or Shading:Building:Detailed.
-
-(2)~~Building surfaces like walls and roofs (in an L-shaped building, for example).
-
-(3)~~Surfaces associated with window setback.
+\begin{itemize}
+  \item
+    Fins, overhangs, trees, neighboring buildings, etc., entered with the objects Shading:Zone:Detailed, Shading:Site:Detailed, or Shading:Building:Detailed.
+  \item
+    Building surfaces like walls and roofs (in an L-shaped building, for example).
+  \item
+    Surfaces associated with window setback.
+\end{itemize}
 
 Category (1) obstructions can have an associated solar transmittance schedule (see description of the field Transmittance Schedule Name for these shading surfaces). If this schedule is not specified, the surface is opaque (has zero transmittance).
 
@@ -255,9 +260,12 @@ The Daylighting:Controls method, with no additional user input,~ calculates the 
 
 This is illustrated in Figure~\ref{fig:vertical-section-through-a-double-faade}, which shows a double-façade buffer zone, Z0, with exterior windows EW1 and EW2. Z0 shares interior windows IW1, IW2 and IW3 with daylit occupied zones ZD1, ZD2 and ZD3, respectively (``daylit'' here means the zone has an associated Daylighting:Controls object). The daylight illuminance at reference points RP1, RP2 and RP3 comes from the interior windows and has two main sources:
 
-1.~~~~Daylight that passes through both an exterior window and an interior window in Z0 and reaches a reference point without reflection. This is called ``direct illuminance.''
-
-2.~~~~Daylight from Z0~ that passes through an interior window and reaches a reference point by inter-reflection in the daylit zone. Because the program calculates this source from the interior solar distribution in Z0 it is recommended that the most accurate calculation of this distribution be made, which occurs if Solar Distribution = FullInteriorAndExterior in the Building object.
+\begin{itemize}
+  \item
+    Daylight that passes through both an exterior window and an interior window in Z0 and reaches a reference point without reflection. This is called ``direct illuminance.''
+  \item
+    Daylight from Z0 that passes through an interior window and reaches a reference point by inter-reflection in the daylit zone. Because the program calculates this source from the interior solar distribution in Z0 it is recommended that the most accurate calculation of this distribution be made, which occurs if Solar Distribution = FullInteriorAndExterior in the Building object.
+\end{itemize}
 
 A third possible source is neglected because it is generally small in double-façade cases. This is daylight that is reflected from the surfaces of Z0, passes through an interior window and then reaches a reference point without inter-reflection in the daylit zone.
 
@@ -431,15 +439,14 @@ The desired lighting level (in lux) at this Reference Point. This is assumed to 
 An IDF example:
 
 \begin{lstlisting}
-
 Daylighting:DELight:ReferencePoint,
-      RefPt 2,            !- Reference Point Name
-      DElight NORTH ZONE, !- DElight Zone Name
-      5.0,  !- X-coordinate of reference point {m}
-      3.0,  !- Y-coordinate of reference point {m}
-      0.9,  !- Z-coordinate of reference point {m}
-      0.5,  !- Fraction of zone controlled by reference point
-      500.; !- Illuminance setpoint at reference point {lux}
+  RefPt 2,              !- Reference Point Name
+  DElight NORTH ZONE,   !- DElight Zone Name
+  5.0,                  !- X-coordinate of reference point {m}
+  3.0,                  !- Y-coordinate of reference point {m}
+  0.9,                  !- Z-coordinate of reference point {m}
+  0.5,                  !- Fraction of zone controlled by reference point
+  500.;                 !- Illuminance setpoint at reference point {lux}
 \end{lstlisting}
 
 \subsection{Daylighting:DELight:ComplexFenestration}\label{daylightingdelightcomplexfenestration}
