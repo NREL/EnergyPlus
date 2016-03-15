@@ -193,7 +193,10 @@ When modeling plants using one of the common pipe modes for plant loops, the sam
 The average temperature is reported as the tank temperature. The average temperature is defined as the value of an integral function of tank temperature on an interval {[}\emph{0},\emph{δt}{]}
 
 \begin{equation}
-\mathop T\limits^ -   = \frac{1}{{\delta t}}\int_0^{\delta t} {T_{tank}^tdt} \;\; = \frac{{{M_{tank}}{c_p}}}{{\dot m{c_p}\delta t}}\left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\left( {1 - \exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}\delta t} \right)} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}
+\begin{split}
+\mathop T\limits^ -   =& \frac{1}{{\delta t}}\int_0^{\delta t} {T_{tank}^tdt} \;\; = \frac{{{M_{tank}}{c_p}}}{{\dot m{c_p}\delta t}}\left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\left( {1 - \exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}\delta t} \right)} \right) \\
+&+ \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}
+\end{split}
 \end{equation}
 
 \subsubsection{Plant Flow Resolver Input}\label{plant-flow-resolver-input}
@@ -235,31 +238,31 @@ The sign of the Loop Demand determines if the loop has a cooling or heating load
 The DualSetPointDeadband scheme for the PlantLoop takes the value that is placed on the Node\%TempSetPointHi and Node\%TempSetPointLo calculates the heating or cooling load necessary to obtain that setpoint; if in the DeadBand then no load is calculated. The pseudo code below shows the basis of the algorithm.
 
 \begin{lstlisting}
-        !Calculate the demand on the loop
-        IF (mdot > 0.0) THEN
-          LoadtoHeatingSetPoint = mdot*Cp*(LoopSetPointLo - LoopTempIn)
-          LoadtoCoolingSetPoint = mdot*Cp*(LoopSetPointHi - LoopTempIn)
-          ! Possible combinations:
-          ! 1  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
-          ! 2  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint < 0 -->  Cooling Required
-          ! 3  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint > 0 -->  Dead Band Operation
-          ! 4  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint < 0 -->  Not Feasible
-          IF (LoadToHeatingSetPoint .GT. 0.0 .AND. LoadToCoolingSetPoint .GT. 0.0) THEN
-             LoopDemand = LoadToHeatingSetPoint
-          ELSE IF (LoadToHeatingSetPoint .LT. 0.0 .AND. LoadToCoolingSetPoint .LT. 0.0) THEN
-             LoopDemand = LoadToCoolingSetPoint
-          ELSE IF (LoadToHeatingSetPoint .LT. 0.0 .AND. LoadToCoolingSetPoint .GT. 0.0) THEN
-             LoopDemand = 0.0
-          ELSE
-             CALL ShowSevereError
-          END IF
-        ELSE
-          LoopDemand = 0.0
-        END IF
+        !Calculate the demand on the loop
+        IF (mdot > 0.0) THEN
+          LoadtoHeatingSetPoint = mdot*Cp*(LoopSetPointLo - LoopTempIn)
+          LoadtoCoolingSetPoint = mdot*Cp*(LoopSetPointHi - LoopTempIn)
+          ! Possible combinations:
+          ! 1  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
+          ! 2  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint < 0 -->  Cooling Required
+          ! 3  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint > 0 -->  Dead Band Operation
+          ! 4  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint < 0 -->  Not Feasible
+          IF (LoadToHeatingSetPoint .GT. 0.0 .AND. LoadToCoolingSetPoint .GT. 0.0) THEN
+             LoopDemand = LoadToHeatingSetPoint
+          ELSE IF (LoadToHeatingSetPoint .LT. 0.0 .AND. LoadToCoolingSetPoint .LT. 0.0) THEN
+             LoopDemand = LoadToCoolingSetPoint
+          ELSE IF (LoadToHeatingSetPoint .LT. 0.0 .AND. LoadToCoolingSetPoint .GT. 0.0) THEN
+             LoopDemand = 0.0
+          ELSE
+             CALL ShowSevereError
+          END IF
+        ELSE
+          LoopDemand = 0.0
+        END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-        IF(ABS(LoopDemand) < LoopDemandTol) LoopDemand = 0.0
+        IF(ABS(LoopDemand) < LoopDemandTol) LoopDemand = 0.0
 \end{lstlisting}
 
 The sign of the Loop Demand determines if the loop has a cooling or heating load. Then the Load Distribution scheme distributes this calculated load to the appropriate equipment, if there is any.

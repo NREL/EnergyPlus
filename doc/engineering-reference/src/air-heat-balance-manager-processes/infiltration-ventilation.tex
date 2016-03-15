@@ -168,7 +168,7 @@ Estimation of this value is difficult; refer to Chapter 16 of the 2009 ASHRAE Ha
 
 \emph{T\(_{e}\)}~~~~~~~~~~~ = Zone air dry-bulb temperature {[}K{]}
 
-\emph{T\(_{b}\)}\(_{ }\) = Local outdoor air dry-bulb temperature {[}K{]}
+\emph{T\(_{b}\)}\(_{ }\) = Local outdoor air dry-bulb temperature {[}K{]}
 
 The following equation, given by Eq. 39 in Chapter 16 of the 2009 ASHRAE Handbook of Fundamentals, is used to calculate the Discharge Coefficient for Opening when the user sets the value for this input field to ``Autocalculate'':
 
@@ -226,23 +226,24 @@ where,
 
 The unbalanced ventilation airflow is given by the following equation:
 
+{\scriptsize
 \begin{equation}
 {Q_{u,v}} = {\left[ {{{\left( {\sum\limits_i {{Q_{v,Natural,i}}}  + \sum\limits_i {{Q_{v,Wind,i}}} } \right)}^2} + {{\left( {\sum\limits_i {{Q_{v,Intake,i}}} } \right)}^2} + {{\left( {\sum\limits_i {{Q_{v,Exhaust,i}}} } \right)}^2} + {{\left( {\sum\limits_i {Max\left( {0,\;({Q_{ERV,Exh,i}} - {Q_{ERV,Sup,i}})} \right)} } \right)}^2}} \right]^{0.5}}
-\end{equation}
+\end{equation}}
 
 where
 
-\emph{Q\(_{i}\)}~~~~~ = Ventilation rate with ``Exhaust'' type in the ith ZoneVentilation:DesignFlowRate object for the same zone
+\emph{Q\(_{v,Exhaust,i}\)}~~~~~ = Ventilation rate with ``Exhaust'' type in the ith ZoneVentilation:DesignFlowRate object for the same zone
 
-\emph{Q\(_{i}\)}~~~~~~~ = Ventilation rate with ``Intake'' type in the ith ZoneVentilation:DesignFlowRate object for the same zone
+\emph{Q\(_{v,Intake,i}\)}~~~~~~~ = Ventilation rate with ``Intake'' type in the ith ZoneVentilation:DesignFlowRate object for the same zone
 
-\emph{Q\(_{i}\)}~~~~~~ = Ventilation rate with ``Natural'' type in the ith ZoneVentilation:DesignFlowRate object for the same zone
+\emph{Q\(_{v,Natural,i}\)}~~~~~~ = Ventilation rate with ``Natural'' type in the ith ZoneVentilation:DesignFlowRate object for the same zone
 
-\emph{Q\(_{v}\)}~~~~~~~ = Ventilation rate in the ith ZoneVentilation:WindandStackOpenArea object for the same zone
+\emph{Q\(_{v,Wind,v}\)}~~~~~~~ = Ventilation rate in the ith ZoneVentilation:WindandStackOpenArea object for the same zone
 
-\emph{Q\(_{i}\)}~~~~~~ = Supply flow rate given in the ith ZoneHVAC:EnergyRecoveryVentilator object
+\emph{Q\(_{ERV,Sup,i}\)}~~~~~~ = Supply flow rate given in the ith ZoneHVAC:EnergyRecoveryVentilator object
 
-\emph{Q\(_{i}\)}~~~~~~ = Exhaust flow rate given in the ith ZoneHVAC:EnergyRecoveryVentilator object
+\emph{Q\(_{ERV,Exh,i}\)}~~~~~~ = Exhaust flow rate given in the ith ZoneHVAC:EnergyRecoveryVentilator object
 
 For Ventilation Type = Intake in the ZoneVentilation:DesignFlowRate object, an appropriate amount of fan heat will be ignored and the outdoor temperature will be used in the zone air heat balance equation.
 
