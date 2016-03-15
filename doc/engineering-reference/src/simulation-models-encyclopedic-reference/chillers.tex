@@ -485,7 +485,10 @@ FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}
 The Fuel Input Curve is a polynomial equation that determines the Ratio of Fuel Input to Energy Output.~ The equation combines both the Fuel Input Curve Coefficients and the Temperature Based Fuel Input Curve Coefficients.~ The defining equation is:
 
 \begin{equation}
-FuelEnergyInput = PLoad * (FI{C_1} + FI{C_2}RLoad + FI{C_3}RLoa{d^2}) * (TBFI{C_1} + TBFI{C_2}A{T_{air}} + TBFI{C_3}AT_{air}^2)
+\begin{split}
+FuelEnergyInput =& PLoad * (FI{C_1} + FI{C_2}RLoad + FI{C_3}RLoa{d^2}) \\
+&* (TBFI{C_1} + TBFI{C_2}A{T_{air}} + TBFI{C_3}AT_{air}^2)
+\end{split}
 \end{equation}
 
 Where FIC represents the Fuel Input Curve Coefficients, TBFIC represents the Temperature Based Fuel Input Curve Coefficients, Rload is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the current ambient and design ambient temperatures.
@@ -857,7 +860,10 @@ RunFrac = MIN(1.0,MAX\left( {HPLR,CPLR} \right)/MinPLR)
 The cooling thermal energy input to the chiller is then computed as follows:
 
 \begin{equation}
-CoolThermalEnergyInput = AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot TeFIRfPLR(CPLR)
+\begin{split}
+CoolThermalEnergyInput =& AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \\
+&\cdot TeFIRfPLR(CPLR)
+\end{split}
 \end{equation}
 
 To make sure that the exhaust mass flow rate and temperature from microturbine are sufficient to drive the chiller, the heat recovery potential is compared with the cooling thermal energy input to the chiller (CoolThermalEergyInput). The heat recovery potential should be greater than the CoolThermalEnergyInput. Heat recovery potential is calculated as:
@@ -1264,9 +1270,10 @@ where
 
 ·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
+{\scriptsize
 \begin{equation}
 ChillerEIRFPLR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2}\, = \,{\raise0.7ex\hbox{{{P_{chiller}}}} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{{{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}
-\end{equation}
+\end{equation}}
 
 where
 
