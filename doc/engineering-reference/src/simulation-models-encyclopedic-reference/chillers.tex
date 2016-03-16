@@ -7,7 +7,7 @@ The input object Chiller:Absorption provides a model for absorption chillers tha
 The part-load ratio of the absoprtion chiller's evaporator is simply the actual cooling effect produced by the chiller divided by the maximum cooling effect available.
 
 \begin{equation}
-PLR = {\raise0.7ex\hbox{{{{\dot Q}_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{{\dot Q}_{evap,\,\,rated}}}}}\right.}\!\lower0.7ex\hbox{{{{\dot Q}_{evap,\,\,rated}}}}}
+PLR = \frac{\dot{Q}_{evap}}{\dot{Q}_{evap,rated}}
 \end{equation}
 
 where
@@ -69,7 +69,7 @@ The evaporator water mass flow rate is calculated based on the Chiller Flow Mode
 \end{equation}
 
 \begin{equation}
-{\dot m_{evap}} = {\raise0.7ex\hbox{{{{\dot Q}_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}
+  \dot{m}_{evap} = \frac{\dot{Q}_{evap}}{C_{p,evap} \Delta T_{evap}}
 \end{equation}
 
 where
@@ -89,7 +89,7 @@ where
 The evaporator outlet water temperature is then calculated based on the cooling effect produced and the evaporator entering water temperature.
 
 \begin{equation}
-{T_{evap,out}} = {T_{evap,in}} + {\raise0.7ex\hbox{{{{\dot Q}_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}
+  T_{evap,out} = T_{evap,in} + \frac{\dot{Q}_{evap}}{\dot{m}_{evap}C_{p,evap}}
 \end{equation}
 
 where
@@ -109,7 +109,7 @@ The condenser heat transfer and condenser leaving water temperature are also cal
 \end{equation}
 
 \begin{equation}
-{T_{cond,out}} = {T_{cond,in}} + {\raise0.7ex\hbox{{{{\dot Q}_{cond}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{cond}}} {{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}
+  T_{cond,out} = T_{cond,in} + \frac{\dot{Q}_{cond}}{\dot{m}_{cond}C_{p,cond}}
 \end{equation}
 
 where
@@ -165,7 +165,7 @@ When a hot water loop is used and the inlet and outlet node names are specified 
 \textbf{Variable Flow Chillers:}
 
 \begin{equation}
-{\dot m_{generator}} = {\raise0.7ex\hbox{{{{\dot Q}_{generator}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{generator}}} {{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}
+  \dot{m}_{generator} = \frac{\dot{Q}_{generator}}{C_{p,water}\Delta T_{generator}}
 \end{equation}
 
 \begin{equation}
@@ -229,7 +229,7 @@ where
 The part-load ratio of the indirect absoprtion chiller's evaporator is simply the actual cooling effect required (load) divided by the maximum cooling effect available.
 
 \begin{equation}
-PLR = {\raise0.7ex\hbox{{{{\dot Q}_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{{\dot Q}_{evap,\,\,max}}}}}\right.}\!\lower0.7ex\hbox{{{{\dot Q}_{evap,\,\,max}}}}}
+  PLR = \frac{\dot{Q}_{evap}}{\dot{Q}_{evap,max}}
 \end{equation}
 
 where
@@ -305,7 +305,7 @@ The evaporator water mass flow rate is calculated based on the Chiller Flow Mode
 \end{equation}
 
 \begin{equation}
-{\dot m_{evap}} = {\raise0.7ex\hbox{{{{\dot Q}_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}
+  \dot m_{evap} = \frac{\dot{Q}_{evap}}{C_{p,evap}\Delta T_{evap}}
 \end{equation}
 
 where
@@ -325,7 +325,7 @@ where
 The evaporator outlet water temperature is then calculated based on the cooling effect produced and the evaporator entering water temperature.
 
 \begin{equation}
-{T_{evap,out}} = {T_{evap,in}} + {\raise0.7ex\hbox{{{{\dot Q}_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}
+  T_{evap,out} = T_{evap,in} + \frac{\dot{Q}_{evap}}{\dot{m}_{evap}C_{p,evap}}
 \end{equation}
 
 where
@@ -345,7 +345,7 @@ The condenser heat transfer and condenser leaving water temperature are also cal
 \end{equation}
 
 \begin{equation}
-{T_{cond,out}} = {T_{cond,in}} + {\raise0.7ex\hbox{{{{\dot Q}_{cond}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{cond}}} {{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}
+  T_{cond,out} = T_{cond,in} + \frac{\dot{Q}_{cond}}{\dot{m}_{cond}C_{p,cond}}
 \end{equation}
 
 where
@@ -407,7 +407,7 @@ When a hot water loop is used and the inlet and outlet node names are specified 
 \textbf{Variable Flow Chillers:}
 
 \begin{equation}
-{\dot m_{generator}} = {\raise0.7ex\hbox{{{{\dot Q}_{generator}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{generator}}} {{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}\right.}\!\lower0.7ex\hbox{{{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}
+  \dot{m}_{generator} = \frac{\dot{Q}_{generator}}{C_{p,water}\Delta T_{generator}}
 \end{equation}
 
 \begin{equation}
@@ -625,7 +625,7 @@ RunFrac = {\mathop{\rm MIN}\nolimits} \left( {1.0,{\mathop{\rm MAX}\nolimits} \l
 
 The cooling fuel input to the chiller is then computed as follows:
 
-\begin{array}{l}CoolFuelInput = \\AvailCoolCap \cdot RunFrac \cdot CFIR \cdot CFIRfT({T_{cw,l}},{T_{cond}}) \cdot CFIRfPLR(CPLR)\end{array}
+CoolFuelInput = AvailCoolCap * RunFrac * CFIR * CFIRfT($T_{cw,l}$,$T_{cond}$) * CFIRfPLR(CPLR)
 
 The electric input to cooling output ratio as function of temperature (\emph{CEIRfT}) curve represents the fraction of electricity to the chiller at full load as it varies by temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature.
 
@@ -745,7 +745,9 @@ ENDIF
 
 The total fuel and electric power input to the chiller is computed as shown below:
 
-\begin{array}{l}TotalElectricPower = HeatElectricPower + CoolElectricPower\\TotalFuelInput = HeatFuelInput + CoolFuelInput\end{array}
+TotalElectricPower = HeatElectricPower + CoolElectricPower
+
+TotalFuelInput = HeatFuelInput + CoolFuelInput
 
 \subsection{ChillerHeater:Absorption:DoubleEffect}\label{chillerheaterabsorptiondoubleeffect}
 
@@ -982,7 +984,17 @@ HeatElectricPower = NomCoolCap \cdot HeatCoolCapRatio \cdot HEIR.RunFrac
 
 If the chiller is delivering heating and cooling simultaneously, the parasitic electric load would be double-counted, so the following logic is applied:
 
-\begin{array}{l}IF\left( {HeatElectricPower \le CoolElectricPower} \right)THEN\\\quad HeatElectricPower = 0.0\\ELSE\\\quad HeatElectricPower = HeatElectricPower - CoolElectricPower\\ENDIF\end{array}
+If HeatElectricPower is less than or equal to CoolElectricPower:
+
+\begin{equation}
+  HeatElectricPower = 0.0
+\end{equation}
+
+Else:
+
+\begin{equation}
+  HeatElectricPower = HeatElectricPower - CoolElectricPower
+\end{equation}
 
 The total thermal energy and electric power input to the chiller is computed as shown below:
 
@@ -1139,11 +1151,11 @@ For both models, the condenser heat transfer rate is then
 The outlet temperatures are then calculated using
 
 \begin{equation}
-{T_{HR,out}} = {T_{HR,in}} + {\raise0.7ex\hbox{{{{\dot Q}_{HR}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{HR}}} {{{\dot m}_{HR}}{c_p}_{HR}}}}\right.}\!\lower0.7ex\hbox{{{{\dot m}_{HR}}{c_p}_{HR}}}}
+  T_{HR,out} = T_{HR,in} + \frac{\dot{Q}_{HR}}{\dot{m}_{HR}C_{p,HR}}
 \end{equation}
 
 \begin{equation}
-{T_{Cond,out}} = {T_{Cond,in}} + {\raise0.7ex\hbox{{{{\dot Q}_{Cond}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Cond}}} {{{\dot m}_{Cond}}{c_p}_{cond}}}}\right.}\!\lower0.7ex\hbox{{{{\dot m}_{Cond}}{c_p}_{cond}}}}
+  T_{Cond,out} = T_{Cond,in} + \frac{\dot{Q}_{Cond}}{\dot{m}_{Cond}C_{p,Cond}}
 \end{equation}
 
 A heat recovery chiller may need to work harder because the refrigeration system faces a higher lift owing to an elevated effective temperature for heat rejection.~ With heat recovery, the condenser temperature used with the chiller's performance curves is determined using one of the following heat-flow-weighted methods. The first is used for the chiller model for the objects Chiller:Electric, and Chiller:Electric:EIR which use the condensing entering temperature for performance.
@@ -1270,10 +1282,12 @@ where
 
 ·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
-{\scriptsize
 \begin{equation}
-ChillerEIRFPLR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2}\, = \,{\raise0.7ex\hbox{{{P_{chiller}}}} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{{{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}
-\end{equation}}
+  \begin{array}{rl}
+    ChillerEIRFPLR &= a + b\PB{PLR} + c\PB{PLR}^2\\
+                   &= \frac{P_{chiller}}{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)
+  \end{array}
+\end{equation}
 
 where
 
@@ -1306,7 +1320,7 @@ The model then calculates the evaporator heat transfer rate required to bring th
 The evaporator heat transfer rate is then compared to the available capacity. If the available chiller capacity is sufficient to meet the evaporator heat transfer rate, the leaving chilled water temperature is set equal to the chilled water setpoint temperature. If the requested evaporator heat transfer rate is larger than the available capacity the chilled water leaving the evaporator is allowed to float upward. For this case, the exiting chilled water temperature is calculated based on the water temperature entering the evaporator, the available cooling capacity, and the evaporator mass flow rate as follows:
 
 \begin{equation}
-{T_{cw,l}} = {T_{cw,e}} - \left( {{\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{avail}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{avail}}} {{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}} \right)
+  T_{cw,l} = T_{cw,e} - \frac{\dot{Q}_{avail}}{\dot{m}_{evap}C_{p,evap}}
 \end{equation}
 
 where
@@ -1322,7 +1336,7 @@ where
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
 \begin{equation}
-PLR = MAX\left( {0.0,MIN\left( {{\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{evap}}} {{{\mathop Q\limits^ \bullet  }_{avail}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{avail}}}}},\,\,PL{R_{\max }}} \right)} \right)
+  PLR = \max\PB{0.0,\min\PB{\frac{\dot{Q}_{evap}}{\dot{Q}_{avail}},PLR_{max}}}
 \end{equation}
 
 where
@@ -1336,7 +1350,7 @@ where
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g.~hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part load ratio yielding constant electrical power consumption under these conditions. Below the minimum part load ratio, the chiller cycles on and off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part load ratio is less than the minimum part load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
 \begin{equation}
-ChillerCyclingRatio = MIN\left( {{\raise0.7ex\hbox{{PLR}} \!\mathord{\left/ {\vphantom {{PLR} {PL{R_{\min }}}}}\right.}\!\lower0.7ex\hbox{{PL{R_{\min }}}}},\,\,1.0} \right)
+  ChillerCyclingRatio = \min\PB{\frac{PLR}{PLR_{min}},1.0}
 \end{equation}
 
 To properly account for chiller electric power consumption when PLR is less than the minimum unloading ratio, the PLR is reset to the greater of the PLR calculated above and the PLR at the minimum unloading ratio. The result is available as the output variable Chiller Part Load Ratio.
@@ -1373,8 +1387,8 @@ where
 
 For water-cooled chillers, the water temperature leaving the condenser is then calculated as shown below.
 
-\begin{equation}
-{T_{cond,l}} = {T_{cond,e}} + {\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{cond}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cond}}} {\left( {{{\mathop m\limits^ \bullet  }_{cond}} * {C_{p,cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {{{\mathop m\limits^ \bullet  }_{cond}} * {C_{p,cond}}} \right)}}}
+\begin{equation} 
+  T_{cond,l} = T_{cond,e} + \frac{\dot{Q}_{cond}}{\dot{m}_{cond}C_{p,cond}}
 \end{equation}
 
 where:
@@ -1610,7 +1624,7 @@ ChillerEIRFPLR = a + b({T_{cond,l}}) + c{({T_{cond,l}})^2} + d(PLR) + e{(PLR)^2}
 \end{equation}
 
 \begin{equation}
-ChillerEIRFPLR = \,{\raise0.7ex\hbox{{{P_{chiller}}}} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{{{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}
+  ChillerEIRFPLR = \frac{P_{chiller}}{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)
 \end{equation}
 
 where
@@ -1678,7 +1692,7 @@ The model then calculates the evaporator heat transfer rate required to bring th
 The evaporator heat transfer rate is then compared to the available capacity. If the available chiller capacity is sufficient to meet the evaporator heat transfer rate, the leaving chilled water temperature is set equal to the chilled water setpoint temperature. If the requested evaporator heat transfer rate is larger than the available capacity the chilled water leaving the evaporator is allowed to float upward. For this case, the exiting chilled water temperature is calculated based on the water temperature entering the evaporator, the available cooling capacity, and the evaporator mass flow rate as follows:
 
 \begin{equation}
-{T_{cw,l}} = {T_{cw,e}} - \left( {{\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{avail}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{avail}}} {{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}} \right)
+  T_{cw,l}  =  T_{cw,e} - \frac{\dot{Q}_{avail}}{\dot{m}_{evap}C_{p,evap}}
 \end{equation}
 
 where
@@ -1694,7 +1708,7 @@ where
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
 \begin{equation}
-PLR = MAX\left( {0.0,MIN\left( {{\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{evap}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{evap}}} {{{\mathop Q\limits^ \bullet  }_{avail}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{avail}}}}},\,\,PL{R_{\max }}} \right)} \right)
+  PLR = \max\PB{0.0,\min\PB{\frac{\dot{Q}_{evap}}{\dot{Q}_{avail}},PLR_{max}}}
 \end{equation}
 
 where
@@ -1710,7 +1724,7 @@ Note that the maximum part-load ratio (PLR\(_{x}\), specified in the Chiller:Ele
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g.~hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part-load ratio yielding constant electrical power consumption under these conditions. Below the minimum part-load ratio, the chiller cycles on/off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part-load ratio is less than the minimum part-load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
 \begin{equation}
-ChillerCyclingRatio = MIN\left( {{\raise0.7ex\hbox{{PLR}} \!\mathord{\left/ {\vphantom {{PLR} {PL{R_{\min }}}}}\right.}\!\lower0.7ex\hbox{{PL{R_{\min }}}}},\,\,1.0} \right)
+  ChillerCyclingRatio = \min \PB{ \frac{PLR}{PLR_{min}}, 1.0 }
 \end{equation}
 
 To properly account for chiller electric power consumption when PLR is less than the minimum unloading ratio, the PLR is reset to the greater of the PLR calculated above and the PLR at the minimum unloading ratio. The result is available as the output variable Chiller Part Load Ratio.
@@ -1748,7 +1762,7 @@ where
 The above curve values are calculated based on the leaving condenser water temperature found through iteration. After obtaining the condenser heat transfer rate, the final leaving condenser water temperature is then calculated as:
 
 \begin{equation}
-{T_{cond,l}} = {T_{cond,e}} + {\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{cond}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cond}}} {\mathop {\left( {{{\mathop m\limits^ \bullet  }_{cond}}*{C_{p,cond}}} \right)}\limits^{} }}}\right.}\!\lower0.7ex\hbox{{\mathop {\left( {{{\mathop m\limits^ \bullet  }_{cond}}*{C_{p,cond}}} \right)}\limits^{} }}}
+  T_{cond,l} = T_{cond,e} + \frac{\dot{Q}_{cond}}{\dot{m}_{cond} C_{p,cond}}
 \end{equation}
 
 where:
@@ -1855,7 +1869,20 @@ Finally, heat recovered from the lube oil and the water jacket are accounted for
 
 Calculations are also made to estimate the electric power input to the basin heater for chillers with evaporatively-cooled condensers. The chillers which calculate basin heater power are Chiller:Electric:EIR, Chiller:Electric, Chiller:ConstantCOP, Chiller:EngineDriven and Chiller:CombustionTurbine.A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the chiller is not active (i.e., chiller is not operating for the simulation time step --- for example, when there is no cooling load to be met by the chiller, \emph{or if there is no water flow through the chiller due to a chiller or pump availability schedule, etc.}). The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (\(^{o}\)C) if they want to model basin heater electric power.
 
-\begin{array}{l}{P_{heater,basin}} = 0.0\\IF\left( {ChillerIsOFF} \right)THEN\\\,\,\,\,\,\,IF\left( {Schedul{e_{heater,basin}}\,is\,Defined} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,IF\left( {CA{P_{heater,basin}}\, > \,0\,.AND.\,Schedul{e_{heater,basin}}\, = \,ON} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{P_{heater,basin}} = \,MAX\left( {0.0,CA{P_{heater,basin}}\left( {{T_{setpoint,basin}} - {T_{db,outdoor}}} \right)} \right)\,\,\,\,\,\,\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\\\,\,\,\,\,ELSE\\\,\,\,\,\,\,\,\,\,\,\,IF\left( {CA{P_{heater,basin}}\, > \,0\,} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{P_{heater,basin}} = \,MAX\left( {0.0,CA{P_{heater,basin}}\left( {{T_{setpoint,basin}} - {T_{db,outdoor}}} \right)} \right)\,\,\,\,\,\,\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\,\\\,\,\,\,\,ENDIF\\ENDIF\end{array}
+\begin{lstlisting}
+P_heater_basin = 0.0
+IF (ChillerIsOFF) THEN
+  IF (Scheduleheater_basin is Defined) THEN
+    IF (CAPheater_basin > 0 AND Scheduleheater_basin = ON) THEN
+      P_heater_basin = MAX(0.0,CAP_heater_basin*(T_setpoint_basin-T_db_outdoor))
+    ENDIF
+  ELSE
+    IF (CAPheater_basin > 0) THEN
+      P_heater_basin = MAX(0.0,CAP_heater_basin*(T_setpoint_basin-T_db_outdoor))
+    ENDIF
+  ENDIF
+ENDIF
+\end{lstlisting}
 
 \begin{equation}
 {E_{heater,basin}} = \left( {{P_{heater,basin}}} \right)\left( {TimeStepSys} \right)3600

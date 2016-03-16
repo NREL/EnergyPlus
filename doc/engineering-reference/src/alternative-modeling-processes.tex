@@ -283,13 +283,13 @@ Although these limitations are significant it is important to note that even in 
 For the case of multiple non-coalescing plumes (n), with equal strength, the total vertical airflow for a given height is:
 
 \begin{equation}
-\mathop V\limits^\cdot   = Cn{B^{{\raise0.5ex\hbox{\scriptstyle 1}\kern-0.1em/\kern-0.15em\lower0.25ex\hbox{\scriptstyle 3}}}}{z^{{\raise0.5ex\hbox{\scriptstyle 5}\kern-0.1em/\kern-0.15em\lower0.25ex\hbox{\scriptstyle 3}}}}
+  \dot{V} = CnB^{1/3}z^{5/3}
 \end{equation}
 
 resulting in a mixed layer height of:
 
 \begin{equation}
-h = \frac{{24.55{F^{{\raise0.5ex\hbox{\scriptstyle 3}\kern-0.1em/\kern-0.15em\lower0.25ex\hbox{\scriptstyle 5}}}}}}{{{{\left( {{n^3}\dot Q} \right)}^{{\raise0.5ex\hbox{\scriptstyle 1}\kern-0.1em/\kern-0.15em\lower0.25ex\hbox{\scriptstyle 5}}}}}}
+  h = \frac{24.55F^{3/5}}{{n^3 \dot{Q}}^{1/5}}
 \end{equation}
 
 \subsubsection{Implementation}\label{implementation}
@@ -399,11 +399,12 @@ The calculation of~ subzone temperatures follows the method used in the \textbf{
 T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + MCP_{tot})
 \end{equation}}
 
-{\scriptsize
-\begin{array}{l}
+\begin{equation}
+  \begin{array}{l}
     T_{oc} = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + T_{fl} \cdot MCP_{tot}) / (11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})
     T_{mx} = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
-  \end{array}}
+  \end{array}
+\end{equation}
 
 Here \({C_{air,fl}}\) , \({C_{air,oc}}\) , and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
 
@@ -421,7 +422,7 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that displacement ventilation was taking place: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If \({T_{mx}} &lt; {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} &lt; {H_{fl,top}} + \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the displacement ventilation calculation.
+If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < {H_{fl,top}} + \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the displacement ventilation calculation.
 
 \textbf{Note:} ~\(\Delta {z_{occ,\min }}\) ~is the minimum thickness of occupied subzone. It is set to 0.2 meters. \({H_{fl,top}}\) is the height of the top of the floor subzone. It is defined to be 0.2 meters; that is, the floor subzone is always 0.2 meters thick and \({T_{fl}}\) ~is the temperature at 0.1 meter above the floor surface.
 
@@ -500,19 +501,19 @@ If \emph{H\(_{f}\)} \textless{} \emph{H\(_{g}\)}
 {T_{comf}} = {T_{fl}}
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{flavg}}\) ~and \({H_{comf}} &lt; {H_{ocavg}}\)
+Else if \({H_{comf}} \ge {H_{flavg}}\) ~and \({H_{comf}} < {H_{ocavg}}\)
 
 \begin{equation}
 {T_{comf}} = ({T_{fl}}({H_{ocavg}} - {H_{comf}}) + {T_{mx}}({H_{comf}} - {H_{flavg}})/({H_{ocavg}} - {H_{flavg}})
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} &lt; {H_{mxavg}}\)
+Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\)
 
 \begin{equation}
 {T_{comf}} = ({T_{oc}}({H_{mxavg}} - {H_{comf}}) + {T_{mx}}({H_{comf}} - {H_{ocavg}})/({H_{mxavg}} - {H_{ocavg}})
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} &lt; {H_{ceil}}\)
+Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\)
 
 \begin{equation}
 {T_{comf}} = {T_{mx}}
@@ -534,19 +535,19 @@ If \emph{H\(_{t}\)} \textless{} \emph{H\(_{g}\)}
 {T_{stat}} = {T_{fl}}
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{flavg}}\) ~and \({H_{stat}} &lt; {H_{ocavg}}\)
+Else if \({H_{stat}} \ge {H_{flavg}}\) ~and \({H_{stat}} < {H_{ocavg}}\)
 
 \begin{equation}
 {T_{stat}} = ({T_{fl}}({H_{ocavg}} - {H_{stat}}) + {T_{mx}}({H_{stat}} - {H_{flavg}})/({H_{ocavg}} - {H_{flavg}})
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} &lt; {H_{mxavg}}\)
+Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mxavg}}\)
 
 \begin{equation}
 {T_{stat}} = ({T_{oc}}({H_{mxavg}} - {H_{stat}}) + {T_{mx}}({H_{stat}} - {H_{ocavg}})/({H_{mxavg}} - {H_{ocavg}})
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} &lt; {H_{ceil}}\)
+Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
 
 \begin{equation}
 {T_{stat}} = {T_{mx}}
@@ -586,7 +587,7 @@ Grad{T_{\max }} = \max (Grad{T_{\max ,1}},Grad{T_{\max ,2}})
 
 For reporting purposes, if the zone is deemed to be mixed, the displacement ventilation report variables are set to flag values.
 
-If \({T_{mx}} &lt; {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} &lt; {H_{fl,top}} + \Delta {z_{occ,\min }}\) ~or \({T_{mx}} - {T_{oc}} &lt; \Delta {T_{Crit{\mathop{\rm Re}\nolimits} p}}\)
+If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < {H_{fl,top}} + \Delta {z_{occ,\min }}\) ~or \({T_{mx}} - {T_{oc}} < \Delta {T_{Crit{\mathop{\rm Re}\nolimits} p}}\)
 
 \begin{equation}
 Grad{T_{avg}} =  - 9.999
@@ -873,10 +874,12 @@ During the surface loop, once the h\(_{c}\)~for a surface is calculated, the app
 
 The calculation of~ subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
 
-\begin{array}{cl}
+\begin{equation}
+  \begin{array}{cl}
     T_{oc} & = \frac{(C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot})} {((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})} \\
     T_{mx} & = \frac{(C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot})} {((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})}
   \end{array}
+\end{equation}
 
 Here \({C_{air,oc}}\) ~and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
 
@@ -896,7 +899,7 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that the UFAD nonuniform zone model was appropriate: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If \({T_{mx}} &lt; {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} &lt; \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the UFAD interior zone calculation.
+If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the UFAD interior zone calculation.
 
 \textbf{Note:} ~\(\Delta {z_{occ,min}}\) ~is the minimum thickness of occupied subzone. It is set to 0.2 meters.
 
@@ -908,7 +911,12 @@ Then the code iterates over these steps.
 
 Calculate \emph{T\(_{g}\)} using
 
-\begin{array}{l}{T_{avg}} = ({C_{air,z}} \cdot (3 \cdot {T_{ - 1,z}} - (3/2) \cdot {T_{ - 2,z}} + (1/3) \cdot {T_{ - 3,z}}) + \\\quad \quad {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}}MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + MC{P_{tot}})\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    T_{avg} &= ({C_{air,z}} \cdot (3 \cdot {T_{ - 1,z}} - (3/2) \cdot {T_{ - 2,z}} + (1/3) \cdot {T_{ - 3,z}}) \\
+            &+ {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}}MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + MC{P_{tot}})
+  \end{array}
+\end{equation}
 
 \begin{equation}
 {T_{mx}} = {T_{avg}}
@@ -950,19 +958,19 @@ If mixing:
 
 If UFAD:
 
-If~ \({H_{comf}} &lt; {H_{ocavg}}\)
+If~ \({H_{comf}} < {H_{ocavg}}\)
 
 \begin{equation}
 {T_{comf}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} &lt; {H_{mxavg}}\)
+Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\)
 
 \begin{equation}
 {T_{comf}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{comf}}} \right) + {T_{mx}}\left( {{H_{comf}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} &lt; {H_{ceil}}\)
+Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\)
 
 \begin{equation}
 {T_{comf}} < {T_{mx}}
@@ -978,19 +986,19 @@ If mixing:
 
 If UFAD:
 
-If\({H_{stat}} &lt; {H_{ocavg}}\)
+If\({H_{stat}} < {H_{ocavg}}\)
 
 \begin{equation}
 {T_{stat}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} &lt; {H_{mxavg}}\)
+Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mxavg}}\)
 
 \begin{equation}
 {T_{stat}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{stat}}} \right) + {T_{mx}}\left( {{H_{stat}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} &lt; {H_{ceil}}\)
+Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
 
 \begin{equation}
 {T_{stat}} = {T_{mx}}
@@ -1169,11 +1177,13 @@ During the surface loop, once the h\(_{c}\)~for a surface is calculated, the app
 
 The calculation of~ subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
 
-\begin{array}{cl}
+\begin{equation}
+  \begin{array}{cl}
     T_{oc} & = \frac{(C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot})} {((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})} \\
     T_{mx} & = \frac{(C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot})} {((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})}
   \end{array}
-  
+\end{equation}
+
 Here \({C_{air,oc}}\) ~and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
 
 \begin{equation}
@@ -1192,7 +1202,7 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that the UFAD zone model was applicable: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If \({T_{mx}} &lt; {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} &lt; \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the UFAD exterior zone calculation.
+If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the UFAD exterior zone calculation.
 
 \textbf{Note:} ~\({\Delta_{occ,min}}\) ~is the minimum thickness of occupied subzone. It is set to 0.2 meters.
 
@@ -1204,7 +1214,12 @@ Then the code iterates over these steps.
 
 Calculate \emph{T\(_{g}\)} using
 
-\begin{array}{l}{T_{avg}} = ({C_{air,z}} \cdot (3 \cdot {T_{ - 1,z}} - (3/2) \cdot {T_{ - 2,z}} + (1/3) \cdot {T_{ - 3,z}}) + \\\quad \quad {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}}MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + MC{P_{tot}})\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    T_{avg} &= ({C_{air,z}} \cdot (3 \cdot {T_{ - 1,z}} - (3/2) \cdot {T_{ - 2,z}} + (1/3) \cdot {T_{ - 3,z}}) \\
+            &+ {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}}MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + MC{P_{tot}})
+  \end{array}
+\end{equation}
 
 \begin{equation}
 {T_{mx}} = {T_{avg}}
@@ -1246,19 +1261,19 @@ If mixing:
 
 If UFAD:
 
-If~ \({H_{comf}} &lt; {H_{ocavg}}\)
+If~ \({H_{comf}} < {H_{ocavg}}\)
 
 \begin{equation}
 {T_{comf}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} &lt; {H_{mxavg}}\)
+Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\)
 
 \begin{equation}
 {T_{comf}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{comf}}} \right) + {T_{mx}}\left( {{H_{comf}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} &lt; {H_{ceil}}\)
+Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\)
 
 \begin{equation}
 {T_{comf}} < {T_{mx}}
@@ -1274,19 +1289,19 @@ If mixing:
 
 If UFAD:
 
-If\({H_{stat}} &lt; {H_{ocavg}}\)
+If\({H_{stat}} < {H_{ocavg}}\)
 
 \begin{equation}
 {T_{stat}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} &lt; {H_{mcavg}}\)
+Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mcavg}}\)
 
 \begin{equation}
 {T_{stat}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{stat}}} \right) + {T_{mx}}\left( {{H_{stat}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} &lt; {H_{ceil}}\)
+Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
 
 \begin{equation}
 {T_{stat}} = {T_{mx}}
@@ -1510,9 +1525,9 @@ See also Figure~\ref{fig:jet-and-recirculation-regions-in-typical}. Note the \em
 \toprule 
 ~ & Y & X & a & b & R\(^2\) \tabularnewline \midrule
 \endhead
-Jet velocity & U\(_J\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in})$ & 1.6173 & 0.1466 & 0.8343 \tabularnewline
-Recirculation zone velocity & U\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in})$ & 0.8911 & 0.0393 & 0.6464 \tabularnewline
-Recirculation zone flow rate & Q\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in})$ & 0.4444 & 0.1751 & 0.6761 \tabularnewline
+Jet velocity & U\(_J\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in}\right)$ & 1.6173 & 0.1466 & 0.8343 \tabularnewline
+Recirculation zone velocity & U\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in}\right)$ & 0.8911 & 0.0393 & 0.6464 \tabularnewline
+Recirculation zone flow rate & Q\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in}\right)$ & 0.4444 & 0.1751 & 0.6761 \tabularnewline
 Jet temperature rise & $\Delta$T\(_J\) & $\frac{q''_{RM}}{\rho {c_p}{Q_{in}}}$ & 0.8254 & 0 & n/a \tabularnewline
 Recirculation zone temperature rise & $\Delta$T\(_R\) & $\frac{q''_{RM}}{\rho {c_p}{Q_{in}}}$ & 1.2734 & 0 & n/a \tabularnewline
 \bottomrule
@@ -1637,11 +1652,13 @@ Locally, the heat transfer process is driven by the variable, local, temperature
 
 An accurate representation of system behavior must consider both the local heat transfer in the shear layer (varying along the \emph{x} direction, driven by the temperature profiles \emph{T\(_{J}\)(x)} and \emph{T\(_{R}\)(x)}) and the heat transfer in the wall boundary layers (with temperature \emph{T\(_{W}\)(r)}). Both transfers can be modeled using differential equations, resulting in the following system of equations:
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} & = \frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
     \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
   \end{array}
+\end{equation}
 
 The relevant boundary conditions are:
 
@@ -1679,11 +1696,13 @@ When heat gains occur in the recirculation region significant heat accumulation 
 
 In the case of a flow in a room with adiabatic surfaces and heat gains in the recirculation region the indoor air temperatures can be predicted using the solution to the following system of equations:
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     \rho C_p F R \left(T_R\left(0\right) - T_R\left(L\right)\right) & = G_R \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
     \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right)
   \end{array}
+\end{equation}
 
 This system of equations differs from system F16 in several ways. Because there is no wall heat transfer there is no need to split the recirculation flow in two parts (\emph{R} and \emph{W}). The temperature increase in the recirculation flow is simply defined by the internal gains (first equation in ). The second and third equations in model shear layer heat transfer are similar in the two cases ( and ).
 
@@ -1709,11 +1728,13 @@ The temperature variations in the recirculation flow is given by:
 
 In this case, the following system of equations must be solved:
 
+\begin{equation}
 \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} & = -\frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) - \frac{G_R}{L_R} \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
     \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
   \end{array}
+\end{equation}
 
 With the boundary conditions: \({T_W}(L) = {T_R}(0)\,,\,{T_W}(0) = {T_R}(L)\,,\,\,{T_J}(0) = {T_{IN}}\)
 
