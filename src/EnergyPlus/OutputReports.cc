@@ -770,7 +770,7 @@ DXFOut(
 					}
 					gio::write( unit, Format_717 ) << TempZoneName;
 				} else {
-					if ( Surface( surf ).Shape == RectangularOverhang ) {
+					if ( Surface( surf ).Shape == SurfaceShape::RectangularOverhang ) {
 						ntri = Triangulate( Surface( surf ).Sides, Surface( surf ).Vertex, mytriangles, Surface( surf ).Azimuth, Surface( surf ).Tilt, Surface( surf ).Name, SurfaceClass_Overhang );
 					} else {
 						ntri = Triangulate( Surface( surf ).Sides, Surface( surf ).Vertex, mytriangles, Surface( surf ).Azimuth, Surface( surf ).Tilt, Surface( surf ).Name, SurfaceClass_Fin );
