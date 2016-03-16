@@ -312,7 +312,7 @@ The net illuminance from the window is obtained by summing the contributions fro
 {E_h} = \sum\limits_{\scriptstyle \substack{window \\ elements}} {{L_w}d\Omega \cos \gamma }
 \end{equation}
 
-In performing the summation, window elements that lie below the workplane (\(\cos \gamma \lt 0\) ) are omitted since light from these elements cannot reach the workplane directly.
+In performing the summation, window elements that lie below the workplane (\(\cos \gamma < 0\) ) are omitted since light from these elements cannot reach the workplane directly.
 
 \begin{figure}[hbtp] % fig 58
 \centering
@@ -439,8 +439,8 @@ Thus
 
 \begin{equation}
 \begin{array}{l}
-    \theta_{min} & =  - \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| \\
-    \theta_{max} & = \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| 
+    \theta_{min} =  - \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| \\
+    \theta_{max} = \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| 
 \end{array}
 \end{equation}
 
@@ -471,10 +471,12 @@ For an unshaded window all of the transmitted flux is downward since the sun alw
 
 For a window with a diffusing shade
 
+\begin{equation}
 \begin{array}{l}
     \Phi_{FW,sh} = \Phi (1 - f) \\
     \Phi_{CW,sh} = \Phi f
-  \end{array}
+\end{array}
+\end{equation}
 
 \subsection{Luminance of Shaded Window}\label{luminance-of-shaded-window}
 
@@ -583,7 +585,7 @@ where \emph{E\(_{r}\)}is the total internally-reflected component of daylight il
 The net daylight glare at a reference point due to all of the windows in a room is expressed in terms of a \emph{glare index} given by
 
 \begin{equation}
-{G_I} = 10{\log_{10}}\sum\limits_{i = 1}^{\scriptstyle{\rm{number of}}\atop\scriptstyle{\rm{windows}}} {{{\rm{G}}_{\rm{i}}}}
+{G_I} = 10{\log_{10}}\sum\limits_{i = 1}^{\scriptstyle \substack{number of \\ windows}} {{{\rm{G}}_{\rm{i}}}}
 \end{equation}
 
 where \emph{G\(_{i}\)} is the glare constant at the reference point due to the \emph{i\(^{th}\)} window
