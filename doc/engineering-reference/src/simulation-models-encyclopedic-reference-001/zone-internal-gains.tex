@@ -14,13 +14,19 @@ The input object People provides a model for internal gains from occupants.~ Hea
 
 Average adjusted metabolic rate {[}3{]} is the metabolic rate to be applied to a mixed group of people with a typical percent composition based on the following factors:
 
-Metabolic rate, adult female = Metabolic rate, adult male X 0.85
-
-Metabolic rate, children = Metabolic rate, adult male X 0.75
+\begin{itemize}
+  \item Metabolic rate, adult female = Metabolic rate, adult male X 0.85
+  \item Metabolic rate, children = Metabolic rate, adult male X 0.75
+\end{itemize}
 
 The original data was in I-P (Inch-Pound) units, but the following correlation is in SI (Systems-International) units.
 
-\begin{array}{c}S = 6.461927 + .946892\cdot M + .0000255737\cdot {M^2}\\ + 7.139322\cdot T - .0627909\cdot T\cdot M + .0000589172\cdot T\cdot {M^2}\\ - .198550\cdot {T^2} + .000940018\cdot {T^2}\cdot M - .00000149532\cdot {T^2}\cdot {M^2}\end{array}
+\begin{equation}
+  \begin{array}{ll}
+    S &= 6.461927 + .946892 M + .0000255737 M^2 + 7.139322 T - .0627909 T M \\
+      &+ .0000589172 T M^2 - .198550 T^2 + .000940018 T^2 M - .00000149532 T^2 M^2
+  \end{array}
+\end{equation}
 
 where
 
@@ -39,7 +45,7 @@ LatentGain = MetabolicRate - SensibleGain
 \begin{figure}[hbtp] % fig 259
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5820.png}
-\caption{  Sensible Heat Gain from People Correlation \protect \label{fig:sensible-heat-gain-from-people-correlation}}
+\caption{  Sensible Heat Gain from People Correlation \protect \label{fig:sensible-heat-gain-from-people-correlation}}
 \end{figure}
 
 The function for sensible gain calculation is compared to the original data points in the following figure.~ The radiant fraction of the sensible gain is a user input on the People object.
@@ -244,7 +250,7 @@ The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for
 \begin{figure}[hbtp] % fig 260
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5821.png}
-\caption{  Control of Outdoor Temperature Controlled Baseboard Heat \protect \label{fig:control-of-outdoor-temperature-controlled}}
+\caption{  Control of Outdoor Temperature Controlled Baseboard Heat \protect \label{fig:control-of-outdoor-temperature-controlled}}
 \end{figure}
 
 \begin{equation}
