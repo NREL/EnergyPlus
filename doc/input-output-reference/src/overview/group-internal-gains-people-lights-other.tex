@@ -88,21 +88,21 @@ Number of People * People Schedule * People Activity * Carbon Dioxide Generation
 This field accepts either ``Yes'' or ``No'' as values. When ``Yes'' is specified, warnings are generated when the space conditions are outside of the ASHRAE 55 comfort range as discussed in the sections that follow titled ``Simplified ASHRAE 55-2004 Graph Related Outputs'' and ``Simplified ASHRAE 55 Warnings.'' The default is not to provide these warnings so if you want to know if your space is outside this comfort range you must set this field to Yes.
 
 % table 11
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\begin{longtable}[c]{p{2.0in}p{1.34in}p{1.33in}p{1.33in}}
 \caption{Metabolic Rates for Various Activities \protect \label{table:metabolic-rates-for-various-activities}}\\
 \toprule 
-Activity & Activity Level w/Person EnergyPlus Schedule Value & Activity Level W/m2 & met* \tabularnewline \midrule
+  Activity & Activity Level w/ Person EnergyPlus Schedule Value & Activity Level W/m\(^2\) & met* \tabularnewline \midrule
 \endhead
-Resting \tabularnewline
+\emph{Resting} \tabularnewline \midrule 
 Sleeping & 72 & 40 & 0.7 \tabularnewline
 Reclining & 81 & 45 & 0.8 \tabularnewline
 Seated, quiet & 108 & 60 & 1 \tabularnewline
 Standing, relaxed & 126 & 70 & 1.2 \tabularnewline
-Walking (on level surface) \tabularnewline
+\emph{Walking (on level surface)} \tabularnewline \midrule
 3.2 km/h (0.9 m/s) & 207 & 115 & 2 \tabularnewline
 4.3 km/h (1.2 m/s) & 270 & 150 & 2.6 \tabularnewline
 6.4 km/h (1.8 m/s) & 396 & 220 & 3.8 \tabularnewline
-Office Activities \tabularnewline
+\emph{Office Activities} \tabularnewline \midrule
 Reading, seated & 99 & 55 & 1 \tabularnewline
 Writing & 108 & 60 & 1 \tabularnewline
 Typing & 117 & 65 & 1.1 \tabularnewline
@@ -110,7 +110,7 @@ Filing, seated & 126 & 70 & 1.2 \tabularnewline
 Filing, standing & 144 & 80 & 1.4 \tabularnewline
 Walking about & 180 & 100 & 1.7 \tabularnewline
 Lifting/packing & 216 & 120 & 2.1 \tabularnewline
-Miscellaneous Occupational Activities \tabularnewline
+\emph{Miscellaneous Occupational Activities} \tabularnewline \midrule
 Cooking & 171 to 207 & 95 to 115 & 1.6 to 2.0 \tabularnewline
 Housecleaning & 207 to 360 & 115 to 200 & 2.0 to 3.4 \tabularnewline
 Seated, heavy limb movement & 234 & 130 & 2.2 \tabularnewline
@@ -119,16 +119,16 @@ sawing (table saw) & 207 to 252 & 115 to 140 & 2.0 to 2.4 \tabularnewline
 light (electrical industry) & 423 & 235 & 4 \tabularnewline
 Handling 50 kg bags & 423 & 235 & 4 \tabularnewline
 Pick and shovel work & 423 to 504 & 235 to 280 & 4.0 to 4.8 \tabularnewline
-Miscellaneous Leisure Activities \tabularnewline
+\emph{Miscellaneous Leisure Activities} \tabularnewline \midrule
 Dancing, social & 252 to 459 & 140 to 255 & 2.4 to 4.4 \tabularnewline
 Calisthenics/exercise & 315 to 423 & 175 to 235 & 3.0 to 4.0 \tabularnewline
 Tennis, singles & 378 to 486 & 210 to 270 & 3.6 to 4.0 \tabularnewline
 Basketball, competitive & 522 to 792 & 290 to 440 & 5.0 to 7.6 \tabularnewline
 Wrestling, competitive & 738 to 909 & 410 to 505 & 7.0 to 8.7 \tabularnewline
 \bottomrule
-\end{longtable}
-
+\scriptsize
 \textbf{*Note that one met = 58.1 W/m\(^{2}\)}
+\end{longtable}
 
 \paragraph{Field: Mean Radiant Temperature Calculation Type}\label{field-mean-radiant-temperature-calculation-type}
 
@@ -747,10 +747,10 @@ The fraction of heat from lights that goes into the zone as visible (short-wave)
 Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table~\ref{table:approximate-values-of-return-air-fraction} for overhead fluorescent lighting for a variety of luminaire configurations. The data is based on ASHRAE 1282-RP ``Lighting Heat Gain Distribution in Buildings'' by Daniel E. Fisher and Chanvit Chantrasrisalai.
 
 % table 14
-\begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
+\begin{longtable}[c]{p{0.8in}>{\raggedright}p{1.6in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}}
 \caption{Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. \protect \label{table:approximate-values-of-return-air-fraction}}\\
 \toprule 
-Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & fconvected \tabularnewline \midrule
+  Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & \(f_{\rm{convected}}\) \tabularnewline \midrule
 \endhead
 1 & Recessed, Parabolic Louver, Non-Vented, T8 & 0.31 & 0.22 & 0.20 & 0.27 \tabularnewline
 2 & Recessed, Acrylic Lens, Non-Vented, T8 & 0.56 & 0.12 & 0.20 & 0.12 \tabularnewline
@@ -765,14 +765,14 @@ Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fract
 10 & Surface Mounted, T5HO & 0.00 & 0.27 & 0.23 & 0.50 \tabularnewline
 11 & Pendant, Direct/Indirect, T8 & 0.00 & 0.32 & 0.23 & 0.45 \tabularnewline
 12 & Pendant, Indirect, T5HO & 0.00 & 0.32 & 0.25 & 0.43 \tabularnewline
- &  &  &  &  &  \tabularnewline
+ &  &  &  &  &  \tabularnewline \midrule
 1 & Recessed, Parabolic Louver, Non-Vented, T8 - Ducted & 0.27 & 0.27 & 0.21 & 0.25 \tabularnewline
 5 & Recessed, Direct/Indirect, T8 - Ducted & 0.27 & 0.22 & 0.17 & 0.34 \tabularnewline
- &  &  &  &  &  \tabularnewline
+ &  &  &  &  &  \tabularnewline \midrule
 1 & Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate & 0.45 & 0.30 & 0.22 & 0.03 \tabularnewline
 3 & Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate & 0.43 & 0.25 & 0.21 & 0.11 \tabularnewline
 5 & Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate & 0.43 & 0.27 & 0.18 & 0.12 \tabularnewline
- &  &  &  &  &  \tabularnewline
+ &  &  &  &  &  \tabularnewline \midrule
 1 & Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate & 0.10 & 0.16 & 0.20 & 0.54 \tabularnewline
 3 & Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate & 0.11 & 0.15 & 0.19 & 0.55 \tabularnewline
 5 & Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate & 0.04 & 0.13 & 0.16 & 0.67 \tabularnewline
@@ -1015,17 +1015,17 @@ InteriorLights:Electricity:Zone :\textless{}Zone Name\textgreater{}.
 As described in the Lights Outputs, values for lights will show up on the following meters:
 
 % table 15
-\begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
+\begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
 \caption{Distribution of Lights to Meters \protect \label{table:distribution-of-lights-to-meters}}\\
 \toprule 
 Meter Name & Scope & Lights Specfics \tabularnewline \midrule
 \endhead
 Electricity:Facility & Entire Facility & All \tabularnewline
 Electricity:Building & All Zones & All \tabularnewline
-Electricity:Zone: < Zone Name > & Specific Zone & All \tabularnewline
+Electricity:Zone: <Zone Name> & Specific Zone & All \tabularnewline
 InteriorLights:Electricity & All Zones & Lights Use \tabularnewline
-InteriorLights:Electricity:Zone: < Zone Name > & Specific Zone & Lights Use \tabularnewline
-< End-Use Subcategory > :InteriorLights:Electricity & Specific Subcategory & Lights Use \tabularnewline
+InteriorLights:Electricity:Zone: <Zone Name> & Specific Zone & Lights Use \tabularnewline
+<End-Use Subcategory> :InteriorLights:Electricity & Specific Subcategory & Lights Use \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1766,9 +1766,11 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The fuel input to the equipment ultimately appears as heat that contributes to zone loads. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Fraction Latent, Fraction Radiant and Fraction Lost. A fourth, defined as the fraction of the heat from other equipment convected to the zone air, is calculated by the program as:
 
-f\(_{d}\) = 1.0 -- (Fraction Latent + Fraction Radiant + Fraction Lost)
+\begin{equation}
+  f_{\rm{convected}} = 1.0 - (\rm{Fraction Latent} + \rm{Fraction Radiant} + \rm{Fraction Lost})
+\end{equation}
 
-You will get an error message if Fraction Latent + Fraction Radiant + Fraction Lost exceeds 1.0.
+You will get an error message if \(\rm{Fraction Latent} + \rm{Fraction Radiant} + \rm{Fraction Lost}\) exceeds 1.0.
 
 \paragraph{Field: Fraction Latent}\label{field-fraction-latent-4}
 
@@ -2745,15 +2747,15 @@ The Zone\-Contaminant\-Source\-And\-Sink:\-Generic contaminant:CutoffModel objec
 
 where
 
-\emph{S\(_{f}\)} = Generic contaminant source strength {[}m\(^{3}\)/s{]}
+\(S_{f}\) = Generic contaminant source strength {[}m\(^{3}\)/s{]}
 
-\emph{G\(_{f}\)} = Generic contaminant generation rate {[}m\(^{3}\)/s{]}
+\(G_{f}\) = Generic contaminant generation rate {[}m\(^{3}\)/s{]}
 
-\emph{F\(_{G}\)} = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
+\(F_{G}\) = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
 
-\emph{C\(_{cutoff}\)} = Cutoff concentration at which emission ceases {[}ppm{]}
+\(C_{\rm{cutoff}}\) = Cutoff concentration at which emission ceases {[}ppm{]}
 
-\emph{C\(_{f}\)} = Generic contaminant concentration value at a given previous time step {[}ppm{]}
+\(C_{f}\) = Generic contaminant concentration value at a given previous time step {[}ppm{]}
 
 \subsubsection{Inputs}\label{inputs-13-006}
 
@@ -2816,7 +2818,7 @@ where
 
 \emph{F\(_{G}\)} = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
 
-t = Time since the start of emission {[}second{]}
+\(t\) = Time since the start of emission {[}second{]}
 
 \emph{t\(_{c}\)} = Decay time constant {[}second{]}
 
@@ -2842,7 +2844,9 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 This field is the time at which the generation rate reaches 0.37 of the original rate.
 
-Note: The variable t, time since the start of emission, will be reset to zero, when a new run period starts, or the generation schedule value is equal to zero.
+\begin{callout}
+  Note: The variable \(t\), time since the start of emission, will be reset to zero, when a new run period starts, or the generation schedule value is equal to zero.
+\end{callout}
 
 An IDF example is provided below:
 
@@ -2889,7 +2893,7 @@ where
 
 \emph{h} = Average film mass transfer coefficient over the sink {[}m/s{]}
 
-\emph{r} = Film density of air {[}kg/m\(^{3}\){]}
+\(\rho\) = Film density of air {[}kg/m\(^{3}\){]}
 
 \emph{A} = Surface area of the adsorbent {[}m\(^{2}\){]}
 
@@ -2924,7 +2928,6 @@ This field denotes the generic contaminant Henry partition coefficient in the un
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
   WEST ZONE GC BLD,     !- Name
   Zn001:Wall001,        !- Surface Name
@@ -2935,7 +2938,7 @@ SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
 
 \subsubsection{Outputs}\label{outputs-11-003}
 
-When a SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object is specified, the following output variables are available:
+When a Sur\-face\-Con\-taminant\-Source\-And\-Sink:\-Generic:\-Boundary\-Layer\-Diffusion object is specified, the following output variables are available:
 
 \begin{itemize}
   \tightlist
@@ -2947,15 +2950,15 @@ When a SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object is 
 
 \paragraph{Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate {[}m3/s{]}}\label{generic-air-contaminant-boundary-layer-diffusion-generation-volume-flow-rate-m3s}
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object.
+This output is the average generic contaminant generation rate from each Sur\-face\-Contaminant\-Source\-And\-Sink:\-Generic:\-Boundary\-Layer\-Diffusion object.
 
 \paragraph{Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration {[}ppm{]}}\label{generic-air-contaminant-boundary-layer-diffusion-inside-face-concentration-ppm}
 
 This output is the average generic contaminant level at the interior surface.
 
-\subsection{SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink}\label{surfacecontaminantsourceandsinkgenericdepositionvelocitysink}
+\subsection{Sur\-face\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Velocity\-Sink}\label{surfacecontaminantsourceandsinkgenericdepositionvelocitysink}
 
-The SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink object specifies the generic contaminant removal rate from a surface. The object is equivalent to the deposition velocity sink model defined in CONTAM 3.0 sources and sinks element types.
+The Sur\-face\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Velocity\-Sink object specifies the generic contaminant removal rate from a surface. The object is equivalent to the deposition velocity sink model defined in CONTAM 3.0 sources and sinks element types.
 
 The deposition velocity model provides for the input of a sink's characteristic in the familiar term of deposition velocity. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition velocity model equation is:
 
@@ -2965,17 +2968,17 @@ The deposition velocity model provides for the input of a sink's characteristic 
 
 where
 
-S\(_{f}\)(\emph{t}) = Removal rate at time t {[}m\(^{3}\)/s{]}
+\(S_f (t)\) = Removal rate at time t {[}m\(^{3}\)/s{]}
 
-\emph{n\(_{d}\)} = Deposition velocity {[}m/s{]}
+\(\nu_d\) = Deposition velocity {[}m/s{]}
 
-\emph{A\(_{s}\)} = Deposition surface area {[}m\(^{2}\){]}
+\(A_s\) = Deposition surface area {[}m\(^{2}\){]}
 
-\emph{m} = Element multiplier {[}dimensionless{]}
+\(m\) = Element multiplier {[}dimensionless{]}
 
-\emph{C}\(_{f}\)(\emph{t}) = Concentration of contaminant generic contaminant at the previous time step {[}ppm{]}
+\(C_f (t)\) = Concentration of contaminant generic contaminant at the previous time step {[}ppm{]}
 
-F\(_{R}\) = Schedule or control signal value at time \emph{t} {[}-{]}
+\(\rm{F}_{R}\) = Schedule or control signal value at time \(t\) {[}-{]}
 
 \subsubsection{Inputs}\label{inputs-16-005}
 
@@ -2998,7 +3001,6 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
   EAST ZONE GC DVS,     !- Name
   Zn002:Wall001,        !- Surface Name
@@ -3020,7 +3022,7 @@ The following output variables are available when the Surface\-Contaminant\-Sour
 
 This output is the average generic contaminant generation rate from each Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Velocity\-Sink object.
 
-\subsection{ZoneContaminantSourceAndSink:Generic:DepositionRateSink}\label{zonecontaminantsourceandsinkgenericdepositionratesink}
+\subsection{Zone\-Con\-taminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Rate\-Sink}\label{zonecontaminantsourceandsinkgenericdepositionratesink}
 
 The Zone\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Rate\-Sink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
 
@@ -3271,20 +3273,21 @@ These output variables are the amount of heat gain for all Zone\-Baseboard:\-Out
 As described in each of the equipment sections, values for specific equipments will show up on the following meters:
 
 % table 17
-\begin{longtable}[c]{p{2.68in}p{1.5in}p{1.81in}}
+\begin{longtable}[c]{>{\raggedright}p{2.8in}>{\raggedright}p{1.2in}>{\raggedright}p{2.0in}}
 \caption{Distribution of Equipment to Meters \protect \label{table:distribution-of-equipment-to-meters}}\\
 \toprule 
 Meter Name & Scope & Equipment Specfics \tabularnewline \midrule
 \endhead
 Electricity:\-Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
 Electricity:\-Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:\-Zone: < Zone Name > & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Electricity:\-Zone: <Zone Name> & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
 Interior\-Equipment:\-Electricity & AllZones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-< End-Use Subcategory > :\-Interior\-Equipment:\-Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
+<End-Use Subcategory> :\-Interior\-Equipment:\-Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
 Gas:\-Facility & Entire Facility & Gas Equipment \tabularnewline
 Gas:\-Building & All Zones & Gas Equipment \tabularnewline
-Gas:\-Zone: < Zone Name > & Specific Zone & Gas Equipment \tabularnewline
+Gas:\-Zone: <Zone Name> & Specific Zone & Gas Equipment \tabularnewline
 Interior\-Equipment:\-Gas & AllZones & Gas Equipment \tabularnewline
-< End-Use Subcategory > :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
+<End-Use Subcategory> :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
 \bottomrule
 \end{longtable}
+
