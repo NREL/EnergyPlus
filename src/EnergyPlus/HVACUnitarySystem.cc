@@ -472,8 +472,12 @@ namespace HVACUnitarySystem {
 				AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithCompressor = false;
 			}
 
-			if ( ( HeatActive ) && ( AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithCompressor || AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithHeating ) ) {
-				AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = true;
+			if ( present (HeatActive) ) {
+				if ( ( HeatActive ) && ( AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithCompressor || AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithHeating ) ) {
+					AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = true;
+				} else {
+					AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = false;
+				}
 			} else {
 				AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = false;
 			}
@@ -10777,7 +10781,7 @@ namespace HVACUnitarySystem {
 				// zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
 				if ( !UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
 					Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-//					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow; #5531 max iterations
+					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow; // #5531 zone equipment needs MaxAvail set or fan will not turn ON
 				}
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = 1.0;
@@ -10786,7 +10790,9 @@ namespace HVACUnitarySystem {
 				}
 			} else {
 				Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-//				Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow; #5531 max iterations
+				if ( !UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
+					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow; // #5531 zone equipment needs MaxAvail set or fan will not turn ON
+				}
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
 				} else {
