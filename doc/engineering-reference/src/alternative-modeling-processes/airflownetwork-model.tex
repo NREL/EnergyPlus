@@ -32,7 +32,7 @@ The EnergyPlus airflow network consists of a set of nodes linked by airflow comp
 Newton's method is used to solve for node air pressures and it requires an initial set of values for the node pressures. There are two initialization methods available. The first is linear initialization and equivalent to Initialization flag = 0. These initial values may be obtained by including in each airflow component a linear approximation relating airflow to pressure drop:
 
 \begin{equation}
-\mathop {{m_i}}\limits^ \bullet   = {C_i}\rho \left( {{\raise0.7ex\hbox{{\Delta {P_i}}} \!\mathord{\left/ {\vphantom {{\Delta {P_i}} \mu }}\right.}\!\lower0.7ex\hbox{\mu }}} \right)
+  \dot{m}_{i} = C_{i}\rho\frac{\Delta P_i}{\mu}
 \end{equation}
 
 where

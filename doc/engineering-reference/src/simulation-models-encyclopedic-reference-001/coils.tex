@@ -1470,7 +1470,7 @@ The standard rating cooling capacity (AHRI 2007, AHRI 2008) is calculated as fol
 
 \begin{equation}
   \begin{array}{rl}
-    \dot{Q}_{StandardRating} & = \dot{Q}_{Total,Rated}\PB{TotCapTempModFac_{Rated}}\PB{TotCapFlowModFac_{Rated}}
+    \dot{Q}_{StandardRating} & = \dot{Q}_{Total,Rated}\PB{TotCapTempModFac_{Rated}}\PB{TotCapFlowModFac_{Rated}} \\
                              & - \PB{FanPowerPerVolFlowRate \cdot \dot{V}_{Rated}}
   \end{array}
 \end{equation}
@@ -4269,8 +4269,8 @@ the design air and water flow rate at the speed ratio are given as following:
 \begin{equation}
   \begin{array}{rl}
     {\rm{DesignAirFlowRateSpeedRatio}} &= ReferenceUnitAirMassFlowRate@SpeedLevel\left( {x - 1} \right) \\
-                                       &* CapacityScaleFactor
-                                       &*\left( {1-\rm{SpeedRatio}} \right) \\
+                                       &* CapacityScaleFactor \\
+                                       &* \left( {1-\rm{SpeedRatio}} \right) \\
                                        &+ ReferenceUnitAirMassFlowRate@SpeedLevel\left( x \right) \\
                                        &* CapacityScaleFactor \\
                                        &* SpeedRatio
@@ -4407,7 +4407,7 @@ The secondary coil performance calculation is invoked using inputs in the DX coi
 \textbf{Cooling Operating Mode:} the primary DX cooling coil of a DX system serving a primary zone is on and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects. This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. The heat rejected by the secondary coil (condenser) of a DX system or heat pump operating in cooling mode is given by:
 
 \begin{equation}
-Q_\rm{cond} = Q_\rm{Evap}+P_\rm{CompCondFan}
+  Q_{cond} = Q_{Evap}+P_{CompCondFan}
 \end{equation}
 
 where
@@ -4528,7 +4528,7 @@ where
 
 \(h\_\text{Outlet}\) is the enthalpy of air leaving the passive coil, (J/kg) 
 
-\(\dot{m}}\text{sec}\) is the secondary DX coil mass flow rate, (kg/s) 
+\(\dot{m}_{\text{sec}}\) is the secondary DX coil mass flow rate, (kg/s) 
 
 PLR is the primary DX cooling coil compressor part-load ratio, (-)
 
@@ -4750,7 +4750,14 @@ The results of the performance curves are applied as follows to determine coolin
 
 The sensible heat ratio (SHR) is determined by a rated SHR and two performance curves. There are two options for the SHR temperature modifying factor, it can either be a function of evaporator entering wetbulb and evaporator entering drybulb temperature or it can add a third independent variable for the state of charge of TES.
 
-\begin{array}{l}SHRTempModFac = \left\{ \begin{array}{l}f\left( {{T_{evap,wb}},{T_{evap,db}}} \right)\\f\left( {{T_{evap,wb}},{T_{evap,db}},{S_{TES}}} \right)\end{array} \right.\\\end{array}
+\begin{equation}
+  SHRTempModFac = \left\{
+    \begin{array}{l}
+      f\PB{T_{evap,wb},T_{evap,db}} \\
+      f\PB{T_{evap,wb},T_{evap,db},S_{TES}}
+    \end{array}
+  \right.
+\end{equation}
 
 The SHR flow fraction modifying factor is a function of air flow fraction through the evaporator section where air flow fraction is the ratio of current air mass flow rate to the rated air mass flow rate.
 
@@ -4841,7 +4848,7 @@ EIRStorTempModFac = {f_{triquadratic}}\left( {{T_{evap,wb}},{T_{cond,db}},{S_{TE
 Another storage energy input ratio modifier curve is a function of flow fraction.
 
 \begin{equation}
-EIRStorFlowModFac = f\left(PB{\frac{\dot{m}_{evap,air}}{\dot{m}_{evap,air,rated}}}
+  EIRStorFlowModFac = f\PB{\frac{\dot{m}_{evap,air}}{\dot{m}_{evap,air,rated}}}
 \end{equation}
 
 Storage part load degradation curve is a function of storage discharge part load ratio.
@@ -4870,7 +4877,14 @@ The results of the performance curves are applied as follows to determine coolin
 
 The sensible heat ratio (SHR) is determined by a rated SHR and two performance curves. There are two options for the SHR temperature modifying factor, it can either be a function of evaporator entering wetbulb and evaporator entering drybulb temperature or it can add a third independent variable for the state of charge of TES.
 
-\begin{array}{l}SHRTempModFac = \left\{ \begin{array}{l}f\left( {{T_{evap,wb}},{T_{evap,db}}} \right)\\f\left( {{T_{evap,wb}},{T_{evap,db}},{S_{TES}}} \right)\end{array} \right.\\\end{array}
+\begin{equation}
+  SHRTempModFac = \left\{
+    \begin{array}{l}
+      f\PB{T_{evap,wb},T_{evap,db}} \\
+      f\PB{T_{evap,wb},T_{evap,db},S_{TES}}
+    \end{array}
+  \right.
+\end{equation}
 
 The SHR flow fraction modifying factor is a function of air flow fraction through the evaporator section where air flow fraction is the ratio of current air mass flow rate to the rated air mass flow rate.
 
@@ -4994,7 +5008,14 @@ EvapPartLoadFac = f\left( {EvapPLR} \right)
 
 The sensible heat ratio (SHR) is determined by a rated SHR and two performance curves. There are two options for the SHR temperature modifying factor, it can either be a function of evaporator entering wetbulb and evaporator entering drybulb temperature or it can add a third independent variable for the state of charge of TES.
 
-\begin{array}{l}SHRTempModFac = \left\{ \begin{array}{l}f\left( {{T_{evap,wb}},{T_{evap,db}}} \right)\\f\left( {{T_{evap,wb}},{T_{evap,db}},{S_{TES}}} \right)\end{array} \right.\\\end{array}
+\begin{equation}
+  SHRTempModFac = \left\{
+    \begin{array}{l}
+      f\PB{T_{evap,wb},T_{evap,db}} \\
+      f\PB{T_{evap,wb},T_{evap,db},S_{TES}}
+    \end{array}
+  \right.
+\end{equation}
 
 The SHR flow fraction modifying factor is a function of air flow fraction through the evaporator section where air flow fraction is the ratio of current air mass flow rate to the rated air mass flow rate.
 
