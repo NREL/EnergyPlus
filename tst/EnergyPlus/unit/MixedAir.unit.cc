@@ -65,6 +65,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -76,6 +77,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -84,6 +86,7 @@
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataAirLoop;
+using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::ScheduleManager;
@@ -91,6 +94,7 @@ using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::SizingManager;
@@ -1115,5 +1119,115 @@ namespace EnergyPlus {
 		Node.deallocate( );
 
 	}
-}
 
+	TEST_F( EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest )
+	{
+		std::string const idf_objects = delimited_string({
+			"Version,8.3;",
+
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node 1; !- Name",
+
+			"  Schedule:Constant,",
+			"    Min OA Sched,             !- Name",
+			"     Any Number,              !- Schedule Type Limits Name",
+			"     0.5;                     !- Value",
+
+			"  ScheduleTypeLimits,",
+			"    Any Number;              !- Name",
+
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,          !- Name",
+			"    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
+			"    VAV Sys 1 Inlet Node,     !- Return Air Node Name",
+			"    Mixed Air Node 1,         !- Mixed Air Node Name",
+			"    Outside Air Inlet Node 1, !- Actuator Node Name",
+			"    autosize,                 !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    autosize,                 !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    FixedDryBulb,             !- Economizer Control Type",
+			"    ModulateFlow,             !- Economizer Control Action Type",
+			"    ,                         !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                         !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                         !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                         !- Electronic Enthalpy Limit Curve Name",
+			"    ,                         !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,                !- Lockout Type",
+			"    ProportionalMinimum,      !- Minimum Limit Type",
+			"    Min OA Sched,             !- Minimum Outdoor Air Schedule Name",
+			"    ,                         !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                         !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                         !- Mechanical Ventilation Controller Name",
+			"    ,                         !- Time of Day Economizer Control Schedule Name",
+			"    Yes,                      !- High Humidity Control",
+			"    Zone1,                    !- Humidistat Control Zone Name",
+			"    1;                        !- High Humidity Outdoor Air Flow Ratio",
+		});
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		compare_err_stream( "" ); // just for debugging
+
+		bool ErrorsFound( false ); // If errors detected in input
+		int ControllerNum( 0 ); // Controller number
+		int NumArg( 0 );
+		int NumNums( 0 );
+		int NumAlphas( 0 );
+		int IOStat( 0 );
+		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+
+		Array1D< Real64 > NumArray( NumNums, 0.0 );
+		Array1D_string AlphArray( NumAlphas );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNums );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_bool lNumericBlanks( NumNums, true );
+
+		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		OAController.allocate( NumOAControllers );
+
+		ControllerNum = 1;
+		Zone.allocate( 1 );
+		Zone( 1 ).Name = "ZONE1";
+		NumOfZones = 1;
+		ZoneEquipConfig.allocate( 1 );
+		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+		ZoneEquipConfig( 1 ).ZoneNode = 2;
+		ZoneEquipConfig( 1 ).AirLoopNum = 1;
+		PrimaryAirSystem.allocate( 1 );
+		PrimaryAirSystem( 1 ).NumBranches = 1;
+		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "OASysName";
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+		OutsideAirSys.allocate( 1 );
+		OutsideAirSys( 1 ).Name = "OASysName";
+		OutsideAirSys( 1 ).NumControllers = 1;
+		OutsideAirSys( 1 ).ControllerType.allocate( 1 );
+		OutsideAirSys( 1 ).ControllerType( 1 ) = "Controller:OutdoorAir";
+		OutsideAirSys( 1 ).ControllerName.allocate( 1 );
+		OutsideAirSys( 1 ).ControllerName( 1 ) = "OA Controller 1";
+		DataAirLoop::NumOASystems = 1;
+		HumidityControlZone.allocate( 1 );
+		HumidityControlZone( 1 ).ActualZoneNum = 1;
+		NumHumidityControlZones = 1;
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
+		//compare_err_stream( "" ); // just for debugging
+
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ ( false, OAController( ControllerNum ).ModifyDuringHighOAMoisture ); // missing input defaults "Control High Indoor Humidity Based on Outdoor Humidity Ratio" to false
+
+		std::string const error_string = delimited_string( {
+			"   ** Warning ** Controller:OutdoorAir \"OA CONTROLLER 1\", missing field value",
+			"   **   ~~~   ** ...Control High Indoor Humidity Based on Outdoor Humidity Ratio will default to Yes when High Humidity Control= \"Yes\"",
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+	}
+
+}
