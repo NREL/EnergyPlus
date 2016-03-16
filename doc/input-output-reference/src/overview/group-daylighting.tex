@@ -2,7 +2,9 @@
 
 Daylighting can be invoked in EnergyPlus by the use of two objects: \textbf{Daylighting:Controls} and \textbf{Daylighting:DELight:Controls}. These are described in the following object descriptions.
 
-Note that Daylighting:Controls and Daylighting:DELight:Controls objects may be intermixed in a single IDF but may not be used in the same zone.
+\begin{callout}
+  Note that Daylighting:Controls and Daylighting:DELight:Controls objects may be intermixed in a single IDF but may not be used in the same zone.
+\end{callout}
 
 \subsection{Daylighting:Controls}\label{daylightingcontrols-000}
 
@@ -71,12 +73,11 @@ For Lighting Control Type = 1 (continuous), the overhead lights dim continuously
 For Lighting Control Type = 2 (stepped), the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs.~daylight illuminance.
 
 % table 18
-\begin{longtable}[c]{p{4.01in}p{1.97in}}
-\caption{Stepped Lighting Control Example \protect \label{table:stepped-lighting-control-example}}\\
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Example of a Stepped Lighting Control System with Three Steps \protect \label{table:stepped-lighting-control-example}}\\
 \toprule 
-Example of a Stepped Lighting Control System with Three Steps \tabularnewline \midrule
+Daylight illuminance & Fraction of lights that are on \tabularnewline \midrule
 \endhead
-Daylight illuminance & Fraction of lights that are on \tabularnewline
 0-200 & 1.0 \tabularnewline
 200-400 & 2/3 \tabularnewline
 400-600 & 1/3 \tabularnewline
@@ -99,17 +100,16 @@ If a zone has two or more windows with glare control, the shading devices will b
 The following table gives recommended values of Maximum Allowable Discomfort Glare Index.
 
 % table 19
-\begin{longtable}[c]{p{3.64in}p{2.35in}}
-  \caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \protect \label{table:recommended-values-discomfort-glare-index}}\\
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \protect \label{table:recommended-values-discomfort-glare-index}}\\
 \toprule 
 Activity or Zone Type & Maximum Allowable DGI \tabularnewline \midrule
 \endhead
 Art Galleries & 16 \tabularnewline
-Factories & -- \tabularnewline
-Rough work & 28 \tabularnewline
-Engine assembly & 26 \tabularnewline
-Fine assembly & 24 \tabularnewline
-Instrument assembly & 22 \tabularnewline
+Factories: Rough work & 28 \tabularnewline
+Factories: Engine assembly & 26 \tabularnewline
+Factories: Fine assembly & 24 \tabularnewline
+Factories: Instrument assembly & 22 \tabularnewline
 Hospital wards & 18 \tabularnewline
 Laboratories & 22 \tabularnewline
 Museums & 20 \tabularnewline
@@ -338,12 +338,11 @@ For Lighting Control Type = 1 (continuous), the overhead lights dim continuously
 For Lighting Control Type = 2 (stepped), the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs.~daylight illuminance.
 
 % table 20
-\begin{longtable}[c]{p{4.01in}p{1.97in}}
-\caption{Stepped Lighting Control Example \protect \label{table:stepped-lighting-control-example-001}}\\
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Example of a Stepped Lighting Control System with Three Steps \protect \label{table:stepped-lighting-control-example-001}}\\
 \toprule 
-Example of a Stepped Lighting Control System with Three Steps \tabularnewline \midrule
+Daylight illuminance & Fraction of lights that are on \tabularnewline \midrule
 \endhead
-Daylight illuminance & Fraction of lights that are on \tabularnewline
 0-200 & 1.0 \tabularnewline
 200-400 & 2/3 \tabularnewline
 400-600 & 1/3 \tabularnewline
@@ -390,16 +389,15 @@ The maximum surface area for nodes in gridding (subdividing) all surfaces in the
 An IDF example:
 
 \begin{lstlisting}
-
 Daylighting:DELight:Controls,
-      DElight NORTH ZONE, !- DElight Zone Name
-      NORTH ZONE,         !- Zone Name
-      1,     !- Lighting control type
-      0.3,   !- Minimum input power fraction for continuous dimming control
-      0.2,   !- Minimum light output fraction for continuous dimming control
-      0,     !- Number of steps (excluding off) for stepped control
-      1.0,   !- Probability lighting will be reset when needed in manual stepped control
-      1.0;   !- Gridding Resolution {m2}
+  DElight NORTH ZONE, !- DElight Zone Name
+  NORTH ZONE,         !- Zone Name
+  1,     !- Lighting control type
+  0.3,   !- Minimum input power fraction for continuous dimming control
+  0.2,   !- Minimum light output fraction for continuous dimming control
+  0,     !- Number of steps (excluding off) for stepped control
+  1.0,   !- Probability lighting will be reset when needed in manual stepped control
+  1.0;   !- Gridding Resolution {m2}
 \end{lstlisting}
 
 \subsection{Daylighting:DELight:ReferencePoint}\label{daylightingdelightreferencepoint}
@@ -818,52 +816,49 @@ Length of pipe {[}m{]} in the transition zone. This is used for determining heat
 The \emph{Transition Zone Name} and \emph{Transition Zone Length} fields can be repeated for additional transition zones.
 
 \begin{lstlisting}
-
 DaylightingDevice:Tubular,
-    Pipe1,                    !- Object Name
-    Dome1,                    !- Dome Name
-    Diffuser1,                !- Diffuser Name
-    Reflective Aluminum,      !- Construction Name
-    0.3556,                   !- Diameter [m] (approximately 14", a standard size)
-    1.4,                      !- Total Length [m] (subtract zone lengths to get outdoor exposed length)
-    0.28,                     !- Effective Thermal Resistance [m2-K/W] between TubularDaylightDome and
-   !                                TubularDaylightDiffuser
-    Attic Zone,               !- Transition Zone 1 Name
-    1.1;                      !- Transition Zone 1 Length [m]
+  Pipe1,                    !- Object Name
+  Dome1,                    !- Dome Name
+  Diffuser1,                !- Diffuser Name
+  Reflective Aluminum,      !- Construction Name
+  0.3556,                   !- Diameter [m] (approximately 14", a standard size)
+  1.4,                      !- Total Length [m] (subtract zone lengths to get outdoor exposed length)
+  0.28,                     !- Effective Thermal Resistance [m2-K/W] between TubularDaylightDome and
+                            !- TubularDaylightDiffuser
+  Attic Zone,               !- Transition Zone 1 Name
+  1.1;                      !- Transition Zone 1 Length [m]
 
+FenestrationSurface:Detailed,
+  Dome1,  !- Subsurface Name
+  TubularDaylightDome,  !- Surface Type
+  Clear Acrylic Dome,  !- Construction Name (only 1 layer allowed in construction)
+  Attic Roof,  !- Base Surface Name
+  ,  !- Outside Face Environment (not allowed for TubularDaylightDome)
+  0.0,  !- VF to Ground
+  ,  !- Window Shading Control (not allowed for TubularDaylightDome)
+  ,  !- Frame/Divider Name (not allowed for TubularDaylightDome)
+  1.0,  !- Multiplier (must be 1.0 for TubularDaylightDome)
+  4,  !- Number of Vertices
+  2.3425,  3.1575,  3.9,
+  2.3425,  2.8425,  3.9,
+  2.6575,  2.8425,  3.9,
+  2.6575,  3.1575,  3.9;
 
-   FenestrationSurface:Detailed,
-    Dome1,  !- Subsurface Name
-    TubularDaylightDome,  !- Surface Type
-    Clear Acrylic Dome,  !- Construction Name (only 1 layer allowed in construction)
-    Attic Roof,  !- Base Surface Name
-    ,  !- Outside Face Environment (not allowed for TubularDaylightDome)
-    0.0,  !- VF to Ground
-    ,  !- Window Shading Control (not allowed for TubularDaylightDome)
-    ,  !- Frame/Divider Name (not allowed for TubularDaylightDome)
-    1.0,  !- Multiplier (must be 1.0 for TubularDaylightDome)
-    4,  !- Number of Vertices
-    2.3425,  3.1575,  3.9,
-    2.3425,  2.8425,  3.9,
-    2.6575,  2.8425,  3.9,
-    2.6575,  3.1575,  3.9;
-
-
-   FenestrationSurface:Detailed,
-    Diffuser1,  !- Subsurface Name
-    TubularDaylightDiffuser,  !- Surface Type
-    Frosted Acrylic Diffuser,  !- Construction Name (only 1 layer allowed in construction)
-    Daylit Zone Ceiling,  !- Base Surface Name
-    ,  !- Outside Face Environment (not allowed for TubularDaylightDiffuser)
-    0.0,  !- VF to Ground
-    ,  !- Window Shading Control (not allowed for TubularDaylightDiffuser)
-    ,  !- Frame/Divider Name (not allowed for TubularDaylightDiffuser)
-    1.0,  !- Multiplier (must be 1.0 for TubularDaylightDiffuser)
-    4,  !- Number of Vertices
-    2.3425,  3.1575,  2.5,
-    2.3425,  2.8425,  2.5,
-    2.6575,  2.8425,  2.5,
-    2.6575,  3.1575,  2.5;
+FenestrationSurface:Detailed,
+  Diffuser1,  !- Subsurface Name
+  TubularDaylightDiffuser,  !- Surface Type
+  Frosted Acrylic Diffuser,  !- Construction Name (only 1 layer allowed in construction)
+  Daylit Zone Ceiling,  !- Base Surface Name
+  ,  !- Outside Face Environment (not allowed for TubularDaylightDiffuser)
+  0.0,  !- VF to Ground
+  ,  !- Window Shading Control (not allowed for TubularDaylightDiffuser)
+  ,  !- Frame/Divider Name (not allowed for TubularDaylightDiffuser)
+  1.0,  !- Multiplier (must be 1.0 for TubularDaylightDiffuser)
+  4,  !- Number of Vertices
+  2.3425,  3.1575,  2.5,
+  2.3425,  2.8425,  2.5,
+  2.6575,  2.8425,  2.5,
+  2.6575,  3.1575,  2.5;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-004}
@@ -981,7 +976,9 @@ The inside shelf is defined as a regular heat transfer surface in the zone. Howe
 
 The outside shelf is defined as a Shading:Zone:Detailed object. The visible and solar absorptance of the outside material layer determines the reflectivity of the shelf.
 
-NOTE:~ Unlike a regular Shading:Zone:Detailed object, the vertices of the outside shelf surface must be ordered so that the outward normal vector points \emph{upward}, i.e.~toward the upper window. This is necessary in order for the outside shelf to properly receive sunlight and shading from other surfaces. A mirror shading surface with the outward normal vector pointing in the opposite direction is automatically created by the program to shade the lower window.
+\begin{callout}
+  NOTE: Unlike a regular Shading:Zone:Detailed object, the vertices of the outside shelf surface must be ordered so that the outward normal vector points \emph{upward}, i.e.~toward the upper window. This is necessary in order for the outside shelf to properly receive sunlight and shading from other surfaces. A mirror shading surface with the outward normal vector pointing in the opposite direction is automatically created by the program to shade the lower window.
+\end{callout}
 
 The inside shelf and outside shelf are both optional. However, if neither shelf is specified, the daylighting shelf object has no effect on the simulation.
 
@@ -1011,10 +1008,11 @@ Reference to a CONSTRUCTION object. This field is required if an outside shelf i
 
 User defined value for the view factor from the window to the outside shelf. This field is optional. If not specified, an exact view factor is calculated for two perpendicular rectangles of the same width having a shared edge. If the given surfaces do not meet these geometric requirements, it is necessary to specify a value here.
 
-NOTE:~ It is up to the user to adjust the view factor to ground of the upper window to account for the part of the view blocked by the outside shelf. The calculated \emph{View Factor To Outside Shelf} is reported in the eio file for this purpose. For the typical case where the shelf is parallel to the ground and the upper window is perpendicular to the ground, the view factor to ground is simply:~ 0.5 -- \emph{View Factor To Outside Shelf}.
+\begin{callout}
+  NOTE: It is up to the user to adjust the view factor to ground of the upper window to account for the part of the view blocked by the outside shelf. The calculated \emph{View Factor To Outside Shelf} is reported in the eio file for this purpose. For the typical case where the shelf is parallel to the ground and the upper window is perpendicular to the ground, the view factor to ground is simply: 0.5 -- \emph{View Factor To Outside Shelf}.
+\end{callout}
 
 \begin{lstlisting}
-
 DaylightingDevice:Shelf,
     Shelf,  !- Name
     Daylit Upper Window,  !- Window Name
@@ -1023,8 +1021,7 @@ DaylightingDevice:Shelf,
     Shelf Construction;  !- Outside Shelf Construction Name (required if outside shelf specified)
     ! 0.29;  !- View Factor To Outside Shelf (optional)
 
-
-  FenestrationSurface:Detailed,
+FenestrationSurface:Detailed,
     Daylit Upper Window,  !- Subsurface Name
     Window,  !- Surface Type
     Standard Window,  !- Construction Name
@@ -1040,8 +1037,7 @@ DaylightingDevice:Shelf,
     4.0,  0.0,  2.0,
     4.0,  0.0,  2.8;
 
-
-   BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Inside Shelf,  !- Surface Name
     Wall,  !- Surface Type
     Shelf Construction,  !- Construction Name
@@ -1057,8 +1053,7 @@ DaylightingDevice:Shelf,
     4.0,  1.0,  2.0,
     1.0,  1.0,  2.0;
 
-
-   Shading:Zone:Detailed,
+Shading:Zone:Detailed,
     Outside Shelf,  !- Surface Name
     Daylit South Wall,  !- Base Surface Name
     ,  !- Shading Transmittance Schedule (default is always opaque)
@@ -1162,7 +1157,6 @@ The visible reflectance of the side walls of the well. If the walls do not all h
 An IDF example:
 
 \begin{lstlisting}
-
 DaylightingDevice:LightWell,  ! The well is 60% reflecting, is 1.2m high and has a 2.5m x 5.5m bottom opening.
    Skylight-1, !- Name of Exterior Window that this Light Well Applies To
    1.2,        !- Height of Well(m)
@@ -1176,7 +1170,8 @@ DaylightingDevice:LightWell,  ! The well is 60% reflecting, is 1.2m high and has
 The following table shows what input objects/fields to use to model different daylighting options. It also gives the name of an example input, if available, that demonstrates the option.
 
 % table 21
-\begin{longtable}[c]{p{1.5in}p{2.99in}p{1.5in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}>{\raggedright}p{1.5in}}
 \caption{Daylighting Modeling Options \protect \label{table:daylighting-modeling-options}}\\
 \toprule 
 Option & Object/Field or Output Variable & Input File \tabularnewline \midrule
@@ -1200,7 +1195,7 @@ Get a radiosity-based interior light inter-reflection calculation & Daylighting:
 Find effect on daylighting of solar reflected from overhangs, neighboring buildings, etc. & Building/SolarDistribution uses “withReflections” option & ~ \tabularnewline
 Find visible transmittance effect of dirt on window & WindowMaterial:Glazing/Dirt Correction Factor for Solar and Visible Transmittance* & ~ \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 *Used only with Daylighting:Controls
 

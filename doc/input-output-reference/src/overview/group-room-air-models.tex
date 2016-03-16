@@ -18,7 +18,7 @@ UserDefined & User Defined & All zones & `Room\-Air\-Model\-Type', `Room\-Air:\-
 One\-Node\-Displacement\-Ventilation & Mundt & displacement ventilation & `Room\-Air\-Model\-Type', `Room\-Air\-Settings:\-One\-Node\-Displacement\-Ventilation', `Room\-Air:Node' \tabularnewline
 Three\-Node\-Displacement\-Ventilation & UCSD Displacement Ventilation & displacement ventilation & `Room\-Air\-Model\-Type', `Room\-Air\-Settings:\-Three\-Node\-Displacement\-Ventilation' \tabularnewline
 Under\-Floor\-Air\-Distribution\-Interior & UCSD UFAD Interior Model & Interior zones served by a UFAD system & `Room\-Air\-Model\-Type', `Room\-Air\-Settings:\-Under\-Floor\-Air\-Distribution\-Interior' \tabularnewline
-Under\-Floor\-Air\-Distribution\-Exterior & UCSD UFAD Exterior Model & Exterior zones served by a UFAD system & `Room\-Air\-Model\-Type', 'Room\-Air\-Settings:\-Under\-Floor\-Air\-Distribution\-Exterior' \tabularnewline
+Under\-Floor\-Air\-Distribution\-Exterior & UCSD UFAD Exterior Model & Exterior zones served by a UFAD system & `Room\-Air\-Model\-Type', `Room\-Air\-Settings:\-Under\-Floor\-Air\-Distribution\-Exterior' \tabularnewline
 Cross\-Ventilation & UCSD Cross Ventilation & cross ventilation & `Room\-Air\-Model\-Type', `Room\-Air\-Settings:\-Cross\-Ventilation' \tabularnewline
 \bottomrule
 \end{longtable}
@@ -53,12 +53,11 @@ Input either \emph{Direct} or \emph{Indirect}
 An example idf entry follows
 
 \begin{lstlisting}
-
 RoomAirModelType,
-      MOD1,      !- Room-Air Model Name
-      ZONE ONE,  !- Zone Name
-      ThreeNodeDisplacementVentilation,  !- Room-Air Modeling Type
-      Direct;    !- Air Temperature Coupling Strategy
+  MOD1,                             !- Room-Air Model Name
+  ZONE ONE,                         !- Zone Name
+  ThreeNodeDisplacementVentilation, !- Room-Air Modeling Type
+  Direct;                           !- Air Temperature Coupling Strategy
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:UserDefined}\label{roomairtemperaturepatternuserdefined}
@@ -90,12 +89,11 @@ This field provides the name of schedule that will be used to control which user
 An example of this object is
 
 \begin{lstlisting}
-
 RoomAir:TemperaturePattern:UserDefined,
-    Ground Floor South Air Temp Contrls , ! Name
-    ZN2_S_1 ,          ! Zone Name
-    Always_on ,        ! Availability Schedule Name
-    Roomair Pattern 1; ! Pattern Control Schedule Name
+  Ground Floor South Air Temp Contrls,  ! Name
+  ZN2_S_1,                              ! Zone Name
+  Always_on,                            ! Availability Schedule Name
+  Roomair Pattern 1;                    ! Pattern Control Schedule Name
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:ConstantGradient}\label{roomairtemperaturepatternconstantgradient}
@@ -135,14 +133,13 @@ This field specifies the gradient, or slope, of temperature changes in the verti
 An example of this object is:
 
 \begin{lstlisting}
-
 RoomAir:TemperaturePattern:ConstantGradient,
-    half C per Meter,       ! Name
-    10005,   ! Control Integer for Pattern Control Schedule Name
-    0.0,     ! Thermostat Offset (Temp at thermostat- Mean Air Temp) [C]
-    1.0,     ! Return Air Offset (Tleaving - Mean Air Temp )  [C]
-    1.0,     ! Exhaust Air Offset (Texhaust - Mean Air Temp)  [C]
-    0.5;     ! Temperature Gradient [K/m]
+  half C per Meter,     ! Name
+  10005,                ! Control Integer for Pattern Control Schedule Name
+  0.0,                  ! Thermostat Offset (Temp at thermostat- Mean Air Temp) [C]
+  1.0,                  ! Return Air Offset (Tleaving - Mean Air Temp )  [C]
+  1.0,                  ! Exhaust Air Offset (Texhaust - Mean Air Temp)  [C]
+  0.5;                  ! Temperature Gradient [K/m]
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:TwoGradient}\label{roomairtemperaturepatterntwogradient}
@@ -212,20 +209,19 @@ This field is used to enter the lower bound on heat rate values. It is required 
 An example of this object follows. This pattern will apply no gradient (effectively the mixing model) if zone air temperatures are 22.5 C or lower. It will apply a gradient of 1 K/m if zone temperatures are 26.0 C or higher. For zone air temperatures between 22.5 and 26.0 it will determine the gradient by linear interpolation and use a gradient between 0.0 and 1.0 K/m depending on where the zone air temperature is in the range.
 
 \begin{lstlisting}
-
 RoomAir:TemperaturePattern:TwoGradient,
-    Mixed to one C per M by Zone DB, ! Name
-    2002,                 ! Control Integer for Pattern Control Schedule
-    1.1,                  ! Thermostat Height meters
-    4.5,                  ! Return Air Height
-    3.5,                  ! Exhaust Air Height
-    0.0, ! Temperature Gradient Lower Bound K/m
-    1.0, ! Temperature Gradient Upper  Bound K/m
-    ZoneDrybulbTemperature, ! Gradient Interpolation Mode
-    26.0,               ! Upper Temperature [C]
-    22.5,               ! Lower Temperature [C]
-    , ! Upper Heat Rate [W]
-    ; ! Lower Heat Rate [W]
+  Mixed to one C per M by Zone DB, ! Name
+  2002,                   ! Control Integer for Pattern Control Schedule
+  1.1,                    ! Thermostat Height meters
+  4.5,                    ! Return Air Height
+  3.5,                    ! Exhaust Air Height
+  0.0,                    ! Temperature Gradient Lower Bound K/m
+  1.0,                    ! Temperature Gradient Upper  Bound K/m
+  ZoneDrybulbTemperature, ! Gradient Interpolation Mode
+  26.0,                   ! Upper Temperature [C]
+  22.5,                   ! Lower Temperature [C]
+  ,                       ! Upper Heat Rate [W]
+  ;                       ! Lower Heat Rate [W]
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:NondimensionalHeight}\label{roomairtemperaturepatternnondimensionalheight}
@@ -279,25 +275,24 @@ DeltaT\(_{i}\) is the temperature difference between the air temperature at the 
 An example of this object corresponding to the figure above is:
 
 \begin{lstlisting}
-
 RoomAir:TemperaturePattern:NondimensionalHeight,
-    Rough UFAD Approx  , ! Name
-    3001 , ! Control Integer for Pattern Control Schedule
-          ! note reference this entry in Schedule
-    -1.0 ,   ! Thermostat Offset
-    1.5 , ! Return Air Offset (Tleaving - Mean Air Temp ) deg C
-    1.75,   ! Exhaust Air Offset (Texhaust - Mean Air Temp) deg C
-    0.05,  -1.8,   ! pair 1 (Zeta , DeltaTai)
-    0.1,   -1.7 ,  ! pair 2 (Zeta , DeltaTai)
-    0.2,   -0.8 ,  ! pair 3 (Zeta , DeltaTai)
-    0.3,   -0.2,   ! pair 4 (Zeta , DeltaTai)
-    0.4,    0.5,   ! pair 5 (Zeta , DeltaTai)
-    0.5,    0.8,   ! pair 6 (Zeta , DeltaTai)
-    0.6,    1.2,   ! pair 7 (Zeta , DeltaTai)
-    0.7,    1.4,   ! pair 8 (Zeta , DeltaTai)
-    0.8,    1.4,   ! pair 9 (Zeta , DeltaTai)
-    0.9,   1.42,   ! pair 10 (Zeta , DeltaTai)
-   0.95,  1.44;   ! pair 11 (Zeta , DeltaTai)
+  Rough UFAD Approx,    ! Name
+  3001,                 ! Control Integer for Pattern Control Schedule
+                        ! note reference this entry in Schedule
+  -1.0 ,                ! Thermostat Offset
+  1.5 ,                 ! Return Air Offset (Tleaving - Mean Air Temp ) deg C
+  1.75,                 ! Exhaust Air Offset (Texhaust - Mean Air Temp) deg C
+  0.05,  -1.8,          ! pair 1 (Zeta , DeltaTai)
+  0.1,   -1.7,          ! pair 2 (Zeta , DeltaTai)
+  0.2,   -0.8,          ! pair 3 (Zeta , DeltaTai)
+  0.3,   -0.2,          ! pair 4 (Zeta , DeltaTai)
+  0.4,    0.5,          ! pair 5 (Zeta , DeltaTai)
+  0.5,    0.8,          ! pair 6 (Zeta , DeltaTai)
+  0.6,    1.2,          ! pair 7 (Zeta , DeltaTai)
+  0.7,    1.4,          ! pair 8 (Zeta , DeltaTai)
+  0.8,    1.4,          ! pair 9 (Zeta , DeltaTai)
+  0.9,   1.42,          ! pair 10 (Zeta , DeltaTai)
+  0.95,  1.44;          ! pair 11 (Zeta , DeltaTai)
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:SurfaceMapping}\label{roomairtemperaturepatternsurfacemapping}
@@ -448,11 +443,11 @@ This model is applicable to spaces that are served by a low velocity floor-level
 
 \begin{itemize}
 \item
-  A foot level temperature (T\(_{R}\)). The floor region is 0.2 meters deep and T\(_{R}\) represents the temperature at the mid-point of the region.
+  A foot level temperature (T\(_{\rm{FLOOR}}\)). The floor region is 0.2 meters deep and T\(_{\rm{FLOOR}}\) represents the temperature at the mid-point of the region.
 \item
-  An occupied subzone temperature (T\(_{C}\)), representing the temperature in the region between the floor layer and the upper, mixed layer.
+  An occupied subzone temperature (T\(_{\rm{OC}}\)), representing the temperature in the region between the floor layer and the upper, mixed layer.
 \item
-  An upper node representing the mixed-layer/outflow temperature (T\(_{X}\)) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
+  An upper node representing the mixed-layer/outflow temperature (T\(_{\rm{MX}}\)) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
 \end{itemize}
 
 \begin{figure}[hbtp] % fig 45
@@ -644,9 +639,9 @@ This model is applicable to interior spaces that are served by an underfloor air
 
 \begin{itemize}
 \item
-  An occupied subzone temperature (T\(_{C}\)), representing the temperature in the region between the floor and the boundary of the upper subzone..
+  An occupied subzone temperature (T\(_{\rm{OC}}\)), representing the temperature in the region between the floor and the boundary of the upper subzone.
 \item
-  An upper subzone temperature (T\(_{X}\)) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
+  An upper subzone temperature (T\(_{\rm{MX}}\)) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
 \end{itemize}
 
 The following fields are used to define an instance of the `UCSD UFAD Interior Model Controls' object.
@@ -749,9 +744,9 @@ This model is applicable to exterior spaces that are served by an underfloor air
 
 \begin{itemize}
 \item
-  An occupied subzone temperature (T\(_{C}\)), representing the temperature in the region between the floor and the boundary of the upper subzone..
+  An occupied subzone temperature (T\(_{\rm{OC}}\)), representing the temperature in the region between the floor and the boundary of the upper subzone..
 \item
-  An upper subzone temperature (T\(_{X}\)) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
+  An upper subzone temperature (T\(_{\rm{MX}}\)) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
 \end{itemize}
 
 The following fields are used to define an instance of the `UCSD UFAD Exterior Model Controls' object.
@@ -847,15 +842,22 @@ RoomAirSettings:UnderFloorAirDistributionExterior,
 
 This model simulates a thermal zone using a network approach by assuming intra-zone nodes connected by user-defined patterns of airflows. The new model also allows users to specify a node to be connected to surfaces to have convective heat transfer between surfaces and the node, portion of internal gains and supply air and return air fractions from zone equipment. The model requires following objects to work together:
 
-\begin{lstlisting}
-RoomAirSettings:AirflowNetwork
-RoomAir:Node:AirflowNetwork
-RoomAir:Node:AirflowNetwork:AdjacentSurfaceList
-RoomAir:Node:AirflowNetwork:InternalGains
-RoomAir:Node:AirflowNetwork:HVACEquipment
-AirflowNetwork:Intrazone:Node
-AirflowNetwork:Intrazone:Linkage
-\end{lstlisting}
+\begin{itemize}
+  \item
+    RoomAirSettings:AirflowNetwork
+  \item
+    RoomAir:Node:AirflowNetwork
+  \item
+    Room\-Air\-:Node:\-Air\-flow\-Net\-work:\-Ad\-jacent\-Sur\-face\-List
+  \item
+    RoomAir:Node:Air\-flow\-Net\-work:\-Internal\-Gains
+  \item
+    RoomAir:Node:Air\-flow\-Net\-work:\-HVAC\-Equipment
+  \item
+    AirflowNetwork:Intrazone:Node
+  \item
+    Airflow\-Net\-work:\-Intra\-zone:\-Link\-age
+\end{itemize}
 
 The first \emph{five} \textbf{objects} are described below. The last two objects are described in the Airflow Network Model section.
 
@@ -867,7 +869,7 @@ This object provides inputs in a thermal zone needed for the RoomAirflowNetwork 
 
 \paragraph{Field: Name}\label{field-name-7-017}
 
-This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object.
+This is a unique character string associated with this instance of the Room\-Air\-Settings:\-Air\-flow\-Net\-work object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-8-002}
 
@@ -906,11 +908,11 @@ This object is used to define a node in a thermal zone. The input specifies the 
 
 \paragraph{Field: Name}\label{field-name-8-017}
 
-This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object.
+This is a unique character string associated with this instance of the Room\-Air\-Settings:\-Air\-flow\-Net\-work object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-9-000}
 
-The name of the EnergyPlus thermal zone and is defined in an RoomAirSettings:AirflowNetwork object.
+The name of the EnergyPlus thermal zone and is defined in an Room\-Air\-Settings:\-Air\-flow\-Net\-work object.
 
 \paragraph{Field: Fraction of Zone Air Volume}\label{field-fraction-of-zone-air-volume}
 
@@ -965,7 +967,7 @@ This object is used to define a list of internal gains in the same zone and asso
 
 \paragraph{Field: Name}\label{field-name-10-014}
 
-This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:InternalGains object.
+This is a unique character string associated with this instance of the Room\-Air:\-Node:\-Air\-flow\-Net\-work:\-Internal\-Gains object.
 
 \paragraph{Field: Internal Gain Object x Type}\label{field-internal-gain-object-x-type}
 
@@ -980,18 +982,17 @@ The field specifies an internal gain object name based on the list in the Energy
 The field specifies a fraction of the particular internal gain object assigned to this node.
 
 \begin{lstlisting}
-
 RoomAir:Node:AirflowNetwork:InternalGains,
-  CentralUpper_Gain,        !- Name
-  People,                !- Internal Gain Object 1 Type
-  NORTH_ZONE People,     !- Internal Gain Object 1 Name
-  0.15,                  !- Fraction of Gains to Node 1
-  Lights,                !- Internal Gain Object 2 Type
-  NORTH_ZONE Lights,     !- Internal Gain Object 2 Name
-  0.15,                  !- Fraction of Gains to Node 2
-  ElectricEquipment,     !- Internal Gain Object 3 Type
+  CentralUpper_Gain,    !- Name
+  People,               !- Internal Gain Object 1 Type
+  NORTH_ZONE People,    !- Internal Gain Object 1 Name
+  0.15,                 !- Fraction of Gains to Node 1
+  Lights,               !- Internal Gain Object 2 Type
+  NORTH_ZONE Lights,    !- Internal Gain Object 2 Name
+  0.15,                 !- Fraction of Gains to Node 2
+  ElectricEquipment,    !- Internal Gain Object 3 Type
   NORTH_ZONE Equip,     !- Internal Gain Object 3 Name
-  0.15;                  !- Fraction of Gains to Node 3
+  0.15;                 !- Fraction of Gains to Node 3
 \end{lstlisting}
 
 \{Field set: 3 fields (Internal Gain Object x Type, Internal Gain Object x Name, and Fraction of Gains to Node x). are extensible.\}
@@ -1004,7 +1005,7 @@ This object is used to define a list of HVAC equipment objects in the same zone 
 
 \paragraph{Field: Name}\label{field-name-11-012}
 
-This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:HVACEquipment object.
+This is a unique character string associated with this instance of the Room\-Air:\-Node:\-Air\-flow\-Net\-work:\-HVAC\-Equipment object.
 
 \paragraph{Field: ZoneHVAC or Air Terminal Equipment Object Type x}\label{field-zonehvac-or-air-terminal-equipment-object-type-x}
 
@@ -1251,7 +1252,9 @@ The convective heat gain from windows in an UnderFloorAirDistributionExterior zo
 
 This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
 
-\emph{(T\(_{c}\)} -- \emph{T\(_{p}\)) / (T\(_{t}\)} \emph{- T\(_{p}\))}
+\begin{equation}
+  \frac{T_{occ} - T_{sup}}{T_{ret} - T_{sup}}
+\end{equation}
 
 \subsubsection{Outputs}\label{outputs-7-009}
 

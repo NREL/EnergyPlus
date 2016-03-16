@@ -3521,7 +3521,7 @@ A maximum of four glass layers and one shading layer is allowed. A gas layer mus
 \begin{figure}[hbtp] % fig 26
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image052.png}
-\caption{Window construction with and without a between-glass shading layer. Shown are gap widths *g*, *g\$\_\{1\}\$* and *g\$\_\{2\}\$*, and shading layer width, *w*. An error will result if *g\$\_\{1\}\$+g\$\_\{2\}\$+w* is not equal to *g*, where *w* is zero for a blind and greater than zero for a shade. \protect \label{fig:window-construction-with-and-without-a}}
+  \caption{Window construction with and without a between-glass shading layer. Shown are gap widths \(g\), \(g_1\) and \(g_2\), and shading layer width, \(w\). An error will result if \(g_1 + g_2 +w\) is not equal to \(g\), where \(w\) is zero for a blind and greater than zero for a shade. \protect \label{fig:window-construction-with-and-without-a}}
 \end{figure}
 
 Outside and inside air film resistances are never given as part of a construction definitions since they are calculated during the EnergyPlus simulation. Note also that constructions are assumed to be one-dimensional in a direction perpendicular to the surface.
@@ -3663,12 +3663,11 @@ Site:GroundTemperature:FCfactorMethod is used only by the underground walls or s
 
 \paragraph{Field: Month Temperature(s) -- 12 fields in all}\label{field-month-temperatures-12-fields-in-all-000}
 
-Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January = 1\(^{t}\) field, February = 2\(^{d}\) field, etc.)
+Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January = 1\(^{st}\) field, February = 2\(^{nd}\) field, etc.)
 
 And, the IDF example:
 
 \begin{lstlisting}
-
 Site:GroundTemperature:FCfactorMethod,  9.5,3.5,-0.7,-1.7,-0.6,3.6,9.3,14,18.2,22.7,21.2,16.8;
 \end{lstlisting}
 
