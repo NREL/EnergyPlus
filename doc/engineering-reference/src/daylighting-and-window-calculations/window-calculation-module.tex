@@ -94,7 +94,11 @@ The following equations show how to convert from this set of values to the trans
 
 Given \emph{n} and \emph{T}, find \emph{R}:
 
-\begin{array}{l}r = {\left( {\frac{{n - 1}}{{n + 1}}} \right)^2}\\\tau  = \frac{{{{\left[ {{{(1 - r)}^4} + 4{r^2}{T^2}} \right]}^{1/2}} - {{(1 - r)}^2}}}{{2{r^2}T}}\\R = r + \frac{{{{(1 - r)}^2}r{\tau ^2}}}{{1 - {r^2}{\tau ^2}}}\end{array}
+\begin{equation}
+\begin{array}{l}
+r = {\left( {\frac{{n - 1}}{{n + 1}}} \right)^2}\\\tau  = \frac{{{{\left[ {{{(1 - r)}^4} + 4{r^2}{T^2}} \right]}^{1/2}} - {{(1 - r)}^2}}}{{2{r^2}T}}\\R = r + \frac{{{{(1 - r)}^2}r{\tau ^2}}}{{1 - {r^2}{\tau ^2}}}
+\end{array}
+\end{equation}
 
 \textbf{Example:}
 
@@ -102,7 +106,11 @@ Given \emph{n} and \emph{T}, find \emph{R}:
 
 \emph{n} = 1.526
 
-\begin{array}{l}r = {\left( {\frac{{1.526 - 1}}{{1.526 + 1}}} \right)^2}\\\tau  = 0.93974\\R = 0.07846\end{array}
+\begin{equation}
+\begin{array}{l}
+r = {\left( {\frac{{1.526 - 1}}{{1.526 + 1}}} \right)^2}\\\tau  = 0.93974\\R = 0.07846
+\end{array}
+\end{equation}
 
 \subsection{Simple Window Model}\label{simple-window-model}
 
@@ -174,11 +182,11 @@ Because the window model in EnergyPlus is for flat geometries, the models are no
 The thickness of the equivalent layer in units of meters is calculated using,
 
 \begin{equation}
-Thickness = 0.002\;;\quad for\;{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 {{R_{l,w}}}}}\right.}\!\lower0.7ex\hbox{{{R_{l,w}}}}} > 7.0
+Thickness = 0.002\;;\quad for\;{\frac{1}{R_{l,w}}} > 7.0
 \end{equation}
 
 \begin{equation}
-Thickness = 0.05914 - \left( {\frac{{0.00714}}{{{R_{l,w}}}}} \right);\;{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 {{R_{l,w}}}}}\right.}\!\lower0.7ex\hbox{{{R_{l,w}}}}} \le 7.0
+Thickness = 0.05914 - \left( {\frac{{0.00714}}{{{R_{l,w}}}}} \right);\;{\frac{1}{R_{l,w}}} \leq 7.0
 \end{equation}
 
 \subsubsection{Step 3.~ Determine Layer Thermal Conductivity}\label{step-3.-determine-layer-thermal-conductivity}
@@ -823,6 +831,7 @@ The direct-to-diffuse and transmittance and reflectance of the blind are calcula
 
 Based on these definitions we have the following equations that relate \emph{J}, \emph{G} and \emph{Q} for the different segments:
 
+\begin{equation}
 \begin{array}{rl}
    J_1 & = Q_1 \\
    J_2 & = Q_2 \\
@@ -830,7 +839,8 @@ Based on these definitions we have the following equations that relate \emph{J},
    J_4 & = Q_4 + \tau_{dif,dif} G_3 + \rho_{dif,dif}^f G_4 \\
    J_5 & = Q_5 + \rho_{dif,dif}^b G_5 + \tau_{dif,dif} G_6 \\
    J_6 & = Q_6 + \tau_{dif,dif} G_5 + \rho_{dif,dif}^f G_6
-  \end{array}
+\end{array}
+\end{equation}
 
 In addition we have the following equation relating \emph{G} and* J*:
 
@@ -968,14 +978,20 @@ The sources for the direct-to-diffuse transmittance calculation are:
 
 For unit incident direct flux, the front direct-to-diffuse transmittance and reflectance of the blind are:
 
-\begin{array}{l}\tau_{bl,f}^{dir,dif} = {G_2}\\\rho_{bl,f}^{dir,dif} = {G_1}\end{array}
+\begin{equation}
+\begin{array}{l}
+\tau_{bl,f}^{dir,dif} = {G_2}\\\rho_{bl,f}^{dir,dif} = {G_1}
+\end{array}
+\end{equation}
 
 where
 
+\begin{equation}
 \begin{array}{l}
     G_2 = \sum_{j = 3}^6 J_j F_{j2} \\
     G_1 = \sum_{j = 3}^6 J_j F_{j1} 
-  \end{array}
+\end{array}
+\end{equation}
 
 and \({J_3}\) to \({J_6}\) are given by Eq. .~
 
