@@ -585,7 +585,7 @@ namespace EnergyPlus {
 		surfaceData1->Azimuth = 2;
 		surfaceData1->Height = 2;
 		surfaceData1->Reveal = 2;
-		surfaceData1->Shape = 2;
+		surfaceData1->Shape = DataSurfaces::SurfaceShape::Quadrilateral;
 		surfaceData1->Sides = 2;
 		surfaceData1->Tilt = 2;
 		surfaceData1->Width = 2;
