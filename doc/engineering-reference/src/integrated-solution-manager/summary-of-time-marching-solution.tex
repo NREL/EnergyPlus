@@ -52,11 +52,13 @@ This approach can be justified because the internal loads and surface temperatur
 
 When the simulation down-steps from using the zone time step to the system time step, linear interpolation is used to generate zone condition history terms:
 
+\begin{equation}
 \begin{array}{l}
   T_z^{t-\delta t} \\
   T_z^{t-2\delta t} \\
   T_z^{t-3\delta t}
- \end{array}
+\end{array}
+\end{equation}
 
 for the system time steps using the history data for the zone time step. If two consecutive zone time steps both down-step to have the same number of system time steps, then the system time step history is preserved and used directly rather than being interpolated from zone time step history. The zone temperature update is made for each system time step using the same equation as for the zone time step except that the zone temperature history and time difference (delta-t) terms are for the system time step instead of for the zone time step.
 

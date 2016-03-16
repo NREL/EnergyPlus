@@ -46,7 +46,7 @@ All terms are positive for net flux to the baffle.~ Each of these heat balance c
 
 \subsubsection{Cavity Convection}\label{cavity-convection}
 
-\(q''_{conv,cav}\) ~is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o))\) ~ where h\(_{cp}\), is the convection coefficient.~ The value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+\(q''_{conv,cav}\) ~is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o})\) ~ where h\(_{cp}\), is the convection coefficient.~ The value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
 Substituting models into (113) and solving for \({T_{s,baff}}\) ~yields the following equation:
 
@@ -131,8 +131,8 @@ where,
 \begin{equation}
 \rlap{--} \dot{V}_{thermal} = \left\{
     \begin{array}{cl}
-      C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{a,cav}-T_{amb}\right)/T_{a,cov}} & \; \left(T_{a,cav}>T_{amb}\right) \\
-      C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{amb}-T_{a,cav}\right)/T_{amb}} & \; \left(T_{a,cav} \lt T_{amb}\,\text{and baffle is vertical}\right) 
+      C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{a,cav}-T_{amb}\right)/T_{a,cov}} & \; \left(T_{a,cav} > T_{amb}\right) \\
+      C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{amb}-T_{a,cav}\right)/T_{amb}} & \; \left(T_{a,cav} < T_{amb}\,\text{and baffle is vertical}\right) 
     \end{array}
   \right.
 \end{equation}
