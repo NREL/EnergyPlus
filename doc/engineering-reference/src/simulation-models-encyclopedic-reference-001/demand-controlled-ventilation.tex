@@ -159,7 +159,7 @@ The method used to calculate the outdoor ventilation air flow rate for each syst
 The minimum outdoor air flow rate is first calculated based on the minimum outdoor air flow rate and the minimum outdoor air schedule value as defined by the user inputs for the object Controller:OutdoorAir:
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{\min OA}} = \,{\mathop V\limits^ \bullet_{\min OA}} * \,\,MinOAScheduleValue * \,RhoStd\,
+\dot{m}_{minOA} = \dot{V}_{minOA} \cdot MinOAScheduleValue \cdot RhoStd
 \end{equation}
 
 where:
@@ -175,7 +175,7 @@ where:
 The outdoor air minimum fraction is then calculated as the ratio of the minimum outdoor air flow rate calculated above to the maximum air flow rate defined in the Branch statement for the main air loop (converted to mass flow rate).
 
 \begin{equation}
-OutAirMinFrac = \left( {{\raise0.7ex\hbox{{{{\mathop m\limits^ \bullet  }_{_{\min OA}}}}} \!\mathord{\left/ {\vphantom {{{{\mathop m\limits^ \bullet  }_{_{\min OA}}}} {{{\mathop m\limits^ \bullet  }_{_{\max branch}}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop m\limits^ \bullet  }_{_{\max branch}}}}}}} \right)
+  OutAirMinFrac = \frac{\dot{m}_{minOA}}{\dot{m}_{max,branch}}
 \end{equation}
 
 where:

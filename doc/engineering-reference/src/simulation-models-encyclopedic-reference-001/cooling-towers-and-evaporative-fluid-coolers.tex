@@ -495,7 +495,12 @@ The cooling tower seeks to maintain the temperature of the water exiting the coo
 
 For each simulation time step, the model first calculates the outlet water temperature with the tower fan operating at maximum speed (FRair = 1.0). The calculated approach temperature (using the correlations described above), inlet air wet-bulb temperature (weather data), and range temperature are used to determine the tower outlet water temperature as follows:
 
-\begin{array}{l}{T_{water,outlet,fanMAX}} = {T_{wb,air}} + \,\,{T_{approach}}\,\,\,\,\,\{ F{R_{air}} = 1.0\} \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\quad \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, = \,{T_{water,inlet}}\, + \,\,{T_{range}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    T_{water,outlet,fanMAX} &= T_{wb,air} + T_{approach} \quad FR_{air} = 1.0 \\
+                              &= {T_{water,inlet}} + {T_{range}}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -583,7 +588,17 @@ If the outlet water temperature at minimum fan speed is above the outlet water t
 
 When the cooling tower fan is operating, fan electric power is calculated based on the air flow rate ratio required to meet the above conditions. If the user has entered a fan power curve object (cubic curve), the output of that curve is multiplied by the design fan power. Otherwise, tower fan power is assumed to be directly proportional to the cube of the air flow rate ratio. In either case, the fan part-load ratio is applied to account for times when the tower fan cycles on/off to meet the setpoint temperature. Fan energy consumption is calculated each simulation time step.
 
-\begin{array}{l}IF\left( {FanPowerCurveObject\,\,\,is\,Defined} \right)THEN\\\quad {P_{fan}} = \left( {CurveOutput} \right)\left( {FanPLR} \right){P_{fan,design}}\\ELSE\\\quad {P_{fan}} = \left( {{P_{fan,design}}} \right)\left( {FanPLR} \right){\left( {F{R_{air}}} \right)^{\rm{3}}}\\ENDIF\end{array}
+If FanPowerCurveObject is defined, then:
+
+\begin{equation}
+  P_{fan} = \left( {CurveOutput} \right)\left( {FanPLR} \right){P_{fan,design}}
+\end{equation}
+
+Else:
+
+\begin{equation}
+  P_{fan} = \left( {{P_{fan,design}}} \right)\left( {FanPLR} \right){\left( {F{R_{air}}} \right)^{\rm{3}}}
+\end{equation}
 
 \begin{equation}
 {E_{fan}} = \left( {{P_{fan}}} \right)\left( {TimeStepSys} \right)3600.
@@ -607,7 +622,20 @@ where:
 
 Calculations are also made to estimate the electric power input to the tower basin heater. A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the cooling tower is not active (i.e., water is not flowing through the tower). The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (\(^{o}\)C) if they want to model basin heater electric power.
 
-\begin{array}{l}{P_{{\rm{heater,basin}}}}{\rm{ = }}0.0\\IF\,(WaterNotFlowingThroughTower)\,THEN\\\,\,\,\,\,\,IF\left( {Schedul{e_{{\rm{heater,basin}}}}\,is\,Defined} \right)THEN\\\quad \,\,\,\,\,\,IF({\rm{CA}}{{\rm{P}}_{{\rm{heater,basin}}}}\,{\rm{ >  }}0\,\,.AND.\,\,\,Schedul{e_{{\rm{heater,basin}}}} = ON)\,\,THEN\\\quad \quad \,\,\,\,\,{P_{{\rm{heater,basin}}}}\,{\rm{ = }}\,\,{\rm{MAX}}\left( {{\rm{0}}{\rm{.0,CA}}{{\rm{P}}_{{\rm{heater,basin}}}}\left( {{{\rm{T}}_{{\rm{setpoint,basin}}}}{\rm{ - }}{{\rm{T}}_{{\rm{db,outdoor}}}}} \right)} \right)\,\,\,\\\,\,\,\quad \,\,ENDIF\\\,\,\,\,\,\,ELSE\\\quad \,\,\,\,\,\,IF(\,{\rm{CA}}{{\rm{P}}_{{\rm{heater,basin}}}}\,{\rm{ >  }}0)\,\,THEN\\\,\,\,\quad \,\,\,\,\,\,\,\,{P_{{\rm{heater,basin}}}}\,{\rm{ = }}\,{\rm{MAX}}\left( {{\rm{0}}{\rm{.0,CA}}{{\rm{P}}_{{\rm{heater,basin}}}}\left( {{{\rm{T}}_{{\rm{setpoint,basin}}}}{\rm{ - }}{{\rm{T}}_{{\rm{db,outdoor}}}}} \right)} \right)\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\\\,\,\,\,\,\,ENDIF\\ENDIF\end{array}
+\begin{lstlisting}
+P_heater_basin =0.0
+IF (WaterNotFlowingThroughTower) THEN
+  IF (Scheduleheater_basin is Defined) THEN
+    IF (CAPheater_basin > 0 AND Scheduleheater_basin = ON) THEN
+      P_heater_basin = MAX(0.0,CAP_heater_basin*(T_setpoint_basin-T_db_outdoor))
+    ENDIF
+  ELSE
+    IF (CAPheater_basin > 0) THEN
+      P_heater_basin = MAX(0.0,CAP_heater_basin*(T_setpoint_basin-T_db_outdoor))
+    ENDIF
+  ENDIF
+ENDIF
+\end{lstlisting}
 
 \begin{equation}
 {E_{{\rm{heater,basin}}}} = \left( {{P_{{\rm{heater,basin}}}}} \right)\left( {TimeStepSys} \right){\rm{3600}}{\rm{.}}
@@ -654,12 +682,10 @@ For the operation of multi-cell towers, the first step is to determine the numbe
 The maximum and minimum flow rates per cell are determined according to the input fractions (\emph{Minimum~ Water Flow Rate Fraction:}\({k_{min}}\) \emph{~}~and \emph{Maximum~ Water Flow Rate Fraction:} \({k_{max}}\) ) as follows:
 
 \begin{equation}
-\left\{
     \begin{array}{rl}
-      {{\dot m}_{w,min}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{min}} \\
-      {{\dot m}_{w,max}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{max}}
+      \dot{m}_{w,min} &= \frac{\dot{m}_{w,des}}{n_{tot}} \times k_{min} \\
+      \dot{m}_{w,max} &= \frac{\dot{m}_{w,des}}{n_{tot}} \times k_{max}
     \end{array}
-  \right.
 \end{equation}
 
 where \({{{\dot m}_{w,des}}}\) ~is the design water flow rate through the entire cooling tower.
@@ -667,12 +693,10 @@ where \({{{\dot m}_{w,des}}}\) ~is the design water flow rate through the entire
 Then, we determine the minimum and maximum number of cells that can operate with this water flow rate:
 
 \begin{equation}
-\left\{
-    {\begin{array}{c}
-      {{n_{min}} & = MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,max}}}},{n_{tot}}} \right)} \\
-      {{n_{max}} & = MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,min}}}},{n_{tot}}} \right)}
-    \end{array}}
-  \right.
+    \begin{array}{c}
+      n_{min} & = \min\PB{\frac{\dot{m}_{w,tot}}{\dot{m}_{w,max}},n_{tot}} \\
+      n_{max} & = \min\PB{\frac{\dot{m}_{w,tot}}{\dot{m}_{w,min}},n_{tot}}
+    \end{array}
 \end{equation}
 
 where \emph{n\(_{t}\)} is the total number of cells of the tower, and\({{{\dot m}_{w,tot}}}\) ~is the water flow rate to the tower.
@@ -805,7 +829,17 @@ where:
 
 Blowdown is water flushed from the basin on a periodic basis to purge the concentration of mineral scale or other contaminants. There are two ways that blowdown is calculated in EnergyPlus.~ Blowdown water rates can be scheduled so that we have:.
 
-\begin{array}{l}IF\left( {Schedul{e_{blowdown}}\,is\,defined} \right)THEN\\\quad {{\dot V}_{blowdown,makeup}} = ScheduleValu{e_{blowdown}}\\ELSE\\\quad {{\dot V}_{blowdown,makeup}} = 0.0\\ENDIF\end{array}
+If ScheduleBlowdown is defined, then:
+
+\begin{equation}
+  \dot{V}_{blowdown,makeup} = ScheduleValue_{blowdown}
+\end{equation}
+
+Else:
+
+\begin{equation}
+  \dot{V}_{blowdown,makeup} = 0.0
+\end{equation}
 
 where:
 
@@ -850,7 +884,7 @@ The input objects FluidCooler:SingleSpeed and FluidCooler:TwoSpeed provide model
 The expression for fluid cooler effectiveness is as follows:
 
 \begin{equation}
-\varepsilon  = 1 - {\mathop{\rm e}\nolimits} \left[ {{\raise0.7ex\hbox{{\{ {{\mathop{\rm e}\nolimits} ^{( - NTU{C_r}\eta )}} - 1\} }} \!\mathord{\left/ {\vphantom {{\{ {{\mathop{\rm e}\nolimits} ^{( - NTU{C_r}\eta )}} - 1\} } {{C_r}\eta }}}\right.}\!\lower0.7ex\hbox{{{C_r}\eta }}}} \right]
+  \varepsilon = 1-\exp{\CB{ \frac{\exp{\PB{-NTU C_r \eta}}-1}{C_{r}^{\eta}} }}
 \end{equation}
 
 Where
@@ -884,7 +918,7 @@ The objective of the fluid cooler model is to predict the exiting water temperat
 With the overall heat transfer coefficient-area product for the fluid cooler calculated by the nominal capacity information entered by the user, the effectiveness of the heat exchanger is then calculated as:
 
 \begin{equation}
-\varepsilon  = 1 - {\mathop{\rm e}\nolimits} \left[ {{\raise0.7ex\hbox{{\{ {{\mathop{\rm e}\nolimits} ^{( - NTU{C_r}\eta )}} - 1\} }} \!\mathord{\left/ {\vphantom {{\{ {{\mathop{\rm e}\nolimits} ^{( - NTU{C_r}\eta )}} - 1\} } {{C_r}\eta }}}\right.}\!\lower0.7ex\hbox{{{C_r}\eta }}}} \right]
+  \varepsilon = 1-\exp{\CB{ \frac{\exp{\PB{-NTU C_r \eta}}-1}{C_{r}^{\eta}} }}
 \end{equation}
 
 The heat transfer rate is then calculated as follows:

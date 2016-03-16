@@ -208,10 +208,12 @@ The model runs either in dry mode or wet mode depending entering air conditions 
 
 If running ``wet,'' use wet bulb effectiveness and wet bulb temperature depression for delta T:
 
+\begin{equation}
 \begin{array}{rl}
   \epsilon_{wb,op} & = \epsilon_{wb,design}\cdot f_{wb,mod}\left(\text{flowRatio}\right) \\
   \text{flowRatio} & = \frac{\dot{m}_{sec}}{\dot{m}_{sys}}
 \end{array}
+\end{equation}
 
 Where:
 
@@ -245,10 +247,12 @@ Then check that there is sufficient heat capacitance flux (mcT) in the secondary
 
 The secondary air entering wet-bulb temperature would be the loswest limit allowed, although this temperature cannot be attained in most practical situations. This is checked as a limiting case.
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     T_{db,out,sys} & = \max\left(T_{db,out,sys},T_{db,out,setpoint}\right) \\
     \dot{Q}_{HX} & = \left(\dot{m}c_p\right)_{sys,in} \cdot \left(T_{db,in,sys}-T_{db,out,sys}\right)
   \end{array}
+\end{equation}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -272,13 +276,15 @@ One approximation that can be made is the outlet condition of the temperature an
   Calculate outlet humidity ratio of the secondary air
 \end{enumerate}
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     T_{db,out,sec} & = T_{db,in,sec} \\
     \text{HumRat}_{out,sec} & = \text{PsyWFnTbH}\left(T_{db,out,sec},\text{enthalpy}_{out,sec}\right) \\
     \dot{V}_{water} & = \frac{QHX / \left[ \left(\text{HumRat}_{out,sec}-\text{HumRat}_{in,sec}\right) \cdot h_{fg,in,sec}\right]}{\rho_{water,Tdb,in,sec}} \\
     or & = \\
     \dot{V}_{water} & = \frac{QHX / \left[ \left(\text{enthalpy}_{out,sec}-\text{enthalpy}_{in,sec}\right) \right]}{\rho_{water,Tdb,in,sec}}
   \end{array}
+\end{equation}
 
 Dry Operation Mode
 
@@ -593,11 +599,13 @@ This section summarizes the model implemented in the component EvaporativeCooler
 
 4)~Recalculate cooler performance using the PLF.
 
-\begin{array}{rl}
+\begin{equation}
+ \begin{array}{rl}
   \epsilon_{op} & = \epsilon_{design}\cdot f_{mod}\left(flowRatio\right) \\
   T_{db,out,sys} & = T_{db,in,sys} - \epsilon_{op}\cdot\left(T_{db,in,sys}-T_{wb,in,sys}\right) \\
   T_{db,out} & = T_{db,in}-\epsilon\left(T_{db,in}-T_{wb,in}\right)
-\end{array}
+ \end{array}
+\end{equation}
 
 where,
 

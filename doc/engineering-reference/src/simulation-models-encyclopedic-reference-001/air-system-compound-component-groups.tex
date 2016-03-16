@@ -98,7 +98,7 @@ where:
 
 \begin{equation}
   \begin{array}{rl}
-    \Delta_{sen,full load} &= \frac{MassFlowRate_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HR\min}} \\
+    \Delta_{sen,full load} &= \frac{MassFlowRate_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HR\min} \\
                            &+ \PB{MassFlowRate_{full load} - \frac{MassFlowRate_{ZoneInlet}}{Frac}} \PB{ h_{Out,full load} - h_{ControlZone}}
   \end{array}
 \end{equation}
@@ -111,7 +111,7 @@ Frac = Control zone air fraction with respect to the system mass flow rate
 
 \begin{equation}
   \begin{array}{rl}
-    \Delta_{sen,coil off} &= \frac{MassFlowRate_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HR\min}} \\
+    \Delta_{sen,coil off} &= \frac{MassFlowRate_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HR\min} \\
                            &+ \PB{MassFlowRate_{coil off} - \frac{MassFlowRate_{ZoneInlet}}{Frac}} \PB{ h_{Out,coil off} - h_{ControlZone}}
   \end{array}
 \end{equation}
@@ -2052,7 +2052,7 @@ After all of the desiccant dehumidifier components are modeled at the appropriat
 \begin{equation}
   \begin{array}{rl}
     \dot{m}_{water_removed,Proc} & = \dot{m}_{Proc,in} \PB{w_{Proc,in} - w_{Proc,out}} \\
-    m_{water_removed,Proc}       & = \dot{m}_{water_removed,Proc} \cdot TimeStepSys \cdot 3600
+    m_{water_removed,Proc}       & = \dot{m}_{water_removed,Proc} \cdot TimeStepSys \cdot 3600\dfrac{•}{•}
   \end{array}
 \end{equation}
 
