@@ -428,62 +428,65 @@ The maximum hot water or steam volumetric flow rate in m\(^{3}\)/s through the u
 
 \paragraph{Field: Minimum Hot Water or Steam Flow Rate}\label{field-minimum-hot-water-or-steam-flow-rate-2}
 
-The minimum hot water or steam volumetric flow rate in m\(^{3}\)/s through the unit's heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If the heating coil is not a hot water or steam~ coil this field should be left blank.
+The minimum hot water or steam volumetric flow rate in m\(^{3}\)/s through the unit's heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If the heating coil is not a hot water or steam coil this field should be left blank.
 
 The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
 
 \begin{equation}
-\frac{{\left| {{Q_{unit,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance\)\(\frac{{\left| {{Q_{PIU,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance
+  \frac{\left| Q_{\rm{unit, out}} - Q_{\rm{zone load}} \right|}{Q_{\rm{zone load}}} \le \rm{ConvergenceTolerance}
 \end{equation}
+
+% \begin{equation}
+%   \frac{\left| Q_{\rm{PIU, out}} - Q_{\rm{zone load}} \right|}{Q_{\rm{zone load}}} \le \rm{ConvergenceTolerance}
+% \end{equation}
 
 The default is 0.001.
 
 An IDF example:
 
 \begin{lstlisting}
-
 AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
-      SPACE2-1 VAV Reheat,     !- Name of System
-      ReheatCoilAvailSched,    !- System Availability schedule
-      autosize,                !- Maximum cooling air volume flow rate
-      autosize,                !- Maximum heating air volume flow rate
-      0.05,                    !- Zone Minimum Air Flow Fraction
-  SPACE2-1 ATU In Node,    !- Air Inlet Node Name
-  SPACE2-1 In Node,        !- Air Outlet Node Name
-      FAN:SIMPLE:VariableVolume,       !- Fan object
-      SPACE2-1 Zone Fan,       !- Fan name
-      COIL:Water:SimpleHeating,!- Heating coil object
-      SPACE2-1 Zone Coil,      !- Heating coil name
-      autosize,                !- Max hot water flow
-      0.0,                     !- Min hot water flow
-      0.001;                   !- Heating Convergence Tolerance
+  SPACE2-1 VAV Reheat,                  !- Name of System
+  ReheatCoilAvailSched,                 !- System Availability schedule
+  autosize,                             !- Maximum cooling air volume flow rate
+  autosize,                             !- Maximum heating air volume flow rate
+  0.05,                                 !- Zone Minimum Air Flow Fraction
+  SPACE2-1 ATU In Node,                 !- Air Inlet Node Name
+  SPACE2-1 In Node,                     !- Air Outlet Node Name
+  FAN:SIMPLE:VariableVol,               !- Fan object
+  SPACE2-1 Zone Fan,                    !- Fan name
+  COIL:Water:SimpleHeating,             Heating coil object
+  SPACE2-1 Zone Coil,                   !- Heating coil name
+  autosize,                             !- Max hot water flow
+  0.0,                                  !- Min hot water flow
+  0.001;                                !- Heating Convergence Tolerance
 
-  Coil:Heating:Water,
-      SPACE2-1 Zone Coil,      !- Coil Name
-      ReheatCoilAvailSched,    !- Availability Schedule Name
-      autosize,                !- UA of the Coil {W/K}
-      autosize,                !- Max Water Flow Rate of Coil {m3/s}
-      SPACE2-1 Zone Coil Water In Node,  !- Coil_Water_Inlet_Node
-      SPACE2-1 Zone Coil Water Out Node,  !- Coil_Water_Outlet_Node
-      SPACE2-1 Zone Coil Air In Node,  !- Coil_Air_Inlet_Node
-      SPACE2-1 In Node;        !- Coil_Air_Outlet_Node
+Coil:Heating:Water,
+  SPACE2-1 Zone Coil,                   !- Coil Name
+  ReheatCoilAvailSched,                 !- Availability Schedule Name
+  autosize,                             !- UA of the Coil {W/K}
+  autosize,                             !- Max Water Flow Rate of Coil {m3/s}
+  SPACE2-1 Zone Coil Water In Node,     !- Coil_Water_Inlet_Node
+  SPACE2-1 Zone Coil Water Out Node,    !- Coil_Water_Outlet_Node
+  SPACE2-1 Zone Coil Air In Node,       !- Coil_Air_Inlet_Node
+  SPACE2-1 In Node;                     !- Coil_Air_Outlet_Node
 
-  Fan:VariableVolume,
-      SPACE2-1 Zone Fan,       !- Fan Name
-      FanAvailSched,           !- Availability Schedule Name
-      0.7,                     !- Fan Total Efficiency
-      125.0,                   !- Delta Pressure {Pa}
-      autosize,                !- Max Flow Rate {m3/s}
-      0.0,                     !- Min Flow Rate {m3/s}
-      0.9,                     !- Motor Efficiency
-      1.0,                     !- Motor In Airstream Fraction
-      0.00153028,              !- FanCoefficient 1
-      0.00520806,              !- FanCoefficient 2
-      1.1086242,               !- FanCoefficient 3
-      -.11635563,              !- FanCoefficient 4
-      0.000,                   !- FanCoefficient 5
-      SPACE2-1 ATU In Node,    !- Fan_Inlet_Node
-      SPACE2-1 Zone Coil Air In Node;   !- Fan_Outlet_Node
+Fan:VariableVolume,
+  SPACE2-1 Zone Fan,                    !- Fan Name
+  FanAvailSched,                        !- Availability Schedule Name
+  0.7,                                  !- Fan Total Efficiency
+  125.0,                                !- Delta Pressure {Pa}
+  autosize,                             !- Max Flow Rate {m3/s}
+  0.0,                                  !- Min Flow Rate {m3/s}
+  0.9,                                  !- Motor Efficiency
+  1.0,                                  !- Motor In Airstream Fraction
+  0.00153028,                           !- FanCoefficient 1
+  0.00520806,                           !- FanCoefficient 2
+  1.1086242,                            !- FanCoefficient 3
+  -.11635563,                           !- FanCoefficient 4
+  0.000,                                !- FanCoefficient 5
+  SPACE2-1 ATU In Node,                 !- Fan_Inlet_Node
+  SPACE2-1 Zone Coil AirIn Node;        !- Fan_Outlet_Node
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3}

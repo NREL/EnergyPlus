@@ -46,17 +46,16 @@ The multiplier to be applied to the end use cost for each following year. The to
 An example of this object in an IDF:
 
 \begin{lstlisting}
-
 LifeCycleCost:UseAdjustment,
-      ElecAdjustment,          !- Name
-      Electricity,             !- Resource
-      1.0000,                  !- Year 1 Multiplier
-      1.0022,                  !- Year 2 Multiplier
-      1.0023,                  !- Year 3 Multiplier
-      1.0024,                  !- Year 4 Multiplier
-      1.0025,                  !- Year 5 Multiplier
-      1.0026,                  !- Year 6 Multiplier
-      1.0027;                  !- Year 7 Multiplier
+  ElecAdjustment,       !- Name
+  Electricity,          !- Resource
+  1.0000,               !- Year 1 Multiplier
+  1.0022,               !- Year 2 Multiplier
+  1.0023,               !- Year 3 Multiplier
+  1.0024,               !- Year 4 Multiplier
+  1.0025,               !- Year 5 Multiplier
+  1.0026,               !- Year 6 Multiplier
+  1.0027;               !- Year 7 Multiplier
 \end{lstlisting}
 
 \subsubsection{CurrencyType}\label{currencytype}
@@ -65,7 +64,7 @@ By default, the predefined reports related to economics use the \$ symbol. If a 
 
 \paragraph{Field: Monetary Unit}\label{field-monetary-unit}
 
-The commonly used three letter currency code for the units of money for the country or region. Based on ISO 4217 currency codes.~ Common currency codes are USD for the U.S. Dollar represented with `\$' and EUR for Euros represented with `\euro{}'.~ The three letter currency codes can be seen at the following web sites (as of 2008):
+The commonly used three letter currency code for the units of money for the country or region. Based on ISO 4217 currency codes. Common currency codes are USD for the U.S. Dollar represented with `\$' and EUR for Euros represented with `€'. The three letter currency codes can be seen at the following web sites (as of 2008):
 
 http://www.iso.org/iso/support/faqs/faqs\_widely\_used\_standards/widely\_used\_standards\_other/currency\_codes/currency\_codes\_list-1.htm
 

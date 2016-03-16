@@ -2882,19 +2882,32 @@ This numeric field contains the gross rated total cooling capacity at the nomina
 
 And then, this scaling factor is used to determine capacities at rated conditions for other speed levels, as below,
 
-\begin{array}{l}{\rm{Gross RatedCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{CapacityScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitCapacity}}@{\rm{SpeedLevel}}({\rm{x}})\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{Gross RatedCapacity} @ \rm{SpeedLevel} \left( {\rm{x}} \right) = \\
+    \quad \quad \quad \rm{CapacityScaleFactor} \times \\
+    \quad \quad \quad \rm{ReferenceUnitCapacity} @ {\rm{SpeedLevel}}(\rm{x})
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Rated Air Flow Rate at Selected Nominal Speed Level}\label{field-rated-air-flow-rate-at-selected-nominal-speed-level}
 
 This numeric field contains the rated volumetric air flow rate on the load side of the DX unit, corresponding to the nominal speed level. This field is autosizable. The value is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects. It is recommended that the ratio of the rated volumetric air flow rate to the rated capacity is the same as the unit performance from the Reference Unit data.
 
 \begin{equation}
-{\rm{AirFlowScaleFactor}} = \frac{{{\rm{RatedVolumetricAirFlowRate}}}}{{{\rm{ReferenceUnitVolAirFlowRate}}@{\rm{NominalSpeedLevel}} \times {\rm{CapacityScaleFactor}}}}
+\rm{AirFlowScaleFactor} = \frac{\rm{RatedVolumetricAirFlowRate}}{\rm{ReferenceUnitVolAirFlowRate} @ \rm{NominalSpeedLevel} \times \rm{CapacityScaleFactor}}
 \end{equation}
 
 And the volumetric air flow rates in the parent objects are calculated as below,
 
-\begin{array}{l}{\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\\quad \quad \quad {\rm{CapacityScaleFactor}}\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{LoopVolumetricAirFlowRate} @ \rm{SpeedLevel} \left( \rm{x} \right) = \\
+    \quad \quad \quad \rm{AirFlowScaleFactor} \times \\
+    \quad \quad \quad \rm{ReferenceUnitVolAirFlowRate} @ \rm{SpeedLevel}(\rm{x}) \times \\
+    \quad \quad \quad \rm{CapacityScaleFactor}
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin-1}
 
@@ -4226,12 +4239,18 @@ This numeric field defines the nominal speed level, at which the rated capacity,
 This numeric field contains the rated capacity at the nominal speed level. This field is autosizable. The gross rated heating capacity is used to determine a capacity scaling factor, as compared to the Reference Unit capacity at the nominal speed level.
 
 \begin{equation}
-{\rm{CapacityScaleFactor}} = \frac{{{\rm{Gross RatedTotalHeatingCapacity}}}}{{{\rm{ReferenceUnitCapacity}}@{\rm{NominalSpeedLevel}}}}
+\rm{CapacityScaleFactor} = \frac{{{\rm{Gross RatedTotalHeatingCapacity}}}}{{{\rm{ReferenceUnitCapacity}}@{\rm{NominalSpeedLevel}}}}
 \end{equation}
 
 And then, this scaling factor is used to determine capacities at rated conditions for other speed levels, as below,
 
-\begin{array}{l}{\rm{Gross RatedCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{CapacityScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitCapacity}}@{\rm{SpeedLevel}}({\rm{x}})\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{Gross RatedCapacity} @ \rm{SpeedLevel} \left( \rm{x} \right) = \\
+    \quad \quad \quad \rm{CapacityScaleFactor} \times \\
+    \quad \quad \quad \rm{ReferenceUnitCapacity} @ \rm{SpeedLevel}(\rm{x})
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Rated Volumetric Air Flow Rate}\label{field-rated-volumetric-air-flow-rate}
 
@@ -4244,12 +4263,12 @@ This numeric field contains the rated volumetric air flow rate on the load side 
 And the volumetric air flow rates in the parent objects are calculated as below,
 
 \begin{equation}
-\begin{array}{l}
-{\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\
-\quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\
-\quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\
-\quad {\kern 1pt} {\kern 1pt} \quad \quad {\rm{CapacityScaleFactor}}
-\end{array}
+  \begin{array}{l}
+    {\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\
+    \quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\
+    \quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\
+    \quad {\kern 1pt} {\kern 1pt} \quad \quad {\rm{CapacityScaleFactor}}
+  \end{array}
 \end{equation}
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-7}
@@ -6171,27 +6190,53 @@ CapacityScaleFactor = \frac{{GrossRatedTotalCoolingCapacity}}{{ReferenceUnitCapa
 
 And then, this scaling factor is used to determine capacities at rated conditions for other speed levels, as below,
 
-\begin{array}{l}GrossRatedCapacity@SpeedLevel\left( x \right) = CapacityScaleFactor\\\quad \quad \quad \quad  \times ReferenceUnitCapacity@SpeedLevel(x)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{GrossRatedCapacity} @ \rm{SpeedLevel} \left( x \right) = \rm{CapacityScaleFactor} \\
+    \quad \quad \quad \quad \times \rm{ReferenceUnitCapacity} @ \rm{SpeedLevel}( x )
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Rated Volumetric Air Flow Rate}\label{field-rated-volumetric-air-flow-rate-1}
 
 This numeric field contains the rated volumetric air flow rate on the load side of the heat pump corresponding to the nominal speed level. This field is autosizable. The value is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects. It is recommended that the ratio of the rated volumetric air flow rate to the rated capacity is the same as the unit performance from the Reference Unit data.
 
-\begin{array}{l}AirFlowScaleFactor = \\\quad \quad \quad \quad \quad \frac{{RatedVolumetricAirFlowRate}}{{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}
+\begin{equation}
+  \begin{array}{l}
+    AirFlowScaleFactor = \\\quad \quad \quad \quad \quad \frac{{RatedVolumetricAirFlowRate}}{{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}
+  \end{array}
+\end{equation}
 
 And the volumetric air flow rates in the parent objects are calculated as below,
 
-\begin{array}{l}LoopVolumetricAirFlowRate@SpeedLevel\left( x \right) = AirFlowScaleFactor\\\quad \quad \quad  \times ReferenceUnitVolAirFlowRate@SpeedLevel(x)\\\quad \quad \quad  \times CapacityScaleFactor\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{LoopVolumetricAirFlowRate} @ \rm{SpeedLevel} \left( x \right) = \rm{AirFlowScaleFactor} \\
+    \quad \quad \quad \times \rm{ReferenceUnitVolAirFlowRate} @ \rm{SpeedLevel}(x) \\
+    \quad \quad \quad \times \rm{CapacityScaleFactor}
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Rated Volumetric Water Flow Rate}\label{field-rated-volumetric-water-flow-rate}
 
 This numeric field contains the rated volumetric water flow rate on the source side of the heat pump at the nominal speed level. This field is autosizable. The value is used to determine an internal scaling factor, and calculate the water flow rates in the water loop. It is recommended that the ratio of the rated volumetric water flow rate to the rated capacity is the same as the unit performance from the Reference Unit data.
 
-\begin{array}{l}WaterFlowScaleFactor = \\\quad \quad \quad \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}\)image5\(\begin{array}{l}WaterFlowScaleFactor = \\\quad \quad \quad \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}
+\begin{equation}
+  \begin{array}{l}
+    WaterFlowScaleFactor = \\
+    \quad \quad \quad \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}
+  \end{array}
+\end{equation}
 
 And the required volumetric water flow rates at the speed levels in the parent objects, other than the nominal speed, are calculated as below,
 
-\begin{array}{l}LoopVolumetricWaterFlowRate@SpeedLevel\left( x \right) = WaterFlowScaleFactor\\\quad \quad \quad  \times ReferenceUnitVolWaterFlowRate@SpeedLevel(x)\\\quad \quad \quad  \times CapacityScaleFactor\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{LoopVolumetricWaterFlowRate} @ \rm{SpeedLevel} \left( x \right) = \rm{WaterFlowScaleFactor} \\
+    \quad \quad \quad \times \rm{ReferenceUnitVolWaterFlowRate} @ \rm{SpeedLevel}(x) \\
+    \quad \quad \quad  \times \rm{CapacityScaleFactor}
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin-5}
 
@@ -6261,13 +6306,19 @@ This alpha field defines the name of a quadratic or cubic performance curve for 
 
 The actual total cooling capacity at Speed \textless{}x\textgreater{}, considering variations in temperatures, air and water flow rates is calculated as below:
 
-\begin{array}{l}ActualCapacity@SpeedLevel\left( x \right) = CapacityScaleFactor\\\quad \quad \quad  \times ReferenceUnitCapacity@SpeedLevel(x)\\\quad \quad \quad  \times TotCapTempModFac@SpeedLevel(x)\\\quad \quad \quad  \times TotCapAirFlowModFac@SpeedLevel(x)\\\quad \quad \quad  \times TotCapWaterFlowModFac@SpeedLevel(x)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    \rm{ActualCapacity} @ \rm{SpeedLevel} \left( x \right) = \rm{CapacityScaleFactor} \\
+    \quad \quad \quad \times \rm{ReferenceUnitCapacity} @ \rm{SpeedLevel}(x) \\
+    \quad \quad \quad \times \rm{TotCapTempModFac} @ \rm{SpeedLevel}(x) \\
+    \quad \quad \quad \times \rm{TotCapAirFlowModFac} @ \rm{SpeedLevel}(x) \\
+    \quad \quad \quad \times \rm{TotCapWaterFlowModFac} @ \rm{SpeedLevel}(x)
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Energy Input Ratio Function of Temperature Curve Name}\label{field-speed-x-energy-input-ratio-function-of-temperature-curve-name-4}
 
-This alpha field defines the name of a bi-quadratic, quadratic or cubic performance curve for
-
-Speed \textless{}x\textgreater{} (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the both the indoor air wet-bulb and entering water temperatures The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR (inverse of rated COP at Speed \textless{}x\textgreater{} from the Reference Unit data) to give the EIR at specific temperature operating conditions (i.e., at an indoor air wet-bulb temperature or entering water temperature different from the rating point temperature). The curve is normalized to have the value of 1.0 at the rating point.
+This alpha field defines the name of a bi-quadratic, quadratic or cubic performance curve for Speed \textless{}x\textgreater{} (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the both the indoor air wet-bulb and entering water temperatures The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR (inverse of rated COP at Speed \textless{}x\textgreater{} from the Reference Unit data) to give the EIR at specific temperature operating conditions (i.e., at an indoor air wet-bulb temperature or entering water temperature different from the rating point temperature). The curve is normalized to have the value of 1.0 at the rating point.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Energy Input Ratio Function of Air Flow Fraction Curve Name}\label{field-speed-x-energy-input-ratio-function-of-air-flow-fraction-curve-name-2}
 
@@ -6279,11 +6330,23 @@ This alpha field defines the name of a quadratic or cubic performance curve for 
 
 The actual EIR at Speed \textless{}x\textgreater{}, considering variations in temperatures, air and water flow rates is calculated as below:
 
-\begin{array}{l}ActualEIR@SpeedLevel\left( x \right) = \frac{{1.0}}{{ReferenceUnitCOP@SpeedLevel(x)}}\\\quad \quad \quad  \times EIRTempModFac@SpeedLevel(x)\\\quad \quad \quad  \times EIRAirFlowModFac@SpeedLevel(x)\\\quad \quad \quad  \times EIRWaterFlowModFac@SpeedLevel(x)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    ActualEIR@SpeedLevel\left( x \right) = \frac{{1.0}}{{ReferenceUnitCOP@SpeedLevel(x)}} \\
+    \quad \quad \quad \times EIRTempModFac@SpeedLevel(x) \\
+    \quad \quad \quad \times EIRAirFlowModFac@SpeedLevel(x) \\
+    \quad \quad \quad \times EIRWaterFlowModFac@SpeedLevel(x)
+  \end{array}
+\end{equation}
 
 And, the actual power consumption is calculated:
 
-\begin{array}{l}ActualPower@SpeedLevel\left( x \right) = ActualCapacity@SpeedLevel\left( x \right)\\\quad \quad \quad \quad  \times ActualEIR@SpeedLevel\left( x \right)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    ActualPower@SpeedLevel\left( x \right) = ActualCapacity@SpeedLevel\left( x \right) \\
+    \quad \quad \quad \quad  \times ActualEIR@SpeedLevel\left( x \right)
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Waste Heat Fraction of Power Input}\label{field-speed-x-reference-unit-waste-heat-fraction-of-power-input}
 
@@ -6295,157 +6358,162 @@ The name of a bi-quadratic performance curve (ref: Performance Curves) that para
 
 The actual recoverable waste heat at Speed \textless{}x\textgreater{} is calculated as below:
 
-\begin{array}{l}ActualWasteHeat@SpeedLevel\left( x \right) = ActualPower@SpeedLevel\left( x \right)\\\quad \quad \quad \quad  \times WasteHeatFrac@SpeedLevel(x)\\\quad \quad \quad \quad  \times WasteHeatTempModFac@SpeedLevel(x)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    ActualWasteHeat@SpeedLevel\left( x \right) = ActualPower@SpeedLevel\left( x \right) \\
+    \quad \quad \quad \quad \times WasteHeatFrac@SpeedLevel(x) \\
+    \quad \quad \quad \quad \times WasteHeatTempModFac@SpeedLevel(x)
+  \end{array}
+\end{equation}
 
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
-
 Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
-  Sys 1 Heat Pump Cooling Mode,                                              !- Name
+  Sys 1 Heat Pump Cooling Mode,                           !- Name
   Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,   !- Water Inlet Node Name
-  Sys 1 Water to Air Heat Pump Source Side1 Outlet Node, !- Water Outlet Node Name
-  Sys 1 Cooling Coil Air Inlet Node,                                    !- Air Inlet Node Name
-  Sys 1 Heating Coil Air Inlet Node,                                    !- Air Outlet Node Name
-  10.0,                                                                                                !- Number of Speeds
-  10.0,                                                                                                !- Nominal Speed Level
-  Autosize,                                                                                      !- Gross Rated Total Cooling Capacity {W}
-  Autosize,                                                                                      !- Rated Air Flow Rate {m3/s}
-  Autosize,                                                                                      !- Rated Water Flow Rate {m3/s}
-  0.0,                                     !Nominal time for Condensate to Begin Leaving the Coil
-  0.0,                                     !Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
-  1,                                !Flag for Using Hot Gas Reheat or Not, 0 = false; 1 = true
-  VS Energy Part Load Fraction 1,   !Energy Part Load Fraction Curve
-  1524.1,                                    !-Speed 1 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                     !-Speed 1 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                       !-Speed 1 Reference Unit Gross Cooling COP
-  0.1359072,                           !-Speed 1 Reference Unit Rated air flow rate
-  0.000381695,                       !-Speed 1 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,             !-Speed 1 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,          !-Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test,     !-Speed 1 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,             !-Speed 1 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,        !-Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test,     !-Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                        !-Speed 1 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 1 Waste Heat Function of Temperature Curve Name
-  1877.9,                                      !-Speed 2 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                       !-Speed 2 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                         !-Speed 2 Reference Unit Gross Cooling COP
-  0.151008,                               !-Speed 2 Reference Unit Rated air flow rate
-  0.000381695,                         !-Speed 2 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,               !-Speed 2 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,          !-Speed 2   Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test,     !-Speed 2   Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,             !-Speed 2   Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,        !-Speed 2   Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test,     !-Speed 2   Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                        !-Speed 2   Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 2   Waste Heat Function of Temperature Curve Name
-  2226.6,                                      !-Speed 3 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                       !-Speed 3 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                         !-Speed 3 Reference Unit Gross Cooling COP
-  0.1661088,                               !-Speed 3 Reference Unit Rated air flow rate
-  0.000381695,                           !-Speed 3 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,                 !-Speed 3 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,      !-Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test,   !-Speed 3 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,        !-Speed 3 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,     !-Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !-Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                        !-Speed 3 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test,!-Speed 3 Waste Heat Function of Temperature Curve Name
-  2911.3,                                  !-Speed 4 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                   !-Speed 4 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                     !-Speed 4 Reference Unit Gross Cooling COP
-  0.1963104,                         !-Speed 4 Reference Unit Rated air flow rate
-  0.000381695,                     !-Speed 4 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,           !-Speed 4 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,      !-Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test, !-Speed 4 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,        !-Speed 4 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,    !-Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !-Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !-Speed 4 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 4 Waste Heat Function of Temperature Curve Name
-  3581.7,                                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                   !- Speed 5 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                     !- Speed 5 Reference Unit Gross Cooling COP
-  0.226512,                           !- Speed 5 Reference Unit Rated air flow rate
-  0.000381695,                     !- Speed 5 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test, !- Speed 5 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,        !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,    !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !- Speed 5 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-  4239.5,                                !-Speed 6 Reference Unit Gross Total Cooling Capacity
-  0.75,                                   !-Speed 6 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                     !-Speed 6 Reference Unit Gross Cooling COP
-  0.2567136,                         !-Speed 6 Reference Unit Rated air flow rate
-  0.000381695,                     !-Speed 6 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,           !-Speed 6 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,      !-Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test, !-Speed 6 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,        !-Speed 6 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,    !-Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !-Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !-Speed 6 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 6 Waste Heat Function of Temperature Curve Name
-  4885.7,                                  !-Speed 7 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                   !-Speed 7 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                     !-Speed 7 Reference Unit Gross Cooling COP
-  0.2869152,                         !-Speed 7 Reference Unit Rated air flow rate
-  0.000381695,                     !-Speed 7 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,           !-Speed 7 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,      !-Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test, !-Speed 7 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,        !-Speed 7 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,    !-Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !-Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !-Speed 7 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 7 Waste Heat Function of Temperature Curve Name
-  5520.7,                                  !-Speed 8 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                     !-Speed 8 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                       !-Speed 8 Reference Unit Gross Cooling COP
-  0.3171168,                           !-Speed 8 Reference Unit Rated air flow rate
-  0.000381695,                       !-Speed 8 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,             !-Speed 8 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,        !-Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test, !-Speed 8 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,        !-Speed 8 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,    !-Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !-Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !-Speed 8 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 8 Waste Heat Function of Temperature Curve Name
-  6144.8,                                      !-Speed 9 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                       !-Speed 9 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                         !-Speed 9 Reference Unit Gross Cooling COP
-  0.3473184,                             !-Speed 9 Reference Unit Rated air flow rate
-  0.000381695,                         !-Speed 9 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,               !-Speed 9 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,        !-Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test,   !-Speed 9 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,          !-Speed 9 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,      !-Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test,   !-Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                      !-Speed 9 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test, !-Speed 9 Waste Heat Function of Temperature Curve Name
-  6758.0,                                    !-Speed 10 Reference Unit Gross Rated Total Cooling Capacity
-  0.75,                                       !-Speed 10 Reference Unit Gross Sensible Heat Ratio
-  4.0,                                         !-Speed 10 Reference Unit Gross Cooling COP
-  0.37752,                                 !-Speed 10 Reference Unit Rated air flow rate
-  0.000381695,                         !-Speed 10 Reference Unit Rated water flow rate
-  TC VS Temp1 Test,               !-Speed 10 Total Cooling Capacity Function of Temperature Curve Name
-  TC VS AirFrac Test,          !-Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-  TC VS WaterFrac Test,     !-Speed 10 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-  EIR VS Temp1 Test,            !-Speed 10 Energy Input Ratio Function of Temperature Curve Name
-  EIR VS AirFrac Test,        !-Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIR VS WaterFrac Test, !-Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !-Speed 10 Waste Heat fraction to power input
-  wasteHeat VS Temp1 Test; !-Speed 10 Waste Heat Function of Temperature Curve Name
+  Sys 1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
+  Sys 1 Cooling Coil Air Inlet Node,!- Air Inlet Node Name
+  Sys 1 Heating Coil Air Inlet Node,!- Air Outlet Node Name
+  10.0,                             !- Number of Speeds
+  10.0,                             !- Nominal Speed Level
+  Autosize,                         !- Gross Rated Total Cooling Capacity {W}
+  Autosize,                         !- Rated Air Flow Rate {m3/s}
+  Autosize,                         !- Rated Water Flow Rate {m3/s}
+  0.0,                              !- Nominal time for Condensate to Begin Leaving the Coil
+  0.0,                              !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
+  1,                                !- Flag for Using Hot Gas Reheat or Not, 0 = false; 1 = true
+  VS Energy Part Load Fraction 1,   !- Energy Part Load Fraction Curve
+  1524.1,                           !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 1 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 1 Reference Unit Gross Cooling COP
+  0.1359072,                        !- Speed 1 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 1 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 1 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 1 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 1 Waste Heat Function of Temperature Curve Name
+  1877.9,                           !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 2 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 2 Reference Unit Gross Cooling COP
+  0.151008,                         !- Speed 2 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 2 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 2   Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 2   Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 2   Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 2   Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 2   Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 2   Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 2   Waste Heat Function of Temperature Curve Name
+  2226.6,                           !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 3 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 3 Reference Unit Gross Cooling COP
+  0.1661088,                        !- Speed 3 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 3 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 3 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 3 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 3 Waste Heat Function of Temperature Curve Name
+  2911.3,                           !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 4 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 4 Reference Unit Gross Cooling COP
+  0.1963104,                        !- Speed 4 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 4 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 4 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 4 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 4 Waste Heat Function of Temperature Curve Name
+  3581.7,                           !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 5 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 5 Reference Unit Gross Cooling COP
+  0.226512,                         !- Speed 5 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 5 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 5 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 5 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 5 Waste Heat Function of Temperature Curve Name
+  4239.5,                           !- Speed 6 Reference Unit Gross Total Cooling Capacity
+  0.75,                             !- Speed 6 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 6 Reference Unit Gross Cooling COP
+  0.2567136,                        !- Speed 6 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 6 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 6 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 6 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 6 Waste Heat Function of Temperature Curve Name
+  4885.7,                           !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 7 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 7 Reference Unit Gross Cooling COP
+  0.2869152,                        !- Speed 7 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 7 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 7 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 7 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 7 Waste Heat Function of Temperature Curve Name
+  5520.7,                           !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 8 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 8 Reference Unit Gross Cooling COP
+  0.3171168,                        !- Speed 8 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 8 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 8 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 8 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 8 Waste Heat Function of Temperature Curve Name
+  6144.8,                           !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 9 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 9 Reference Unit Gross Cooling COP
+  0.3473184,                        !- Speed 9 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 9 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 9 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 9 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test,          !- Speed 9 Waste Heat Function of Temperature Curve Name
+  6758.0,                           !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity
+  0.75,                             !- Speed 10 Reference Unit Gross Sensible Heat Ratio
+  4.0,                              !- Speed 10 Reference Unit Gross Cooling COP
+  0.37752,                          !- Speed 10 Reference Unit Rated air flow rate
+  0.000381695,                      !- Speed 10 Reference Unit Rated water flow rate
+  TC VS Temp1 Test,                 !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+  TC VS AirFrac Test,               !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+  TC VS WaterFrac Test,             !- Speed 10 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+  EIR VS Temp1 Test,                !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+  EIR VS AirFrac Test,              !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIR VS WaterFrac Test,            !- Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                              !- Speed 10 Waste Heat fraction to power input
+  wasteHeat VS Temp1 Test;          !- Speed 10 Waste Heat Function of Temperature Curve Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-26}
@@ -6935,17 +7003,34 @@ CapacityScaleFactor = \frac{{GrossRatedHeatingCapacity}}{{ReferenceUnitCapacity@
 
 And then, this scaling factor is used to determine capacities at rated conditions for other speed levels, as below,
 
-\begin{array}{l}GrossRatedCapacity@SpeedLevel\left( x \right) = \\\quad \quad \quad \quad CapacityScaleFactor \times ReferenceUnitCapacity@SpeedLevel(x)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    GrossRatedCapacity@SpeedLevel \left( x \right) = \\
+    \quad \quad \quad \quad CapacityScaleFactor \times ReferenceUnitCapacity@SpeedLevel(x)
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Rated Volumetric Air Flow Rate}\label{field-rated-volumetric-air-flow-rate-2}
 
 This numeric field contains the rated volumetric air flow rate on the load side of the heat pump corresponding to the nominal speed level. This field is autosizable. The value is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects. It is recommended that the ratio of the rated volumetric air flow rate to the rated capacity is the same as the unit performance from the Reference Unit data.
 
-\begin{array}{l}AirFlowScaleFactor = \\\quad \quad \quad \quad \frac{{RatedVolumetricAirFlowRate}}{{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}
+\begin{equation}
+  \begin{array}{l}
+    AirFlowScaleFactor = \\
+    \quad \quad \quad \quad \frac{{RatedVolumetricAirFlowRate}}{{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}
+  \end{array}
+\end{equation}
 
 And the volumetric air flow rates in the parent objects are calculated as below,
 
-\begin{array}{l}LoopVolumetricAirFlowRate@SpeedLevel\left( x \right) = \\\quad \quad \quad \quad AirFlowScaleFactor\\\quad \quad \quad \quad  \times ReferenceUnitVolAirFlowRate@SpeedLevel(x)\\\quad \quad \quad \quad  \times CapacityScaleFactor\end{array}
+\begin{equation}
+  \begin{array}{l}
+    LoopVolumetricAirFlowRate@SpeedLevel\left( x \right) = \\
+    \quad \quad \quad \quad AirFlowScaleFactor \\
+    \quad \quad \quad \quad  \times ReferenceUnitVolAirFlowRate@SpeedLevel(x) \\
+    \quad \quad \quad \quad  \times CapacityScaleFactor
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Rated Volumetric Water Flow Rate}\label{field-rated-volumetric-water-flow-rate-1}
 
@@ -7013,7 +7098,15 @@ This alpha field defines the name of a quadratic or cubic performance curve for 
 
 The actual total heating capacity at Speed \textless{}x\textgreater{}, considering variations in temperatures, air and water flow rates is calculated as below:
 
-\begin{array}{l}ActualCapacity@SpeedLevel\left( x \right) = CapacityScaleFactor\\\quad \quad \quad \quad \quad  \times ReferenceUnitCapacity@SpeedLevel(x)\\\quad \quad \quad \quad \quad  \times TotCapTempModFac@SpeedLevel(x)\\\quad \quad \quad \quad \quad  \times TotCapAirFlowModFac@SpeedLevel(x)\\\quad \quad \quad \quad \quad  \times TotCapWaterFlowModFac@SpeedLevel(x)\end{array}
+\begin{equation}
+  \begin{array}{l}
+    ActualCapacity@SpeedLevel\left( x \right) = CapacityScaleFactor \\
+    \quad \quad \quad \quad \quad \times ReferenceUnitCapacity@SpeedLevel(x) \\
+    \quad \quad \quad \quad \quad \times TotCapTempModFac@SpeedLevel(x) \\
+    \quad \quad \quad \quad \quad \times TotCapAirFlowModFac@SpeedLevel(x) \\
+    \quad \quad \quad \quad \quad \times TotCapWaterFlowModFac@SpeedLevel(x)
+  \end{array}
+\end{equation}
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Energy Input Ratio Function of Temperature Curve Name}\label{field-speed-x-energy-input-ratio-function-of-temperature-curve-name-5}
 
@@ -7029,11 +7122,23 @@ This alpha field defines the name of a quadratic or cubic performance curve for 
 
 The actual EIR at Speed \textless{}x\textgreater{}, considering variations in temperatures, air and water flow rates is calculated as below:
 
-\begin{array}{l}ActualEIR@SpeedLevel\left( x \right) = \frac{{1.0}}{{ReferenceUnitCOP@SpeedLevel(x)}}\\\quad \quad \quad \quad \quad \quad \quad \quad \quad  \times EIRTempModFac@SpeedLevel(x)\\\quad \quad \quad \quad \quad \quad \quad \quad \quad  \times EIRAirFlowModFac@SpeedLevel(x)\\\quad \quad \quad \quad \quad \quad \quad \quad \quad  \times EIRWaterFlowModFac@SpeedLevel(x)\end{array}
+\begin{equation}
+\begin{array}{l}
+ActualEIR@SpeedLevel \left( x \right) = \frac{{1.0}}{{ReferenceUnitCOP@SpeedLevel(x)}} \\
+\quad \quad \quad \quad \quad \quad \quad \quad \quad \times EIRTempModFac@SpeedLevel(x) \\
+\quad \quad \quad \quad \quad \quad \quad \quad \quad \times EIRAirFlowModFac@SpeedLevel(x) \\
+\quad \quad \quad \quad \quad \quad \quad \quad \quad \times EIRWaterFlowModFac@SpeedLevel(x)
+\end{array}
+\end{equation}
 
 And, the actual power consumption is calculated:
 
-\begin{array}{l}ActualPower@SpeedLevel\left( x \right) = ActualCapacity@SpeedLevel\left( x \right)\\\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad  \times ActualEIR@SpeedLevel\left( x \right)\end{array}
+\begin{equation}
+\begin{array}{l}
+ActualPower@SpeedLevel\left( x \right) = ActualCapacity@SpeedLevel\left( x \right) \\
+\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \times ActualEIR@SpeedLevel\left( x \right)
+\end{array}
+\end{equation}
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Rated Waste Heat Fraction of Power Input}\label{field-speed-x-rated-waste-heat-fraction-of-power-input-2}
 
@@ -7045,148 +7150,149 @@ The name of a bi-quadratic performance curve (ref: Performance Curves) that para
 
 The actual recoverable waste heat at Speed \textless{}x\textgreater{} is calculated as below:
 
-\begin{array}{l}ActualWasteHeat@SpeedLevel\left( x \right) = ActualPower@SpeedLevel\left( x \right)\\\quad \quad \quad \quad \quad \quad  \times WasteHeatFrac@SpeedLevel(x)\\\quad \quad \quad \quad \quad \quad  \times WasteHeatTempModFac@SpeedLevel(x)\end{array}
+\begin{equation}
+\begin{array}{l}
+ActualWasteHeat@SpeedLevel\left( x \right) = ActualPower@SpeedLevel\left( x \right) \\
+\quad \quad \quad \quad \quad \quad \times WasteHeatFrac@SpeedLevel(x) \\
+\quad \quad \quad \quad \quad \quad \times WasteHeatTempModFac@SpeedLevel(x)
+\end{array}
+\end{equation}
 
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
-
 Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
-  Sys 1 Heat Pump Heating Mode,                                                        !- Name
-  Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,        !- Water Inlet Node Name
-  Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,      !- Water Outlet Node Name
-  Sys 1 Heating Coil Air Inlet Node,                                              !- Air Inlet Node Name
-  Sys 1 SuppHeating Coil Air Inlet Node,                                      !- Air Outlet Node Name
-  10.0,                                                                                                         !- Number of Speeds
-  10.0,                                                                                                         !- Nominal Speed Level
-  Autosize,                                                                                                !- Rated Heating Capacity {W}
-  Autosize,                                                                                                !- Rated Air Flow Rate {m3/s}
-  Autosize,                                                                                                !- Rated Water Flow Rate {m3/s}
-  VS Energy Part Load Fraction 1,                                                    !- Energy part load fraction curve
-  1838.7,                                                                       !- Speed 1 Reference Unit Gross Rated Heating Capacity
-  5.0,                                                                              !- Speed 1 Reference Unit Gross Rated Heating COP
-  0.1661088,                                                                                !- Speed 1 Reference Unit Rated Air Flow Rate
-  0.000381695,                                                                            !- Speed 1 Reference Unit Rated Water Flow Rate
-  Heating VS Temp1 Test,       !- Speed 1 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,   !- Speed 1 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 1 Heating Capacity Function of Water Flow Fraction Curve Name
+  Sys 1 Heat Pump Heating Mode,                           !- Name
+  Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,   !- Water Inlet Node Name
+  Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
+  Sys 1 Heating Coil Air Inlet Node,                      !- Air Inlet Node Name
+  Sys 1 SuppHeating Coil Air Inlet Node,                  !- Air Outlet Node Name
+  10.0,                           !- Number of Speeds
+  10.0,                           !- Nominal Speed Level
+  Autosize,                       !- Rated Heating Capacity {W}
+  Autosize,                       !- Rated Air Flow Rate {m3/s}
+  Autosize,                       !- Rated Water Flow Rate {m3/s}
+  VS Energy Part Load Fraction 1, !- Energy part load fraction curve
+  1838.7,                         !- Speed 1 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 1 Reference Unit Gross Rated Heating COP
+  0.1661088,                      !- Speed 1 Reference Unit Rated Air Flow Rate
+  0.000381695,                    !- Speed 1 Reference Unit Rated Water Flow Rate
+  Heating VS Temp1 Test,          !- Speed 1 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 1 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 1 Heating Capacity Function of Water Flow Fraction Curve Name
   EIRH VS Temp1 Test,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,         !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                           !- Speed 1 Waste Heat Fraction to Power Input
-  Heating wasteHeat VS Temp1 Test,     !- Speed 1 Waste Heat Function of Temperature Curve Name
-  2295.5,                                        !- Speed 2 Reference Unit Gross Rated Heating Capacity
-  5.0,                                           !- Speed 2 Reference Unit Gross Rated Heating COP
-  0.179322,                                 !- Speed 2 Reference Unit Rated air flow rate
-  0.000381695,                           !- Speed 2 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,       !- Speed 2 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,   !- Speed 2 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 2 Heating Capacity Function of Water Flow Fraction Curve Name
-  EIRH VS Temp1 Test,            !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,       !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 2 Waste Heat Fraction to Power Input
-  Heating wasteHeat VS Temp1 Test,   !- Speed 2 Waste Heat Function of Temperature Curve Name
-  2751.3,                                        !- Speed 3 Reference Unit Gross Rated Heating Capacity
-  5.0*,*                                             !- Speed 3 Reference Unit Gross COP
-  0.1925352,                                 !- Speed 3 Reference Unit Rated Air Flow Rate
-  0.000381695,                             !- Speed 3 Reference Unit Rated Water Flow Rate
-  Heating VS Temp1 Test,         !- Speed 3 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,     !- Speed 3 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 3 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS AirFrac Test,           !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 1 Waste Heat Fraction to Power Input
+  Heating wasteHeat VS Temp1 Test,!- Speed 1 Waste Heat Function of Temperature Curve Name
+  2295.5,                         !- Speed 2 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 2 Reference Unit Gross Rated Heating COP
+  0.179322,                       !- Speed 2 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 2 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 2 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 2 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 2 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS Temp1 Test,             !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+  EIRH VS AirFrac Test,           !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 2 Waste Heat Fraction to Power Input
+  Heating wasteHeat VS Temp1 Test,!- Speed 2 Waste Heat Function of Temperature Curve Name
+  2751.3,                         !- Speed 3 Reference Unit Gross Rated Heating Capacity
+  5.0*,*                          !- Speed 3 Reference Unit Gross COP
+  0.1925352,                      !- Speed 3 Reference Unit Rated Air Flow Rate
+  0.000381695,                    !- Speed 3 Reference Unit Rated Water Flow Rate
+  Heating VS Temp1 Test,          !- Speed 3 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 3 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 3 Heating Capacity Function of Water Flow Fraction Curve Name
   EIRH VS Temp1 Test,             !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,         !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 3 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-  3659.6,                                          !- Speed 4 Reference Unit Gross Rated Heating Capacity
-  5.0,                                               !- Speed 4 Reference Unit Gross Rated Heating COP
-  0.2189616,                                   !- Speed 4 Reference Unit Rated air flow rate
-  0.000381695,                               !- Speed 4 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,       !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 4 Heating Capacity Function of Water Flow Fraction Curve Name
-  EIRH VS Temp1 Test,            !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,       !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 4 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
-
-
-  4563.7,                                        !- Speed 5 Reference Unit Gross Rated Heating Capacity
-  5.0,                                             !- Speed 5 Reference Unit Gross Rated Heating COP
-  0.245388,                                   !- Speed 5 Reference Unit Rated air flow rate
-  0.000381695,                             !- Speed 5 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,         !- Speed 5 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,     !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 5 Heating Capacity Function of Water Flow Fraction Curve Name
-  EIRH VS Temp1 Test,            !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,       !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 5 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test,   !- Speed 5 Waste Heat Function of Temperature Curve Name
-  5463.3,                                                  !- Speed 6 Reference Unit Gross Rated Heating Capacity
-  5.0,                                                           !- Speed 6 Reference Unit Gross Rated Heating COP
-  0.2718144,                                               !- Speed 6 Reference Unit Rated air flow rate
-  0.000381695,                                           !- Speed 6 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,                       !- Speed 6 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test, !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 6 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS AirFrac Test,           !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 3 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test,!- Speed 3 Waste Heat Function of Temperature Curve Name
+  3659.6,                         !- Speed 4 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 4 Reference Unit Gross Rated Heating COP
+  0.2189616,                      !- Speed 4 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 4 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 4 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 4 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS Temp1 Test,             !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+  EIRH VS AirFrac Test,           !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 4 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test,!- Speed 4 Waste Heat Function of Temperature Curve Name
+  4563.7,                         !- Speed 5 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 5 Reference Unit Gross Rated Heating COP
+  0.245388,                       !- Speed 5 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 5 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 5 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 5 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS Temp1 Test,             !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+  EIRH VS AirFrac Test,           !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 5 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test,!- Speed 5 Waste Heat Function of Temperature Curve Name
+  5463.3,                         !- Speed 6 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 6 Reference Unit Gross Rated Heating COP
+  0.2718144,                      !- Speed 6 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 6 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 6 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 6 Heating Capacity Function of Water Flow Fraction Curve Name
   EIRH VS Temp1 Test,             !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,       !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 6 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-  6358.4,                                      !- Speed 7 Reference Unit Gross Rated Heating Capacity
-  5.0,                                           !- Speed 7 Reference Unit Gross Rated Heating COP
-  0.2982408,                               !- Speed 7 Reference Unit Rated air flow rate
-  0.000381695,                           !- Speed 7 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,       !- Speed 7 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,   !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 7 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS AirFrac Test,           !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 6 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test,!- Speed 6 Waste Heat Function of Temperature Curve Name
+  6358.4,                         !- Speed 7 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 7 Reference Unit Gross Rated Heating COP
+  0.2982408,                      !- Speed 7 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 7 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 7 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 7 Heating Capacity Function of Water Flow Fraction Curve Name
   EIRH VS Temp1 Test,             !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,         !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 7 Waste Heat fraction to power input
+  EIRH VS AirFrac Test,           !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 7 Waste Heat fraction to power input
   Heating wasteHeat VS Temp1 Test,!- Speed 7 Waste Heat Function of Temperature Curve Name
-  7248.5,                                      !- Speed 8 Reference Unit Gross Rated Heating Capacity
-  5.0,                                           !- Speed 8 Reference Unit Gross Rated Heating COP
-  0.3246672,                               !- Speed 8 Reference Unit Rated air flow rate
-  0.000381695,                           !- Speed 8 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,       !- Speed 8 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,   !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 8 Heating Capacity Function of Water Flow Fraction Curve Name
-  EIRH VS Temp1 Test,            !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,       !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 8 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test,   !- Speed 8 Waste Heat Function of Temperature Curve Name
-  8133.6,                                      !- Speed 9 Reference Unit Gross Heating Capacity
-  5.0,                                           !- Speed 9 Reference Unit Gross Rated Heating COP
-  0.3510936,                               !- Speed 9 Reference Unit Rated air flow rate
-  0.000381695,                           !- Speed 9 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test,       !- Speed 9 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test,   !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 9 Heating Capacity Function of Water Flow Fraction Curve Name
-  EIRH VS Temp1 Test,            !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test,       !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test,     !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                          !- Speed 9 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
-
-
-  9013.2,                                !- Speed 10 Reference Unit Gross Rated Heating Capacity
-  5.0,                                     !- Speed 10 Reference Unit Gross Rated Heating COP
-  0.37752,                             !- Speed 10 Reference Unit Rated air flow rate
-  0.000381695,                     !- Speed 10 Reference Unit Rated water flow rate
-  Heating VS Temp1 Test, !- Speed 10 Heating Capacity Function of Temperature Curve Name
-  Heating VS AirFrac Test, !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
-  Heating VS WaterFrac Test,!- Speed 10 Heating Capacity Function of Water Flow Fraction Curve
-  EIRH VS Temp1 Test,      !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-  EIRH VS AirFrac Test, !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-  EIRH VS WaterFrac Test, !- Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
-  0.1,                                    !- Speed 10 Waste Heat fraction to power input
-  Heating wasteHeat VS Temp1 Test; !- Speed 10 Waste Heat Function of Temperature Curve Name
+  7248.5,                         !- Speed 8 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 8 Reference Unit Gross Rated Heating COP
+  0.3246672,                      !- Speed 8 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 8 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 8 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 8 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS Temp1 Test,             !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+  EIRH VS AirFrac Test,           !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 8 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test,!- Speed 8 Waste Heat Function of Temperature Curve Name
+  8133.6,                         !- Speed 9 Reference Unit Gross Heating Capacity
+  5.0,                            !- Speed 9 Reference Unit Gross Rated Heating COP
+  0.3510936,                      !- Speed 9 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 9 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 9 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 9 Heating Capacity Function of Water Flow Fraction Curve Name
+  EIRH VS Temp1 Test,             !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+  EIRH VS AirFrac Test,           !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 9 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test,!- Speed 9 Waste Heat Function of Temperature Curve Name
+  9013.2,                         !- Speed 10 Reference Unit Gross Rated Heating Capacity
+  5.0,                            !- Speed 10 Reference Unit Gross Rated Heating COP
+  0.37752,                        !- Speed 10 Reference Unit Rated air flow rate
+  0.000381695,                    !- Speed 10 Reference Unit Rated water flow rate
+  Heating VS Temp1 Test,          !- Speed 10 Heating Capacity Function of Temperature Curve Name
+  Heating VS AirFrac Test,        !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
+  Heating VS WaterFrac Test,      !- Speed 10 Heating Capacity Function of Water Flow Fraction Curve
+  EIRH VS Temp1 Test,             !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+  EIRH VS AirFrac Test,           !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+  EIRH VS WaterFrac Test,         !- Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
+  0.1,                            !- Speed 10 Waste Heat fraction to power input
+  Heating wasteHeat VS Temp1 Test;!- Speed 10 Waste Heat Function of Temperature Curve Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-28}

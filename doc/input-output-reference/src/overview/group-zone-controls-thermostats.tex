@@ -368,7 +368,7 @@ The radiative fraction \(\gamma\) is selected by the user and can be scheduled t
 \toprule 
 Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline \midrule
 \endhead
-\$\textbackslashgamma\$ & 0.5 & 0.4 & 0.3 \tabularnewline
+\(\gamma\) & 0.5 & 0.4 & 0.3 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -386,7 +386,7 @@ This field controls whether the input for radiative fraction is a constant value
 
 \paragraph{Field: Fixed Radiative Fraction}\label{field-fixed-radiative-fraction}
 
-This is the fraction, \(\gamma\) , of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to \textbf{Constant}.
+This is the fraction, \(\gamma\), of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to \textbf{Constant}.
 
 \paragraph{Field: Radiative Fraction Schedule Name}\label{field-radiative-fraction-schedule-name}
 
@@ -397,64 +397,58 @@ Note that by setting the values in this schedule separately for design days, the
 An example of this object follows.
 
 \begin{lstlisting}
-
 ZoneControl:Thermostat:OperativeTemperature,
-  Zone 1 Thermostat,   !- ZoneControl:Thermostat Name
-  Constant,                     !- Radiative Fraction Input Mode
-  0.5,                               !- Fixed Radiative Fraction
-  ;   !- Radiative Fraction Schedule
+  Zone 1 Thermostat,    !- ZoneControl:Thermostat Name
+  Constant,             !- Radiative Fraction Input Mode
+  0.5,                  !- Fixed Radiative Fraction
+  ;                     !- Radiative Fraction Schedule
 \end{lstlisting}
 
 Global operative temperature applied to all zones for a global thermostat:
 
 \begin{lstlisting}
-
 ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
+ZoneControl:Thermostat,
+  AllControlledZones Thermostat,        !- Name
+  AllControlledZones,                   !- Zone Name
+  Zone Control Type Sched,              !- Control Type Schedule Name
+  ThermostatSetpoint:SingleCooling,     !- Control 1 Object Type
+  CoolingSetPoint,                      !- Control 1 Name
+  ThermostatSetpoint:SingleHeating,     !- Control 2 Object Type
+  HeatingSetpoint,                      !- Control 2 Name
+  ThermostatSetpoint:DualSetpoint,      !- Control 3 Object Type
+  DualSetPoint;                         !- Control 3 Name
 
-  ZoneControl:Thermostat,
-  AllControlledZones Thermostat,               !- Name
-  AllControlledZones,                               !- Zone Name
-  Zone Control Type Sched, !- Control Type Schedule Name
-  ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
-  CoolingSetPoint,                 !- Control 1 Name
-  ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
-  HeatingSetpoint,                 !- Control 2 Name
-  ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
-  DualSetPoint;                       !- Control 3 Name
 
-
-  ZoneControl:Thermostat:OperativeTemperature,
-  AllControlledZones Thermostat,               !- Thermostat Name
-  CONSTANT,                               !- Radiative Fraction Input Mode
-  0.4;                                         !- Fixed Radiative Fraction
+ZoneControl:Thermostat:OperativeTemperature,
+  AllControlledZones Thermostat,        !- Thermostat Name
+  CONSTANT,                             !- Radiative Fraction Input Mode
+  0.4;                                  !- Fixed Radiative Fraction
 \end{lstlisting}
 
 Global operative temperature referencing a single zone from the list:
 
 \begin{lstlisting}
-
 ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 \end{lstlisting}
 
 \begin{lstlisting}
-
 ZoneControl:Thermostat,
-  AllControlledZones Thermostat,               !- Name
-  AllControlledZones,                               !- Zone Name
-  Zone Control Type Sched, !- Control Type Schedule Name
-  ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
-  CoolingSetPoint,                 !- Control 1 Name
-  ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
-  HeatingSetpoint,                 !- Control 2 Name
-  ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
-  DualSetPoint;                       !- Control 3 Name
+  AllControlledZones Thermostat,        !- Name
+  AllControlledZones,                   !- Zone Name
+  Zone Control Type Sched,              !- Control Type Schedule Name
+  ThermostatSetpoint:SingleCooling,     !- Control 1 Object Type
+  CoolingSetPoint,                      !- Control 1 Name
+  ThermostatSetpoint:SingleHeating,     !- Control 2 Object Type
+  HeatingSetpoint,                      !- Control 2 Name
+  ThermostatSetpoint:DualSetpoint,      !- Control 3 Object Type
+   DualSetPoint;                        !- Control 3 Name
 
-
-  ZoneControl:Thermostat:OperativeTemperature,
-  SPACE3-1 AllControlledZones Thermostat,               !- Thermostat Name
+ZoneControl:Thermostat:OperativeTemperature,
+  SPACE3-1 AllControlledZones Thermostat, !- Thermostat Name
   CONSTANT,                               !- Radiative Fraction Input Mode
-  0.4;                                         !- Fixed Radiative Fraction
+  0.4;                                    !- Fixed Radiative Fraction
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-032}
