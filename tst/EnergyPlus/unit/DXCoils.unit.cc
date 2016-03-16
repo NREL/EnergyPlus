@@ -668,6 +668,58 @@ namespace EnergyPlus {
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
 
+		// Now test that coil output at Speed = 1, CyclingRatio = 1 is the same as Speed = 2 and SpeedRatio = 0
+		Real64 DXCoilOutletNodeTemp = Coil.OutletAirTemp;
+		Real64 DXCoilOutletNodeHumRat = Coil.OutletAirHumRat;
+		Real64 DXCoilOutletNodeEnthalpy = Coil.OutletAirEnthalpy;
+		Real64 DXCoilHeatingCapacity = Coil.TotalHeatingEnergyRate;
+
+		SpeedRatio = 0.0;
+		CycRatio = 1.0;
+		SpeedNum = 2;
+
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
+
+		Real64 DXCoilOutletNodeTemp2 = Coil.OutletAirTemp;
+		Real64 DXCoilOutletNodeHumRat2 = Coil.OutletAirHumRat;
+		Real64 DXCoilOutletNodeEnthalpy2 = Coil.OutletAirEnthalpy;
+		Real64 DXCoilHeatingCapacity2 = Coil.TotalHeatingEnergyRate;
+
+		EXPECT_DOUBLE_EQ( DXCoilOutletNodeTemp, DXCoilOutletNodeTemp2 );
+		EXPECT_DOUBLE_EQ( DXCoilOutletNodeHumRat, DXCoilOutletNodeHumRat2 );
+		EXPECT_DOUBLE_EQ( DXCoilOutletNodeEnthalpy, DXCoilOutletNodeEnthalpy2 );
+		EXPECT_DOUBLE_EQ( DXCoilHeatingCapacity, DXCoilHeatingCapacity2 );
+
+		// Defroster on
+		OutDryBulbTemp = -5.0; // cold
+
+		SpeedRatio = 0.0;
+		CycRatio = 1.0;
+		SpeedNum = 1;
+
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
+
+		DXCoilOutletNodeTemp = Coil.OutletAirTemp;
+		DXCoilOutletNodeHumRat = Coil.OutletAirHumRat;
+		DXCoilOutletNodeEnthalpy = Coil.OutletAirEnthalpy;
+		DXCoilHeatingCapacity = Coil.TotalHeatingEnergyRate;
+
+		SpeedRatio = 0.0;
+		CycRatio = 1.0;
+		SpeedNum = 2;
+
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
+
+		DXCoilOutletNodeTemp2 = Coil.OutletAirTemp;
+		DXCoilOutletNodeHumRat2 = Coil.OutletAirHumRat;
+		DXCoilOutletNodeEnthalpy2 = Coil.OutletAirEnthalpy;
+		DXCoilHeatingCapacity2 = Coil.TotalHeatingEnergyRate;
+
+		EXPECT_DOUBLE_EQ( DXCoilOutletNodeTemp, DXCoilOutletNodeTemp2 );
+		EXPECT_DOUBLE_EQ( DXCoilOutletNodeHumRat, DXCoilOutletNodeHumRat2 );
+		EXPECT_DOUBLE_EQ( DXCoilOutletNodeEnthalpy, DXCoilOutletNodeEnthalpy2 );
+		EXPECT_DOUBLE_EQ( DXCoilHeatingCapacity, DXCoilHeatingCapacity2 );
+
 	}
 
 	TEST_F( EnergyPlusFixture, TestSingleSpeedDefrostCOP ) {

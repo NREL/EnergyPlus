@@ -57,11 +57,11 @@ On/Off Fan Model
 The on/off fan model is similar to the simple fan model with the exception that the on/off fan may cycle on and off during a simulation time step. The cycling rate of the fan is known as the run time fraction. The calculation of run time fraction accounts for the part-load losses of other equipment used in the HVAC system. A part-load factor (a.k.a. part-load ratio) is first calculated for the fan as the ratio of the actual operating mass flow rate to the maximum fan mass flow rate. The run time fraction is then calculated as the part-load factor divided by the part-load fraction. The part-load fraction is determined by other HVAC equipment in the simulation (Ref. DX coil) for use by this specific fan model.
 
 \begin{equation}
-{f_{flow}} = {\raise0.7ex\hbox{{\mathop m\limits^ \bullet  }} \!\mathord{\left/ {\vphantom {{\mathop m\limits^ \bullet  } {{{\mathop m\limits^ \bullet  }_{\max }}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop m\limits^ \bullet  }_{\max }}}}}
+  f_{flow} = \frac{\dot{m}}{\dot{m}_{max}}
 \end{equation}
 
 \begin{equation}
-RTF = {\raise0.7ex\hbox{{{f_{flow}}}} \!\mathord{\left/ {\vphantom {{{f_{flow}}} {PLF}}}\right.}\!\lower0.7ex\hbox{{PLF}}}
+  RTF = \frac{f_{flow}}{PLF}
 \end{equation}
 
 The total fan power is then calculated as the maximum fan power multipled by the run time fraction.
@@ -103,7 +103,7 @@ EfficiencyRatio = f\left( {{N_{ratio}}} \right) = EfficiencyCurveOutput
 To account for the change in fan speed and to ensure that the run time fraction is accurately calculated, an adjustment to the previous calculation for run time fraction is made. This adjusts the calculated run time fraction to account for times when the fan speed has been reduced and the new speed is now considered the fan's maximum speed. The speed adjusted run time fraction is then used in the fan power calculation.
 
 \begin{equation}
-RTF = {\raise0.7ex\hbox{{RTF}} \!\mathord{\left/ {\vphantom {{RTF} {{N_{ratio}}}}}\right.}\!\lower0.7ex\hbox{{{N_{ratio}}}}}
+RTF = \frac{RTF}{N_{ratio}}
 \end{equation}
 
 \begin{equation}

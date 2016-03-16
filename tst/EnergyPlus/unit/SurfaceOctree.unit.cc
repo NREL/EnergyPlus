@@ -305,7 +305,7 @@ TEST( SurfaceOctreeTest, Composite )
 	Surface( 10 ).Vertex = { Vertex(1,0,0), Vertex(1,1,0), Vertex(1,1,1), Vertex(1,0,1) };
 	Surface( 11 ).Vertex = { Vertex(0,0,0), Vertex(1,0,0), Vertex(1,1,0), Vertex(0,1,0) };
 	Surface( 12 ).Vertex = { Vertex(0,0,1), Vertex(1,0,1), Vertex(1,1,1), Vertex(0,1,1) };
-	for ( int i = 1; i <= TotSurfaces; ++i ) Surface( i ).Shape = Rectangle;
+	for ( int i = 1; i <= TotSurfaces; ++i ) Surface( i ).Shape = SurfaceShape::Rectangle;
 
 	// SurfaceOctreeCube
 	SurfaceOctreeCube const cube( Surface );
@@ -408,19 +408,19 @@ TEST( SurfaceOctreeTest, Composite )
 	// Function processing
 	{ // Hits cube but predicate never satisfied
 		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == Triangle; };
+		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == SurfaceShape::Triangle; };
 		EXPECT_FALSE( cube.hasSurfaceSegmentIntersectsCube( a, b, predicate ) );
 		EXPECT_FALSE( cube.hasSurfaceRayIntersectsCube( a, dir, predicate ) );
 	}
 	{ // Hits cube and predicate satisfied
 		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == Rectangle; };
+		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == SurfaceShape::Rectangle; };
 		EXPECT_TRUE( cube.hasSurfaceSegmentIntersectsCube( a, b, predicate ) );
 		EXPECT_TRUE( cube.hasSurfaceRayIntersectsCube( a, dir, predicate ) );
 	}
 	{ // Misses cube so predicate never tested
 		Vertex const a( -1.0, 3.0, 3.0 ), b( 3.0, 3.0, 3.0 ), dir( ( b - a ).normalize_zero() );
-		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == Rectangle; };
+		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == SurfaceShape::Rectangle; };
 		EXPECT_FALSE( cube.hasSurfaceSegmentIntersectsCube( a, b, predicate ) );
 		EXPECT_FALSE( cube.hasSurfaceRayIntersectsCube( a, dir, predicate ) );
 	}
