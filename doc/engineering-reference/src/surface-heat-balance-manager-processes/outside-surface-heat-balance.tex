@@ -588,12 +588,14 @@ This model equation is for the total film coefficient and includes the natural c
 
 Blocken et al. (2009) developed a set of correlations for windward facing outdoor surfaces using numerical methods (key: BlockenWindward).
 
+\begin{equation}
 \begin{array}{lcl}
     h_f = 4.6V^{0.89}_{10m} & : & \theta \leq 11.25 \\
     h_f = 5.0V^{0.80}_{10m} & : & 11.25 < \theta \leq 33.75 \\
     h_f = 4.6V^{0.84}_{10m} & : & 33.75 < \theta \leq 56.25 \\
     h_f = 4.5V^{0.81}_{10m} & : & 56.25 < \theta \leq 100.0
-  \end{array}
+\end{array}
+\end{equation}
 
 Where \emph{V\(_{m}\)} is the air velocity at the location of the weather station and θ is the angle of incidence between the wind and the surface in degrees.~ This model is only applicable to windward surfaces and lacks a natural convection component and therefore cannot be used on its own but only within the adaptive convection algorithm for the outside face.
 
@@ -632,21 +634,25 @@ This model only claims to be applicable to horizontal roof surfaces so it may no
 
 Emmel et al. (2007) developed a set of correlations for outdoor surfaces using numerical methods.~ The following equations are for vertical surfaces (key: EmmelVertical):
 
+\begin{equation}
 \begin{array}{lcl}
     h_f = 5.15V^{0.81}_{10m} & : & \theta \leq 22.5 \\
     h_f = 3.34V^{0.84}_{10m} & : & 22.5 < \theta \leq 67.5 \\
     h_f = 4.78V^{0.71}_{10m} & : & 67.5 < \theta \leq 112.5 \\
     h_f = 4.05V^{0.77}_{10m} & : & 112.5 < \theta \leq 157.5 \\
     h_f = 3.54V^{0.76}_{10m} & : & 157.5 < \theta \leq 180.0
-  \end{array}
+\end{array}
+\end{equation}
 
 Where \emph{V\(_{m}\)} is the air velocity at the location of the weather station and $\theta$ is the angle of incidence between the wind and the surface in degrees.~ The following equations are used for horizontal (roof) surfaces (key: EmmelRoof):
 
+\begin{equation}
 \begin{array}{lcl}
     h_f = 5.11V^{0.78}_{10m} & : & \theta \leq 22.5 \\
     h_f = 4.60V^{0.79}_{10m} & : & 22.5 < \theta \leq 67.5 \\
     h_f = 3.67V^{0.85}_{10m} & : & 67.5 < \theta \leq 90
-  \end{array}
+\end{array}
+\end{equation}
 
 Where $\theta$ is the angle of incidence between the wind and the longest edge of the roof surface in degrees.
 
