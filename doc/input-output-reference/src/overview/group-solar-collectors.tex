@@ -55,9 +55,9 @@ The following output variables are reported for the SolarCollector:FlatPlate:Wat
 
 \begin{itemize}
 \item
-  HVAC,Average,Solar Collector Incident Angle Modifier \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector Incident Angle Modifier {[]}
 \item
-  HVAC,Average,Solar Collector Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector Efficiency {[]}
 \item
   HVAC,Average,Solar Collector Heat Transfer Rate {[}W{]}
 \item
@@ -68,11 +68,11 @@ The following output variables are reported for the SolarCollector:FlatPlate:Wat
   HVAC,Sum,Solar Collector Heat Transfer Energy {[}J{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Solar Collector Incident Angle Modifier \protect\hyperlink{section-1}{}}{Solar Collector Incident Angle Modifier }}\label{solar-collector-incident-angle-modifier}
+\paragraph{\texorpdfstring{Solar Collector Incident Angle Modifier {[]}}{Solar Collector Incident Angle Modifier }}\label{solar-collector-incident-angle-modifier}
 
 The incident angle modifier is an important intermediate value used in the SRCC calculation of solar collector performance. The value reported here is the combined result for the current time that includes incident angles of beam solar, diffuse solar from sky, and diffuse solar from ground.
 
-\paragraph{\texorpdfstring{Solar Collector Efficiency \protect\hyperlink{section-1}{}}{Solar Collector Efficiency }}\label{solar-collector-efficiency}
+\paragraph{\texorpdfstring{Solar Collector Efficiency {[]}}{Solar Collector Efficiency }}\label{solar-collector-efficiency}
 
 The overall collector efficiency. This is the ratio of collected energy and the incident solar energy. The efficiency can be greater than 1 at times when the outdoor air temperature is warm enough.
 
@@ -96,7 +96,7 @@ In addition, several surface variables are also relevant for the collector s sur
 \item
   Zone,Average,Surface Outside Face Sunlit Area {[}m2{]}
 \item
-  Zone,Average,Surface Outside Face Sunlit Fraction \protect\hyperlink{section-1}{}
+  Zone,Average,Surface Outside Face Sunlit Fraction {[]}
 \item
   Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area {[}W/m2{]}
 \item
@@ -106,7 +106,7 @@ In addition, several surface variables are also relevant for the collector s sur
 \item
   Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area {[}W/m2{]}
 \item
-  Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value \protect\hyperlink{section-1}{}
+  Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value {[]}
 \end{itemize}
 
 The temperatures at the inlet and outlet nodes and the collector mass flow rate can be monitored using the system node output variables:
@@ -364,7 +364,7 @@ The following output variables are reported for the SolarCollector:IntegralColle
 \item
   HVAC,Average,Solar Collector Overall Top Heat Loss Coefficient {[}W/m2-C{]}
 \item
-  HVAC,Average,Solar Collector Thermal Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector Thermal Efficiency {[]}
 \item
   HVAC,Average,Solar Collector Storage Heat Transfer Rate {[}W{]}
 \item
@@ -378,7 +378,7 @@ The following output variables are reported for the SolarCollector:IntegralColle
 \item
   HVAC,Sum, Solar Collector Skin Heat Transfer Energy {[}J{]}
 \item
-  HVAC,Average,Solar Collector Transmittance Absorptance Product \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector Transmittance Absorptance Product {[]}
 \end{itemize}
 
 \paragraph{Solar Collector Storage Water Temperature {[}C{]}}\label{solar-collector-storage-water-temperature-c}
@@ -389,7 +389,7 @@ This output variable is the ICS collector stored water average temperature at a 
 
 This output variable is the ICS collector absorber plate average temperature at a given time steps in degree Celsius.
 
-\paragraph{\texorpdfstring{Solar Collector Thermal Efficiency \protect\hyperlink{section-1}{}}{Solar Collector Thermal Efficiency }}\label{solar-collector-thermal-efficiency}
+\paragraph{\texorpdfstring{Solar Collector Thermal Efficiency {[]}}{Solar Collector Thermal Efficiency }}\label{solar-collector-thermal-efficiency}
 
 This output variable is the instantaneous thermal efficiency of the ICS solar collector in per cent. This value is determined from net useful energy collected and the total incident solar radiation for each time step. The net useful energy collected is the sum of the energy stored in the collector and net useful energy delivered.
 
@@ -411,7 +411,7 @@ These output variables are the instantaneous skin heat loss rate and the heat lo
 
 This output variable is the heat rate and Energy transferred from the ICS collector to the collector loop fluid (water) in Watts and Joule, respectively. This value is determined from the collector water mass flow rate, specific heat of water and the temperature difference between the collector water outlet and inlet nodes at each time step. The value is positive when the fluid is heated or negative when cooled.
 
-\paragraph{\texorpdfstring{Solar Collector Transmittance Absorptance Product \protect\hyperlink{section-1}{}}{Solar Collector Transmittance Absorptance Product }}\label{solar-collector-transmittance-absorptance-product}
+\paragraph{\texorpdfstring{Solar Collector Transmittance Absorptance Product {[]}}{Solar Collector Transmittance Absorptance Product }}\label{solar-collector-transmittance-absorptance-product}
 
 This output variable is the transmittance-absorptance product of the covers and absorber system of the ICS solar collector. This value ranges from 0.0 to less than 1.0.
 
@@ -494,7 +494,7 @@ The output variables that are available for flat plate PVT include the following
 \item
   HVAC,Sum,Generator Produced Thermal Energy {[}J{]}
 \item
-  HVAC,Average,Generator PVT Fluid Bypass Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Generator PVT Fluid Bypass Status {[]}
 \item
   HVAC,Average,Generator PVT Fluid Inlet Temperature {[}C{]}
 \item
@@ -509,7 +509,7 @@ The output variables that are available for flat plate PVT include the following
 
 These outputs are the thermal energy and power produced by the PVT collector. PVT collectors are a type of cogenerator, producing both electrical and thermal power and these variables report the thermal portion in the same manner as other fuel-based cogenerators. The thermal energy is placed on HeatProduced meter and is attributed to SolarWater or SolarAir depending on the type of working fluid. The generator thermal production is also reported at the load center level.
 
-\paragraph{\texorpdfstring{Generator PVT Fluid Bypass Status \protect\hyperlink{section-1}{}}{Generator PVT Fluid Bypass Status }}\label{generator-pvt-fluid-bypass-status}
+\paragraph{\texorpdfstring{Generator PVT Fluid Bypass Status {[]}}{Generator PVT Fluid Bypass Status }}\label{generator-pvt-fluid-bypass-status}
 
 This output variable indicates the status a bypass damper. It is only available for air-based PVT. There are no dimensions and the range is between 0.0 and 1.0. If the value is 0.0, then there is no bypassing and all the working fluid goes through the collector. If the value is 1.0, then there is complete bypassing and all the working fluid goes around the collector. If the value is between 0.0 and 1.0, then the model is effectively mixing bypass and collector streams to target a temperature setpoint placed on the outlet node.
 
@@ -838,7 +838,7 @@ In addition to related output that can be obtained for air nodes and surfaces, t
 
 \begin{itemize}
 \item
-  HVAC,Average,Solar Collector Heat Exchanger Effectiveness \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector Heat Exchanger Effectiveness {[]}
 \item
   HVAC,Average,Solar Collector Leaving Air Temperature {[}C{]}
 \item
@@ -868,12 +868,12 @@ In addition to related output that can be obtained for air nodes and surfaces, t
 \item
   HVAC,Average,Solar Collector Incident Solar Radiation {[}W/m2{]}
 \item
-  HVAC,Average,Solar Collector System Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector System Efficiency {[]}
 \item
-  HVAC,Average,Solar Collector Surface Efficiency \protect\hyperlink{section-1}{}
+  HVAC,Average,Solar Collector Surface Efficiency {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Solar Collector Heat Exchanger Effectiveness \protect\hyperlink{section-1}{}}{Solar Collector Heat Exchanger Effectiveness }}\label{solar-collector-heat-exchanger-effectiveness}
+\paragraph{\texorpdfstring{Solar Collector Heat Exchanger Effectiveness {[]}}{Solar Collector Heat Exchanger Effectiveness }}\label{solar-collector-heat-exchanger-effectiveness}
 
 The results from UTSC correlations defined by \({\varepsilon_{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}\) .
 
@@ -933,11 +933,11 @@ The part of mass flow rate of natural ventilation air exchange between the plenu
 
 The intensity of solar radiation incident on the UTSC collector from all sources.
 
-\paragraph{\texorpdfstring{Solar Collector System Efficiency \protect\hyperlink{section-1}{}}{Solar Collector System Efficiency }}\label{solar-collector-system-efficiency}
+\paragraph{\texorpdfstring{Solar Collector System Efficiency {[]}}{Solar Collector System Efficiency }}\label{solar-collector-system-efficiency}
 
 The overall efficiency of the UTSC system including collected solar energy and heat recovered from the underlying surface.
 
-\paragraph{\texorpdfstring{Solar Collector Surface Efficiency \protect\hyperlink{section-1}{}}{Solar Collector Surface Efficiency }}\label{solar-collector-surface-efficiency}
+\paragraph{\texorpdfstring{Solar Collector Surface Efficiency {[]}}{Solar Collector Surface Efficiency }}\label{solar-collector-surface-efficiency}
 
 The efficiency of the UTSC solar collector.
 

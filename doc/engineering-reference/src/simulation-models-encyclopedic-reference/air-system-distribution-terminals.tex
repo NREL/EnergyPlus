@@ -36,7 +36,7 @@ The VAV Single Duct Reheat and No Reheat terminal units (objects AirTerminal:Sin
 \caption{Schematic of AirTerminal:SingleDuct:VAV:Reheat Unit \protect \label{fig:schematic-of-airterminal-singleduct-vav-001}}
 \end{figure}
 
-The operation of the dampers and the control are described in the section AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat\textbf{,} which follows. The exception is that the section below describes how the air flow rate is varied for both cooling and heating. For the case of AirTerminal:SingleDuct:VAV:NoReheat and AirTerminal:SingleDuct:VAV:Reheat, air flow only varies during cooling operation and the air flow rate is set at the minimum value (minimum air flow fraction) when zone heating is required.
+The operation of the dampers and the control are described in the section AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and \\ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat, which follows. The exception is that the section below describes how the air flow rate is varied for both cooling and heating. For the case of AirTerminal:SingleDuct:VAV:NoReheat and AirTerminal:SingleDuct:VAV:Reheat, air flow only varies during cooling operation and the air flow rate is set at the minimum value (minimum air flow fraction) when zone heating is required.
 
 \subsubsection{Minimum Outdoor Air Control}\label{minimum-outdoor-air-control}
 
@@ -46,7 +46,7 @@ The single duct air terminals may also be used to provide a minimum outdoor air 
 
 \subsubsection{Overview}\label{overview-001}
 
-The VAV Heating and Cooling Single Duct Reheat and No Reheat terminal units (objects AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat provide models for variable-air-volume (VAV) terminal units are widely used in commercial and industrial applications. The VAV terminal units contain actuated dampers that vary the amount of central system air supplied to a zone. These terminal units may also contain a heating coil to trim the supply air temperature when overcooling is possible. The heating coil may also serve as the primary air heating source when the central system contains cooling-only equipment.
+The VAV Heating and Cooling Single Duct Reheat and No Reheat terminal units (objects AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and \\ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat provide models for variable-air-volume (VAV) terminal units are widely used in commercial and industrial applications. The VAV terminal units contain actuated dampers that vary the amount of central system air supplied to a zone. These terminal units may also contain a heating coil to trim the supply air temperature when overcooling is possible. The heating coil may also serve as the primary air heating source when the central system contains cooling-only equipment.
 
 The VAV terminal units described here are used primarily with central air handling equipment with cooling and heating capability. The terminal unit dampers modulate in \textbf{both} cooling and heating mode to maintain the zone setpoint temperature(s). The central air handling equipment may be either variable air volume or constant volume where a bypass duct is used to shunt excess system air flow back to the inlet of the central air handler as terminal unit dampers modulate to satisfy the zone thermostat (i.e., AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass).
 
@@ -184,7 +184,7 @@ No specific references.
 
 \subsection{Constant Volume Single Duct Four Pipe Induction Air Terminal}\label{constant-volume-single-duct-four-pipe-induction-air-terminal}
 
-The four pipe induction terminal unit (object name: AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction) is a hybrid air-hydronic unit that supplies both centrally conditioned air and local hydronic heating/cooling to a zone. Centrally conditioned air is supplied to the terminal unit at high pressure and constant flow. The central (primary) air is discharged into the terminal unit through a nozzle, inducing a fixed flow of zone (secondary) through a hydronic heating/cooling coil. The primary and secondary air streams mix and are discharged to the zone. Hot or cold water flow through the coil is varied to meet the zone heating or cooling requirement.
+The four pipe induction terminal unit (object name: \\ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction) is a hybrid air-hydronic unit that supplies both centrally conditioned air and local hydronic heating/cooling to a zone. Centrally conditioned air is supplied to the terminal unit at high pressure and constant flow. The central (primary) air is discharged into the terminal unit through a nozzle, inducing a fixed flow of zone (secondary) through a hydronic heating/cooling coil. The primary and secondary air streams mix and are discharged to the zone. Hot or cold water flow through the coil is varied to meet the zone heating or cooling requirement.
 
 \subsubsection{Model}\label{model}
 
@@ -258,7 +258,7 @@ No specific references.
 
 \subsubsection{Overview}\label{overview-1-000}
 
-The input objects AirTerminal:SingleDuct:SeriesPIU:Reheat and AirTerminal:SingleDuct:ParallelPIU:Reheat provide models for fan powered induction terminal units that occur in a variety of configurations. EnergyPlus models 2 types: \emph{series} (sometimes called \emph{constant}) and \emph{parallel} (sometimes called \emph{intermittent}). The series unit provides a constant flow of air to the zone (the fan is always on at a constant flow) with a variable proportion of primary and secondary air. The parallel unit has an intermittent fan: the fan is off at maximum cooling and does not switch on until primary air flow is significantly reduced from the maximum. Once on it provides a constant flow of secondary air. Both units induce air from the zone or plenum (secondary air) and mix it with centrally conditioned supply air (primary air). Both units are variable volume: the supply air flow rate is varied to match zone conditioning requirement.
+The input objects AirTerminal:SingleDuct:SeriesPIU:Reheat and \\ AirTerminal:SingleDuct:ParallelPIU:Reheat provide models for fan powered induction terminal units that occur in a variety of configurations. EnergyPlus models 2 types: \emph{series} (sometimes called \emph{constant}) and \emph{parallel} (sometimes called \emph{intermittent}). The series unit provides a constant flow of air to the zone (the fan is always on at a constant flow) with a variable proportion of primary and secondary air. The parallel unit has an intermittent fan: the fan is off at maximum cooling and does not switch on until primary air flow is significantly reduced from the maximum. Once on it provides a constant flow of secondary air. Both units induce air from the zone or plenum (secondary air) and mix it with centrally conditioned supply air (primary air). Both units are variable volume: the supply air flow rate is varied to match zone conditioning requirement.
 
 \subsubsection{Model}\label{model-1}
 
@@ -980,23 +980,23 @@ The recirculated cool air flow rate is controlled to meet the zone cooling loads
 
 where,
 
-\$\{c\_\{p,zone\}\} = \$ ~specific heat of zone air being served by the terminal unit, J/kg-K
+\(c_{p,zone}\) = \$ ~specific heat of zone air being served by the terminal unit, J/kg-K
 
-\$\{c\_\{p,OA\}\} = \$ ~specific heat of outdoor air entering the terminal unit, J/kg-K
+\(c_{p,OA}\) = \$ ~specific heat of outdoor air entering the terminal unit, J/kg-K
 
-\$\{c\_\{p,RC\}\} = \$ ~specific heat of the recirculated (cool) air entering the terminal unit (if present), J/kg-K
+\(c_{p,RC}\) = \$ ~specific heat of the recirculated (cool) air entering the terminal unit (if present), J/kg-K
 
-\$\{\omega\_\{zone\}\} = \$ humidity ratio of the zone air, kg/kg
+\(\omega_{zone}\) = \$ humidity ratio of the zone air, kg/kg
 
-\$\{\omega\_\{OA\}\} = \$ humidity ratio of the outdoor air entering the terminal unit, kg/kg
+\(\omega_{OA}\) = \$ humidity ratio of the outdoor air entering the terminal unit, kg/kg
 
-\$\{\omega\_\{RC\}\} = \$ humidity ratio of the recirculated air entering the terminal unit, kg/kg
+\(\omega_{RC}\) = \$ humidity ratio of the recirculated air entering the terminal unit, kg/kg
 
-\$\{T\_\{zone\}\} = \$ air drybulb temperature of the zone, ºC
+\(T_{zone}\) = \$ air drybulb temperature of the zone, ºC
 
-\$\{T\_\{OA\}\} = \$ air drybulb temperature of the outdoor air entering the terminal unit, ºC
+\(T_{OA}\) = \$ air drybulb temperature of the outdoor air entering the terminal unit, ºC
 
-\$\{T\_\{RC\}\} = \$ air drybulb temperature of the recirculated cool air entering the terminal unit, ºC
+\(T_{RC}\) = \$ air drybulb temperature of the recirculated cool air entering the terminal unit, ºC
 
 \(PsyCpAirFnWTdb\) ~is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio and drybulb temperature.
 

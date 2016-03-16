@@ -193,7 +193,7 @@ This input field eanbles DX Cooling coils to be used for 100\% outdoor air dedic
 
 \paragraph{Field: DOAS DX Cooling Coil Leaving Minimum Air Temperature}\label{field-doas-dx-cooling-coil-leaving-minimum-air-temperature}
 
-This input field is DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. This input field is optional and only used along with in the input field above. The minimum and maximum values of this input field are 0.0C and 7.2C, and the default value is 2.0°C.
+This input field is DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. This input field is optional and only used along with in the input field above. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.2\(^{o}\)C, and the default value is 2.0°C.
 
 \paragraph{Field: Latent Load Control}\label{field-latent-load-control}
 
@@ -308,7 +308,7 @@ This numeric field contains the maximum on-off cycling rate for the compressor, 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image295.svg}
+\includegraphics{media/image295.png}
 \caption{}
 \end{figure}
 
@@ -318,7 +318,7 @@ This numeric field contains the time constant for the cooling coil's capacity to
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image296.svg}
+\includegraphics{media/image296.png}
 \caption{}
 \end{figure}
 
@@ -328,7 +328,7 @@ This numeric field contains the fraction of on-cycle power use to adjust the par
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image297.svg}
+\includegraphics{media/image297.png}
 \caption{}
 \end{figure}
 
@@ -462,7 +462,7 @@ AirLoopHVAC:UnitarySystem,
 
 \begin{itemize}
 \item
-  HVAC,Average, Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Unitary System Fan Part Load Ratio {[]}
 \item
   HVAC,Average, Unitary System Compressor Part Load Ratio
 \item
@@ -486,18 +486,18 @@ Two speed coil outputs
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Unitary System Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Cycling Ratio {[]}
 \end{itemize}
 
 Multi speed coil outputs
 
 \begin{itemize}
 \item
-  HVAC,Average,Unitary System DX Coil Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System DX Coil Cycling Ratio {[]}
 \item
-  HVAC,Average,Unitary System DX Coil Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System DX Coil Speed Ratio {[]}
 \item
-  HVAC,Average,Unitary System DX Coil Speed Level \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System DX Coil Speed Level {[]}
 \item
   HVAC,Average,Unitary System Electric Power{[}W{]}
 \item
@@ -533,28 +533,28 @@ Water to air heat pump outputs
 \item
   HVAC,Average, Unitary System Requested Heating Rate {[}W{]}
 \item
-  HVAC,Average, Unitary System Water Coil Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Unitary System Water Coil Cycling Ratio {[]}
 \item
-  HVAC,Average, Unitary System Water Coil Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Unitary System Water Coil Speed Ratio {[]}
 \item
-  HVAC,Average, Unitary System Water Coil Speed Level \protect\hyperlink{section-1}{}
+  HVAC,Average, Unitary System Water Coil Speed Level {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the unitary system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff). When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio}
+\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system's DX heating or cooling coil at Speed 1. The runtime fraction for the unitary system compressor may be different from the compressor part-load ratio reported here due the part-load performance of the heating/cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate. When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Cycling Ratio \protect\hyperlink{section-1}{}}{Unitary System DX Coil Cycling Ratio }}\label{unitary-system-dx-coil-cycling-ratio}
+\paragraph{\texorpdfstring{Unitary System DX Coil Cycling Ratio {[]}}{Unitary System DX Coil Cycling Ratio }}\label{unitary-system-dx-coil-cycling-ratio}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system's DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the unitary system is cycling on and off its lowest speed (Speed 1) and 1.0 when the unitary system operates at speeds above 1.
 
 When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Ratio \protect\hyperlink{section-1}{}}{Unitary System DX Coil Speed Ratio }}\label{unitary-system-dx-coil-speed-ratio}
+\paragraph{\texorpdfstring{Unitary System DX Coil Speed Ratio {[]}}{Unitary System DX Coil Speed Ratio }}\label{unitary-system-dx-coil-speed-ratio}
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( {[}Compressor Speed - Compressor speed at Speed i-1{]} / {[}Compressor speed at Speed i - Compressor speed at Speed i-1{]}). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
@@ -562,7 +562,7 @@ The physical meaning of the speed ratio is dependent on the compressor configura
 
 When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1 and 1 at Speed \textgreater{} 1.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Level \protect\hyperlink{section-1}{}}{Unitary System DX Coil Speed Level }}\label{unitary-system-dx-coil-speed-level}
+\paragraph{\texorpdfstring{Unitary System DX Coil Speed Level {[]}}{Unitary System DX Coil Speed Level }}\label{unitary-system-dx-coil-speed-level}
 
 This output variable reports the maximum speed needed when the unitary system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the unitary system operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the unitary system operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the unitary system operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a single compressor. For multiple compressors, the unitary system operates at Speed 3 in the 40\% of a system timestep and at Speed 2 in the whole system timestep.
 
@@ -636,15 +636,15 @@ This output variable is the latent cooling requested from the zone humidistat in
 
 This output variable is the sensible heating requested from the zone thermostat in watts. This value is calculated using the unitary system outlet air and zone conditions, the specific heat of the zone air, and the supply air mass flow rate entering/leaving the system. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Water Coil Cycling Ratio \protect\hyperlink{section-1}{}}{Unitary System Water Coil Cycling Ratio }}\label{unitary-system-water-coil-cycling-ratio}
+\paragraph{\texorpdfstring{Unitary System Water Coil Cycling Ratio {[]}}{Unitary System Water Coil Cycling Ratio }}\label{unitary-system-water-coil-cycling-ratio}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed fan chilled water or hot water coil for the entire system timestep. The value is between 0.0 and 1.0 when the AHU is cycling on and off its lowest speed (fan speed 1) and 1.0 when the multispeed fan chilled water or hot water AHU operates at speed levels above 1.
 
-\paragraph{\texorpdfstring{Unitary System Water Coil Speed Ratio \protect\hyperlink{section-1}{}}{Unitary System Water Coil Speed Ratio }}\label{unitary-system-water-coil-speed-ratio}
+\paragraph{\texorpdfstring{Unitary System Water Coil Speed Ratio {[]}}{Unitary System Water Coil Speed Ratio }}\label{unitary-system-water-coil-speed-ratio}
 
 This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( {[}System Load -- Capacity at Fan Speed i-1{]} / {[}Capacity at Fan Speed i -- Capacity at Fan Speed i-1{]}). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep.
 
-\paragraph{\texorpdfstring{Unitary System Water Coil Speed Level \protect\hyperlink{section-1}{}}{Unitary System Water Coil Speed Level }}\label{unitary-system-water-coil-speed-level}
+\paragraph{\texorpdfstring{Unitary System Water Coil Speed Level {[]}}{Unitary System Water Coil Speed Level }}\label{unitary-system-water-coil-speed-level}
 
 This output variable reports the maximum speed needed when the system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the AHU operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed level is above the minimum (speed = 1), the system operation is determined by the speed ratio. For example, when the speed ratio is 0.4 and the speed lever is 3, then the supply air fan and water coil operate at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep.
 
@@ -882,72 +882,72 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
 
 
   Coil:Heating:Gas,
-      Furnace Heating Coil 1,         !- Coil Name
-      FanAndCoilAvailSched,           !- Availability Schedule Name
-      0.8,    !- Gas Burner Efficiency of the Coil
-      25000,  !- Nominal Capacity of the Coil {W}
-      Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
-      Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
+      Furnace Heating Coil 1,         !- Coil Name
+      FanAndCoilAvailSched,           !- Availability Schedule Name
+      0.8,    !- Gas Burner Efficiency of the Coil
+      25000,  !- Nominal Capacity of the Coil {W}
+      Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
+      Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
 
-    Coil:Cooling:DX:SingleSpeed,
-      Furnace ACDXCoil 1,    !- Coil Name
-      FanAndCoilAvailSched,  !- Availability Schedule
-      25000,  !- Rated Total Cooling Capacity (gross) {W}
-      0.75,   !- Rated SHR
-      3.0,    !- Rated COP
-      1.3,    !- Rated Air Volume Flow Rate {m3/s}
-      DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
-      Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
-      WindACCoolCapFT,  !- Total Cooling Capacity Modifier Curve (function of temperature)
-      WindACCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-      WindACEIRFT,      !- Energy Input Ratio Modifier Curve (function of temperature)
-      WindACEIRFFF,     !- Energy Input Ratio Modifier Curve (function of flow fraction)
-      WindACPLFFPLR,    !- Part Load Fraction Correlation (function of part load ratio)
-      CyclingFanAndCompressor;    !- Supply Air Fan Operation Mode
+    Coil:Cooling:DX:SingleSpeed,
+      Furnace ACDXCoil 1,    !- Coil Name
+      FanAndCoilAvailSched,  !- Availability Schedule
+      25000,  !- Rated Total Cooling Capacity (gross) {W}
+      0.75,   !- Rated SHR
+      3.0,    !- Rated COP
+      1.3,    !- Rated Air Volume Flow Rate {m3/s}
+      DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
+      Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
+      WindACCoolCapFT,  !- Total Cooling Capacity Modifier Curve (function of temperature)
+      WindACCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
+      WindACEIRFT,      !- Energy Input Ratio Modifier Curve (function of temperature)
+      WindACEIRFFF,     !- Energy Input Ratio Modifier Curve (function of flow fraction)
+      WindACPLFFPLR,    !- Part Load Fraction Correlation (function of part load ratio)
+      CyclingFanAndCompressor;    !- Supply Air Fan Operation Mode
 
-    Fan:OnOff,
-      Supply Fan 1,                !- Fan Name
-      FanAndCoilAvailSched,        !- Availability Schedule Name
-      0.7,    !- Fan Total Efficiency
-      600.0,  !- Delta Pressure {Pa}
-      1.3,    !- Max Flow Rate {m3/s}
-      0.9,    !- Motor Efficiency
-      1.0,    !- Motor In Airstream Fraction
-      Air Loop Inlet Node,         !- Fan\_Inlet\_Node
-      DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
+    Fan:OnOff,
+      Supply Fan 1,                !- Fan Name
+      FanAndCoilAvailSched,        !- Availability Schedule Name
+      0.7,    !- Fan Total Efficiency
+      600.0,  !- Delta Pressure {Pa}
+      1.3,    !- Max Flow Rate {m3/s}
+      0.9,    !- Motor Efficiency
+      1.0,    !- Motor In Airstream Fraction
+      Air Loop Inlet Node,         !- Fan\_Inlet\_Node
+      DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone1DirectAir,        !- Direct Air Name
+      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
+      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
+     0.47;  !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-      0.36;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone2DirectAir,        !- Direct Air Name
+      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
+      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
+      0.36;  !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone3DirectAir,        !- Direct Air Name
+      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
+      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
+     0.47;  !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 ~Example of Heat/Cool Furnace Specification
 
 \subsubsection{Outputs}\label{outputs-1-029}
 
-HVAC,Average,Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 
-HVAC,Average,Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+HVAC,Average,Unitary System Compressor Part Load Ratio {[]}
 
 \paragraph{Unitary System Fan Part Load Ratio}\label{unitary-system-fan-part-load-ratio-1}
 
 This output variable is the ratio of actual air mass flow rate through the furnace to the furnace's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the furnace is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state furnace heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the furnace fan may be different from the fan part-load ratio reported here due the part-load performance of the furnace's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
-Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+Unitary System Compressor Part Load Ratio {[]}
 
 \subsection{~AirLoopHVAC:UnitaryHeatCool}\label{airloophvacunitaryheatcool}
 
@@ -1123,60 +1123,60 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   Unitary System ACDXCoil 1,       !- Cooling coil name
   None;        !- High humidity control
 
-    Coil:Heating:Gas,
-      Unitary System Heating Coil 1,  !- Coil Name
-      FanAndCoilAvailSched,           !- Availability Schedule Name
-      0.8,    !- Gas Burner Efficiency of the Coil
-      25000,  !- Nominal Capacity of the Coil {W}
-      Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
-      Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
+    Coil:Heating:Gas,
+      Unitary System Heating Coil 1,  !- Coil Name
+      FanAndCoilAvailSched,           !- Availability Schedule Name
+      0.8,    !- Gas Burner Efficiency of the Coil
+      25000,  !- Nominal Capacity of the Coil {W}
+      Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
+      Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
 
 
-    Coil:Cooling:DX:SingleSpeed,
-      Unitary System ACDXCoil 1,      !- Coil Name
-      FanAndCoilAvailSched,  !- Availability Schedule
-      25000,  !- Rated Total Cooling Capacity (gross) {W}
-      0.75,   !- Rated SHR
-      3.0,    !- Rated COP
-      1.3,    !- Rated Air Volume Flow Rate {m3/s}
-      DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
-      Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
-      WindACCoolCapFT,  !- Total Cooling Capacity Modifier Curve (function of temperature)
-      WindACCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-      WindACEIRFT,      !- Energy Input Ratio Modifier Curve (function of temperature)
-      WindACEIRFFF,     !- Energy Input Ratio Modifier Curve (function of flow fraction)
-      WindACPLFFPLR,    !- Part Load Fraction Correlation (function of part load ratio)
-      CyclingFanAndCompressor;    !- Supply Air Fan Operation Mode
+    Coil:Cooling:DX:SingleSpeed,
+      Unitary System ACDXCoil 1,      !- Coil Name
+      FanAndCoilAvailSched,  !- Availability Schedule
+      25000,  !- Rated Total Cooling Capacity (gross) {W}
+      0.75,   !- Rated SHR
+      3.0,    !- Rated COP
+      1.3,    !- Rated Air Volume Flow Rate {m3/s}
+      DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
+      Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
+      WindACCoolCapFT,  !- Total Cooling Capacity Modifier Curve (function of temperature)
+      WindACCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
+      WindACEIRFT,      !- Energy Input Ratio Modifier Curve (function of temperature)
+      WindACEIRFFF,     !- Energy Input Ratio Modifier Curve (function of flow fraction)
+      WindACPLFFPLR,    !- Part Load Fraction Correlation (function of part load ratio)
+      CyclingFanAndCompressor;    !- Supply Air Fan Operation Mode
 
 
-    Fan:OnOff,
-      Supply Fan 1,                !- Fan Name
-      FanAndCoilAvailSched,        !- Availability Schedule Name
-      0.7,    !- Fan Total Efficiency
-      600.0,  !- Delta Pressure {Pa}
-      1.3,    !- Max Flow Rate {m3/s}
-      0.9,    !- Motor Efficiency
-      1.0,    !- Motor In Airstream Fraction
-      Air Loop Inlet Node,         !- Fan\_Inlet\_Node
-      DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
+    Fan:OnOff,
+      Supply Fan 1,                !- Fan Name
+      FanAndCoilAvailSched,        !- Availability Schedule Name
+      0.7,    !- Fan Total Efficiency
+      600.0,  !- Delta Pressure {Pa}
+      1.3,    !- Max Flow Rate {m3/s}
+      0.9,    !- Motor Efficiency
+      1.0,    !- Motor In Airstream Fraction
+      Air Loop Inlet Node,         !- Fan\_Inlet\_Node
+      DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone1DirectAir,        !- Direct Air Name
+      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
+      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
+     0.47;  !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-     0.36;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone2DirectAir,        !- Direct Air Name
+      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
+      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
+     0.36;  !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone3DirectAir,        !- Direct Air Name
+      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
+      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
+     0.47;  !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat/Cool Unitary System Specification
@@ -1185,16 +1185,16 @@ Example of Heat/Cool Unitary System Specification
 
 \begin{itemize}
 \item
-  HVAC,Average, Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Unitary System Fan Part Load Ratio {[]}
 \item
   HVAC,Average, Unitary System Compressor Part Load Ratio
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-2}
+\subsubsection{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-2}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
-\subsubsection{\texorpdfstring{Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-1}
+\subsubsection{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-1}
 
 This output variable is the ratio of the sensible cooling load to the steady-state cooling capacity of the unitary system's DX cooling coil. The runtime fraction for the DX cooling coil compressor may be different from the compressor part-load ratio reported here due the part-load performance of the cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
@@ -1344,122 +1344,122 @@ Note: the air-to-air heat pump's fan, cooling coil, heating coil and supplementa
 \begin{lstlisting}
 
 AirLoopHVAC:UnitaryHeatPump:AirToAir,
-        DXAC Heat Pump 1,            ! Heat Pump name
-        FanAndCoilAvailSched,        ! Heat Pump availability schedule
-        Mixed Air Node,              ! Heat Pump air inlet  node
-        Air Loop Outlet Node,        ! Heat Pump air outlet  node
-        1.3,                  !- Cooling Supply Air Flow Rate {m3/s}
-        1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-        0.0,                  !- No Load Suuply Air Flow Rate {m3/s}
-        East Zone,                   ! Controlling zone or thermostat location
-        Fan:OnOff,            ! Supply air fan type
-        Supply Fan 1,                ! Supply air fan name –- same name used in fan object
-        Coil:Heating:DX:SingleSpeed,    ! Heating coil type
-        Heat Pump DX Heating Coil 1, ! Heating coil name –- same name used in DX heating coil object
-        Coil:Cooling:DX:SingleSpeed, !  Cooling coil type
-        Heat Pump ACDXCoil 1,        ! Cooling coil name –- same name used in DX cooling coil object
-        Coil:Heating:Gas,            ! Supplemental heating coil type
-        Heat Pump DX Supp Heating Coil 1, ! Supplemental heating coil name–- same as in heating coil object
-        50,                          ! Maximum supply air temperature from supplemental heater [C]
-        21,                      ! Maximum outdoor dry-bulb temp for supplemental heating coil operation [C]
-        BlowThrough,                ! Fan  placement
-        CycFanSchedule,              ! Supply air fan operating mode schedule name
-        CoolReheat;                  !- Dehumidification Control Type
+        DXAC Heat Pump 1,            ! Heat Pump name
+        FanAndCoilAvailSched,        ! Heat Pump availability schedule
+        Mixed Air Node,              ! Heat Pump air inlet  node
+        Air Loop Outlet Node,        ! Heat Pump air outlet  node
+        1.3,                  !- Cooling Supply Air Flow Rate {m3/s}
+        1.3,                  !- Heating Supply Air Flow Rate {m3/s}
+        0.0,                  !- No Load Suuply Air Flow Rate {m3/s}
+        East Zone,                   ! Controlling zone or thermostat location
+        Fan:OnOff,            ! Supply air fan type
+        Supply Fan 1,                ! Supply air fan name –- same name used in fan object
+        Coil:Heating:DX:SingleSpeed,    ! Heating coil type
+        Heat Pump DX Heating Coil 1, ! Heating coil name –- same name used in DX heating coil object
+        Coil:Cooling:DX:SingleSpeed, !  Cooling coil type
+        Heat Pump ACDXCoil 1,        ! Cooling coil name –- same name used in DX cooling coil object
+        Coil:Heating:Gas,            ! Supplemental heating coil type
+        Heat Pump DX Supp Heating Coil 1, ! Supplemental heating coil name–- same as in heating coil object
+        50,                          ! Maximum supply air temperature from supplemental heater [C]
+        21,                      ! Maximum outdoor dry-bulb temp for supplemental heating coil operation [C]
+        BlowThrough,                ! Fan  placement
+        CycFanSchedule,              ! Supply air fan operating mode schedule name
+        CoolReheat;                  !- Dehumidification Control Type
 
-     Coil:Heating:DX:SingleSpeed,
-        Heat Pump DX Heating Coil 1,     ! Name of heating coil
-        FanAndCoilAvailSched,            ! Heating coil schedule
-        35000,                           ! Rated total heating capacity [W] (at 21.11C/8.33C)
-        2.75,                            ! Rated heating COP
-        1.7,                             ! Rated air flow rate [m3/s]
-        Heating Coil Air Inlet Node,     ! Coil air inlet node
-        SuppHeating Coil Air Inlet Node, ! Coil air outlet node
-        HPACHeatCapFT,                   ! Heating capacity modifier curve (temperature,C)
-        HPACHeatCapFFF,                  ! Heating capacity modifier curve (flow fraction)
-        HPACHeatEIRFT,                   ! Energy input ratio modifier curve (temperature,C)
-        HPACHeatEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
-        HPACCoolPLFFPLR,                 ! Part load fraction modifier curve (function of part-load ratio)
-        ,                         ! defrost EIR modifier curve (temp, C) not required for resistive defrost
-        CyclingFanAndCompressor,                   ! Operation mode (cycling fan, cycling compressor)
-        -5.0,                            ! Minimum OAT for heat pump compressor operation [C]
-        5.0,                             ! Maximum outdoor dry-bulb temp for defrost operation [C]
-        200.0,                           ! Crankcase heater capacity[W]
-        10.0,                            ! Maximum OAT for crankcase heater operation [C]
-        resistive,                       ! Defrost strategy (resistive or reverse-cycle)
-        timed,                           ! Defrost control (timed or on-demand)
-        0.166667,                        !Defrost time period fraction (used for timed defrost control only)
-        20000;                           ! Resistive defrost heater capacity [W]
+     Coil:Heating:DX:SingleSpeed,
+        Heat Pump DX Heating Coil 1,     ! Name of heating coil
+        FanAndCoilAvailSched,            ! Heating coil schedule
+        35000,                           ! Rated total heating capacity [W] (at 21.11C/8.33C)
+        2.75,                            ! Rated heating COP
+        1.7,                             ! Rated air flow rate [m3/s]
+        Heating Coil Air Inlet Node,     ! Coil air inlet node
+        SuppHeating Coil Air Inlet Node, ! Coil air outlet node
+        HPACHeatCapFT,                   ! Heating capacity modifier curve (temperature,C)
+        HPACHeatCapFFF,                  ! Heating capacity modifier curve (flow fraction)
+        HPACHeatEIRFT,                   ! Energy input ratio modifier curve (temperature,C)
+        HPACHeatEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
+        HPACCoolPLFFPLR,                 ! Part load fraction modifier curve (function of part-load ratio)
+        ,                         ! defrost EIR modifier curve (temp, C) not required for resistive defrost
+        CyclingFanAndCompressor,                   ! Operation mode (cycling fan, cycling compressor)
+        -5.0,                            ! Minimum OAT for heat pump compressor operation [C]
+        5.0,                             ! Maximum outdoor dry-bulb temp for defrost operation [C]
+        200.0,                           ! Crankcase heater capacity[W]
+        10.0,                            ! Maximum OAT for crankcase heater operation [C]
+        resistive,                       ! Defrost strategy (resistive or reverse-cycle)
+        timed,                           ! Defrost control (timed or on-demand)
+        0.166667,                        !Defrost time period fraction (used for timed defrost control only)
+        20000;                           ! Resistive defrost heater capacity [W]
 
-     Coil:Cooling:DX:SingleSpeed,
-        Heat Pump ACDXCoil 1,            ! Name of cooling coil
-        FanAndCoilAvailSched,            ! Availability schedule
-        32000,                           ! Rated total cooling capacity [W]
-        0.75,                            ! Rated sensible heat ratio
-        3.0,                             ! Rated COP
-        1.7,                             ! Rated air flow rate [m3/s]
-        DX Cooling Coil Air Inlet Node,  ! Coil air inlet node
-        Heating Coil Air Inlet Node,     ! Coil air outlet node
-        HPACCoolCapFT,                   ! Cooling capacity modifier curve (temperature,C)
-        HPACCoolCapFFF,                  ! Cooling capacity modifier curve (flow fraction)
-        HPACCoolEIRFT,                   ! Energy input ratio modifier curve (temperature,C)
-        HPACCoolEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
-        HPACCoolPLFFPLR,                 ! Part load factor modifier curve (function of part-load ratio)
-        CyclingFanAndCompressor;                   ! Operation mode (cycling fan, cycling compressor)
+     Coil:Cooling:DX:SingleSpeed,
+        Heat Pump ACDXCoil 1,            ! Name of cooling coil
+        FanAndCoilAvailSched,            ! Availability schedule
+        32000,                           ! Rated total cooling capacity [W]
+        0.75,                            ! Rated sensible heat ratio
+        3.0,                             ! Rated COP
+        1.7,                             ! Rated air flow rate [m3/s]
+        DX Cooling Coil Air Inlet Node,  ! Coil air inlet node
+        Heating Coil Air Inlet Node,     ! Coil air outlet node
+        HPACCoolCapFT,                   ! Cooling capacity modifier curve (temperature,C)
+        HPACCoolCapFFF,                  ! Cooling capacity modifier curve (flow fraction)
+        HPACCoolEIRFT,                   ! Energy input ratio modifier curve (temperature,C)
+        HPACCoolEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
+        HPACCoolPLFFPLR,                 ! Part load factor modifier curve (function of part-load ratio)
+        CyclingFanAndCompressor;                   ! Operation mode (cycling fan, cycling compressor)
 
-     Coil:Heating:Gas,
-        Heat Pump DX Supp Heating Coil 1, ! Name of heating coil
-        FanAndCoilAvailSched,             ! Availability schedule
-        0.8 ,                             ! Gas Burner Efficiency of the Coil
-        32000,                            ! Nominal Capacity of the Coil [W]
-        SuppHeating Coil Air Inlet Node,  ! Supplementary heating coil air side inlet node
-        Air Loop Outlet Node;             ! Supplementary heating coil air side outlet node
+     Coil:Heating:Gas,
+        Heat Pump DX Supp Heating Coil 1, ! Name of heating coil
+        FanAndCoilAvailSched,             ! Availability schedule
+        0.8 ,                             ! Gas Burner Efficiency of the Coil
+        32000,                            ! Nominal Capacity of the Coil [W]
+        SuppHeating Coil Air Inlet Node,  ! Supplementary heating coil air side inlet node
+        Air Loop Outlet Node;             ! Supplementary heating coil air side outlet node
 
-     Fan:OnOff,
-        Supply Fan 1,                    ! Fan Name
-        FanAndCoilAvailSched,            ! Fan Schedule
-        0.7,                             ! Fan Total Efficiency
-        300.0,                           ! Delta Pressure [N/M^2]
-        1.7,                             ! Max Vol Flow Rate  [m^3/Sec]
-        0.9,                             ! motor efficiency
-        1.0,                             ! motor in air stream fraction
-        Mixed Air Node,                  ! fan inlet node
-        DX Cooling Coil Air Inlet Node;  ! fan outlet node
+     Fan:OnOff,
+        Supply Fan 1,                    ! Fan Name
+        FanAndCoilAvailSched,            ! Fan Schedule
+        0.7,                             ! Fan Total Efficiency
+        300.0,                           ! Delta Pressure [N/M^2]
+        1.7,                             ! Max Vol Flow Rate  [m^3/Sec]
+        0.9,                             ! motor efficiency
+        1.0,                             ! motor in air stream fraction
+        Mixed Air Node,                  ! fan inlet node
+        DX Cooling Coil Air Inlet Node;  ! fan outlet node
 
-     AirTerminal:SingleDuct:Uncontrolled,
-        Zone1DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 1 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+     AirTerminal:SingleDuct:Uncontrolled,
+        Zone1DirectAir,                  ! direct air unit name
+       FanAndCoilAvailSched,            ! schedule name for on/off schedule
+        Zone 1 Inlet Node,               ! zone supply air node name
+       0.612;                           ! maximum air flow rate, m3/s
 
-     AirTerminal:SingleDuct:Uncontrolled,
-        Zone2DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 2 Inlet Node,               ! zone supply air node name
-       0.476;                           ! maximum air flow rate, m3/s
+     AirTerminal:SingleDuct:Uncontrolled,
+        Zone2DirectAir,                  ! direct air unit name
+       FanAndCoilAvailSched,            ! schedule name for on/off schedule
+        Zone 2 Inlet Node,               ! zone supply air node name
+       0.476;                           ! maximum air flow rate, m3/s
 
-     AirTerminal:SingleDuct:Uncontrolled,
-        Zone3DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 3 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+     AirTerminal:SingleDuct:Uncontrolled,
+        Zone3DirectAir,                  ! direct air unit name
+       FanAndCoilAvailSched,            ! schedule name for on/off schedule
+        Zone 3 Inlet Node,               ! zone supply air node name
+       0.612;                           ! maximum air flow rate, m3/s
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-024}
 
 \begin{itemize}
 \item
-  HVAC, Average, Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC, Average, Unitary System Fan Part Load Ratio {[]}
 \item
-  HVAC, Average, Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC, Average, Unitary System Compressor Part Load Ratio {[]}
 \item
   HVAC, Average, Unitary System Dehumidification Induced Heating Demand Rate {[}W{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-3}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-3}
 
 This output variable is the ratio of actual air mass flow rate through the heat pump to the heat pump's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the furnace is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state heat pump heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the heat pump fan may be different from the fan part-load ratio reported here due the part-load performance of the heat pump's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-2}
+\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-2}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the heat pump's DX heating or cooling coil. The runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due the part-load performance of the heating/cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
@@ -1680,211 +1680,211 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
   1.7;                     !- Cooling Speed 4 Supply Air Flow Rate
 
   Coil:Heating:DX:MultiSpeed,
-      Heat Pump DX Heating Coil 1,  !- Name of heat pump heating coil
-      FanAndCoilAvailSched,    !- Availability Schedule
-      Heating Coil Air Inlet Node,  !- Coil Air Inlet Node
-      SuppHeating Coil Air Inlet Node,  !- Coil Air Outlet Node
-      CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
-      -8.0,                    !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
-      200.0,                   !- Crankcase Heater Capacity {W}
-  10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
-                           !- Operation {C}
-      HPACDefrostCAPFT,        !- Defrost energy input ratio modifier curve (temperature)
-      7.22,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
-      reverse-cycle,           !- Defrost Strategy
-      timed,                   !- Defrost Control
-      0.058333,                !- Defrost Time Period Fraction
-      2000.0,                  !- Resistive Defrost Heater Capacity {W}
-      No,                      !- Apply Part Load Fraction to Speeds greater than 1
-      NaturalGas,              !- Fuel type
-      4,                       !- Number of speeds
-      7500,                    !- Rated Total Heating Capacity, Speed 1 {W}
-      2.75,                    !- Rated COP, Speed 1
-      0.45,                    !- Rated Air Volume Flow Rate, Speed 1 {m3/s}
-      HPACHeatCapFT Speed 1,   !- Total Heating Capacity Modifier Curve, Speed 1 (temperature)
-      HPACHeatCapFF Speed 1,   !- Total Heating capacity modifier curve, Speed 1 (flow fraction)
-      HPACHeatEIRFT Speed 1,   !- Energy input ratio modifier curve, Speed 1 (temperature)
-      HPACHeatEIRFF Speed 1,   !- Energy input ratio modifier curve, Speed 1 (flow fraction)
-      HPACHeatPLFFPLR Speed 1, !- Part load fraction correlation, Speed 1 (part load ratio)
-      0.2,                     !- Rated waste heat fraction of power input, Speed 1
-      HAPCHeatWHFT Speed 1,    !- Waste heat modifier curve, Speed 1 (temperature)
-      17500,                   !- Rated Total Heating Capacity, Speed 2 {W}
-      2.75,                    !- Rated COP, Speed 2
-      0.85,                    !- Rated Air Volume Flow Rate, Speed 2 {m3/s}
-      HPACHeatCapFT Speed 2,   !- Total Heating Capacity Modifier Curve, Speed 2 (temperature)
-      HPACHeatCapFF Speed 2,   !- Total Heating capacity modifier curve, Speed 2 (flow fraction)
-      HPACHeatEIRFT Speed 2,   !- Energy input ratio modifier curve, Speed 2 (temperature)
-      HPACHeatEIRFF Speed 2,   !- Energy input ratio modifier curve, Speed 2 (flow fraction)
-      HPACHeatPLFFPLR Speed 2, !- Part load fraction correlation, Speed 2 (part load ratio)
-      0.2,                     !- Rated waste heat fraction of power input, Speed 2
-      HAPCHeatWHFT Speed 2,    !- Waste heat modifier curve, Speed 2 (temperature)
-      25500,                   !- Rated Total Heating Capacity, Speed 3 {W}
-      2.75,                    !- Rated COP, Speed 3
-      1.25,                    !- Rated Air Volume Flow Rate, Speed 3 {m3/s}
-      HPACHeatCapFT Speed 3,   !- Total Heating Capacity Modifier Curve, Speed 3 (temperature)
-      HPACHeatCapFF Speed 3,   !- Total Heating capacity modifier curve, Speed 3 (flow fraction)
-      HPACHeatEIRFT Speed 3,   !- Energy input ratio modifier curve, Speed 3 (temperature)
-      HPACHeatEIRFF Speed 3,   !- Energy input ratio modifier curve, Speed 3 (flow fraction)
-      HPACHeatPLFFPLR Speed 3, !- Part load fraction correlation, Speed 3 (part load ratio)
-      0.2,                     !- Rated waste heat fraction of power input, Speed 3
-      HAPCHeatWHFT Speed 3,    !- Waste heat modifier curve, Speed 3 (temperature)
-      35500,                   !- Rated Total Heating Capacity, Speed 4 {W}
-      2.75,                    !- Rated COP, Speed 4
-      1.75,                    !- Rated Air Volume Flow Rate, Speed 4 {m3/s}
-      HPACHeatCapFT Speed 4,   !- Total Heating Capacity Modifier Curve, Speed 4 (temperature)
-      HPACHeatCapFF Speed 4,   !- Total Heating capacity modifier curve, Speed 4 (flow fraction)
-      HPACHeatEIRFT Speed 4,   !- Energy input ratio modifier curve, Speed 4 (temperature)
-      HPACHeatEIRFF Speed 4,   !- Energy input ratio modifier curve, Speed 4 (flow fraction)
-      HPACHeatPLFFPLR Speed 4, !- Part load fraction correlation, Speed 4 (part load ratio)
-      0.2,                     !- Rated waste heat fraction of power input, Speed 4
-      HAPCHeatWHFT Speed 4;    !- Waste heat modifier curve, Speed 4 (temperature)
+      Heat Pump DX Heating Coil 1,  !- Name of heat pump heating coil
+      FanAndCoilAvailSched,    !- Availability Schedule
+      Heating Coil Air Inlet Node,  !- Coil Air Inlet Node
+      SuppHeating Coil Air Inlet Node,  !- Coil Air Outlet Node
+      CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
+      -8.0,                    !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
+      200.0,                   !- Crankcase Heater Capacity {W}
+  10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
+                           !- Operation {C}
+      HPACDefrostCAPFT,        !- Defrost energy input ratio modifier curve (temperature)
+      7.22,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+      reverse-cycle,           !- Defrost Strategy
+      timed,                   !- Defrost Control
+      0.058333,                !- Defrost Time Period Fraction
+      2000.0,                  !- Resistive Defrost Heater Capacity {W}
+      No,                      !- Apply Part Load Fraction to Speeds greater than 1
+      NaturalGas,              !- Fuel type
+      4,                       !- Number of speeds
+      7500,                    !- Rated Total Heating Capacity, Speed 1 {W}
+      2.75,                    !- Rated COP, Speed 1
+      0.45,                    !- Rated Air Volume Flow Rate, Speed 1 {m3/s}
+      HPACHeatCapFT Speed 1,   !- Total Heating Capacity Modifier Curve, Speed 1 (temperature)
+      HPACHeatCapFF Speed 1,   !- Total Heating capacity modifier curve, Speed 1 (flow fraction)
+      HPACHeatEIRFT Speed 1,   !- Energy input ratio modifier curve, Speed 1 (temperature)
+      HPACHeatEIRFF Speed 1,   !- Energy input ratio modifier curve, Speed 1 (flow fraction)
+      HPACHeatPLFFPLR Speed 1, !- Part load fraction correlation, Speed 1 (part load ratio)
+      0.2,                     !- Rated waste heat fraction of power input, Speed 1
+      HAPCHeatWHFT Speed 1,    !- Waste heat modifier curve, Speed 1 (temperature)
+      17500,                   !- Rated Total Heating Capacity, Speed 2 {W}
+      2.75,                    !- Rated COP, Speed 2
+      0.85,                    !- Rated Air Volume Flow Rate, Speed 2 {m3/s}
+      HPACHeatCapFT Speed 2,   !- Total Heating Capacity Modifier Curve, Speed 2 (temperature)
+      HPACHeatCapFF Speed 2,   !- Total Heating capacity modifier curve, Speed 2 (flow fraction)
+      HPACHeatEIRFT Speed 2,   !- Energy input ratio modifier curve, Speed 2 (temperature)
+      HPACHeatEIRFF Speed 2,   !- Energy input ratio modifier curve, Speed 2 (flow fraction)
+      HPACHeatPLFFPLR Speed 2, !- Part load fraction correlation, Speed 2 (part load ratio)
+      0.2,                     !- Rated waste heat fraction of power input, Speed 2
+      HAPCHeatWHFT Speed 2,    !- Waste heat modifier curve, Speed 2 (temperature)
+      25500,                   !- Rated Total Heating Capacity, Speed 3 {W}
+      2.75,                    !- Rated COP, Speed 3
+      1.25,                    !- Rated Air Volume Flow Rate, Speed 3 {m3/s}
+      HPACHeatCapFT Speed 3,   !- Total Heating Capacity Modifier Curve, Speed 3 (temperature)
+      HPACHeatCapFF Speed 3,   !- Total Heating capacity modifier curve, Speed 3 (flow fraction)
+      HPACHeatEIRFT Speed 3,   !- Energy input ratio modifier curve, Speed 3 (temperature)
+      HPACHeatEIRFF Speed 3,   !- Energy input ratio modifier curve, Speed 3 (flow fraction)
+      HPACHeatPLFFPLR Speed 3, !- Part load fraction correlation, Speed 3 (part load ratio)
+      0.2,                     !- Rated waste heat fraction of power input, Speed 3
+      HAPCHeatWHFT Speed 3,    !- Waste heat modifier curve, Speed 3 (temperature)
+      35500,                   !- Rated Total Heating Capacity, Speed 4 {W}
+      2.75,                    !- Rated COP, Speed 4
+      1.75,                    !- Rated Air Volume Flow Rate, Speed 4 {m3/s}
+      HPACHeatCapFT Speed 4,   !- Total Heating Capacity Modifier Curve, Speed 4 (temperature)
+      HPACHeatCapFF Speed 4,   !- Total Heating capacity modifier curve, Speed 4 (flow fraction)
+      HPACHeatEIRFT Speed 4,   !- Energy input ratio modifier curve, Speed 4 (temperature)
+      HPACHeatEIRFF Speed 4,   !- Energy input ratio modifier curve, Speed 4 (flow fraction)
+      HPACHeatPLFFPLR Speed 4, !- Part load fraction correlation, Speed 4 (part load ratio)
+      0.2,                     !- Rated waste heat fraction of power input, Speed 4
+      HAPCHeatWHFT Speed 4;    !- Waste heat modifier curve, Speed 4 (temperature)
 
 
-    COIL:Cooling:DX:MultiSpeed,
-      Heat Pump ACDXCoil 1,    !- Coil Name
-      FanAndCoilAvailSched,    !- Availability Schedule
-      DX Cooling Coil Air Inlet Node,  !- Coil Air Inlet Node
-      Heating Coil Air Inlet Node,  !- Coil Air Outlet Node
-      CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
-      Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name
-      AirCooled,              !- Condenser Type
-      ,                        !- Name of Water Storage Tank for Supply
-      ,                        !- Name of Water Storage Tank for Condensate Collection
-      No,                      !- Apply Part Load Fraction to Speeds greater than 1
-      No,                      !- Apply Latent Degradation to Speeds greater than 1
-      200.0,                   !- Crankcase Heater Capacity {W}
-  10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
-                           !- Operation {C}
-      NaturalGas,              !- Fuel type
-      4,                       !- Number of speeds
-      7500,                    !- Rated Total Cooling Capacity, Speed 1 (gross) {W}
-      0.75,                    !- Rated SHR, Speed 1
-      3.0,                     !- Rated COP, Speed 1
-      0.40,                    !- Rated Air Volume Flow Rate, Speed 1 {m3/s}
-      HPACCoolCapFT Speed 1,   !- Total Cooling Capacity Modifier Curve, Speed 1 (temperature)
-      HPACCoolCapFF Speed 1,   !- Total Cooling Capacity Modifier Curve, Speed 1 (flow fraction)
-      HPACCOOLEIRFT Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (temperature)
-      HPACCOOLEIRFF Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (flow fraction)
-      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 1 (part load ratio)
-      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 1 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 1 {dimensionless}
-      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 1 {cycles/hr}
-      45.0,                    !- Latent Capacity Time Constant, Speed 1 {s}
-      0.2,                     !- Rated waste heat fraction of power input, Speed 1 {dimensionless}
-      HAPCCoolWHFT Speed 1,    !- Waste heat modifier curve, Speed 1 (temperature)
-      0.9,                     !- Evaporative Condenser Effectiveness, Speed 1 {dimensionless}
-      0.05,                    !- Evaporative Condenser Air Volume Flow Rate, Speed 1 {m3/s}
-      50,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 1 {W}
-      17500,                   !- Rated Total Cooling Capacity, Speed 2 (gross) {W}
-      0.75,                    !- Rated SHR, Speed 2
-      3.0,                     !- Rated COP, Speed 2
-      0.85,                    !- Rated Air Volume Flow Rate, Speed 2 {m3/s}
-      HPACCoolCapFT Speed 2,   !- Total Cooling Capacity Modifier Curve, Speed 2 (temperature)
-      HPACCoolCapFF Speed 2,   !- Total Cooling Capacity Modifier Curve, Speed 2 (flow fraction)
-      HPACCOOLEIRFT Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (temperature)
-      HPACCOOLEIRFF Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (flow fraction)
-      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 2 (part load ratio)
-      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 2 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 2 {dimensionless}
-      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 2 {cycles/hr}
-      45.0,                    !- Latent Capacity Time Constant, Speed 2 {s}
-      0.2,                     !- Rated waste heat fraction of power input, Speed 2 {dimensionless}
-      HAPCCoolWHFT Speed 2,    !- Waste heat modifier curve, Speed 2 (temperature)
-      0.9,                     !- Evaporative Condenser Effectiveness, Speed 2 {dimensionless}
-      0.1,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 2 {m3/s}
-      60,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 2 {W}
-      25500,                   !- Rated Total Cooling Capacity, Speed 3 (gross) {W}
-      0.75,                    !- Rated SHR, Speed 3
-      3.0,                     !- Rated COP, Speed 3
-      1.25,                    !- Rated Air Volume Flow Rate, Speed 3 {m3/s}
-      HPACCoolCapFT Speed 3,   !- Total Cooling Capacity Modifier Curve, Speed 3 (temperature)
-      HPACCoolCapFF Speed 3,   !- Total Cooling Capacity Modifier Curve, Speed 3 (flow fraction)
-      HPACCOOLEIRFT Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (temperature)
-      HPACCOOLEIRFF Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (flow fraction)
-      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 3 (part load ratio)
-      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 3 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 3 {dimensionless}
-      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 3 {cycles/hr}
-      45.0,                    !- Latent Capacity Time Constant, Speed 3 {s}
-      0.2,                     !- Rated waste heat fraction of power input, Speed 3 {dimensionless}
-      HAPCCoolWHFT Speed 3,    !- Waste heat modifier curve, Speed 3 (temperature)
-      0.9,                     !- Evaporative Condenser Effectiveness, Speed 3 {dimensionless}
-      0.2,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 3 {m3/s}
-      80,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 3 {W}
-      35500,                   !- Rated Total Cooling Capacity, Speed 4 (gross) {W}
-      0.75,                    !- Rated SHR, Speed 4
-      3.0,                     !- Rated COP, Speed 4
-      1.75,                    !- Rated Air Volume Flow Rate, Speed 4 {m3/s}
-      HPACCoolCapFT Speed 4,   !- Total Cooling Capacity Modifier Curve, Speed 4 (temperature)
-      HPACCoolCapFF Speed 4,   !- Total Cooling Capacity Modifier Curve, Speed 4 (flow fraction)
-      HPACCOOLEIRFT Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (temperature)
-      HPACCOOLEIRFF Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (flow fraction)
-      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 4 (part load ratio)
-      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 4 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 4 {dimensionless}
-      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 4 {cycles/hr}
-      45.0,                    !- Latent Capacity Time Constant, Speed 4 {s}
-      0.2,                     !- Rated waste heat fraction of power input, Speed 4 {dimensionless}
-      HAPCCoolWHFT Speed 4,    !- Waste heat modifier curve, Speed 4 (temperature)
-      0.9,                     !- Evaporative Condenser Effectiveness, Speed 4 {dimensionless}
-      0.3,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 4 {m3/s}
-      100;                     !- Evaporative Condenser Pump Rated Power Consumption, Speed 4 {W}
+    COIL:Cooling:DX:MultiSpeed,
+      Heat Pump ACDXCoil 1,    !- Coil Name
+      FanAndCoilAvailSched,    !- Availability Schedule
+      DX Cooling Coil Air Inlet Node,  !- Coil Air Inlet Node
+      Heating Coil Air Inlet Node,  !- Coil Air Outlet Node
+      CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
+      Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name
+      AirCooled,              !- Condenser Type
+      ,                        !- Name of Water Storage Tank for Supply
+      ,                        !- Name of Water Storage Tank for Condensate Collection
+      No,                      !- Apply Part Load Fraction to Speeds greater than 1
+      No,                      !- Apply Latent Degradation to Speeds greater than 1
+      200.0,                   !- Crankcase Heater Capacity {W}
+  10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
+                           !- Operation {C}
+      NaturalGas,              !- Fuel type
+      4,                       !- Number of speeds
+      7500,                    !- Rated Total Cooling Capacity, Speed 1 (gross) {W}
+      0.75,                    !- Rated SHR, Speed 1
+      3.0,                     !- Rated COP, Speed 1
+      0.40,                    !- Rated Air Volume Flow Rate, Speed 1 {m3/s}
+      HPACCoolCapFT Speed 1,   !- Total Cooling Capacity Modifier Curve, Speed 1 (temperature)
+      HPACCoolCapFF Speed 1,   !- Total Cooling Capacity Modifier Curve, Speed 1 (flow fraction)
+      HPACCOOLEIRFT Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (temperature)
+      HPACCOOLEIRFF Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (flow fraction)
+      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 1 (part load ratio)
+      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 1 {s}
+  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
+                           !- Capacity, Speed 1 {dimensionless}
+      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 1 {cycles/hr}
+      45.0,                    !- Latent Capacity Time Constant, Speed 1 {s}
+      0.2,                     !- Rated waste heat fraction of power input, Speed 1 {dimensionless}
+      HAPCCoolWHFT Speed 1,    !- Waste heat modifier curve, Speed 1 (temperature)
+      0.9,                     !- Evaporative Condenser Effectiveness, Speed 1 {dimensionless}
+      0.05,                    !- Evaporative Condenser Air Volume Flow Rate, Speed 1 {m3/s}
+      50,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 1 {W}
+      17500,                   !- Rated Total Cooling Capacity, Speed 2 (gross) {W}
+      0.75,                    !- Rated SHR, Speed 2
+      3.0,                     !- Rated COP, Speed 2
+      0.85,                    !- Rated Air Volume Flow Rate, Speed 2 {m3/s}
+      HPACCoolCapFT Speed 2,   !- Total Cooling Capacity Modifier Curve, Speed 2 (temperature)
+      HPACCoolCapFF Speed 2,   !- Total Cooling Capacity Modifier Curve, Speed 2 (flow fraction)
+      HPACCOOLEIRFT Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (temperature)
+      HPACCOOLEIRFF Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (flow fraction)
+      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 2 (part load ratio)
+      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 2 {s}
+  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
+                           !- Capacity, Speed 2 {dimensionless}
+      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 2 {cycles/hr}
+      45.0,                    !- Latent Capacity Time Constant, Speed 2 {s}
+      0.2,                     !- Rated waste heat fraction of power input, Speed 2 {dimensionless}
+      HAPCCoolWHFT Speed 2,    !- Waste heat modifier curve, Speed 2 (temperature)
+      0.9,                     !- Evaporative Condenser Effectiveness, Speed 2 {dimensionless}
+      0.1,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 2 {m3/s}
+      60,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 2 {W}
+      25500,                   !- Rated Total Cooling Capacity, Speed 3 (gross) {W}
+      0.75,                    !- Rated SHR, Speed 3
+      3.0,                     !- Rated COP, Speed 3
+      1.25,                    !- Rated Air Volume Flow Rate, Speed 3 {m3/s}
+      HPACCoolCapFT Speed 3,   !- Total Cooling Capacity Modifier Curve, Speed 3 (temperature)
+      HPACCoolCapFF Speed 3,   !- Total Cooling Capacity Modifier Curve, Speed 3 (flow fraction)
+      HPACCOOLEIRFT Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (temperature)
+      HPACCOOLEIRFF Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (flow fraction)
+      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 3 (part load ratio)
+      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 3 {s}
+  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
+                           !- Capacity, Speed 3 {dimensionless}
+      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 3 {cycles/hr}
+      45.0,                    !- Latent Capacity Time Constant, Speed 3 {s}
+      0.2,                     !- Rated waste heat fraction of power input, Speed 3 {dimensionless}
+      HAPCCoolWHFT Speed 3,    !- Waste heat modifier curve, Speed 3 (temperature)
+      0.9,                     !- Evaporative Condenser Effectiveness, Speed 3 {dimensionless}
+      0.2,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 3 {m3/s}
+      80,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 3 {W}
+      35500,                   !- Rated Total Cooling Capacity, Speed 4 (gross) {W}
+      0.75,                    !- Rated SHR, Speed 4
+      3.0,                     !- Rated COP, Speed 4
+      1.75,                    !- Rated Air Volume Flow Rate, Speed 4 {m3/s}
+      HPACCoolCapFT Speed 4,   !- Total Cooling Capacity Modifier Curve, Speed 4 (temperature)
+      HPACCoolCapFF Speed 4,   !- Total Cooling Capacity Modifier Curve, Speed 4 (flow fraction)
+      HPACCOOLEIRFT Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (temperature)
+      HPACCOOLEIRFF Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (flow fraction)
+      HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 4 (part load ratio)
+      1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 4 {s}
+  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
+                           !- Capacity, Speed 4 {dimensionless}
+      3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 4 {cycles/hr}
+      45.0,                    !- Latent Capacity Time Constant, Speed 4 {s}
+      0.2,                     !- Rated waste heat fraction of power input, Speed 4 {dimensionless}
+      HAPCCoolWHFT Speed 4,    !- Waste heat modifier curve, Speed 4 (temperature)
+      0.9,                     !- Evaporative Condenser Effectiveness, Speed 4 {dimensionless}
+      0.3,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 4 {m3/s}
+      100;                     !- Evaporative Condenser Pump Rated Power Consumption, Speed 4 {W}
 
   Coil:Heating:Gas,
-      Supp Gas Heating Coil 1,  !- Coil Name
-      FanAndCoilAvailSched,    !- Availability Schedule Name
-      0.8,                     !- Gas Burner Efficiency of the Coil
-      45000,                   !- Nominal Capacity of the Coil {W}
-      SuppHeating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
-      Air Loop Outlet Node;    !- Coil\_Air\_Outlet\_Node
+      Supp Gas Heating Coil 1,  !- Coil Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
+      0.8,                     !- Gas Burner Efficiency of the Coil
+      45000,                   !- Nominal Capacity of the Coil {W}
+      SuppHeating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
+      Air Loop Outlet Node;    !- Coil\_Air\_Outlet\_Node
 
   Fan:OnOff,
-      Supply Fan 1,            !- Fan Name
-      FanAndCoilAvailSched,    !- Availability Schedule Name
-      0.7,                     !- Fan Total Efficiency
-      300.0,                   !- Delta Pressure {Pa}
-      1.7,                     !- Max Flow Rate {m3/s}
-      0.9,                     !- Motor Efficiency
-      1.0,                     !- Motor In Airstream Fraction
-      Mixed Air Node,          !- Fan\_Inlet\_Node
-      DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
+      Supply Fan 1,            !- Fan Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
+      0.7,                     !- Fan Total Efficiency
+      300.0,                   !- Delta Pressure {Pa}
+      1.7,                     !- Max Flow Rate {m3/s}
+      0.9,                     !- Motor Efficiency
+      1.0,                     !- Motor In Airstream Fraction
+      Mixed Air Node,          !- Fan\_Inlet\_Node
+      DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
   AirTerminal:SingleDuct:Uncontrolled,
-        Zone1DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 1 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+        Zone1DirectAir,                  ! direct air unit name
+       FanAndCoilAvailSched,            ! schedule name for on/off schedule
+        Zone 1 Inlet Node,               ! zone supply air node name
+       0.612;                           ! maximum air flow rate, m3/s
 
   AirTerminal:SingleDuct:Uncontrolled,
-        Zone2DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 2 Inlet Node,               ! zone supply air node name
-       0.476;                           ! maximum air flow rate, m3/s
+        Zone2DirectAir,                  ! direct air unit name
+       FanAndCoilAvailSched,            ! schedule name for on/off schedule
+        Zone 2 Inlet Node,               ! zone supply air node name
+       0.476;                           ! maximum air flow rate, m3/s
 
   AirTerminal:SingleDuct:Uncontrolled,
-        Zone3DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 3 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+        Zone3DirectAir,                  ! direct air unit name
+       FanAndCoilAvailSched,            ! schedule name for on/off schedule
+        Zone 3 Inlet Node,               ! zone supply air node name
+       0.612;                           ! maximum air flow rate, m3/s
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-021}
 
 \begin{itemize}
 \item
-  HVAC,Average,Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \item
-  HVAC,Average,Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Compressor Part Load Ratio {[]}
 \item
-  HVAC,Average,Unitary System DX Coil Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System DX Coil Cycling Ratio {[]}
 \item
-  HVAC,Average,Unitary System DX Coil Speed Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System DX Coil Speed Ratio {[]}
 \item
-  HVAC,Average,Unitary System DX Coil Speed Level \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System DX Coil Speed Level {[]}
 \item
   HVAC,Average,Unitary System Electric Power{[}W{]}
 \item
@@ -1924,21 +1924,21 @@ If heat recovery is specified:
   HVAC,Sum, Unitary System Heat Recovery Energy {[}J{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-4}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-4}
 
 This output variable is the ratio of actual air mass flow rate through the multispeed heat pump to the heat pump's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate) at Speed 1. For continuous fan operation mode, this variable is always 1.0 when the heat pump is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state heat pump heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the heat pump fan may be different from the fan part-load ratio reported here due the part-load performance of the heat pump's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff). When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-3}
+\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-3}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump's DX heating or cooling coil at Speed 1. The runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due the part-load performance of the heating/cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate. When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Cycling Ratio \protect\hyperlink{section-1}{}}{Unitary System DX Coil Cycling Ratio }}\label{unitary-system-dx-coil-cycling-ratio-1}
+\paragraph{\texorpdfstring{Unitary System DX Coil Cycling Ratio {[]}}{Unitary System DX Coil Cycling Ratio }}\label{unitary-system-dx-coil-cycling-ratio-1}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump's DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the multispeed heat pump operates at speeds above 1.
 
 When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Ratio \protect\hyperlink{section-1}{}}{Unitary System DX Coil Speed Ratio }}\label{unitary-system-dx-coil-speed-ratio-1}
+\paragraph{\texorpdfstring{Unitary System DX Coil Speed Ratio {[]}}{Unitary System DX Coil Speed Ratio }}\label{unitary-system-dx-coil-speed-ratio-1}
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( {[}Compressor Speed - Compressor speed at Speed i-1{]} / {[}Compressor speed at Speed i - Compressor speed at Speed i-1{]}). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
@@ -1946,7 +1946,7 @@ The physical meaning of the speed ratio is dependent on the compressor configura
 
 When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1, and 1 at Speed \textgreater{} 1
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Level \protect\hyperlink{section-1}{}}{Unitary System DX Coil Speed Level }}\label{unitary-system-dx-coil-speed-level-1}
+\paragraph{\texorpdfstring{Unitary System DX Coil Speed Level {[]}}{Unitary System DX Coil Speed Level }}\label{unitary-system-dx-coil-speed-level-1}
 
 This output variable reports the maximum speed needed when the heat pump operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the heat pump operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the heat pump operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the heat pump operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a single compressor. For multiple compressors, the heat pump operates at Speed 3 in the 40\% of a system timestep and at Speed 2 in the whole system timestep.
 
@@ -2098,75 +2098,75 @@ Note: the furnace's fan and heating coil must be connected in the air loop accor
 \begin{lstlisting}
 
 AirLoopHVAC:Unitary:Furnace:HeatOnly,
-      Gas Furnace 1,        !- Name
-      FanAndCoilAvailSched, !- Availability Schedule Name
-      Air Loop Inlet Node,  !- Furnace Air Inlet Node Name
-      Air Loop Outlet Node, !- Furnace Air Outlet Node Name
-      CycFanSchedule,       !- Supply Air Fan Operating Mode Schedule Name
-      80,                   !- Maximum Supply Air Temperature {C}
-      1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-      East Zone,            !- Controlling Zone or Thermostat Location
-      Fan:OnOff,            !- Supply Fan Object Type
-      Supply Fan 1,         !- Supply Fan Fame
-      BlowThrough,          !- Fan Placement
-      Coil:Heating:Gas,     !- Heating Coil Object Type
-      Furnace Coil;         !- Heating Coil Name
+      Gas Furnace 1,        !- Name
+      FanAndCoilAvailSched, !- Availability Schedule Name
+      Air Loop Inlet Node,  !- Furnace Air Inlet Node Name
+      Air Loop Outlet Node, !- Furnace Air Outlet Node Name
+      CycFanSchedule,       !- Supply Air Fan Operating Mode Schedule Name
+      80,                   !- Maximum Supply Air Temperature {C}
+      1.3,                  !- Heating Supply Air Flow Rate {m3/s}
+      East Zone,            !- Controlling Zone or Thermostat Location
+      Fan:OnOff,            !- Supply Fan Object Type
+      Supply Fan 1,         !- Supply Fan Fame
+      BlowThrough,          !- Fan Placement
+      Coil:Heating:Gas,     !- Heating Coil Object Type
+      Furnace Coil;         !- Heating Coil Name
 
 
-    Coil:Heating:Gas,
-      Furnace Coil,          !- Coil Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      0.8,                   !- Gas Burner Efficiency of the Coil
-      20000,                 !- Nominal Capacity of the Coil {W}
-      Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
-      Air Loop Outlet Node,         !- Coil_Air_Outlet_Node
-      ,                      !- Coil_Temp_Setpoint_Node
-      100,                   !- Parasitic Electric Load {W}
-      PLFCurveforGasFurnace, !- Part load fraction correlation (function of part load ratio)
-      10;                    !- Parasitic Gas Load {W}
+    Coil:Heating:Gas,
+      Furnace Coil,          !- Coil Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+      0.8,                   !- Gas Burner Efficiency of the Coil
+      20000,                 !- Nominal Capacity of the Coil {W}
+      Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
+      Air Loop Outlet Node,         !- Coil_Air_Outlet_Node
+      ,                      !- Coil_Temp_Setpoint_Node
+      100,                   !- Parasitic Electric Load {W}
+      PLFCurveforGasFurnace, !- Part load fraction correlation (function of part load ratio)
+      10;                    !- Parasitic Gas Load {W}
 
 
   Curve:Cubic,
-      PLFCurveforGasFurnace, !- Name
-      0.8,  !- Coefficient1 Constant
-      0.2,  !- Coefficient2 x
-      0.0,  !- Coefficient3 x**2
-      0.0,  !- Coefficient4 x**3
-      0,  !- Minimum Value of x
-      1;  !- Maximum Value of x
+      PLFCurveforGasFurnace, !- Name
+      0.8,  !- Coefficient1 Constant
+      0.2,  !- Coefficient2 x
+      0.0,  !- Coefficient3 x**2
+      0.0,  !- Coefficient4 x**3
+      0,  !- Minimum Value of x
+      1;  !- Maximum Value of x
 
 
-    Fan:OnOff,
-      Supply Fan 1,          !- Fan Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      0.7,    !- Fan Total Efficiency
-      600.0,  !- Delta Pressure {Pa}
-      1.3,    !- Max Flow Rate {m3/s}
-      0.9,    !- Motor Efficiency
-      1.0,    !- Motor In Airstream Fraction
-      Air Loop Inlet Node,          !- Fan_Inlet_Node
-      Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
+    Fan:OnOff,
+      Supply Fan 1,          !- Fan Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+      0.7,    !- Fan Total Efficiency
+      600.0,  !- Delta Pressure {Pa}
+      1.3,    !- Max Flow Rate {m3/s}
+      0.9,    !- Motor Efficiency
+      1.0,    !- Motor In Airstream Fraction
+      Air Loop Inlet Node,          !- Fan_Inlet_Node
+      Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,       !-Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone1DirectAir,       !-Direct Air Name
+      FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      Zone 1 Inlet Node,    !- Zone Supply Air Node Name
+     0.47;   !- Maximum air flow rate {m3/s}
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-     0.36;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone2DirectAir,       !- Direct Air Name
+     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      Zone 2 Inlet Node,    !- Zone Supply Air Node Name
+     0.36;   !- Maximum air flow rate {m3/s}
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone3DirectAir,       !- Direct Air Name
+     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      Zone 3 Inlet Node,    !- Zone Supply Air Node Name
+     0.47;   !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat-Only Furnace Specification
@@ -2176,10 +2176,10 @@ Example of Heat-Only Furnace Specification
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-5}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-5}
 
 This output variable is the ratio of actual air mass flow rate through the furnace to the furnace's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the furnace is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating load to the furnace heating capacity. For the cycling fan mode, the runtime fraction for the furnace fan may be different from the fan part-load ratio reported here due the part-load performance of the furnace's heating coil (delay at start-up to reach steady-state heating output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
@@ -2273,75 +2273,75 @@ Note: the unitary system's fan and heating coil must be connected in the air loo
 \begin{lstlisting}
 
 AirLoopHVAC:UnitaryHeatOnly,
-      Gas Unitary System 1, !- Name
-      FanAndCoilAvailSched, !- Availability Schedule Name
-      Air Loop Inlet Node,  !- Unitary System Air Inlet Node Name
-      Air Loop Outlet Node, !- Unitary System Air Outlet Node Name
-      CycFanSchedule,       !- Supply Air Fan Operating Mode Schedule Name
-      80,                   !- Maximum Supply Air Temperature {C}
-      1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-      East Zone,            !- Controlling Zone or Thermostat Location
-      Fan:OnOff,            !- Supply Fan Object Type
-      Supply Fan 1,         !- Supply Fan Name
-      BlowThrough,          !- Fan Placement
-      Coil:Heating:Gas,     !- Heating Coil Object Type
-      Unitary System Heating Coil; !- Heating Coil Name
+      Gas Unitary System 1, !- Name
+      FanAndCoilAvailSched, !- Availability Schedule Name
+      Air Loop Inlet Node,  !- Unitary System Air Inlet Node Name
+      Air Loop Outlet Node, !- Unitary System Air Outlet Node Name
+      CycFanSchedule,       !- Supply Air Fan Operating Mode Schedule Name
+      80,                   !- Maximum Supply Air Temperature {C}
+      1.3,                  !- Heating Supply Air Flow Rate {m3/s}
+      East Zone,            !- Controlling Zone or Thermostat Location
+      Fan:OnOff,            !- Supply Fan Object Type
+      Supply Fan 1,         !- Supply Fan Name
+      BlowThrough,          !- Fan Placement
+      Coil:Heating:Gas,     !- Heating Coil Object Type
+      Unitary System Heating Coil; !- Heating Coil Name
 
 
-    Coil:Heating:Gas,
-      Unitary System Heating Coil, !- Coil Name
-      FanAndCoilAvailSched,        !- Availability Schedule Name
-      0.8,                         !- Gas Burner Efficiency of the Coil
-      20000,                       !- Nominal Capacity of the Coil {W}
-      Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
-      Air Loop Outlet Node,        !- Coil_Air_Outlet_Node
-      ,                            !- Coil_Temp_Setpoint_Node
-      100,                         !- Parasitic Electric Load {W}
-      PLFCurveforUnitarySystem,    !- Part load fraction correlation (function of part load ratio)
-      10;                          !- Parasitic Gas Load {W}
+    Coil:Heating:Gas,
+      Unitary System Heating Coil, !- Coil Name
+      FanAndCoilAvailSched,        !- Availability Schedule Name
+      0.8,                         !- Gas Burner Efficiency of the Coil
+      20000,                       !- Nominal Capacity of the Coil {W}
+      Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
+      Air Loop Outlet Node,        !- Coil_Air_Outlet_Node
+      ,                            !- Coil_Temp_Setpoint_Node
+      100,                         !- Parasitic Electric Load {W}
+      PLFCurveforUnitarySystem,    !- Part load fraction correlation (function of part load ratio)
+      10;                          !- Parasitic Gas Load {W}
 
 
   Curve:Cubic,
-      PLFCurveforUnitarySystem,  !- Name
-      0.8,  !- Coefficient1 Constant
-      0.2,  !- Coefficient2 x
-      0.0,  !- Coefficient3 x**2
-      0.0,  !- Coefficient4 x**3
-      0,  !- Minimum Value of x
-      1;  !- Maximum Value of x
+      PLFCurveforUnitarySystem,  !- Name
+      0.8,  !- Coefficient1 Constant
+      0.2,  !- Coefficient2 x
+      0.0,  !- Coefficient3 x**2
+      0.0,  !- Coefficient4 x**3
+      0,  !- Minimum Value of x
+      1;  !- Maximum Value of x
 
 
   Fan:OnOff,
-      Supply Fan 1,          !- Fan Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      0.7,    !- Fan Total Efficiency
-      600.0,  !- Delta Pressure {Pa}
-      1.3,    !- Max Flow Rate {m3/s}
-      0.9,    !- Motor Efficiency
-      1.0,    !- Motor In Airstream Fraction
-      Air Loop Inlet Node,          !- Fan_Inlet_Node
-      Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
+      Supply Fan 1,          !- Fan Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+      0.7,    !- Fan Total Efficiency
+      600.0,  !- Delta Pressure {Pa}
+      1.3,    !- Max Flow Rate {m3/s}
+      0.9,    !- Motor Efficiency
+      1.0,    !- Motor In Airstream Fraction
+      Air Loop Inlet Node,          !- Fan_Inlet_Node
+      Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,       !-Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone1DirectAir,       !-Direct Air Name
+      FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      Zone 1 Inlet Node,    !- Zone Supply Air Node Name
+     0.47;   !- Maximum air flow rate {m3/s}
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-     0.36;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone2DirectAir,       !- Direct Air Name
+     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      Zone 2 Inlet Node,    !- Zone Supply Air Node Name
+     0.36;   !- Maximum air flow rate {m3/s}
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone3DirectAir,       !- Direct Air Name
+     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      Zone 3 Inlet Node,    !- Zone Supply Air Node Name
+     0.47;   !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat-Only Unitary System Specification
@@ -2351,10 +2351,10 @@ Example of Heat-Only Unitary System Specification
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-6}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-6}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating load to the unitary system heating capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the unitary system's heating coil (delay at start-up to reach steady-state heating output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
@@ -2469,7 +2469,7 @@ This numeric field contains the maximum on-off cycling rate for the compressor, 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image305.svg}
+\includegraphics{media/image305.png}
 \caption{}
 \end{figure}
 
@@ -2479,7 +2479,7 @@ This numeric field contains the time constant for the cooling coil's capacity to
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image306.svg}
+\includegraphics{media/image306.png}
 \caption{}
 \end{figure}
 
@@ -2489,7 +2489,7 @@ This numeric field contains the fraction of on-cycle power use to adjust the par
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image307.svg}
+\includegraphics{media/image307.png}
 \caption{}
 \end{figure}
 
@@ -2589,162 +2589,162 @@ Following is an example of IDF usage:
 \begin{lstlisting}
 
 AirLoopHVAC:UnitaryHeatPump:WaterToAir,
-      DXAC Heat Pump 1,        !- Name
-      FanAndCoilAvailSched,    !- Availability Schedule Name
-      Mixed Air Node,          !- Air Inlet Node Name
-      Air Loop Outlet Node,    !- Air Outlet Node Name
-      2,                       !- Supply Air Flow Fate {m3/s}
-      East Zone,               !- Controlling Zone or Thermostat Location
-      Fan:OnOff,        !- Supply Air Fan Object Type
-      Supply Fan 1,            !- Supply Air Fan Name
-      Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Heating Coil Object Type
-      Heat Pump Heating Mode,  !- Heating Coil Name
-      0.001,                   !- Heating Convergence
-      Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
-      Heat Pump Cooling Mode,  !- Cooling Coil Name
-      0.001,                   !- Cooling Convergence
-      2.5, !- Maximum Cycling Rate {cycles/hr}
-      60, !- Heat Pump Time Constant {s}
-      0.01, !- Fraction of On-Cycle Power Use
-      60,    !- Heat Pump Fan Delay Time {s}
-      Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-      Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
-      50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
-      21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-      Outside Air Inlet Node, !- Outdoor Dry-Bulb Temperature Sensor Node Name
-      BlowThrough,             !- Fan Placement
-      CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
-      CoolReheat;              !- Dehumidification Control Type
+      DXAC Heat Pump 1,        !- Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
+      Mixed Air Node,          !- Air Inlet Node Name
+      Air Loop Outlet Node,    !- Air Outlet Node Name
+      2,                       !- Supply Air Flow Fate {m3/s}
+      East Zone,               !- Controlling Zone or Thermostat Location
+      Fan:OnOff,        !- Supply Air Fan Object Type
+      Supply Fan 1,            !- Supply Air Fan Name
+      Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Heating Coil Object Type
+      Heat Pump Heating Mode,  !- Heating Coil Name
+      0.001,                   !- Heating Convergence
+      Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
+      Heat Pump Cooling Mode,  !- Cooling Coil Name
+      0.001,                   !- Cooling Convergence
+      2.5, !- Maximum Cycling Rate {cycles/hr}
+      60, !- Heat Pump Time Constant {s}
+      0.01, !- Fraction of On-Cycle Power Use
+      60,    !- Heat Pump Fan Delay Time {s}
+      Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+      Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
+      50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
+      21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+      Outside Air Inlet Node, !- Outdoor Dry-Bulb Temperature Sensor Node Name
+      BlowThrough,             !- Fan Placement
+      CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
+      CoolReheat;              !- Dehumidification Control Type
 
 
   Schedule:Compact,
-      CyclingFanSch,           !- Name
-      Fraction,                !- Schedule Type Limits Name
-      Through: 12/31,          !- Field 1
-      For: AllDays,            !- Field 2
-      Until: 24:00,            !- Field 3
-      0.0;                     !- Field 4
+      CyclingFanSch,           !- Name
+      Fraction,                !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: AllDays,            !- Field 2
+      Until: 24:00,            !- Field 3
+      0.0;                     !- Field 4
 
 
 
 
-    Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
-      Heat Pump Cooling Mode,  !- Name
-      Scroll,                !- Compressor Type
-      R22,                   !- Refrigerant Type
-      0.0015,                  !- Design Source Side Flow Rate {m3/s}
-      38000,  !- Nominal Cooling Coil Capacity {W)
-      0,            !- Nominal Time for Condensate Removal to Begin {s}
-      0,      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-      3000000,                 !- High Pressure CutOff {Pa}
-      0,                       !- Low Pressure CutOff {Pa}
-      Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
-      Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
-      Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
-      Heating Coil Air Inlet Node,  !- Air Outlet Node Name
-      3.78019E+03,!-Parameter 1 {W/K}
-      2.80303E+03,!- Parameter 2 {W/K}
-     7.93591E-01,!- Parameter 3 {C}
-      1.91029E+03,!- Parameter 4 {W}
-      2.66127E+00,!- Parameter 5
-      1.06009E-02,!- Parameter 6
-      1.65103E+00,!- Parameter 7
-      9.73887E-03,!- Parameter 8
-      1.04563E+03;!- Parameter 9
+    Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
+      Heat Pump Cooling Mode,  !- Name
+      Scroll,                !- Compressor Type
+      R22,                   !- Refrigerant Type
+      0.0015,                  !- Design Source Side Flow Rate {m3/s}
+      38000,  !- Nominal Cooling Coil Capacity {W)
+      0,            !- Nominal Time for Condensate Removal to Begin {s}
+      0,      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+      3000000,                 !- High Pressure CutOff {Pa}
+      0,                       !- Low Pressure CutOff {Pa}
+      Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
+      Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
+      Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+      Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+      3.78019E+03,!-Parameter 1 {W/K}
+      2.80303E+03,!- Parameter 2 {W/K}
+     7.93591E-01,!- Parameter 3 {C}
+      1.91029E+03,!- Parameter 4 {W}
+      2.66127E+00,!- Parameter 5
+      1.06009E-02,!- Parameter 6
+      1.65103E+00,!- Parameter 7
+      9.73887E-03,!- Parameter 8
+      1.04563E+03;!- Parameter 9
 
 
 
 
-   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
-      Heat Pump HEATING Mode,  !- Name
-      Scroll,                !- Compressor Type
-      R22,                   !- Refrigerant Type
-      0.0015,                  !- Design Source Side Flow Rate {m3/s}
-      38000,                   !- Nominal Heating Coil Capacity {W}
-      3000000,                 !- High Pressure CutOff
-      0,                       !- Low Pressure CutOff {Pa}
-      Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
-      Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
-      Heating Coil Air Inlet Node,  !- Air Inlet Node Name
-      SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
-      3.91379E+03,  !-Parameter 1 {W/K}
-     5.94753E-01,  !- Parameter 2 {C}
-      2.49945E+03,  !- Parameter 3 {W}
-      8.68734E-01,  !- Parameter 4
-      7.23595E-03,  !- Parameter 5
-      3.69126E+00,  !- Parameter 6
-      1.75701E-05,  !- Parameter 7
-     3.65348E+03;  !-Parameter 8
+   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
+      Heat Pump HEATING Mode,  !- Name
+      Scroll,                !- Compressor Type
+      R22,                   !- Refrigerant Type
+      0.0015,                  !- Design Source Side Flow Rate {m3/s}
+      38000,                   !- Nominal Heating Coil Capacity {W}
+      3000000,                 !- High Pressure CutOff
+      0,                       !- Low Pressure CutOff {Pa}
+      Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
+      Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
+      Heating Coil Air Inlet Node,  !- Air Inlet Node Name
+      SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
+      3.91379E+03,  !-Parameter 1 {W/K}
+     5.94753E-01,  !- Parameter 2 {C}
+      2.49945E+03,  !- Parameter 3 {W}
+      8.68734E-01,  !- Parameter 4
+      7.23595E-03,  !- Parameter 5
+      3.69126E+00,  !- Parameter 6
+      1.75701E-05,  !- Parameter 7
+     3.65348E+03;  !-Parameter 8
 
 
 
 
-    Coil:Heating:Gas,
-      Heat Pump DX Supp Heating Coil 1,  !- Name
-      FanAndCoilAvailSched,    !- Availability Schedule Name
-      0.8,                     !- Gas Burner Efficiency
-      32000,                   !- Nominal Capacity {W}
-      SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
-      Air Loop Outlet Node;    !- Air Outlet Node Name
+    Coil:Heating:Gas,
+      Heat Pump DX Supp Heating Coil 1,  !- Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
+      0.8,                     !- Gas Burner Efficiency
+      32000,                   !- Nominal Capacity {W}
+      SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
+      Air Loop Outlet Node;    !- Air Outlet Node Name
 
 
 
 
-    BRANCH,
-      Gshp Cooling Condenser Branch,  !- Name
-      0,  !- Maximum Flow Rate {m3/s}
-       , !- Pressure Drop Curve Name
-      Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
-      Heat Pump Cooling Mode,  !- Component 1 Name
-      Water to Air Heat Pump Source Side1 Inlet Node, !- Component 1 Inlet Node Name
-      Water to Air Heat Pump Source Side1 Outlet Node, !- Component 1 Outlet Node Name
-      ACTIVE;  !- Component 1 Branch Control Type
+    BRANCH,
+      Gshp Cooling Condenser Branch,  !- Name
+      0,  !- Maximum Flow Rate {m3/s}
+       , !- Pressure Drop Curve Name
+      Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
+      Heat Pump Cooling Mode,  !- Component 1 Name
+      Water to Air Heat Pump Source Side1 Inlet Node, !- Component 1 Inlet Node Name
+      Water to Air Heat Pump Source Side1 Outlet Node, !- Component 1 Outlet Node Name
+      ACTIVE;  !- Component 1 Branch Control Type
 
 
-    BRANCH,
-      Gshp Heating Condenser Branch,  !- Name
-      0,  !- Maximum Flow Rate {m3/s}
-       , !- Pressure Drop Curve Name
-      Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
-      Heat Pump Heating Mode,  !- Component 1 Name
-      Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-      Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-      ACTIVE;  !- Component 1 Branch Control Type
+    BRANCH,
+      Gshp Heating Condenser Branch,  !- Name
+      0,  !- Maximum Flow Rate {m3/s}
+       , !- Pressure Drop Curve Name
+      Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
+      Heat Pump Heating Mode,  !- Component 1 Name
+      Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
+      Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
+      ACTIVE;  !- Component 1 Branch Control Type
 
 
 
 
-    Fan:OnOff,
-      Supply Fan 1,          !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      0.7,                   !- FanTotal Efficiency
-      300.0,                 !– Pressure Rise {Pa}
-      2.0,                   !- Maximum Flow Rate {m3/s}
-      0.9,                   !- Motor Efficiency
-      1.0,                   !- Motor In Airstream Fraction
-      Mixed Air Node,        !- Air Inlet_Node Name
-      Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+    Fan:OnOff,
+      Supply Fan 1,          !- Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+      0.7,                   !- FanTotal Efficiency
+      300.0,                 !– Pressure Rise {Pa}
+      2.0,                   !- Maximum Flow Rate {m3/s}
+      0.9,                   !- Motor Efficiency
+      1.0,                   !- Motor In Airstream Fraction
+      Mixed Air Node,        !- Air Inlet_Node Name
+      Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,        !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-     Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-     0.7;                   !- Maximum Air Flow Rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone1DirectAir,        !- Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+     Zone 1 Inlet Node,     !- Zone Supply Air Node Name
+     0.7;                   !- Maximum Air Flow Rate {m3/s}
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,        !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-     Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-     0.6;                   !- Maximum Air Flow Rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone2DirectAir,        !- Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+     Zone 2 Inlet Node,     !- Zone Supply Air Node Name
+     0.6;                   !- Maximum Air Flow Rate {m3/s}
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,        !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-     0.7;                   !- Maximum Air Flow Rate {m3/s}
+    AirTerminal:SingleDuct:Uncontrolled,
+      Zone3DirectAir,        !- Name
+      FanAndCoilAvailSched,  !- Availability Schedule Name
+     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
+     0.7;                   !- Maximum Air Flow Rate {m3/s}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-011}
@@ -2772,7 +2772,7 @@ The heat pump \emph{demand} as well as the compressor and fan part-load ratios m
 \item
   HVAC,Average, Unitary System Requested Heating Rate {[}W{]}
 \item
-  HVAC,Average, Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average, Unitary System Compressor Part Load Ratio {[]}
 \item
   HVAC,Average, Unitary System Fan Part Load Ratio
 \item
@@ -2791,11 +2791,11 @@ This output variable is the latent cooling requested from the zone humidistat in
 
 This output variable is the sensible heating requested from the zone thermostat in watts. This value is calculated using the unitary heat pump outlet air and zone conditions, the specific heat of the zone air, and the supply air mass flow rate entering/leaving the system. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-4}
+\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-4}
 
 This output variable is the ratio of actual load on the unitary system to the unitary system's steady state output.~ This ratio is based on the nominal capacity of the unit.
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-7}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-7}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule).
 
@@ -3039,82 +3039,82 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   None;                    !- Dehumidification control type
 
   OutdoorAir:Mixer,
-      Outdoor air Mixer,       !- Name
-      Mixed Air Node,          !- Mixed Air Node Name
-      Outdoor air Inlet Node,  !- Outdoor Air Stream Node
-      Relief Air Outlet Node,  !- Relief Air Stream Node Name
-      Mixer Inlet Node;        !- Return Air Stream Node Name
+      Outdoor air Mixer,       !- Name
+      Mixed Air Node,          !- Mixed Air Node Name
+      Outdoor air Inlet Node,  !- Outdoor Air Stream Node
+      Relief Air Outlet Node,  !- Relief Air Stream Node Name
+      Mixer Inlet Node;        !- Return Air Stream Node Name
 
   Fan:OnOff,
-      Supply Fan 1,            !- Fan Name
-      FanAndCoilAvailSched,    !- Availability Schedule Name
-      0.7,                     !- Fan Total Efficiency
-      600.0,                   !- Delta Pressure {Pa}
-      1.8,                     !- Max Flow Rate {m3/s}
-      0.9,                     !- Motor Efficiency
-      1.0,                     !- Motor In Airstream Fraction
-      Mixed Air Node,          !- Fan\_Inlet\_Node
-      DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
+      Supply Fan 1,            !- Fan Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
+      0.7,                     !- Fan Total Efficiency
+      600.0,                   !- Delta Pressure {Pa}
+      1.8,                     !- Max Flow Rate {m3/s}
+      0.9,                     !- Motor Efficiency
+      1.0,                     !- Motor In Airstream Fraction
+      Mixed Air Node,          !- Fan\_Inlet\_Node
+      DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
   Coil:Cooling:DX:TwoStageWithHumidityControlMode,
-      ACDXCoil 2,              !- Coil Name
-      FanAndCoilAvailSched,    !- Availability Schedule
-      DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
-      Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
-      ,                        !- Crankcase Heater Capacity {W}
-      ,                        !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-      2,                       !- Number of Capacity Stages
-      0,                       !- Number of Enhanced Dehumidification Modes
-      CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-      ACDXCoil 2 Standard Mode-Stage 1,  !- Normal Mode Stage 1 Coil Performance Object Name
-      CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-      ACDXCoil 2 Standard Mode-Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Object Name
+      ACDXCoil 2,              !- Coil Name
+      FanAndCoilAvailSched,    !- Availability Schedule
+      DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
+      Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
+      ,                        !- Crankcase Heater Capacity {W}
+      ,                        !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
+      2,                       !- Number of Capacity Stages
+      0,                       !- Number of Enhanced Dehumidification Modes
+      CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+      ACDXCoil 2 Standard Mode-Stage 1,  !- Normal Mode Stage 1 Coil Performance Object Name
+      CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+      ACDXCoil 2 Standard Mode-Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Object Name
 
   Coil:Heating:Gas,
-      Furnace Heating Coil 1,  !- Coil Name
-      FanAndCoilAvailSched,    !- Availability Schedule Name
-      0.8,                     !- Gas Burner Efficiency of the Coil
-      35000,                   !- Nominal Capacity of the Coil {W}
-      Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
-      Heating Coil Air Outlet Node; !- Coil\_Air\_Outlet\_Node
+      Furnace Heating Coil 1,  !- Coil Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
+      0.8,                     !- Gas Burner Efficiency of the Coil
+      35000,                   !- Nominal Capacity of the Coil {W}
+      Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
+      Heating Coil Air Outlet Node; !- Coil\_Air\_Outlet\_Node
 
   AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
-      Zone 1 VAV System,       !- Name of System
-      FanAndCoilAvailSched,    !- System Availability schedule
-      Zone 1 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
-      Zone 1 VAV Inlet Node,   !-UNIT Air Inlet Node
-      0.583,                   !- Maximum air flow rate {m3/s}
-      0.25,                    !- Zone Minimum Air Flow Fraction
-      ,                        !- Control node
-      Coil:Heating:Electric,   !- Reheat Component Object
-      Reheat Coil Zone 1,      !- Name of Reheat Component
-      0.0,                     !- Max Reheat Water Flow {m3/s}
-      0.0,                     !- Min Reheat Water Flow {m3/s}
-      Zone 1 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-      0.001;                   !- Convergence Tolerance
+      Zone 1 VAV System,       !- Name of System
+      FanAndCoilAvailSched,    !- System Availability schedule
+      Zone 1 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
+      Zone 1 VAV Inlet Node,   !-UNIT Air Inlet Node
+      0.583,                   !- Maximum air flow rate {m3/s}
+      0.25,                    !- Zone Minimum Air Flow Fraction
+      ,                        !- Control node
+      Coil:Heating:Electric,   !- Reheat Component Object
+      Reheat Coil Zone 1,      !- Name of Reheat Component
+      0.0,                     !- Max Reheat Water Flow {m3/s}
+      0.0,                     !- Min Reheat Water Flow {m3/s}
+      Zone 1 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
+      0.001;                   !- Convergence Tolerance
 
   AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
-      Zone 2 VAV System,       !- Name of System
-      FanAndCoilAvailSched,    !- System Availability schedule
-      Zone 2 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
-      Zone 2 VAV Inlet Node,   !-UNIT Air Inlet Node
-      0.583,                   !- Maximum air flow rate {m3/s}
-      0.25,                    !- Zone Minimum Air Flow Fraction
-      ,                        !- Control node
-      Coil:Heating:Electric,   !- Reheat Component Object
-      Reheat Coil Zone 2,      !- Name of Reheat Component
-      0.0,                     !- Max Reheat Water Flow {m3/s}
-      0.0,                     !- Min Reheat Water Flow {m3/s}
-      Zone 2 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-      0.001;                   !- Convergence Tolerance
+      Zone 2 VAV System,       !- Name of System
+      FanAndCoilAvailSched,    !- System Availability schedule
+      Zone 2 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
+      Zone 2 VAV Inlet Node,   !-UNIT Air Inlet Node
+      0.583,                   !- Maximum air flow rate {m3/s}
+      0.25,                    !- Zone Minimum Air Flow Fraction
+      ,                        !- Control node
+      Coil:Heating:Electric,   !- Reheat Component Object
+      Reheat Coil Zone 2,      !- Name of Reheat Component
+      0.0,                     !- Max Reheat Water Flow {m3/s}
+      0.0,                     !- Min Reheat Water Flow {m3/s}
+      Zone 2 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
+      0.001;                   !- Convergence Tolerance
 
   AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
-      Zone 3 VAV System,       !- Name of System
-      FanAndCoilAvailSched,    !- System Availability schedule
-      Zone 3 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-      Zone 3 VAV Inlet Node,   !-UNIT Air Inlet Node
-      0.584,                   !- Maximum air flow rate {m3/s}
-      0.25;                    !- Zone Minimum Air Flow Fraction
+      Zone 3 VAV System,       !- Name of System
+      FanAndCoilAvailSched,    !- System Availability schedule
+      Zone 3 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
+      Zone 3 VAV Inlet Node,   !-UNIT Air Inlet Node
+      0.584,                   !- Maximum air flow rate {m3/s}
+      0.25;                    !- Zone Minimum Air Flow Fraction
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-7-011}
@@ -3149,9 +3149,9 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
 \item
   HVAC,Sum,Unitary System Electric Energy {[}J{]}
 \item
-  HVAC,Average,Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \item
-  HVAC,Average,Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Unitary System Compressor Part Load Ratio {[]}
 \item
   HVAC,Average,Unitary System Bypass Air Mass Flow Rate {[}kg/s{]}
 \item
@@ -3214,11 +3214,11 @@ This output field is the electricity consumption rate of the CBVAV system in Wat
 
 This output field is the electricity consumption of the CBVAV system in Joules for the time period being reported. The consumption includes electricity used by the DX compressor (including crankcase heater), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), and the heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-8}
+\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-8}
 
 This output field is the part-load ratio of the supply air fan, which will be either zero or 1 for each simulation timestep. For this system, the fan will operate continuously for the simulation timestep if the system is available (ref. Field: Availability schedule name) and there is a cooling or heating load to be met (i.e., fan part-load ratio will equal 1). When the system is available but there is no cooling or heating load to be met, the fan will either be off for the entire timestep or on for the entire timestep depending on the supply air fan operating mode schedule (ref. Field: Supply Air Fan Operating Mode Schedule Name). This value is set for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio \protect\hyperlink{section-1}{}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-5}
+\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-5}
 
 This output field is the part-load ratio of the compressor used by the DX coils (cooling and heating). The compressor part-load ratio is defined as the total coil load divided by the coil steady-state capacity (steady-state capacity of first stage for multi-mode coils). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 

@@ -16,17 +16,17 @@ In the case of Controler:WaterCoil which controls a hot water or chilled water c
 
 \begin{lstlisting}
 
-  Controller:WaterCoil,
-      Main Cooling Coil Controller,  !- Name
-      Temperature,                   !- Control variable
-      Reverse,                       !- Action
-      Flow,                          !- Actuator variable
-      Main Cooling Coil Air Outlet Node,   !- Control_Node
-      Main Cooling Coil Water Inlet Node,  !- Actuator_Node
-      0.002,                         !- Controller Convergence Tolerance:
-                                     !- delta temp from setpoint temp {deltaC}
-      autosize,                      !- Max Actuated Flow {m3/s}
-      0.0;                           !- Min Actuated Flow {m3/s}
+  Controller:WaterCoil,
+      Main Cooling Coil Controller,  !- Name
+      Temperature,                   !- Control variable
+      Reverse,                       !- Action
+      Flow,                          !- Actuator variable
+      Main Cooling Coil Air Outlet Node,   !- Control_Node
+      Main Cooling Coil Water Inlet Node,  !- Actuator_Node
+      0.002,                         !- Controller Convergence Tolerance:
+                                     !- delta temp from setpoint temp {deltaC}
+      autosize,                      !- Max Actuated Flow {m3/s}
+      0.0;                           !- Min Actuated Flow {m3/s}
 \end{lstlisting}
 
 It is possible to place the control node downstream of the actual object being controlled, for example after other coils and the supply fan, but I recommend using the coil leaving air node as the control node for tighter control.

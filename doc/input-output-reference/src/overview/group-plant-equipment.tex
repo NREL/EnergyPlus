@@ -144,7 +144,7 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Cycling Ratio {[]}
 \item
   HVAC,Average,Chiller Propane Rate {[}W{]}
 \item
@@ -440,32 +440,32 @@ Following is an example input for an Absorption Chiller.
 \begin{lstlisting}
 
 Chiller:Absorption,
-      Big Chiller,             !- Chiller Name
-      50000,                   !- Nominal Capacity {W}
-      250,                     !- Nominal Pumping Power {W}
-      Big Chiller Inlet Node,  !- Plant_Side_Inlet_Node
-      Big Chiller Outlet Node, !- Plant_Side_Outlet_Node
-      Big Chiller Condenser Inlet Node,  !- Condenser_Side_Inlet_Node
-      Big Chiller Condenser Outlet Node,  !- Condenser_Side_Outlet_Node
-      0.15,                    !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      0.65,                    !- Opt Part Load Ratio
-      35.0,                    !- Temp Design Condenser Inlet {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
-      0.03303,                 !- Coefficient1 of the steam use part load ratio curve
-      0.6852,                  !- Coefficient2 of the steam use part load ratio curve
-      0.2818,                  !- Coefficient3 of the steam use part load ratio curve
-      1.0,                     !- Coefficient1 of the pump electric use part load ratio curve
-      0,                       !- Coefficient2 of the pump electric part load ratio curve
-      0,                       !- Coefficient3 of the pump electric use part load ratio curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      AbsorberSteamInletNode,  !- Generator Inlet Node Name
-      AbsorberSteamOutletNode, !- Generator Outlet Node Name
-      VariableFlow,            !- Chiller Flow Mode
-      Steam,                   !- Generator Fluid Type
-      autosize,                !- Design Generator Volumetric Fluid Flow Rate {m3/s}
-      2.0;                     !- Degree of Subcooling in Steam Generator {C}
+      Big Chiller,             !- Chiller Name
+      50000,                   !- Nominal Capacity {W}
+      250,                     !- Nominal Pumping Power {W}
+      Big Chiller Inlet Node,  !- Plant_Side_Inlet_Node
+      Big Chiller Outlet Node, !- Plant_Side_Outlet_Node
+      Big Chiller Condenser Inlet Node,  !- Condenser_Side_Inlet_Node
+      Big Chiller Condenser Outlet Node,  !- Condenser_Side_Outlet_Node
+      0.15,                    !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      0.65,                    !- Opt Part Load Ratio
+      35.0,                    !- Temp Design Condenser Inlet {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
+      0.03303,                 !- Coefficient1 of the steam use part load ratio curve
+      0.6852,                  !- Coefficient2 of the steam use part load ratio curve
+      0.2818,                  !- Coefficient3 of the steam use part load ratio curve
+      1.0,                     !- Coefficient1 of the pump electric use part load ratio curve
+      0,                       !- Coefficient2 of the pump electric part load ratio curve
+      0,                       !- Coefficient3 of the pump electric use part load ratio curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      AbsorberSteamInletNode,  !- Generator Inlet Node Name
+      AbsorberSteamOutletNode, !- Generator Outlet Node Name
+      VariableFlow,            !- Chiller Flow Mode
+      Steam,                   !- Generator Fluid Type
+      autosize,                !- Design Generator Volumetric Fluid Flow Rate {m3/s}
+      2.0;                     !- Degree of Subcooling in Steam Generator {C}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-025}
@@ -668,36 +668,36 @@ Following is an example input for an Absorption Chiller.
 \begin{lstlisting}
 
 Chiller:Absorption:Indirect,
-      Big Chiller,             !- Chiller Name
-      100000,                  !- Nominal Capacity {W}
-      250,                     !- Nominal Pumping Power {W}
-      Big Chiller Inlet Node,  !- Evaporator Inlet Node Name
-      Big Chiller Outlet Node, !- Evaporator Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      0.15,                    !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      0.65,                    !- Opt Part Load Ratio
-      35.0,                    !- Temp Design Condenser Inlet {C}
-      10.0,                    !- Temp Lower Limit Condenser Inlet {C}
-      5.0,                     !- Chilled Water Outlet Temperature Lower Limit {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
-      VariableFlow,            !- Chiller Flow Mode
-      SteamUseFPLR,            !- Generator Heat Input function of part-load ratio curve name
-      PumpUseFPLR,             !- Pump Electric Input function of part-load ratio curve name
-      AbsorberSteamInletNode,  !- Generator Inlet Node Name
-      AbsorberSteamOutletNode, !- Generator Outlet Node Name
-      CAPfCOND,                !- Capacity Correction function of condenser temperature curve name
-      CAPfEVAP,                !- Capacity Correction function of evaporator temperature curve name
-      ,                        !- Capacity Correction function of generator temperature curve name
-      SteamFCondTemp,       !- Generator Heat Input Correction function of condenser temperature curve name
-      SteamFEvapTemp,       !- Generator Heat Input Correction function of evaporator temperature curve name
-      Steam,                   !- Generator Heat Source Type
-      autosize,                !- Design Generator Volumetric Fluid Flow Rate {m3/s}
-      30.0,                    !- Temp Lower Limit Generator Inlet {C}
-      2.0,                     !- Degree of Subcooling in Steam Generator {C}
-      12.0;                    !- Degree of Subcooling in Steam Condensate Loop {C}
+      Big Chiller,             !- Chiller Name
+      100000,                  !- Nominal Capacity {W}
+      250,                     !- Nominal Pumping Power {W}
+      Big Chiller Inlet Node,  !- Evaporator Inlet Node Name
+      Big Chiller Outlet Node, !- Evaporator Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      0.15,                    !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      0.65,                    !- Opt Part Load Ratio
+      35.0,                    !- Temp Design Condenser Inlet {C}
+      10.0,                    !- Temp Lower Limit Condenser Inlet {C}
+      5.0,                     !- Chilled Water Outlet Temperature Lower Limit {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
+      VariableFlow,            !- Chiller Flow Mode
+      SteamUseFPLR,            !- Generator Heat Input function of part-load ratio curve name
+      PumpUseFPLR,             !- Pump Electric Input function of part-load ratio curve name
+      AbsorberSteamInletNode,  !- Generator Inlet Node Name
+      AbsorberSteamOutletNode, !- Generator Outlet Node Name
+      CAPfCOND,                !- Capacity Correction function of condenser temperature curve name
+      CAPfEVAP,                !- Capacity Correction function of evaporator temperature curve name
+      ,                        !- Capacity Correction function of generator temperature curve name
+      SteamFCondTemp,       !- Generator Heat Input Correction function of condenser temperature curve name
+      SteamFEvapTemp,       !- Generator Heat Input Correction function of evaporator temperature curve name
+      Steam,                   !- Generator Heat Source Type
+      autosize,                !- Design Generator Volumetric Fluid Flow Rate {m3/s}
+      30.0,                    !- Temp Lower Limit Generator Inlet {C}
+      2.0,                     !- Degree of Subcooling in Steam Generator {C}
+      12.0;                    !- Degree of Subcooling in Steam Condensate Loop {C}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-019}
@@ -852,30 +852,30 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 Chiller:ConstantCOP, Little Chiller,
-          25000,             ! Nominal Capacity [W]
-          2.5,               ! COP
-          0.0011,            ! Design Chilled Water Flow Rate [m3/s]
-          0.0011,            ! Design Condenser Water Flow Rate [m3/s]
-          Little Chiller Inlet Node, Little Chiller Outlet Node,
-          Little Chiller Condenser Inlet Node, Little Chiller Condenser Outlet Node,
-          WaterCooled,
-          VariableFlow;
+          25000,             ! Nominal Capacity [W]
+          2.5,               ! COP
+          0.0011,            ! Design Chilled Water Flow Rate [m3/s]
+          0.0011,            ! Design Condenser Water Flow Rate [m3/s]
+          Little Chiller Inlet Node, Little Chiller Outlet Node,
+          Little Chiller Condenser Inlet Node, Little Chiller Condenser Outlet Node,
+          WaterCooled,
+          VariableFlow;
 
 
   Chiller:ConstantCOP,
-      Little Chiller,          !- Name
-      25000,                   !- Nominal Capacity {W}
-      2.5,                     !- Nominal COP {W/W}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
-      Little Chiller Inlet Node,   !- Chilled Water Inlet Node Name
-      Little Chiller Outlet Node,  !- Chilled Water Outlet Node Name
-      Little Chiller Condenser Inlet Node,   !- Condenser Inlet Node Name
-      Little Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      EvaporativelyCooled,                   !- Condenser Type
-      VariableFlow,            !- Chiller Flow Mode
-      ,                        !- Sizing Factor
-      450;                     !- Basin Heater Capacity {W/K}
+      Little Chiller,          !- Name
+      25000,                   !- Nominal Capacity {W}
+      2.5,                     !- Nominal COP {W/W}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
+      Little Chiller Inlet Node,   !- Chilled Water Inlet Node Name
+      Little Chiller Outlet Node,  !- Chilled Water Outlet Node Name
+      Little Chiller Condenser Inlet Node,   !- Condenser Inlet Node Name
+      Little Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      EvaporativelyCooled,                   !- Condenser Type
+      VariableFlow,            !- Chiller Flow Mode
+      ,                        !- Sizing Factor
+      450;                     !- Basin Heater Capacity {W/K}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-015}
@@ -1172,33 +1172,33 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 Chiller:Electric,
-      Big Chiller,             !- Chiller Name
-      WaterCooled,             !- Condenser Type
-      100000,                  !- Nominal Capacity {W}
-      2.75,                    !- COP
-      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
-      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      .15,                     !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      .65,                     !- Optimum Part Load Ratio
-      29.44,                   !- Design Condenser Inlet Temperature {C}
-      2.682759,                !- Temperature Rise Coefficient
-      6.667,                   !- Design Chilled Water Outlet Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0005,                  !- Design Condenser Water Flow Rate {m3/s}
-      0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
-      -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
-      -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
-      1.907846,                !- Coefficient 1 of Power Ratio Curve
-      -1.20498700,             !- Coefficient 2 of Power Ratio Curve
-      0.26346230,              !- Coefficient 3 of Power Ratio Curve
-      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
-      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
-      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      VariableFlow;            !- Chiller Flow Mode
+      Big Chiller,             !- Chiller Name
+      WaterCooled,             !- Condenser Type
+      100000,                  !- Nominal Capacity {W}
+      2.75,                    !- COP
+      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      .15,                     !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      .65,                     !- Optimum Part Load Ratio
+      29.44,                   !- Design Condenser Inlet Temperature {C}
+      2.682759,                !- Temperature Rise Coefficient
+      6.667,                   !- Design Chilled Water Outlet Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0005,                  !- Design Condenser Water Flow Rate {m3/s}
+      0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
+      -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
+      -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
+      1.907846,                !- Coefficient 1 of Power Ratio Curve
+      -1.20498700,             !- Coefficient 2 of Power Ratio Curve
+      0.26346230,              !- Coefficient 3 of Power Ratio Curve
+      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      VariableFlow;            !- Chiller Flow Mode
 \end{lstlisting}
 
 An example of an Air-Cooled Chiller:
@@ -1206,37 +1206,37 @@ An example of an Air-Cooled Chiller:
 \begin{lstlisting}
 
 Chiller:Electric,
-      Big Chiller,             !- Chiller Name
-      AirCooled,              !- Condenser Type
-      100000,                  !- Nominal Capacity {W}
-      2.58,                    !- COP
-      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
-      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      .05,                     !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      .65,                     !- Optimum Part Load Ratio
-      35.0,                    !- Design Condenser Inlet Temperature {C}
-      2.778,                   !- Temperature Rise Coefficient
-      6.67,                    !- Design Chilled Water Outlet Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.002,                   !- Design Condenser Water Flow Rate {m3/s}
-      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
-      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
-      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
-      2.333,                   !- Coefficient 1 of Power Ratio Curve
-      -1.975,                  !- Coefficient 2 of Power Ratio Curve
-      0.6121,                  !- Coefficient 3 of Power Ratio Curve
-      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
-      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
-      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      VariableFlow;            !- Chiller Flow Mode
+      Big Chiller,             !- Chiller Name
+      AirCooled,              !- Condenser Type
+      100000,                  !- Nominal Capacity {W}
+      2.58,                    !- COP
+      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      .05,                     !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      .65,                     !- Optimum Part Load Ratio
+      35.0,                    !- Design Condenser Inlet Temperature {C}
+      2.778,                   !- Temperature Rise Coefficient
+      6.67,                    !- Design Chilled Water Outlet Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.002,                   !- Design Condenser Water Flow Rate {m3/s}
+      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
+      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
+      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
+      2.333,                   !- Coefficient 1 of Power Ratio Curve
+      -1.975,                  !- Coefficient 2 of Power Ratio Curve
+      0.6121,                  !- Coefficient 3 of Power Ratio Curve
+      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      VariableFlow;            !- Chiller Flow Mode
 
   OutdoorAir:Node,
-      Big Chiller Condenser Inlet Node,  !- Node Name
-      -1.0;                    !- Height Above Ground {m}
+      Big Chiller Condenser Inlet Node,  !- Node Name
+      -1.0;                    !- Height Above Ground {m}
 \end{lstlisting}
 
 An example of an Evaporatively-Cooled Chiller:
@@ -1244,44 +1244,44 @@ An example of an Evaporatively-Cooled Chiller:
 \begin{lstlisting}
 
 Chiller:Electric,
-      Big Chiller,             !- Name
-      EvaporativelyCooled,               !- Condenser Type
-      100000,                  !- Nominal Capacity {W}
-      2.58,                    !- Nominal COP
-      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
-      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      0.05,                    !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      0.65,                    !- Optimum Part Load Ratio
-      35.0,                    !- Design Condenser Inlet Temperature {C}
-      2.778,                   !- Temperature Rise Coefficient
-      6.67,                    !- Design Chilled Water Outlet Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.002,                   !- Design Condenser Water Flow Rate {m3/s}
-      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
-      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
-      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
-      2.333,                   !- Coefficient 1 of Power Ratio Curve
-      -1.975,                  !- Coefficient 2 of Power Ratio Curve
-      0.6121,                  !- Coefficient 3 of Power Ratio Curve
-      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
-      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
-      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      VariableFlow,            !- Chiller Flow Mode
-      ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
-      ,                        !- Heat Recovery Inlet Node Name
-      ,                        !- Heat Recovery Outlet Node Name
-      ,                        !- Sizing Factor
-      450,                     !- Basin Heater Capacity {W/K}
-      3,                       !- Basin Heater Setpoint Temperature {C}
-      Basin heater sch;        !- Basin Heater Operating Schedule Name
+      Big Chiller,             !- Name
+      EvaporativelyCooled,               !- Condenser Type
+      100000,                  !- Nominal Capacity {W}
+      2.58,                    !- Nominal COP
+      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      0.05,                    !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      0.65,                    !- Optimum Part Load Ratio
+      35.0,                    !- Design Condenser Inlet Temperature {C}
+      2.778,                   !- Temperature Rise Coefficient
+      6.67,                    !- Design Chilled Water Outlet Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.002,                   !- Design Condenser Water Flow Rate {m3/s}
+      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
+      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
+      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
+      2.333,                   !- Coefficient 1 of Power Ratio Curve
+      -1.975,                  !- Coefficient 2 of Power Ratio Curve
+      0.6121,                  !- Coefficient 3 of Power Ratio Curve
+      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      VariableFlow,            !- Chiller Flow Mode
+      ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
+      ,                        !- Heat Recovery Inlet Node Name
+      ,                        !- Heat Recovery Outlet Node Name
+      ,                        !- Sizing Factor
+      450,                     !- Basin Heater Capacity {W/K}
+      3,                       !- Basin Heater Setpoint Temperature {C}
+      Basin heater sch;        !- Basin Heater Operating Schedule Name
 
-    OutdoorAir:Node,
-      Big Chiller Condenser Inlet Node,  !- Name
-      -1.0;                    !- Height Above Ground {m}
+    OutdoorAir:Node,
+      Big Chiller Condenser Inlet Node,  !- Name
+      -1.0;                    !- Height Above Ground {m}
 \end{lstlisting}
 
 An example of a Heat Recovery Chiller:
@@ -1289,36 +1289,36 @@ An example of a Heat Recovery Chiller:
 \begin{lstlisting}
 
 Chiller:Electric,
-      Big Chiller,             !- Chiller Name
-      WaterCooled,            !- Condenser Type
-      25000,                   !- Nominal Capacity {W}
-      2.75,                    !- COP
-      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
-      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      .15,                     !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      .65,                     !- Optimum Part Load Ratio
-      29.44,                   !- Design Condenser Inlet Temperature {C}
-      2.682759,                !- Temperature Rise Coefficient
-      6.667,                   !- Design Chilled Water Outlet Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0005,                  !- Design Condenser Water Flow Rate {m3/s}
-      0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
-      -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
-      -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
-      1.907846,                !- Coefficient 1 of Power Ratio Curve
-      -1.20498700,             !- Coefficient 2 of Power Ratio Curve
-      0.26346230,              !- Coefficient 3 of Power Ratio Curve
-      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
-      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
-      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      VariableFlow,            !- Chiller Flow Mode
-      0.00055,                 !- Design heat recovery water flow rate {m3/s}
-      Big Chiller Heat Rec Inlet Node,  !- Heat Recovery Inlet Node Name
-      Big Chiller Heat Rec Outlet Node;  !- Heat Recovery Outlet Node Name
+      Big Chiller,             !- Chiller Name
+      WaterCooled,            !- Condenser Type
+      25000,                   !- Nominal Capacity {W}
+      2.75,                    !- COP
+      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      .15,                     !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      .65,                     !- Optimum Part Load Ratio
+      29.44,                   !- Design Condenser Inlet Temperature {C}
+      2.682759,                !- Temperature Rise Coefficient
+      6.667,                   !- Design Chilled Water Outlet Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0005,                  !- Design Condenser Water Flow Rate {m3/s}
+      0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
+      -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
+      -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
+      1.907846,                !- Coefficient 1 of Power Ratio Curve
+      -1.20498700,             !- Coefficient 2 of Power Ratio Curve
+      0.26346230,              !- Coefficient 3 of Power Ratio Curve
+      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      VariableFlow,            !- Chiller Flow Mode
+      0.00055,                 !- Design heat recovery water flow rate {m3/s}
+      Big Chiller Heat Rec Inlet Node,  !- Heat Recovery Inlet Node Name
+      Big Chiller Heat Rec Outlet Node;  !- Heat Recovery Outlet Node Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-013}
@@ -1551,81 +1551,81 @@ An example of this statement in an IDF is:
   ! A generic centrifugal chiller from DOE-2.1E
   !
   Chiller:Electric:EIR,
-   DOE-2 Centrifugal/5.50COP,  !- Chiller Name
-   Autosize,                   !- Reference Capacity {W}
-   5.5,                        !- Reference COP {W/W}
-   6.67,                       !- Reference Leaving Chilled Water Temperature {C}
-   29.4,                       !- Reference Entering Condenser Fluid Temperature {C}
-   Autosize,                   !- Reference Chilled Water Flow Rate {m3/s}
-   Autosize,                   !- Reference Condenser Water Flow Rate {m3/s}
-   DOE-2 Centrifugal/5.50COP CAPFT,  !- Cooling Capacity Function of Temperature Curve
-   DOE-2 Centrifugal/5.50COP EIRFT,  !- Electric Input to Cooling Output Ratio Function of
-                                        Temperature Curve
-   DOE-2 Centrifugal/5.50COP EIRFPLR,!- Electric Input to Cooling Output Ratio Function of Part Load
-                                        Ratio Curve
-   0.1,                        !- Minimum Part Load Ratio
-   1.0,                        !- Maximum Part Load Ratio
-   1.0,                        !- Optimum Part Load Ratio
-   0.2,                        !- Minimum Unloading Ratio
-   Chilled Water Side Inlet Node,        !- Chilled Water Side Inlet Node
-   Chilled Water Side Outlet Node,       !- Chilled Water Side Outlet Node
-   Condenser Side Inlet Node,  !- Condenser Side Inlet Node
-   Condenser Side Outlet Node, !- Condenser Side Outlet Node
-   WaterCooled,               !- Condenser Type
-   ,                           !- Condenser Fan Power Ratio {W/W}
-   1.0,                        !- Fraction of Compressor Electric Power Rejected by Condenser
-   2.0,                        !- Leaving Chilled Water Lower Temperature Limit {C}
-   ConstantFlow;               !- Chiller Evaporator Flow Mode
+   DOE-2 Centrifugal/5.50COP,  !- Chiller Name
+   Autosize,                   !- Reference Capacity {W}
+   5.5,                        !- Reference COP {W/W}
+   6.67,                       !- Reference Leaving Chilled Water Temperature {C}
+   29.4,                       !- Reference Entering Condenser Fluid Temperature {C}
+   Autosize,                   !- Reference Chilled Water Flow Rate {m3/s}
+   Autosize,                   !- Reference Condenser Water Flow Rate {m3/s}
+   DOE-2 Centrifugal/5.50COP CAPFT,  !- Cooling Capacity Function of Temperature Curve
+   DOE-2 Centrifugal/5.50COP EIRFT,  !- Electric Input to Cooling Output Ratio Function of
+                                        Temperature Curve
+   DOE-2 Centrifugal/5.50COP EIRFPLR,!- Electric Input to Cooling Output Ratio Function of Part Load
+                                        Ratio Curve
+   0.1,                        !- Minimum Part Load Ratio
+   1.0,                        !- Maximum Part Load Ratio
+   1.0,                        !- Optimum Part Load Ratio
+   0.2,                        !- Minimum Unloading Ratio
+   Chilled Water Side Inlet Node,        !- Chilled Water Side Inlet Node
+   Chilled Water Side Outlet Node,       !- Chilled Water Side Outlet Node
+   Condenser Side Inlet Node,  !- Condenser Side Inlet Node
+   Condenser Side Outlet Node, !- Condenser Side Outlet Node
+   WaterCooled,               !- Condenser Type
+   ,                           !- Condenser Fan Power Ratio {W/W}
+   1.0,                        !- Fraction of Compressor Electric Power Rejected by Condenser
+   2.0,                        !- Leaving Chilled Water Lower Temperature Limit {C}
+   ConstantFlow;               !- Chiller Evaporator Flow Mode
 
 
   !
   ! Curve set (3 Curves):
   !
   ! Cooling Capacity Function of Temperature Curve for open or hermetic water-cooled centrifugal
-    chillers
+    chillers
   ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
   ! Same as DOE-2.1E HERM-CENT-CAP-FT (CCAPT3) and OPEN-CENT-CAP-FT (CCAPT1)
-   Curve:Biquadratic,
-   DOE-2 Centrifugal/5.50COP CAPFT,  !- Name
-   0.257896E+00,               !- Coefficient1 Constant
-   0.389016E-01,               !- Coefficient2 x
-   -0.217080E-03,              !- Coefficient3 x**2
-   0.468684E-01,               !- Coefficient4 y
-   -0.942840E-03,              !- Coefficient5 y**2
-   -0.343440E-03,              !- Coefficient6 x*y
-   5.0,                        !- Minimum Value of x
-   10.0,                       !- Maximum Value of x
-   24.0,                       !- Minimum Value of y
-   35.0;                       !- Maximum Value of y
+   Curve:Biquadratic,
+   DOE-2 Centrifugal/5.50COP CAPFT,  !- Name
+   0.257896E+00,               !- Coefficient1 Constant
+   0.389016E-01,               !- Coefficient2 x
+   -0.217080E-03,              !- Coefficient3 x**2
+   0.468684E-01,               !- Coefficient4 y
+   -0.942840E-03,              !- Coefficient5 y**2
+   -0.343440E-03,              !- Coefficient6 x*y
+   5.0,                        !- Minimum Value of x
+   10.0,                       !- Maximum Value of x
+   24.0,                       !- Minimum Value of y
+   35.0;                       !- Maximum Value of y
   !
   ! Energy Input to Cooling Output Ratio Function of Temperature Curve for open or hermetic water-
-    cooled centrifugal chillers
+    cooled centrifugal chillers
   ! x = Leaving Chilled Water Temperature and y = Entering Condenser Water Temperature
   ! Same as DOE-2.1E HERM-CENT-EIR-FT (EIRT3) and OPEN-CENT-EIR-FT (EIRT1)
-   Curve:Biquadratic,
-   DOE-2 Centrifugal/5.50COP EIRFT,  !- Name
-   0.933884E+00,               !- Coefficient1 Constant
-   -0.582120E-01,              !- Coefficient2 x
-   0.450036E-02,               !- Coefficient3 x**2
-   0.243000E-02,               !- Coefficient4 y
-   0.486000E-03,               !- Coefficient5 y**2
-   -0.121500E-02,              !- Coefficient6x*y
-   5.0,                        !- Minimum Value of x
-   10.0,                       !- Maximum Value of x
-   24.0,                       !- Minimum Value of y
-   35.0;                       !- Maximum Value of y
+   Curve:Biquadratic,
+   DOE-2 Centrifugal/5.50COP EIRFT,  !- Name
+   0.933884E+00,               !- Coefficient1 Constant
+   -0.582120E-01,              !- Coefficient2 x
+   0.450036E-02,               !- Coefficient3 x**2
+   0.243000E-02,               !- Coefficient4 y
+   0.486000E-03,               !- Coefficient5 y**2
+   -0.121500E-02,              !- Coefficient6x*y
+   5.0,                        !- Minimum Value of x
+   10.0,                       !- Maximum Value of x
+   24.0,                       !- Minimum Value of y
+   35.0;                       !- Maximum Value of y
   !
   ! Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve for open or hermetic
-    water-cooled centrifugal chillers
+    water-cooled centrifugal chillers
   ! x = Part Load Ratio (load/capacity)
   ! Same as DOE-2.1E HERM-CENT-EIR-FPLR (EIRPLR3) and OPEN-CENT-EIR-FPLR (EIRPLR1)
-   Curve:Quadratic,
-   DOE-2 Centrifugal/5.50COP EIRFPLR, !- Name
-   0.222903,                   !- Coefficient1 Constant
-   0.313387,                   !- Coefficient2 x
-   0.463710,                   !- Coefficient3 x**2
-   0.0,                        !- Minimum Value of x
-   1.0;                        !- Maximum Value of x
+   Curve:Quadratic,
+   DOE-2 Centrifugal/5.50COP EIRFPLR, !- Name
+   0.222903,                   !- Coefficient1 Constant
+   0.313387,                   !- Coefficient2 x
+   0.463710,                   !- Coefficient3 x**2
+   0.0,                        !- Minimum Value of x
+   1.0;                        !- Maximum Value of x
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-010}
@@ -1662,9 +1662,9 @@ An example of this statement in an IDF is:
 \item
   Zone,Meter,HeatRejection:EnergyTransfer {[}J{]}
 \item
-  HVAC,Average,Chiller Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Part Load Ratio {[]}
 \item
-  HVAC,Average,Chiller Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Cycling Ratio {[]}
 \item
   HVAC,Average,Chiller False Load Heat Transfer Rate {[}W{]}
 \item
@@ -1675,11 +1675,11 @@ Curve object outputs:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Capacity Temperature Modifier Multiplier \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Capacity Temperature Modifier Multiplier {[]}
 \item
-  HVAC,Average,Chiller EIR Temperature Modifier Multiplier \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller EIR Temperature Modifier Multiplier {[]}
 \item
-  HVAC,Average,Chiller EIR Part Load Modifier Multiplier \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller EIR Part Load Modifier Multiplier {[]}
 \end{itemize}
 
 Air-cooled or Evap-cooled:
@@ -1746,23 +1746,23 @@ Most of these chiller output variables are defined above under ``Generic Chiller
 
 These outputs are for the electric power consumption of the chiller condenser fan and are applicable to air- or evaporatively-cooled chillers. These reports are available only for the Chiller:Electric:EIR and only when the Condenser Fan Power Ratio input field is greater than 0. This output is also added to a meter object with Resource Type = Electricity, End Use Key = Chillers, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Chiller Capacity Temperature Modifier Multiplier \protect\hyperlink{section-1}{}}{Chiller Capacity Temperature Modifier Multiplier }}\label{chiller-capacity-temperature-modifier-multiplier}
+\paragraph{\texorpdfstring{Chiller Capacity Temperature Modifier Multiplier {[]}}{Chiller Capacity Temperature Modifier Multiplier }}\label{chiller-capacity-temperature-modifier-multiplier}
 
 This is the output of the curve object Cooling Capacity Function of Temperature Curve.
 
-\paragraph{\texorpdfstring{Chiller EIR Temperature Modifier Multiplier \protect\hyperlink{section-1}{}}{Chiller EIR Temperature Modifier Multiplier }}\label{chiller-eir-temperature-modifier-multiplier}
+\paragraph{\texorpdfstring{Chiller EIR Temperature Modifier Multiplier {[]}}{Chiller EIR Temperature Modifier Multiplier }}\label{chiller-eir-temperature-modifier-multiplier}
 
 This is the output of the curve object Electric Input to Cooling Output Ratio Function of Temperature Curve.
 
-\paragraph{\texorpdfstring{Chiller EIR Part Load Modifier Multiplier \protect\hyperlink{section-1}{}}{Chiller EIR Part Load Modifier Multiplier }}\label{chiller-eir-part-load-modifier-multiplier}
+\paragraph{\texorpdfstring{Chiller EIR Part Load Modifier Multiplier {[]}}{Chiller EIR Part Load Modifier Multiplier }}\label{chiller-eir-part-load-modifier-multiplier}
 
 This is the output of the curve object Electric Input to Cooling Output Ratio Function of Part Load Curve.
 
-\paragraph{\texorpdfstring{Chiller Part Load Ratio \protect\hyperlink{section-1}{}}{Chiller Part Load Ratio }}\label{chiller-part-load-ratio-1}
+\paragraph{\texorpdfstring{Chiller Part Load Ratio {[]}}{Chiller Part Load Ratio }}\label{chiller-part-load-ratio-1}
 
 This output is the ratio of the evaporator heat transfer rate plus the false load heat transfer rate (if applicable) to the available chiller capacity. This value is used to determine Chiller EIR Part Load Modifier Multiplier.
 
-\paragraph{\texorpdfstring{Chiller Cycling Ratio \protect\hyperlink{section-1}{}}{Chiller Cycling Ratio }}\label{chiller-cycling-ratio-1}
+\paragraph{\texorpdfstring{Chiller Cycling Ratio {[]}}{Chiller Cycling Ratio }}\label{chiller-cycling-ratio-1}
 
 The cycling ratio is the amount of time the chiller operates during each simulation timestep. If the chiller part-load ratio falls below the minimum part-load ratio, the chiller cycles on and off to meet the cooling load.
 
@@ -1905,80 +1905,80 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 Chiller:Electric:ReformulatedEIR,
-    Main Chiller,                        !- Chiller Name
-    50000,                               !- Reference Capacity {W}
-    3.99,                                !- Reference COP
-    6.67,                                !- Reference Leaving Chilled Water Temperature {C}
-    35.0,                                !- Reference Leaving Condenser Water Temperature {C}
-    0.00898,                             !- Reference Chilled Water Flow Rate {m3/s}
-    0.01122,                             !- Reference Condenser Water Flow Rate {m3/s}
-    Main Chiller RecipCapFT,             !- Cooling Capacity Function of Temperature Curve
-    Main Chiller RecipEIRFT,             !- Electric Input to Cooling Output Ratio Function of Temperature Curve
+    Main Chiller,                        !- Chiller Name
+    50000,                               !- Reference Capacity {W}
+    3.99,                                !- Reference COP
+    6.67,                                !- Reference Leaving Chilled Water Temperature {C}
+    35.0,                                !- Reference Leaving Condenser Water Temperature {C}
+    0.00898,                             !- Reference Chilled Water Flow Rate {m3/s}
+    0.01122,                             !- Reference Condenser Water Flow Rate {m3/s}
+    Main Chiller RecipCapFT,             !- Cooling Capacity Function of Temperature Curve
+    Main Chiller RecipEIRFT,             !- Electric Input to Cooling Output Ratio Function of Temperature Curve
   LeavingCondenserWaterTemperature     !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    Main Chiller RecipEIRFPLR,           !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
-    0.01,                                !- Minimum Part Load Ratio
-    1,                                   !- Maximum Part Load Ratio
-    1,                                   !- Optimum Part Load Ratio
-    0.07,                                !- Minimum Unloading Ratio
-    Main Chiller ChW Inlet,              !- Chilled Water Side Inlet Node
-    Main Chiller ChW Outlet,             !- Chilled Water Side Outlet Node
-    Main Chiller Cnd Inlet,              !- Condenser Side Inlet Node
-    Main Chiller Cnd Outlet,             !- Condenser Side Outlet Node
-    1,                                   !- Fraction of Compressor Electric Power Rejected by Condenser
-    2,                                   !- Leaving Chilled Water Lower Temperature Limit {C}
-    ConstantFlow;                        !- Chiller Flow Mode
+    Main Chiller RecipEIRFPLR,           !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    0.01,                                !- Minimum Part Load Ratio
+    1,                                   !- Maximum Part Load Ratio
+    1,                                   !- Optimum Part Load Ratio
+    0.07,                                !- Minimum Unloading Ratio
+    Main Chiller ChW Inlet,              !- Chilled Water Side Inlet Node
+    Main Chiller ChW Outlet,             !- Chilled Water Side Outlet Node
+    Main Chiller Cnd Inlet,              !- Condenser Side Inlet Node
+    Main Chiller Cnd Outlet,             !- Condenser Side Outlet Node
+    1,                                   !- Fraction of Compressor Electric Power Rejected by Condenser
+    2,                                   !- Leaving Chilled Water Lower Temperature Limit {C}
+    ConstantFlow;                        !- Chiller Flow Mode
 
   ! Cooling capacity to rated capacity function of Temperature Curve
   ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
-    Curve:Biquadratic,
-      Main Chiller RecipCapFT,  !- Name
-      0.958546443,       !- Coefficient1 Constant
-      0.035168695,       !- Coefficient2 x
-      0.000124662,       !- Coefficient3 x\*\*2
-      -0.00274551,       !-Coefficient4y
-      -0.00005000,       !-Coefficient5y\*\*2
-      -0.00017234,       !-Coefficient6x\*y
-      5.00,              !- Minimum Value of x
-      10.0,              !- Maximum Value of x
-      20.00,             !- Minimum Value of y
-      40.94;             !- Maximum Value of y
+    Curve:Biquadratic,
+      Main Chiller RecipCapFT,  !- Name
+      0.958546443,       !- Coefficient1 Constant
+      0.035168695,       !- Coefficient2 x
+      0.000124662,       !- Coefficient3 x\*\*2
+      -0.00274551,       !-Coefficient4y
+      -0.00005000,       !-Coefficient5y\*\*2
+      -0.00017234,       !-Coefficient6x\*y
+      5.00,              !- Minimum Value of x
+      10.0,              !- Maximum Value of x
+      20.00,             !- Minimum Value of y
+      40.94;             !- Maximum Value of y
 
   ! Energy Input to Cooling Output Ratio Function of Temperature Curve
   ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
-    Curve:Biquadratic,
-      Main Chiller RecipEIRFT,  !- Name
-      0.732700123,       !- Coefficient1 Constant
-      -0.00834360,       !- Coefficient2 x
-      0.000638530,       !- Coefficient3 x\*\*2
-      -0.00303753,       !-Coefficient4y
-      0.000484952,       !-Coefficient5y\*\*2
-      -0.00083584,       !-Coefficient6x\*y
-      5.00,              !- Minimum Value of x
-      10.0,              !- Maximum Value of x
-      20.00,             !- Minimum Value of y
-      40.94;             !- Maximum Value of y
+    Curve:Biquadratic,
+      Main Chiller RecipEIRFT,  !- Name
+      0.732700123,       !- Coefficient1 Constant
+      -0.00834360,       !- Coefficient2 x
+      0.000638530,       !- Coefficient3 x\*\*2
+      -0.00303753,       !-Coefficient4y
+      0.000484952,       !-Coefficient5y\*\*2
+      -0.00083584,       !-Coefficient6x\*y
+      5.00,              !- Minimum Value of x
+      10.0,              !- Maximum Value of x
+      20.00,             !- Minimum Value of y
+      40.94;             !- Maximum Value of y
 
   ! Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
   ! x = Leaving Condenser water Temperature and y = Part Load Ratio
 
-    Curve:Bicubic,
-      Main Chiller RecipEIRFPLR, !- Name
-      0.070862846,        !- Coefficient1 Constant
-      0.002787560,        !- Coefficient2 x
-      -0.00000891,        !- Coefficient3 x\*\*2
-      0.230973399,        !-Coefficient4y
-      1.250442176,        !-Coefficient5y\*\*2
-      -0.00216102,        !-Coefficient6x\*y
-      0.000000,           !-Coefficient7x\*\*3
-      -0.56300936,        !-Coefficient8y\*\*3
-      0.000000,           !-Coefficient9x\*\*2\*y
-      0.000000,           !-Coefficient10x\*y\*\*2
-      20.00,              !- Minimum Value of x
-      40.94,              !- Maximum Value of x
-      0.01,               !- Minimum Value of y
-      1.0;               !- Maximum Value of y
+    Curve:Bicubic,
+      Main Chiller RecipEIRFPLR, !- Name
+      0.070862846,        !- Coefficient1 Constant
+      0.002787560,        !- Coefficient2 x
+      -0.00000891,        !- Coefficient3 x\*\*2
+      0.230973399,        !-Coefficient4y
+      1.250442176,        !-Coefficient5y\*\*2
+      -0.00216102,        !-Coefficient6x\*y
+      0.000000,           !-Coefficient7x\*\*3
+      -0.56300936,        !-Coefficient8y\*\*3
+      0.000000,           !-Coefficient9x\*\*2\*y
+      0.000000,           !-Coefficient10x\*y\*\*2
+      20.00,              !- Minimum Value of x
+      40.94,              !- Maximum Value of x
+      0.01,               !- Minimum Value of y
+      1.0;               !- Maximum Value of y
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-5-006}
@@ -2161,10 +2161,10 @@ where PLR is the Part Load Ratio from the Chiller. The Part Load Based Fuel Inpu
 
 \begin{lstlisting}
 IF (PartLoadRat = = 0)THEN
-   EngineDrivenFuelEnergy = 0
+   EngineDrivenFuelEnergy = 0
 ELSE
-   ClngLoadFuelRat = CurveValue(EngineDrivenChiller(ChillerNum)%ClngLoadtoFuelCurve, PartLoadRat )
-   EngineDrivenFuelEnergy = QEvaporator / ClngLoadFuelRat
+   ClngLoadFuelRat = CurveValue(EngineDrivenChiller(ChillerNum)%ClngLoadtoFuelCurve, PartLoadRat )
+   EngineDrivenFuelEnergy = QEvaporator / ClngLoadFuelRat
 END IF
 \end{lstlisting}
 
@@ -2285,48 +2285,48 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 Chiller:EngineDriven,
-      Central Chiller,         !- Chiller Name
-      WaterCooled,            !- Condenser Type
-      autosize,                !- Nominal Capacity {W}
-      2.75,                    !- COP
-      Central Chiller Inlet Node,  !- Chilled Water Inlet Node Name
-      Central Chiller Outlet Node,  !- Chilled Water Outlet Node Name
-      Central Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Central Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      0.0,                     !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      .65,                     !- Optimum Part Load Ratio
-      35.0,                    !- Design Condenser Inlet Temperature {C}
-      2.778,                   !- Temperature Rise Coefficient
-      6.67,                    !- Design Chilled Water Outlet Temperature {C}
-      autosize,                !- Design Chilled Water Flow Rate {m3/s}
-      autosize,                !- Design Condenser Water Flow Rate {m3/s}
-      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
-      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
-      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
-      2.333,                   !- Coefficient 1 of Power Ratio Curve
-      -1.975,                  !- Coefficient 2 of Power Ratio Curve
-      0.6121,                  !- Coefficient 3 of Power Ratio Curve
-      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
-      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
-      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      Fuel Use Curve,          !- the Fuel Use Curve
-      Jacket Heat Recovery Curve,  !- the Recovery Jacket Heat curve
-      Lube Heat Recovery Curve,!- the Recovery Lube Heat curve
-      Total Exhaust Energy Curve,  !- the Total Exhaust Energy curve
-      Exhaust Temperature Curve,  !- the Exhaust Temperature curve
-      0.01516,                 !- Coefficient1 of UA curve
-      0.9,                     !- Coefficient2 of UA curve
-      0.00063,                 !- Maximum Exhaust Flow per W of Power Output {(kg/s)/W}
-      150,                     !- Design Minimum Exhaust temp. (Steam Saturation Temperature) {C}
-      DIESEL,                  !- Fuel Type
-      45500,                   !- Fuel Heating Value {kJ/kg}
-      0.0,                     !- Design heat recovery water flow rate {m3/s}
-      ,                        !- Heat Recovery Inlet Node Name
-      ,                        !- Heat Recovery Outlet Node Name
-      VariableFlow,            !- Chiller Flow Mode
-      60.0;                    !- Maximum Temp for Heat Recovery. This sets max availability {C}
+      Central Chiller,         !- Chiller Name
+      WaterCooled,            !- Condenser Type
+      autosize,                !- Nominal Capacity {W}
+      2.75,                    !- COP
+      Central Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+      Central Chiller Outlet Node,  !- Chilled Water Outlet Node Name
+      Central Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Central Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      0.0,                     !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      .65,                     !- Optimum Part Load Ratio
+      35.0,                    !- Design Condenser Inlet Temperature {C}
+      2.778,                   !- Temperature Rise Coefficient
+      6.67,                    !- Design Chilled Water Outlet Temperature {C}
+      autosize,                !- Design Chilled Water Flow Rate {m3/s}
+      autosize,                !- Design Condenser Water Flow Rate {m3/s}
+      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
+      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
+      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
+      2.333,                   !- Coefficient 1 of Power Ratio Curve
+      -1.975,                  !- Coefficient 2 of Power Ratio Curve
+      0.6121,                  !- Coefficient 3 of Power Ratio Curve
+      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      Fuel Use Curve,          !- the Fuel Use Curve
+      Jacket Heat Recovery Curve,  !- the Recovery Jacket Heat curve
+      Lube Heat Recovery Curve,!- the Recovery Lube Heat curve
+      Total Exhaust Energy Curve,  !- the Total Exhaust Energy curve
+      Exhaust Temperature Curve,  !- the Exhaust Temperature curve
+      0.01516,                 !- Coefficient1 of UA curve
+      0.9,                     !- Coefficient2 of UA curve
+      0.00063,                 !- Maximum Exhaust Flow per W of Power Output {(kg/s)/W}
+      150,                     !- Design Minimum Exhaust temp. (Steam Saturation Temperature) {C}
+      DIESEL,                  !- Fuel Type
+      45500,                   !- Fuel Heating Value {kJ/kg}
+      0.0,                     !- Design heat recovery water flow rate {m3/s}
+      ,                        !- Heat Recovery Inlet Node Name
+      ,                        !- Heat Recovery Outlet Node Name
+      VariableFlow,            !- Chiller Flow Mode
+      60.0;                    !- Maximum Temp for Heat Recovery. This sets max availability {C}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-006}
@@ -2830,62 +2830,62 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 Chiller:CombustionTurbine,
-      Big Chiller,             !- Chiller Name
-      WaterCooled,            !- Condenser Type
-      30000,                   !- Nominal Capacity {W}
-      2.75,                    !- COP
-      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
-      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
-      .15,                     !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      .65,                     !- Optimum Part Load Ratio
-      35.0,                    !- Design Condenser Inlet Temperature {C}
-      2.778,                   !- Temperature Rise Coefficient
-      6.67,                    !- Design Chilled Water Outlet Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
-      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
-      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
-      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
-      2.333,                   !- Coefficient 1 of Power Ratio Curve
-      -1.975,                  !- Coefficient 2 of Power Ratio Curve
-      0.6121,                  !- Coefficient 3 of Power Ratio Curve
-      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
-      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
-      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
-      9.41,                    !- Coefficient 1 of Fuel Input curve
-      -9.48,                   !- Coefficient 2 of Fuel Input curve
-      4.32,                    !- Coefficient 3 of Fuel Input curve
-      1.0044,                  !- Coefficient 1 of Temperature Based Fuel Input curve
-      -0.0008,                 !- Coefficient 2 of Temperature Based Fuel Input curve
-      0,                       !- Coefficient 3 of Temperature Based Fuel Input curve
-      15.63518363,             !- Coefficient 1 of Exhaust Flow curve
-      -0.03059999,             !- Coefficient 2 of Exhaust Flow curve
-      -0.0002,                 !- Coefficient 3 of Exhaust Flow curve
-      916.992,                 !- Coefficient 1 of Exhaust Gas Temperature curve
-      307.998,                 !- Coefficient 2 of Exhaust Gas Temperature curve
-      79.992,                  !- Coefficient 3 of Exhaust Gas Temperature curve
-      1.005,                   !- Coefficient 1 of Temperature Based Exhaust Gas Temperature c
-      0.0018,                  !- Coefficient 2 of Temperature Based Exhaust Gas Temperature c
-      0,                       !- Coefficient 3 of Temperature Based Exhaust Gas Temperature c
-      0.223,                   !- Coefficient 1 of Recovery Lube Heat curve
-      -0.4,                    !- Coefficient 2 of Recovery Lube Heat curve
-      0.2286,                  !- Coefficient 3 of Recovery Lube Heat curve
-      0.01907045,              !- Coefficient 1 of UA curve
-      0.9,                     !- Coefficient 2 of UA curve
-      50000,                   !- Gas Turbine Engine Capacity {W}
-      0.00000504,              !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
-      150,                     !- Design Steam Saturation Temperature {C}
-      43500,                   !- Fuel Higher Heating Value {kJ/kg}
-      0.0,                     !- Design Heat Recovery Water Flow Rate {m3/s}
-      ,                        !- Heat Recovery Inlet Node Name
-      ,                        !- Heat Recovery Outlet Node Name
-      VariableFlow,            !- Chiller Flow Mode
-      NaturalGas,              !- Fuel Type
-      80.0;                    !- Heat Recovery Maximum Temperature {C}
+      Big Chiller,             !- Chiller Name
+      WaterCooled,            !- Condenser Type
+      30000,                   !- Nominal Capacity {W}
+      2.75,                    !- COP
+      Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+      Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+      .15,                     !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      .65,                     !- Optimum Part Load Ratio
+      35.0,                    !- Design Condenser Inlet Temperature {C}
+      2.778,                   !- Temperature Rise Coefficient
+      6.67,                    !- Design Chilled Water Outlet Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
+      0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
+      -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
+      -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
+      2.333,                   !- Coefficient 1 of Power Ratio Curve
+      -1.975,                  !- Coefficient 2 of Power Ratio Curve
+      0.6121,                  !- Coefficient 3 of Power Ratio Curve
+      0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+      0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+      0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+      5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+      9.41,                    !- Coefficient 1 of Fuel Input curve
+      -9.48,                   !- Coefficient 2 of Fuel Input curve
+      4.32,                    !- Coefficient 3 of Fuel Input curve
+      1.0044,                  !- Coefficient 1 of Temperature Based Fuel Input curve
+      -0.0008,                 !- Coefficient 2 of Temperature Based Fuel Input curve
+      0,                       !- Coefficient 3 of Temperature Based Fuel Input curve
+      15.63518363,             !- Coefficient 1 of Exhaust Flow curve
+      -0.03059999,             !- Coefficient 2 of Exhaust Flow curve
+      -0.0002,                 !- Coefficient 3 of Exhaust Flow curve
+      916.992,                 !- Coefficient 1 of Exhaust Gas Temperature curve
+      307.998,                 !- Coefficient 2 of Exhaust Gas Temperature curve
+      79.992,                  !- Coefficient 3 of Exhaust Gas Temperature curve
+      1.005,                   !- Coefficient 1 of Temperature Based Exhaust Gas Temperature c
+      0.0018,                  !- Coefficient 2 of Temperature Based Exhaust Gas Temperature c
+      0,                       !- Coefficient 3 of Temperature Based Exhaust Gas Temperature c
+      0.223,                   !- Coefficient 1 of Recovery Lube Heat curve
+      -0.4,                    !- Coefficient 2 of Recovery Lube Heat curve
+      0.2286,                  !- Coefficient 3 of Recovery Lube Heat curve
+      0.01907045,              !- Coefficient 1 of UA curve
+      0.9,                     !- Coefficient 2 of UA curve
+      50000,                   !- Gas Turbine Engine Capacity {W}
+      0.00000504,              !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
+      150,                     !- Design Steam Saturation Temperature {C}
+      43500,                   !- Fuel Higher Heating Value {kJ/kg}
+      0.0,                     !- Design Heat Recovery Water Flow Rate {m3/s}
+      ,                        !- Heat Recovery Inlet Node Name
+      ,                        !- Heat Recovery Outlet Node Name
+      VariableFlow,            !- Chiller Flow Mode
+      NaturalGas,              !- Fuel Type
+      80.0;                    !- Heat Recovery Maximum Temperature {C}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-7-006}
@@ -3073,7 +3073,12 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). The available cooling capacity is computed as follows:
 
-\begin{array}{l}CoolFuelInput = \\AvailCoolCap \cdot RunFrac \cdot CFIR \cdot CFIRfT({T_{cw,l}},{T_{cond}}) \cdot CFIRfPLR(CPLR)\end{array}
+\begin{equation}
+\begin{array}{l}
+\rm{CoolFuelInput} = \\
+\rm{AvailCoolCap} \cdot \rm{RunFrac} \cdot \rm{CFIR} \cdot \rm{CFIRfT}( T_{cw,l}, {T_{\rm{cond}}}) \cdot \rm{CFIRfPLR}( \rm{CPLR} )
+\end{array}
+\end{equation}
 
 \paragraph{Field: Fuel Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-fuel-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
@@ -3083,7 +3088,12 @@ The CFIRfT curve represents the fraction of the fuel input to the chiller at ful
 
 The CFIRfPLR curve represents the fraction of the fuel input to the chiller as the load the chiller varies but the operating temperatures remain at the design values. The curve is normalized so that at full load the value of the curve should be 1.0. The curve is usually linear or quadratic. The cooling fuel input to the chiller is computed as follows:
 
-\begin{array}{l}CoolElectricPower = \\NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT({T_{cw,l}},{T_{cond}}) \cdot CEIRfPLR(CPLR)\end{array}
+\begin{equation}
+\begin{array}{l}
+\rm{CoolElectricPower} = \\
+\rm{NomCoolCap} \cdot \rm{RunFrac} \cdot \rm{CEIR} \cdot \rm{CEIRfT}(T_{cw,l}, T_{cond}) \cdot \rm{CEIRfPLR}(\rm{CPLR})
+\end{array}
+\end{equation}
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-2}
 
@@ -3146,41 +3156,41 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 ChillerHeater:Absorption:DirectFired,
-      Big Chiller,             !- Chiller Name
-      100000,                  !- Nominal Cooling Capacity {W}
-      0.8,                     !- Heating to Cooling capacity ratio
-      0.97,                    !- Fuel Input to Cooling Output Ratio
-      1.25,                    !- Fuel Input to Heating Output Ratio
-      0.01,                    !- Electric Input to Cooling Output Ratio
-      0.005,                   !- Electric Input to Heating Output Ratio
-      Big Chiller Inlet Node,  !- Chilled Water Side Inlet Node Name
-      Big Chiller Outlet Node, !- Chilled Water Side Outlet Node Name
-      Big Chiller Condenser Inlet Node,  !- Condenser Side Inlet Node Name
-      Big Chiller Condenser Outlet Node,  !- Condenser Side Outlet Node Name
-      Purchased Heat Inlet Node,  !- Hot Water Side Inlet Node Name
-      Purchased Heat Outlet Node,  !- Hot Water Side Outlet Node Name
-      0.000001,                !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      0.6,                     !- Optimum Part Load Ratio
-      29,                      !- Design Entering Condenser Water Temperature {C}
-      7,                       !- Design Leaving Chilled Water Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
-      0.0043,                  !- Design Hot Water Flow Rate {m3/s}
-      GasAbsFlatBiQuad,        !- Cooling Capacity Function of Temperature Curve Name
-      GasAbsFlatBiQuad,        !- Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
-      GasAbsLinearQuad,        !- Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
-      GasAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-      GasAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
-      GasAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
-      GasAbsLinearQuad,        !- Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
-      EnteringCondenser,       !- Temperature Curve Input Variable
-      WaterCooled,             !- Condenser Type
-      2,                       !- Chilled Water Temperature Lower Limit {C}
-      0,                       !- Fuel Higher Heating Value {kJ/kg}
-      VariableFlow,            !- Chiller Flow Mode
-      NaturalGas,              !- Fuel Type
-      1.0;                     !- Sizing Factor
+      Big Chiller,             !- Chiller Name
+      100000,                  !- Nominal Cooling Capacity {W}
+      0.8,                     !- Heating to Cooling capacity ratio
+      0.97,                    !- Fuel Input to Cooling Output Ratio
+      1.25,                    !- Fuel Input to Heating Output Ratio
+      0.01,                    !- Electric Input to Cooling Output Ratio
+      0.005,                   !- Electric Input to Heating Output Ratio
+      Big Chiller Inlet Node,  !- Chilled Water Side Inlet Node Name
+      Big Chiller Outlet Node, !- Chilled Water Side Outlet Node Name
+      Big Chiller Condenser Inlet Node,  !- Condenser Side Inlet Node Name
+      Big Chiller Condenser Outlet Node,  !- Condenser Side Outlet Node Name
+      Purchased Heat Inlet Node,  !- Hot Water Side Inlet Node Name
+      Purchased Heat Outlet Node,  !- Hot Water Side Outlet Node Name
+      0.000001,                !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      0.6,                     !- Optimum Part Load Ratio
+      29,                      !- Design Entering Condenser Water Temperature {C}
+      7,                       !- Design Leaving Chilled Water Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
+      0.0043,                  !- Design Hot Water Flow Rate {m3/s}
+      GasAbsFlatBiQuad,        !- Cooling Capacity Function of Temperature Curve Name
+      GasAbsFlatBiQuad,        !- Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
+      GasAbsLinearQuad,        !- Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      GasAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+      GasAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      GasAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
+      GasAbsLinearQuad,        !- Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
+      EnteringCondenser,       !- Temperature Curve Input Variable
+      WaterCooled,             !- Condenser Type
+      2,                       !- Chilled Water Temperature Lower Limit {C}
+      0,                       !- Fuel Higher Heating Value {kJ/kg}
+      VariableFlow,            !- Chiller Flow Mode
+      NaturalGas,              !- Fuel Type
+      1.0;                     !- Sizing Factor
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-8-005}
@@ -3248,7 +3258,7 @@ Outputs specific to Direct Fired Absorption Chiller
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Chiller Heater Runtime Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Runtime Fraction {[]}
 \end{itemize}
 
 Outputs specific to Direct Fired Absorption Chiller during cooling operation
@@ -3286,7 +3296,7 @@ Outputs specific to Direct Fired Absorption Chiller during heating operation
 \item
   HVAC,Sum,Chiller Heater Heating Electric Energy {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Heating Part Load Ratio {[]}
 \item
   HVAC,Average,Chiller Heater Heating Rate {[}W{]}
 \item
@@ -3311,7 +3321,7 @@ These outputs are the electric power input to the chiller when operating in cool
 
 These outputs are the fuel input to the chiller when operating in cooling mode, heating mode, or both depending on the fuel type entered. This value is not metered, but the separate cooling and heating fuel consumption are metered (see below).
 
-\paragraph{\texorpdfstring{Chiller Heater Runtime Fraction \protect\hyperlink{section-1}{}}{Chiller Heater Runtime Fraction }}\label{chiller-heater-runtime-fraction}
+\paragraph{\texorpdfstring{Chiller Heater Runtime Fraction {[]}}{Chiller Heater Runtime Fraction }}\label{chiller-heater-runtime-fraction}
 
 This is the average fraction of the time period during which the direct fired absorption chiller-heater was operating in either cooling mode, heating mode, or both.
 
@@ -3467,7 +3477,12 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). The available cooling capacity is computed as follows:
 
-\begin{array}{l}CoolThermalEnergyInput = AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot \\\quad \quad \quad \quad \quad \quad TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot TeFIRfPLR(CPLR)\end{array}
+\begin{equation}
+\begin{array}{l}
+\rm{CoolThermalEnergyInput} = \rm{AvailCoolCap} \cdot \rm{RunFrac} \cdot \rm{TeFIR} \cdot \\
+\quad \quad \quad \quad \quad \quad \rm{TeFIRfT} \left( T_{cw,l}, T_{cond} \right) \cdot \rm{TeFIRfPLR}( \rm{CPLR} )
+\end{array}
+\end{equation}
 
 \paragraph{Field: Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-thermal-energy-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
@@ -3546,40 +3561,40 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 ChillerHeater:Absorption:DoubleEffect,
-      Exh Chiller,             !- Chiller Name
-      100000,                  !- Nominal Cooling Capacity {W}
-      0.8,                     !- Heating to Cooling capacity ratio
-      0.97,                    !- Thermal Energy Input to Cooling Output Ratio
-      1.25,                    !- Thermal Energy Input to Heating Output Ratio
-      0.01,                    !- Electric Input to Cooling Output Ratio
-      0.005,                   !- Electric Input to Heating Output Ratio
-      Exh Chiller Inlet Node,  !- Chilled Water Side Inlet Node Name
-      Exh Chiller Outlet Node, !- Chilled Water Side Outlet Node Name
-      Exh Chiller Condenser Inlet Node,  !- Condenser Side Inlet Node Name
-      Exh Chiller Condenser Outlet Node,  !- Condenser Side Outlet Node Name
-      Exh Chiller Heating Inlet Node,  !- Hot Water Side Inlet Node Name
-      Exh Chiller Heating Outlet Node,  !- Hot Water Side Outlet Node Name
-      0.000001,                !- Minimum Part Load Ratio
-      1.0,                     !- Maximum Part Load Ratio
-      0.6,                     !- Optimum Part Load Ratio
-      29,                      !- Design Entering Condenser Water Temperature {C}
-      7,                       !- Design Leaving Chilled Water Temperature {C}
-      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
-      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
-      0.0043,                  !- Design Hot Water Flow Rate {m3/s}
-       ExhAbsorb_CapFt,        !- Cooling Capacity Function of Temperature Curve Name
-      ExhAbsorb_EIRFt,         !- Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve Name
-       ExhAbsorb_PLR,        !- Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
-      ExhAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-      ExhAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
-      ExhAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
-      ExhAbsLinearQuad,        !- Thermal Energy Input to Heat Output Ratio During Heating Only Operation Curve Name
-      EnteringCondenser,       !- Temperature Curve Input Variable
-      WaterCooled,             !- Condenser Type
-      2,                       !- Chilled Water Temperature Lower Limit {C}
-      Generator:MicroTurbine ; ! Field Exhaust Source Object Type
-  Capston500 ;                ! Field Exhaust Source name
-  1.0;                       !- Sizing Factor
+      Exh Chiller,             !- Chiller Name
+      100000,                  !- Nominal Cooling Capacity {W}
+      0.8,                     !- Heating to Cooling capacity ratio
+      0.97,                    !- Thermal Energy Input to Cooling Output Ratio
+      1.25,                    !- Thermal Energy Input to Heating Output Ratio
+      0.01,                    !- Electric Input to Cooling Output Ratio
+      0.005,                   !- Electric Input to Heating Output Ratio
+      Exh Chiller Inlet Node,  !- Chilled Water Side Inlet Node Name
+      Exh Chiller Outlet Node, !- Chilled Water Side Outlet Node Name
+      Exh Chiller Condenser Inlet Node,  !- Condenser Side Inlet Node Name
+      Exh Chiller Condenser Outlet Node,  !- Condenser Side Outlet Node Name
+      Exh Chiller Heating Inlet Node,  !- Hot Water Side Inlet Node Name
+      Exh Chiller Heating Outlet Node,  !- Hot Water Side Outlet Node Name
+      0.000001,                !- Minimum Part Load Ratio
+      1.0,                     !- Maximum Part Load Ratio
+      0.6,                     !- Optimum Part Load Ratio
+      29,                      !- Design Entering Condenser Water Temperature {C}
+      7,                       !- Design Leaving Chilled Water Temperature {C}
+      0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+      0.0011,                  !- Design Condenser Water Flow Rate {m3/s}
+      0.0043,                  !- Design Hot Water Flow Rate {m3/s}
+       ExhAbsorb_CapFt,        !- Cooling Capacity Function of Temperature Curve Name
+      ExhAbsorb_EIRFt,         !- Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve Name
+       ExhAbsorb_PLR,        !- Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      ExhAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+      ExhAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      ExhAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
+      ExhAbsLinearQuad,        !- Thermal Energy Input to Heat Output Ratio During Heating Only Operation Curve Name
+      EnteringCondenser,       !- Temperature Curve Input Variable
+      WaterCooled,             !- Condenser Type
+      2,                       !- Chilled Water Temperature Lower Limit {C}
+      Generator:MicroTurbine ; ! Field Exhaust Source Object Type
+  Capston500 ;                ! Field Exhaust Source name
+  1.0;                       !- Sizing Factor
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-9-005}
@@ -3629,7 +3644,7 @@ Outputs specific to Exhaust Fired Absorption Chiller
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,Chiller Heater Runtime Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Runtime Fraction {[]}
 \end{itemize}
 
 Outputs specific to Exhaust Fired Absorption Chiller during cooling operation
@@ -3686,7 +3701,7 @@ The ``Chiller'' output variables are defined above under ``Generic Chiller Outpu
 
 These outputs are the electric power input to the chiller when operating in cooling mode, heating mode, or both. This value is not metered, but the separate cooling and heating electric consumption are metered (see below).
 
-\paragraph{\texorpdfstring{Chiller Heater Runtime Fraction \protect\hyperlink{section-1}{}}{Chiller Heater Runtime Fraction }}\label{chiller-heater-runtime-fraction-1}
+\paragraph{\texorpdfstring{Chiller Heater Runtime Fraction {[]}}{Chiller Heater Runtime Fraction }}\label{chiller-heater-runtime-fraction-1}
 
 This is the average fraction of the time period during which the Exhaust Fired absorption chiller-heater was operating in either cooling mode, heating mode, or both.
 
@@ -3696,7 +3711,7 @@ These outputs are the electricity input to the Exhaust Fired absorption chiller 
 
 This is the average available cooling capacity for the reported time period.
 
-\paragraph{\texorpdfstring{Chiller Heater Cooling Part Load Ratio \protect\hyperlink{section-1}{}}{Chiller Heater Cooling Part Load Ratio }}\label{chiller-heater-cooling-part-load-ratio-1}
+\paragraph{\texorpdfstring{Chiller Heater Cooling Part Load Ratio {[]}}{Chiller Heater Cooling Part Load Ratio }}\label{chiller-heater-cooling-part-load-ratio-1}
 
 This is the average cooling load (Chiller Heater Evaporator Cooling Rate {[}W{]}) divided by the average available cooling capacity (Chiller Heater Maximum Cooling Rate {[}W{]}) for the reported time period.
 
@@ -3718,7 +3733,7 @@ These outputs are the electric power input to the Exhaust Fired absorption chill
 
 This is the average available heating capacity for the reported time period.
 
-\paragraph{\texorpdfstring{Chiller Heater Heating Part Load Ratio \protect\hyperlink{section-1}{}}{Chiller Heater Heating Part Load Ratio }}\label{chiller-heater-heating-part-load-ratio-1}
+\paragraph{\texorpdfstring{Chiller Heater Heating Part Load Ratio {[]}}{Chiller Heater Heating Part Load Ratio }}\label{chiller-heater-heating-part-load-ratio-1}
 
 This is the average heating load (Chiller Heater Heating Rate {[}W{]}) divided by the average available heating capacity (Chiller Heater Maximum Heating Rate {[}W{]}) for the reported time period.
 
@@ -3864,7 +3879,12 @@ BiQuadratic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {
 QuadraticLinear \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot PLR\cdot {T_w} + {A_5}\cdot PL{R^2}\cdot {T_w}
 \end{equation}
 
-\begin{array}{l}Bicubic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}{T_w}^2 + {A_5}PLR\cdot {T_w} + {A_6}PL{R^3}\\\quad \quad \quad \quad \quad \quad \quad  + {A_7}\cdot {T_w}^3 + {A_8}\cdot PL{R^2}\cdot {T_w} + {A_9}\cdot PLR\cdot {T_w}^2\end{array}
+\begin{equation}
+\begin{array}{l}
+  \rm{Bicubic} \to \rm{Eff} = A_0 + A_1 \cdot \rm{PLR} + A_2 \cdot \rm{PLR}^2 + A_3 \cdot T_w + A_4 T_w^2 + A_5 \rm{PLR} \cdot T_w + A_6 \rm{PLR}^3 \\
+  \quad \quad \quad \quad \quad \quad \quad  + A_7 \cdot T_w^3 + A_8 \cdot \rm{PLR}^2 \cdot T_w + A_9 \cdot \rm{PLR} \cdot T_w^2
+\end{array}
+\end{equation}
 
 where
 
@@ -3922,37 +3942,37 @@ An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
-  Boiler:HotWater,
-      Condensing Boiler,   !- Boiler Name
-      NaturalGas,          !- Fuel Type
-      25000,               !- Nominal Capacity {W}
-      EnteringBoiler       !- Efficiency Curve Temperature Evaluation Variable
-      0.89,                !- Nominal Thermal Efficiency
-      CondensingBoilerEff, !- Boiler Efficiency Curve Name
-      75,                  !- Design Boiler Water Outlet Temp {C}
-      0.0021,              !- Max Design Boiler Water Flow Rate {m3/s}
-      0.10,                !- Minimum Part Load Ratio
-      1.00,                !- Maximum Part Load Ratio
-      1.00,                !- Optimum Part Load Ratio
-      Boiler Inlet Node,   !- Boiler Water Inlet Node
-      Boiler Outlet Node,  !- Boiler Water Outlet Node
-      80,                  !- Temp Upper Limit Water Outlet {C}
-      ConstantFlow,        !- Boiler Flow Mode
-      25.0;                !- Parasitic Electric Load {W}
+  Boiler:HotWater,
+      Condensing Boiler,   !- Boiler Name
+      NaturalGas,          !- Fuel Type
+      25000,               !- Nominal Capacity {W}
+      EnteringBoiler       !- Efficiency Curve Temperature Evaluation Variable
+      0.89,                !- Nominal Thermal Efficiency
+      CondensingBoilerEff, !- Boiler Efficiency Curve Name
+      75,                  !- Design Boiler Water Outlet Temp {C}
+      0.0021,              !- Max Design Boiler Water Flow Rate {m3/s}
+      0.10,                !- Minimum Part Load Ratio
+      1.00,                !- Maximum Part Load Ratio
+      1.00,                !- Optimum Part Load Ratio
+      Boiler Inlet Node,   !- Boiler Water Inlet Node
+      Boiler Outlet Node,  !- Boiler Water Outlet Node
+      80,                  !- Temp Upper Limit Water Outlet {C}
+      ConstantFlow,        !- Boiler Flow Mode
+      25.0;                !- Parasitic Electric Load {W}
 
 
-    Curve:Biquadratic,
-      CondensingBoilerEff,     !- Name
-      1.124970374,             !- Coefficient1 Constant
-      0.014963852,             !- Coefficient2 x
-     -0.02599835,              !- Coefficient3 x**2
-      0.0,                     !-Coefficient4y
-     -1.40464E-6,              !-Coefficient5y**2
-     -0.00153624,              !- Coefficient6x*y
-      0.1,                     !- Minimum Value of x
-      1.0,                     !- Maximum Value of x
-      30.0,                    !- Minimum Value of y
-      85.0;                    !- Maximum Value of y
+    Curve:Biquadratic,
+      CondensingBoilerEff,     !- Name
+      1.124970374,             !- Coefficient1 Constant
+      0.014963852,             !- Coefficient2 x
+     -0.02599835,              !- Coefficient3 x**2
+      0.0,                     !-Coefficient4y
+     -1.40464E-6,              !-Coefficient5y**2
+     -0.00153624,              !- Coefficient6x*y
+      0.1,                     !- Minimum Value of x
+      1.0,                     !- Maximum Value of x
+      30.0,                    !- Minimum Value of y
+      85.0;                    !- Maximum Value of y
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-10-005}
@@ -4086,7 +4106,7 @@ These outputs are the heating output (load) of the boiler. Energy is metered on 
 
 These outputs are the hot water inlet and outlet temperatures and flow rate for the boiler.
 
-\paragraph{\texorpdfstring{Boiler Part Load Ratio \protect\hyperlink{section-1}{}}{Boiler Part Load Ratio }}\label{boiler-part-load-ratio}
+\paragraph{\texorpdfstring{Boiler Part Load Ratio {[]}}{Boiler Part Load Ratio }}\label{boiler-part-load-ratio}
 
 This output is the operating part-load ratio of the boiler. The part-load ratio is calculated as the boiler load divided by the boiler nominal capacity. The part-load ratio is limited by the minimum and maximum part-load ratio inputs specified by the user.
 
@@ -4177,37 +4197,37 @@ An example of a Steam Boiler input statement from an IDF is:
 \begin{lstlisting}
 
 Boiler:Steam,
-      Steam Boiler Plant Boiler,  !- Boiler Name
-      NaturalGas,                 !- Fuel Type
-      160000,                     !-Maximum Boiler Pressure Pascal
-      0.8,                        !- Theoretical Boiler Efficiency
-      115,                        !- Max Design Outlet Steam Temp
-      300000,                     !- Nominal Capacity W
-      0.00001,                    !- Minimum Part Load Ratio
-      1.0,                        !- Maximum Part Load Ratio
-      0.2,                        !- Optimum Part Load Ratio
-      0.8,!- Coefficient 1 of the fuel use/part load ratio curve
-      0.1,!- Coefficient 2 of the fuel use/part load ratio curve
-      0.1,!- Coefficient 3 of the fuel use/part load ratio curve
-      Steam Boiler Plant Boiler Inlet Node,  !- Boiler Steam Inlet Node
-      Steam Boiler Plant Boiler Outlet Node; !- Plant Loop Outlet Node
+      Steam Boiler Plant Boiler,  !- Boiler Name
+      NaturalGas,                 !- Fuel Type
+      160000,                     !-Maximum Boiler Pressure Pascal
+      0.8,                        !- Theoretical Boiler Efficiency
+      115,                        !- Max Design Outlet Steam Temp
+      300000,                     !- Nominal Capacity W
+      0.00001,                    !- Minimum Part Load Ratio
+      1.0,                        !- Maximum Part Load Ratio
+      0.2,                        !- Optimum Part Load Ratio
+      0.8,!- Coefficient 1 of the fuel use/part load ratio curve
+      0.1,!- Coefficient 2 of the fuel use/part load ratio curve
+      0.1,!- Coefficient 3 of the fuel use/part load ratio curve
+      Steam Boiler Plant Boiler Inlet Node,  !- Boiler Steam Inlet Node
+      Steam Boiler Plant Boiler Outlet Node; !- Plant Loop Outlet Node
 
 
   Boiler:Steam,
-      Steam Boiler Plant Boiler,  !- Boiler Name
-      NaturalGas,                 !- Fuel Type
-      160000,                     !-Maximum Boiler Pressure Pascal
-      0.8,                        !- Theoretical Boiler Efficiency
-      115,                        !- Max Design Outlet Steam Temp
-  autosize,                  !- Nominal Capacity W
-      0.00001,                    !- Minimum Part Load Ratio
-      1.0,                        !- Maximum Part Load Ratio
-      0.2,                        !- Optimum Part Load Ratio
-      0.8,!- Coefficient 1 of the fuel use/part load ratio curve
-      0.1,!- Coefficient 2 of the fuel use/part load ratio curve
-      0.1,!- Coefficient 3 of the fuel use/part load ratio curve
-      Steam Boiler Plant Boiler Inlet Node,  !- Boiler Steam Inlet Node
-      Steam Boiler Plant Boiler Outlet Node; !- Plant Loop Outlet Node
+      Steam Boiler Plant Boiler,  !- Boiler Name
+      NaturalGas,                 !- Fuel Type
+      160000,                     !-Maximum Boiler Pressure Pascal
+      0.8,                        !- Theoretical Boiler Efficiency
+      115,                        !- Max Design Outlet Steam Temp
+  autosize,                  !- Nominal Capacity W
+      0.00001,                    !- Minimum Part Load Ratio
+      1.0,                        !- Maximum Part Load Ratio
+      0.2,                        !- Optimum Part Load Ratio
+      0.8,!- Coefficient 1 of the fuel use/part load ratio curve
+      0.1,!- Coefficient 2 of the fuel use/part load ratio curve
+      0.1,!- Coefficient 3 of the fuel use/part load ratio curve
+      Steam Boiler Plant Boiler Inlet Node,  !- Boiler Steam Inlet Node
+      Steam Boiler Plant Boiler Outlet Node; !- Plant Loop Outlet Node
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-11-004}
@@ -4359,7 +4379,7 @@ This model is an equation-fit model from the catalog data which resembles a blac
 
 \textbf{HeatPump:WaterToWater:ParameterEstimation:Heating}
 
-This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently ``hardwired'' to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\FluidPropertiesRefData.idf.
+This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently ``hardwired'' to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\\FluidPropertiesRefData.idf.
 
 Descriptions and strength of each respective model is available in the following references:
 
@@ -4703,28 +4723,28 @@ An idf example:
 \begin{lstlisting}
 
 HeatPump:WaterToWater:ParameterEstimation:Cooling,
-      GshpCLG,                 !- Water to Water Heat Pump Name
-      GshpCLG SourceSide Inlet Node,  !- Source Side Inlet Node
-      GshpCLG SourceSide Outlet Node,  !- Source Side Outlet Node
-      GshpCLG LoadSide Inlet Node,  !- Load Side Inlet Node
-      GshpCLG LoadSide Outlet Node,  !- Load Side Outlet Node
-      3.5,                     !- Nominal COP
-      45000,                   !- Nominal Capacity {W}
-      0.0,                     !- Min PLR
-      1,                       !- Max PLR
-      1,                       !- optimum PLR
-      .003,                    !- Load side Flow Rate {m3/s}
-      .003,                    !- Source Side Flow Rate {m3/s}
-      7761,                    !- Load side Heat Transfer Coefficient {W/K}
-      3998,                    !- Source Side Heat Transfer Coefficient {W/K}
-      .012544,                 !- Piston Displacement {m3/s}
-      .05469,                  !- Compressor Clearance Factor %
-      92156.2,                 !- Compressor Suction And Discharge Pressure Drop {Pa}
-      4.8907,                  !- Superheating {C}
-      2803.9,                  !- Constant Part of Electro Mechanical Power Losses {W}
-      .699,                    !- Loss Factor
-      0.0,                     !- High Pressure Cut off {Pa}
-      0.0;                     !- LowPressure Cut off {Pa}
+      GshpCLG,                 !- Water to Water Heat Pump Name
+      GshpCLG SourceSide Inlet Node,  !- Source Side Inlet Node
+      GshpCLG SourceSide Outlet Node,  !- Source Side Outlet Node
+      GshpCLG LoadSide Inlet Node,  !- Load Side Inlet Node
+      GshpCLG LoadSide Outlet Node,  !- Load Side Outlet Node
+      3.5,                     !- Nominal COP
+      45000,                   !- Nominal Capacity {W}
+      0.0,                     !- Min PLR
+      1,                       !- Max PLR
+      1,                       !- optimum PLR
+      .003,                    !- Load side Flow Rate {m3/s}
+      .003,                    !- Source Side Flow Rate {m3/s}
+      7761,                    !- Load side Heat Transfer Coefficient {W/K}
+      3998,                    !- Source Side Heat Transfer Coefficient {W/K}
+      .012544,                 !- Piston Displacement {m3/s}
+      .05469,                  !- Compressor Clearance Factor %
+      92156.2,                 !- Compressor Suction And Discharge Pressure Drop {Pa}
+      4.8907,                  !- Superheating {C}
+      2803.9,                  !- Constant Part of Electro Mechanical Power Losses {W}
+      .699,                    !- Loss Factor
+      0.0,                     !- High Pressure Cut off {Pa}
+      0.0;                     !- LowPressure Cut off {Pa}
 \end{lstlisting}
 
 \subsection{HeatPump:WaterToWater:ParameterEstimation:Heating}\label{heatpumpwatertowaterparameterestimationheating}
@@ -4824,28 +4844,28 @@ An idf example:
 \begin{lstlisting}
 
 HeatPump:WaterToWater:ParameterEstimation:Heating,
-      GshpHeating,             !- Water to Water Heat Pump Name
-      GshpHeating SourceSide Inlet Node,  !- Source Side Inlet Node
-      GshpHeating SourceSide Outlet Node,  !- Source Side Outlet Node
-      GshpHeating LoadSide Inlet Node,  !- Load Side Inlet Node
-      GshpHeating LoadSide Outlet Node,  !- Load Side Outlet Node
-      3.5,                     !- Nominal COP
-      50000,                   !- Nominal Capacity {W}
-      0.0,                     !- Min PLR
-      1,                       !- Max PLR
-      1,                       !- optimum PLR
-      .003,                    !- Load side Flow Rate {m3/s}
-      .003,                    !- Source Side Flow Rate {m3/s}
-      7761,                    !- Load side Heat Transfer Coefficient {W/K}
-      3998,                    !- Source Side Heat Transfer Coefficient {W/K}
-      .012544,                 !- Piston Displacement {m3/s}
-      .05469,                  !- Compressor Clearance Factor %
-      92156.2,                 !- Compressor Suction And Dischrage Pressure Drop {Pa}
-      4.8907,                  !- Superheating {C}
-      2803.9,                  !- Constant Part Of Electro Mechanical Power Losses {W}
-      .699,                    !- Loss Factor
-      0.0,                     !- High Pressure Cut off {Pa}
-      0.0;                     !- LowPressure Cut off {Pa}
+      GshpHeating,             !- Water to Water Heat Pump Name
+      GshpHeating SourceSide Inlet Node,  !- Source Side Inlet Node
+      GshpHeating SourceSide Outlet Node,  !- Source Side Outlet Node
+      GshpHeating LoadSide Inlet Node,  !- Load Side Inlet Node
+      GshpHeating LoadSide Outlet Node,  !- Load Side Outlet Node
+      3.5,                     !- Nominal COP
+      50000,                   !- Nominal Capacity {W}
+      0.0,                     !- Min PLR
+      1,                       !- Max PLR
+      1,                       !- optimum PLR
+      .003,                    !- Load side Flow Rate {m3/s}
+      .003,                    !- Source Side Flow Rate {m3/s}
+      7761,                    !- Load side Heat Transfer Coefficient {W/K}
+      3998,                    !- Source Side Heat Transfer Coefficient {W/K}
+      .012544,                 !- Piston Displacement {m3/s}
+      .05469,                  !- Compressor Clearance Factor %
+      92156.2,                 !- Compressor Suction And Dischrage Pressure Drop {Pa}
+      4.8907,                  !- Superheating {C}
+      2803.9,                  !- Constant Part Of Electro Mechanical Power Losses {W}
+      .699,                    !- Loss Factor
+      0.0,                     !- High Pressure Cut off {Pa}
+      0.0;                     !- LowPressure Cut off {Pa}
 \end{lstlisting}
 
 Since the heat pump is defined with two separate objects (one for heating, one for cooling), the connections to the condenser has to be done carefully. The example below shows the configuration for parameter estimation objects. The same specifications and configuration also applies to the equation fit model.
@@ -4869,13 +4889,13 @@ For the heating mode:
 \begin{lstlisting}
 
 BRANCH, Heating GshpHeating Branch,
-        ,
-        ,
-    HeatPump:WatertoWater:ParameterEstimatinon:Heating,
-    GshpHeating,
-    GshpHeating LoadSide Inlet Node,
-    GshpHeating LoadSide Outlet Node,
-    ACTIVE;
+        ,
+        ,
+    HeatPump:WatertoWater:ParameterEstimatinon:Heating,
+    GshpHeating,
+    GshpHeating LoadSide Inlet Node,
+    GshpHeating LoadSide Outlet Node,
+    ACTIVE;
 \end{lstlisting}
 
 \textbf{!in condenser loop}
@@ -4883,13 +4903,13 @@ BRANCH, Heating GshpHeating Branch,
 \begin{lstlisting}
 
 BRANCH, GshpHeating SourceSide Branch,
-        ,
-        ,
-    HeatPump:WatertoWater:ParameterEstimatinon:Heating,
-    GshpHeating,
-    GshpHeating SourceSide Inlet Node,
-    GshpHeating SourceSide Outlet Node,
-    ACTIVE;
+        ,
+        ,
+    HeatPump:WatertoWater:ParameterEstimatinon:Heating,
+    GshpHeating,
+    GshpHeating SourceSide Inlet Node,
+    GshpHeating SourceSide Outlet Node,
+    ACTIVE;
 \end{lstlisting}
 
 Example of Heat Pump Links
@@ -4913,12 +4933,12 @@ For the cooling mode:
 \begin{lstlisting}
 
 BRANCH,GshpCLG1 Chiller Branch,
-    ,
-    ,
-    HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
-    GshpCLG LoadSide Inlet Node1,
-    GshpCLG LoadSide Outlet Node1,
-    Active;
+    ,
+    ,
+    HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
+    GshpCLG LoadSide Inlet Node1,
+    GshpCLG LoadSide Outlet Node1,
+    Active;
 \end{lstlisting}
 
 \textbf{!in condenser loop}
@@ -4926,12 +4946,12 @@ BRANCH,GshpCLG1 Chiller Branch,
 \begin{lstlisting}
 
 BRANCH, GshpCLG1 Condenser Branch,
-    ,
-    ,
-    HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
-    GshpCLG SourceSide Inlet Node1,
-    GshpCLG SourceSide Outlet Node1,
-    ACTIVE;
+    ,
+    ,
+    HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
+    GshpCLG SourceSide Inlet Node1,
+    GshpCLG SourceSide Outlet Node1,
+    ACTIVE;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-13-003}
@@ -5092,8 +5112,8 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 DistrictCooling, Purchased Cooling,
-          NODE_35,NODE_49,
-          68000;
+          NODE_35,NODE_49,
+          68000;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-14-003}
@@ -5166,8 +5186,8 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 DistrictHeating,Purchased Heating,
-          NODE_30,NODE_29,
-          1000000;
+          NODE_30,NODE_29,
+          1000000;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-15-002}
@@ -5248,13 +5268,13 @@ And, as shown in an IDF:
 \begin{lstlisting}
 
 PlantComponent:TemperatureSource,
-      FluidSource,             !- Name
-      FluidSource Inlet Node,  !- Inlet Node
-      FluidSource Outlet Node, !- Outlet Node
-      Autosize,                !- Design Volume Flow Rate {m3/s}
-      Constant,                !- Temperature Specification Type
-      62,                      !- Source Temperature {C}
-      ;                        !- Source Temperature Schedule Name
+      FluidSource,             !- Name
+      FluidSource Inlet Node,  !- Inlet Node
+      FluidSource Outlet Node, !- Outlet Node
+      Autosize,                !- Design Volume Flow Rate {m3/s}
+      Constant,                !- Temperature Specification Type
+      62,                      !- Source Temperature {C}
+      ;                        !- Source Temperature Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-16-000}
@@ -5317,7 +5337,7 @@ The order of the multiple chiller-heaters' operation is assumed to be sequential
 \begin{figure}[hbtp] % fig 77
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image186.png}
-\caption{Diagram of a central heat pump system with three chiller-heaters in heat recovery mode         (No heat is exchanged with the ground source loop) \protect \label{fig:diagram-of-a-central-heat-pump-system-with-001}}
+\caption{Diagram of a central heat pump system with three chiller-heaters in heat recovery mode         (No heat is exchanged with the ground source loop) \protect \label{fig:diagram-of-a-central-heat-pump-system-with-001}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 78
@@ -5405,24 +5425,24 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 CentralHeatPumpSystem,
-    ChillerBank,             !- Name
-    SmartMixing,             !- Control Method
-    Chiller Inlet Node,      !- Cooling Loop Inlet Node Name
-    Chiller Outlet Node,     !- Cooling Loop Outlet Node Name
-    Condenser Inlet Node,    !- Source Loop Inlet Node Name
-    Condenser Outlet Node,   !- Source Loop Outlet Node Name
-    HWInlet,                 !- Heating Loop Inlet Node Name
-    HWOutlet,                !- Heating Loop Outlet Node Name
-    460,                     !- Ancillary Power {W}
-    ,                        !- Ancillary Operation Schedule Name
-    ChillerHeaterPerformance:Electric:EIR,  !- Chiller Heater Modules Object Type 1
-    ChillerHeaterModule 1,   !- Chiller Heater Modules Performance Component Name 1
-    ON,                      !- Chiller Heater Modules Control Schedule Name 1
-    2,                       !- Number of Chiller Heater Modules 1
-    ChillerHeaterPerformance:Electric:EIR,  !- Chiller Heater Modules Object Type 2
-    ChillerHeaterModule 2,   !- Chiller Heater Modules Performance Component Name 2
-    ON,                      !- Chiller Heater Modules Control Schedule Name 2
-    2;                       !- Number of Chiller Heater Modules 2
+    ChillerBank,             !- Name
+    SmartMixing,             !- Control Method
+    Chiller Inlet Node,      !- Cooling Loop Inlet Node Name
+    Chiller Outlet Node,     !- Cooling Loop Outlet Node Name
+    Condenser Inlet Node,    !- Source Loop Inlet Node Name
+    Condenser Outlet Node,   !- Source Loop Outlet Node Name
+    HWInlet,                 !- Heating Loop Inlet Node Name
+    HWOutlet,                !- Heating Loop Outlet Node Name
+    460,                     !- Ancillary Power {W}
+    ,                        !- Ancillary Operation Schedule Name
+    ChillerHeaterPerformance:Electric:EIR,  !- Chiller Heater Modules Object Type 1
+    ChillerHeaterModule 1,   !- Chiller Heater Modules Performance Component Name 1
+    ON,                      !- Chiller Heater Modules Control Schedule Name 1
+    2,                       !- Number of Chiller Heater Modules 1
+    ChillerHeaterPerformance:Electric:EIR,  !- Chiller Heater Modules Object Type 2
+    ChillerHeaterModule 2,   !- Chiller Heater Modules Performance Component Name 2
+    ON,                      !- Chiller Heater Modules Control Schedule Name 2
+    2;                       !- Number of Chiller Heater Modules 2
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-17-000}
@@ -5661,50 +5681,50 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 ChillerHeaterPerformance:Electric:EIR,
-    ChillerHeaterModule 1,   !- Name
-    12500,                   !- Reference Cooling Mode Evaporator Capacity {W}
-    1.5,                     !- Reference Cooling Mode COP {W/W}
-    6.67,                    !- Reference Cooling Mode Leaving Chilled Water Temperature {C}
-    29.4,                    !- Reference Cooling Mode Entering Condenser Fluid Temperature {C}
-    35.0,                    !- Reference Cooling Mode Leaving Condenser Water Temperature {C}
-    0.74,                    !- Reference Heating Mode Cooling Capacity Ratio
-    1.38,                    !- Reference Heating Mode Cooling Power Input Ratio
-    6.67,                    !- Reference Heating Mode Leaving Chilled Water Temperature {C}
-    60,                      !- Reference Heating Mode Leaving Condenser Water Temperature {C}
-    29.44,                   !- Reference Heating Mode Entering Condenser Fluid Temperature {C}
-    5,                       !- Heating Mode Entering Chilled Water Temperature Low Limit {C}
-    VariableFlow,            !- Chilled Water Flow Mode Type
-    0.0003525,               !- Design Chilled Water Flow Rate {m$^{3}$/s}
-    0.0005525,               !- Design Condenser Water Flow Rate {m$^{3}$/s}
-    0.0003525,               !- Design Hot Water Flow Rate {m$^{3}$/s}
-    1,                       !- Compressor Motor Efficiency
-    WaterCooled,             !- Condenser Type
-    EnteringCondenser,       !- Cooling Mode Temperature Curve Condenser Water Independent Variable
-    ChillerHeaterClgCapFT,   !- Cooling Mode Cooling Capacity Function of Temperature Curve Name
-    ChillerHeaterClgEIRFT,   !- Cooling Mode Electric Input to Cooling Output Ratio Function of
-                                !-   Temperature Curve Name
-    ChillerHeaterClgEIRFPLR, !- Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load
-                         !-   Ratio Curve Name
-    1,                       !- Cooling Mode Cooling Capacity Optimum Part Load Ratio
-    LeavingCondenser,        !- Heating Mode Temperature Curve Condenser Water Independent Variable
-    ChillerHeaterHtgCapFT,   !- Heating Mode Cooling Capacity Function of Temperature Curve Name
-    ChillerHeaterHtgEIRFT,   !- Heating Mode Electric Input to Cooling Output Ratio Function of
-                               !-   Temperature Curve Name
-    ChillerHeaterHtgEIRFPLR, !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load
-                               !-   Ratio Curve Name
-    1,                       !- Heating Mode Cooling Capacity Optimum Part Load Ratio
-    1;                       !- Sizing Factor
+    ChillerHeaterModule 1,   !- Name
+    12500,                   !- Reference Cooling Mode Evaporator Capacity {W}
+    1.5,                     !- Reference Cooling Mode COP {W/W}
+    6.67,                    !- Reference Cooling Mode Leaving Chilled Water Temperature {C}
+    29.4,                    !- Reference Cooling Mode Entering Condenser Fluid Temperature {C}
+    35.0,                    !- Reference Cooling Mode Leaving Condenser Water Temperature {C}
+    0.74,                    !- Reference Heating Mode Cooling Capacity Ratio
+    1.38,                    !- Reference Heating Mode Cooling Power Input Ratio
+    6.67,                    !- Reference Heating Mode Leaving Chilled Water Temperature {C}
+    60,                      !- Reference Heating Mode Leaving Condenser Water Temperature {C}
+    29.44,                   !- Reference Heating Mode Entering Condenser Fluid Temperature {C}
+    5,                       !- Heating Mode Entering Chilled Water Temperature Low Limit {C}
+    VariableFlow,            !- Chilled Water Flow Mode Type
+    0.0003525,               !- Design Chilled Water Flow Rate {m$^{3}$/s}
+    0.0005525,               !- Design Condenser Water Flow Rate {m$^{3}$/s}
+    0.0003525,               !- Design Hot Water Flow Rate {m$^{3}$/s}
+    1,                       !- Compressor Motor Efficiency
+    WaterCooled,             !- Condenser Type
+    EnteringCondenser,       !- Cooling Mode Temperature Curve Condenser Water Independent Variable
+    ChillerHeaterClgCapFT,   !- Cooling Mode Cooling Capacity Function of Temperature Curve Name
+    ChillerHeaterClgEIRFT,   !- Cooling Mode Electric Input to Cooling Output Ratio Function of
+                                !-   Temperature Curve Name
+    ChillerHeaterClgEIRFPLR, !- Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load
+                         !-   Ratio Curve Name
+    1,                       !- Cooling Mode Cooling Capacity Optimum Part Load Ratio
+    LeavingCondenser,        !- Heating Mode Temperature Curve Condenser Water Independent Variable
+    ChillerHeaterHtgCapFT,   !- Heating Mode Cooling Capacity Function of Temperature Curve Name
+    ChillerHeaterHtgEIRFT,   !- Heating Mode Electric Input to Cooling Output Ratio Function of
+                               !-   Temperature Curve Name
+    ChillerHeaterHtgEIRFPLR, !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load
+                               !-   Ratio Curve Name
+    1,                       !- Heating Mode Cooling Capacity Optimum Part Load Ratio
+    1;                       !- Sizing Factor
 \end{lstlisting}
 
 \subsection{ChillerHeaterPerformance:Electric:EIR Outputs}\label{chillerheaterperformanceelectriceir-outputs}
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Operation Mode Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Operation Mode Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater Part Load Ratio Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Part Load Ratio Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} {[]}
 \item
   HVAC,Average,Chiller Heater Cooling Electric Power Unit \textless{}x\textgreater{} {[}W{]}
 \item
@@ -5738,13 +5758,13 @@ ChillerHeaterPerformance:Electric:EIR,
 \item
   HVAC,Average,Chiller Heater Condenser Mass Flow Rate Unit \textless{}x\textgreater{} {[}kg/s{]}
 \item
-  HVAC,Average,Chiller Heater COP Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater COP Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater Capacity Temperature Modifier Multiplier Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater Capacity Temperature Modifier Multiplier Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater EIR Temperature Modifier Multiplier Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater EIR Temperature Modifier Multiplier Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater EIR Part Load Modifier Multiplier Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{}
+  HVAC,Average,Chiller Heater EIR Part Load Modifier Multiplier Unit \textless{}x\textgreater{} {[]}
 \end{itemize}
 
 Note that much of these output variables are adapted from the definitions above under ``Generic Chiller Outputs'' and ``Electric EIR Chiller Outputs.'' The following outputs are repeated up to the maximum of individual chiller-heater module objects. The maximum number may be different from the number of object defined in this object when users define two or more identical chiller-heater modules for a single chiller heater object in the central heat pump system.
@@ -5928,11 +5948,11 @@ Following is an example input for the THERMAL STORAGE:ICE:SIMPLE object.
 \begin{lstlisting}
 
 ThermalStorage:Ice:Simple,
-      ITS,                     !- Ice Storage Name
-      IceOnCoilInternal,       !- Ice Storage Type
-      1.5,                     !- Ice Storage Capacity {GJ}
-      ITS Inlet Node,          !- Plant Loop Inlet Node
-      ITS Outlet Node;         !- Plant Loop Outlet Node
+      ITS,                     !- Ice Storage Name
+      IceOnCoilInternal,       !- Ice Storage Type
+      1.5,                     !- Ice Storage Capacity {GJ}
+      ITS Inlet Node,          !- Plant Loop Inlet Node
+      ITS Outlet Node;         !- Plant Loop Outlet Node
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-18-000}
@@ -5943,7 +5963,7 @@ The following outputs are available for simple Ice Storage model:
 \item
   HVAC,Average,Ice Thermal Storage Requested Load {[}W{]}
 \item
-  Zone,Average,Ice Thermal Storage End Fraction\protect\hyperlink{section-1}{}
+  Zone,Average,Ice Thermal Storage End Fraction{[]}
 \item
   HVAC,Average,Ice Thermal Storage Mass Flow Rate {[}kg/s{]}
 \item
@@ -5964,7 +5984,7 @@ The following outputs are available for simple Ice Storage model:
 
 The load requested by the plant control scheme. A positive value indicates a cooling load or a request to discharge (melt) the tank. A negative value indicates a request to charge (freeze) the tank.
 
-\paragraph{\texorpdfstring{Ice Thermal Storage End Fraction \protect\hyperlink{section-1}{}}{Ice Thermal Storage End Fraction }}\label{ice-thermal-storage-end-fraction}
+\paragraph{\texorpdfstring{Ice Thermal Storage End Fraction {[]}}{Ice Thermal Storage End Fraction }}\label{ice-thermal-storage-end-fraction}
 
 The fraction of full ice storage which is present at the end of the current HVAC timestep. When reported at a frequency less than detailed, this value is averaged over the reporting period.
 
@@ -6067,20 +6087,20 @@ An IDF example:
 \begin{lstlisting}
 
 ThermalStorage:Ice:Detailed,
-      Ice Tank,                !- Ice Storage Name
-      ON,                      !- Ice Storage availability schedule
-      0.5,                     !- Ice Storage Capacity {GJ}
-      Ice Tank Inlet Node,     !- Plant Loop Inlet Node
-      Ice Tank Outlet Node,    !- Plant Loop Outlet Node
-      QuadraticLinear,         !- Discharging Curve Fit Type
-      DischargeCurve,          !- Discharging Curve Name
-      QuadraticLinear,         !- Charging Curve Fit Type
-      ChargeCurve,             !- Charging Curve Name
-      1.0,                     !- Timestep of Curve Fit Data
-      0.0001,                  !- Parasitic electric load during discharging
-      0.0002,                  !- Parasitic electric load during charging
-      0.0003,                  !- Tank loss coefficient
-      0.0;                     !- Freezing temperature [C]
+      Ice Tank,                !- Ice Storage Name
+      ON,                      !- Ice Storage availability schedule
+      0.5,                     !- Ice Storage Capacity {GJ}
+      Ice Tank Inlet Node,     !- Plant Loop Inlet Node
+      Ice Tank Outlet Node,    !- Plant Loop Outlet Node
+      QuadraticLinear,         !- Discharging Curve Fit Type
+      DischargeCurve,          !- Discharging Curve Name
+      QuadraticLinear,         !- Charging Curve Fit Type
+      ChargeCurve,             !- Charging Curve Name
+      1.0,                     !- Timestep of Curve Fit Data
+      0.0001,                  !- Parasitic electric load during discharging
+      0.0002,                  !- Parasitic electric load during charging
+      0.0003,                  !- Tank loss coefficient
+      0.0;                     !- Freezing temperature [C]
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-19-000}
@@ -6091,9 +6111,9 @@ Current detailed ice storage output variables are:
 \item
   System, Average, Ice Thermal Storage Cooling Rate {[}W{]}
 \item
-  System, Average, Ice Thermal Storage Change Fraction \protect\hyperlink{section-1}{}
+  System, Average, Ice Thermal Storage Change Fraction {[]}
 \item
-  System, Average, Ice Thermal Storage End Fraction \protect\hyperlink{section-1}{}
+  System, Average, Ice Thermal Storage End Fraction {[]}
 \item
   System, Average, Ice Thermal Storage Mass Flow Rate {[}kg/s{]}
 \item
@@ -6119,22 +6139,22 @@ Current detailed ice storage output variables are:
 \item
   System, Sum, Ice Thermal Storage Ancillary Electric Energy {[}J{]}
 \item
-  System, Average, Ice Thermal Storage On Coil Fraction \protect\hyperlink{section-1}{}
+  System, Average, Ice Thermal Storage On Coil Fraction {[]}
 \end{itemize}
 
 \paragraph{~Ice Thermal Storage Cooling Rate {[}W{]}}\label{ice-thermal-storage-cooling-rate-w}
 
 The actual load (absolute value) provided by the ice storage system during the current timestep
 
-\paragraph{\texorpdfstring{Ice Thermal Storage Change Fraction \protect\hyperlink{section-1}{}}{Ice Thermal Storage Change Fraction }}\label{ice-thermal-storage-change-fraction}
+\paragraph{\texorpdfstring{Ice Thermal Storage Change Fraction {[]}}{Ice Thermal Storage Change Fraction }}\label{ice-thermal-storage-change-fraction}
 
 The change in the ice tank's charge fraction charged during the current timestep (positive for charging, negative for discharging).
 
-\paragraph{\texorpdfstring{Ice Thermal Storage End Fraction \protect\hyperlink{section-1}{}}{Ice Thermal Storage End Fraction }}\label{ice-thermal-storage-end-fraction-1}
+\paragraph{\texorpdfstring{Ice Thermal Storage End Fraction {[]}}{Ice Thermal Storage End Fraction }}\label{ice-thermal-storage-end-fraction-1}
 
 The fraction charge of the ice storage system at the end of the timestep
 
-\paragraph{\texorpdfstring{Ice Thermal Storage On Coil Fraction \protect\hyperlink{section-1}{}}{Ice Thermal Storage On Coil Fraction }}\label{ice-thermal-storage-on-coil-fraction}
+\paragraph{\texorpdfstring{Ice Thermal Storage On Coil Fraction {[]}}{Ice Thermal Storage On Coil Fraction }}\label{ice-thermal-storage-on-coil-fraction}
 
 The fraction of ice that is actually on the freezing surface at the end of the timestep.~ This can be different for an ``inside melt'' system than the end fraction (see previous output parameter).
 
@@ -6288,29 +6308,29 @@ An example input object follows.
 
 \begin{lstlisting}
 
-  ThermalStorage:ChilledWater:Mixed,
-      Chilled Water Storage Tank 1 ,  !- Name
-      4.0 ,                           !- Tank Volume
-      CW-Tank-Temp-Schedule,          !- Setpoint Temperature Schedule Name
-      3.5,                            !- Deadband Temperature Difference
-      1.0 ,                           !- Minimum Temperature Limit
-      25000 ,                         !- Nominal Cooling Capacity
-      Zone ,                          !- Ambient Temperature Indicator
-      ,                               !- Ambient Temperature Schedule Name
-      ZN_1_FLR_1_SEC_5 ,              !- Ambient Temperature Zone Name
-      ,                               !- Ambient Temperature Outdoor Air Node Name
-      5.0 ,                           !- Heat Gain Coefficient from Ambient Temperature
-      CW Tank Discharge Inlet node,   !- Use Side Inlet Node Name
-      CW Tank Discharge Outlet node , !- Use Side Outlet Node Name
-      1.0 ,                           !- Use Side Effectiveness
-      TES Use Schedule,               !- Use Side Availability Schedule Name
-      Autosize ,                      !- Use Side Design Flow Rate
-      CW Tank Charge Inlet Node,      !- Source Side Inlet Node Name
-      CW Tank Charge Outlet Node,     !- Source Side Outlet Node Name
-      1.0,                            !- Source Side Effectiveness
-      TES Charge Schedule,            !- Source Side Availability Schedule Name
-      Autosize ,                      !- Source Side Design Flow Rate
-      4.0;                            !- Tank Recovery Time
+  ThermalStorage:ChilledWater:Mixed,
+      Chilled Water Storage Tank 1 ,  !- Name
+      4.0 ,                           !- Tank Volume
+      CW-Tank-Temp-Schedule,          !- Setpoint Temperature Schedule Name
+      3.5,                            !- Deadband Temperature Difference
+      1.0 ,                           !- Minimum Temperature Limit
+      25000 ,                         !- Nominal Cooling Capacity
+      Zone ,                          !- Ambient Temperature Indicator
+      ,                               !- Ambient Temperature Schedule Name
+      ZN_1_FLR_1_SEC_5 ,              !- Ambient Temperature Zone Name
+      ,                               !- Ambient Temperature Outdoor Air Node Name
+      5.0 ,                           !- Heat Gain Coefficient from Ambient Temperature
+      CW Tank Discharge Inlet node,   !- Use Side Inlet Node Name
+      CW Tank Discharge Outlet node , !- Use Side Outlet Node Name
+      1.0 ,                           !- Use Side Effectiveness
+      TES Use Schedule,               !- Use Side Availability Schedule Name
+      Autosize ,                      !- Use Side Design Flow Rate
+      CW Tank Charge Inlet Node,      !- Source Side Inlet Node Name
+      CW Tank Charge Outlet Node,     !- Source Side Outlet Node Name
+      1.0,                            !- Source Side Effectiveness
+      TES Charge Schedule,            !- Source Side Availability Schedule Name
+      Autosize ,                      !- Source Side Design Flow Rate
+      4.0;                            !- Tank Recovery Time
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-20-000}
@@ -6562,40 +6582,40 @@ An example input object follows.
 
 \begin{lstlisting}
 
-  ThermalStorage:ChilledWater:Stratified,
-      Chilled Water Storage Tank 1 ,  !- Name
-      4.0  ,                          !- Tank Volume
-      2.0 ,                           !- Tank Height
-      VerticalCylinder,               !- Tank Shape
-       ,                              !- Tank Perimeter
-      CW-Tank-Temp-Schedule ,         !- Setpoint Temperature Schedule Name
-      3.5 ,                           !- Deadband Temperature Difference
-      1.4 ,                           !- Temperature Sensor Height
-      1.0 ,                           !- Minimum Temperature Limit
-      2500,                           !- Nominal Cooling Capacity
-      Zone,                           !- Ambient Temperature Indicator
-       ,                              !- Ambient Temperature Schedule Name
-      ZN_1_FLR_1_SEC_5 ,              !- Ambient Temperature Zone Name
-       ,                              !- Ambient Temperature OutdoorAir:Node Name
-      4.2,                            !- Uniform Skin Loss Coefficient Per Unit Area To Ambient Temperature
-      CW Tank Discharge Inlet node,   !- Use Side Inlet Node Name
-      CW Tank Discharge Outlet node,  !- Use Side Outlet Node Name
-      1.0,                            !- Use Side Effectiveness
-      ALWAYS_ON,                      !- Use Side Availability Schedule Name
-      1.85 ,                          !- Use Side Inlet Height
-      0.15 ,                          !- Use Side Outlet Height
-      autosize,                       !- Use Side Design Flow Rate
-      CW Tank Charge Inlet Node,      !- Source Side Inlet Node Name
-      CW Tank Charge Outlet Node,     !- Source Side Outlet Node Name
-      1.0,                            !- Source Side Effectiveness
-      TES Charge Schedule,            !- Source Side Availability Schedule Name
-      0.15,                           !- Source Side Inlet Height
-      1.85,                           !- Source Side Outlet Height
-      autosize,                       !- Source Side Design Flow Rate
-      2.0,                            !- Tank Recovery Time
-      Seeking,                        !- Inlet Mode
-      6,                              !- Number Of Nodes
-      0.0;                            !- Additional Destratification Conductivity
+  ThermalStorage:ChilledWater:Stratified,
+      Chilled Water Storage Tank 1 ,  !- Name
+      4.0  ,                          !- Tank Volume
+      2.0 ,                           !- Tank Height
+      VerticalCylinder,               !- Tank Shape
+       ,                              !- Tank Perimeter
+      CW-Tank-Temp-Schedule ,         !- Setpoint Temperature Schedule Name
+      3.5 ,                           !- Deadband Temperature Difference
+      1.4 ,                           !- Temperature Sensor Height
+      1.0 ,                           !- Minimum Temperature Limit
+      2500,                           !- Nominal Cooling Capacity
+      Zone,                           !- Ambient Temperature Indicator
+       ,                              !- Ambient Temperature Schedule Name
+      ZN_1_FLR_1_SEC_5 ,              !- Ambient Temperature Zone Name
+       ,                              !- Ambient Temperature OutdoorAir:Node Name
+      4.2,                            !- Uniform Skin Loss Coefficient Per Unit Area To Ambient Temperature
+      CW Tank Discharge Inlet node,   !- Use Side Inlet Node Name
+      CW Tank Discharge Outlet node,  !- Use Side Outlet Node Name
+      1.0,                            !- Use Side Effectiveness
+      ALWAYS_ON,                      !- Use Side Availability Schedule Name
+      1.85 ,                          !- Use Side Inlet Height
+      0.15 ,                          !- Use Side Outlet Height
+      autosize,                       !- Use Side Design Flow Rate
+      CW Tank Charge Inlet Node,      !- Source Side Inlet Node Name
+      CW Tank Charge Outlet Node,     !- Source Side Outlet Node Name
+      1.0,                            !- Source Side Effectiveness
+      TES Charge Schedule,            !- Source Side Availability Schedule Name
+      0.15,                           !- Source Side Inlet Height
+      1.85,                           !- Source Side Outlet Height
+      autosize,                       !- Source Side Design Flow Rate
+      2.0,                            !- Tank Recovery Time
+      Seeking,                        !- Inlet Mode
+      6,                              !- Number Of Nodes
+      0.0;                            !- Additional Destratification Conductivity
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-21-000}

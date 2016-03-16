@@ -65,220 +65,220 @@ The main input objects that implement this example of demand management are list
 \begin{lstlisting}
 
 EnergyManagementSystem:ProgramCallingManager,
-    Demand Manager Demonstration,
-    BeginTimestepBeforePredictor,
-    Determine_Current_Demand_Manage_State,
-    Dispatch_Demand_Controls_By_State;
+    Demand Manager Demonstration,
+    BeginTimestepBeforePredictor,
+    Determine_Current_Demand_Manage_State,
+    Dispatch_Demand_Controls_By_State;
 
 
   EnergyManagementSystem:Program,
-    Determine_Current_Demand_Manage_State,
-    Set localDemand = CurntFacilityElectDemand / 1000.0 ,
-    Set CurrntTrend = @TrendDirection FacilityElectTrend 4,
-    IF (Month = = 1) ,
-      Set argTargetDemand = 0.85 * 1154.01,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 2),
-      Set argTargetDemand = 0.85 * 1150.85 ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 3),
-      Set argTargetDemand = 0.85 * 1313.56 ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 4),
-      Set argTargetDemand = 0.85 * 1364.28,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 5),
-      Set argTargetDemand = 0.85 * 1506.29  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 6),
-      Set argTargetDemand = 0.85 * 1516.93  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
+    Determine_Current_Demand_Manage_State,
+    Set localDemand = CurntFacilityElectDemand / 1000.0 ,
+    Set CurrntTrend = @TrendDirection FacilityElectTrend 4,
+    IF (Month = = 1) ,
+      Set argTargetDemand = 0.85 * 1154.01,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 2),
+      Set argTargetDemand = 0.85 * 1150.85 ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 3),
+      Set argTargetDemand = 0.85 * 1313.56 ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 4),
+      Set argTargetDemand = 0.85 * 1364.28,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 5),
+      Set argTargetDemand = 0.85 * 1506.29  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 6),
+      Set argTargetDemand = 0.85 * 1516.93  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
 
 
-    ELSEIF (Month = = 7),
-      Set argTargetDemand = 0.85 * 1545.20  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 8),
-      Set argTargetDemand = 0.85 * 1555.20  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 9),
-      Set argTargetDemand = 0.85 * 1491.38  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 10),
-      Set argTargetDemand = 0.85 * 1402.86  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 11),
-      Set argTargetDemand = 0.85 * 1418.69  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ELSEIF (Month = = 12),
-      Set argTargetDemand = 0.85 * 1440.48  ,
-      Set argCrntDmnd = localDemand,
-      Set argTrendDirection = CurrntTrend,
-    ENDIF,
-    Run Find_Demand_State;
+    ELSEIF (Month = = 7),
+      Set argTargetDemand = 0.85 * 1545.20  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 8),
+      Set argTargetDemand = 0.85 * 1555.20  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 9),
+      Set argTargetDemand = 0.85 * 1491.38  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 10),
+      Set argTargetDemand = 0.85 * 1402.86  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 11),
+      Set argTargetDemand = 0.85 * 1418.69  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ELSEIF (Month = = 12),
+      Set argTargetDemand = 0.85 * 1440.48  ,
+      Set argCrntDmnd = localDemand,
+      Set argTrendDirection = CurrntTrend,
+    ENDIF,
+    Run Find_Demand_State;
 
 
 
 
   EnergyManagementSystem:Subroutine,
-    Find_Demand_State,
-    !  argTargetDemand       Input kW level target
-    !  argCrntDmnd           Input  kW level current
-    !  argTrendDirection            Input   J/hour
-    !  argDmndMngrState     Output  value code, 0.0 = no management,
-    !                        1.0 = level 1 demand management
-    !                     2.0 = level 2 demand management
-    !                     3.0 = level 3 demand management
-    Set DmndStateX1 = @TrendValue Demand_Mgr_State_Trend 1,
-    Set DmndStateX2 = @TrendValue Demand_Mgr_State_Trend 2,
-    Set Level1Demand = 0.9 * argTargetDemand,
-    Set argCrntDmnd = argCrntDmnd,
-    Set argTargetDemand = argTargetDemand,
-    SET argDmndMngrState = DmndStateX1, ! initialize to last state then model changes
-    IF (argCrntDmnd > Level1Demand) && (argCrntDmnd <argTargetDemand) && (argTrendDirection > 0.0),
+    Find_Demand_State,
+    !  argTargetDemand       Input kW level target
+    !  argCrntDmnd           Input  kW level current
+    !  argTrendDirection            Input   J/hour
+    !  argDmndMngrState     Output  value code, 0.0 = no management,
+    !                        1.0 = level 1 demand management
+    !                     2.0 = level 2 demand management
+    !                     3.0 = level 3 demand management
+    Set DmndStateX1 = @TrendValue Demand_Mgr_State_Trend 1,
+    Set DmndStateX2 = @TrendValue Demand_Mgr_State_Trend 2,
+    Set Level1Demand = 0.9 * argTargetDemand,
+    Set argCrntDmnd = argCrntDmnd,
+    Set argTargetDemand = argTargetDemand,
+    SET argDmndMngrState = DmndStateX1, ! initialize to last state then model changes
+    IF (argCrntDmnd > Level1Demand) && (argCrntDmnd <argTargetDemand) && (argTrendDirection > 0.0),
 
 
-      IF DmndStateX1 < = 1.0,
-        SET argDmndMngrState = 1.0,
-      ELSEIF (DmndStateX1 = = 2.0) && (DmndStateX2 < 2.0),
-        SET argDmndMngrState = 2.0,  ! go at least two timesteps at 2.0
-      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 3.0),
-        SET argDmndMngrState = 2.0,
-      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 2.0),
-        SET argDmndMngrState = 3.0,  ! go at least two timesteps at 3.0
-      ENDIF,
+      IF DmndStateX1 < = 1.0,
+        SET argDmndMngrState = 1.0,
+      ELSEIF (DmndStateX1 = = 2.0) && (DmndStateX2 < 2.0),
+        SET argDmndMngrState = 2.0,  ! go at least two timesteps at 2.0
+      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 3.0),
+        SET argDmndMngrState = 2.0,
+      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 2.0),
+        SET argDmndMngrState = 3.0,  ! go at least two timesteps at 3.0
+      ENDIF,
 
 
-    ELSEIF (argCrntDmnd > argTargetDemand) && (argTrendDirection < 0.0),
-      IF DmndStateX1 < = 2.0,
-        SET argDmndMngrState = 2.0,
-      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 2.0) , ! go at least two timesteps at 3.0
-        SET argDmndMngrState = 3.0,
-      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 3.0),
-        SET argDmndMngrState = 2.0,
-      ENDIF,
+    ELSEIF (argCrntDmnd > argTargetDemand) && (argTrendDirection < 0.0),
+      IF DmndStateX1 < = 2.0,
+        SET argDmndMngrState = 2.0,
+      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 2.0) , ! go at least two timesteps at 3.0
+        SET argDmndMngrState = 3.0,
+      ELSEIF (DmndStateX1 = = 3.0) && (DmndStateX2 = = 3.0),
+        SET argDmndMngrState = 2.0,
+      ENDIF,
 
 
-    ELSEIF (argCrntDmnd > argTargetDemand) && (argTrendDirection > = 0.0),
-      Set argDmndMngrState = 3.0,
-    ENDIF;
+    ELSEIF (argCrntDmnd > argTargetDemand) && (argTrendDirection > = 0.0),
+      Set argDmndMngrState = 3.0,
+    ENDIF;
 
 
 
 
   EnergyManagementSystem:Program,
-    Dispatch_Demand_Controls_By_State,
-    IF     (argDmndMngrState = = 0.0),
-      RUN Unset_Demand_Controls,
-    ELSEIF (argDmndMngrState = = 1.0),
-      RUN Set_Demand_Level1_Controls,
-    ELSEIF (argDmndMngrState = = 2.0),
-      Run Set_Demand_Level2_Controls,
-    ELSEIF (argDmndMngrState = = 3.0),
-      Run Set_Demand_Level3_Controls,
-    ENDIF;
+    Dispatch_Demand_Controls_By_State,
+    IF     (argDmndMngrState = = 0.0),
+      RUN Unset_Demand_Controls,
+    ELSEIF (argDmndMngrState = = 1.0),
+      RUN Set_Demand_Level1_Controls,
+    ELSEIF (argDmndMngrState = = 2.0),
+      Run Set_Demand_Level2_Controls,
+    ELSEIF (argDmndMngrState = = 3.0),
+      Run Set_Demand_Level3_Controls,
+    ENDIF;
 
 
 
 
   EnergyManagementSystem:Subroutine,
-    Unset_Demand_Controls,
-    SET Set_Cooling_Setpoint_Sched    = Null,
-    SET Set_Basement_Lights           = Null,
-    SET Set_Core_bottom_Lights        = Null,
-    SET Set_Core_mid_Lights           = Null,
-    SET Set_Core_top_Lights           = Null,
-    SET Set_Perimeter_bot_ZN_3_Lights = Null,
-    SET Set_Perimeter_bot_ZN_2_Lights = Null,
-    SET Set_Perimeter_bot_ZN_1_Lights = Null,
-    SET Set_Perimeter_bot_ZN_4_Lights = Null,
-    SET Set_Perimeter_mid_ZN_3_Lights = Null,
-    SET Set_Perimeter_mid_ZN_2_Lights = Null,
-    SET Set_Perimeter_mid_ZN_1_Lights = Null,
-    SET Set_Perimeter_mid_ZN_4_Lights = Null,
-    SET Set_Perimeter_top_ZN_3_Lights = Null,
-    SET Set_Perimeter_top_ZN_2_Lights = Null,
-    SET Set_Perimeter_top_ZN_1_Lights = Null,
-    SET Set_Perimeter_top_ZN_4_Lights = Null;
+    Unset_Demand_Controls,
+    SET Set_Cooling_Setpoint_Sched    = Null,
+    SET Set_Basement_Lights           = Null,
+    SET Set_Core_bottom_Lights        = Null,
+    SET Set_Core_mid_Lights           = Null,
+    SET Set_Core_top_Lights           = Null,
+    SET Set_Perimeter_bot_ZN_3_Lights = Null,
+    SET Set_Perimeter_bot_ZN_2_Lights = Null,
+    SET Set_Perimeter_bot_ZN_1_Lights = Null,
+    SET Set_Perimeter_bot_ZN_4_Lights = Null,
+    SET Set_Perimeter_mid_ZN_3_Lights = Null,
+    SET Set_Perimeter_mid_ZN_2_Lights = Null,
+    SET Set_Perimeter_mid_ZN_1_Lights = Null,
+    SET Set_Perimeter_mid_ZN_4_Lights = Null,
+    SET Set_Perimeter_top_ZN_3_Lights = Null,
+    SET Set_Perimeter_top_ZN_2_Lights = Null,
+    SET Set_Perimeter_top_ZN_1_Lights = Null,
+    SET Set_Perimeter_top_ZN_4_Lights = Null;
 
 
   EnergyManagementSystem:Subroutine,
-    Set_Demand_Level1_Controls,
-    ! set lighting power to 90% of what it would otherwise be
-    SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 0.8, ! add 0.8 deg C to cooling setpoint
-    SET Set_Basement_Lights           = 0.90 * Basement_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_bottom_Lights        = 0.90 * Core_bottom_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_mid_Lights           = 0.90 * Core_mid_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_top_Lights           = 0.90 * Core_top_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_3_Lights = 0.90 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_2_Lights = 0.90 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_1_Lights = 0.90 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_4_Lights = 0.90 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_3_Lights = 0.90 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_2_Lights = 0.90 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_1_Lights = 0.90 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_4_Lights = 0.90 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_3_Lights = 0.90 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_2_Lights = 0.90 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_1_Lights = 0.90 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_4_Lights = 0.90 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
+    Set_Demand_Level1_Controls,
+    ! set lighting power to 90% of what it would otherwise be
+    SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 0.8, ! add 0.8 deg C to cooling setpoint
+    SET Set_Basement_Lights           = 0.90 * Basement_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_bottom_Lights        = 0.90 * Core_bottom_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_mid_Lights           = 0.90 * Core_mid_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_top_Lights           = 0.90 * Core_top_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_3_Lights = 0.90 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_2_Lights = 0.90 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_1_Lights = 0.90 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_4_Lights = 0.90 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_3_Lights = 0.90 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_2_Lights = 0.90 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_1_Lights = 0.90 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_4_Lights = 0.90 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_3_Lights = 0.90 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_2_Lights = 0.90 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_1_Lights = 0.90 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_4_Lights = 0.90 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
 
 
   EnergyManagementSystem:Subroutine,
-    Set_Demand_Level2_Controls,
-    ! set lighting power to 80% of what it would otherwise be
-    SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 1.5, ! add 1.5 deg C to cooling setpoint
-    SET Set_Basement_Lights           = 0.80 * Basement_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_bottom_Lights        = 0.80 * Core_bottom_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_mid_Lights           = 0.80 * Core_mid_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_top_Lights           = 0.80 * Core_top_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_3_Lights = 0.80 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_2_Lights = 0.80 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_1_Lights = 0.80 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_4_Lights = 0.80 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_3_Lights = 0.80 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_2_Lights = 0.80 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_1_Lights = 0.80 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_4_Lights = 0.80 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_3_Lights = 0.80 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_2_Lights = 0.80 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_1_Lights = 0.80 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_4_Lights = 0.80 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
+    Set_Demand_Level2_Controls,
+    ! set lighting power to 80% of what it would otherwise be
+    SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 1.5, ! add 1.5 deg C to cooling setpoint
+    SET Set_Basement_Lights           = 0.80 * Basement_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_bottom_Lights        = 0.80 * Core_bottom_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_mid_Lights           = 0.80 * Core_mid_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_top_Lights           = 0.80 * Core_top_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_3_Lights = 0.80 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_2_Lights = 0.80 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_1_Lights = 0.80 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_4_Lights = 0.80 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_3_Lights = 0.80 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_2_Lights = 0.80 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_1_Lights = 0.80 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_4_Lights = 0.80 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_3_Lights = 0.80 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_2_Lights = 0.80 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_1_Lights = 0.80 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_4_Lights = 0.80 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
 
 
 
 
   EnergyManagementSystem:Subroutine,
-    Set_Demand_Level3_Controls,
-    ! set lighting power to 70% of what it would otherwise be
-    SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 2.0, ! add 2.0 deg C to cooling setpoint
-    SET Set_Basement_Lights           = 0.70 * Basement_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_bottom_Lights        = 0.70 * Core_bottom_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_mid_Lights           = 0.70 * Core_mid_Lights * BLDG_LIGHT_SCH,
-    SET Set_Core_top_Lights           = 0.70 * Core_top_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_3_Lights = 0.70 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_2_Lights = 0.70 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_1_Lights = 0.70 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_bot_ZN_4_Lights = 0.70 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_3_Lights = 0.70 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_2_Lights = 0.70 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_1_Lights = 0.70 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_mid_ZN_4_Lights = 0.70 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_3_Lights = 0.70 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_2_Lights = 0.70 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_1_Lights = 0.70 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
-    SET Set_Perimeter_top_ZN_4_Lights = 0.70 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
+    Set_Demand_Level3_Controls,
+    ! set lighting power to 70% of what it would otherwise be
+    SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 2.0, ! add 2.0 deg C to cooling setpoint
+    SET Set_Basement_Lights           = 0.70 * Basement_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_bottom_Lights        = 0.70 * Core_bottom_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_mid_Lights           = 0.70 * Core_mid_Lights * BLDG_LIGHT_SCH,
+    SET Set_Core_top_Lights           = 0.70 * Core_top_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_3_Lights = 0.70 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_2_Lights = 0.70 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_1_Lights = 0.70 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_bot_ZN_4_Lights = 0.70 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_3_Lights = 0.70 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_2_Lights = 0.70 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_1_Lights = 0.70 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_mid_ZN_4_Lights = 0.70 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_3_Lights = 0.70 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_2_Lights = 0.70 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_1_Lights = 0.70 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
+    SET Set_Perimeter_top_ZN_4_Lights = 0.70 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
 
 
 
@@ -292,82 +292,82 @@ EnergyManagementSystem:ProgramCallingManager,
 
 
   EnergyManagementSystem:Sensor,
-    BLDG_LIGHT_SCH, !- Name
-    BLDG_LIGHT_SCH, !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value; !- Output:Variable or Output:Meter Name
+    BLDG_LIGHT_SCH, !- Name
+    BLDG_LIGHT_SCH, !- Output:Variable or Output:Meter Index Key Name
+    Schedule Value; !- Output:Variable or Output:Meter Name
 
 
 
 
   EnergyManagementSystem:Sensor,
-    CurntFacilityElectDemand,  !- Name
-    Whole Building,        !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power; !- Output:Variable Name
+    CurntFacilityElectDemand,  !- Name
+    Whole Building,        !- Output:Variable or Output:Meter Index Key Name
+    Facility Total Electric Demand Power; !- Output:Variable Name
 
 
 
 
   EnergyManagementSystem:TrendVariable,
-    Demand_Mgr_State_Trend , !- Name
-    argDmndMngrState, !- EMS Variable Name
-    48 ; !- Number of Timesteps to be Logged
+    Demand_Mgr_State_Trend , !- Name
+    argDmndMngrState, !- EMS Variable Name
+    48 ; !- Number of Timesteps to be Logged
 
 
   EnergyManagementSystem:TrendVariable,
-    FacilityElectTrend , !- Name
-    CurntFacilityElectDemand, !- EMS Variable Name
-    144 ; !- Number of Timesteps to be Logged
+    FacilityElectTrend , !- Name
+    CurntFacilityElectDemand, !- EMS Variable Name
+    144 ; !- Number of Timesteps to be Logged
 
 
   EnergyManagementSystem:Sensor,
-    Cooling_Setpoint_Sched,  !- Name
-    CLGSETP_SCH_Copy,        !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value; !- Output:Variable or Output:Meter Name
+    Cooling_Setpoint_Sched,  !- Name
+    CLGSETP_SCH_Copy,        !- Output:Variable or Output:Meter Index Key Name
+    Schedule Value; !- Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Actuator,
-    Set_Cooling_Setpoint_Sched,  !- Name
-    CLGSETP_SCH ,     !- Actuated Component Unique Name
-    Schedule:Compact,   !- Actuated Component Type
-    Schedule Value    ; !- Actuated Component Control Type
+    Set_Cooling_Setpoint_Sched,  !- Name
+    CLGSETP_SCH ,     !- Actuated Component Unique Name
+    Schedule:Compact,   !- Actuated Component Type
+    Schedule Value    ; !- Actuated Component Control Type
 
 
   EnergyManagementSystem:OutputVariable,
-    Erl Cooling Setpoint [C],    !- Name
-    Set_Cooling_Setpoint_Sched,  !- EMS Variable Name
-    Averaged   ,                 !- Type of Data in Variable
-    ZoneTimestep;                !- Update Frequency
+    Erl Cooling Setpoint [C],    !- Name
+    Set_Cooling_Setpoint_Sched,  !- EMS Variable Name
+    Averaged   ,                 !- Type of Data in Variable
+    ZoneTimestep;                !- Update Frequency
 
 
 
 
   Output:Variable,
-    *,
-    Erl Cooling Setpoint,
-    Timestep;
+    *,
+    Erl Cooling Setpoint,
+    Timestep;
 
 
   EnergyManagementSystem:Actuator,
-    Set_Basement_Lights,  !- Name
-    Basement_Lights ,     !- Actuated Component Unique Name
-    Lights,               !- Actuated Component Type
-    Electric Power Level; !- Actuated Component Control Type
+    Set_Basement_Lights,  !- Name
+    Basement_Lights ,     !- Actuated Component Unique Name
+    Lights,               !- Actuated Component Type
+    Electric Power Level; !- Actuated Component Control Type
 
 
   EnergyManagementSystem:InternalVariable,
-    Basement_Lights , !- Name
-    Basement_Lights , !- Internal Data Index Key Name
-    Lighting Power Design Level ; !- Internal Data Type
+    Basement_Lights , !- Name
+    Basement_Lights , !- Internal Data Index Key Name
+    Lighting Power Design Level ; !- Internal Data Type
 
 
   EnergyManagementSystem:Actuator,
-    Set_Core_bottom_Lights, !- Name
-    Core_bottom_Lights ,  !- Actuated Component Unique Name
-    Lights,               !- Actuated Component Type
-    Electric Power Level; !- Actuated Component Control Type
+    Set_Core_bottom_Lights, !- Name
+    Core_bottom_Lights ,  !- Actuated Component Unique Name
+    Lights,               !- Actuated Component Type
+    Electric Power Level; !- Actuated Component Control Type
   EnergyManagementSystem:InternalVariable,
-    Core_bottom_Lights , !- Name
-    Core_bottom_Lights , !- Internal Data Index Key Name
-    Lighting Power Design Level ; !- Internal Data Type
+    Core_bottom_Lights , !- Name
+    Core_bottom_Lights , !- Internal Data Index Key Name
+    Lighting Power Design Level ; !- Internal Data Type
   << Snipped remaining Lights Sensors and Actuators >>
 \end{lstlisting}

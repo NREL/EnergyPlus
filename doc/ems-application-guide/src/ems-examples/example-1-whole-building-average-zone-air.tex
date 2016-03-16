@@ -38,97 +38,97 @@ A set of input objects to solve this problem appears below and is included in th
 \begin{lstlisting}
 
 EnergyManagementSystem:Sensor,
-     T1, !Name
-     Perimeter_ZN_1 ,! Output:Variable or Output:Meter Index Key Name
-     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+     T1, !Name
+     Perimeter_ZN_1 ,! Output:Variable or Output:Meter Index Key Name
+     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
-   EnergyManagementSystem:Sensor,
-     T2, !Name
-     Perimeter_ZN_2 , ! Output:Variable or Output:Meter Index Key Name
-     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+   EnergyManagementSystem:Sensor,
+     T2, !Name
+     Perimeter_ZN_2 , ! Output:Variable or Output:Meter Index Key Name
+     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
-   EnergyManagementSystem:Sensor,
-     T3, !Name
-     Perimeter_ZN_3 , ! Output:Variable or Output:Meter Index Key Name
-     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+   EnergyManagementSystem:Sensor,
+     T3, !Name
+     Perimeter_ZN_3 , ! Output:Variable or Output:Meter Index Key Name
+     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
-   EnergyManagementSystem:Sensor,
-     T4, !Name
-     Perimeter_ZN_4, ! Output:Variable or Output:Meter Index Key Name
-     Zone Mean Air Temperature ;! Output:Variable or Output:Meter Name
+   EnergyManagementSystem:Sensor,
+     T4, !Name
+     Perimeter_ZN_4, ! Output:Variable or Output:Meter Index Key Name
+     Zone Mean Air Temperature ;! Output:Variable or Output:Meter Name
 
 
-   EnergyManagementSystem:Sensor,
-     T5, !Name
-     Core_ZN , ! Output:Variable or Output:Meter Index Key Name
-     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+   EnergyManagementSystem:Sensor,
+     T5, !Name
+     Core_ZN , ! Output:Variable or Output:Meter Index Key Name
+     Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
 
-   EnergyManagementSystem:ProgramCallingManager,
-     Average Building Temperature , ! Name
-     EndOfZoneTimestepBeforeZoneReporting , ! EnergyPlus Model Calling Point
-     AverageZoneTemps ; ! Program Name 1
+   EnergyManagementSystem:ProgramCallingManager,
+     Average Building Temperature , ! Name
+     EndOfZoneTimestepBeforeZoneReporting , ! EnergyPlus Model Calling Point
+     AverageZoneTemps ; ! Program Name 1
 
 
-   EnergyManagementSystem:GlobalVariable,
-     AverageBuildingTemp;
+   EnergyManagementSystem:GlobalVariable,
+     AverageBuildingTemp;
 
 
-   EnergyManagementSystem:OutputVariable,
-     Weighted Average Building Zone Air Temperature [C], ! Name
-     AverageBuildingTemp, ! EMS Variable Name
-     Averaged, ! Type of Data in Variable
-     ZoneTimeStep ; ! Update Frequency
+   EnergyManagementSystem:OutputVariable,
+     Weighted Average Building Zone Air Temperature [C], ! Name
+     AverageBuildingTemp, ! EMS Variable Name
+     Averaged, ! Type of Data in Variable
+     ZoneTimeStep ; ! Update Frequency
 
 
-   EnergyManagementSystem:InternalVariable,
-     Zn1vol,
-     Perimeter_ZN_1,
-     Zone Air Volume;
+   EnergyManagementSystem:InternalVariable,
+     Zn1vol,
+     Perimeter_ZN_1,
+     Zone Air Volume;
 
 
-   EnergyManagementSystem:InternalVariable,
-     Zn2vol,
-     Perimeter_ZN_2,
-     Zone Air Volume;
+   EnergyManagementSystem:InternalVariable,
+     Zn2vol,
+     Perimeter_ZN_2,
+     Zone Air Volume;
 
 
-   EnergyManagementSystem:InternalVariable,
-     Zn3vol,
-     Perimeter_ZN_3,
-     Zone Air Volume;
+   EnergyManagementSystem:InternalVariable,
+     Zn3vol,
+     Perimeter_ZN_3,
+     Zone Air Volume;
 
 
-   EnergyManagementSystem:InternalVariable,
-     Zn4vol,
-     Perimeter_ZN_4,
-     Zone Air Volume;
+   EnergyManagementSystem:InternalVariable,
+     Zn4vol,
+     Perimeter_ZN_4,
+     Zone Air Volume;
 
 
-   EnergyManagementSystem:InternalVariable,
-     Zn5vol,
-     Core_ZN ,
-     Zone Air Volume;
+   EnergyManagementSystem:InternalVariable,
+     Zn5vol,
+     Core_ZN ,
+     Zone Air Volume;
 
 
-   EnergyManagementSystem:Program,
-     AverageZoneTemps , ! Name
-     SET SumNumerator = T1*Zn1vol + T2*Zn2vol + T3*Zn3vol + T4*Zn4vol + T5*Zn5vol,
-     SET SumDenominator = Zn1vol + Zn2vol + Zn3vol + Zn4vol + Zn5vol,
-     SET AverageBuildingTemp = SumNumerator / SumDenominator;
+   EnergyManagementSystem:Program,
+     AverageZoneTemps , ! Name
+     SET SumNumerator = T1*Zn1vol + T2*Zn2vol + T3*Zn3vol + T4*Zn4vol + T5*Zn5vol,
+     SET SumDenominator = Zn1vol + Zn2vol + Zn3vol + Zn4vol + Zn5vol,
+     SET AverageBuildingTemp = SumNumerator / SumDenominator;
 
 
-   Output:EnergyManagementSystem,
-     Verbose,
-     Verbose,
-     Verbose;
+   Output:EnergyManagementSystem,
+     Verbose,
+     Verbose,
+     Verbose;
 
 
-   Output:Variable,
-     *,                       !- Key Value
-     Weighted Average Building Zone Air Temperature,  !- Variable Name
-     timestep;                  !- Reporting Frequency
+   Output:Variable,
+     *,                       !- Key Value
+     Weighted Average Building Zone Air Temperature,  !- Variable Name
+     timestep;                  !- Reporting Frequency
 \end{lstlisting}

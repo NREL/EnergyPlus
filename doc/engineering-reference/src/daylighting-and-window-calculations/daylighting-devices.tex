@@ -11,7 +11,7 @@ The input object DaylightingDevice:Tubular provides a special model for fenestra
 \begin{figure}[hbtp] % fig 66
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image869.png}
-\caption{  Tubular Daylighting Devices \protect \label{fig:tubular-daylighting-devices}}
+\caption{  Tubular Daylighting Devices \protect \label{fig:tubular-daylighting-devices}}
 \end{figure}
 
 The dome is typically a hemisphere made of clear plastic.~ It allows daylight into the pipe while keeping exterior weather out.~ The pipe is assumed to be a smooth cylinder with a highly reflective inside surface.~ The surface is usually either bare polished metal or a special reflective sheet adhered to the inside.~ The pipe channels the daylight from the dome to the diffuser via multiple internal reflections.~ The diffuser is typically a flat frosted plastic cover.~ The diffuser evenly distributes the daylight to the zone.~ The dome/diffuser area and pipe area must be approximately equal (within 2\%) for running the simulation successfully.
@@ -34,7 +34,7 @@ For both daylighting and heat balance simulations, the dome and diffuser are tre
 \begin{figure}[hbtp] % fig 67
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image870.png}
-\caption{  Dome and Diffuser Surfaces \protect \label{fig:dome-and-diffuser-surfaces}}
+\caption{  Dome and Diffuser Surfaces \protect \label{fig:dome-and-diffuser-surfaces}}
 \end{figure}
 
 The pipe is simulated by a separate code module.~ While several different measures for characterizing TDD performance are in use (Zhang 2002; Harrison 1998), the total transmittance of the TDD is most compatible with the EnergyPlus daylighting and heat balance code.~ Calculation of the transmittance of the pipe and the TDD for different types of radiation is fundamental to all phenomena covered by the model.
@@ -46,7 +46,7 @@ The transmittance of beam radiation is derived from the integration of the trans
 \begin{figure}[hbtp] % fig 68
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image871.png}
-\caption{  Discrete Ray in a Pipe \protect \label{fig:discrete-ray-in-a-pipe}}
+\caption{  Discrete Ray in a Pipe \protect \label{fig:discrete-ray-in-a-pipe}}
 \end{figure}
 
 For an opaque surface, the reflectivity is:
@@ -80,7 +80,7 @@ In the graph below, interpolated values from EnergyPlus are compared to the resu
 \begin{figure}[hbtp] % fig 69
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image874.png}
-\caption{  Pipe Transmittance Comparison. \protect \label{fig:pipe-transmittance-comparison.}}
+\caption{  Pipe Transmittance Comparison. \protect \label{fig:pipe-transmittance-comparison.}}
 \end{figure}
 
 During initialization of each unique TDD, the program integrates and tabulates values for the visible and solar transmittance of the pipe.~ The results are subsequently used in the daylighting simulation and heat balance simulation respectively.
@@ -311,7 +311,7 @@ The window is divided into two window surfaces: an upper window and a lower wind
 \begin{figure}[hbtp] % fig 70
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image893.png}
-\caption{  Daylighting Shelf Diagram \protect \label{fig:daylighting-shelf-diagram}}
+\caption{  Daylighting Shelf Diagram \protect \label{fig:daylighting-shelf-diagram}}
 \end{figure}
 
 Daylighting shelves are simulated separately for daylighting and the zone heat balance.~ The general model is similar in both cases, but the details vary.
@@ -397,7 +397,7 @@ The view factor to the outside shelf, F\(_{s}\), if not specified by the user in
 \begin{figure}[hbtp] % fig 71
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image899.png}
-\caption{  Window and Outside Shelf as Adjacent Perpendicular Rectangles. \protect \label{fig:window-and-outside-shelf-as-adjacent}}
+\caption{  Window and Outside Shelf as Adjacent Perpendicular Rectangles. \protect \label{fig:window-and-outside-shelf-as-adjacent}}
 \end{figure}
 
 For this geometry the view factor is given by (Mills 1995):

@@ -48,19 +48,19 @@ Examples of this statement in two different IDFs:
 \begin{lstlisting}
 
 PlantEquipmentOperationSchemes,
-      CW Loop Operation,       !- Name
-      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 1 Object Type
-      Peak Operation,          !- Control Scheme 1 Name
-      On Peak,                 !- Control Scheme 1 Schedule
-      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 2 Object Type
-      Off Peak Operation,      !- Control Scheme 2 Name
-      Off Peak;                !- Control Scheme 2 Schedule
+      CW Loop Operation,       !- Name
+      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 1 Object Type
+      Peak Operation,          !- Control Scheme 1 Name
+      On Peak,                 !- Control Scheme 1 Schedule
+      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 2 Object Type
+      Off Peak Operation,      !- Control Scheme 2 Name
+      Off Peak;                !- Control Scheme 2 Schedule
 
   PlantEquipmentOperationSchemes,
-      CW Loop Operation,       !- Name
-      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 1 Object Type
-      Central Chiller Only,    !- Control Scheme 1 Name
-      PlantOnSched;            !- Control Scheme 1 Schedule
+      CW Loop Operation,       !- Name
+      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 1 Object Type
+      Central Chiller Only,    !- Control Scheme 1 Name
+      PlantOnSched;            !- Control Scheme 1 Schedule
 \end{lstlisting}
 
 In the first IDF example, ``PlantEquipmentOperation:CoolingLoad'' is the type of control scheme. ``Peak Operation'' and ``Off Peak Operation'' are the names of two different load range based controls defined separately (see below -- ). ``On Peak'' and ``Off Peak'' are schedules defined elsewhere in the input file.
@@ -127,15 +127,15 @@ Examples of this statement in two IDFs:
 \begin{lstlisting}
 
 CondenserEquipmentOperationSchemes,
-      Tower Loop Operation,    !- CondenserOperationSchemeName
-      PlantEquipmentOperation:CoolingLoad,  Control Scheme 1 Object Type
-      Year Round Tower Operation,  !- Control Scheme 1 Name
-      PlantOnSched;            !- Control Scheme 1 Schedule
+      Tower Loop Operation,    !- CondenserOperationSchemeName
+      PlantEquipmentOperation:CoolingLoad,  Control Scheme 1 Object Type
+      Year Round Tower Operation,  !- Control Scheme 1 Name
+      PlantOnSched;            !- Control Scheme 1 Schedule
 
   CondenserEquipmentOperationSchemes,Tower Loop Operation,
-      PlantEquipmentOperation:CoolingLoad, Peak Load Operation, AFTERNOONSCHEDULE,
-      PlantEquipmentOperation:CoolingLoad, OffPeak Load Operation, MORNINGSCHEDULE,
-      PlantEquipmentOperation:OutdoorWetBulb, NightOperation, NIGHTSCHEDULE;
+      PlantEquipmentOperation:CoolingLoad, Peak Load Operation, AFTERNOONSCHEDULE,
+      PlantEquipmentOperation:CoolingLoad, OffPeak Load Operation, MORNINGSCHEDULE,
+      PlantEquipmentOperation:OutdoorWetBulb, NightOperation, NIGHTSCHEDULE;
 \end{lstlisting}
 
 Each schedule (AFTERNOONSCHEDULE, MORNINGSCHEDULE, NIGHTSCHEDULE) invokes its associated operation scheme (Peak Load Operation, OffPeak Load Operation, NightOperation). The type of operation scheme and its name references the input syntax associated with the range specification and the associated equipment.
@@ -191,9 +191,9 @@ An example of these statements in an IDF is:
 \begin{lstlisting}
 
 PlantEquipmentOperation:CoolingLoad, Peak Operation,
-          0,7000,   Chiller Plant,
-          7000,24500,   Chiller Plant and Purchased,
-          24500,500000, Purchased Only;
+          0,7000,   Chiller Plant,
+          7000,24500,   Chiller Plant and Purchased,
+          24500,500000, Purchased Only;
 \end{lstlisting}
 
 This particular load based operation scheme (above) has three different ranges. ``Chiller Plant'', ``Chiller Plant and Purchased'', and ``Purchased Only'' are names which link to various PlantEquipmentList or CondenserEquipmentList objects as described below. Gaps may be left in the load ranges specified, but to operate equipment over the entire range the upper limit of a given range must equal the lower limit of the next range as shown in the example. If gaps are left in the load ranges specified, a warning message will be issued when the load to be met falls within a load range ``gap''. If the user wishes to leave a load range ``gap'' for a specific reason (no equipment to operate on this plant {[}or condenser{]} loop within this load range) and does not want the warning messages to be generated, then specify a lower limit, upper limit and equipment list name for the gap and do not specify any equipment in the associated equipment list, as shown below.
@@ -201,30 +201,30 @@ This particular load based operation scheme (above) has three different ranges. 
 \begin{lstlisting}
 
 PlantEquipmentOperation:CoolingLoad, Peak Operation,
-      0,7000,   Chiller Plant,
-      7000,7100, NoEquipmentOperationOnThisPlantLoop,
-      7100,24500,   Chiller Plant and Purchased,
-      24500,500000, Purchased Only;
+      0,7000,   Chiller Plant,
+      7000,7100, NoEquipmentOperationOnThisPlantLoop,
+      7100,24500,   Chiller Plant and Purchased,
+      24500,500000, Purchased Only;
 
   PlantEquipmentList,
-      Chiller Plant,           !- Name
-      Chiller:Electric,        !- Equipment 1 Object Type
-      Big Chiller;             !- Equipment 1 Name
+      Chiller Plant,           !- Name
+      Chiller:Electric,        !- Equipment 1 Object Type
+      Big Chiller;             !- Equipment 1 Name
 
   PlantEquipmentList,
-      NoEquipmentOperationOnThisPlantLoop;    !- Name
+      NoEquipmentOperationOnThisPlantLoop;    !- Name
 
   PlantEquipmentList,
-      Chiller Plant and Purchased,  !- Name
-      Chiller:Electric,        !- Equipment 1 Object Type
-      Big Chiller,             !- Equipment 1 Name
-      DistrictCooling,         !- Equipment 2 Object Type
-      Purchased Cooling;       !- Equipment 2 Name
+      Chiller Plant and Purchased,  !- Name
+      Chiller:Electric,        !- Equipment 1 Object Type
+      Big Chiller,             !- Equipment 1 Name
+      DistrictCooling,         !- Equipment 2 Object Type
+      Purchased Cooling;       !- Equipment 2 Name
 
   PlantEquipmentList,
-      Purchased Only,          !- Name
-      DistrictCooling,         !- Equipment 1 Object Type
-      Purchased Cooling;       !- Equipment 1 Name
+      Purchased Only,          !- Name
+      DistrictCooling,         !- Equipment 1 Object Type
+      Purchased Cooling;       !- Equipment 1 Name
 \end{lstlisting}
 
 \subsection{PlantEquipmentOperation:OutdoorDryBulb}\label{plantequipmentoperationoutdoordrybulb}
@@ -342,25 +342,25 @@ And, as an example in an IDF:
 \begin{lstlisting}
 
 PlantEquipmentOperationSchemes,
-      CW Loop Operation,       !- PlantOperationSchemeName
-      PlantEquipmentOperation:ComponentSetpoint, ! Control Scheme 1 Object Type
-      Test Scheme,                         !- Control Scheme 1 Name
-      On;                                  !- Control Scheme 1 Schedule
+      CW Loop Operation,       !- PlantOperationSchemeName
+      PlantEquipmentOperation:ComponentSetpoint, ! Control Scheme 1 Object Type
+      Test Scheme,                         !- Control Scheme 1 Name
+      On;                                  !- Control Scheme 1 Schedule
 
   PlantEquipmentOperation:ComponentSetpoint,
-      Test Scheme,
-      CHILLER:ELECTRIC,        !- Equipment 1 Object Type
-      Little Chiller,          !- Equipment 1 Name
-      Little Chiller Inlet Node, !- Demand Calculation 1 Node Name
-      Little Chiller Outlet Node, !- Setpoint 1 Node Name
-      0.0011,                     !- Component 1 Flow Rate
-      COOLING,                    !- Operation 1 Type
-      CHILLER:ELECTRIC,        !- Equipment 2 Object Type
-      Big Chiller,             !- Equipment 2 Name
-      Big Chiller Inlet Node,  !- Demand Calculation 2 Node Name
-      Big Chiller Outlet Node, !- Setpoint 2 Node Name
-      0.0011,                  !- Component 2 Flow Rate
-      COOLING;                 !- Operation 2 Type
+      Test Scheme,
+      CHILLER:ELECTRIC,        !- Equipment 1 Object Type
+      Little Chiller,          !- Equipment 1 Name
+      Little Chiller Inlet Node, !- Demand Calculation 1 Node Name
+      Little Chiller Outlet Node, !- Setpoint 1 Node Name
+      0.0011,                     !- Component 1 Flow Rate
+      COOLING,                    !- Operation 1 Type
+      CHILLER:ELECTRIC,        !- Equipment 2 Object Type
+      Big Chiller,             !- Equipment 2 Name
+      Big Chiller Inlet Node,  !- Demand Calculation 2 Node Name
+      Big Chiller Outlet Node, !- Setpoint 2 Node Name
+      0.0011,                  !- Component 2 Flow Rate
+      COOLING;                 !- Operation 2 Type
 \end{lstlisting}
 
 \subsection{PlantEquipmentOperation:ThermalEnergyStorage}\label{plantequipmentoperationthermalenergystorage}
@@ -478,8 +478,8 @@ An example of this statement in an IDF is:
 \begin{lstlisting}
 
 PlantEquipmentList, Chiller Plant and Purchased,
-          Chiller:Electric, Big Chiller,
-          DistrictCooling, Purchased Cooling;
+          Chiller:Electric, Big Chiller,
+          DistrictCooling, Purchased Cooling;
 \end{lstlisting}
 
 Note that this list is the middle range defined in the PlantEquipmentOperation:CoolingLoad statement named ``Peak Operation'' above. This defines the equipment available when the load encountered by the plant (chiller water demand, for example) is between 7000 W and 24500 W. EnergyPlus will run the ``Big Chiller'' first up to its capacity and then attempt to meet the remaining load (while in that range) with the next piece of equipment (in this case, ``Purchased:Cooling'') in the list.

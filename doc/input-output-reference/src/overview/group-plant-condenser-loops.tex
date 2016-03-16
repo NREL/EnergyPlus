@@ -110,26 +110,26 @@ An example of this statement used in an IDF is:
 
 \begin{lstlisting}
 
-  PlantLoop,
-      Hot Water Loop,         !- Plant Loop Name
-      Water,                  !- Fluid Type
-      ,                       !- User Defined Fluid Type
-      Hot Loop Operation,     !- Plant Operation Scheme List Name
-      HW Loop Outlet Node,    !- Loop Temperature Setpoint Schedule Name
-      100,                    !- Maximum Loop Temperature {C}
-      10,                     !- Minimum Loop Temperature {C}
-      autosize,               !- Maximum Loop Volumetric Flow Rate {m3/s}
-      0.0,                    !- Minimum Loop Volumetric Flow Rate {m3/s}
-      autosize,               !- volume of the plant loop {m3}
-      HW Supply Inlet Node,   !- Plant Side Inlet Node Name
-      HW Supply Outlet Node,  !- Plant Side Outlet Node Name
-      Heating Supply Side Branches,    !- Plant Side Branch List Name
-      Heating Supply Side Connectors,  !- Plant Side Connector List Name
-      HW Demand Inlet Node,   !- Demand Side Inlet Node Name
-      HW Demand Outlet Node,  !- Demand Side Outlet Nodes Name
-      Heating Demand Side Branches,    !- Demand Side Branch List Name
-      Heating Demand Side Connectors,  !- Demand Side Connector List Name
-      Optimal;                !- Load Distribution Scheme
+  PlantLoop,
+      Hot Water Loop,         !- Plant Loop Name
+      Water,                  !- Fluid Type
+      ,                       !- User Defined Fluid Type
+      Hot Loop Operation,     !- Plant Operation Scheme List Name
+      HW Loop Outlet Node,    !- Loop Temperature Setpoint Schedule Name
+      100,                    !- Maximum Loop Temperature {C}
+      10,                     !- Minimum Loop Temperature {C}
+      autosize,               !- Maximum Loop Volumetric Flow Rate {m3/s}
+      0.0,                    !- Minimum Loop Volumetric Flow Rate {m3/s}
+      autosize,               !- volume of the plant loop {m3}
+      HW Supply Inlet Node,   !- Plant Side Inlet Node Name
+      HW Supply Outlet Node,  !- Plant Side Outlet Node Name
+      Heating Supply Side Branches,    !- Plant Side Branch List Name
+      Heating Supply Side Connectors,  !- Plant Side Connector List Name
+      HW Demand Inlet Node,   !- Demand Side Inlet Node Name
+      HW Demand Outlet Node,  !- Demand Side Outlet Nodes Name
+      Heating Demand Side Branches,    !- Demand Side Branch List Name
+      Heating Demand Side Connectors,  !- Demand Side Connector List Name
+      Optimal;                !- Load Distribution Scheme
 \end{lstlisting}
 
 In the above example input there is no system availability manager specified and the Demand Calculation Scheme will default to SingleSetpoint using a single setpoint manager. Common pipe simulation field in the above example will default to ``NONE'' since it is not specified.
@@ -154,9 +154,9 @@ In the following output variables, ``Debug'' denotes variables that are used pri
 \item
   HVAC,Average,Plant Supply Side Unmet Demand Rate {[}W{]}
 \item
-  HVAC,Sum,Plant Solver Sub Iteration Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,Plant Solver Sub Iteration Count {[]}
 \item
-  HVAC,Sum,Plant Solver Half Loop Calls Count \protect\hyperlink{section-1}{}
+  HVAC,Sum,Plant Solver Half Loop Calls Count {[]}
 \item
   HVAC,Average,Debug Plant Loop Bypass Fraction
 \item
@@ -166,21 +166,21 @@ In the following output variables, ``Debug'' denotes variables that are used pri
 \item
   HVAC,Average,Plant Common Pipe Temperature {[}C{]}
 \item
-  HVAC,Average,Plant Common Pipe Flow Direction Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Plant Common Pipe Flow Direction Status {[]}
 \item
   HVAC,Average,Plant Common Pipe Primary Mass Flow Rate {[}Kg/s{]}
 \item
   HVAC,Average,Plant Common Pipe Secondary Mass Flow Rate {[}Kg/s{]}
 \item
-  HVAC,Average,Primary Side Common Pipe Flow Direction \protect\hyperlink{section-1}{}
+  HVAC,Average,Primary Side Common Pipe Flow Direction {[]}
 \item
-  HVAC,Average,Secondary Side Common Pipe Flow Direction \protect\hyperlink{section-1}{}
+  HVAC,Average,Secondary Side Common Pipe Flow Direction {[]}
 \item
   HVAC,Average,Plant Common Pipe Primary to Secondary Mass Flow Rate {[}Kg/s{]}
 \item
   HVAC,Average,Plant Common Pipe Secondary to Primary Mass Flow Rate {[}Kg/s{]}
 \item
-  HVAC,Average,Plant System Cycle On Off Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Plant System Cycle On Off Status {[]}
 \item
   HVAC,Average,Plant Demand Side Loop Pressure Difference {[}Pa{]}
 \item
@@ -221,7 +221,7 @@ This is the value of the demand that could not be distributed to the plant equip
 
 This is the value of the demand NOT provided by the plant equipment to meet the heating or cooling setpoint of the loop. The value is positive when the plant equipment cannot meet the setpoint, and the value is negative when the plant equipment provides more than enough heating or cooling to meet the setpoint. A negative value can happen when the amount of demand is smaller than the minimum capacity of the equipment using the minimum part load ratio.
 
-\paragraph{\texorpdfstring{Plant Solver Sub Iteration Count \protect\hyperlink{section-1}{}}{Plant Solver Sub Iteration Count }}\label{plant-solver-sub-iteration-count}
+\paragraph{\texorpdfstring{Plant Solver Sub Iteration Count {[]}}{Plant Solver Sub Iteration Count }}\label{plant-solver-sub-iteration-count}
 
 This is the count of iterations that the overall plant simulation used over the period of time being reported.~ This high-level output is from the plant solver used for all the plant loops and condenser loops in the model.
 
@@ -237,7 +237,7 @@ This output gives the magnitude of the flow through common pipe. The value is av
 
 This output gives the value of the temperature of the fluid flowing through common pipe. This value is averaged over the reporting interval.
 
-\paragraph{\texorpdfstring{Plant Common Pipe Flow Direction Status \protect\hyperlink{section-1}{}}{Plant Common Pipe Flow Direction Status }}\label{plant-common-pipe-flow-direction-status}
+\paragraph{\texorpdfstring{Plant Common Pipe Flow Direction Status {[]}}{Plant Common Pipe Flow Direction Status }}\label{plant-common-pipe-flow-direction-status}
 
 This output gives the direction of flow in common pipe. The value is an integer and can be 0, 1 or 2. Since the output value is averaged over reporting interval, a non-integer value may be shown as an output when the reporting interval is not detailed. An output value of 0 means that there was no flow in common pipe. An output value of 1 means that the secondary flow is greater than primary flow, whereas a value of 2 means that primary flow is greater than secondary flow.
 
@@ -249,11 +249,11 @@ This output variable gives the mass flow in the primary side common pipe leg in 
 
 This output variable gives the mass flow in the secondary side common pipe leg in a Two-Way common pipe simulation. Value is averaged over the reporting interval.
 
-\paragraph{\texorpdfstring{Primary Side Common Pipe Flow Direction \protect\hyperlink{section-1}{}}{Primary Side Common Pipe Flow Direction }}\label{primary-side-common-pipe-flow-direction}
+\paragraph{\texorpdfstring{Primary Side Common Pipe Flow Direction {[]}}{Primary Side Common Pipe Flow Direction }}\label{primary-side-common-pipe-flow-direction}
 
 This output variable gives the direction of flow in a primary side common pipe leg in a Two-Way Common Pipe Simulation. A value of zero means there was no flow in the pipe. A value of 1 means the flow was from top to bottom in EnergyPlus loop schematic. So for primary side, a value of 1 means the flow is from Primary side inlet to Primary side outlet and a value of 2 means flow is from Primary side outlet to Primary side inlet.
 
-\paragraph{\texorpdfstring{Secondary Side Common Pipe Flow Direction \protect\hyperlink{section-1}{}}{Secondary Side Common Pipe Flow Direction }}\label{secondary-side-common-pipe-flow-direction}
+\paragraph{\texorpdfstring{Secondary Side Common Pipe Flow Direction {[]}}{Secondary Side Common Pipe Flow Direction }}\label{secondary-side-common-pipe-flow-direction}
 
 This output variable gives the direction of flow in a Secondary side common pipe leg in a Two-Way Common Pipe Simulation. A value of zero means there was no flow in the pipe. A value of 1 means the flow was from top to bottom in EnergyPlus loop schematic. So for Secondary side, a value of 1 means the flow is from Secondary side outlet to Secondary side inlet and a value of 2 means flow is from Secondary side inlet to Secondary side outlet. Note that this is opposite to the primary side common pipe.
 
@@ -398,56 +398,56 @@ An example of this statement used in an IDF is:
 
 \begin{lstlisting}
 
-  CondenserLoop,
-      Condenser Water Loop,    !- Name
-      Water,                   !- Fluid Type
-      ,                        !- User Defined Fluid Type
-      Tower Loop Operation,    !- Condenser Equipment Operation Scheme Name
-      Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
-      80,                      !- Maximum Loop Temperature {C}
-      10,                      !- Minimum Loop Temperature {C}
-      autosize,                !- Maximum Loop Flow Rate {m3/s}
-      0.0,                     !- Minimum Loop Flow Rate {m3/s}
-      autocalculate,           !- Condenser Loop Volume {m3}
-      Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
-      Condenser Supply Outlet Node,  !- Condenser Side Outlet Node Name
-      Condenser Supply Side Branches,  !- Condenser Side Branch List Name
-      Condenser Supply Side Connectors,  !- Condenser Side Connector List Name
-      Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
-      Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
-      Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
-      Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-      SequentialLoad;              !- Load Distribution Scheme
+  CondenserLoop,
+      Condenser Water Loop,    !- Name
+      Water,                   !- Fluid Type
+      ,                        !- User Defined Fluid Type
+      Tower Loop Operation,    !- Condenser Equipment Operation Scheme Name
+      Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
+      80,                      !- Maximum Loop Temperature {C}
+      10,                      !- Minimum Loop Temperature {C}
+      autosize,                !- Maximum Loop Flow Rate {m3/s}
+      0.0,                     !- Minimum Loop Flow Rate {m3/s}
+      autocalculate,           !- Condenser Loop Volume {m3}
+      Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
+      Condenser Supply Outlet Node,  !- Condenser Side Outlet Node Name
+      Condenser Supply Side Branches,  !- Condenser Side Branch List Name
+      Condenser Supply Side Connectors,  !- Condenser Side Connector List Name
+      Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
+      Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
+      Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
+      Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
+      SequentialLoad;              !- Load Distribution Scheme
 
-    SetpointManager:FollowOutdoorAirTemperature,
-      MyCondenserControl,      !- Name
-      Temperature,             !- Control Variable
-      OutdoorAirWetBulb,       !- Reference Temperature Type
-      0,                       !- Offset Temperature Difference {deltaC}
-      80,                      !- Maximum Setpoint Temperature {C}
-      10,                      !- Minimum Setpoint Temperature {C}
-      Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
+    SetpointManager:FollowOutdoorAirTemperature,
+      MyCondenserControl,      !- Name
+      Temperature,             !- Control Variable
+      OutdoorAirWetBulb,       !- Reference Temperature Type
+      0,                       !- Offset Temperature Difference {deltaC}
+      80,                      !- Maximum Setpoint Temperature {C}
+      10,                      !- Minimum Setpoint Temperature {C}
+      Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
-    CondenserLoop,
-      Chilled Water Condenser Loop,  !- Name
-      UserDefinedFluidType,    !- Fluid Type
-      PropyleneGlycol15Percent,!- User Defined Fluid Type
-      Tower Loop Operation,    !- Condenser Equipment Operation Scheme Name
-      Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
-      80,                      !- Maximum Loop Temperature {C}
-      10,                      !- Minimum Loop Temperature {C}
-      0.00330000,              !- Maximum Loop Flow Rate {m3/s}
-      0,                       !- Minimum Loop Flow Rate {m3/s}
-      autocalculate,           !- Condenser Loop Volume {m3}
-      Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
-      Condenser Supply Outlet Node,  !- Condenser Side Outlet Node Name
-      Condenser Supply Side Branches,  !- Condenser Side Branch List Name
-      Condenser Supply Side Connectors,  !- Condenser Side Connector List Name
-      Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
-      Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
-      Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
-      Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-      SequentialLoad;              !- Load Distribution Scheme
+    CondenserLoop,
+      Chilled Water Condenser Loop,  !- Name
+      UserDefinedFluidType,    !- Fluid Type
+      PropyleneGlycol15Percent,!- User Defined Fluid Type
+      Tower Loop Operation,    !- Condenser Equipment Operation Scheme Name
+      Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
+      80,                      !- Maximum Loop Temperature {C}
+      10,                      !- Minimum Loop Temperature {C}
+      0.00330000,              !- Maximum Loop Flow Rate {m3/s}
+      0,                       !- Minimum Loop Flow Rate {m3/s}
+      autocalculate,           !- Condenser Loop Volume {m3}
+      Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
+      Condenser Supply Outlet Node,  !- Condenser Side Outlet Node Name
+      Condenser Supply Side Branches,  !- Condenser Side Branch List Name
+      Condenser Supply Side Connectors,  !- Condenser Side Connector List Name
+      Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
+      Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
+      Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
+      Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
+      SequentialLoad;              !- Load Distribution Scheme
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-018}

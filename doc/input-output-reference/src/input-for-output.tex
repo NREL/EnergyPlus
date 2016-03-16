@@ -208,7 +208,7 @@ This is a condensed reporting that illustrates the full range of schedule values
 This field should contain the word \textbf{Hourly} or \textbf{TimeStep} to obtain the respective reports.
 
 \begin{lstlisting}
-Output:Schedules, Hourly;     ! values on hourly increments (day schedule resolution)
+Output:Schedules, Hourly;     ! values on hourly increments (day schedule resolution)
   Output:Schedules, TimeStep; ! will give them at the timestep of the simulation
 \end{lstlisting}
 
@@ -274,9 +274,9 @@ An example of this object follows.
 
 \begin{lstlisting}
 Output:EnergyManagementSystem,
-  Verbose,    ! Actuator Availability Dictionary Reporting
-  Verbose,    ! Internal Variable Availability Dictionary Reporting
-  ErrorsOnly; ! EnergyPlus Runtime Language Debug Output Level
+  Verbose,    ! Actuator Availability Dictionary Reporting
+  Verbose,    ! Internal Variable Availability Dictionary Reporting
+  ErrorsOnly; ! EnergyPlus Runtime Language Debug Output Level
 \end{lstlisting}
 
 \subsection{OutputControl:SurfaceColorScheme}\label{outputcontrolsurfacecolorscheme}
@@ -386,16 +386,16 @@ Output:Variable, * , Zone Mean Radiant Temperature, timestep;
 Output:Variable, * , Zone Air System Sensible Heating Energy, hourly;
 Output:Variable, * , Zone Air System Sensible Cooling Energy, hourly;
 Output:Variable, * , Zone Air Temperature, hourly;
-Output:Variable, * , Zone Air Temperature;  ! same as previous line
+Output:Variable, * , Zone Air Temperature;  ! same as previous line
 \end{lstlisting}
 
-\subsection{Output:Meter and Output:Meter:MeterFileOnly}\label{outputmeter-and-outputmetermeterfileonly}
+\subsection{Output:\-Meter and Output:\-Meter:\-Meter\-File\-Only}\label{outputmeter-and-outputmetermeterfileonly}
 
-\subsection{Output:Meter:Cumulative and Output:Meter:Cumulative:MeterFileOnly}\label{outputmetercumulative-and-outputmetercumulativemeterfileonly}
+\subsection{Output:\-Meter:\-Cumulative and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only}\label{outputmetercumulative-and-outputmetercumulativemeterfileonly}
 
 Appropriate variables are grouped onto ``meters'' for reporting purposes.~ (The meters available are listed in the eplusout.mdd file, see Variable Dictionary Report section.) If the ``Output:Meter'' input object is used, these results written out to both the \textbf{eplusout.eso} and \textbf{eplusout.mtr} files. This allows easy graphing and comparison with ``normal'' values (such as Zone Temperature or Outdoor Temperature). If the ``Output:Meter:MeterFileOnly'' input object is used, then the values results written out to only the \textbf{eplusout.mtr} file. The \textbf{eplusout.mtr} file has the same structure as the \textbf{eplusout.eso} file. A companion file, the \textbf{eplusout.mtd} file, contains a detailed list and explanation of all meters for a given run and the component values that are accumulated on each meter.
 
-The cumulative meter outputs (Output:Meter:Cumulative and ~Output:Meter:Cumulative:MeterFileOnly) use the same meter names but the output is cumulative for the reporting (for each environment). That is, if the reporting frequency for the cumulative meter output is hourly, then hour 1 value will be that for hour 1, hour 2 value will be hour1 + hour2, etc. In other words, the end value for a cumulative meter reporting should be identical if you reported the value of the meter at the RunPeriod frequency.
+The cumulative meter outputs (Output:Meter:Cumulative and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only) use the same meter names but the output is cumulative for the reporting (for each environment). That is, if the reporting frequency for the cumulative meter output is hourly, then hour 1 value will be that for hour 1, hour 2 value will be hour1 + hour2, etc. In other words, the end value for a cumulative meter reporting should be identical if you reported the value of the meter at the RunPeriod frequency.
 
 \subsubsection{Field: Name}\label{field-name-1-036}
 
@@ -449,7 +449,7 @@ Current resource types are shown in the table below:
 
 % table 38
 \begin{longtable}[c]{@{}l@{}}
-\caption{Table of Metered Resource  Types \protect \label{table:table-of-metered-resource-types}}\\
+\caption{Table of Metered Resource  Types \protect \label{table:table-of-metered-resource-types}}\\
 \toprule 
 Utility/Fuel Types \tabularnewline \midrule
 \endhead
@@ -495,7 +495,7 @@ An example of specifying in the IDF:
 
 \begin{lstlisting}
 Output:EnvironmentalImpactFactors,
-  Monthly;  !- Reporting_Frequency
+  Monthly;  !- Reporting_Frequency
 \end{lstlisting}
 
 \subsection{EnvironmentalImpactFactors}\label{environmentalimpactfactors}
@@ -532,12 +532,12 @@ An example of specifying in the IDF:
 
 \begin{lstlisting}
 EnvironmentalImpactFactors,
-  0.3,         !- Disctrict Heating Efficiency
-  3.0,         !- District Cooling COP
-  0.25,        !- Steam Conversion Efficiency
-  80.7272,     !- Total Carbon Equivalent Emission Factor From N2O
-  6.2727,      !- Total Carbon Equivalent Emission Factor From CH4
-  0.2727;      !- Total Carbon Equivalent Emission Factor From CO2
+  0.3,         !- Disctrict Heating Efficiency
+  3.0,         !- District Cooling COP
+  0.25,        !- Steam Conversion Efficiency
+  80.7272,     !- Total Carbon Equivalent Emission Factor From N2O
+  6.2727,      !- Total Carbon Equivalent Emission Factor From CH4
+  0.2727;      !- Total Carbon Equivalent Emission Factor From CO2
 \end{lstlisting}
 
 \subsection{FuelFactors}\label{fuelfactors}
@@ -703,43 +703,43 @@ Similar to the source energy calculation, this field contains the name of a sche
 An example of specifying in the IDF:
 
 \begin{lstlisting}
-FuelFactors,          !  USA national average based on eGRID, EIA 1605
-  Electricity,        !- Existing Fuel Resource Name
-  kg,                 !- Units of Measure (kg or m3)
-  ,                   !- Energy per Unit Factor
-  2.253,              !- Source Energy Factor {J/J}
-  ,                   !- Source Energy Schedule Name
-  168.33317,          !- CO2 Emission Factor {g/MJ}
-  ,                   !- CO2 Emission Factor Schedule Name
-  4.20616E-02,        !- CO Emission Factor {g/MJ}
-  ,                   !- CO Emission Factor Schedule Name
-  1.39858E-03,        !- CH4 Emission Factor {g/MJ}
-  ,                   !- CH4 Emission Factor Schedule Name
-  4.10753E-01,        !- NOx Emission Factor {g/MJ}
-  ,                   !- NOx Emission Factor Schedule Name
-  2.41916E-03,        !- N2O Emission Factor {g/MJ}
-  ,                   !- N2O Emission Factor Schedule Name
-  8.65731E-01,        !- SO2 Emission Factor {g/MJ}
-  ,                   !- SO2 Emission Factor Schedule Name
-  2.95827E-02,        !- PM Emission Factor {g/MJ}
-  ,                   !- PM Emission Factor Schedule Name
-  1.80450E-02,        !- PM10 Emission Factor {g/MJ}
-  ,                   !- PM10 Emission Factor Schedule Name
-  1.15377E-02,        !- PM2.5 Emission Factor {g/MJ}
-  ,                   !- PM2.5 Emission Factor Schedule Name
-  1.10837E-03,        !- NH3 Emission Factor {g/MJ}
-  ,                   !- NH3 Emission Factor Schedule Name
-  3.72332E-03,        !- NMVOC Emission Factor {g/MJ}
-  ,                   !- NMVOC Emission Factor Schedule Name
-  3.36414E-06,        !- Hg Emission Factor {g/MJ}
-  ,                   !- Hg Emission Factor Schedule Name
-  0,                  !- Pb Emission Factor {g/MJ}
-  ,                   !- Pb Emission Factor Schedule Name
-  2.10074,            !- Water Emission Factor {L/MJ}
-  ,                   !- Water Emission Factor Schedule Name
-  0,                  !- Nuclear High Level Emission Factor {g/MJ}
-  ,                   !- Nuclear High Level Emission Factor Schedule Name
-  0;                  !- Nuclear Low Level Emission Factor {m3/MJ}
+FuelFactors,          !  USA national average based on eGRID, EIA 1605
+  Electricity,        !- Existing Fuel Resource Name
+  kg,                 !- Units of Measure (kg or m3)
+  ,                   !- Energy per Unit Factor
+  2.253,              !- Source Energy Factor {J/J}
+  ,                   !- Source Energy Schedule Name
+  168.33317,          !- CO2 Emission Factor {g/MJ}
+  ,                   !- CO2 Emission Factor Schedule Name
+  4.20616E-02,        !- CO Emission Factor {g/MJ}
+  ,                   !- CO Emission Factor Schedule Name
+  1.39858E-03,        !- CH4 Emission Factor {g/MJ}
+  ,                   !- CH4 Emission Factor Schedule Name
+  4.10753E-01,        !- NOx Emission Factor {g/MJ}
+  ,                   !- NOx Emission Factor Schedule Name
+  2.41916E-03,        !- N2O Emission Factor {g/MJ}
+  ,                   !- N2O Emission Factor Schedule Name
+  8.65731E-01,        !- SO2 Emission Factor {g/MJ}
+  ,                   !- SO2 Emission Factor Schedule Name
+  2.95827E-02,        !- PM Emission Factor {g/MJ}
+  ,                   !- PM Emission Factor Schedule Name
+  1.80450E-02,        !- PM10 Emission Factor {g/MJ}
+  ,                   !- PM10 Emission Factor Schedule Name
+  1.15377E-02,        !- PM2.5 Emission Factor {g/MJ}
+  ,                   !- PM2.5 Emission Factor Schedule Name
+  1.10837E-03,        !- NH3 Emission Factor {g/MJ}
+  ,                   !- NH3 Emission Factor Schedule Name
+  3.72332E-03,        !- NMVOC Emission Factor {g/MJ}
+  ,                   !- NMVOC Emission Factor Schedule Name
+  3.36414E-06,        !- Hg Emission Factor {g/MJ}
+  ,                   !- Hg Emission Factor Schedule Name
+  0,                  !- Pb Emission Factor {g/MJ}
+  ,                   !- Pb Emission Factor Schedule Name
+  2.10074,            !- Water Emission Factor {L/MJ}
+  ,                   !- Water Emission Factor Schedule Name
+  0,                  !- Nuclear High Level Emission Factor {g/MJ}
+  ,                   !- Nuclear High Level Emission Factor Schedule Name
+  0;                  !- Nuclear Low Level Emission Factor {m3/MJ}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-029}

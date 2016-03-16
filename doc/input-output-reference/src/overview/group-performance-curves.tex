@@ -1350,7 +1350,14 @@ Curve:QuadraticLinear,
 
 This curve is a 2\(^{d}\) order polynomial function of three variable polynomial independent variables. Input consists of the curve name, the twenty seven coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the triquadratic curve:
 
-\begin{array}{l}CurveValue = {A_0} + {A_1}*{x^2} + {A_2}*x + {A_3}*{y^2} + {A_4}*y + {A_5}*{z^2} + {A_6}*z + {A_7}*{x^2}{y^2} + {A_8}*xy + \\\quad \quad \quad \quad \quad {A_9}*x{y^2} + {A_{10}}*{x^2}y + {A_{11}}*{x^2}{z^2} + {A_{12}}*xz + {A_{13}}*x{z^2} + {A_{14}}*{x^2}z + {A_{15}}*{y^2}{z^2} + \\\quad \quad \quad \quad \quad {A_{16}}*yz + {A_{17}}*y{z^2} + {A_{18}}*{y^2}z + {A_{19}}*{x^2}{y^2}{z^2} + {A_{20}}*{x^2}{y^2}z + {A_{21}}{x^2}y{z^2} + {A_{22}}x{y^2}{z^2} + \\\quad \quad \quad \quad \quad {A_{23}}{x^2}yz + {A_{24}}x{y^2}z + {A_{25}}xy{z^2} + {A_{26}}xyz\end{array}
+\begin{equation}
+  \begin{array}{l}
+    CurveValue = {A_0} + {A_1}*{x^2} + {A_2}*x + {A_3}*{y^2} + {A_4}*y + {A_5}*{z^2} + {A_6}*z + {A_7}*{x^2}{y^2} + {A_8}*xy + \\
+    \quad \quad \quad \quad \quad {A_9}*x{y^2} + {A_{10}}*{x^2}y + {A_{11}}*{x^2}{z^2} + {A_{12}}*xz + {A_{13}}*x{z^2} + {A_{14}}*{x^2}z + {A_{15}}*{y^2}{z^2} + \\
+    \quad \quad \quad \quad \quad {A_{16}}*yz + {A_{17}}*y{z^2} + {A_{18}}*{y^2}z + {A_{19}}*{x^2}{y^2}{z^2} + {A_{20}}*{x^2}{y^2}z + {A_{21}}{x^2}y{z^2} + {A_{22}}x{y^2}{z^2} + \\
+    \quad \quad \quad \quad \quad {A_{23}}{x^2}yz + {A_{24}}x{y^2}z + {A_{25}}xy{z^2} + {A_{26}}xyz
+  \end{array}
+\end{equation}
 
 \subsubsection{Inputs}\label{inputs-10-011}
 
@@ -2175,14 +2182,14 @@ Curve:DoubleExponentialDecay,
 
 The current value of the performance curve. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
 
-\paragraph{\texorpdfstring{Performance Curve Input Variable 1(-N) Value \protect\hyperlink{section-1}{}}{Performance Curve Input Variable 1(-N) Value }}\label{performance-curve-input-variable-1-n-value}
+\paragraph{\texorpdfstring{Performance Curve Input Variable 1(-N) Value {[]}}{Performance Curve Input Variable 1(-N) Value }}\label{performance-curve-input-variable-1-n-value}
 
 The current value of the nth independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
 
-HVAC,Average,Performance Curve Output Value \protect\hyperlink{section-1}{}
+HVAC,Average,Performance Curve Output Value {[]}
 
-HVAC,Average,Performance Curve Input Variable 1 Value \protect\hyperlink{section-1}{}
+HVAC,Average,Performance Curve Input Variable 1 Value {[]}
 
-HVAC,Average,Performance Curve Input Variable 2 Value \protect\hyperlink{section-1}{}
+HVAC,Average,Performance Curve Input Variable 2 Value {[]}
 
-HVAC,Average,Performance Curve Input Variable 3 Value \protect\hyperlink{section-1}{}
+HVAC,Average,Performance Curve Input Variable 3 Value {[]}

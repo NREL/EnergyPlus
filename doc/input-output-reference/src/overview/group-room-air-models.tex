@@ -26,7 +26,7 @@ Cross\-Ventilation & UCSD Cross Ventilation & cross ventilation & `Room\-Air\-Mo
 
 \subsection{RoomAirModelType}\label{roomairmodeltype}
 
-EnergyPlus uses the RoomAirModelType object to determine which air model is available for use in a given zone during the simulation. If no RoomAirModelType object is specified (for each zone or the whole building), then EnergyPlus will run with the conventional, completely mixing air model (for each zone or the whole building). Include a RoomAirModelType for each zone that the user wants modeled using a more detailed method. Currently only a single RoomAirModelType object can be specified for each zone; you cannot switch between models during a simulation. However, the UCSD Displacement, Cross Ventilation and UFAD models switch from displacement to mixing ventilation when the operating conditions do not give rise to unmixed flow. The following parameters are fields required by the RoomAirModelType object.
+EnergyPlus uses the Room\-Air\-Model\-Type object to determine which air model is available for use in a given zone during the simulation. If no Room\-Air\-Model\-Type object is specified (for each zone or the whole building), then EnergyPlus will run with the conventional, completely mixing air model (for each zone or the whole building). Include a Room\-Air\-Model\-Type for each zone that the user wants modeled using a more detailed method. Currently only a single Room\-Air\-Model\-Type object can be specified for each zone; you cannot switch between models during a simulation. However, the UCSD Displacement, Cross Ventilation and UFAD models switch from displacement to mixing ventilation when the operating conditions do not give rise to unmixed flow. The following parameters are fields required by the Room\-Air\-Model\-Type object.
 
 \subsubsection{Inputs}\label{inputs-041}
 
@@ -40,7 +40,7 @@ This alpha field indicates the unique name of a Zone object defined elsewhere in
 
 \paragraph{Field: Room-Air Modeling Type}\label{field-room-air-modeling-type}
 
-This alpha field indicates the room-air model used for the specified zone. Currently, there are three options for different air models. Entering the keyword `Mixing' specifies the conventional complete-mixing air model. Note that Mixing is the default and no RoomAirModelType object would be needed to use the complete-mixing model. Entering the keyword `UserDefined `specifies the User Defined Room Air Temperature Patterns. Entering the keyword `OneNodeDisplacementVentilation `specifies the Mundt one node displacement ventilation air model for displacement ventilation. Entering the keyword `ThreeNodeDisplacementVentilation` specifies the three-node displacement ventilation model developed by the University of California, San Diego (UCSD DV). Entering the keyword `CrossVentilation' specifies the two-zone cross ventilation model developed by the University of California, San Diego (UCSD CV). Entering the keyword `UnderFloorAirDistributionInterior` specifies the two-node interior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFI). Entering the keyword `UnderFloorAirDistributionExterior` specifies the two-node exterior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFE).
+This alpha field indicates the room-air model used for the specified zone. Currently, there are three options for different air models. Entering the keyword `Mixing' specifies the conventional complete-mixing air model. Note that Mixing is the default and no Room\-Air\-Model\-Type object would be needed to use the complete-mixing model. Entering the keyword `UserDefined `specifies the User Defined Room Air Temperature Patterns. Entering the keyword `OneNodeDisplacementVentilation `specifies the Mundt one node displacement ventilation air model for displacement ventilation. Entering the keyword `ThreeNodeDisplacementVentilation` specifies the three-node displacement ventilation model developed by the University of California, San Diego (UCSD DV). Entering the keyword `CrossVentilation' specifies the two-zone cross ventilation model developed by the University of California, San Diego (UCSD CV). Entering the keyword `UnderFloorAirDistributionInterior` specifies the two-node interior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFI). Entering the keyword `UnderFloorAirDistributionExterior` specifies the two-node exterior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFE).
 
 \paragraph{Field: Air Temperature Coupling Strategy}\label{field-air-temperature-coupling-strategy}
 
@@ -55,10 +55,10 @@ An example idf entry follows
 \begin{lstlisting}
 
 RoomAirModelType,
-      MOD1,      !- Room-Air Model Name
-      ZONE ONE,  !- Zone Name
-      ThreeNodeDisplacementVentilation,  !- Room-Air Modeling Type
-      Direct;    !- Air Temperature Coupling Strategy
+      MOD1,      !- Room-Air Model Name
+      ZONE ONE,  !- Zone Name
+      ThreeNodeDisplacementVentilation,  !- Room-Air Modeling Type
+      Direct;    !- Air Temperature Coupling Strategy
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:UserDefined}\label{roomairtemperaturepatternuserdefined}
@@ -92,10 +92,10 @@ An example of this object is
 \begin{lstlisting}
 
 RoomAir:TemperaturePattern:UserDefined,
-    Ground Floor South Air Temp Contrls , ! Name
-    ZN2_S_1 ,          ! Zone Name
-    Always_on ,        ! Availability Schedule Name
-    Roomair Pattern 1; ! Pattern Control Schedule Name
+    Ground Floor South Air Temp Contrls , ! Name
+    ZN2_S_1 ,          ! Zone Name
+    Always_on ,        ! Availability Schedule Name
+    Roomair Pattern 1; ! Pattern Control Schedule Name
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:ConstantGradient}\label{roomairtemperaturepatternconstantgradient}
@@ -137,12 +137,12 @@ An example of this object is:
 \begin{lstlisting}
 
 RoomAir:TemperaturePattern:ConstantGradient,
-    half C per Meter,       ! Name
-    10005,   ! Control Integer for Pattern Control Schedule Name
-    0.0,     ! Thermostat Offset (Temp at thermostat- Mean Air Temp) [C]
-    1.0,     ! Return Air Offset (Tleaving - Mean Air Temp )  [C]
-    1.0,     ! Exhaust Air Offset (Texhaust - Mean Air Temp)  [C]
-    0.5;     ! Temperature Gradient [K/m]
+    half C per Meter,       ! Name
+    10005,   ! Control Integer for Pattern Control Schedule Name
+    0.0,     ! Thermostat Offset (Temp at thermostat- Mean Air Temp) [C]
+    1.0,     ! Return Air Offset (Tleaving - Mean Air Temp )  [C]
+    1.0,     ! Exhaust Air Offset (Texhaust - Mean Air Temp)  [C]
+    0.5;     ! Temperature Gradient [K/m]
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:TwoGradient}\label{roomairtemperaturepatterntwogradient}
@@ -214,18 +214,18 @@ An example of this object follows. This pattern will apply no gradient (effectiv
 \begin{lstlisting}
 
 RoomAir:TemperaturePattern:TwoGradient,
-    Mixed to one C per M by Zone DB, ! Name
-    2002,                 ! Control Integer for Pattern Control Schedule
-    1.1,                  ! Thermostat Height meters
-    4.5,                  ! Return Air Height
-    3.5,                  ! Exhaust Air Height
-    0.0, ! Temperature Gradient Lower Bound K/m
-    1.0, ! Temperature Gradient Upper  Bound K/m
-    ZoneDrybulbTemperature, ! Gradient Interpolation Mode
-    26.0,               ! Upper Temperature [C]
-    22.5,               ! Lower Temperature [C]
-    , ! Upper Heat Rate [W]
-    ; ! Lower Heat Rate [W]
+    Mixed to one C per M by Zone DB, ! Name
+    2002,                 ! Control Integer for Pattern Control Schedule
+    1.1,                  ! Thermostat Height meters
+    4.5,                  ! Return Air Height
+    3.5,                  ! Exhaust Air Height
+    0.0, ! Temperature Gradient Lower Bound K/m
+    1.0, ! Temperature Gradient Upper  Bound K/m
+    ZoneDrybulbTemperature, ! Gradient Interpolation Mode
+    26.0,               ! Upper Temperature [C]
+    22.5,               ! Lower Temperature [C]
+    , ! Upper Heat Rate [W]
+    ; ! Lower Heat Rate [W]
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:NondimensionalHeight}\label{roomairtemperaturepatternnondimensionalheight}
@@ -281,23 +281,23 @@ An example of this object corresponding to the figure above is:
 \begin{lstlisting}
 
 RoomAir:TemperaturePattern:NondimensionalHeight,
-    Rough UFAD Approx  , ! Name
-    3001 , ! Control Integer for Pattern Control Schedule
-          ! note reference this entry in Schedule
-    -1.0 ,   ! Thermostat Offset
-    1.5 , ! Return Air Offset (Tleaving - Mean Air Temp ) deg C
-    1.75,   ! Exhaust Air Offset (Texhaust - Mean Air Temp) deg C
-    0.05,  -1.8,   ! pair 1 (Zeta , DeltaTai)
-    0.1,   -1.7 ,  ! pair 2 (Zeta , DeltaTai)
-    0.2,   -0.8 ,  ! pair 3 (Zeta , DeltaTai)
-    0.3,   -0.2,   ! pair 4 (Zeta , DeltaTai)
-    0.4,    0.5,   ! pair 5 (Zeta , DeltaTai)
-    0.5,    0.8,   ! pair 6 (Zeta , DeltaTai)
-    0.6,    1.2,   ! pair 7 (Zeta , DeltaTai)
-    0.7,    1.4,   ! pair 8 (Zeta , DeltaTai)
-    0.8,    1.4,   ! pair 9 (Zeta , DeltaTai)
-    0.9,   1.42,   ! pair 10 (Zeta , DeltaTai)
-   0.95,  1.44;   ! pair 11 (Zeta , DeltaTai)
+    Rough UFAD Approx  , ! Name
+    3001 , ! Control Integer for Pattern Control Schedule
+          ! note reference this entry in Schedule
+    -1.0 ,   ! Thermostat Offset
+    1.5 , ! Return Air Offset (Tleaving - Mean Air Temp ) deg C
+    1.75,   ! Exhaust Air Offset (Texhaust - Mean Air Temp) deg C
+    0.05,  -1.8,   ! pair 1 (Zeta , DeltaTai)
+    0.1,   -1.7 ,  ! pair 2 (Zeta , DeltaTai)
+    0.2,   -0.8 ,  ! pair 3 (Zeta , DeltaTai)
+    0.3,   -0.2,   ! pair 4 (Zeta , DeltaTai)
+    0.4,    0.5,   ! pair 5 (Zeta , DeltaTai)
+    0.5,    0.8,   ! pair 6 (Zeta , DeltaTai)
+    0.6,    1.2,   ! pair 7 (Zeta , DeltaTai)
+    0.7,    1.4,   ! pair 8 (Zeta , DeltaTai)
+    0.8,    1.4,   ! pair 9 (Zeta , DeltaTai)
+    0.9,   1.42,   ! pair 10 (Zeta , DeltaTai)
+   0.95,  1.44;   ! pair 11 (Zeta , DeltaTai)
 \end{lstlisting}
 
 \subsection{RoomAir:TemperaturePattern:SurfaceMapping}\label{roomairtemperaturepatternsurfacemapping}
@@ -347,20 +347,20 @@ An example of this object, which might be used to elevate temperatures near west
 \begin{lstlisting}
 
 RoomAir:TemperaturePattern:SurfaceMapping,
-    GroundFloor SW Corner Hot Near West Wall, ! Name
-    4001, ! Control Integer for Pattern Control Schedule Name
-    0.0, ! Thermostat Offset(Temp at thermostat- Mean Air Temp)
-    0.0, ! Return Air Offset  deg C
-    0.0, ! Exhaust Air Offset
-    ZN1_SW_1:W_ExtWall:1 ,  0.8,  ! pair 1 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:2 ,  0.9,  ! pair 2 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:3 ,  1.0,  ! pair 3 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:4,   1.1,  ! pair 4 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:5,   1.3,  ! pair 5 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:6,   1.5,  ! pair 6 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:7,   1.7,  ! pair 7 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:8,   2.1,  ! pair 8 (Surface Name , DeltaTai)
-    ZN1_SW_1:W_ExtWall:9,   2.4 ; ! pair 8 (Surface Name , DeltaTai)
+    GroundFloor SW Corner Hot Near West Wall, ! Name
+    4001, ! Control Integer for Pattern Control Schedule Name
+    0.0, ! Thermostat Offset(Temp at thermostat- Mean Air Temp)
+    0.0, ! Return Air Offset  deg C
+    0.0, ! Exhaust Air Offset
+    ZN1_SW_1:W_ExtWall:1 ,  0.8,  ! pair 1 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:2 ,  0.9,  ! pair 2 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:3 ,  1.0,  ! pair 3 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:4,   1.1,  ! pair 4 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:5,   1.3,  ! pair 5 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:6,   1.5,  ! pair 6 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:7,   1.7,  ! pair 7 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:8,   2.1,  ! pair 8 (Surface Name , DeltaTai)
+    ZN1_SW_1:W_ExtWall:9,   2.4 ; ! pair 8 (Surface Name , DeltaTai)
 \end{lstlisting}
 
 \subsection{RoomAir:Node}\label{roomairnode}
@@ -406,12 +406,12 @@ An IDF example:
 \begin{lstlisting}
 
 RoomAir:Node,
-      WESTZN:FLOORAIR,    !- Node Name
-      Floor,      !- Node Type
-      WEST ZONE,  !- Name of Zone to Which the Air Node Belongs
-      0.1,        !- Height of Nodal Control Volume Center {m}
-      WESTZN:FLOOR:LEFF,  !- surface name
-      WESTZN:FLOOR:RIGHT; !- surface name
+      WESTZN:FLOORAIR,    !- Node Name
+      Floor,      !- Node Type
+      WEST ZONE,  !- Name of Zone to Which the Air Node Belongs
+      0.1,        !- Height of Nodal Control Volume Center {m}
+      WESTZN:FLOOR:LEFF,  !- surface name
+      WESTZN:FLOOR:RIGHT; !- surface name
 \end{lstlisting}
 
 \subsection{RoomAirSettings:OneNodeDisplacementVentilation}\label{roomairsettingsonenodedisplacementventilation}
@@ -437,9 +437,9 @@ An IDF example:
 \begin{lstlisting}
 
 RoomAirSettings:OneNodeDisplacementVentilation,
-      WEST ZONE,  !- Zone Name
-      0.1,  !- Fraction of internal loads from the convective Floor Air
-      0.1;  !- Fraction of internal loads from the Infiltration Air
+      WEST ZONE,  !- Zone Name
+      0.1,  !- Fraction of internal loads from the convective Floor Air
+      0.1;  !- Fraction of internal loads from the Infiltration Air
 \end{lstlisting}
 
 \subsection{RoomAirSettings:ThreeNodeDisplacementVentilation}\label{roomairsettingsthreenodedisplacementventilation}
@@ -528,12 +528,12 @@ An example input:
 \begin{lstlisting}
 
 RoomAirSettings:ThreeNodeDisplacementVentilation,
-      ZONE ONE,  !- Zone Name
-      Constant - .2,  !- Gain Distribution Schedule Name
-       1,  !- Number of Plumes per Occupant
-        ,  !- Thermostat Height
-        ,  !- Comfort Height
-      .3;  !- Temp. Difference Threshold for Displacement Ventilation
+      ZONE ONE,  !- Zone Name
+      Constant - .2,  !- Gain Distribution Schedule Name
+       1,  !- Number of Plumes per Occupant
+        ,  !- Thermostat Height
+        ,  !- Comfort Height
+      .3;  !- Temp. Difference Threshold for Displacement Ventilation
 \end{lstlisting}
 
 \subsection{RoomAirSettings:CrossVentilation}\label{roomairsettingscrossventilation}
@@ -618,7 +618,7 @@ Average airflow velocity in the jet region in front of the window, in meters per
 
 Average airflow velocity in the recirculation region of the flow in meters per second.
 
-\paragraph{\texorpdfstring{Room Air Zone Recirculation and Inflow Rate Ratio \protect\hyperlink{section-1}{}}{Room Air Zone Recirculation and Inflow Rate Ratio }}\label{room-air-zone-recirculation-and-inflow-rate-ratio}
+\paragraph{\texorpdfstring{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}{Room Air Zone Recirculation and Inflow Rate Ratio }}\label{room-air-zone-recirculation-and-inflow-rate-ratio}
 
 Ratio between airflow rate in the recirculation regions and the total inflow rate, non-dimensional.
 
@@ -630,11 +630,11 @@ Area of the inflow aperture in square meters. This area can change due to variat
 
 Length of the room along the cross ventilation direction, in meters.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixing Status \protect\hyperlink{section-1}{}}{Room Air Zone Is Mixing Status }}\label{room-air-zone-is-mixing-status}
+\paragraph{\texorpdfstring{Room Air Zone Is Mixing Status {[]}}{Room Air Zone Is Mixing Status }}\label{room-air-zone-is-mixing-status}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or significant momentum conservation is occurring (UCSD CV model used). The value 1 means well-mixed; 0 means cross ventilation is present. Transition to mixed flow can occur due to three mechanism: reduction in inflow velocity, reduction in inflow aperture area and dominance of buoyancy effects. A value of 1 is yes, a value of 0 is no.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Recirculating Status \protect\hyperlink{section-1}{}}{Room Air Zone Is Recirculating Status }}\label{room-air-zone-is-recirculating-status}
+\paragraph{\texorpdfstring{Room Air Zone Is Recirculating Status {[]}}{Room Air Zone Is Recirculating Status }}\label{room-air-zone-is-recirculating-status}
 
 An integer flag that indicates whether recirculations are present in the flow. A cross ventilation flow does not have recirculations whenever the inflow area is similar to the room cross section area (such as airflow in a typical corridor). A value of 1 is yes, a value of 0 is no.
 
@@ -719,28 +719,28 @@ An example input is:
 
 \begin{lstlisting}
 
-  RoomAirModelType,
-      SPACE5-1 RoomAir Model,  !- Name
-      SPACE5-1,                !- Zone Name
-      UnderFloorAirDistributionInterior,  !- Room-Air Modeling Type
-      DIRECT;                  !- Air Temperature Coupling Strategy
+  RoomAirModelType,
+      SPACE5-1 RoomAir Model,  !- Name
+      SPACE5-1,                !- Zone Name
+      UnderFloorAirDistributionInterior,  !- Room-Air Modeling Type
+      DIRECT;                  !- Air Temperature Coupling Strategy
 
   RoomAirSettings:UnderFloorAirDistributionInterior,
-      SPACE5-1,                !- Zone Name
-      Autocalculate,           !- Number of Diffusers
-      Autocalculate,           !- Power per Plume
-      Autocalculate,           !- Design Effective Area of Diffuser {m2}
-      Autocalculate,           !- Diffuser Slot Angle from Vertical {deg}
-      ,                        !- Thermostat Height {m}
-      ,                        !- Comfort Height {m}
-      0.001,         !- Temperature Difference Threshold for Reporting {deltaC}
-      Swirl,                   !- Diffuser Type
-      1.7,                     !- Transition Height {m}
-      Autocalculate,           !- Coefficient A
-      Autocalculate,           !- Coefficient B
-      Autocalculate,           !- Coefficient C
-      Autocalculate,           !- Coefficient D
-     Autocalculate;           !- Coefficient E
+      SPACE5-1,                !- Zone Name
+      Autocalculate,           !- Number of Diffusers
+      Autocalculate,           !- Power per Plume
+      Autocalculate,           !- Design Effective Area of Diffuser {m2}
+      Autocalculate,           !- Diffuser Slot Angle from Vertical {deg}
+      ,                        !- Thermostat Height {m}
+      ,                        !- Comfort Height {m}
+      0.001,         !- Temperature Difference Threshold for Reporting {deltaC}
+      Swirl,                   !- Diffuser Type
+      1.7,                     !- Transition Height {m}
+      Autocalculate,           !- Coefficient A
+      Autocalculate,           !- Coefficient B
+      Autocalculate,           !- Coefficient C
+      Autocalculate,           !- Coefficient D
+     Autocalculate;           !- Coefficient E
 \end{lstlisting}
 
 \subsection{RoomAirSettings:UnderFloorAirDistributionExterior}\label{roomairsettingsunderfloorairdistributionexterior}
@@ -826,21 +826,21 @@ An example input is:
 
 \begin{lstlisting}
 RoomAirSettings:UnderFloorAirDistributionExterior,
-      SPACE1-1,                !- Zone Name
-      Autocalculate,           !- Number of Diffusers per Zone
-      Autocalculate,           !- Power per Plume
-      Autocalculate,           !- Design Effective Area of Diffuser {m2}
-      Autocalculate,           !- Diffuser Slot Angle from Vertical {deg}
-      ,                        !- Thermostat Height {m}
-      ,                        !- Comfort Height {m}
-      0.001,                   !- Temperature Difference Threshold for Reporting {deltaC}
-      LinearBarGrille,         !- Diffuser Type
-      1.7,                     !- Transition Height {m}
-      Autocalculate,           !- Coefficient A
-      Autocalculate,           !- Coefficient B
-      Autocalculate,           !- Coefficient C
-      Autocalculate,           !- Coefficient D
-      Autocalculate;           !- Coefficient E
+      SPACE1-1,                !- Zone Name
+      Autocalculate,           !- Number of Diffusers per Zone
+      Autocalculate,           !- Power per Plume
+      Autocalculate,           !- Design Effective Area of Diffuser {m2}
+      Autocalculate,           !- Diffuser Slot Angle from Vertical {deg}
+      ,                        !- Thermostat Height {m}
+      ,                        !- Comfort Height {m}
+      0.001,                   !- Temperature Difference Threshold for Reporting {deltaC}
+      LinearBarGrille,         !- Diffuser Type
+      1.7,                     !- Transition Height {m}
+      Autocalculate,           !- Coefficient A
+      Autocalculate,           !- Coefficient B
+      Autocalculate,           !- Coefficient C
+      Autocalculate,           !- Coefficient D
+      Autocalculate;           !- Coefficient E
 \end{lstlisting}
 
 \subsection{RoomAirflowNetwork Model}\label{roomairflownetwork-model}
@@ -1097,11 +1097,11 @@ The temperature of the region near the floor in degrees C.
 
 The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper well-mixed subzone.
 
-\paragraph{\texorpdfstring{Room Air Zone Recommended Minimum Flow Fraction \protect\hyperlink{section-1}{}}{Room Air Zone Recommended Minimum Flow Fraction }}\label{room-air-zone-recommended-minimum-flow-fraction}
+\paragraph{\texorpdfstring{Room Air Zone Recommended Minimum Flow Fraction {[]}}{Room Air Zone Recommended Minimum Flow Fraction }}\label{room-air-zone-recommended-minimum-flow-fraction}
 
 The ratio of the minimum recommended flow rate to the actual flow rate. Here flow rate means the sum of infiltration, ventilation, mixing and system air flow rates. The minimum flow is the flow needed to establish the boundary between the occupied and mixed subzones at 1.5 meters.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixed Status \protect\hyperlink{section-1}{}}{Room Air Zone Is Mixed Status }}\label{room-air-zone-is-mixed-status}
+\paragraph{\texorpdfstring{Room Air Zone Is Mixed Status {[]}}{Room Air Zone Is Mixed Status }}\label{room-air-zone-is-mixed-status}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD DV model used). The value 1 means well-mixed; 0 means stratified.
 
@@ -1168,15 +1168,15 @@ Area of the inflow aperture in square meters. This area can change due to variat
 
 Length of the room along the cross ventilation direction, in meters.
 
-\paragraph{\texorpdfstring{Room Air Zone Recirculation and Inflow Rate Ratio \protect\hyperlink{section-1}{}}{Room Air Zone Recirculation and Inflow Rate Ratio }}\label{room-air-zone-recirculation-and-inflow-rate-ratio-1}
+\paragraph{\texorpdfstring{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}{Room Air Zone Recirculation and Inflow Rate Ratio }}\label{room-air-zone-recirculation-and-inflow-rate-ratio-1}
 
 Ratio between airflow rate in the recirculation region and inflow rate, non-dimensional.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixing Status \protect\hyperlink{section-1}{}}{Room Air Zone Is Mixing Status }}\label{room-air-zone-is-mixing-status-1}
+\paragraph{\texorpdfstring{Room Air Zone Is Mixing Status {[]}}{Room Air Zone Is Mixing Status }}\label{room-air-zone-is-mixing-status-1}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or significant momentum conservation is occurring (UCSD CV model used). The value 1 means well-mixed; 0 means cross ventilation is present. Transition to mixed flow can occur due to three mechanism: reduction in inflow velocity, reduction in inflow aperture area and dominance of buoyancy effects. A value of 1 is yes, a value of 0 is no.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Recirculating Status \protect\hyperlink{section-1}{}}{Room Air Zone Is Recirculating Status }}\label{room-air-zone-is-recirculating-status-1}
+\paragraph{\texorpdfstring{Room Air Zone Is Recirculating Status {[]}}{Room Air Zone Is Recirculating Status }}\label{room-air-zone-is-recirculating-status-1}
 
 An integer flag that indicates whether recirculations are present in the flow. A cross ventilation flow does not have recirculations whenever the inflow area is similar to the room cross section area (such as airflow in a typical corridor). A value of 1 is yes, a value of 0 is no.
 
@@ -1190,7 +1190,7 @@ An integer flag that indicates whether recirculations are present in the flow. A
 \item
   HVAC,Average,Room Air Zone Transition Height {[}m{]}
 \item
-  HVAC,Average,Room Air Zone Is Mixed Status \protect\hyperlink{section-1}{}
+  HVAC,Average,Room Air Zone Is Mixed Status {[]}
 \item
   HVAC,Average,Room Air Zone Average Temperature Gradient {[}K/m{]}
 \item
@@ -1198,11 +1198,11 @@ An integer flag that indicates whether recirculations are present in the flow. A
 \item
   HVAC,Average,Room Air Zone Thermostat Temperature {[}C{]}
 \item
-  HVAC,Average,Room Air Zone Transition Height Gamma Value \protect\hyperlink{section-1}{}
+  HVAC,Average,Room Air Zone Transition Height Gamma Value {[]}
 \item
   HVAC,Average,Room Air Zone Plume Heat Transfer Rate {[}W{]}
 \item
-  HVAC,Average,Room Air Zone Temperature Stratification Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,Room Air Zone Temperature Stratification Fraction {[]}
 \item
   HVAC,Average,Room Air Zone Window Plume Heat Transfer Rate {[}W{]}
 \end{itemize}
@@ -1219,7 +1219,7 @@ The temperature of the lower, occupied subzone in degrees C.
 
 The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper subzone..
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixed Status \protect\hyperlink{section-1}{}}{Room Air Zone Is Mixed Status }}\label{room-air-zone-is-mixed-status-1}
+\paragraph{\texorpdfstring{Room Air Zone Is Mixed Status {[]}}{Room Air Zone Is Mixed Status }}\label{room-air-zone-is-mixed-status-1}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD UFI model used). The value 1 means well-mixed; 0 means stratified.
 
@@ -1235,7 +1235,7 @@ The temperature at the user specified comfort height in degrees C.
 
 The temperature at the height of the thermostat (specified by user input) in degrees C.
 
-\paragraph{\texorpdfstring{Room Air Zone Transition Height Gamma Value \protect\hyperlink{section-1}{}}{Room Air Zone Transition Height Gamma Value }}\label{room-air-zone-transition-height-gamma-value}
+\paragraph{\texorpdfstring{Room Air Zone Transition Height Gamma Value {[]}}{Room Air Zone Transition Height Gamma Value }}\label{room-air-zone-transition-height-gamma-value}
 
 Value of gamma -- a dimensionless ``height'' used in calculating the transition height. Lower values of gamma indicate increased stratification, higher values less. Generally the values should be between 2 and 30.
 
@@ -1247,7 +1247,7 @@ The heat in watts driving the plumes in the occupied subzone.
 
 The convective heat gain from windows in an UnderFloorAirDistributionExterior zone.
 
-\paragraph{\texorpdfstring{Room Air Zone Temperature Stratification Fraction \protect\hyperlink{section-1}{}}{Room Air Zone Temperature Stratification Fraction }}\label{room-air-zone-temperature-stratification-fraction}
+\paragraph{\texorpdfstring{Room Air Zone Temperature Stratification Fraction {[]}}{Room Air Zone Temperature Stratification Fraction }}\label{room-air-zone-temperature-stratification-fraction}
 
 This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
 
@@ -1271,9 +1271,9 @@ This output, (Phi) is a measure of temperature stratification in the space. It i
 \item
   HVAC,Average,RoomAirflowNetwork Node SysDepZoneLoadsLagged {[}W{]}
 \item
-  HVAC,Average,RoomAirflowNetwork Node HVAC Supply Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,RoomAirflowNetwork Node HVAC Supply Fraction {[]}
 \item
-  HVAC,Average,RoomAirflowNetwork Node HVAC Return Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,RoomAirflowNetwork Node HVAC Return Fraction {[]}
 \end{itemize}
 
 \paragraph{RoomAirflowNetwork Node Temperature {[}C{]}}\label{roomairflownetwork-node-temperature-c-000}

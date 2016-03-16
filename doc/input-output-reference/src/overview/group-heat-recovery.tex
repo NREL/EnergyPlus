@@ -183,7 +183,7 @@ This output is the electric consumption of the unit in Joules for the timestep b
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{media/image423.svg}
+\includegraphics{media/image423.png}
 \caption{}
 \end{figure}
 
@@ -435,13 +435,13 @@ HeatExchanger:AirToAir:SensibleAndLatent,
 \item
   HVAC,Sum,Heat Exchanger Electric Energy {[}J{]}
 \item
-  HVAC,Average,Heat Exchanger Sensible Effectiveness\protect\hyperlink{section-1}{}
+  HVAC,Average,Heat Exchanger Sensible Effectiveness{[]}
 \item
-  HVAC,Average,Heat Exchanger Latent Effectiveness\protect\hyperlink{section-1}{}
+  HVAC,Average,Heat Exchanger Latent Effectiveness{[]}
 \item
   HVAC,Average,Heat Exchanger Supply Air Bypass Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Heat Exchanger Exhaust Air Bypass Mass Flow Rate {[}kg/s{]} HVAC,Average,Heat Exchanger Defrost Time Fraction\protect\hyperlink{section-1}{}
+  HVAC,Average,Heat Exchanger Exhaust Air Bypass Mass Flow Rate {[}kg/s{]} HVAC,Average,Heat Exchanger Defrost Time Fraction{[]}
 \end{itemize}
 
 \paragraph{Heat Exchanger Sensible Heating Rate {[}W{]}}\label{heat-exchanger-sensible-heating-rate-w-1}
@@ -500,11 +500,11 @@ This output is the electric consumption rate of the unit in Watts. This rate is 
 
 This output is the electric consumption of the unit in Joules for the timestep being reported. This ouput is also added to a meter with ResourceType = Electricity, EndUseKey = HeatRecovery, GroupKey = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Heat Exchanger Sensible Effectiveness \protect\hyperlink{section-1}{}}{Heat Exchanger Sensible Effectiveness }}\label{heat-exchanger-sensible-effectiveness}
+\paragraph{\texorpdfstring{Heat Exchanger Sensible Effectiveness {[]}}{Heat Exchanger Sensible Effectiveness }}\label{heat-exchanger-sensible-effectiveness}
 
 This output is the average sensible effectiveness of the heat exchanger (excluding bypass air, if any) over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heat Exchanger Latent Effectiveness \protect\hyperlink{section-1}{}}{Heat Exchanger Latent Effectiveness }}\label{heat-exchanger-latent-effectiveness}
+\paragraph{\texorpdfstring{Heat Exchanger Latent Effectiveness {[]}}{Heat Exchanger Latent Effectiveness }}\label{heat-exchanger-latent-effectiveness}
 
 This output is the average latent effectiveness of the heat exchanger (excluding bypass air, if any) over the timestep being reported.
 
@@ -516,7 +516,7 @@ This output is the average mass flow rate in kg/second of the supply (primary) a
 
 This output is the average mass flow rate in kg/second of the exhaust (secondary) air stream that is bypassing the heat exchanger over the timestep being reported. This flow rate is equal to the total exhaust mass flow rate through the heat exchanger \textbf{unit} minus the amount passing through the exhaust side of the heat exchanger \textbf{core}.
 
-\paragraph{\texorpdfstring{Heat Exchanger Defrost Time Fraction \protect\hyperlink{section-1}{}}{Heat Exchanger Defrost Time Fraction }}\label{heat-exchanger-defrost-time-fraction}
+\paragraph{\texorpdfstring{Heat Exchanger Defrost Time Fraction {[]}}{Heat Exchanger Defrost Time Fraction }}\label{heat-exchanger-defrost-time-fraction}
 
 This output is the average fraction of the reporting timestep when frost control is being implemented.
 

@@ -9,14 +9,14 @@ Ratchet Example: A utility has a single ratchet that says that the billing deman
 \begin{lstlisting}
 
 UtilityCost:Ratchet,
-    BillingDemand1,   ! Ratchet Variable Name
-    ExampleTariff1,   ! Tariff Name
-    TotalDemand,      ! Baseline Source Variable
-    TotalDemand,      ! Adjustment Source Variable
-    Summer,           ! Season From
-    Annual,           ! Season To
-    0.60,             ! Multiplier Value or Variable Name
-    0;                ! Offset Value or Variable Name
+    BillingDemand1,   ! Ratchet Variable Name
+    ExampleTariff1,   ! Tariff Name
+    TotalDemand,      ! Baseline Source Variable
+    TotalDemand,      ! Adjustment Source Variable
+    Summer,           ! Season From
+    Annual,           ! Season To
+    0.60,             ! Multiplier Value or Variable Name
+    0;                ! Offset Value or Variable Name
 \end{lstlisting}
 
 The Ratchet Variable Name (the first field) should be used wherever the ratchet should be applied and is often the source variable for UtilityCost:Charge:Simple or UtilityCost:Charge:Block.

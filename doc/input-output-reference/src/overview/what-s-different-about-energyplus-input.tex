@@ -47,16 +47,21 @@ The input data file is the primary file that EnergyPlus uses to create the build
 
 \subsection{EnergyPlus Output Processing}\label{energyplus-output-processing}
 
-1)~~~~Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as ``stream of consciousness'' (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms ``output variable'' and ``output variable'' (accessed by the Output:Variable and/or Output:Meter objects) are used interchangably in this document.
-
-2)~~~~Most EnergyPlus reporting can be readily viewed in current spreadsheet programs -- or other software that can process ``delimited variable'' reports. In these kind of reports, each ``column'' is separated from the next by a ``delimiter''. Typical delimiters are ``comma'' and ``tab''. Gradually, EnergyPlus reporting is moving from all comma separated reports to allow the user to select the delimiter via ``style'' objects.
-
-3)~~~~Styled reports allow for more selectable output reporting but also increase the number of output files as we have chosen to create the report names with extensions that typify the actual reporting. Depending on the reporting, these can be:
-
-✓~Tab -- reports with a .tab extension have tabs as the delimiter. These report files (directly from EnergyPlus) will be named something like ``eplus\textless{}xxx\textgreater{}.tab'' where the \textless{}xxx\textgreater{} is a short name of the kind of report (e.g.~Zsz for Zone Sizing, Map for Daylighting Map)
-
-✓~Csv -- reports with a .csv extension have commas as the delimiter. These are also specially formatted for use in spreadsheets (such as the compilation of results from the eplusout.eso file into the eplusout.csv file using the default post-processor program).
-
-✓~Txt -- reports with a .txt extension have spaces as the ``delimiter'' but only certain of these are really formatted the way you might expect: where multiple spaces make printing with a non-proportional font would produce readable output.
-
-✓~Html -- reports with a .html extension are ``web-browser'' ready.
+\begin{enumerate}
+  \item
+    Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as ``stream of consciousness'' (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms ``output variable'' and ``output variable'' (accessed by the Output:Variable and/or Output:Meter objects) are used interchangably in this document.
+  \item
+    Most EnergyPlus reporting can be readily viewed in current spreadsheet programs -- or other software that can process ``delimited variable'' reports. In these kind of reports, each ``column'' is separated from the next by a ``delimiter''. Typical delimiters are ``comma'' and ``tab''. Gradually, EnergyPlus reporting is moving from all comma separated reports to allow the user to select the delimiter via ``style'' objects.
+  \item
+    Styled reports allow for more selectable output reporting but also increase the number of output files as we have chosen to create the report names with extensions that typify the actual reporting. Depending on the reporting, these can be:
+    \begin{itemize}
+      \item
+        Tab -- reports with a .tab extension have tabs as the delimiter. These report files (directly from EnergyPlus) will be named something like ``eplus\textless{}xxx\textgreater{}.tab'' where the \textless{}xxx\textgreater{} is a short name of the kind of report (e.g.~Zsz for Zone Sizing, Map for Daylighting Map)
+      \item
+        Csv -- reports with a .csv extension have commas as the delimiter. These are also specially formatted for use in spreadsheets (such as the compilation of results from the eplusout.eso file into the eplusout.csv file using the default post-processor program).
+      \item
+        Txt -- reports with a .txt extension have spaces as the ``delimiter'' but only certain of these are really formatted the way you might expect: where multiple spaces make printing with a non-proportional font would produce readable output.
+      \item
+        Html -- reports with a .html extension are ``web-browser'' ready.
+    \end{itemize}
+\end{enumerate}

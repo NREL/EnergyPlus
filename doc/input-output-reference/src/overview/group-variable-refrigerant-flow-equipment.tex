@@ -410,87 +410,87 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow syste
 \begin{lstlisting}
 
 AirConditioner:VariableRefrigerantFlow,
-    VRF Heat Pump,        !- Heat Pump Name
-    VRFCondAvailSched,    !- Availability Schedule Name
-    autosize,             !- Gross Rated Total Cooling Capacity {W}
-    3.16038,              !- Gross Rated Cooling COP {W}
-    -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
-    43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
-    VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
-    VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
-    VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
-    VRFCoolEIRFT,         !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
-    VRFCoolEIRFTBoundary, !- Cooling Energy Input Ratio Boundary Curve Name
-    VRFCoolEIRFTHi,       !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
-    CoolingEIRLowPLR,     !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
-    CoolingEIRHiPLR,      !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
-    CoolingCombRatio,     !- Cooling Combination Ratio Correction Factor Curve Name
-    VRFCPLFFPLR,          !- Cooling Part-Load Fraction Correlation Curve Name
-    autosize,             !- Gross Rated Heating Capacity {W}
-    ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
-    3.40909,              !- Gross Rated Heating COP
-    -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
-    15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
-    VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
-    VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
-    VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
-    VRFHeatEIRFT,         !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
-    VRFHeatEIRFTBoundary, !- Heating Energy Input Ratio Boundary Curve Name
-    VRFHeatEIRFTHi,       !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
-    WetBulbTemperature,   !- Heating Performance Curve Outdoor Temperature Type
-    HeatingEIRLowPLR,     !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
-    HeatingEIRHiPLR,      !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
-    HeatingCombRatio,     !- Heating Combination Ratio Correction Factor Curve Name
-    VRFCPLFFPLR,          !- Heating Part-Load Fraction Correlation Curve Name
-    0.25,                 !- Minimum Heat Pump Part-Load Ratio
-    SPACE1-1,             !- Zone Name for Master Thermostat Location
-    LoadPriority,         !- Master Thermostat Priority Control Type
-    ,                     !- Thermostat Priority Schedule Name
-    VRF Heat Pump TU List, !- Zone Terminal Unit List Name
-    No,                   !- Heat Pump Waste Heat Recovery
-    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}
-    10,                   !- Vertical Height used for Piping Correction Factor {m}
-    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name
-    -0.000386,            !- Piping Correction Factor for Height in Cooling Mode Coefficient
-    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}
-    ,                     !- Piping Correction Factor for Length in Heating Mode Curve Name
-    ,                     !- Piping Correction Factor for Height in Heating Mode Coefficient
-    15,                   !- Crankcase Heater Power per Compressor {W}
-    3,                    !- Number of Compressors
-    0.33,                 !- Ratio of Compressor Size to Total Compressor Capacity
-    7,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
-    Resistive,            !- Defrost Strategy
-    Timed,                !- Defrost Control
-    ,                     !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
-    ,                     !- Defrost Time Period Fraction
-    autosize,             !- Resistive Defrost Heater Capacity {W}
-    7,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
-    EvaporativelyCooled,  !- Condenser Type
-    MyVRFOANode,          !- Condenser Inlet Node Name
-    ,                     !- Condenser Outlet Node Name
-    ,                     !- Water Condenser Volume Flow Rate
-    ,                     !- Evaporative Condenser Effectiveness {dimensionless}
-    autosize,             !- Evaporative Condenser Air Flow Rate {m3/s}
-    autosize,             !- Evaporative Condenser Pump Rated Power Consumption {W}
-    ,                     !- Supply Water Storage Tank Name
-    200,                  !- Basin Heater Capacity {W/K}
-    ,                     !- Basin Heater Set Point Temperature (C)
-    ,                     !- Basin Heater Operating Schedule Name
-    ,                     !- Fuel Type
-    ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-    ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
-    ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Cooling Capacity Fraction
-    ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
-    ,                     !- Heat Recovery Cooling Energy Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Cooling Energy Fraction
-    ,                     !- Heat Recovery Cooling Energy Time Constant (hr)
-    ,                     !- Heat Recovery Heating Capacity Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Heating Capacity Fraction
-    ,                     !- Heat Recovery Heating Capacity Time Constant (hr)
-    ,                     !- Heat Recovery Heating Energy Modifier Function of Temperature Curve Name
-    ,                     !- Initial Heat Recovery Heating Energy Fraction
-    ;                     !- Heat Recovery Heating Energy Time Constant (hr)
+    VRF Heat Pump,        !- Heat Pump Name
+    VRFCondAvailSched,    !- Availability Schedule Name
+    autosize,             !- Gross Rated Total Cooling Capacity {W}
+    3.16038,              !- Gross Rated Cooling COP {W}
+    -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
+    43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
+    VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
+    VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
+    VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
+    VRFCoolEIRFT,         !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
+    VRFCoolEIRFTBoundary, !- Cooling Energy Input Ratio Boundary Curve Name
+    VRFCoolEIRFTHi,       !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
+    CoolingEIRLowPLR,     !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
+    CoolingEIRHiPLR,      !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
+    CoolingCombRatio,     !- Cooling Combination Ratio Correction Factor Curve Name
+    VRFCPLFFPLR,          !- Cooling Part-Load Fraction Correlation Curve Name
+    autosize,             !- Gross Rated Heating Capacity {W}
+    ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
+    3.40909,              !- Gross Rated Heating COP
+    -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
+    15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
+    VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
+    VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
+    VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
+    VRFHeatEIRFT,         !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
+    VRFHeatEIRFTBoundary, !- Heating Energy Input Ratio Boundary Curve Name
+    VRFHeatEIRFTHi,       !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
+    WetBulbTemperature,   !- Heating Performance Curve Outdoor Temperature Type
+    HeatingEIRLowPLR,     !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
+    HeatingEIRHiPLR,      !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
+    HeatingCombRatio,     !- Heating Combination Ratio Correction Factor Curve Name
+    VRFCPLFFPLR,          !- Heating Part-Load Fraction Correlation Curve Name
+    0.25,                 !- Minimum Heat Pump Part-Load Ratio
+    SPACE1-1,             !- Zone Name for Master Thermostat Location
+    LoadPriority,         !- Master Thermostat Priority Control Type
+    ,                     !- Thermostat Priority Schedule Name
+    VRF Heat Pump TU List, !- Zone Terminal Unit List Name
+    No,                   !- Heat Pump Waste Heat Recovery
+    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}
+    10,                   !- Vertical Height used for Piping Correction Factor {m}
+    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name
+    -0.000386,            !- Piping Correction Factor for Height in Cooling Mode Coefficient
+    30,                   !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}
+    ,                     !- Piping Correction Factor for Length in Heating Mode Curve Name
+    ,                     !- Piping Correction Factor for Height in Heating Mode Coefficient
+    15,                   !- Crankcase Heater Power per Compressor {W}
+    3,                    !- Number of Compressors
+    0.33,                 !- Ratio of Compressor Size to Total Compressor Capacity
+    7,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+    Resistive,            !- Defrost Strategy
+    Timed,                !- Defrost Control
+    ,                     !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+    ,                     !- Defrost Time Period Fraction
+    autosize,             !- Resistive Defrost Heater Capacity {W}
+    7,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+    EvaporativelyCooled,  !- Condenser Type
+    MyVRFOANode,          !- Condenser Inlet Node Name
+    ,                     !- Condenser Outlet Node Name
+    ,                     !- Water Condenser Volume Flow Rate
+    ,                     !- Evaporative Condenser Effectiveness {dimensionless}
+    autosize,             !- Evaporative Condenser Air Flow Rate {m3/s}
+    autosize,             !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                     !- Supply Water Storage Tank Name
+    200,                  !- Basin Heater Capacity {W/K}
+    ,                     !- Basin Heater Set Point Temperature (C)
+    ,                     !- Basin Heater Operating Schedule Name
+    ,                     !- Fuel Type
+    ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
+    ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+    ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Cooling Capacity Fraction
+    ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
+    ,                     !- Heat Recovery Cooling Energy Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Cooling Energy Fraction
+    ,                     !- Heat Recovery Cooling Energy Time Constant (hr)
+    ,                     !- Heat Recovery Heating Capacity Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Heating Capacity Fraction
+    ,                     !- Heat Recovery Heating Capacity Time Constant (hr)
+    ,                     !- Heat Recovery Heating Energy Modifier Function of Temperature Curve Name
+    ,                     !- Initial Heat Recovery Heating Energy Fraction
+    ;                     !- Heat Recovery Heating Energy Time Constant (hr)
 \end{lstlisting}
 
 \subsection{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}\label{airconditionervariablerefrigerantflowfluidtemperaturecontrol}
@@ -870,19 +870,19 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
 \item
   HVAC,Average,VRF Heat Pump Total Heating Rate {[}W{]}
 \item
-  HVAC,Average,VRF Heat Pump Cooling COP \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Cooling COP {[]}
 \item
-  HVAC,Average,VRF Heat Pump Heating COP \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Heating COP {[]}
 \item
-  HVAC,Average,VRF Heat Pump COP \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump COP {[]}
 \item
-  HVAC,Average,VRF Heat Pump Part Load Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Part Load Ratio {[]}
 \item
-  HVAC,Average,VRF Heat Pump Runtime Fraction \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Runtime Fraction {[]}
 \item
-  HVAC,Average,VRF Heat Pump Cycling Ratio \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Cycling Ratio {[]}
 \item
-  HVAC,Average,VRF Heat Pump Operating Mode \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Operating Mode {[]}
 \item
   HVAC,Average,VRF Heat Pump Condenser Inlet Temperature {[}C{]}
 \item
@@ -904,7 +904,7 @@ Heat Recovery:
 \begin{itemize}
 \tightlist
 \item
-  HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier {[]}
 \end{itemize}
 
 Evap-cooled:
@@ -921,7 +921,7 @@ Evap-cooled:
 \item
   HVAC,Average,VRF Heat Pump Basin Heater Electric Energy {[}J{]}
 \item
-  HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier \protect\hyperlink{section-1}{}
+  HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier {[]}
 \end{itemize}
 
 Water-cooled:
@@ -1023,15 +1023,15 @@ This output field is the heating mode electricity consumption rate of the variab
 
 This output field is the heating mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), additional energy required for defrost, and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
-\paragraph{\texorpdfstring{VRF Heat Pump Cooling COP\protect\hyperlink{section-1}{}}{VRF Heat Pump Cooling COP}}\label{vrf-heat-pump-cooling-cop}
+\paragraph{\texorpdfstring{VRF Heat Pump Cooling COP{[]}}{VRF Heat Pump Cooling COP}}\label{vrf-heat-pump-cooling-cop}
 
 This is the operating cooling coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Cooling Rate and Variable Refrigerant Flow Heat Pump Cooling Electric Consumption Rate output variables. Crankcase heater (usually 0 in cooling mode), evaporative condenser water pump, and defrost (usually 0 in cooling mode) consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in cooling mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Heating COP\protect\hyperlink{section-1}{}}{VRF Heat Pump Heating COP}}\label{vrf-heat-pump-heating-cop}
+\paragraph{\texorpdfstring{VRF Heat Pump Heating COP{[]}}{VRF Heat Pump Heating COP}}\label{vrf-heat-pump-heating-cop}
 
 This is the operating heating coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Heating Rate and Variable Refrigerant Flow Heat Pump Heating Electric Consumption Rate output variables. Crankcase heater, evaporative condenser water pump (usually 0 in heating mode), and defrost consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in heating mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump COP\protect\hyperlink{section-1}{}}{VRF Heat Pump COP}}\label{vrf-heat-pump-cop}
+\paragraph{\texorpdfstring{VRF Heat Pump COP{[]}}{VRF Heat Pump COP}}\label{vrf-heat-pump-cop}
 
 This is the operating coefficient of performance for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -1047,15 +1047,15 @@ This is the electricity consumption of the heat pump in Joules for the time step
 
 This output field is the part-load ratio of the heat pump condenser. Heat pump part-load ratio is defined as the total coil load divided by the heat pump's maximum available capacity at the current operating conditions. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Runtime Fraction \protect\hyperlink{section-1}{}}{VRF Heat Pump Runtime Fraction }}\label{vrf-heat-pump-runtime-fraction}
+\paragraph{\texorpdfstring{VRF Heat Pump Runtime Fraction {[]}}{VRF Heat Pump Runtime Fraction }}\label{vrf-heat-pump-runtime-fraction}
 
 This output field is the runtime fraction of the heat pump condenser's first stage compressor. Heat pump runtime fraction is defined as the fraction of time the first stage compressor is on during a given time period and includes cycling losses. This value is calculated as the ratio of the VRF Heat Pump Cycling Ratio and the output of the Cooling Part-Load Fraction Correlation Curve object as the specific cycling ratio. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Cycling Ratio \protect\hyperlink{section-1}{}}{VRF Heat Pump Cycling Ratio }}\label{vrf-heat-pump-cycling-ratio}
+\paragraph{\texorpdfstring{VRF Heat Pump Cycling Ratio {[]}}{VRF Heat Pump Cycling Ratio }}\label{vrf-heat-pump-cycling-ratio}
 
 This output field is the cycling ratio of the heat pump condenser's first stage compressor. Heat pump cycling ratio is defined as the fraction of time the first stage compressor is on during a given time period. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Operating Mode \protect\hyperlink{section-1}{}}{VRF Heat Pump Operating Mode }}\label{vrf-heat-pump-operating-mode}
+\paragraph{\texorpdfstring{VRF Heat Pump Operating Mode {[]}}{VRF Heat Pump Operating Mode }}\label{vrf-heat-pump-operating-mode}
 
 This output field is an integer representation of the operating mode of the variable refrigerant flow heat pump. The operating mode for cooling mode is indicated by a 1 and heating mode is indicated by a 2. A value of 0 is reported if the heat pump is off. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -1123,7 +1123,7 @@ This output is the electric consumption rate of the heat pump's basin heater (fo
 
 This output is the electric consumption of the heat pump's basin heater (for evaporatively-cooled condenser type) in Joules. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Status Change Multiplier \protect\hyperlink{section-1}{}}{VRF Heat Pump Heat Recovery Status Change Multiplier }}\label{vrf-heat-pump-heat-recovery-status-change-multiplier}
+\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Status Change Multiplier {[]}}{VRF Heat Pump Heat Recovery Status Change Multiplier }}\label{vrf-heat-pump-heat-recovery-status-change-multiplier}
 
 This output applies only when heat recovery is used and represents the multiplier used to derate the capacity of the system when transitioning from cooling or heating mode to heat recovery mode. This value is 1 when derating does not apply (i.e., the system has not recently changed modes to provide heat recovery). Derating during a transition period is applied according to the inputs for Heat Recovery Fraction and Heat Recovery Time Constant. To turn transition derating off, set Heat Recovery Fraction to 1. Refer to the engineering reference document discussion on the variable refrigerant flow heat pump model section for transition from cooling only mode to heat recovery mode for a more detailed description.
 
@@ -1184,10 +1184,10 @@ Following is an example input for a ZoneTerminalUnitList object.
 \begin{lstlisting}
 
 ZoneTerminalUnitList,
-     VRF Heat Pump TU List, !- Zone Terminal Unit List Name
-     TU3,                   !- Zone Terminal Unit Name 1
-     TU4,                   !- Zone Terminal Unit Name 2
-     TU1,                   !- Zone Terminal Unit Name 3
-     TU2,                   !- Zone Terminal Unit Name 4
-     TU5;                   !- Zone Terminal Unit Name 5
+     VRF Heat Pump TU List, !- Zone Terminal Unit List Name
+     TU3,                   !- Zone Terminal Unit Name 1
+     TU4,                   !- Zone Terminal Unit Name 2
+     TU1,                   !- Zone Terminal Unit Name 3
+     TU2,                   !- Zone Terminal Unit Name 4
+     TU5;                   !- Zone Terminal Unit Name 5
 \end{lstlisting}

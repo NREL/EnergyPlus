@@ -6,39 +6,39 @@ In the descriptions below, the fields for each input object will be described bu
 
 \begin{lstlisting}
 Site:Location,
-       \unique-object
-       \min-fields 5
-  A1 , \field Name
-       \required-field
-       \type  alpha
-  N1 , \field Latitude
-       \units deg
-       \minimum -90.0
-       \maximum +90.0
-       \default 0.0
-       \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
-       \type real
-  N2 , \field Longitude
-       \units deg
-       \minimum -180.0
-       \maximum +180.0
-       \default 0.0
-       \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
-       \type real
-  N3 , \field Time Zone
-       \note basic these limits on the WorldTimeZone Map (2003)
-       \units hr
-       \minimum -12.0
-       \maximum +14.0
-       \default 0.0
-       \note  Time relative to GMT. Decimal hours.
-       \type real
-  N4 ; \field Elevation
-       \units m
-       \minimum -300.0
-       \maximum< 8900.0
-       \default 0.0
-       \type real
+       \unique-object
+       \min-fields 5
+  A1 , \field Name
+       \required-field
+       \type  alpha
+  N1 , \field Latitude
+       \units deg
+       \minimum -90.0
+       \maximum +90.0
+       \default 0.0
+       \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+  N2 , \field Longitude
+       \units deg
+       \minimum -180.0
+       \maximum +180.0
+       \default 0.0
+       \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+  N3 , \field Time Zone
+       \note basic these limits on the WorldTimeZone Map (2003)
+       \units hr
+       \minimum -12.0
+       \maximum +14.0
+       \default 0.0
+       \note  Time relative to GMT. Decimal hours.
+       \type real
+  N4 ; \field Elevation
+       \units m
+       \minimum -300.0
+       \maximum< 8900.0
+       \default 0.0
+       \type real
 \end{lstlisting}
 
 The IDD excerpt above is the complete definition as seen in the IDD file.

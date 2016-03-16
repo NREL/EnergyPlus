@@ -3,38 +3,38 @@
 When the EnergyPlus HVAC simulation manager needs to simulate the zone equipment side of the air loop it calls \emph{ManageZoneEquipment}, the zone equipment simulation manager subroutine. Like the other managers, \emph{ManageZoneEquipment} has a very simple structure:
 
 \begin{lstlisting}
-        IF (GetInputFlag) THEN
-          CALL GetZoneEquipment
-          GetInputFlag = .FALSE.
-        END IF
+        IF (GetInputFlag) THEN
+          CALL GetZoneEquipment
+          GetInputFlag = .FALSE.
+        END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-        CALL InitZoneEquipment(FirstHVACIteration)
+        CALL InitZoneEquipment(FirstHVACIteration)
 \end{lstlisting}
 
 \begin{lstlisting}
-        IF (ZoneSizingCalc) THEN
-          CALL SizeZoneEquipment
-        ELSE
-          CALL SimZoneEquipment(FirstHVACIteration, SimAir)
-        END IF
+        IF (ZoneSizingCalc) THEN
+          CALL SizeZoneEquipment
+        ELSE
+          CALL SimZoneEquipment(FirstHVACIteration, SimAir)
+        END IF
 \end{lstlisting}
 
 \begin{lstlisting}
-        CALL RecordZoneEquipment(SimAir)
+        CALL RecordZoneEquipment(SimAir)
 \end{lstlisting}
 
 \begin{lstlisting}
-        CALL ReportZoneEquipment
+        CALL ReportZoneEquipment
 \end{lstlisting}
 
 \begin{lstlisting}
-        SimZone = .False.
+        SimZone = .False.
 \end{lstlisting}
 
 \begin{lstlisting}
-        RETURN
+        RETURN
 \end{lstlisting}
 
 \begin{enumerate}

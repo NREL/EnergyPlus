@@ -18,123 +18,123 @@ The main input objects that implement this example of EMS-based thermochromic gl
 
 \begin{lstlisting}
 
-  Construction,
-      TCwindow_25,                !- Name
-      Clear3PPG,               !- Outside Layer
-      AIR 3MM,                 !- Layer 2
-      WO18RT25,              !- Layer 3
-      AIR 8MM,                 !- Layer 4
-      SB60Clear3PPG;           !- Layer 5
+  Construction,
+      TCwindow_25,                !- Name
+      Clear3PPG,               !- Outside Layer
+      AIR 3MM,                 !- Layer 2
+      WO18RT25,              !- Layer 3
+      AIR 8MM,                 !- Layer 4
+      SB60Clear3PPG;           !- Layer 5
 
 
-    EnergyManagementSystem:ConstructionIndexVariable,
-      TCwindow_25,
-      TCwindow_25;
+    EnergyManagementSystem:ConstructionIndexVariable,
+      TCwindow_25,
+      TCwindow_25;
 
 
-    Construction,
-      TCwindow_27,                !- Name
-      Clear3PPG,               !- Outside Layer
-      AIR 3MM,                 !- Layer 2
-      WO18RT27,              !- Layer 3
-      AIR 8MM,                 !- Layer 4
-      SB60Clear3PPG;           !- Layer 5
+    Construction,
+      TCwindow_27,                !- Name
+      Clear3PPG,               !- Outside Layer
+      AIR 3MM,                 !- Layer 2
+      WO18RT27,              !- Layer 3
+      AIR 8MM,                 !- Layer 4
+      SB60Clear3PPG;           !- Layer 5
 
 
-    EnergyManagementSystem:ConstructionIndexVariable,
-      TCwindow_27,
-      TCwindow_27;
+    EnergyManagementSystem:ConstructionIndexVariable,
+      TCwindow_27,
+      TCwindow_27;
   <<SNIPPED states between 27C and 80C>>
 
 
-    Construction,
-      TCwindow_80,                !- Name
-      Clear3PPG,               !- Outside Layer
-      AIR 3MM,                 !- Layer 2
-      WO18RT80,              !- Layer 3
-      AIR 8MM,                 !- Layer 4
-      SB60Clear3PPG;           !- Layer 5
+    Construction,
+      TCwindow_80,                !- Name
+      Clear3PPG,               !- Outside Layer
+      AIR 3MM,                 !- Layer 2
+      WO18RT80,              !- Layer 3
+      AIR 8MM,                 !- Layer 4
+      SB60Clear3PPG;           !- Layer 5
 
 
-    EnergyManagementSystem:ConstructionIndexVariable,
-      TCwindow_80,
-      TCwindow_80;
+    EnergyManagementSystem:ConstructionIndexVariable,
+      TCwindow_80,
+      TCwindow_80;
 
 
-    Construction,
-      TCwindow_85,                !- Name
-      Clear3PPG,               !- Outside Layer
-      AIR 3MM,                 !- Layer 2
-      WO18RT85,              !- Layer 3
-      AIR 8MM,                 !- Layer 4
-      SB60Clear3PPG;           !- Layer 5
+    Construction,
+      TCwindow_85,                !- Name
+      Clear3PPG,               !- Outside Layer
+      AIR 3MM,                 !- Layer 2
+      WO18RT85,              !- Layer 3
+      AIR 8MM,                 !- Layer 4
+      SB60Clear3PPG;           !- Layer 5
 
 
-    EnergyManagementSystem:ConstructionIndexVariable,
-      TCwindow_85,
-      TCwindow_85;
+    EnergyManagementSystem:ConstructionIndexVariable,
+      TCwindow_85,
+      TCwindow_85;
 
 
-    EnergyManagementSystem:Sensor,
-      Win1_Tout,
-      Perimeter_ZN_1_wall_south_Window_1,
-      Surface Outside Face Temperature;
+    EnergyManagementSystem:Sensor,
+      Win1_Tout,
+      Perimeter_ZN_1_wall_south_Window_1,
+      Surface Outside Face Temperature;
 
 
-    EnergyManagementSystem:Actuator,
-      Win1_Construct,
-      Perimeter_ZN_1_wall_south_Window_1,
-      Surface,
-      Construction State;
+    EnergyManagementSystem:Actuator,
+      Win1_Construct,
+      Perimeter_ZN_1_wall_south_Window_1,
+      Surface,
+      Construction State;
 
 
-    EnergyManagementSystem:ProgramCallingManager,
-      My thermochromic window emulator,
-      BeginTimestepBeforePredictor,
-      ZN_1_wall_south_Window_1_Control;
+    EnergyManagementSystem:ProgramCallingManager,
+      My thermochromic window emulator,
+      BeginTimestepBeforePredictor,
+      ZN_1_wall_south_Window_1_Control;
 
 
-    EnergyManagementSystem:Program,
-      ZN_1_wall_south_Window_1_Control,
-      IF Win1_Tout < = 26.0 ,
-        Set Win1_Construct = TCwindow_25,
-      ELSEIF Win1_Tout < = 28.0 ,
-        SEt Win1_Construct = TCwindow_27,
-      ELSEIF Win1_Tout < = 30.0 ,
-        SET Win1_Construct = TCwindow_29,
-      ELSEIF Win1_Tout < = 32.0 ,
-        SET Win1_Construct = TCwindow_31,
-      ELSEIF Win1_Tout < = 34.0 ,
-        SET Win1_Construct = TCwindow_33,
-      ELSEIF Win1_Tout < = 36.0 ,
-        SET Win1_Construct = TCwindow_35,
-      ELSEIF Win1_Tout < = 38.0 ,
-        SET Win1_Construct = TCwindow_37,
-      ELSEIF Win1_Tout < = 40.0 ,
-        SET Win1_Construct = TCwindow_39,
-      ELSEIF Win1_Tout < = 42.0 ,
-        SET Win1_Construct = TCwindow_41,
-      ELSEIF Win1_Tout < = 44.0 ,
-        SET Win1_Construct = TCwindow_43,
-      ELSEIF Win1_Tout < = 47.5 ,
-        SET Win1_Construct = TCwindow_45,
-      ELSEIF Win1_Tout < = 52.5 ,
-        SET Win1_Construct = TCwindow_50,
-      ELSEIF Win1_Tout < = 57.5 ,
-        SET Win1_Construct = TCwindow_55,
-      ELSEIF Win1_Tout < = 62.5 ,
-        SET Win1_Construct = TCwindow_60,
-      ELSEIF Win1_Tout < = 67.5 ,
-        SET Win1_Construct = TCwindow_65,
-      ELSEIF Win1_Tout < = 72.5 ,
-        SET Win1_Construct = TCwindow_70,
-      ELSEIF Win1_Tout < = 77.5 ,
-        SET Win1_Construct = TCwindow_75,
-      ELSEIF Win1_Tout < = 82.5 ,
-        SET Win1_Construct = TCwindow_80,
-      ELSE ,
-        SET Win1_Construct = TCwindow_85,
-      ENDIF;
+    EnergyManagementSystem:Program,
+      ZN_1_wall_south_Window_1_Control,
+      IF Win1_Tout < = 26.0 ,
+        Set Win1_Construct = TCwindow_25,
+      ELSEIF Win1_Tout < = 28.0 ,
+        SEt Win1_Construct = TCwindow_27,
+      ELSEIF Win1_Tout < = 30.0 ,
+        SET Win1_Construct = TCwindow_29,
+      ELSEIF Win1_Tout < = 32.0 ,
+        SET Win1_Construct = TCwindow_31,
+      ELSEIF Win1_Tout < = 34.0 ,
+        SET Win1_Construct = TCwindow_33,
+      ELSEIF Win1_Tout < = 36.0 ,
+        SET Win1_Construct = TCwindow_35,
+      ELSEIF Win1_Tout < = 38.0 ,
+        SET Win1_Construct = TCwindow_37,
+      ELSEIF Win1_Tout < = 40.0 ,
+        SET Win1_Construct = TCwindow_39,
+      ELSEIF Win1_Tout < = 42.0 ,
+        SET Win1_Construct = TCwindow_41,
+      ELSEIF Win1_Tout < = 44.0 ,
+        SET Win1_Construct = TCwindow_43,
+      ELSEIF Win1_Tout < = 47.5 ,
+        SET Win1_Construct = TCwindow_45,
+      ELSEIF Win1_Tout < = 52.5 ,
+        SET Win1_Construct = TCwindow_50,
+      ELSEIF Win1_Tout < = 57.5 ,
+        SET Win1_Construct = TCwindow_55,
+      ELSEIF Win1_Tout < = 62.5 ,
+        SET Win1_Construct = TCwindow_60,
+      ELSEIF Win1_Tout < = 67.5 ,
+        SET Win1_Construct = TCwindow_65,
+      ELSEIF Win1_Tout < = 72.5 ,
+        SET Win1_Construct = TCwindow_70,
+      ELSEIF Win1_Tout < = 77.5 ,
+        SET Win1_Construct = TCwindow_75,
+      ELSEIF Win1_Tout < = 82.5 ,
+        SET Win1_Construct = TCwindow_80,
+      ELSE ,
+        SET Win1_Construct = TCwindow_85,
+      ENDIF;
 
 
   Output:Variable, Perimeter_ZN_1_wall_south_Window_1, Surface Construction Index, timestep;

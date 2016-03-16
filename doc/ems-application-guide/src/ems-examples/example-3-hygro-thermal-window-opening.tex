@@ -55,37 +55,37 @@ EMS-related input objects to solve this problem are listed below and are include
 \begin{lstlisting}
 
 EnergyManagementSystem:Sensor,
-    ZoneRH , ! Name
-    Zone 1 Node, ! Output:Variable or Output:Meter Index Key Name
-    System Node Relative Humidity; ! Output:Variable or Output:Meter Name
+    ZoneRH , ! Name
+    Zone 1 Node, ! Output:Variable or Output:Meter Index Key Name
+    System Node Relative Humidity; ! Output:Variable or Output:Meter Name
 
 
   EnergyManagementSystem:Actuator,
-    MyOpenFactor,                            ! Name
-    Zn001:Wall001:Win001,                  ! Component Name
-    AirFlow Network Window/Door Opening, ! Component Type
-    Venting Opening Factor;    ! Control Type
+    MyOpenFactor,                            ! Name
+    Zn001:Wall001:Win001,                  ! Component Name
+    AirFlow Network Window/Door Opening, ! Component Type
+    Venting Opening Factor;    ! Control Type
 
 
   EnergyManagementSystem:ProgramCallingManager,
-    RH Controlled Open Factor ,    ! Name
-    BeginTimestepBeforePredictor , ! EnergyPlus Model Calling Point
-    RH_OpeningController ;         ! Program Name 1
+    RH Controlled Open Factor ,    ! Name
+    BeginTimestepBeforePredictor , ! EnergyPlus Model Calling Point
+    RH_OpeningController ;         ! Program Name 1
 
 
   EnergyManagementSystem:Program,
-    RH_OpeningController ,     ! Name
-    IF ZoneRH < 25,
-      SET MyOpenFactor = 0.0 ,
-    ELSEIF ZoneRH > 60,
-      SET MyOpenFactor = 1.0 ,
-    ELSE,
-      SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),
-    ENDIF;
+    RH_OpeningController ,     ! Name
+    IF ZoneRH < 25,
+      SET MyOpenFactor = 0.0 ,
+    ELSEIF ZoneRH > 60,
+      SET MyOpenFactor = 1.0 ,
+    ELSE,
+      SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),
+    ENDIF;
 
 
   Output:EnergyManagementSystem,
-    Verbose,
-    Verbose,
-    Verbose;
+    Verbose,
+    Verbose,
+    Verbose;
 \end{lstlisting}
