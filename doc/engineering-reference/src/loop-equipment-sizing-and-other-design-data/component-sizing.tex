@@ -159,10 +159,12 @@ The oustide air fraction is calculated as (where V\(_{r}\) is calculated as abov
 
 With the inlet and outlet conditions established, we can obtain the inlet and outlet enthalpies:
 
-\begin{array}{rl}
+\begin{equation}
+ \begin{array}{rl}
   h_{air,coil,des,in} & = \text{PsyHFnTdbW}\left(T_{air,in,des},W_{air,in,des}\right) \\
-  h_{air,coil,des,out} & = \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right) \\
-\end{array}
+  h_{air,coil,des,out} & = \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right)
+ \end{array}
+\end{equation}
 
 Where PsyHFnTdbW is the EnergyPlus function for calculation air specific enthalpy given the air temperature and humidity ratio. We now have all we need to calculate the design coil capacity, \(\dot{Q}_{coil,des}\) .
 
@@ -187,11 +189,12 @@ Where:
 
 The enthalpies are given by:
 
-\begin{array}{lr}
+\begin{equation}
+ \begin{array}{lr}
   h_{air,coil,des,in} & = \text{PsyHFnTdbW}\left(T_{air,in,des},W_{air,in,des}\right) \\
-  h_{air,coil,des,out} & = \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right) \\
-\end{array}
-
+  h_{air,coil,des,out} & = \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right)
+ \end{array}
+\end{equation}
 Where the inputs to those functions are the coil inlet design conditions. For coils in terminal units these are set at the system level to the system design supply air temperature. For zonal units they are set to design return air, mixed air, or outside air as appropriate to the unit. T\(_{s}\) is set to the zone cooling design supply air temperature as specified in the \emph{Zone:Sizing} inputs. W\(_{s}\) is set to the zone cooling design supply air humidity ratio as specified in the \emph{Zone:Sizing} inputs.
 
 \subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - System Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - System Coils}}\label{design-water-flow-rate-m3s---system-coils}
@@ -275,12 +278,14 @@ The outlet air temperature depends on whether the coil is in the outside air str
 
 If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit, then:
 
-\begin{array}{rl}
+\begin{equation}
+ \begin{array}{rl}
   \dot{Q}_{coil,des} & = c_{p,air}\rho_{air}\dot{V}_{w,coil,des}\Delta T_{w,des} \\
   T_1 & = T_{air,in,des} - \dot{Q}_{coil,des} / \left(\rho_{air}c_{p,air}\dot V_{air,coil,des}\right) \\
   T_2 & = T_{w,out,des} + 2 \\
   T_{air,out,des} & = \max \left(T_1,T_2\right)
  \end{array}
+\end{equation}
 
 For all other cases T\(_{s}\) is set to T\(_{s}\) (the zone design supply air temperature as specified in Sizing:Zone).
 
@@ -473,18 +478,18 @@ The calculation is identical to that done for \emph{Coil:Cooling:Water}, which i
 The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. The following calculations are then performed to determine the rated total cooling capacity.
 
 \begin{equation}
-{T_{WB,ratio}} = {\raise0.7ex\hbox{{\left( {{T_{WB,air,in,des}} + 273.15\,C} \right)}} \!\mathord{\left/ {\vphantom {{\left( {{T_{WB,air,in,des}} + 273.15\,C} \right)} {283.15\,C}}}\right.}\!\lower0.7ex\hbox{{283.15\,C}}}
+  T_{WB,ratio} = \frac{T_{WB,air,in,des}+273.15C}{283.15C}
 \end{equation}
 
 \begin{equation}
-{T_{S,ratio}} = {\raise0.7ex\hbox{{\left( {29.44\,C + 273.15\,C} \right)}} \!\mathord{\left/ {\vphantom {{\left( {29.44\,C + 273.15\,C} \right)} {283.15\,C}}}\right.}\!\lower0.7ex\hbox{{283.15\,C}}}
+  T_{S,ratio} = \frac{29.44C+273.15C}{283.15C}
 \end{equation}
 
 where:
 
-\$\{T\_\{WB,ratio\}\} = \$ ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
+$T_{WB,ratio} = $ ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
 
-\$\{T\_\{S,ratio\}\} = \$ ratio of source-side inlet water temperature in Kelvin to a reference temperature
+$T_{S,ratio} = $ ratio of source-side inlet water temperature in Kelvin to a reference temperature
 
 TCC1 = user input for Total Cooling Capacity Coefficient 1
 
@@ -504,18 +509,25 @@ The 4\(^{h}\) and 5\(^{h}\) coefficient (TCC4 and TCC5) used in the above equati
 
 The enthalpy of the entering air is then compared with the enthalpy of the exiting air. The calculations for air enthalpy are identical to that done for \emph{Coil:Cooling:Water}. If the entering air enthalpy is less than the exiting air enthalpy, a reference value of 48,000 J/kg is used as the entering air enthalpy. If the TotCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
 
-\begin{array}{l}IF({H_{in}}\, > \,{H_{out}})THEN\\\,\,\,\,\,{\mathop Q\limits^\cdot_{coil,des,total}} = {\raise0.7ex\hbox{{{m_{air,des}}\left( {{H_{in}} - {H_{out}}} \right)}} \!\mathord{\left/ {\vphantom {{{m_{air,des}}\left( {{H_{in}} - {H_{out}}} \right)} {TotCapTempModFac}}}\right.}\!\lower0.7ex\hbox{{TotCapTempModFac}}}\\ELSE\\\,\,\,\,\,{\mathop Q\limits^\cdot_{coil,des,total}} = {\raise0.7ex\hbox{{{m_{air,des}}\left( {48000 - {H_{out}}} \right)}} \!\mathord{\left/ {\vphantom {{{m_{air,des}}\left( {48000 - {H_{out}}} \right)} {TotCapTempModFac}}}\right.}\!\lower0.7ex\hbox{{TotCapTempModFac}}}\\ENDIF\end{array}
+\begin{equation}
+  \dot{Q}_{coil,des,total}   = \left\{
+                                  \begin{array}{cl}
+                                    \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}}{TotCapTempModFac}  & if H_{in}>H_{out} \\
+                                    \frac{\dot{m}_{air,des}\PB{48000 -H_{out}}}{TotCapTempModFac}  & otherwise
+                                  \end{array}
+                                \right.
+\end{equation}
 
 \subsubsection{Rated Sensible Cooling Capacity}\label{rated-sensible-cooling-capacity}
 
 The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. The following calculations are then performed to determine the rated sensible cooling capacity.
 
 \begin{equation}
-{T_{DB,ratio}} = {\raise0.7ex\hbox{{\left( {{T_{DB,air,in,des}} + 273.15\,C} \right)}} \!\mathord{\left/ {\vphantom {{\left( {{T_{DB,air,in,des}} + 273.15\,C} \right)} {283.15\,C}}}\right.}\!\lower0.7ex\hbox{{283.15\,C}}}
+  T_{DB,ratio} = \frac{T_{DB,air,in,des}+273.15C}{283.15C}
 \end{equation}
 
 \begin{equation}
-{T_{S,ratio}} = {\raise0.7ex\hbox{{\left( {29.44\,C + 273.15\,C} \right)}} \!\mathord{\left/ {\vphantom {{\left( {29.44\,C + 273.15\,C} \right)} {283.15\,C}}}\right.}\!\lower0.7ex\hbox{{283.15\,C}}}
+  T_{S,ratio} = \frac{29.44C+273.15C}{283.15C}
 \end{equation}
 
 where:
@@ -534,13 +546,25 @@ SCC5 = user input for Sensible Cooling Capacity Coefficient 5
 
 SCC6 = user input for Sensible Cooling Capacity Coefficient 6
 
-\begin{array}{l}SensCapTempModFac = \,SCC1 + SCC2\left( {{T_{DB,ratio}}} \right) + SCC3\left( {{T_{WB,ratio}}} \right) + SCC4\left( {{T_{S,ratio}}} \right)\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + SCC5 + SCC6\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    SensCapTempModFac &= SCC1 + SCC2\left( {{T_{DB,ratio}}} \right) + SCC3\left( {{T_{WB,ratio}}} \right) \\
+                      &+ SCC4\left( {{T_{S,ratio}}} \right) + SCC5 + SCC6
+  \end{array}
+\end{equation}
 
 The 5\(^{h}\) and 6\(^{h}\) coefficient (SCC5 and SCC6) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
 
 The dry-bulb temperature of the entering air is then compared with the dry-bulb temperature of the exiting air. The calculations for air dry-bulb temperature are identical to that done for \emph{Coil:Cooling:Water}. If the entering air dry-bulb temperature is less than the exiting air dry-bulb temperature, a reference value of 24 C is used as the entering air dry-bulb temperature. If the SensCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil sensible cooling capacity is set equal to 0.
 
-\begin{array}{l}IF({T_{DB,in}}\, > \,{T_{DB,out}})THEN\\\,\,\,\,\,{\mathop Q\limits^\cdot_{coil,des,sensible}} = {\raise0.7ex\hbox{{{m_{air,des}}C{p_{air,des}}\left( {{T_{DB,in}} - {T_{DB,out}}} \right)}} \!\mathord{\left/ {\vphantom {{{m_{air,des}}C{p_{air,des}}\left( {{T_{DB,in}} - {T_{DB,out}}} \right)} {SensCapTempModFac}}}\right.}\!\lower0.7ex\hbox{{SensCapTempModFac}}}\\ELSE\\\,\,\,\,\,{\mathop Q\limits^\cdot_{coil,des,sensible}} = {\raise0.7ex\hbox{{{m_{air,des}}C{p_{air,des}}\left( {24 - {T_{DB,out}}} \right)}} \!\mathord{\left/ {\vphantom {{{m_{air,des}}C{p_{air,des}}\left( {24 - {T_{DB,out}}} \right)} {SensCapTempModFac}}}\right.}\!\lower0.7ex\hbox{{SensCapTempModFac}}}\\ENDIF\end{array}
+\begin{equation}
+  \dot{Q}_{coil,des,sensible} = \left\{
+                                  \begin{array}{cl}
+                                    \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,in}-T_{DB,out}}}{SensCapTempModFac}  & if T_{DB,in}>T_{DB,out} \\
+                                    \frac{\dot{m}_{air,des}C_{p,air,des}\PB{24       -T_{DB,out}}}{SensCapTempModFac}  & otherwise
+                                  \end{array}
+                                \right.
+\end{equation}
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit Sizing}\label{coilcoolingwatertoairheatpumpvariablespeedequationfit-sizing}
 
@@ -2225,7 +2249,7 @@ If the cooler is part of the outdoor air path of a central air system, then the 
 The secondary DX coils model does not have a standalone object and it is models as add-on feature to the DX Coils. When the secondary DX coil is added to a primary DX cooling coil, the heat rejected to secondary zone is sensible only and is treated as tnternal gain, hence secondary air flow rate is not required in the model. Where as when the secondary DX coil is added to a primary DX heating coil, then the heat removed from secondary zone may have sensible and latent components and is treated as tnternal gain. The sensible/latent component split among other parameters requires secondary coil air flow rate. Hence secondary coil air flow rate sizing is added based on the primary DX cooling coil only.
 
 \begin{equation}
-\dot{V}_\rm{SecCoil} = \dot{V}_\rm{PriHeatCoil}\cdot \text{ScalingFactor}
+  \dot{V}_{SecCoil} = \dot{V}_{PriHeatCoil} \cdot \text{ScalingFactor}
 \end{equation}
 
 where
@@ -2331,7 +2355,7 @@ where
 \item
   (D) is depth of pad, m
 \item
-  (\epsilon)is saturation effectiveness
+  \(\epsilon\) is saturation effectiveness
 \end{itemize}
 
 \subsection{Heat Recovery Sizing}\label{heat-recovery-sizing}

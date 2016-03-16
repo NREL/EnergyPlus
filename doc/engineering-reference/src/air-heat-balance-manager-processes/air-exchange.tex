@@ -10,13 +10,15 @@ For refrigerated space air exchange (using ZoneRefrigerationDoorMixing object(s)
 
 The volume of air flow into the receiving zone is specified by the user with a number of control parameters and schedules listed in the Input Output Guide. The user can turn this one-way flow on or off based on the temperature difference between the source and receiving zones, or it may be independent of the temperature difference. The density and specific heat of the air flowing into the receiving zone are determined using the average temperature and average humidity ratio in the source and receiving zones. The humidity ratio of the air flowing into the receiving zone is set equal to the humidity ratio of the source zone. The mass, moisture,and energy terms are then used as described in two previous sections, Basis for the Zone and Air System Integration, and Moisture Predictor-Corrector.
 
-\begin{array}{cl}
+\begin{equation}
+ \begin{array}{cl}
     \rho_{Avg} & = f \left( \frac{T_{ReceivingZone} + T_{SourceZone}}{2},\frac{W_{ReceivingZone} + W_{SourceZone}}{2},P_{Barometric} \right) \\
     c_{P,Avg} & = f \left( \frac{T_{ReceivingZone} + T_{SourceZone}}{2},\frac{W_{ReceivingZone} + W_{SourceZone}}{2}\right) \\
     \dot m_{MixingFlowToReceivingZone} & = \sum_{AllSourceZones} \rho_{Avg}\dot V_{Air} \\
     \dot Q_{MixingFlowToReceivingZone} & = \sum_{AllSourceZones} \rho_{Avg}C_{p,Avg}\dot V_{Air}\left(T_{sourceZone}-T_{receivingZone}\right) \\
     \text{Moisture}_{MixingFlowToReceivingZone} & = \sum_{AllSourceZones} \rho_{Avg} \dot V_{Air} W_{SourceZone}
   \end{array}
+\end{equation}
 
 where:
 
@@ -44,13 +46,15 @@ W\(_{e}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Humidity Ratio in the Source Zone (kg\(_
 
 For cross-mixing, the mass of moist air exchanged between the two zones is assumed to be equal.~ Again, the density and specific heat are based on the average conditions in the two zones. Note that the temperature and humidity ratio differences ensure that when the energy and~ moisture terms are used in the Moisture Predictor-Corrector, they correctly reflect a loss or gain in each zone.
 
-\begin{array}{cl}
+\begin{equation}
+  \begin{array}{cl}
     \dot{m}_{MixingFlowToReceivingZone} & = \dot{m}_{MixingFlowToSourceZone} = \rho_{Avg}\dot{V}_{Air} \\
     \dot{Q}_{MixingFlowToSourceZone}    & = \rho_{Avg} C_{p,Avg} \dot{V}_{Air} \left( T_{ReceivingZone}-T_{SourceZone} \right) \\
     \dot{Q}_{MixingFlowToReceivingZone} & = \rho_{Avg} C_{p,Avg} \dot{V}_{Air} \left( T_{SourceZone} - T_{ReceivingZone} \right) \\
     \text{Moisture}_{MixingFlowToSourceZone} & = \rho_{Avg} \dot{V}_{Air} W_{ReceivingZone} \\
     \text{Moisture}_{MixingFlowToReceivingZone} & = \rho_{Avg} \dot{V}_{Air} W_{SourceZone}
   \end{array}
+\end{equation}
 
 where:
 
@@ -72,10 +76,11 @@ When closed refrigerated spaces exchange air with other closed spaces, the air f
 
 The sensible and latent energy loads are modeled according to the guidance specified in (ASHRAE 2006d, ASHRAE 2009, and Gosney and Olama, 1975).~ Equal dry air exchange is assumed, that is, the mass of dry air infiltrating into the receiving zone is assumed to equal the mass of dry air infiltrating out of the source zone.
 
-\begin{array}{cl}
+\begin{equation}
+  \begin{array}{cl}
     h_{zoneA},\rho_{zoneA} & = f (T_{zoneA},W_{zoneA},P_{Barometric}) \\
     h_{zoneB},\rho_{zoneB} & = f (T_{zoneB},W_{zoneB},P_{Barometric}) \\
-    \rho_{zoneA} &\gt \rho_{zoneB} \\
+    \rho_{zoneA} & > \rho_{zoneB} \\
     \dot{Q}_{Mixing} & = \dot{Q}_{FullFlow} \times \text{Schedule}_{DoorOpen} \times F_{Flow} \times (1-F_{Protection}) \\
     \dot{Q}_{FullFlow} & = B (h_{zoneB}-h_{zoneA}) \\
     B & = 0.221 A_{door} \rho_{zoneA} F_{Density} \sqrt{ \left(1-\frac{\rho_{zoneB}}{\rho_{zoneA}}\right) g H_{Door} } \\
@@ -88,6 +93,7 @@ The sensible and latent energy loads are modeled according to the guidance speci
     \dot{Q}_{MixingFlowZoneAtoB} & = \sum_{AllZoneAs} \dot{m}_{ZoneBtoA} C_{p,ZoneA} \left(T_{zoneA}-T_{zoneB}\right) \\
     \text{Moisture}_{MixingFlowZoneAtoB} & = \sum_{AllZoneAs} \dot{m}_{ZoneBtoA} \left( W_{zoneA}-W_{zoneB} \right) 
   \end{array}
+\end{equation}
 
 where:
 

@@ -99,7 +99,7 @@ DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C
 \end{equation}
 
 \begin{equation}
-\dot m = MIN\left( {{{\dot m}_{max}},\,\,\,MAX\left( {{{\dot m}_{max}}*MinAirFlowFrac\,,\,\,\,{\raise0.7ex\hbox{{{{\dot Q}_{zone}}}} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{zone}}} {DeltaCpT}}}\right.}\!\lower0.7ex\hbox{{DeltaCpT}}}} \right)\,\,} \right)
+  \dot{m} = \min \PB{ \dot{m}_{max}, \max \PB{ \dot{m}_{max}\times MinAirFlowFrac,\frac{\dot{Q}_{zone}}{DeltaCpT} } }
 \end{equation}
 
 where
@@ -246,7 +246,7 @@ If the unit is on, check whether active heating or cooling by the hydronic coils
 
 If \({\dot Q_{z,req}} > {\dot Q_{pri}}\) ~we need active heating. Set the cold water flow rate to the minimum. Check that the terminal unit can meet the load by setting the hot water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit}. If the output is less than the zone demand we are done -- all the outputs have been calculated. Otherwise call \emph{SolveRegulaFalsi} to obtain the hot water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
-If \({\dot Q_{z,req}} &lt; {\dot Q_{pri}}\) we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit.} If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call \emph{SolveRegulaFalsi} to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
+If \({\dot Q_{z,req}} < {\dot Q_{pri}}\) we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit.} If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call \emph{SolveRegulaFalsi} to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
 Note that the terminal unit output is never explicitly passed to another routine. Instead the output is saved as the outlet conditions on the terminal unit outlet air node. The node data is accessed when the terminal unit output is needed elsewhere in the program (in \emph{SimZoneAirLoopEquipment} for instance).
 
@@ -434,9 +434,9 @@ If the unit is off, call \emph{CalcVAVVS} with flow rates set to their minimum f
 
 If the unit is on, we need to establish the boundaries of 4 conditioning regions: a) active cooling with fan on; b) active heating with fan on; c) active heating with fan off; d) passive cooling with fan off. The heating/cooling demand will fall into one of these regions. Once the correct region is determined, we will know which model input to vary for control and thus how to invert the calculation.
 
-To establish the boundaries of region a) we call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the cooling maximum, once with the cooling air flow rate set to the minimum. In both cases the heating coil output is at the minimum and the fan is on. Call the 2 cooling outputs \({\dot Q_{cool,max,fanon}}\) and \({\dot Q_{cool,min,fanon}}\) . Remembering that EnergyPlus convention is that cooling loads are negative, then if \({\dot Q_{tot}} &lt; {\dot Q_{cool,max,fanon}}\) the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call \emph{CalcVAVV} again. This concludes the simulation. If~ \({\dot Q_{cool,max,fanon}} &lt; {\dot Q_{tot}} &lt; {\dot Q_{cool,min,fanon}}\) the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call \emph{SolveRegulaFalsi} to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
+To establish the boundaries of region a) we call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the cooling maximum, once with the cooling air flow rate set to the minimum. In both cases the heating coil output is at the minimum and the fan is on. Call the 2 cooling outputs \({\dot Q_{cool,max,fanon}}\) and \({\dot Q_{cool,min,fanon}}\) . Remembering that EnergyPlus convention is that cooling loads are negative, then if \({\dot Q_{tot}} < {\dot Q_{cool,max,fanon}}\) the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call \emph{CalcVAVV} again. This concludes the simulation. If~ \({\dot Q_{cool,max,fanon}} < {\dot Q_{tot}} < {\dot Q_{cool,min,fanon}}\) the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call \emph{SolveRegulaFalsi} to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
 
-To establish the boundaries of region b) call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to \emph{CalcVAVVS} \({\dot Q_{heat,max,fanon}}\) and \({\dot Q_{heat,min,fanon}}\) . If \({\dot Q_{heat,max,fanon}} &lt; {\dot Q_{tot}}\) the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call \emph{CalcVAVVS} again. This concludes the simulation for this case. If \({\dot Q_{heat,min,fanon}} &lt; {\dot Q_{tot}} &lt; {\dot Q_{heat,max,fanon}}\) the heating demand is in the active heating, fan on region. For a hot water coil we call \emph{SolveRegulaFalsi} with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to \emph{SolveRegulaFalsi}.~ The call to \emph{SolveRegulaFalsi} concludes the simulation for this case.
+To establish the boundaries of region b) call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to \emph{CalcVAVVS} \({\dot Q_{heat,max,fanon}}\) and \({\dot Q_{heat,min,fanon}}\) . If \({\dot Q_{heat,max,fanon}} < {\dot Q_{tot}}\) the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call \emph{CalcVAVVS} again. This concludes the simulation for this case. If \({\dot Q_{heat,min,fanon}} < {\dot Q_{tot}} < {\dot Q_{heat,max,fanon}}\) the heating demand is in the active heating, fan on region. For a hot water coil we call \emph{SolveRegulaFalsi} with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to \emph{SolveRegulaFalsi}.~ The call to \emph{SolveRegulaFalsi} concludes the simulation for this case.
 
 This region only applies to terminal units with a hot water coil. To establish the boundaries of region c) the fan is set to off, the supply air flow rate is set to minimum flow and \emph{CalcVAVVS} is called twice: once with the hot water flow at maximum and once with the hot water flow at minimum. Call the two heating outputs \({\dot Q_{heat,max,fanoff}}\)\\
 and \({\dot Q_{tot}}\) . If \({\dot Q_{tot}}\) ~is between these values, the supply air flow rate is set to its minimum, the fan is set to off, and in the call to \emph{SolveRegulaFalsi} the hot water flow rate is varied to meet the load. This concludes the simulation for this case.
@@ -925,7 +925,7 @@ where
 The outdoor air input requirements, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
 \begin{equation}
-\mathop m\limits^\cdot   = MAX\left( {\mathop m\limits^\cdot  ,\,{\raise0.7ex\hbox{{\mathop {{m_{OA}}}\limits^\cdot  }} \!\mathord{\left/ {\vphantom {{\mathop {{m_{OA}}}\limits^\cdot  } {OAFrac}}}\right.}\!\lower0.7ex\hbox{{OAFrac}}}} \right)
+  \dot{m} = \max\PB{ \dot{m}, \frac{\dot{m}_{OA}}{OAFrac} }
 \end{equation}
 
 where:
@@ -937,7 +937,7 @@ where:
 The damper position is then calculated as:
 
 \begin{equation}
-FRA{C_{damper}} = {\raise0.7ex\hbox{{\dot m}} \!\mathord{\left/ {\vphantom {{\dot m} {{{\dot m}_{max}}}}}\right.}\!\lower0.7ex\hbox{{{{\dot m}_{max}}}}}
+  FRAC_{damper} = \frac{\dot{m}}{\dot{m}_{max}}
 \end{equation}
 
 where
@@ -1008,9 +1008,9 @@ The contribution to zone load provided by the outdoor air toward meeting the coo
 
 where,
 
-\$\{\dot m\_\{OA\}\} = \$ is the mass flow rate of outdoor air determined by the outdoor air requirement, kg/s
+$\dot{m}_{OA} =$ is the mass flow rate of outdoor air determined by the outdoor air requirement, kg/s
 
-\$\{T\_\{zonesetpoint\}\} = \$ is the zone cooling setpoint drybulb temperature, ºC
+$T_{zonesetpoint} =$ is the zone cooling setpoint drybulb temperature, ºC
 
 This is then used to calculate the load that the recirculated cool air should deliver, \({Q_{RC}}\) ~(W):
 
