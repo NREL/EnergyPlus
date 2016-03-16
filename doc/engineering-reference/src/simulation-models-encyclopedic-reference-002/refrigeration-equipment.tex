@@ -228,7 +228,7 @@ where:
 
 \(\mathop {{{\dot V}_{evaporation,makeup}}}\limits^{}\) = Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate (m\(^{3}\)/s)
 
-\$\{\dot m\_\{air\}\} = \$ ~mass flow rate of air through the evaporative condenser (kg/s)
+\(\dot m_{air} = \) ~mass flow rate of air through the evaporative condenser (kg/s)
 
 \({\omega_{air,outlet}}\) ~ = humidity ratio of air leaving the evaporative media (kg\(_{r}\)/kg\(_{r}\)) based on the effective dry-bulb temperature \emph{T\(_{e}\)}, as described above, outdoor air wet-bulb temperature, and outdoor barometric pressure
 
@@ -494,7 +494,23 @@ Refrigerated cases typically require a specific number of defrost cycles per day
 
 For electric, hot gas, and hot brine defrost types, energy use by the defrost heater occurs during the scheduled defrost period. For defrost with temperature termination, the energy is also multiplied by the defrost ratio simulating a defrost duration shorter than the defined (maximum) period. For all non-electric defrost types, defrost electric power is set equal to zero (and is not available as an output variable). For hot gas and hot brine defrost types in cases served by a detailed system, the condenser heat rejection load is reduced by the amount of heat recovered for use in the defrost system. This condenser credit is not applied for the simple compressor rack system.
 
-\begin{array}{l}If\,(DefrostType\, = \,Electric)\,\,Then\\ ,\,\,\,\,\,{P_{def}} = {P'}_{def}\left( {{L_{case}}} \right)\left( {SC{H_{defrost}}} \right)\\ElseIf\,(DefrostType\, = \,ElectricWithTempTermination)\,Then\\ ,\,\,\,\,\,{P_{def}} = {P'}_{def}\left( {{L_{case}}} \right)\left( {SC{H_{defrost}}} \right)(DefrostRatio)\\Else\\ ,\,\,\,\,\,{P_{def}} = 0.0\\EndIf\end{array}
+If DefrostType is electric:
+
+\begin{equation}
+  P_{def} = {P'}_{def} L_{case} SCH_{defrost} 
+\end{equation}
+
+If DefrostType is ElectricWithTempTermination:
+
+\begin{equation}
+  P_{def} = {P'}_{def} L_{case} SCH_{defrost} \PB{DefrostRatio}
+\end{equation}
+
+Otherwise:
+
+\begin{equation}
+  P_{def} = 0.0
+\end{equation}
 
 where:
 
@@ -510,7 +526,29 @@ where:
 
 Frost accumulation on the case evaporator will vary with the humidity level in the ambient air surrounding the case. Therefore, defrost heater operation can be reduced when ambient air humidity levels are low. Several methods are used to reduce unnecessary defrost heater operation, including terminating heater operation when the measured evaporator temperature indicates that the accumulated frost has been completely melted. For modeling refrigerated cases with temperature-terminated defrost, EnergyPlus allows the user to specify a defrost energy correction curve to account for variations in defrost energy as ambient air humidity levels change. The user can select from four correction curve types: None, Case Temperature Method, Relative Humidity Method, or Dewpoint Method.
 
-\begin{array}{l}{\rm{None (default):}}\\ ,\,\,\,DefrostRatio = 1\\ {\rm{Case}}\,{\rm{Temperature}}\,{\rm{Method:}}\\ ,\,\,\,DefrostRatio = 1 - \left( {R{H_{rated}} - R{H_{air}}} \right)\left[ {a + b\left( {{T_{case}}} \right) + c{{\left( {{T_{case}}} \right)}^2} + d{{\left( {{T_{case}}} \right)}^3}} \right]\,\\ {\rm{RH}}\,{\rm{method:}}\\ ,\,\,\,DefrostRatio = e + f\left( {R{H_{air}}} \right) + g{\left( {R{H_{air}}} \right)^2} + h{\left( {R{H_{air}}} \right)^3}\\ {\rm{Dewpoint}}\,{\rm{method:}}\\ ,\,\,\,DefrostRatio = i + j\left( {{T_{dp,air}}} \right) + k{\left( {{T_{dp,air}}} \right)^2} + l{\left( {{T_{dp,air}}} \right)^3}\end{array}
+For type None (default):
+
+\begin{equation}
+  DefrostRatio = 1
+\end{equation}
+
+For type Case Temperature Method:
+
+\begin{equation}
+  DefrostRatio = 1 - \PB{RH_{rated} - RH_{air}} \PB{a + b T_{case} + c T_{case}^2 + d T_{case}^3}
+\end{equation}
+
+For type RH Method:
+
+\begin{equation}
+  DefrostRatio = e + f \PB{RH_{air}} + g \PB{RH_{air}^2} + h \PB{RH_{air}^3}
+\end{equation}
+
+For type Dewpoint Method:
+
+\begin{equation}
+  DefrostRatio = i + j T_{dp,air} + k T_{dp,air}^2 + l T_{dp,air}^3
+\end{equation}
 
 where:
 
@@ -569,9 +607,19 @@ where:
 
 \(SC{H_{defrost,dripdown}}\) ~~~ = defrost drip-down schedule value (0 to 1)
 
-During defrost (SCHdefrost), the model assumes that the hot gas, hot brine, or electric heater energy directly contributes to melting the frost (heat of fusion of water). Defrost energy not attributed to melting frost from the evaporator coil results in a heat load on the refrigerated case evaporator (\(_{}\)). When the defrost drip-down time period ends, this defrost energy heat load is added to the actual case load (up to the maximum evaporator capacity) until the total defrost energy heat load is removed (which may take several simulation time steps)
+During defrost (SCHdefrost), the model assumes that the hot gas, hot brine, or electric heater energy directly contributes to melting the frost (heat of fusion of water). Defrost energy not attributed to melting frost from the evaporator coil results in a heat load on the refrigerated case evaporator \(Q_{def}\). When the defrost drip-down time period ends, this defrost energy heat load is added to the actual case load (up to the maximum evaporator capacity) until the total defrost energy heat load is removed (which may take several simulation time steps)
 
-\begin{array}{l}If\left( {DefrostType = Electric\;or\;HotGas\;or\;HotBrine} \right)\;Then\\ quad \quad {{\dot Q}_{def}} = MAX\left( {0.0,\left[ {P_{def}'({L_{case}})(SC{H_{def}}) - \frac{{Frost({h_f})}}{{{t_{zn}}}}} \right]} \right)\\Else\\ quad \quad {{\dot Q}_{def}} = 0.0\\Endif\end{array}
+If DefrostType is Electric, HotGas, or HotBrine:
+
+\begin{equation}
+  \dot{Q}_{def} = \max\RB{0.0,\PB{P_{def}' L_{case} SCH_{def} - \frac{Frost\PB{h_f}}{t_{zn}}}}
+\end{equation}
+
+Otherwise:
+
+\begin{equation}  
+  \dot{Q}_{def} = 0.0
+\end{equation}
 
 where:
 
@@ -673,7 +721,23 @@ SCH\(_{C}\)~~~~ = case credit fraction (schedule value, 0 to 1)
 
 Latent load on the refrigerated case evaporator will vary with ambient humidity levels. Therefore, the refrigerated case model allows the user to specify a latent case credit curve to adjust case credits based on ambient humidity, and the user can select from three curve types: Case Temperature Method, Relative Humidity Method, or Dewpoint Method.
 
-\begin{array}{l}{\rm{Case}}\,{\rm{Temperature}}\,{\rm{Method:}}\\ ,\,\,\,LatentRatio = 1 - \left( {R{H_{rated}} - R{H_{air}}} \right)\left[ {m + n\left( {{T_{case}}} \right) + o{{\left( {{T_{case}}} \right)}^2} + p{{\left( {{T_{case}}} \right)}^3}} \right]\,\\ {\rm{RH}}\,{\rm{method:}}\\ ,\,\,\,LatentRatio = q + r\left( {R{H_{air}}} \right) + s{\left( {R{H_{air}}} \right)^2} + t{\left( {R{H_{air}}} \right)^3}\\ {\rm{Dewpoint}}\,{\rm{method:}}\\ ,\,\,\,LatentRatio = u + v\left( {{T_{dp,air}}} \right) + w{\left( {{T_{dp,air}}} \right)^2} + x{\left( {{T_{dp,air}}} \right)^3}\end{array}
+If CurveType is Case Temperature Method:
+
+\begin{equation}
+  LatentRatio = 1-\PB{RH_{rated}-RH_{air}}\PB{m+nT_{case}+oT_{case}^2+pT_{case}^3}
+\end{equation}
+
+Else if CurveType is RH Method:
+
+\begin{equation}
+  LatentRatio = q + r\PB{RH_{air}} + s\PB{RH_{air}^2} + t\PB{RH_{air}^3}
+\end{equation}
+
+Else if CurveType is Dewpoint Method:
+
+\begin{equation}
+  LatentRatio = u + vT_{dp,air} + wT_{dp,air}^2 + xT_{dp,air}^3
+\end{equation}
 
 where:
 
@@ -748,11 +812,17 @@ RAF~~~~~~~~~~~ = return air factor (see Figure~\ref{fig:return-air-factor-versus
 
 Control systems are now available that increase the evaporator temperature to improve compressor efficiency whenever the total loads on a system are less than the system capacity. To model these systems, a variable evaporator temperature is an option available with the detailed refrigeration system object (Refrigeration:System). If this option is selected, the model will compare the refrigeration load on each case to the load at rated conditions. If the case load in a particular time step is less than the rated load, an acceptable elevated evaporator temperature is determined for that case. The evaporator temperature for the whole refrigeration system is then set by the minimum evaporator temperature needed for any particular case.
 
-\begin{array}{l}L{F_{case}} = \frac{{{{\dot Q}_{case,actual}}}}{{{{\dot Q}_{case,rated}}}};0.5 \le L{F_{case}} \le 1.0\\ {T_{{\rm{Evap,Allowed}}}} = {T_{case}} - L{F_{case}}({T_{case}} - {T_{Evap,Design}})\end{array}
+\begin{equation}
+  LF_{case} = \frac{\dot{Q}_{case,actual}}{\dot{Q}_{case,rated}}
+\end{equation}
+
+\begin{equation} 
+  T_{Evap,Allowed} = T_{case} - LF_{case}\PB{T_{case} - T_{Evap,Design}}
+\end{equation}
 
 where:
 
-LF\(_{e}\)~~~~~~~~~ = Load factor for a particular case
+LF\(_{e}\)~~~~~~~~~ = Load factor for a particular case, constrained to the range 0.5 to 1.0
 
 Tevap~~~~~~~~ = Evaporator temperature, C.
 
@@ -1004,7 +1074,13 @@ ULF = Capacit{y_{Rated,Sensible}}/DT{1_{Rated}}
 
 \emph{The mass transfer process is much more ``thermally effective'' than the sensible heat transfer process, that is, the heat flux through the evaporator surfaces during the mass transfer process is extremely high.(AHRI, 2001) Consequently, if the surface effectiveness of the coil were to remain constant, the increase in the evaporator cooling capacity during combined sensible and latent cooling would be equal to the sensible cooling capacity divided by the SHR\ldots{} However, the increase in heat flux through the fin surfaces has the effect of decreasing fin efficiency and overall surface effectiveness due to an increase in the fin surface temperature gradient.7 The result is a slightly lower total cooling capacity.}
 
-\begin{array}{*{20}{c}}{{Q_{ideal}} = \frac{{{q_{sens}}}}{{SHR}};}&{SHR = \frac{{{q_{sens}}}}{{{Q_{total}}}}}\end{array}
+\begin{equation}
+  Q_{ideal} = \frac{q_{sens}}{SHR}
+\end{equation}
+
+\begin{equation}
+  SHR = \frac{q_{sens}}{Q_{total}}
+\end{equation}
 
 Where:
 
@@ -1012,9 +1088,20 @@ Where:
 
 \({Q_{{\rm{Total}}}}\) ~~~~~~~~ = Cooling capacity (total), actual
 
-The total capacity is therefore a function of the sensible heat ratio, which is a function of the total capacity, and they are both, of course a function of the psychometrics of the air flowing through the chiller. This is handled with a two step estimation process.
+The total capacity is therefore a function of the sensible heat ratio, which is a function of the total capacity, and they are both, of course a function of the psychometrics of the air flowing through the chiller. This is handled with a two step estimation process:
 
-\begin{array}{l}\Delta T = {\rm{Minimum}}(\Delta {T_{{\rm{max}}}},({T_{{\rm{Coil inlet}}}} - {T_{{\rm{evap}}}}))\\ {q_{{\rm{sens,max}}}} = ULF*\Delta T \times (1 - SC{H_{{\rm{Defrost,DripDown}}}}) \times SC{H_{{\rm{Coil}}}}\\ {T_{{\rm{Coil exit estimate}}}} = {T_{{\rm{Coil inlet}}}} - \frac{{{q_{{\rm{sens,max}}}}}}{{{{\dot m}_{{\rm{DryA ir}}}} \times {c_{p,{\rm{Coil Inlet Dry Air}}}}}}\\ {h_{{\rm{Coil exit estimate}}}} = f({T_{{\rm{Coil exit estimate}}}},{P_{{\rm{Barometric}}}}){\rm{at a Relative Humidity of 1}}{\rm{.0}}\\ {Q_{{\rm{Total estimate}}}} = ({h_{{\rm{Coil Inlet}}}} - {h_{{\rm{Coil exit estimate}}}}) \times {{\dot m}_{{\rm{max}}}}\\SHR = \frac{{{q_{{\rm{sens,max}}}}}}{{{Q_{{\rm{Total estimate}}}}}}\\ {\rm{Correction}} = f(SHR);{\rm{Function input by user, linear or quadratic curve}}\\ {Q_{{\rm{Total}}}} = {\rm{Correction}} \times {q_{{\rm{sens,max}}}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+                  \Delta T &= \min{ \Delta T_{max},\PB{T_{coil inlet} - T_{evap}}} \\
+              q_{sens,max} &= ULF \cdot \Delta T \cdot \PB{1 - SCH_{Defrost,DripDown}} \cdot SCH_{Coil} \\ 
+    T_{Coil exit estimate} &= T_{Coil inlet} - \frac{q_{sens,max}}{\dot{m}_{DryAir} C_{p,Coil Inlet Dry Air}} \\
+    h_{Coil exit estimate} &= f\PB{T_{Coil exit estimate},P_{Barometric}}\left.\right|_{at a Relative Humidity of 1} \\
+        Q_{Total estimate} &= \dot{m}_{max}\PB{h_{Coil Inlet} - h_{Coil exit estimate}} \\
+                       SHR &= \frac{q_{sens,max}}{Q_{Total estimate}} \\
+         \text{Correction} &= f(SHR);\,\text{Function input by user, linear or quadratic curve} \\
+                 Q_{Total} &= \text{Correction} \times q_{sens,max}
+  \end{array}
+\end{equation}
 
 Where:
 
@@ -1048,7 +1135,16 @@ Some manufacturers are beginning to provide more comprehensive performance infor
 
 The sensible and latent loads served are then calculated as:
 
-\begin{array}{l}{h_{{\rm{Coil exit}}}} = {h_{{\rm{Coil Inlet}}}} - \frac{{{Q_{{\rm{Total}}}}}}{{{{\dot V}_{{\rm{A ir,Max}}}} \times {\rho_{{\rm{Coil Inlet}}}}}}\\ {T_{{\rm{Coil exit}}}} = f({h_{{\rm{Coil exit}}}}){\rm{at a Relative Humidity of 1}}{\rm{.0}}\\H{R_{{\rm{Coil exit}}}} = f({T_{{\rm{Coil exit}}}},{h_{{\rm{Coil exit}}}})\\ {{\dot m}_{Water}} = {{\dot m}_{dryair,\max }} \times (H{R_{{\rm{Coil exit}}}} - H{R_{{\rm{Coil inlet}}}})\\ {q_{latent}} = {{\dot m}_{water}} \times {h_{icetovapor}}\\ {q_{{\rm{sens}}}} = {Q_{Total}} - {q_{latent}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+      h_{Coil exit} &= h_{Coil Inlet} - \frac{Q_{Total}}{\dot{V}_{Air,Max} \rho_{Coil Inlet}} \\
+      T_{Coil exit} &= f\PB{h_{Coil exit}}\left.\right|_{\text{at a Relative Humidity of 1}} \\
+     HR_{Coil exit} &= f\PB{T_{Coil exit},h_{Coil exit}} \\
+    \dot{m}_{Water} &= \dot{m}_{dryair,max} \PB{HR_{Coil exit} - HR_{Coil inlet}} \\
+         q_{latent} &= \dot{m}_{water} h_{icetovapor} \\
+           q_{sens} &= Q_{Total} - q_{latent}
+  \end{array}
+\end{equation}
 
 Where:
 
@@ -1104,7 +1200,12 @@ These values are in turn used to determine the total heat rejection load on the 
 
 After each detailed refrigeration system has been solved, all energy transfers (subcoolers, secondary loops, and cascade condensers) among the systems are made.
 
-\begin{array}{*{20}{c}}{{{\dot Q}_{Transfer}} = \sum {{{\dot Q}_{CascadeCondenser}} + \sum {{{\dot Q}_{SecondaryLoop}} + \sum {{{\dot Q}_{MechanicalSubcooler}}} } } }\\ {{{\dot Q}_{{\rm{Refrigeration}}}} = \sum {{{\dot Q}_{Case}} + \sum {{{\dot Q}_{WalkIn}} + \sum {{{\dot Q}_{Transfer}}( + \sum {{{\dot Q}_{PipeHeatGain}}} )} } } }\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \dot{Q}_{Transfer} &= \sum \dot{Q}_{CascadeCondenser} + \sum \dot{Q}_{SecondaryLoop} + \sum \dot{Q}_{MechanicalSubcooler} \\
+    \dot{Q}_{Refrigeration} &= \sum \dot{Q}_{Case} + \sum \dot{Q}_{WalkIn} + \sum \dot{Q}_{Transfer} + \sum \dot{Q}_{PipeHeatGain}
+  \end{array}
+\end{equation}
 
 This two step process is repeated twice to ensure that all the energy transfers among systems are balanced.
 
@@ -1114,7 +1215,13 @@ Suction piping heat gain is an optional element in the load calculation.~ Typica
 
 The compressor object (Refrigeration:Compressor) calculations start with the determination of the inlet (suction) and outlet (discharge) conditions. The suction pressure is defined by the saturated suction temperature (equal to the evaporating temperature in the refrigeration loads connected to the suction group) minus the pressure drop in the suction pipes. With proper design, this pressure drop typically corresponds to a saturated suction temperature drop of about 1C. The saturated discharge pressure is defined by the condensing temperature plus the pressure drop in the discharge pipes. With proper design, this discharge pipe pressure drop typically corresponds to a saturated discharge temperature increase of about 0.5C (ASHRAE 2006a). These two temperatures are then used with the manufacturer's performance curves for each compressor. The performance curves are defined in ARI Standard 540 and take the following form (ARI 2004):
 
-\begin{array}{l}X = {C_1} + {C_2}(S) + {C_3}(D) + {C_4}({S^2}) + {C_5}(SD) + {C_6}({D^2}) + {C_7}({S^3}) + {C_8}(D{S^2}) + {C_9}(S{D^2}) + {C_{10}}({D^3})\\S = {T_{evap}} - 1.\\D = {T_{condense}} + 0.5\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    X &= {C_1} + {C_2}(S) + {C_3}(D) + {C_4}({S^2}) + {C_5}(SD) + {C_6}({D^2}) + {C_7}({S^3}) + {C_8}(D{S^2}) + {C_9}(S{D^2}) + {C_{10}}({D^3}) \\
+    S &= {T_{evap}} - 1. \\
+    D &= {T_{condense}} + 0.5
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1138,7 +1245,12 @@ The rated values for the cooling capacity and power consumption from the manufac
 
 Once the corrected capacity is calculated for each compressor, the compressors are dispatched one at a time until the system load is met. The last compressor dispatched is assumed to run at full load for the fraction of the time step necessary to meet the load, That is, the model neglects compressor cycling losses at part-load conditions. Using the state point identification from Figure~\ref{fig:state-points-and-energy-flows-for-detailed}, these corrections are shown in the following equations. If the capacity available from all the compressors is less than the sum of the case loads for that time period, the unmet load is accumulated to be met in succeeding time steps. If this accumulated unmet load becomes too great, a warning message is generated.
 
-\begin{array}{*{20}{c}}{Ca{p_{corrected}} = \frac{{{\rho_{1b}}}}{{{\rho_{1c}}}} \times \frac{{({h_{1b}} - {h_4})}}{{({h_{1c}} - {h_{4c}})}}Ca{p_{rated}}}\\ {\dot m = \frac{{Ca{p_{corrected}}}}{{({h_{1b}} - {h_4})}}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    Cap_{corrected} &= \frac{\rho_{1b}}{\rho_{1c}} \times \frac{h_{1b} - h_4}{h_{1c} - h_{4c}} Cap_{rated} \\
+    \dot{m} &= \frac{Cap_{corrected}}{h_{1b} - h_4}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1240,19 +1352,24 @@ A minimum condensing temperature is specified for the detailed refrigeration sys
 
 The heat rejection capacity of a dry air-cooled condenser object (Refrigeration:Condenser:AirCooled) is directly proportional to the difference between the condensing temperature and the drybulb temperature for the heat rejection environment. The manufacturers typically provide the performance data, at one standard atmosphere, in a linear relationship between heat rejection and temperature difference. A correction factor is applied to account for the variation in air density with elevation (Carrier 1999).
 
-\begin{array}{l}Hre{j_{Rated}} = {C_1} + {C_2} \times ({T_{condense}} - {T_{drybulb}})\\Hre{j_{Rated,corrected}} = Hre{j_{Rated}} \times \left( {1 - 7.17E - 5 \times Elevation} \right)\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    Hrej_{Rated} &= C_1 + C_2 \PB{T_{condenser} - T_{drybulb}} \\
+    Hrej_{Rated,corrected} &= Hrej_{Rated} \PB{1 - \PB{7.17E-5 \times Elevation}}
+  \end{array}
+\end{equation}
 
 where:
 
-Hrej\(_{ }\) = Manufacturer's rated heat rejected by the condenser (W)
+\(Hrej_{rated}\) = Manufacturer's rated heat rejected by the condenser (W)
 
-C\(_{1}\) ~ = Intercept taken from manufacturer's condenser performance data (W)
+C\(_{1}\) = Intercept taken from manufacturer's condenser performance data (W)
 
-C\(_{2}\) ~ = Coefficient taken from the manufacturer's condenser performance data (W/C)
+C\(_{2}\) = Coefficient taken from the manufacturer's condenser performance data (W/C)
 
 T\(_{e}\) = Condensing temperature (C)
 
-T\(_{b}\)~ = Drybulb temperature for the local environment (C)
+T\(_{b}\) = Drybulb temperature for the local environment (C)
 
 Elevation = Local elevation (m)
 
@@ -1268,7 +1385,13 @@ This calculated condensing temperature is then compared to the minimum condensin
 
 Condenser fan power for air-cooled condensers is determined by the type of fan control, fixed, variable speed, or two-speed. For all three fan control types, the fan power is set equal to the rated fan power whenever the calculated condensing temperature is greater than or equal to the minimum allowed condensing temperature. If the calculated temperature is less than the minimum allowed, the condenser air flow must be reduced. The reduced rated capacity is calculated using the previous equation for \emph{Hrej\(_{d}\)} with the specified minimum condensing temperature. (Note, the minimum condensing temperature is often determined by the expansion valve performance, and is therefore input with the system description, not with the condenser description.) The air flow for the reduced condenser capacity is:
 
-\begin{array}{l}Hrej \propto {\left( {AirVelocity} \right)^N}\\ {\rm{Air Velocity}} \propto {\left( {Hrej} \right)^{1/N}}\\ {\rm{Air Volume Ratio}} = {\left( {\frac{{Hrej}}{{Hre{j_{Rated}}}}} \right)^{1/N}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    Hrej &\propto \text{AirVelocity}^N \\
+    \text{Air Velocity} &\propto Hrej^{1/N} \\
+    \text{Air Volume Ratio} &= \PB{\frac{Hrej}{Hrej_{Rated}}}^{1/N}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1310,9 +1433,15 @@ For an ideal variable speed fan, the power is proportional to the cube of the ai
 {P_{CondFan}} = {({\rm{Air Volume Ratio}})^{2.5}}{P_{CondFan,design}}
 \end{equation}
 
-For a two-speed fan, the fan power is varied as for a constant speed fan with dampers for Air Volume Ratios greater than or equal to 0.6. For lower Air Volume Ratios,~ which correspond to a half-speed fan setting, the power is reduced to the variable fan power value at that point and then varied as for damper control below Air Volume Ratios of 0.6.
+For a two-speed fan, the fan power is varied as for a constant speed fan with dampers for Air Volume Ratios greater than or equal to 0.6. For lower Air Volume Ratios,~ which correspond to a half-speed fan setting, the power is reduced to the variable fan power value at that point and then varied as for damper control below Air Volume Ratios (AVR) of 0.6.
 
-\begin{array}{*{20}{c}}{{P_{CondFan}} = ({\rm{Air Volume Ratio}})\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right){P_{CondFan,design}}{\rm{      for Air Volume Ratio}} \ge 0.6}\\ {{P_{CondFan}} = \left( {\frac{{{\rm{Air Volume Ratio }} + {\rm{ 0}}{\rm{.4}}}}{{{{\rm{2}}^{{\rm{2}}{\rm{.5}}}}}}} \right)\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right)\left( {{P_{CondFan,design}}} \right){\rm{    for Air Volume Ratio }} < {\rm{ 0}}{\rm{.6}}}\end{array}
+\begin{equation}
+  P_{CondFan} = \left\{ \begin{array}{cr}
+                          \PB{AVR}\PB{e^{\PB{1-AVR}}}P_{CondFan,Design} & if AVR \geq 0.6 \\
+                          \PB{\frac{AVR+0.4}{2^{2.5}}}\PB{e^{\PB{1-AVR}}}P_{CondFan,Design} & if AVR < 0.6
+                        \end{array}
+                \right.
+\end{equation}
 
 For a water cooled condenser, there is no fan load at the condenser (i.e., the~ water/refrigerant heat exchanger). Any fan load would be related to and accounted for at the heat rejection object (e.g., cooling tower)
 
@@ -1320,7 +1449,12 @@ For a water cooled condenser, there is no fan load at the condenser (i.e., the~ 
 
 The input object Refrigeration:Condenser:EvaporativeCooled allows using evaporative cooling rather than dry air cooling which will allow for more efficient condenser heat rejection based on the entering air approaching the wet-bulb temperature rather than the dry-bulb temperature. Analyses under the International Energy Agency's (IEA) Heat Pumping Programme Annex 26 indicates that this measure can improve refrigeration system efficiency by up to 10\% (IEA 2003). The basin heater energy and water pumping power consumption for evaporative condensers in the detailed refrigeration system is modeled as described for the Refrigeration:CompressorRack. Just as for air-dried condensers, an elevation correction is needed to adjust for the variation in density of the air. This correction factor was derived by combining the barometric pressure correction from ARI 490 and a standard correlation for barometric pressure as a function of elevation(ARI 2008, NASA 1976).
 
-\begin{array}{l}Hre{j_{Rated,Corrected}} = Hre{j_{Rated}} \times \left[ {1 + {k_1}B{P_{std}}(1 - {e^{(A \times Elev)}})} \right]\\A = \frac{{{g_0} \times {M_0}}}{{{R^*} \times {T_b}}} =  - 0.00012{m^{ - 1}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    Hrej_{Rated,Corrected} &= Hrej_{Rated} \RB{ 1 + k_1 B P_{std} \PB{1 - e^{\PB{A \times Elev}}}} \\
+    A &= \frac{g_0 M_0}{R^* T_b} = - 0.00012m^{-1}
+  \end{array}
+\end{equation}
 
 where
 
@@ -1344,7 +1478,14 @@ Hre{j_{Rated,Corrected}} = Hre{j_{Rated}} \times (1 - 3.07E - 5 \times Elevation
 
 To calculate the condensing temperature for an evaporative cooled condenser, it is necessary to provide the manufacturer's performance data. The manufacturers typically provide this data as a table of condensing temperature as a function of both entering wet-bulb temperature and the ratio of the heat rejected to the rated heat rejected. This data can be well represented, as shown in Figure~\ref{fig:comparison-of-the-condensing-temperature}, by a regression of the form:
 
-\begin{array}{l}({T_{condense}} - {T_{wetbulb}}) = {C_1} + {C_2} \times HRCF + \frac{{{C_3}}}{{HRCF}} + {C_4}{T_{wetbulb}},or\\ {T_{condense}} = {C_1} + {C_2} \times HRCF + \frac{{{C_3}}}{{HRCF}} + (1 + {C_4}){T_{wetbulb}}\\ {\rm{where:  }}HRCF = \frac{{Hre{j_{Rated}}}}{{Hrej}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \PB{T_{condense} - T_{wetbulb}} &= {C_1} + {C_2} \times HRCF + \frac{C_3}{HRCF} + {C_4}{T_{wetbulb}}\, or: \\
+    T_{condense} &= {C_1} + {C_2} \times HRCF + \frac{C_3}{HRCF} + \PB{1 + C_4}T_{wetbulb}
+  \end{array}
+\end{equation}
+
+Where: $HRCF = \frac{Hrej_{Rated}}{Hrej}$
 
 C\(_{1}\), C\(_{2}\), C\(_{3}\), and C\(_{4}\)~~~~ = ~~~~~~~~~ Coefficients determined by regression from manufacturer's data.
 
@@ -1358,7 +1499,13 @@ Figure~\ref{fig:comparison-of-the-condensing-temperature} shows a comparison bet
 
 Again, the condensing temperature is not allowed to fall below the system's minimum allowed condensing temperature. Just as with an air-cooled condenser, the air flow through the condenser is controlled to maintain this minimum condensing temperature and the air velocity reduction is a function of the decreased capacity (Manske, 1999). For an evaporative condenser, relevant capacity is not the amount of heat rejected, but the rated capacity at that reduced air flow. That decreased rated capacity must first be calculated based upon the specified minimum condensing temperature. Using Equation , the specified condensing temperature is used to calculate the reduced HRCF, which is used with the current heat rejection to calculate the ``reduced Rated Heat Rejection''.
 
-\begin{array}{l}{\rm{0}} = {C_2} \times HRC{F^2} + (({C_1} + {C_4}{T_{wetbulb}} - ({T_{condense}} - {T_{wetbulb}})) \times HRCF + {C_3}\\ {\rm{Reduced Rated Heat Rejection}} = HRCF \times Hrej\\ {\rm{Air Volume Ratio}} = {\left( {\frac{{{\rm{Reduced Rated Heat Rejection}}}}{{Hre{j_{Rated}}}}} \right)^{1/N}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    0 &= C_2 \times HRCF^2 + \RB{C_1 + C_4 T_{wetbulb} - \PB{T_{condense} - T_{wetbulb}}} \times HRCF + C_3 \\
+    \text{Reduced Rated Heat Rejection} &= HRCF \times Hrej \\
+    \text{Air Volume Ratio} = \PB{\frac{\text{Reduced Rated Heat Rejection}}{Hrej_{Rated}}}^{1/N}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1366,7 +1513,15 @@ N = exponent for evaporative condensers, set to 0.76 (Manske, 1999)
 
 The water consumption for an evaporative condenser is calculated based upon the air flow rate, the total heat rejection, and the heat rejection environment. The amount of water consumption also includes the amount of water that is purged to reduce the concentration of contaminants. The purge water is estimated as proportional to the heat rejection, at a rate of 5.0E-10 m\(^{3}\)/s per Watt of heat rejection (B.A.C., 2007). (This value, which corresponds to 3 gal./min. per 100 tons, is slightly more conservative than the value quoted by ASHRAE, 2004.) For the compressor racks, the condenser effectiveness was input as a function of the environmental wetbulb temperature. For the detailed evaporative condenser, the input data instead describes the capacity as a function of environmental conditions and loading. From that data, the water evaporation is calculated using the effectiveness corresponding to a fully loaded condenser. When the condenser is operating outside the bounds of the manufacturer's data, the effectiveness is limited to a maximum value of 0.9.
 
-\begin{array}{l}\eta  = \frac{{Hrej}}{{{{\dot V}_{air,rated}} \times {\rho_{air}} \times ({{\left. h \right|}_{Tcondense,sat}} - {h_{air,in}})}}\\ {h_{air,out}} = {h_{air,in}} + \eta  \times ({\left. h \right|_{Tcondense,sat}} - {h_{air,in}})\\ {T_{air,out}} = {T_{saturated}}({h_{air,out}},{P_{barometric}})\\ {{\dot V}_{evaporation}} = \frac{{AirVolumeRatio \times {{\dot V}_{air,rated}} \times {\rho_{air,dry}} \times ({\omega_{air,out}} - {\omega_{air,in}})}}{{{\rho_{water}}}}\\ {{\dot V}_{makeup}} = {{\dot V}_{evaporation}} + {{\dot V}_{purge}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \eta &= \frac{Hrej}{\dot{V}_{air,rated} \rho_{air} \PB{\left. h \right|_{Tcondense,sat} - h_{air,in}}} \\
+    h_{air,out} &= h_{air,in} + \eta \PB{\left. h \right|_{Tcondense,sat} - h_{air,in}} \\
+    T_{air,out} &= T_{saturated}\PB{h_{air,out},P_{barometric}} \\
+    \dot{V}_{evaporation} &= \frac{\text{AirVolumeRatio} \cdot \dot{V}_{air,rated} \cdot \rho_{air,dry} \cdot \PB{\omega_{air,out} - \omega_{air,in}}}{\rho_{water}} \\
+    \dot{V}_{makeup} = \dot{V}_{evaporation} + \dot{V}_{purge}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1400,7 +1555,12 @@ The source of the makeup water may be specified as a water storage tank. If not 
 
 An evaporative condenser can be scheduled, using the Evaporative Condenser Availability Schedule described previously, so that it operates in a dry mode for a portion of the year. This is important in climates subject to freezing weather in order to avoid excessive ice formation on the condenser surfaces and surroundings. (The Availability Schedule is the correct way to model the use of evaporative condensers in cold climates. However, some users may take a single input description and use it to model a building with a refrigeration system in a variety of climates. To avoid modeling the use of evaporative coolers in freezing weather, the code includes a cutout to switch to dry operation whenever the outdoor drybulb temperature drops below 4C.) Dry operation can also reduce water use when the dry heat rejection capacity of the equipment is sufficient to meet the load during times of the year when the outside drybulb temperature is reduced. In dry operation, the condenser heat rejection capacity is approximately one third of the rated wetted heat rejection capacity(Manske, 2000). In dry operation, the condensing temperature is estimated by using the same four-factor equation, but using the air drybulb temperature instead of the wetbulb temperature and using the reduced heat rejection capacity factor.
 
-\begin{array}{l}HRC{F_{{\rm{dry operation}}}} = HRC{F_{{\rm{wet operation}}}}/3.0\\ {T_{{\rm{condense,dry operation}}}} = {C_1} + {C_2} \times HRC{F_{{\rm{dry operation}}}} + \frac{{{C_3}}}{{HRC{F_{{\rm{dry operation}}}}}} + (1 + {C_4}){T_{drybulb}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    HRCF_{dry operation} &= \frac{HRCF_{wet operation}}{3.0} \\
+    T_{condense,dry operation} &= {C_1} + {C_2} \times HRCF_{dry operation} + \frac{C_3}{HRCF_{dry operation}} + \PB{1 + C_4} T_{drybulb}
+  \end{array}
+\end{equation}
 
 \paragraph{Water-Cooled Condensers}\label{water-cooled-condensers}
 
@@ -1456,7 +1616,12 @@ where
 
 Subcooler objects (Refrigeration:Subcooler) reduce the temperature of the liquid refrigerant after it leaves the condenser and before it reaches the thermal expansion valve, corresponding to state point, 3b, on Figure~\ref{fig:state-points-and-energy-flows-for-detailed}. The detailed refrigeration system permits the use of two type of subcoolers, mechanical and liquid suction. A mechanical subcooler is used to transfer refrigeration load from a lower-temperature system to a higher-temperature system. For example, the compressors that are used to provide cooling for dairy products could be used to subcool the refrigerant in another system that is serving frozen food cases. For the system providing the cooling, the mechanical subcooler acts like another refrigerated case load. For the system receiving the cooling, the mechanical subcooler reduces the enthalpy of the refrigerant from point 3a to point 3b on Figure~\ref{fig:state-points-and-energy-flows-for-detailed}, and thus reduces the required refrigerant flow rate. Mechanical subcooler performance is defined by the controlled temperature of the subcooled liquid as follows:
 
-\begin{array}{l}\dot Q = \dot m \times {c_p}({T_{3a}} - {T_{control}})\\ {h_{3b}} = {h_{3a}} - {c_{p,liquid}}({T_{3a}} - {T_{control}})\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \dot{Q} &= \dot{m} C_p \PB{T_{3a} - T_{control}} \\
+    h_{3b}  &= h_{3a} - C_{p,liquid} \PB{T_{3a} - T_{control}}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1472,7 +1637,14 @@ h~~~ = enthalpy, J/kg
 
 A liquid suction heat exchanger (LSHX) subcooler uses the cold gas exiting the refrigerated cases to subcool the condensed liquid refrigerant in the same system. Depending upon the shape of the refrigerant's saturation curve and the operating condensing and evaporating temperature, this can save significant energy by reducing the required refrigerant flow (ASHRAE 2006a). (This model neglects the pressure drop through the suction side of the heat exchanger, although this pressure drop will cause the compressor to operate at a lower suction pressure.) A liquid suction heat exchanger is defined by specifying the design values for: inlet liquid temperature, inlet vapor temperature, and liquid temperature change. A liquid suction heat exchanger subcooler will also increase the superheat of the gas returning to the compressor, as shown by the difference between state points 1a and 1b in Figure~\ref{fig:state-points-and-energy-flows-for-detailed}:
 
-\begin{array}{l}{\eta_{LSHX}} = \frac{{\Delta {T_{Design}}}}{{\left( {{T_{{\rm{Liquid Design}}}} - {T_{{\rm{Vapor Design}}}}} \right)}}\\ dot Q = \dot m \times {c_{p,liquid}}{\eta_{LSHX}}({T_{3a}} - {T_{1a}})\\ {T_{1b}} = {T_{1a}} + \frac{{\dot Q}}{{\dot m{c_{p,vapor}}}}\\ {h_{3b}} = {h_{3a}} - \frac{{\dot Q}}{{\dot m}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \eta_{LSHX} &= \frac{\Delta T_{Design}}{T_{Liquid Design} - T_{Vapor Design}} \\
+    \dot{Q} &= \dot{m} C_{p,liquid} \eta_{LSHX} \PB{T_{3a} - T_{1a}} \\
+    T_{1b} &= T_{1a} + \frac{\dot{Q}}{\dot{m}C_{p,vapor}} \\
+    h_{3b} &= h_{3a} - \frac{\dot{Q}}{\dot{m}}
+  \end{array}
+\end{equation}
 
 where:
 
@@ -1612,7 +1784,13 @@ Capacity\(_{x}\) ~~~~~~~~~~~ ~ = Maximum secondary evaporator capacity (W)
 
 For a two-phase system, the secondary evaporator effectiveness is not calculated. Both the evaporating and condensing sides of the heat exchanger are assumed to operate at fixed temperatures.~ If the capacity of the secondary evaporator is not input, it will be calculated as the sum of the rated loads plus the rated pump power.
 
-\begin{array}{*{20}{c}}{Capacit{y_{{\rm{Rated}}}} = {\rm{Input,  OR}}}\\ {Capacit{y_{{\rm{Rated}}}} = \sum {{{\dot Q}_{{\rm{Case}}}} + \sum {{{\dot Q}_{{\rm{WalkIn}}}} + Powe{r_{{\rm{Pump}}}}} } }\\ {Capacit{y_{{\rm{Max}}}} = Capacit{y_{{\rm{Rated}}}}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    Capacity_{Rated} &= \text{Input,  OR:} \\
+    Capacity_{Rated} &= \sum \dot{Q}_{Case} + \sum \dot{Q}_{WalkIn} + Power_{Pump} \\
+    Capacity_{Max}   &= Capacity_{Rated}
+  \end{array}
+\end{equation}
 
 If the flow rate through the evaporator is not input, it will be calculated based upon the input value for the Circulating Rate.
 
@@ -1678,7 +1856,13 @@ LF\(_{p}\)~~~~~~~~ = ratio of total flow needed to the total flow specified at f
 
 The user may also specify multiple constant-speed pumps.~ Multiple pumps, or pump staging, are often used to reduce the total pumping power requirements while still providing the capacity and constant pressure drop needed to meet peak design loads.(Faramarzi, R. T., and Walker, D. H. 2004) When multiple pumps are specified, the flow rate provided by one pump is compared to the flow rate needed to meet the refrigeration load on the loop during that time step. If that flow rate is insufficient, another pump is added, and the process is continued until the needed flow rate is met or all the pumps are included. The incremental power for each pump is added to determine the total pump power for the loop. Each pump is assumed to operate at full load if it is needed at all.~ A bypass is assumed to carry any fluid flow not needed to meet the load.~ An iterative solution is required for the total pump load on the heat exchanger because the flow rate is determined by the load, which includes the pump power that is determined by the necessary flow rate. For the first estimate, the pump power load is assumed to be zero.
 
-\begin{array}{*{20}{c}}{{{\dot Q}_{{\rm{Refrigeration}}}} = \sum {{{\dot Q}_{{\rm{Case}}}} + \sum {{{\dot Q}_{{\rm{WalkIn}}}}} } }\\ {{{\dot Q}_{{\rm{TotalSecondary}}}} = {{\dot Q}_{{\rm{Refrigeration}}}} + {{\dot Q}_{{\rm{Pump}}}} + \left( {\sum {{{\dot Q}_{{\rm{Pipe and Receiver Shell heat gains}}}}} } \right)}\\ {{\rm{Flo}}{{\rm{w}}_{{\rm{needed}}}}{\rm{ }} = {\rm{ }}\frac{{{{\dot Q}_{{\rm{TotalSecondary}}}}}}{{Eta({C_{{\rm{p,Brine}}}})({\rho_{{\rm{Brine}}}})({T_{{\rm{BrineOutRated}}}} - {T_{{\rm{evap}}}})}}}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \dot{Q}_{Refrigeration} &= \sum \dot{Q}_{Case} + \sum \dot{Q}_{WalkIn} \\
+    \dot{Q}_{TotalSecondary} &= \dot{Q}_{Refrigeration} + \dot{Q}_{Pump} + \sum \dot{Q}_{Pipe and Receiver Shell heat gains} \\
+    \text{FlowNeeded} &= \frac{\dot{Q}_{TotalSecondary}}{\eta C_{p,Brine} \rho_{Brine}\PB{T_{BrineOutRated} - T_{evap}}}
+  \end{array}
+\end{equation}
 
 Where:
 
@@ -1790,14 +1974,13 @@ When the compressor discharge conditions are such that the CO\(_{2}\) is in the 
 
 Several researchers have developed correlations to determine the optimum gas cooler pressure in CO\(_{2}\) refrigeration systems (Chen and Gu 2005; Ge and Tassou 2011; Kauf 1998; Liao and Zhao 2000; Sawalha 2008).~ Using a similar curve-fitting procedure, the following optimum gas cooler pressure correlations are used in EnergyPlus:
 
-\[<!-- \]\{p\_\{gc\}\} = \textbackslash{}left\{ \{
-
-\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} &lt; 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}
-
-\} \right.\[ -->\]
-
 \begin{equation}
-{p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}} {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}} {T_{amb}} \ge 27}\end{array}} \right.
+  p_{gc} = \left\{
+             \begin{array}{cl}
+               7.5 \times 10^6                                & if T_{amb} <    27^{\circ}C \\
+               2.3083 \times 10^5 T_{amb} + 1.190 \times 10^6 & if T_{amb} \geq 27^{\circ}C
+             \end{array}
+           \right.
 \end{equation}
 
 where \emph{p\(_{c}\)} is the optimum gas cooler pressure (Pa) and \emph{T\(_{b}\)} (°C) is the ambient temperature surrounding the gas cooler.~ The corresponding gas cooler exit temperature, \emph{T\(_{o}\)} (°C), is determined as follows:
@@ -1814,14 +1997,15 @@ During transcritical operation, the gas cooler outlet pressure is not allowed to
 
 During subcritical operation, the gas cooler behaves as a condenser and the condensing pressure is allowed to float with the ambient conditions.~ The condensing temperature, \emph{T\(_{d}\)} (°C), is determined according to the following:
 
-\[<!--\]\{T\_\{cond\}\} = \textbackslash{}left\{ \{
-
-\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T &lt; {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T &lt; {T_{amb}} &lt; {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} &lt; 30.978}\end{array}
-
-\} \right.\[ -->\]
-
 \begin{equation}
-{T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}} {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}} {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}} {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}} {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.
+  T_{cond} = \left\{
+               \begin{array}{cl}
+                 T_{cond,min}                           & if T_{amb} \le T_{cond,min} - \Delta T \\
+                 T_{amb} + \Delta T                     & if T_{cond,min} - \Delta T < T_{amb} \le T_{trans} - \Delta T \\
+                 T_{trans}                              & if T_{trans} - \Delta T < T_{amb} < T_{trans} \\
+                 T_{sat,P = 7.2MPa}                     & if T_{trans} \le {T_{amb}} < 30.978 
+               \end{array}
+             \right.
 \end{equation}
 
 where \emph{T\(_{b}\)} is the ambient temperature (°C), Δ\emph{T} is the temperature difference between the condensing temperature and the ambient temperature (°C), \emph{T\(_{d}\)}\(_{*}\) is the minimum allowable condensing temperature (°C), and \emph{T\(_{s}\)} is the ambient air transition temperature between subcritical and transcritical operation (°C).~ The condensing pressure, \emph{P\(_{d}\)} (Pa), is determined as the saturation pressure corresponding to the condensing temperature.

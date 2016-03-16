@@ -660,11 +660,11 @@ This model predicts the regeneration air stream outlet temperature and humidity 
 The user is required to enter a nominal volumetric air flow rate and a nominal face velocity. From these inputs, a heat exchanger face area (applicable for both the regeneration and process sides of the heat exchanger) is calculated and used to determine the operating face velocity during the simulation.
 
 \begin{equation}
-{A_{face}}\, = \,{\raise0.7ex\hbox{{{V_{face,nom}}}} \!\mathord{\left/ {\vphantom {{{V_{face,nom}}} {{{\mathop v\limits^ \bullet  }_{face,nom}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop v\limits^ \bullet  }_{face,nom}}}}}
+  A_{face} = \frac{V_{face,nom}}{\dot{v}_{face,nom}}
 \end{equation}
 
 \begin{equation}
-RFV\, = \,{\raise0.7ex\hbox{{{{\mathop m\limits^ \bullet  }_{Reg,in}}}} \!\mathord{\left/ {\vphantom {{{{\mathop m\limits^ \bullet  }_{Reg,in}}} {\left( {{\rho_{Std}}{A_{face}}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {{\rho_{Std}}{A_{face}}} \right)}}}
+  RFV = \frac{\dot{m}_{Reg,in}}{\rho_{std}A_{face}}
 \end{equation}
 
 where:
@@ -741,13 +741,41 @@ where:
 
 The regeneration outlet air conditions described above represent the full load outlet conditions under steady-state operation. However, there are times when the heat exchanger may not operate for the entire simulation time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger for a portion of the time step). For example, the parent object calling this heat exchanger model may request that it only provide heat exchange for a portion of the time step (\emph{HXPartLoadRatio}). Another example would be if this heat exchanger is not called by a parent object but is instead placed directly in a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem and a setpoint manager is used to place a minimum and/or maximum humidity ratio setpoint on the process air outlet node. For this case the humidity setpoints, if present, are used to calculate a part-load ratio for the heat exchanger assuming the full-load process air humidity ratio difference is equivalent (but opposite in sign) to the regeneration air humidity ratio difference (\emph{w\(_{f}\)}):
 
-\(\begin{array}{l}IF\,\,\left( {{w_{diff}} > 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,humidified,\,process\,air\,dehumidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{max, set\,point}}} \right)}}{{{w_{diff}}}}\\ELSE\,IF\,\left( {{w_{diff}} &lt; 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,dehumidified,\,process\,air\,humidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{min, set\,point}}} \right)}}{{{w_{diff}}}}\\END\,IF\\HXPartLoadRatio = MAX\left( {0.0,HXPartLoadRatio} \right)\\HXPartLoadRatio = MIN\,\left( {1.0,HXPartLoadRatio} \right)\end{array}\)
+If $w_{diff}>0$, then Regen air humidified, process air dehumidified:
+
+\begin{equation}
+  HXPartLoadRatio = \frac{w_{Proc,in} - w_{max, setpoint}}{w_{diff}}
+\end{equation}
+
+Else, if $w_{diff} <0$, then Regen air dehumidified, process air humidified:
+
+\begin{equation}
+  HXPartLoadRatio = \frac{w_{Proc,in} - w_{min, setpoint}}{w_{diff}}
+\end{equation}
+
+And finally, HXPartLoadRatio is constrained to be within the range 0 to 1.
 
 If this heat exchanger is not being called by a parent object and no humidity setpoints are placed on the process air outlet node, then the model assumes that the heat exchanger operates for the entire simulation time step when it is available to operate (based on its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
 
 EnergyPlus has an established convention for placing information on outlet air nodes. If the air flow rate is continuous but the device only operates for a portion of the simulation time step, then the average outlet conditions (temperature, humidity and enthalpy) are placed on the outlet air node. If the air flow rate cycles on and off during the simulation time step, then the full load outlet conditions are placed on the outlet air node along with the average air mass flow rate for the simulation time step. To account for these cases, this model uses the following logic:
 
-\begin{array}{l}IF(FanOpMode\,\,.EQ.\,\,CycFanCycComp\,\,.OR.\,\,RegAirInletIsOANode)\,THEN\\\,\,\,\,\,\,\,\,{T_{Reg,\,\,out}}\, = \,{T_{Reg,\,\,in}} + {T_{diff}}\\\,\,\,\,\,\,\,\,{w_{Reg,\,\,out}}\, = \,{w_{Reg,\,\,in}} + {w_{diff}}\\ELSE\\\,\,\,\,\,\,\,\,{T_{Reg,\,\,out}}\, = \,{T_{Reg,\,\,in}} + \left( {{T_{diff}}*HXPartLoadRatio} \right)\\\,\,\,\,\,\,\,\,{w_{Reg,\,\,out}}\, = \,{w_{Reg,\,\,in}} + \left( {{w_{diff}}*HXPartLoadRatio} \right)\\ENDIF\end{array}
+If FanOpMode is equal to CycFanCycComp or if RegAirInletIsOANode is true then:
+
+\begin{equation}
+  \begin{array}{rl}
+    T_{Reg,out} &= T_{Reg,in} + T_{diff} \\
+    w_{Reg,out} &= w_{Reg,in} + w_{diff}
+  \end{array}
+\end{equation}
+
+Otherwise:
+
+\begin{equation}
+  \begin{array}{rl}
+    T_{Reg,out} &= T_{Reg,in} + T_{diff} \cdot HXPartLoadRatio \\
+    w_{Reg,out} &= w_{Reg,in} + w_{diff} \cdot HXPartLoadRatio 
+  \end{array}
+\end{equation}
 
 where:
 
@@ -813,7 +841,18 @@ where:
 
 Like the regeneration outlet air conditions, the process outlet air conditions are also checked for exceeding saturated conditions and, if detected, the temperature and humidity ratio are reset assuming constant enthalpy.
 
-\begin{array}{l}{T_{sat}} = \,PsyTsatFnHPb\left( {{h_{Proc,\,\,out}}\,,\,\,PB} \right)\\IF({T_{sat}} > \,{T_{Proc,out}})\,THEN\\\,\,\,\,\,\,\,\,\,\,{T_{Proc,out}} = {T_{sat}}\\\,\,\,\,\,\,\,\,\,\,{w_{Proc,out}} = PsyWFnTdbH\left( {{T_{Proc,out}}\,,\,\,{h_{Proc,out}}} \right)\\END\,IF\end{array}
+\begin{equation}
+  T_{sat} = PsyTsatFnHPb \PB{h_{Proc,out},PB}
+\end{equation}
+
+If $T_{sat}>T_{Proc,out}$, then:
+
+\begin{equation}
+  \begin{array}{rl}
+    T_{Proc,out} &= T_{sat} \\
+    w_{Proc,out} &= PsyWFnTdbH \PB{T_{Proc,out},h_{Proc,out}}
+  \end{array}
+\end{equation}  
 
 Heat recovery electric power is the electric consumption rate of the unit in watts. The nominal electric power for the heat exchanger is specified in the input data file, and can be used to model controls (transformers, relays, etc.) and/or a motor for a rotary heat exchanger. The model assumes that this electric power is consumed whenever the heat exchanger operates. The electric power is assumed to be zero for all other times. None of this electric power is assumed to contribute thermal load to either of the heat exchanger air streams. As with the thermal performance of the heat exchanger, the power used by the heat exchanger is also proportional to the heat exchanger part load ratio.
 

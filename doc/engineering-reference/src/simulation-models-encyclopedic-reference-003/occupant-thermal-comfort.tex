@@ -620,7 +620,9 @@ EvapHeatLossMax = 2.2*Hc*(SkinVapPress - VapPress)*CloPermeatEff
 
 Here, control signals, based on setpoint temperatures in the skin and core, are introduced into passive system equations and these equations are integrated numerically for small time increments or small increments in core and skin temperature. The control signals modulate the thermoregulatory mechanism and regulate the peripheral blood flow, the sweat rate, and the increase of metabolic heat by active muscle shivering. The development of the controlling functions of skin conductance (KS), sweat rate (E\(_{w}\)), and shivering (M\(_{v}\)) is based on their correlation with the deviations in skin and core temperatures from their setpoints.
 
-\begin{array}{l}KS = 5.3 + [6.75 + 42.45({T_{cr}} - 36.98) + 8.15{({T_{cr}} - 35.15)^{0.8}}({T_{sk}} - 33.8)]\\/[1.0 + 0.4(32.1 - {T_{sk}})]\end{array}
+\begin{equation}
+  KS = 5.3 + \frac{6.75+42.45\PB{T_{cr}-36.98}+8.15\PB{T_{cr}-35.15}^{0.8}\PB{T_{sk}-33.8}}{1+0.4\PB{32.1-T_{sk}}}
+\end{equation}
 
 SkinCndctDilation = 42.45*CoreSignalWarmMax \&
 
@@ -634,7 +636,9 @@ SkinCndctConstriction = 1.0 + 0.4*SkinSignalColdMax
 
 ThermCndct = 5.3+(6.75+SkinCndctDilation)/SkinCndctConstriction
 
-\begin{array}{l}{E_{sw}} = \phi  \times [260({T_{cr}} - 36.9) + 26({T_{sk}} - 33.8)]\exp [({T_{sk}} - 33.8)/8.5]\\/[1.0 + 0.05{(33.37 - {T_{sk}})^{2.4}}]\end{array}
+\begin{equation}
+  E_{sw} = \phi \frac{\RB{260\PB{T_{cr} - 36.9} + 26\PB{T_{sk} - 33.8}} \exp\RB{\PB{T_{sk} - 33.8}/8.5}}{1.0 + 0.05\PB{33.37 - T_{sk}}^{2.4}}
+\end{equation}
 
 WeighFac = 260.+70.*AcclPattern
 
