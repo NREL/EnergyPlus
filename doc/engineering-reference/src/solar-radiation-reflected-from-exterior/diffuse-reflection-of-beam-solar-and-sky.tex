@@ -85,7 +85,7 @@ The above reflection factor is used in the timestep calculation to find the irra
 \begin{equation}
 \begin{split}
 QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad \\
-* ReflFacSkySolObs(RecSurfNum) (W/m\(^{2}\))
+* ReflFacSkySolObs(RecSurfNum) (W/m^{2})
 \end{split}
 \end{equation}
 
@@ -103,7 +103,11 @@ If a downgoing ray from a receiving point hits the ground (for example, rays 1-6
 
 The factor for reflection of sky radiation from the ground onto a receiving surface is calculated in subroutine CalcSkySolDiffuseReflFactors. It is given by:
 
-\begin{array}{l}{\rm{ReflFacSkySolGnd(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {\left[ {(Hi{t_{gnd,i}}d{\Omega_i}\cos {\alpha_i}/\pi )\sum\limits_{j(i)}^{{N_{ray}}} {Hi{t_{sky,j(i)}}\cos {\alpha_{j(i)}}d{\Omega_{j(i)}}/\pi } } \right]} } \end{array}
+\begin{equation}
+\begin{array}{l}
+{\rm{ReflFacSkySolGnd(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {\left[ {(Hi{t_{gnd,i}}d{\Omega_i}\cos {\alpha_i}/\pi )\sum\limits_{j(i)}^{{N_{ray}}} {Hi{t_{sky,j(i)}}\cos {\alpha_{j(i)}}d{\Omega_{j(i)}}/\pi } } \right]} }
+\end{array}
+\end{equation}
 
 where
 
@@ -212,7 +216,7 @@ where
 The factor for specular reflection of beam solar from obstruction onto a receiving surface is calculated in subroutine CalcBeamSolSpecularReflFactors. It is given by:
 
 \begin{equation}
-{\rm{ReflFacBmToBmSolObs(RecSurfNum,IHr) }} = \sum\limits_{\scriptstyle specularly\atop{\scriptstyle reflecting\atop\scriptstyle surfaces}} {} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]
+{\rm{ReflFacBmToBmSolObs(RecSurfNum,IHr) }} = \sum\limits_{\scriptstyle \substack{specularly \\ reflecting \\ surfaces}} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]
 \end{equation}
 
 The program assumes that specular reflection from a surface is due to glazing. If the reflecting surface is a window belonging to the building itself (as in Figure~\ref{fig:solar-reflection-from-building-surfaces-onto}), then \({f_{C,glazed}}\) is the fraction of the window that is glazed (which is 1.0 unless the window has dividers).

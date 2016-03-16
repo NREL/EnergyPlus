@@ -255,12 +255,14 @@ where \emph{k} = \emph{cs}, \emph{ts}, \emph{is} or \emph{os}. The integral is e
 
 where
 
+\begin{equation}
 \begin{array}{l}
     \theta_{sky}(i) = (i - 1/2) \Delta \theta_{sky} \\
     \phi_{sky}(j) = (j - 1/2) \Delta \phi_{sky} \\
     \Delta \theta_{sky} = 2 \pi / N_{\theta} \\
     \Delta \phi_{sky} = \pi / 2N_{\phi} 
-  \end{array}
+\end{array}
+\end{equation}
 
 \({N_\theta } = 18\) ~and \({N_\phi } = 8\) ~were found to give a \(\pm 1\%\) accuracy in the calculation of \({E_h}_{,k}\) .
 
@@ -307,7 +309,7 @@ Equation becomes exact as \(dx/D\) and \(dy/D \to 0\) and is accurate to better 
 The net illuminance from the window is obtained by summing the contributions from all the window elements:
 
 \begin{equation}
-{E_h} = \sum\limits_{\scriptstyle window\atop\scriptstyle elements} {{L_w}d\Omega \cos \gamma }
+{E_h} = \sum\limits_{\scriptstyle \substack{window \\ elements}} {{L_w}d\Omega \cos \gamma }
 \end{equation}
 
 In performing the summation, window elements that lie below the workplane (\(\cos \gamma \lt 0\) ) are omitted since light from these elements cannot reach the workplane directly.
@@ -398,10 +400,12 @@ For a window with a diffusing shade the total transmitted flux is
 
 The downgoing and upgoing portions of this flux are
 
+\begin{equation}
 \begin{array}{l}
     \Phi_{FW,sh} = \Phi (1 - f) \\
     \Phi_{CW,sh} = \Phi f
-  \end{array}
+\end{array}
+\end{equation}
 
 where \emph{f}, the fraction of the hemisphere seen by the inside of the window that lies above the window midplane, is given by
 
@@ -433,10 +437,12 @@ A = {\cos ^{ - 1}}(\tan \phi \tan {\phi_w})
 
 Thus
 
+\begin{equation}
 \begin{array}{l}
     \theta_{min} & =  - \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| \\
     \theta_{max} & = \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| 
-  \end{array}
+\end{array}
+\end{equation}
 
 \subsection{Transmitted Flux from Direct Sun}\label{transmitted-flux-from-direct-sun}
 
@@ -456,10 +462,12 @@ where T is the net transmittance of the window glazing (plus shade, if present).
 
 For an unshaded window all of the transmitted flux is downward since the sun always lies above the window midplane. Therefore
 
+\begin{equation}
 \begin{array}{l}
     \Phi_{FW,unsh} = \Phi \\
     \Phi_{CW,unsh} = 0
-  \end{array}
+\end{array}
+\end{equation}
 
 For a window with a diffusing shade
 
@@ -516,18 +524,22 @@ The modified solid angle is
 
 where p is a ``position factor'' {[}Petherbridge \& Longmore, 1954{]} that accounts for the decrease in visual excitation as the luminous element moves away from the line of sight. This factor depends on the horizontal and vertical displacement ratios, \emph{x\(_{R}\)} and \emph{y\(_{R}\)} (Figure~\ref{fig:geometry-for-calculation-of-displacement}),~ given by
 
+\begin{equation}
 \begin{array}{rl}
     x_R(i,j) & = \frac{\sqrt{A^2-(YD)^2}}{RR} \\
     y_R(i,j) & = \left|YD/RR\right|
-  \end{array}
+\end{array}
+\end{equation}
 
 where
 
+\begin{equation}
 \begin{array}{rl}
     RR & = D (\hat{R}_{ray}\cdot\hat{v}_{view}) \\
     A^2 & = D^2 - (RR)^2 \\
     YD = R_{win}(3) - R_{ref}(3)
-  \end{array}
+\end{array}
+\end{equation}
 
 \begin{figure}[hbtp] % fig 59
 \centering
