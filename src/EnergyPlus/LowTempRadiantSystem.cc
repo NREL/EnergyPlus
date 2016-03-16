@@ -704,10 +704,12 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
-					ShowContinueError( "Input for " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFields( 3 ) );
-					ErrorsFound = true;
+					if( ( !lAlphaBlanks( 7 ) ) || ( !lAlphaBlanks( 8 ) ) ) {
+						ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFields( 3 ) );
+						ErrorsFound = true;
+					}
 				}
 			} else if ( SameString( Alphas( 6 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
@@ -794,10 +796,12 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
-					ShowContinueError( "Input for " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFields( 8 ) );
-					ErrorsFound = true;
+					if( ( !lAlphaBlanks( 11 ) ) || ( !lAlphaBlanks( 12 ) ) ) {
+						ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFields( 8 ) );
+						ErrorsFound = true;
+					}
 				}
 			} else if ( SameString( Alphas( 10 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).CoolingCapMethod = CapacityPerFloorArea;
