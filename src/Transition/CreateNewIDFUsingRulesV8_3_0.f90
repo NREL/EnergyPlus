@@ -378,7 +378,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! Remove Max flow rate field
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:10) = InArgs(1:10)
+                OutArgs(1:3) = InArgs(1:3)
+                OutArgs(4) = InArgs(11) 
+                OutArgs(5:10) = InArgs(5:10)
                 OutArgs(11:CurArgs-1) = InArgs(12:CurArgs)
                 CurArgs = CurArgs - 1
 

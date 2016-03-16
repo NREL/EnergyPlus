@@ -21,13 +21,14 @@ EPlusRepoPath = 'https://github.com/' + RepoName
 debug = False
 
 def usage():
-    print("""Script should be called with 4 positional arguments:
+    print("""Script should be called with 8 positional arguments:
  - the path to a repository
  - the path to a markdown output file
  - the path to a html output file
  - the path to a local git executable
  - a github token for performing authentication API requests
- - the commit SHA for the last major release""")
+ - the commit SHA for the last major release
+ - a program version identifier""")
 
 # command line arguments: repo base path, output markdown and html file paths, a git exe path, and a github token
 if len(sys.argv) == 7:
@@ -37,6 +38,7 @@ if len(sys.argv) == 7:
     git_exe = sys.argv[4]
     github_token = sys.argv[5]
     last_commit = sys.argv[6]
+    program_version = sys.argv[7]
 elif len(sys.argv) == 8:
     repo = sys.argv[1]
     md_file = sys.argv[2]
@@ -44,6 +46,7 @@ elif len(sys.argv) == 8:
     git_exe = sys.argv[4]
     github_token = sys.argv[5]
     last_commit = sys.argv[6]
+    program_version = sys.argv[7]
 else:
     usage()
     sys.exit(1)
@@ -100,14 +103,6 @@ for pr_num in pr_numbers:
 		label_name = label['name']
 		if label_name in ValidPRTypes:
 			PRS[label_name].append([pr_num, title])
-    #if len(labels) != 1:
-        #print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (pr_num, title, len(labels)))
-    #else:
-        #key = 'Unknown'
-        #first_label_name = labels[0]['name']
-        #if first_label_name in ValidPRTypes:
-            #key = first_label_name
-        #PRS[key].append([pr_num, title])
 
 # Now write the nice markdown output file
 with io.open(md_file, 'w') as f:
@@ -120,8 +115,8 @@ with io.open(md_file, 'w') as f:
         for pr in PRS[pr_type]:
             out(' - [#' + pr[0] + '](' + EPlusRepoPath + '/pull/' + pr[0] + ') : ' + pr[1])
 
-    out('# ChangeLog')
-    out('Consists of pull requests merged in since the last release.')
+    out('# Changelog for EnergyPlus ' + program_version)
+    out('Consists of pull requests merged in since the last release - starting with SHA [' + last_commit + '](https://github.com/' + RepoName + '/commit/' + last_commit + ')')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
@@ -159,8 +154,8 @@ with io.open(html_file, 'w') as f2:
     out(' padding: 6px;')
     out('}')
     out('</style>')
-    out('<h1>EnergyPlus ChangeLog</h1>')
-    out('This file is auto-generated from merged pull requests in the repository.')
+    out('<h1>ChangeLog for EnergyPlus ' + program_version + '</h1>')
+    out('<h1>Consists of pull requests merged in since the last release - starting with SHA <a href = "https://github.com/' + RepoName + '/commit/' + last_commit + '">' + last_commit + '</a>' + '</h1>')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')

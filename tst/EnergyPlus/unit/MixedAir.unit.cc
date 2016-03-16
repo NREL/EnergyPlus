@@ -1075,4 +1075,45 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.2408617, OAController( 1 ).OAFractionRpt, 0.00001 );
 
 	}
+
+	TEST_F( EnergyPlusFixture, MixedAir_ControllerTypeTest ) {
+
+		int OAControllerNum = 1;
+
+		OAController.allocate( OAControllerNum );
+		Node.allocate( 4 );
+
+		OAController( OAControllerNum ).ControllerType_Num = ControllerOutsideAir;
+		OAController( OAControllerNum ).OANode = 1;
+		OAController( OAControllerNum ).InletNode = 2;
+		OAController( OAControllerNum ).RelNode = 3;
+		OAController( OAControllerNum ).RetNode = 4;
+		OAController( OAControllerNum ).OAMassFlow = 0.1;
+		OAController( OAControllerNum ).ExhMassFlow = 0.0;
+		OAController( OAControllerNum ).RelMassFlow = max( OAController( OAControllerNum ).OAMassFlow - OAController( OAControllerNum ).ExhMassFlow, 0.0 );
+		Node( OAController( OAControllerNum ).RetNode ).MassFlowRate = 0.2;
+		Node( OAController( OAControllerNum ).RelNode ).MassFlowRate = OAController( OAControllerNum ).RelMassFlow;
+		Node( OAController( OAControllerNum ).InletNode ).CO2 = 600.0;
+		Node( OAController( OAControllerNum ).RelNode ).CO2 = 500.0;
+		OutdoorCO2 = 400.0;
+
+		Node( OAController( OAControllerNum ).InletNode ).GenContam = 0.5;
+		Node( OAController( OAControllerNum ).RelNode ).GenContam = 0.3;
+		OutdoorGC = 0.1;
+
+		Contaminant.CO2Simulation = true;
+		Contaminant.GenericContamSimulation = true;
+
+		UpdateOAController( OAControllerNum );
+		// Expect no value changes of relief node due to no actions. 
+		EXPECT_NEAR( 500.0, Node( OAController( OAControllerNum ).RelNode ).CO2, 0.00001 );
+		EXPECT_NEAR( 0.3, Node( OAController( OAControllerNum ).RelNode ).GenContam, 0.00001 );
+
+		Contaminant.CO2Simulation = false;
+		Contaminant.GenericContamSimulation = false;
+		OAController.deallocate( );
+		Node.deallocate( );
+
+	}
 }
+

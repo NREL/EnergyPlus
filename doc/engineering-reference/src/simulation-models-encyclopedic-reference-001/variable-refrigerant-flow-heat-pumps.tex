@@ -64,7 +64,7 @@ The operating capacity of the heat pump is calculated based on the user defined 
 The cooling combination ratio correction factor is defined as the total terminal unit rated cooling capacity divided by the heat pump's rated cooling capacity. The combination ratio is important when multiple terminal units (or DX coils) are attached to a single variable-speed condensing unit. If the combination ratio is less than 1, the condenser's rated capacity is assumed to be able to meet the indoor terminal unit's demand request. However, if the combination ratio is determined to be greater than 1, the maximum cooling capacity available from the heat pump's condenser may be higher than the user specified rated cooling capacity. The combination ratio capacity correction factor is based on a linear, quadratic or cubic curve and provides a multiplier \textgreater{} 1 to correct for combination ratio's greater than 1. For example, a combination ratio of 1.3 (130\%) may result in a combination ratio capacity correction factor of 1.06 (outdoor condenser can actually provide 106\% of rated capacity) . The cooling combination ratio correction factor is applied to cooling performance calculations. If the cooling combination ratio correction curve name is not specified by the user, the cooling combination ratio correction factor (CR \(_{n}\)) in the following equation is assumed to be equal to 1.
 
 \begin{equation}
-C{R_{cooling\,,\,rated\,}} = {\raise0.7ex\hbox{{\sum\limits_1^n {{{\mathop Q\limits^ \bullet  }_{coil(i)\,,\,cooling,\,rated}}} }} \!\mathord{\left/ {\vphantom {{\sum\limits_1^n {{{\mathop Q\limits^ \bullet  }_{coil(i)\,,\,cooling,\,rated}}} } {{{\mathop Q\limits^ \bullet  }_{cooling,\,total,\,\,rated}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{cooling,\,total,\,\,rated}}}}}
+  CR_{cooling,rated} = \frac{\sum \limits_1^n \dot{Q}_{coil(i),cooling,rated}}{\dot{Q}_{cooling,total,rated}}
 \end{equation}
 
 \begin{equation}
@@ -98,7 +98,7 @@ The heat pump's cooling capacity correction factor (function of temperature) is 
 \end{equation}
 
 \begin{equation}
-{T_{wb,avg}} = \sum\limits_1^i {\left( {{T_{wb,i}}} \right)} \left( {{\raise0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{zone(i)}}}} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{zone(i)}}} {{{\mathop Q\limits^ \bullet  }_{zone,\,total}}}}}\right.}\!\lower0.7ex\hbox{{{{\mathop Q\limits^ \bullet  }_{zone,\,total}}}}}} \right)
+  T_{wb,avg} = \sum\limits_1^i {\PB{T_{wb,i}}} \PB{\dot{Q}_{zone(i)}}{\dot{Q}_{zone,total}}
 \end{equation}
 
 The operating capacity of the heat pump is calculated using a bi-quadratic equation using a load-weighted average indoor wet-bulb temperature and outdoor dry-bulb temperature as the independent variables.
