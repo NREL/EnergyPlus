@@ -134,11 +134,11 @@ where \({c_{p,w}}\) ~is the specific heat capacity of the water.
 
 The model then assumes the air mass flow rate is given by the following expression:
 
-\$\$\{\dot m\_\{a,std\}\} = \{0.0062 + .0000275 \dot Q\_\{design\}\}
+$\dot{m}_{a,std} = 0.0062 + .0000275 \dot{Q}_{design}$
 
 Since the inlet air temperature, \{T\_\{a,in\}\} , of 18°C and the heating capacity of the unit, i.e.~rated capacity, are known, the outlet air temperature, \{T\_\{a,out\}\} , can be obtained from expression
 
-\{T\_\{a,out\}\} = \frac{{{q_{std}}}}{{\dot m_{a,std}{c_{p,a}}}} + \{T\_\{a,in\}\}\$\$
+$T_{a,out} = \frac{q_{std}}{\dot{m}_{a,std}c_{p,a}} + T_{a,in}$
 
 where \({c_{p,a}}\) ~is the specific heat capacity of the air.
 
@@ -186,11 +186,11 @@ Temperatures at the nodes are now known and the UA value is determined in the sa
 
 Once the UA value is determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and the zone air as convection-only model does (see ``Hot Water Baseboard Heater with Only Convection'' model). During this calculation the air mass flow rate is proportioned to the water mass flow rate:
 
-\$\$\{\dot m\_a\} = \{\{\dot m\_\{a,std\}\} \frac{\dot m_w}{\dot m_{w,max}}\}
+$\dot{m}_a = \dot{m}_{a,std} \frac{\dot{m}_w}{\dot{m}_{w,max}}$
 
 The model then determines the radiant heat addition by
 
-\{q\_\{rad\}\} = q \cdot Fra\{c\_\{rad\}\}\$\$
+$q_{rad} = q \cdot Frac_{rad}$
 
 where \emph{q} is the total heating capacity of the heater and \emph{Frac\(_{d}\)} is the user-defined fraction.
 
