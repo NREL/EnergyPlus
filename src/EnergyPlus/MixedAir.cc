@@ -1684,14 +1684,6 @@ namespace MixedAir {
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
 					VentMechZoneName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 5 );
 
-					for ( OutAirNum = 1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
-						if ( OAController( OutAirNum ).VentilationMechanicalName == VentilationMechanical( VentMechNum ).Name && VentilationMechanical( VentMechNum ).DCVFlag ) {
-							AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = true;
-						} else {
-							AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = false;
-						}
-					}
-
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
 						DesignSpecOAObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 6 );
@@ -3278,6 +3270,12 @@ namespace MixedAir {
 						SetupEMSActuator( "Outdoor Air Controller", OAController( OAControllerLoop ).Name, "Air Mass Flow Rate", "[kg/s]", OAController( OAControllerLoop ).EMSOverrideOARate, OAController( OAControllerLoop ).EMSOARateValue );
 					}
 
+					VentMechObjectNum = OAController( OAControllerLoop ).VentMechObjectNum;
+					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
+						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
+							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
+						}
+					}
 				}
 
 				InitOAControllerSetUpAirLoopHVACVariables = false;
