@@ -2041,9 +2041,11 @@ namespace FanCoilUnits {
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
 						// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
 						CWFlowBypass = MdotLockC - CWFlow;
-						// note outlet temperature changes but outlet enthalpy stays the same
+						// change water outlet temperature and enthalpy
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Temp = ( CWFlowBypass * Node( FanCoil( FanCoilNum ).ColdControlNode ).Temp +
 							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Temp ) / MdotLockC;
+						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy = ( CWFlowBypass * Node( FanCoil( FanCoilNum ).ColdControlNode ).Enthalpy +
+							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy ) / MdotLockC;
 					}
 					else {
 						// if MdotLockC <= HWFlow use MdotLockC as is
@@ -2145,9 +2147,11 @@ namespace FanCoilUnits {
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).MassFlowRate = MdotLockH;
 							// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
 							HWFlowBypass = MdotLockH - HWFlow;
-							// note outlet temperature changes but outlet enthalpy stays the same
+							// change outlet water temperature and enthalpy
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Temp = ( HWFlowBypass * Node( FanCoil( FanCoilNum ).HotControlNode ).Temp +
 								HWFlow * Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Temp ) / MdotLockH;
+							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Enthalpy = ( HWFlowBypass * Node( FanCoil( FanCoilNum ).HotControlNode ).Enthalpy +
+								HWFlow * Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Enthalpy ) / MdotLockH;
 						}
 						else {
 							// if MdotLockH <= HWFlow use MdotLockH as is
