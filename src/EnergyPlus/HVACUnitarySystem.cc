@@ -6830,20 +6830,23 @@ namespace HVACUnitarySystem {
 						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					} else if ( CoolingLoad ) {
 						// RegulaFalsi may not find cooling PLR when the latent degradation model is used.
-						// IF iteration limit is exceeded, find tighter boundary of solution and repeat RegulaFalsi
+						// IF iteration limit is exceeded (SolFlag = -1), find tighter boundary of solution and repeat RegulaFalsi
 						TempMaxPLR = -0.1;
 						TempSysOutput = SensOutputOff;
 						TempLoad = ZoneLoad;
-						while ( ( TempSysOutput - TempLoad ) > 0.0 && TempMaxPLR < 1.0 ) {
+						while ( ( TempSysOutput - TempLoad ) > 0.0 && TempMaxPLR < 0.95 ) { // avoid PLR > 1 by limiting TempMaxPLR to 1 (i.e., TempMaxPLR += 0.1)
 							// find upper limit of HeatingPLR
 							TempMaxPLR += 0.1;
+							if ( TempMaxPLR > 0.95 && TempMaxPLR < 1.05 ) {
+								TempMaxPLR = 1.0; // enforce a perfect 1.0 at the top end
+							}
 							SetSpeedVariables( UnitarySysNum, true, TempMaxPLR );
 							CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, TempMaxPLR, HeatPLR, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 							TempSysOutput = TempSensOutput;
 						}
 						TempMinPLR = TempMaxPLR;
-						while ( ( TempSysOutput - TempLoad ) < 0.0 && TempMinPLR > 0.0 ) {
-							// pull upper limit of HeatingPLR DOwn to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
+						while ( ( TempSysOutput - TempLoad ) < 0.0 && TempMinPLR > 0.05 ) {
+							// pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
 							TempMaxPLR = TempMinPLR;
 							// find minimum limit of HeatingPLR
 							TempMinPLR -= 0.01;
@@ -7142,9 +7145,10 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 			UnitarySystem( UnitarySysNum ).CoolingCycRatio = 0.0;
 			if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil || UnitarySystem( UnitarySysNum ).VarSpeedHeatingCoil ) {
-				if ( UnitarySystem( UnitarySysNum ).HeatingSpeedNum == 1 ) {
+				if ( UnitarySystem( UnitarySysNum ).HeatingSpeedNum <= 1 ) {
 					UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).HeatingCycRatio = PartLoadRatio;
+					MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
 						UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = PartLoadRatio;
@@ -7169,9 +7173,10 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 			UnitarySystem( UnitarySysNum ).HeatingCycRatio = 0.0;
 			if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil || UnitarySystem( UnitarySysNum ).VarSpeedCoolingCoil ) {
-				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum == 1 ) {
+				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum <= 1 ) {
 					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).CoolingCycRatio = PartLoadRatio;
+					MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
 						UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = PartLoadRatio;
@@ -7204,10 +7209,8 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 			}
 		}
-		if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 || UnitarySystem( UnitarySysNum ).HeatingSpeedNum > 1 ) {
-			OnOffAirFlowRatio = 1.0;
-			SetAverageAirFlow( UnitarySysNum, PartLoadRatio, OnOffAirFlowRatio );
-		}
+		OnOffAirFlowRatio = 1.0;
+		SetAverageAirFlow( UnitarySysNum, PartLoadRatio, OnOffAirFlowRatio );
 	}
 
 	Real64
@@ -10382,9 +10385,17 @@ namespace HVACUnitarySystem {
 						}
 					}
 				} else {
-					if ( HeatSpeedNum <= 1 ) {
+					if ( HeatSpeedNum < 1 ) {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					} else if ( HeatSpeedNum == 1 ) {
+						if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil ) {
+							CompOffMassFlow = 0.0; // #5518
+							CompOffFlowRatio = 0.0;
+						} else {
+							CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
+							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
+						}
 					} else {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum - 1 );
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
@@ -10463,9 +10474,17 @@ namespace HVACUnitarySystem {
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 					}
 				} else {
-					if ( CoolSpeedNum <= 1 ) {
+					if ( CoolSpeedNum < 1 ) {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					} else if ( CoolSpeedNum == 1 ) {
+						if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil ) {
+							CompOffMassFlow = 0.0; // #5518
+							CompOffFlowRatio = 0.0;
+						} else {
+							CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
+							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+						}
 					} else {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
@@ -10650,7 +10669,13 @@ namespace HVACUnitarySystem {
 			} // ELSE ! No Moisture Load
 		} // No Heating/Cooling Load
 
-		MSHPMassFlowRateLow = CompOffMassFlow; // these need to be set for multi-speed coils
+		if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil && ( HeatingLoad && HeatSpeedNum == 1 ) ) {
+			MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+		} else if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil && ( CoolingLoad && CoolSpeedNum == 1 ) ) {
+			MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+		} else {
+			MSHPMassFlowRateLow = CompOffMassFlow; // these need to be set for multi-speed coils
+		}
 		MSHPMassFlowRateHigh = CompOnMassFlow; // doesn't hurt to set these if multi-speed coils are not used
 
 		// Set the system mass flow rates
