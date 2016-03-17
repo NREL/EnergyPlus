@@ -741,8 +741,6 @@ namespace EnergyPlus {
 		int ControlledZoneNum( 1 );
 		bool FirstHVACIteration( true );
 		bool ErrorsFound( false );
-		Real64 PartLoadRatio( 1.0 );
-		Real64 SpeedRatio( 0.0 );
 		Real64 QZnReq( 0.0 );
 		Real64 HotWaterMassFlowRate( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );
@@ -1093,8 +1091,6 @@ namespace EnergyPlus {
 		int ControlledZoneNum( 1 );
 		bool FirstHVACIteration( true );
 		bool ErrorsFound( false );
-		Real64 PartLoadRatio( 1.0 );
-		Real64 SpeedRatio( 0.0 );
 		Real64 QZnReq( 0.0 );
 		Real64 HotWaterMassFlowRate( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );
@@ -1400,8 +1396,6 @@ namespace EnergyPlus {
 		int ControlledZoneNum( 1 );
 		bool FirstHVACIteration( true );
 		bool ErrorsFound( false );
-		Real64 PartLoadRatio( 1.0 );
-		Real64 SpeedRatio( 0.0 );
 		Real64 QZnReq( 0.0 );
 		Real64 HotWaterMassFlowRate( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );

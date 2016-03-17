@@ -1852,8 +1852,6 @@ namespace FanCoilUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const iReverseAction( 1 );
-		int const iNormalAction( 2 );
 		int const MaxIterCycl( 100 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
