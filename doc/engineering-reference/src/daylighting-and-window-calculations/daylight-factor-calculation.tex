@@ -312,7 +312,7 @@ The net illuminance from the window is obtained by summing the contributions fro
 {E_h} = \sum\limits_{\scriptstyle \substack{window \\ elements}} {{L_w}d\Omega \cos \gamma }
 \end{equation}
 
-In performing the summation, window elements that lie below the workplane (\(\cos \gamma \lt 0\) ) are omitted since light from these elements cannot reach the workplane directly.
+In performing the summation, window elements that lie below the workplane (\(\cos \gamma < 0\) ) are omitted since light from these elements cannot reach the workplane directly.
 
 \begin{figure}[hbtp] % fig 58
 \centering
@@ -438,7 +438,7 @@ A = {\cos ^{ - 1}}(\tan \phi \tan {\phi_w})
 Thus
 
 \begin{equation}
-\begin{array}{l}
+\begin{array}{rl}
     \theta_{min} & =  - \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| \\
     \theta_{max} & = \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| 
 \end{array}
@@ -471,10 +471,12 @@ For an unshaded window all of the transmitted flux is downward since the sun alw
 
 For a window with a diffusing shade
 
-\begin{array}{l}
-    \Phi_{FW,sh} = \Phi (1 - f) \\
-    \Phi_{CW,sh} = \Phi f
+\begin{equation}
+  \begin{array}{rl}
+    \Phi_{FW,sh} &= \Phi (1 - f) \\
+    \Phi_{CW,sh} &= \Phi f
   \end{array}
+\end{equation}
 
 \subsection{Luminance of Shaded Window}\label{luminance-of-shaded-window}
 

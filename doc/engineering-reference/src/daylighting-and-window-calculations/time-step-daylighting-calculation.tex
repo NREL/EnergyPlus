@@ -130,19 +130,23 @@ where \emph{E\(_{sun}\)} and \emph{E\(_{sky}\)} are the exterior horizontal illu
 
 The horizontal illuminance from sun and sky are given by
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     E_{h,sun} & = \eta_{dir} S_{norm,dir} \cos Z \\
     E_{h,sky} & = \eta_{dif} S_{h,dif}
   \end{array}
+\end{equation}
 
 where \emph{Z} is the solar zenith angle,~ \emph{$\eta$\(_{dif}\)} is the luminous efficacy (in lumens/Watt) of diffuse solar radiation from the sky and \emph{$\eta$\(_{dir}\)} is the luminous efficacy of direct radiation from the sun. The efficacies are calculated from direct and global solar irradiance using a method described in (Perez et al, 1990).
 
 The fractions \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are given by
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     f_k    & = \frac{ s_{k,k'} E_{h,k} } { s_{k,k'} E_{h,k} + (1 - s_{k,k'})E_{h,k'}} \\
     f_{k'} & = \frac{ (1 - s_{k,k'} ) E_{h,k'} } { s_{k,k'} E_{h,k} + (1 - s_{k,k'} ) E_{h,k'}}
   \end{array}
+\end{equation}
 
 where \emph{E\(_{h,k}\)} and \emph{E\(_{h,k’}\)} are the horizontal illuminances from skies \emph{k} and \emph{k'}, respectively (see ``Exterior Horizontal Luminance,'' above), and \emph{s\(_{’}\)} is the interpolation factor for skies \emph{k}and \emph{k'}(see ``Time-Step Sky Luminance,'' above).~ For example, if~ \emph{$\varepsilon$} \textgreater{} 3, \emph{k} = \emph{cs} (clear sky), \emph{k'} = \emph{ts} (clear turbid sky) and
 
@@ -225,7 +229,12 @@ The fractional electric lighting input power, \emph{f\(_{P}\)}, corresponding to
 For a continuously-dimmable control system, it is assumed that \emph{f\(_{P}\)} is constant and equal to \emph{f\(_{n}\)}for \emph{f\(_{L}\)\textless{}f\(_{n}\)} and that f\(_{P}\) increases linearly from \emph{f\(_{n}\)} to 1.0 as \emph{f\(_{L}\)} increases from \emph{f\(_{n}\)} to 1.0 (Figure~\ref{fig:control-action-for-a-continuous-dimming}). This gives
 
 \begin{equation}
-{f_P} = \left\{ \begin{array}{l}{f_{P,\min }} & {\rm{for }}{f_L} < {f_{L,\min }}\\\frac{{{f_L} + (1 - {f_L}){f_{P,\min }} - {f_{L,\min }}}}{{1 - {f_{L,\min }}}}\end{array} \right.{\rm{   for }}{f_{L,\min }} \le {f_L} \le 1
+  f_P = \left\{
+          \begin{array}{cl}
+            f_{P,min} & for: f_L < f_{L,min} \\
+            \frac{f_L + (1 - f_L)f_{P,min} - f_{L,min}}{1 - f_{L,min}} & for: f_{L,min} \le f_L \le 1
+          \end{array}
+        \right.
 \end{equation}
 
 \begin{figure}[hbtp] % fig 60
@@ -243,7 +252,13 @@ A ``continuous/off'' dimming system has the same behavior as a continuous dimmin
 For a stepped control system, \emph{f\(_{P}\)} takes on discrete values depending on the range of \emph{f\(_{L}\)}and the number of steps, \emph{N\(_{L}\)}\(_{ }\) (Figure~\ref{fig:stepped-lighting-control-with-three-steps.}). This gives
 
 \begin{equation}
-{f_P} = \left\{ \begin{array}{l}0, & {\rm{if }}{f_L} = 0\\\frac{{{\mathop{\rm int}} ({N_L}{f_L}) + 1}}{{{N_L}}}, & {\rm{for }}0 < {f_L} < 1\\1, & {\rm{if }}{f_L} = 1\end{array} \right.
+  f_P = \left\{
+          \begin{array}{cl}
+            0 & for: f_L = 0 \\
+            \frac{\mathop{\rm int} (N_L f_L) + 1}{N_L} & for: 0 < f_L < 1 \\
+            1 & for: f_L = 1
+          \end{array}
+         \right.
 \end{equation}
 
 If a lighting control probability,* p\(_{L}\)\emph{, is specified,} f\(_{P}\)* is set one level higher a fraction of the time equal to \emph{1-p\(_{L}\)}. Specifically, if* f\(_{P}\)* \textless{}1,* f\(_{P}\)\emph{à} f\(_{P}\)\emph{+ 1/}N\(_{L}\)* if a random number between 0 and 1 exceeds \emph{p\(_{L}\)}. This can be used to simulate the uncertainty associated with manual switching of lights.
