@@ -22,27 +22,27 @@ The volume of air flow into the receiving zone is specified by the user with a n
 
 where:
 
-c\(_{g}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Average specific heat of air within the two zones (J/kg.K)
+c\(_{P,Avg}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Average specific heat of air within the two zones (J/kg.K)
 
-\({\dot m_{{\rm{MixingFlowToReceivingZone}}}}\) ~~~~~~~~~ = Mass of moist air flowing into the receiving zone (kg\(_{r}\)/s)
+\({\dot m_{{\rm{MixingFlowToReceivingZone}}}}\) ~~~~~~~~~ = Mass of moist air flowing into the receiving zone (kg\(_{air}\)/s)
 
-Moisture\(_{e}\)~~~ = Moisture mass flow rate into the receiving zone (kg\(_{O}\)/s)
+Moisture\(_{MixingFlowToReceivingZone}\)~~~ = Moisture mass flow rate into the receiving zone (kg\(_{H2O}\)/s)
 
-P\(_{c}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Outside barometric pressure (Pa)
+P\(_{Barometric}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Outside barometric pressure (Pa)
 
-ρ\(_{ }\) = Average density of air within the two zones (kg/s)
+ρ\(_{Avg}\) = Average density of air within the two zones (kg/s)
 
 \({\dot Q_{{\rm{MixingFlowToReceivingZone}}}}\) ~~~~~~~~~ = Energy added to receiving zone air by mixing mass flow (W)
 
-T\(_{ }\) = Temperature in the Receiving Zone (\(^{o}\)C)
+T\(_{ReceivingZone                                                      }\) = Temperature in the Receiving Zone (\(^{o}\)C)
 
-T\(_{e}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Temperature in the Source Zone (\(^{o}\)C)
+T\(_{SourceZone}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Temperature in the Source Zone (\(^{o}\)C)
 
 \({\dot V_{Air}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Volume rate of air flow defined by the user (m\(^{3}\)/s)
 
-W\(_{e}\) ~~~~~~~~~~~~ = Humidity Ratio in the Receiving Zone (kg\(_{O}\)/kg\(_{r}\))
+W\(_{ReceivingZone}\) ~~~~~~~~~~~~ = Humidity Ratio in the Receiving Zone (kg\(_{H2O}\)/kg\(_{dry\\ air}\))
 
-W\(_{e}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Humidity Ratio in the Source Zone (kg\(_{O}\)/kg\(_{r}\))
+W\(_{SourceZone}\)~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Humidity Ratio in the Source Zone (kg\(_{H2O}\)/kg\(_{dry\\ air}\))
 
 For cross-mixing, the mass of moist air exchanged between the two zones is assumed to be equal.~ Again, the density and specific heat are based on the average conditions in the two zones. Note that the temperature and humidity ratio differences ensure that when the energy and~ moisture terms are used in the Moisture Predictor-Corrector, they correctly reflect a loss or gain in each zone.
 
@@ -58,17 +58,17 @@ For cross-mixing, the mass of moist air exchanged between the two zones is assum
 
 where:
 
-\({\dot m_{{\rm{MixingFlowToSourceZone}}}}\) ~~~~~~~~~~~ = Mass of moist air flowing into the source zone (kg\(_{r}\)/s)
+\({\dot m_{{\rm{MixingFlowToSourceZone}}}}\) ~~~~~~~~~~~ = Mass of moist air flowing into the source zone (kg\(_{air}\)/s)
 
-Moisture\(_{e}\)~~~~~~ = Moisture mass flow rate into the source zone (kg\(_{O}\)/s)
+Moisture\(_{MixingFlowToSourceZone}\)~~~~~~ = Moisture mass flow rate into the source zone (kg\(_{H2O}\)/s)
 
 \({\dot Q_{{\rm{MixingFlowToSourceZone}}}}\) ~~~~~~~~~~~~ = Sensible energy added to source zone air by mixing mass flow (W)
 
 \({\dot Q_{{\rm{MixingFlowToReceivingZone}}}}\) ~~~~~~~~~ = Sensible energy added to receiving zone air by mixing mass flow, W
 
-\(Moistur{e_{{\rm{MixingFlowToSourceZone}}}}\) = Latent load added to source zone air by mixing mass flow (kg\(_{O}\)/s)
+\(Moistur{e_{{\rm{MixingFlowToSourceZone}}}}\) = Latent load added to source zone air by mixing mass flow (kg\(_{H2O}\)/s)
 
-\(Moistur{e_{{\rm{MixingFlowToReceivingZone}}}}\) = Latent load added to receiving zone air by mixing mass flow (kg\(_{O}\)/s)
+\(Moistur{e_{{\rm{MixingFlowToReceivingZone}}}}\) = Latent load added to receiving zone air by mixing mass flow (kg\(_{H2O}\)/s)
 
 \subsection{Density Difference Controlled Air Exchange}\label{density-difference-controlled-air-exchange}
 
@@ -97,35 +97,35 @@ The sensible and latent energy loads are modeled according to the guidance speci
 
 where:
 
-A\(_{r}\)~~~~~~~~~~~ = ~ Area of door between Zones A and B (m\(^{2}\))
+A\(_{door}\)~~~~~~~~~~~ = ~ Area of door between Zones A and B (m\(^{2}\))
 
-F\(_{w}\) ~~~~~~~~~~ = ~Doorway flow factor, = 0.8 if ΔT \textgreater{} 11\(^{o}\)C; = 1.1 if ΔT \textless{} = 11\(^{o}\)C
+F\(_{Flow}\) ~~~~~~~~~~ = ~Doorway flow factor, = 0.8 if ΔT \textgreater{} 11\(^{o}\)C; = 1.1 if ΔT \textless{} = 11\(^{o}\)C
 
-F\(_{n}\) ~~~~~~ = Doorway protection factor, = 0 for no protection; = ~ 0.5 for an air curtain; and 0.9 for a strip curtain (dimensionless)
+F\(_{Protection}\) ~~~~~~ = Doorway protection factor, = 0 for no protection; = ~ 0.5 for an air curtain; and 0.9 for a strip curtain (dimensionless)
 
 g~~~~~~~~~~~~~~~ = ~ Gravitational constant (m/s\(^{2}\))
 
-h\(_{ }\) = ~ enthalpy of the air within Zone A (J/kg)
+h\(_{ZoneA}\) = ~ enthalpy of the air within Zone A (J/kg)
 
-h\(_{ }\) = ~ enthalpy of the air within Zone B (J/kg)
+h\(_{ZoneB}\) = ~ enthalpy of the air within Zone B (J/kg)
 
-H\(_{r}\)~~~~~~~~~~~ = ~ Height of door between source and receiving zones (m)
+H\(_{door}\)~~~~~~~~~~~ = ~ Height of door between source and receiving zones (m)
 
-Q\(_{w}\) ~~~~~~ = Sensible and latent refrigeration load (on Zone A) for fully established flow (W)
+Q\(_{FullFlow}\) ~~~~~~ = Sensible and latent refrigeration load (on Zone A) for fully established flow (W)
 
-Q\(_{g}\) ~~~~~~~~ = Sensible and latent mixing refrigeration load on Zone A for the time step (W)
+Q\(_{Mixing}\) ~~~~~~~~ = Sensible and latent mixing refrigeration load on Zone A for the time step (W)
 
-m\(_{B}\) ~ = Mass of dry air exchanged between zones A and B (kg\(_{r}\)/s)
+m\(_{DryAirZoneAB}\) ~ = Mass of dry air exchanged between zones A and B (kg\(_{air}\)/s)
 
-Schedule\(_{n}\) ~~~~~~ = Value scheduled by user, fraction of time door open during time step (dimensionless)
+Schedule\(_{DoorOpen}\) ~~~~~~ = Value scheduled by user, fraction of time door open during time step (dimensionless)
 
-W\(_{ }\) = ~ Humidity ratio of the air within Zone A (kg\(_{O}\)/kg\(_{r}\))
+W\(_{ZoneA}\) = ~ Humidity ratio of the air within Zone A (kg\(_{H2O}\)/kg\(_{air}\))
 
-W\(_{B}\) ~~~~~~~~ = ~ Humidity ratio of air within Zone B (kg\(_{O}\)/kg\(_{r}\))
+W\(_{ZoneB}\) ~~~~~~~~ = ~ Humidity ratio of air within Zone B (kg\(_{H2O}\)/kg\(_{air}\))
 
-Ρ\(_{ }\) = ~ Density of air within Zone A (kg/m\(^{3}\))
+Ρ\(_{ZoneA}\) = ~ Density of air within Zone A (kg/m\(^{3}\))
 
-ρ\(_{B}\) ~~~~~~~~~ = ~ Density of air within Zone B (kg/m\(^{3}\))
+ρ\(_{ZoneB}\) ~~~~~~~~~ = ~ Density of air within Zone B (kg/m\(^{3}\))
 
 \subsection{References}\label{references}
 
