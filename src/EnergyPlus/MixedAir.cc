@@ -275,8 +275,9 @@ namespace MixedAir {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool InitOAControllerOneTimeFlag( true );
-		bool InitOAControllerSetPointCheckFlag( true );
+		Array1D_bool InitOAControllerSetPointCheckFlag( true );
 		bool InitOAControllerSetUpAirLoopHVACVariables( true );
+		bool AllocateOAControllersFlag( true );
 		Array1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
 		Array1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
 		Array1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
@@ -383,8 +384,9 @@ namespace MixedAir {
 		GetOAMixerInputFlag = true;
 		GetOAControllerInputFlag = true;
 		InitOAControllerOneTimeFlag = true;
-		InitOAControllerSetPointCheckFlag = true;
+		InitOAControllerSetPointCheckFlag.deallocate();
 		InitOAControllerSetUpAirLoopHVACVariables = true;
+		AllocateOAControllersFlag = true;
 		ControllerLists.deallocate();
 		OAController.deallocate();
 		OAMixer.deallocate();
@@ -909,7 +911,7 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OAControllerNum;
 
-		if ( GetOAControllerInputFlag ) { // Gets input for object  first time Sim routine is called
+		if ( ( GetOAControllerInputFlag ) && ( AirLoopNum > 0 ) ) { // Gets input for object  first time Sim routine is called from an airloop
 			GetOAControllerInputs();
 			GetOAControllerInputFlag = false;
 		}
@@ -1425,22 +1427,18 @@ namespace MixedAir {
 		cAlphaFields.allocate( MaxAlphas );
 		cNumericFields.allocate( MaxNums );
 
-		NumOAControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
-		NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
-		NumOAControllers += NumERVControllers;
 
-		//     Mangesh code to fix CR 8225 - 09/14/2010
-		//NumControllerList = GetNumObjectsFound("AirLoopHVAC:ControllerList")
-		//NumOASys = GetNumObjectsFound("AirLoopHVAC:OutdoorAirSystem")
+		// Count OAcontrollers and ERVcontrollers and allocate arrays
+		AllocateOAControllers();
 
-		if ( NumOAControllers > 0 ) {
 
-			OAController.allocate( NumOAControllers );
-			OAControllerInfo.allocate( NumOAControllers );
+		// If there are ERV controllers, they have been filled before now NumOAControllers includes the count of NumERVControllers
+		if ( NumOAControllers > NumERVControllers ) {
 			CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
-			for ( OutAirNum = 1; OutAirNum <= NumOAControllers - NumERVControllers; ++OutAirNum ) {
-				GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			int currentOAControllerNum = 0;
+			for ( OutAirNum = NumERVControllers+1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
+				++currentOAControllerNum;
+				GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
 				VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -2208,6 +2206,26 @@ namespace MixedAir {
 	}
 
 	void
+	AllocateOAControllers()
+	{
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
+
+		using namespace InputProcessor;
+
+		if ( AllocateOAControllersFlag ) {
+			NumOAControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
+			NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
+			NumOAControllers += NumERVControllers;
+			OAController.allocate( NumOAControllers );
+			OAControllerInfo.allocate( NumOAControllers );
+			AllocateOAControllersFlag = false;
+		}
+
+	}
+
+	void
 	GetOAMixerInputs()
 	{
 
@@ -2814,8 +2832,9 @@ namespace MixedAir {
 		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
 		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
 		//////////////////////////////////
-		static Array1D_bool MyEnvrnFlag; // One-time initialization flag
-		static Array1D_bool MySizeFlag; // One-time initialization flag
+		static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
+		static Array1D_bool OAControllerMyEnvrnFlag; // One-time initialization flag
+		static Array1D_bool OAControllerMySizeFlag; // One-time initialization flag
 		static Array1D_bool MechVentCheckFlag; // One-time initialization flag
 		bool FoundZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
 		bool FoundAreaZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
@@ -2826,7 +2845,6 @@ namespace MixedAir {
 		Real64 RhoAirStdInit; // Standard air density
 		Real64 TotalPeopleOAFlow; // Total outside air required for PEOPLE objects served by this OA controller
 		int MixedAirNode; // Controller:OutdoorAir mixed air node
-		int OAControllerIndex; // Index to Controller:OutdoorAir
 		int ZoneNum; // DO loop index (zone number)
 		int ZoneIndex; // Index to zone in mechanical ventilation zone list
 		int AirLoopZoneInfoZoneNum; // Index to AirLoopZoneInfo structure
@@ -2838,7 +2856,6 @@ namespace MixedAir {
 		int thisNumForMixer; // Temporary array counter
 		int thisMixerIndex; // Temporary array counter
 		int OASysNum; // Temporary array counter
-		int thisOAController; // Temporary array counter
 		int found; // Temporary index to equipment
 		int OANode; // OA node index
 		int VentMechObjectNum; // Temporary variable
@@ -2860,104 +2877,100 @@ namespace MixedAir {
 		ErrorsFound = false;
 		OANode = 0;
 
-		if ( InitOAControllerOneTimeFlag ) {
-
-			MyEnvrnFlag.dimension( NumOAControllers, true );
-			MySizeFlag.dimension( NumOAControllers, true );
+		if (InitOAControllerOneTimeFlag) {
+			OAControllerMyOneTimeFlag.dimension(NumOAControllers, true);
+			OAControllerMyEnvrnFlag.dimension( NumOAControllers, true );
+			OAControllerMySizeFlag.dimension( NumOAControllers, true );
 			MechVentCheckFlag.dimension( NumOAControllers, true );
-
-			// Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
-			// This input setup needs to happen for all controllers, not just the one first passed into this init routine
-			for ( thisOAController = 1; thisOAController <= NumOAControllers; ++thisOAController ) {
-
-				{ auto const SELECT_CASE_var( OAController( thisOAController ).ControllerType_Num );
-
-				if ( SELECT_CASE_var == ControllerOutsideAir ) {
-					thisOASys = 0;
-					for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
-						// find which OAsys has this controller
-						found = FindItemInList( OAController( thisOAController ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
-						if ( found != 0 ) {
-							thisOASys = OASysNum;
-							break; // we found it
-						}
-					}
-					if ( thisOASys == 0 ) {
-						ShowSevereError( "InitOAController: Did not find OAController=\"" + OAController( thisOAController ).Name + "\"." );
-						ShowContinueError( "in list of valid OA Controllers." );
-						ErrorsFound = true;
-						continue;
-					}
-					thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
-					if ( thisNumForMixer != 0 ) {
-						equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
-						thisMixerIndex = FindItemInList( equipName, OAMixer );
-						if ( thisMixerIndex != 0 ) {
-							OAController( thisOAController ).InletNode = OAMixer( thisMixerIndex ).InletNode;
-						} else {
-							ShowSevereError( "InitOAController: Did not find OAMixer=\"" + equipName + "\"." );
-							ShowContinueError( "in list of valid OA Mixers." );
-							ErrorsFound = true;
-						}
-					} else {
-						ShowSevereError( "InitOAController: Did not find OutdoorAir:Mixer Component=\"OutdoorAir:Mixer\"." );
-						ShowContinueError( "in list of valid OA Components." );
-						ErrorsFound = true;
-					}
-
-					if ( OAController( thisOAController ).InletNode == 0 ) { //throw an error
-						ShowSevereError( "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + OAController( thisOAController ).Name );
-						ErrorsFound = true;
-					}
-
-				} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
-					// set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
-					// with the assumption that equipment is bypassed....
-
-					OAController( thisOAController ).InletNode = OAController( thisOAController ).OANode;
-
-				} else {
-					ShowSevereError( "InitOAController: Failed to find ControllerType: " + OAController( thisOAController ).ControllerType );
-					ErrorsFound = true;
-
-				}}
-
-			}
+			InitOAControllerSetPointCheckFlag.dimension ( NumOAControllers, true );
 			InitOAControllerOneTimeFlag = false;
+		}
+		if ( OAControllerMyOneTimeFlag( OAControllerNum ) ) {
+			// Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
+			{ auto const SELECT_CASE_var( OAController( OAControllerNum ).ControllerType_Num );
+
+			if ( SELECT_CASE_var == ControllerOutsideAir ) {
+				thisOASys = 0;
+				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
+					// find which OAsys has this controller
+					found = FindItemInList( OAController( OAControllerNum ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
+					if ( found != 0 ) {
+						thisOASys = OASysNum;
+						break; // we found it
+					}
+				}
+				if ( thisOASys == 0 ) {
+					ShowSevereError( "InitOAController: Did not find OAController=\"" + OAController( OAControllerNum ).Name + "\"." );
+					ShowContinueError( "in list of valid OA Controllers." );
+					ErrorsFound = true;
+				}
+				thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
+				if ( thisNumForMixer != 0 ) {
+					equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
+					thisMixerIndex = FindItemInList( equipName, OAMixer );
+					if ( thisMixerIndex != 0 ) {
+						OAController( OAControllerNum ).InletNode = OAMixer( thisMixerIndex ).InletNode;
+					} else {
+						ShowSevereError( "InitOAController: Did not find OAMixer=\"" + equipName + "\"." );
+						ShowContinueError( "in list of valid OA Mixers." );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( "InitOAController: Did not find OutdoorAir:Mixer Component=\"OutdoorAir:Mixer\"." );
+					ShowContinueError( "in list of valid OA Components." );
+					ErrorsFound = true;
+				}
+
+				if ( OAController( OAControllerNum ).InletNode == 0 ) { //throw an error
+					ShowSevereError( "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + OAController( OAControllerNum ).Name );
+					ErrorsFound = true;
+				}
+
+			} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
+				// set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
+				// with the assumption that equipment is bypassed....
+
+				OAController( OAControllerNum ).InletNode = OAController( OAControllerNum ).OANode;
+
+			} else {
+				ShowSevereError( "InitOAController: Failed to find ControllerType: " + OAController( OAControllerNum ).ControllerType );
+				ErrorsFound = true;
+
+			}}
+
+			OAControllerMyOneTimeFlag( OAControllerNum ) = false;
 
 		}
 
-		if ( ! SysSizingCalc && InitOAControllerSetPointCheckFlag && DoSetPointTest && ! FirstHVACIteration ) {
-			for ( OAControllerIndex = 1; OAControllerIndex <= NumOAControllers; ++OAControllerIndex ) {
-				MixedAirNode = OAController( OAControllerIndex ).MixNode;
-				if ( MixedAirNode > 0 ) {
-					//      IF (OAController(OAControllerIndex)%Econo == 1 .AND. .NOT. AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
-					if ( OAController( OAControllerIndex ).Econo > NoEconomizer && AirLoopControlInfo( AirLoopNum ).AnyContFan ) {
-						if ( Node( MixedAirNode ).TempSetPoint == SensedNodeFlagValue ) {
-							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerIndex ).Name );
+		if ( ! SysSizingCalc && InitOAControllerSetPointCheckFlag( OAControllerNum ) && DoSetPointTest && ! FirstHVACIteration ) {
+			MixedAirNode = OAController( OAControllerNum ).MixNode;
+			if ( MixedAirNode > 0 ) {
+				//      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
+				if ( OAController( OAControllerNum ).Econo > NoEconomizer && AirLoopControlInfo( AirLoopNum ).AnyContFan ) {
+					if ( Node( MixedAirNode ).TempSetPoint == SensedNodeFlagValue ) {
+						if ( ! AnyEnergyManagementSystemInModel ) {
+							ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerNum ).Name );
+							ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
+							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
+							SetPointErrorFlag = true;
+						} else {
+							// add call to check node in EMS
+							CheckIfNodeSetPointManagedByEMS( MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag );
+							if ( SetPointErrorFlag ) {
+								ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerNum ).Name );
 								ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
 								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
-								SetPointErrorFlag = true;
-							} else {
-								// add call to check node in EMS
-								CheckIfNodeSetPointManagedByEMS( MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag );
-								if ( SetPointErrorFlag ) {
-									ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerIndex ).Name );
-									ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
-									ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
-									ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
-								}
+								ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 							}
 						}
 					}
 				}
 			}
 
-			InitOAControllerSetPointCheckFlag = false;
+			InitOAControllerSetPointCheckFlag( OAControllerNum ) = false;
 		}
 
-		if ( ! SysSizingCalc && MySizeFlag( OAControllerNum ) ) {
+		if ( ! SysSizingCalc && OAControllerMySizeFlag( OAControllerNum ) ) {
 			SizeOAController( OAControllerNum );
 			if ( AirLoopNum > 0 ) {
 				AirLoopControlInfo( AirLoopNum ).OACtrlNum = OAControllerNum;
@@ -2982,15 +2995,15 @@ namespace MixedAir {
 				ShowContinueError( "  To set the minimum outside air flow rate use the \"Design (minimum) outdoor air flow rate\" field in the Sizing:System object" );
 				ErrorsFound = true;
 			}
-			MySizeFlag( OAControllerNum ) = false;
+			OAControllerMySizeFlag( OAControllerNum ) = false;
 		}
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( OAControllerNum ) ) {
+		if ( BeginEnvrnFlag && OAControllerMyEnvrnFlag( OAControllerNum ) ) {
 			OANode = OAController( OAControllerNum ).OANode;
 			RhoAirStdInit = StdRhoAir;
 			OAController( OAControllerNum ).MinOAMassFlowRate = OAController( OAControllerNum ).MinOA * RhoAirStdInit;
 			OAController( OAControllerNum ).MaxOAMassFlowRate = OAController( OAControllerNum ).MaxOA * RhoAirStdInit;
-			MyEnvrnFlag( OAControllerNum ) = false;
+			OAControllerMyEnvrnFlag( OAControllerNum ) = false;
 			Node( OANode ).MassFlowRateMax = OAController( OAControllerNum ).MaxOAMassFlowRate;
 
 			//predefined reporting
@@ -3038,7 +3051,7 @@ namespace MixedAir {
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( OAControllerNum ) = true;
+			OAControllerMyEnvrnFlag( OAControllerNum ) = true;
 		}
 
 		VentMechObjectNum = OAController( OAControllerNum ).VentMechObjectNum;
@@ -3194,7 +3207,7 @@ namespace MixedAir {
 		// two IF statements are checked each time through Init (e.g., if StandAloneERV controllers are used
 		// without AirloopHVAC objects).
 		if ( InitOAControllerSetUpAirLoopHVACVariables ) {
-			if ( NumPrimaryAirSys > 0 ) {
+			if ( AirLoopNum > 0 ) {
 				// Added code to report (TH, 10/20/2008):
 				//   air economizer status (1 = on, 0 = off or does not exist), and
 				//   actual and minimum outside air fraction (0 to 1)
@@ -5213,10 +5226,9 @@ namespace MixedAir {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( GetOAControllerInputFlag ) {
-			// Make sure OAControllers are "gotten"
-			GetOAControllerInputs();
-			GetOAControllerInputFlag = false;
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
 		}
 
 		NumberOfOAControllers = NumOAControllers;
@@ -6146,10 +6158,9 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( GetOAControllerInputFlag ) {
-			// Make sure OAControllers are "gotten"
-			GetOAControllerInputs();
-			GetOAControllerInputFlag = false;
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
 		}
 
 		if ( OACtrlNum <= 0 || OACtrlNum > NumOAControllers ) {
@@ -6304,6 +6315,7 @@ namespace MixedAir {
 		// PURPOSE OF THIS SUBROUTINE:
 		// When OA Controller data is gotten from other routines, must check to make sure
 		// new name doesn't duplicate.  (Essentially a pass through to call Verify Name)
+		// Currently, this is only called from HVACStandAlongERV::GetStandaloneERV()
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -6329,10 +6341,9 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( GetOAControllerInputFlag ) {
-			// Make sure OAControllers are "gotten"
-			GetOAControllerInputs();
-			GetOAControllerInputFlag = false;
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
 		}
 
 		VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
