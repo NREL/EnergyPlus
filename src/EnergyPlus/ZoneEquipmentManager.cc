@@ -1035,6 +1035,9 @@ namespace ZoneEquipmentManager {
 			ShowFatalError( "SetUpZoneSizingArrays: Errors found in Sizing:Zone input" );
 		}
 
+		// Put Auto Sizing of Sizing:Zone inputs here!
+		AutoCalcDOASControlStrategy();
+
 		ZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		FinalZoneSizing.allocate( NumOfZones );
 		CalcZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
@@ -5453,6 +5456,93 @@ namespace ZoneEquipmentManager {
 			}
 		}
 		MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
+	}
+
+	void
+		AutoCalcDOASControlStrategy()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS Function:
+		// This subroutine does the autosizing calculations for the Sizing:Zone
+		// DOAS input.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// See IO Ref for suggested values
+		
+		// Using/Aliasing
+
+		// FUNCTION ARGUMENT DEFINITIONS:
+		// na
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ZoneSizIndex;
+		bool ErrorsFound;
+
+		ErrorsFound = false;
+		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
+			if ( ZoneSizingInput( ZoneSizIndex ).AccountForDOAS ) {
+				if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOANeutralSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 21.1;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 23.9;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint
+							- 2.8;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint
+							+ 2.8;
+					}
+				} else if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOANeutralDehumSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 14.4;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 22.2;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 14.4;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 22.2;
+					}
+				} else if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOACoolSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 12.2;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 14.4;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint
+							- 2.2;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint
+							+ 2.2;
+					}
+				}
+				if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint ) {
+					ShowSevereError( "For Sizing:Zone = " + ZoneSizingInput( ZoneSizIndex ).ZoneName );
+					ShowContinueError( "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint" );
+					ErrorsFound = true;
+				}
+			}
+		}
+		if ( ErrorsFound ) {
+			ShowFatalError( "Errors found in DOAS sizing input. Program terminates." );
+		}
 	}
 
 } // ZoneEquipmentManager

@@ -213,6 +213,9 @@ namespace ZoneEquipmentManager {
 		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
 	);
 
+	void
+	AutoCalcDOASControlStrategy();
+
 } // ZoneEquipmentManager
 
 } // EnergyPlus
