@@ -95,9 +95,11 @@ The following equations show how to convert from this set of values to the trans
 Given \emph{n} and \emph{T}, find \emph{R}:
 
 \begin{equation}
-\begin{array}{l}
-r = {\left( {\frac{{n - 1}}{{n + 1}}} \right)^2}\\\tau  = \frac{{{{\left[ {{{(1 - r)}^4} + 4{r^2}{T^2}} \right]}^{1/2}} - {{(1 - r)}^2}}}{{2{r^2}T}}\\R = r + \frac{{{{(1 - r)}^2}r{\tau ^2}}}{{1 - {r^2}{\tau ^2}}}
-\end{array}
+  \begin{array}{l}
+    r = \left( \frac{n - 1}{n + 1} \right)^2 \\
+    \tau  = \frac{\left[ (1 - r)^4 + 4 r^2 T^2 \right]^{1/2} - (1 - r)^2}{2 r^2 T} \\
+    R = r + \frac{(1 - r)^2 r \tau ^2}{1 - r^2 \tau ^2}
+  \end{array}
 \end{equation}
 
 \textbf{Example:}
@@ -107,9 +109,11 @@ r = {\left( {\frac{{n - 1}}{{n + 1}}} \right)^2}\\\tau  = \frac{{{{\left[ {{{(1 
 \emph{n} = 1.526
 
 \begin{equation}
-\begin{array}{l}
-r = {\left( {\frac{{1.526 - 1}}{{1.526 + 1}}} \right)^2}\\\tau  = 0.93974\\R = 0.07846
-\end{array}
+  \begin{array}{l}
+    r = \left( \frac{1.526 - 1}{1.526 + 1} \right)^2 \\
+    \tau = 0.93974 \\
+    R = 0.07846
+  \end{array}
 \end{equation}
 
 \subsection{Simple Window Model}\label{simple-window-model}
@@ -182,11 +186,12 @@ Because the window model in EnergyPlus is for flat geometries, the models are no
 The thickness of the equivalent layer in units of meters is calculated using,
 
 \begin{equation}
-Thickness = 0.002\;;\quad for\;{\frac{1}{R_{l,w}}} > 7.0
-\end{equation}
-
-\begin{equation}
-Thickness = 0.05914 - \left( {\frac{{0.00714}}{{{R_{l,w}}}}} \right);\;{\frac{1}{R_{l,w}}} \leq 7.0
+  Thickness = \left\{
+                \begin{array}{cl}
+                  0.002                             & for \frac{1}{R_{l,w}} > 7.0 \\
+                  0.05914 - \frac{0.00714}{R_{l,w}} & for \frac{1}{R_{l,w}} \leq 7.0
+                \end{array}
+              \right.
 \end{equation}
 
 \subsubsection{Step 3.~ Determine Layer Thermal Conductivity}\label{step-3.-determine-layer-thermal-conductivity}
@@ -832,14 +837,14 @@ The direct-to-diffuse and transmittance and reflectance of the blind are calcula
 Based on these definitions we have the following equations that relate \emph{J}, \emph{G} and \emph{Q} for the different segments:
 
 \begin{equation}
-\begin{array}{rl}
-   J_1 & = Q_1 \\
-   J_2 & = Q_2 \\
-   J_3 & = Q_3 + \rho_{dif,dif}^b G_3 + \tau_{dif,dif} G_4 \\
-   J_4 & = Q_4 + \tau_{dif,dif} G_3 + \rho_{dif,dif}^f G_4 \\
-   J_5 & = Q_5 + \rho_{dif,dif}^b G_5 + \tau_{dif,dif} G_6 \\
-   J_6 & = Q_6 + \tau_{dif,dif} G_5 + \rho_{dif,dif}^f G_6
-\end{array}
+  \begin{array}{rl}
+    J_1 & = Q_1 \\
+    J_2 & = Q_2 \\
+    J_3 & = Q_3 + \rho_{dif,dif}^b G_3 + \tau_{dif,dif} G_4 \\
+    J_4 & = Q_4 + \tau_{dif,dif} G_3 + \rho_{dif,dif}^f G_4 \\
+    J_5 & = Q_5 + \rho_{dif,dif}^b G_5 + \tau_{dif,dif} G_6 \\
+    J_6 & = Q_6 + \tau_{dif,dif} G_5 + \rho_{dif,dif}^f G_6
+  \end{array}
 \end{equation}
 
 In addition we have the following equation relating \emph{G} and* J*:
@@ -877,7 +882,7 @@ Q' = XJ'
 where \emph{X} is a 4x4 matrix and
 
 \begin{equation}
-J' = \left[ \begin{array}
+J' = \left[ \begin{array}{c}
    J_3 \\
    J_4 \\
    J_5 \\
@@ -885,7 +890,7 @@ J' = \left[ \begin{array}
 \end{equation}
 
 \begin{equation}
-Q' = \left[ \begin{array}
+Q' = \left[ \begin{array}{c}
     Q_3 \\
     Q_4 \\
     Q_5 \\
@@ -971,7 +976,7 @@ The sources for the direct-to-diffuse transmittance calculation are:
     \end{array}
   \right\}
   \;
-  \varphi_b \gt \varphi_s + \frac{\pi }{2}
+  \varphi_b > \varphi_s + \frac{\pi }{2}
   \;
   \rm{ (beam hits back of slats)}
 \end{equation}
@@ -979,18 +984,19 @@ The sources for the direct-to-diffuse transmittance calculation are:
 For unit incident direct flux, the front direct-to-diffuse transmittance and reflectance of the blind are:
 
 \begin{equation}
-\begin{array}{l}
-\tau_{bl,f}^{dir,dif} = {G_2}\\\rho_{bl,f}^{dir,dif} = {G_1}
-\end{array}
+  \begin{array}{l}
+    \tau_{bl,f}^{dir,dif} = {G_2} \\
+    \rho_{bl,f}^{dir,dif} = {G_1}
+  \end{array}
 \end{equation}
 
 where
 
 \begin{equation}
-\begin{array}{l}
+  \begin{array}{l}
     G_2 = \sum_{j = 3}^6 J_j F_{j2} \\
     G_1 = \sum_{j = 3}^6 J_j F_{j1} 
-\end{array}
+  \end{array}
 \end{equation}
 
 and \({J_3}\) to \({J_6}\) are given by Eq. .~
@@ -1015,7 +1021,9 @@ All blind properties are calculated for slat angles ranging from --90\(^{O}\) to
 
 To calculate the diffuse-to-diffuse properties, assuming uniformly distributed incident diffuse radiation, each slat bounding the cell is divided into two segments of equal length (Figure~\ref{fig:slat-cell-showing-arrangement-of-segments}), i.e., \({s_3} = {s_4}\) and \({s_5} = {s_6}\) .~ For front-side properties we have a unit source, \({Q_1} = 1\) .~ All the other \({Q_i}\) are zero. Using this source value, we apply the methodology described above to obtain \emph{G\(_{2}\)}and \emph{G\(_{1}\)}. We then have
 
+\begin{equation}
 \begin{array}{l}\tau_{bl,f}^{dif,dif} = {G_2}\\\rho_{bl,f}^{dif,dif} = {G_1}\\\alpha_{bl,f}^{dif} = 1 - \tau_{bl,f}^{dif,dif} - \rho_{bl,f}^{dif,dif}\end{array}
+\end{equation}
 
 The back-side properties are calculated in a similar way by setting \emph{Q\(_{2}\)} = 1 with the other \({Q_i}\) equal to zero.
 
@@ -1035,7 +1043,7 @@ For horizontal slats on a vertical window (the most common configuration) the bl
 
 \(\tau_{bl,f}^{sky - dif,dif} = {\rm{ }}\) front transmittance for sky diffuse solar
 
-\$\{\rm{ }\}\rho\_\{bl,f\}\^{}\{gnd - dif,dif\} = \$ front reflectance for ground diffuse solar
+$\rho_{bl,f}^{gnd - dif,dif} = $ front reflectance for ground diffuse solar
 
 \(\rho_{bl,f}^{sky - dif,dif} = {\rm{ }}\) front reflectance for sky diffuse solar
 
@@ -1093,7 +1101,9 @@ The edge correction factor for diffuse incident radiation is calculated by avera
 
 As an example of how the edge correction factor is applied, the following two equations show how blind front diffuse transmittance and reflectance calculated assuming zero slat thickness are modified by the edge correction factor. It is assumed that the edge transmittance is zero and that the edge reflectance is the same as the slat front reflectance, \emph{ρ\(_{f}\)}.
 
+\begin{equation}
 \begin{array}{l}\tau_{bl,f}^{dif,dif} \to \tau_{bl,f}^{dif,dif}\left( {1 - {f_{edge}}} \right)\\\rho_{bl,f}^{dif} \to \rho_{bl,f}^{dif}\left( {1 - {f_{edge}}} \right) + {f_{edge}}{\rho_f}\end{array}
+\end{equation}
 
 \begin{figure}[hbtp] % fig 84
 \centering
@@ -1369,7 +1379,9 @@ T_{f,sys}^{gnd - dif,dif}\left[ {\frac{{|\cos \gamma |}}{2}{I_{sky,inc}} + \left
 
 \emph{Diffuse solar absorbed by glass layers:}
 
+\begin{equation}
 \begin{array}{l}A_{gl,j,f}^{sky - dif,sys}\left[ {\left( {1 - \frac{{|\cos \gamma |}}{2}} \right){I_{sky,inc}} + \frac{{|\cos \gamma |}}{2}{I_{gnd,inc}}} \right] + \\A_{gl,j,f}^{gnd - dif,sys}\left[ {\frac{{|\cos \gamma |}}{2}{I_{sky,inc}} + \left( {1 - \frac{{|\cos \gamma |}}{2}} \right){I_{gnd,inc}}} \right],{\rm{    }}j = 1,N\end{array}
+\end{equation}
 
 \subsubsection{Screens}\label{screens}
 
@@ -1453,7 +1465,7 @@ Given the diffuse reflectance ρ\(_{c}\) and the screen aspect ratio γ, the mod
 \end{equation}
 
 \begin{equation}
-\varepsilon  = \arccos \left( {{\raise0.7ex\hbox{{\left[ {\cos \alpha '\cos \varphi '} \right]}} \!\mathord{\left/ {\vphantom {{\left[ {\cos \alpha '\cos \varphi '} \right]} {\cos \mu }}}\right.}\!\lower0.7ex\hbox{{\cos \mu }}}} \right)
+  \varepsilon  = \arccos \PB{\frac{\cos \alpha '\cos \varphi '}{\cos \mu}}
 \end{equation}
 
 \begin{equation}
@@ -1494,9 +1506,13 @@ This first component of screen direct beam transmittance was developed using geo
 
 The second component of the window screen transmittance model is an empirical algorithm that accounts for the inward reflection of incident beam radiation off the screen material surface. The calculation procedure for the screen's transmittance via beam reflection, \emph{T\(_{t}\)} (α', φ') is as follows:
 
+\begin{equation}
 \begin{array}{l}{T_{scattmax}} = 0.0229\,\gamma  + 0.2971\,{\rho_{sc}} - 0.03624\,{\gamma ^2}\, + \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,0.04763\,{\rho_{sc}}^2 - 0.44416\,\gamma \,{\rho_{sc}}\end{array}
+\end{equation}
 
+\begin{equation}
 \begin{array}{l}T_{scattmax}^{vis} = 0.0229\,\gamma  + 0.2971\,\rho_{sc}^{vis} - 0.03624\,{\gamma ^2}\, + \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,0.04763{\left( {\rho_{sc}^{vis}} \right)^2} - 0.44416\,\gamma \,\rho_{sc}^{vis}\end{array}
+\end{equation}
 
 \begin{equation}
 {\delta_{max}} = 89.7 - {{10\gamma } \mathord{\left/ {\vphantom {{10\gamma } {0.16}}} \right. } {0.16}}
@@ -1507,11 +1523,11 @@ The second component of the window screen transmittance model is an empirical al
 \end{equation}
 
 \begin{equation}
-Pea{k_{ratio}} = {\raise0.7ex\hbox{{1.0}} \!\mathord{\left/ {\vphantom {{1.0} {\left( {0.2{\rho_{sc}}\left( {1 - \gamma } \right)} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {0.2{\rho_{sc}}\left( {1 - \gamma } \right)} \right)}}}
+  Peak_{ratio} = \frac{1}{0.2{\rho_{sc}}\left( {1 - \gamma } \right)}
 \end{equation}
 
 \begin{equation}
-Peak_{ratio}^{vis} = {\raise0.7ex\hbox{{1.0}} \!\mathord{\left/ {\vphantom {{1.0} {\left( {0.2\rho_{sc}^{vis}\left( {1 - \gamma } \right)} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {0.2\rho_{sc}^{vis}\left( {1 - \gamma } \right)} \right)}}}
+  Peak_{ratio}^{vis} = \frac{1}{0.2\rho_{sc}^{vis}\left( {1 - \gamma } \right)}
 \end{equation}
 
 \begin{equation}
@@ -1522,12 +1538,16 @@ Peak_{ratio}^{vis} = {\raise0.7ex\hbox{{1.0}} \!\mathord{\left/ {\vphantom {{1.0
 T_{scatt}^{vis}\left( {\alpha ',\varphi '} \right) = 0.2\rho_{sc}^{vis}T_{scattmax}^{vis}\left( {1 - \gamma } \right)\left( {1 + \left( {Peak_{ratio}^{vis} - 1} \right){e^{\frac{{ - {{\left| {\delta  - {\delta_{max}}} \right|}^{2.0}}}}{{600}}}}} \right)
 \end{equation}
 
-\begin{array}{rl}
-IF \left( \delta \gt \delta_{max} \right) \; T_{scatt} \left( \alpha ',\varphi ' \right) =& 0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) \\
-&- 0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
-IF \left( \delta \gt \delta_{max} \right) \; T_{scatt}^{vis} \left( \alpha ',\varphi ' \right) =& 0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio}^{vis} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) \\
-&- 0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
-\end{array}
+If $\delta > \delta_{max}$, then:
+
+\begin{equation}
+  \begin{array}{rl}
+    T_{scatt} \left( \alpha ',\varphi ' \right) &= 0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) \\
+                                                &- 0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
+    T_{scatt}^{vis} \left( \alpha ',\varphi ' \right) &= 0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio}^{vis} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) \\
+                                                      &- 0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right)
+  \end{array}
+\end{equation}
 
 where
 
@@ -1707,17 +1727,17 @@ For the example of beam transmittance, the incident solar beam strikes the scree
 \caption{Screen/Glass System Transmittance Equation Schematic. \protect \label{fig:screenglass-system-transmittance-equation}}
 \end{figure}
 
-The screen/glass system transmittance equation shown in the figure above is repeated here in an alternate format to emphasize the recurring nature of the infinite series. This equation represents the final solar beam transmittance equation for the screen/glass combination. The recurring terms are shown as a summation of a quantity raised to the n power, with n ranging from 0 to infinity. Since the quantity \(R_{gl}^{dif}R_{sc}^{dif,dif}\) ~is less than 1, the summation \(\sum\limits_{n = 0}^\infty {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}}\) converges and can be expressed as 
+The screen/glass system transmittance equation shown in the figure above is repeated here in an alternate format to emphasize the recurring nature of the infinite series. This equation represents the final solar beam transmittance equation for the screen/glass combination. The recurring terms are shown as a summation of a quantity raised to the n power, with n ranging from 0 to infinity. Since the quantity \(R_{gl}^{dif}R_{sc}^{dif,dif}\) ~is less than 1, the summation \(\sum\limits_{n = 0}^\infty {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}}\) converges and can be expressed as $\PB{1-R_{gl,f}^{dif}R_{sc}^{dif,dif}}^{-1}$.  Since the reflected (scattered) transmittance of incident solar beam (\(T_{sc}^{dir,dif}\)) and the diffusely reflecting beam \(T_{sc}^{dir,dir}R_{gl,f}^{dir}R_{sc}^{dir,dif}\) ~are both assumed to be hemispherically diffuse radiation, the reflected (scattered) transmittance of incident solar beam is added to the infinite series as shown below.
 
 \begin{equation}
-\({\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 {\left( {1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}} \right)}}}\right.}\!\lower0.7ex\hbox{{\left( {1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}} \right)}}}\) 
+\begin{array}{rl}
+  T_{sys}^{dir,all}(\alpha ',\varphi ',\phi ) &= T_{sc}^{dir,dir}(\alpha ',\varphi ')T_{gl}^{dir}\left( \phi  \right) \\
+                                              &+ (T_{sc}^{dir,dir}(\alpha ',\varphi ')R_{gl,f}^{dir}R_{sc}^{dir,dif}(\alpha ',\varphi ') \\
+                                              &+ T_{sc}^{dir,dif}(\alpha ',\varphi '))T_{gl}^{dif}\sum\limits_{n = 0}^\infty  {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}} 
+\end{array}
 \end{equation}
 
-Since the reflected (scattered) transmittance of incident solar beam (\(T_{sc}^{dir,dif}\)) and the diffusely reflecting beam \(T_{sc}^{dir,dir}R_{gl,f}^{dir}R_{sc}^{dir,dif}\) ~are both assumed to be hemispherically diffuse radiation, the reflected (scattered) transmittance of incident solar beam is added to the infinite series as shown below.
-
-\begin{array}{l}
-T_{sys}^{dir,all}(\alpha ',\varphi ',\phi ) = T_{sc}^{dir,dir}(\alpha ',\varphi ')T_{gl}^{dir}\left( \phi  \right) + (T_{sc}^{dir,dir}(\alpha ',\varphi ')R_{gl,f}^{dir}R_{sc}^{dir,dif}(\alpha ',\varphi ') &+ T_{sc}^{dir,dif}(\alpha ',\varphi '))T_{gl}^{dif}\sum\limits_{n = 0}^\infty  {{{(R_{gl,f}^{dif}R_{sc}^{dif,dif})}^n}} \\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; - or - 
-\end{array}
+or:
 
 \begin{equation}
 T_{sys}^{dir,all}(\alpha ',\varphi ',\phi ) = T_{sc}^{dir,dir}(\alpha ',\varphi ')T_{gl}^{dir}\left( \phi  \right) + \frac{{(T_{sc}^{dir,dir}(\alpha ',\varphi ')R_{gl,f}^{dir}R_{sc}^{dir,dif}(\alpha ',\varphi ') + T_{sc}^{dir,dif}(\alpha ',\varphi '))T_{gl}^{dif}}}{{1 - R_{gl,f}^{dif}R_{sc}^{dif,dif}}}
@@ -2024,13 +2044,15 @@ The LBNL method, which focuses on glazing systems consisting of plane-parallel l
 
 Equations (without the delta distribution in \textbf{\emph{x}}) and are then considered to define the components of a diagonal matrix,
 
+\begin{equation}
 \begin{array}{*{20}{c}}{{\bf{\Lambda }^{{\rm{(s)}}}} = \left( {{\Lambda ^{{\rm{(s)}}}}_{ij}} \right)}&{{\rm{where}}}&{\Lambda_{ij}^{{\rm{(s)}}} = \left( {{{\bf{p}}_j}\cdot {{\bf{n}}^{{\rm{(s)}}}}} \right)\Delta {\Omega_j}{\delta_{ij}}}\end{array}
+\end{equation}
 
 Considering the radiance in the various basis directions to be the components of a vector,
 
 \begin{equation}
 \bf{S} = \left( 
-    \begin{array}
+    \begin{array}{c}
       S_1 \\ ... \\ S_j \\ ...
     \end{array}
   \right)
@@ -2040,7 +2062,9 @@ Considering the radiance in the various basis directions to be the components of
 
 equation becomes
 
+\begin{equation}
 \begin{array}{*{20}{c}}{{S^{{\rm{(T)}}}}_j = \sum\limits_i {{T_{ji}}} \sum\limits_k {{\Lambda_{ik}}} {S_k}}&{{\rm{where}}}&{{T_{ji}} = {\mathop{\rm T}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}})}\end{array}
+\end{equation}
 
 which has the obvious character of a series of matrix multiplications.~ (Note that the superscript (T) here means transmitted, not the matrix operation transpose.)~ Similarly, the reflectance matrix elements are
 
@@ -2052,7 +2076,7 @@ The method then identifies the infinitesimal directional irradiances in equation
 
 \begin{equation}
 E = \left( 
-    \begin{array}
+    \begin{array}{c}
       E_1 \\ ... \\ E_i \\ ...
     \end{array}
   \right)
@@ -2216,7 +2240,9 @@ With the sky radiance shape \emph{s(\textbf{p})} specified in the EnergyPlus cod
 
 In this context, the transmitted radiance for a complex fenestration system given in equation becomes
 
+\begin{equation}
 \begin{array}{c}S({{\bf{p}}^{{\rm{(T)}}}}) = {I^{({\bf{Sky}})}}(t)\int\limits_{{\Omega ^{{\rm{(Sky)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})s({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + \int\limits_{{\Omega ^{{\rm{(Gnd)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + H\left( {\Delta {\Omega ^{{\rm{(Sun)}}}}(t) \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)\int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}(t)} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + \int\limits_{{\Omega ^{{\rm{(Sf)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Refl)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \end{array}
+\end{equation}
 
 where the incoming hemisphere viewed by the fenestration has been broken up into four parts.~ The viewed sky (excluding the part containing the sun) is \({\Omega ^{{\rm{(Sky)}}}}\) , the viewed ground is \({\Omega ^{{\rm{(Gnd)}}}}\) , the part subtended by the sun is DW\(^{)}\), and the part subtended by one or more exterior surfaces (shading or reflecting objects) is W\(^{)}\).~ These solid angles must exclude the exterior surfaces.~ The symbol \emph{H} represents a Helmholtz function: Its value is one if its logical argument is true, zero otherwise.~ It has been inserted into the equation to account for those times when the sun is behind an exterior object.~ Where there are multiple exterior shading or reflecting objects, W\(^{)}\) may consist of several regions that may be disjoint or connected, depending on the exterior geometry.~ As indicated in the equation, DW\(^{)}\) is time-dependent, to account for the sun's movement; W\(^{)}\) and W\(^{)}\)~ are fixed, but as written \({\Omega ^{{\rm{(Sky)}}}}\) ~has a time dependence induced by the exclusion of the solid angle subtended by the sun.~ So that we can discuss the parts separately, we break the outgoing radiance down by source:
 
@@ -2226,7 +2252,9 @@ S({{\bf{p}}^{{\rm{(T)}}}}) = {S^{{\rm{(Sky)}}}}({{\bf{p}}^{{\rm{(T)}}}}) + {S^{{
 
 By subtracting the radiation from the part of the sky hidden by the sun from \({S^{{\rm{(Sun)}}}}\) ~and adding it back into \emph{S}\(^{)}\) we can remove the time dependence of W\(^{)}\):
 
+\begin{equation}
 \begin{array}{c}{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = H\left( {\Delta {\Omega ^{{\rm{(Sun)}}}}(t) \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)\\ \times \int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}(t)} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})\left[ {{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(I)}}}},t) - {I^{({\bf{Sky}})}}(t)s({{\bf{p}}^{{\rm{(I)}}}})} \right]\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \end{array}
+\end{equation}
 
 \begin{equation}
 {S^{{\rm{(Sky)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {I^{({\bf{Sky}})}}(t)\int\limits_{{\Omega ^{{\rm{(Sky)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})s({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
@@ -2256,7 +2284,9 @@ The individual shading surface reflected radiances are then
 
 The solid angle of integration in this expression is subtended by the portion of the exterior reflecting surface \emph{n} viewed by the fenestration; if one surface lies behind another, the hidden part of its surface is removed from the solid angle it subtends.~ This is summarized by the requirement
 
+\begin{equation}
 \begin{array}{l}{\Omega ^{{\rm{(Sf)}}}} = \bigcup\limits_n {{\Omega ^{{\rm{(Sf, n)}}}}} \\\bigcap\limits_n {{\Omega ^{{\rm{(Sf, n)}}}}}  = 0\end{array}
+\end{equation}
 
 (This requirement will need to be modified to handle the case of transmitting exterior surfaces.)
 
@@ -2296,16 +2326,18 @@ is the sky radiance shape factor evaluated at the central direction of the i\(^{
 
 \begin{equation}
 V_i^{(Sky)} = \left\{
-    \begin{array}
+    \begin{array}{rl}
       1                      & \text{all of } \Delta\Omega_i \text{ views sky for all of fenestration} \\
       \text{viewed fraction} & \text{some of } \Delta\Omega_i \text{, fenestration views sky} \\
-      0                      & \text{none of } \Delta\Omega_i \text{ views sky for any part of fenestration
+      0                      & \text{none of } \Delta\Omega_i \text{ views sky for any part of fenestration}
+    \end{array}
+  \right.
 \end{equation}
 
 Then we can carry out the summation over all downward directions and write
 
 \begin{equation}
-{S_j}^{{\rm{(T,Sky)}}} = {I^{({\bf{Sky}})}}(t)\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}{s_i}}
+  S_j^{(T,Sky)} = I^{Sky}(t)\sum_{i down} T_{ji} \Lambda_{ii} V_i^{(Sky)} {s_i}
 \end{equation}
 
 Similarly, equation becomes
@@ -2343,7 +2375,9 @@ and equation becomes, in terms of the incident irradiances,
 
 and in terms of the normalized irradiance factors,
 
+\begin{equation}
 \begin{array}{c}{S_j}^{{\rm{(T, Sf, n)}}} = \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}{I^{{\rm{(D)}}}}(t)U_{i{\rm{ r(}}t{\rm{)}}}^{{\rm{(D,n)}}}{\rho ^{{\rm{(sp, n)}}}}} \\ + \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}\left[ {{I^{{\rm{(D)}}}}(t)U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}{\rho ^{{\rm{(n)}}}} + {I^{(Sky)}}(t)U_i^{{\rm{(Sky,n)}}}{\rho ^{{\rm{(n)}}}}} \right]} \end{array}
+\end{equation}
 
 The specularly reflected term can be removed from the sum, since only one value of i can contribute:
 
@@ -2353,7 +2387,9 @@ The specularly reflected term can be removed from the sum, since only one value 
 
 and
 
+\begin{equation}
 \begin{array}{c}{S_j}^{{\rm{(T, Sf, n)}}} = {T_{j{\rm{ r(}}t{\rm{)}}}}{\Lambda_{{\rm{ r(}}t{\rm{) r(}}t{\rm{)}}}}V_{{\rm{ r(}}t{\rm{)}}}^{{\rm{(Sf, n)}}}U_{{\rm{ r(}}t{\rm{) r(}}t{\rm{)}}}^{{\rm{(D,n)}}}{I^{(D)}}(t){\rho ^{{\rm{(sp, n)}}}}\\ + {\rho ^{{\rm{(n)}}}}\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}\left( {{I^{{\rm{(D)}}}}(t)U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}} + U_i^{(Sky,n)}{I^{(Sky)}}(t)} \right)} \end{array}
+\end{equation}
 
 which separates specular and diffuse reflectance from the exterior surfaces.
 
@@ -2377,11 +2413,7 @@ The transmitted radiance from direct beam radiation is
 {S_j}^{{\rm{(T, Sun)}}} = {T_{j{\rm{ s}}(t)}}\cos {\theta ^{{\rm{(Sun)}}}}{I^{{\rm{(D)}}}}(t)V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}
 \end{equation}
 
-This introduces yet one more geometric view factor:
-
-\[V_{i s(t)}^(D)}\] ~
-
-is zero if the sun direction s\emph{(t)} is not \emph{i}; if \emph{i} = s(\emph{t}) it is the fraction of the fenestration area irradiated by the direct sun.~ Equation uses the fact that the angular size of the sun is smaller than any basis solid angle element, and that EnergyPlus treats the sun and circumsolar region as a point source {[}hence the absence of the sky correction in equation {]}.
+This introduces yet one more geometric view factor: $V_{i s(t)}^{(D)}$\ is zero if the sun direction s\emph{(t)} is not \emph{i}; if \emph{i} = s(\emph{t}) it is the fraction of the fenestration area irradiated by the direct sun.~ Equation uses the fact that the angular size of the sun is smaller than any basis solid angle element, and that EnergyPlus treats the sun and circumsolar region as a point source {[}hence the absence of the sky correction in equation {]}.
 
 At this point we have developed separate expressions for a fenestration's~ transmitted radiance in a particular direction depending on the exterior source of the radiation.~ These expressions utilize the discretized BTDF of the fenestration in the form of transmittance matrix elements over an angular basis.~ The exterior geometry is re-expressed in the form of geometric view factors in this basis.~ In the process, the explicit time dependence of the exterior radiation has been reduced to the time-varying direct and diffuse solar intensities and the solar position.~ The time dependence of the solar position, however, consists merely in specifying, for a particular time, which of the basis solid angle elements contains the solar direction.~ The entire exterior geometry necessary for the fenestration transmittance calculation can therefore be pre-calculated.
 
@@ -2443,9 +2475,13 @@ The total power at the interior surface \emph{k} for each source of radiation th
 {W^{{\rm{(Sky), }}k}} = {I^{({\bf{Sky}})}}(t)\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}A_{ji}^{{\rm{(f, Sky), }}k}{s_i}} }
 \end{equation}
 
+\begin{equation}
 \begin{array}{c}{W^{{\rm{(Sf,n)}},k}} = {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(sp, n)}}}}\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}{T_{j{\rm{ r(}}t{\rm{)}}}}{\Lambda_{{\rm{ r(}}t{\rm{) r(}}t{\rm{)}}}}V_{{\rm{ r(}}t{\rm{)}}}^{{\rm{(Sf, n)}}}A_{j{\rm{ r(}}t{\rm{)}}}^{{\rm{(f, Sf, n), }}k}U_{{\rm{ r(}}t{\rm{) s(}}t{\rm{)}}}^{{\rm{(D,n)}}}} \\ + {I^{(D)}}(t){\rho ^{{\rm{(n)}}}}\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}A_{ji}^{{\rm{(f, Sf, n), }}k}U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}} } \\ + {I^{(Sky)}}(t){\rho ^{{\rm{(n)}}}}\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}A_{ji}^{{\rm{(f, Sf, n), }}k}U_i^{{\rm{(Sky,n)}}}} } \end{array}
+\end{equation}
 
+\begin{equation}
 \begin{array}{c}{W^{{\rm{(Gnd)}},k}} = {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(Gnd)}}}}\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}up} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}A_{ji}^{{\rm{(f, Gnd), }}k}U_{i{\rm{ }}Sky(tch)}^{{\rm{(D, Gnd)}}}} } \\ + {I^{({\bf{Sky}})}}(t){\rho ^{{\rm{(Gnd)}}}}\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}up} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}A_{ji}^{{\rm{(f, Gnd), }}k}U_i^{{\rm{( Sky,Gnd)}}}} } \end{array}
+\end{equation}
 
 \begin{equation}
 {W^{{\rm{(Sun)}},k}} = {I^{{\rm{(D)}}}}(t)\sum\limits_j {F_j^{{\rm{(}}k{\rm{)}}}\Lambda_{jj}^{{\rm{(T)}}}{T_{j{\rm{ s}}(t)}}\cos {\theta_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}}}V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}A_{j{\rm{ s(}}t{\rm{)}}}^{{\rm{(f, Sun), }}k}}
@@ -2487,7 +2523,9 @@ then equations through become
 {W^{{\rm{(Sky), }}k}} = {I^{({\bf{Sky}})}}(t){Z^{{\rm{(Sky), }}k}}
 \end{equation}
 
+\begin{equation}
 \begin{array}{c}{W^{{\rm{(Sf,n)}},k}} = {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(sp, n)}}}}{Z_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},k} + {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(n)}}}}{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},k}\\ + {I^{({\bf{Sky}})}}(t){\rho ^{{\rm{(n)}}}}{Z^{{\rm{(Sky, Sf, n)}},k}}\end{array}
+\end{equation}
 
 \begin{equation}
 {W^{{\rm{(Gnd)}},k}} = {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(Gnd)}}}}{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},k} + {I^{({\bf{Sky}})}}(t){\rho ^{{\rm{(Gnd)}}}}{Z^{{\rm{(Sky, Gnd)}},k}}
@@ -2573,7 +2611,9 @@ For thermal calculations it is necessary to know the energy absorbed in each lay
 {K^{{\rm{(Sky, Sf, n)}},l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}U_i^{{\rm{(Sky, n)}}}}
 \end{equation}
 
+\begin{equation}
 \begin{array}{c}{Q^{{\rm{(Sf,n)}},l}} = {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(sp, n)}}}}{K_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},l} + {I^{{\rm{(D)}}}}(t){\rho ^{{\rm{(n)}}}}{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},l}\\ + {I^{({\bf{Sky}})}}(t){\rho ^{{\rm{(n)}}}}{K^{{\rm{(Sky, Sf, n)}},l}}\end{array}
+\end{equation}
 
 \begin{equation}
 {K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},l} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}up} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D, Gnd)}}}}
@@ -2734,12 +2774,14 @@ in\(_{1}\), \ldots{}, in\(_{N}\) -- set of receiving complex fenestration basis 
 
 Result of equation is minimal dot product, which corresponds to best matching direction of receiving surface.~ If we mark that direction with index k, then equation becomes:
 
-\begin{array}{l}
+\begin{equation}
+  \begin{array}{l}
     AWinSurf(SurfNum,Lay) = \\
       \frac{1}{A(SurfNum)} \cdot \\
       \sum_{i = 1}^{N_{extwin}} (\sum\limits_{j = 1}^{N_{out}} AbsIntSur{f_k}(SurfNum) \cdot TB{m_{k,j}} \cdot \\
       A_{k,j} \cdot \text{Aoverlap}_{k,j}(SurfNum)) \cdot \text{CosInc}_i
   \end{array}
+\end{equation}
 
 where,
 

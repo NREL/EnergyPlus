@@ -131,7 +131,7 @@ where,
 
 There are four cases for the Nusselt correlation that vary by the tilt angle in degrees, \(\gamma\) , and are based on heating conditions.~ For cooling conditions (where \({T_{surf,i}} > {T_{air}}\) ) the tilt angle is complemented so that \(\gamma = 180 - \gamma\)
 
-Case A. \({0^\circ } \le \gamma &lt; 15^\circ\)
+Case A. \({0^\circ } \le \gamma < 15^\circ\)
 
 \begin{equation}
 Nu = 0.13Ra_H^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{3}}}
@@ -151,13 +151,13 @@ Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{1} \!\mathord{\
 Nu = 0.13\left( {Ra_H^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{3}}} - Ra_{CV}^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{3}}}} \right) + 0.56{\left( {R{a_{CV}}\sin \gamma } \right)^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{4}}}};\;R{a_H} > R{a_{CV}}
 \end{equation}
 
-Case C. \(90^\circ &lt; \gamma \le 179^\circ\)
+Case C. \(90^\circ < \gamma \le 179^\circ\)
 
 \begin{equation}
 Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{4}}}};\;{10^5} \le R{a_H}\sin \gamma  < {10^{11}}
 \end{equation}
 
-Case D. \(179^\circ &lt; \gamma \le 180^\circ\)
+Case D. \(179^\circ < \gamma \le 180^\circ\)
 
 \begin{equation}
 Nu = 0.58Ra_H^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{5}}};\;R{a_H} \le {10^{11}}
@@ -348,9 +348,10 @@ If a shading device has a non-zero short-wave transmittance then absorption take
 
 Otherwise
 
-\begin{array}{cl}
+\begin{equation}
+  \begin{array}{cl}
     f_1 = 0,\;f_2 = 0 &\text{if} \alpha_{sh} \le 0.01 \\
-    f_1 = 1,\;f_2 = 0 &\text{if} \alpha_{sh} \gt 0.999 \\
+    f_1 = 1,\;f_2 = 0 &\text{if} \alpha_{sh} > 0.999 \\
     \left.
       \begin{array}{l}
         f_1 = \frac{1 - e^{0.5 \ln (1 - \alpha_{sh}}} {\alpha_{sh}} \\
@@ -358,6 +359,7 @@ Otherwise
       \end{array}
     \right\} &\text{if} 0.01 lt \alpha_{sh} \le 0.999
   \end{array}
+\end{equation}
 
 \subsection{Window~ Frame and Divider Calculation}\label{window-frame-and-divider-calculation}
 
@@ -1068,12 +1070,19 @@ The \emph{Δp\(_{Z}\)} term is the sum of the pressure drops at the inlet and ou
 
 Here, the inlet pressure drop factor, Z\(_{in}\), and the outlet pressure drop factor, Z\(_{out}\), are given by
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     Z_{in}  & = \left( \frac{A_{gap}}{0.66A_{eq,in}}  - 1 \right)^2 \\
     Z_{out} & = \left( \frac{A_{gap}}{0.60A_{eq,out}} - 1 \right)^2
   \end{array}
+\end{equation}
 
-\begin{array}{l}{Z_{in}} = {\left( {\frac{{{A_{gap}}}}{{0.66{A_{eq,in}}}} - 1} \right)^2}\\\{Z_{out}} = {\left( {\frac{{{A_{gap}}}}{{0.60{A_{eq,out}}}} - 1} \right)^2}\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    {Z_{in}}  &= {\left( {\frac{{{A_{gap}}}}{{0.66{A_{eq,in}}}} - 1} \right)^2} \\
+    {Z_{out}} &= {\left( {\frac{{{A_{gap}}}}{{0.60{A_{eq,out}}}} - 1} \right)^2}
+  \end{array}
+\end{equation}
 
 where
 
@@ -1085,17 +1094,21 @@ where
 
 If T\(_{gap}\) \textgreater{} T\(_{gap,in}\)
 
-\begin{array}{rl}
+\begin{equation}
+  \begin{array}{rl}
     A_{eq,in}  & = A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
     A_{eq,out} & = A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
   \end{array}
+\end{equation}
 
 If T\(_{gap}\) ≤ T\(_{gap,in}\)
 
-\begin{array}{rl}
-    A_{eq,in}  & = A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
-    A_{eq,out} & = A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
+\begin{equation}
+  \begin{array}{rl}
+    A_{eq,in}  & = A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
+    A_{eq,out} & = A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
   \end{array}
+\end{equation}
 
 Here, the area of the openings through which airflow occurs (see Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-openings-for-an-interior-shading}) are defined as follows:
 
@@ -1299,7 +1312,12 @@ h_{cv,2} (T_{gap,2}-\theta_3) + k_2 (\theta_4-\theta_3) +
 
 The convective heat transfer coefficients are given by
 
-\begin{array}{l}{h_{cv,1}} = 2{h_{c,1}} + 4v\\\{h_{cv,2}} = 2{h_{c,2}} + 4v\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    h_{cv,1} &= 2 h_{c,1} + 4v \\
+    h_{cv,2} &= 2 h_{c,2} + 4v
+  \end{array}
+\end{equation}
 
 where
 
@@ -1321,7 +1339,13 @@ where the driving pressure difference between gap \#1 and \#2 is
 
 The pressure drops on the right-hand side of this equation are:
 
-\begin{array}{l}\Delta {p_{B,i}} = \frac{{{\rho_{gap,}}_i}}{2}{v^2}\\\Delta {p_{HP,i}} = 12{\mu_{gap,}}_i\frac{H}{{{s^2}}}\\\Delta {p_{Z,i}} = \frac{{{\rho_{gap,}}_i{v^2}}}{2}({Z_{in,i}} + {Z_{out,i}})\end{array}
+\begin{equation}
+  \begin{array}{rl}
+    \Delta p_{B,i} &= \frac{\rho_{gap,i}}{2} v^2 \\
+    \Delta p_{HP,i} &= 12 \mu_{gap,i} \frac{H}{s^2} \\
+    \Delta p_{Z,i} &= \frac{\rho_{gap,i} v^2}{2}\PB{Z_{in,i} + Z_{out,i}}
+  \end{array}
+\end{equation}
 
 where \emph{i} = gap number (1 or 2).
 
@@ -1351,7 +1375,12 @@ Similarly,
 
 Solving these simultaneous equations gives:
 
-~\(\begin{array}{l}{T_{gap,1,out}} = \frac{{{T_{ave,1}}(1 - {\xi_1}) + {\xi_1}{T_{ave,2}}(1 - {\xi_2})}}{{1 - {\xi_1}{\xi_2}}}\\\\\{T_{gap,2,out}} = \frac{{{T_{ave,2}}(1 - {\xi_2}) + {\xi_2}{T_{ave,1}}(1 - {\xi_1})}}{{1 - {\xi_1}{\xi_2}}}\end{array}\)
+\begin{equation}
+  \begin{array}{rl}
+    T_{gap,1,out} &= \frac{T_{ave,1}\PB{1 - \xi_1} + \xi_1 T_{ave,2}\PB{1 - \xi_2}}{1 - \xi_1 \xi_2} \\
+    T_{gap,2,out} &= \frac{T_{ave,2}\PB{1 - \xi_2} + \xi_2 T_{ave,1}\PB{1 - \xi_1}}{1 - \xi_1 \xi_2}
+  \end{array}
+\end{equation}
 
 Using these in
 
@@ -1407,15 +1436,15 @@ In airflow windows forced air flows in the gap between adjacent layers of glass.
 
 Five configurations of airflow windows are modeled (Figure~\ref{fig:gap-airflow-configurations-for-airflow}) that depend on the source and destination of forced air. The allowed combinations of Airflow Source and Airflow Destination are:
 
-InsideAir \rightarrow OutsideAir
+InsideAir $\rightarrow$ OutsideAir
 
-InsideAir \rightarrow InsideAir
+InsideAir $\rightarrow$ InsideAir
 
-InsideAir \rightarrow ReturnAir
+InsideAir $\rightarrow$ ReturnAir
 
-OutsideAir \rightarrow InsideAir
+OutsideAir $\rightarrow$ InsideAir
 
-OutsideAir \rightarrow OutsideAir
+OutsideAir $\rightarrow$ OutsideAir
 
 \begin{figure}[hbtp] % fig 106
 \centering
@@ -1607,7 +1636,9 @@ $\gamma$~~~~ = Specific heat ratio, $\gamma$\(_{r}\) = 1.40.
 
 From the paper Collins and Robinson (Collins, R., \& Robinson, S. (1991)), B is set at approximately 50 for Air, if pressure is given in torr.~ Therefore according to Collins and Robinson, for air and approximate conditions of EGU:
 
-\emph{C}\(_{D}\) \approx 50·P
+\begin{equation}
+  C_{COND} \approx 50 \cdot P
+\end{equation}
 
 Where P is in torr (i.e., mm Hg).
 
@@ -1615,7 +1646,9 @@ Where P is in torr (i.e., mm Hg).
 
 Using formula 2 and assuming \emph{T}\(_{1}\) to be 20 ºC and \emph{T}\(_{2}\) to be -18 ºC (expected temperatures of glass surfaces in EGU, if one glass surface is low-e and unit is exposed to NFRC standard environmental conditions), and using SI system of units, the B is calculated as 54.4, which is very close to the value of 50, proposed by Collins and Robinson
 
-\emph{C}\(_{D}\) \approx 54.4·P
+\begin{equation}
+  C_{COND} \approx 54.4 \cdot P
+\end{equation}
 
 We will use exact value, calculated by the formula, so values of will be input into the calculations, which enables more flexible model that can account for special treatment of glass surfaces.
 
