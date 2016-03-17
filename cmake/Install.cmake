@@ -404,7 +404,7 @@ if ( BUILD_DOCS )
 	install(FILES "${CMAKE_BINARY_DIR}/doc-build/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation")
 	install(FILES "${CMAKE_BINARY_DIR}/doc-build/PlantApplicationGuide.pdf" DESTINATION "./Documentation")
 	install(FILES "${CMAKE_BINARY_DIR}/doc-build/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation")
-	install(FILES "${CMAKE_BINARY_DIR}/doc-build/UsingEnergyPlusforCompliance.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation")
 endif ()
 
 INCLUDE(CPack)
