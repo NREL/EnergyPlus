@@ -26,7 +26,7 @@ This series of flowcharts serve as a guide for identifying and inputting the Hea
 
 \subsubsection{Heating Loop Supply Side Construction}\label{heating-loop-supply-side-construction}
 
-The main components on the supply side half loop for the Heating Loop are the hot water boiler that generates hot water and the variable speed pump that circulates the hot water through the loop. This half loop supplies hot water to five heating coils on the demand side half loop. The supply side half loop contains four components, four branches, eight nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the Primary Cooling loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-004}. The flowchart for supply side branches and components is provided in Figure 78. The flowchart for supply side connectors is provided in Figure 79.
+The main components on the supply side half loop for the Heating Loop are the hot water boiler that generates hot water and the variable speed pump that circulates the hot water through the loop. This half loop supplies hot water to five heating coils on the demand side half loop. The supply side half loop contains four components, four branches, eight nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the Primary Cooling loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-004}. The flowchart for supply side branches and components is provided in Figure~\ref{fig:flowchart-for-heating-loop-supply-side-branches-and}. The flowchart for supply side connectors is provided in Figure~\ref{fig:flowchart-for-heating-loop-supply-side-connectors}.
 
 \begin{figure}[hbtp] % fig 77
 \centering
@@ -34,45 +34,39 @@ The main components on the supply side half loop for the Heating Loop are the ho
 \caption{EnergyPlus line diagram for the supply side of the heating loop \protect \label{fig:energyplus-line-diagram-for-the-supply-side-004}}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 78
 \centering
-\includegraphics{media/image078.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image078.png}
+\caption{Flowchart for heating loop supply side branches and components \protect \label{fig:flowchart-for-heating-loop-supply-side-branches-and}}
 \end{figure}
 
-Figure 78 -- Flowchart for heating loop supply side branches and components
-
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 79
 \centering
-\includegraphics{media/image079.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image079.png}
+\caption{Flowchart for heating loop supply side connectors \protect \label{fig:flowchart-for-heating-loop-supply-side-connectors}}
 \end{figure}
-
-Figure 79 -- Flowchart for heating loop supply side connectors
 
 \subsubsection{Heating Loop Demand Side Construction}\label{heating-loop-demand-side-construction}
 
-The demand side half loop contains five heating coils that heat the air in the different zones of the building by using the hot water that is supplied by the hot water boiler. This side of the loop also has sixteen nodes, eight components, eight branches, and one splitter-mixer pair. An EnergyPlus schematic for the demand side is provided in Figure 80. The flowchart for demand side branch definition is provided in Figure 81. The flowchart for the demand side connectors is provided in Figure 82.
+The demand side half loop contains five heating coils that heat the air in the different zones of the building by using the hot water that is supplied by the hot water boiler. This side of the loop also has sixteen nodes, eight components, eight branches, and one splitter-mixer pair. An EnergyPlus schematic for the demand side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-demand-side-004}. The flowchart for demand side branch definition is provided in Figure~\ref{fig:flowchart-for-heating-loop-demand-side-branches-and}. The flowchart for the demand side connectors is provided in Figure~\ref{fig:flowchart-for-heating-loop-demand-side-connectors}.
 
-\textbf{\includegraphics{media/image080.png}}
-
-Figure 80 - EnergyPlus line diagram for the demand side of the heating loop
-
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 80
 \centering
-\includegraphics{media/image081.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image080.png}
+\caption{EnergyPlus line diagram for the demand side of the heating loop \protect \label{fig:energyplus-line-diagram-for-the-demand-side-004}}
 \end{figure}
 
-Figure 81 -- Flowchart for heating loop demand side branches and components
-
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 81
 \centering
-\includegraphics{media/image082.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image081.png}
+\caption{Flowchart for heating loop demand side branches and components \protect \label{fig:flowchart-for-heating-loop-demand-side-branches-and}}
 \end{figure}
 
-Figure 82 -- Flowchart for heating loop demand side connectors
+\begin{figure}[hbtp] % fig 82
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image082.png}
+\caption{Flowchart for heating loop demand side connectors \protect \label{fig:flowchart-for-heating-loop-demand-side-connectors}}
+\end{figure}
 
 \subsection{Flowcharts for Heating Loop Controls}\label{flowcharts-for-heating-loop-controls}
 
@@ -80,39 +74,33 @@ The Heating Loop is operated by using set-points, plant equipment operation sche
 
 \subsubsection{Heating Loop Schedules}\label{heating-loop-schedules}
 
-The flowchart for Primary Cooling loop schedule definition is provided in Figure 83. The Heating Loop uses three different schedules to operate properly. \emph{PlantOnSchedule} is a compact schedule that uses a discrete \emph{ScheduleTypeLimit} (\emph{On/Off)} which defines that the value of ON is 1 and that of Off is 0. This plant loop also uses another compact schedule named \emph{HW Loop Temp Schedule} to declare that the temperature at the heating loop outlet and the boiler outlet to be 82 degrees Celsius. This schedule uses a schedule type limit named \emph{Temperature,} which defines the loop upper and lower temperature limits. The compact schedule \emph{ALWAYS\_ON} dictates that the boiler and the cooling coils are On at all times of the day. This schedule uses the \emph{ScheduleTypeLimit (Fraction)} to set the fractional flow rate of the components to 1.
+The flowchart for Primary Heating loop schedule definition is provided in Figure~\ref{fig:flowchart-for-heating-loop-schedules}. The Heating Loop uses three different schedules to operate properly. \emph{PlantOnSchedule} is a compact schedule that uses a discrete \emph{ScheduleTypeLimit} (\emph{On/Off)} which defines that the value of ON is 1 and that of Off is 0. This plant loop also uses another compact schedule named \emph{HW Loop Temp Schedule} to declare that the temperature at the heating loop outlet and the boiler outlet to be 82 degrees Celsius. This schedule uses a schedule type limit named \emph{Temperature,} which defines the loop upper and lower temperature limits. The compact schedule \emph{ALWAYS\_ON} dictates that the boiler and the cooling coils are On at all times of the day. This schedule uses the \emph{ScheduleTypeLimit (Fraction)} to set the fractional flow rate of the components to 1.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 83
 \centering
-\includegraphics{media/image083.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image083.png}
+\caption{Flowchart for heating loop schedules \protect \label{fig:flowchart-for-heating-loop-schedules}}
 \end{figure}
-
-Figure 83 -- Flowchart for heating loop schedules
 
 \subsubsection{Heating Loop Plant Equipment Operation Schemes}\label{heating-loop-plant-equipment-operation-schemes}
 
-The \emph{PlantEquipmentOperationschemes} object uses the \emph{PlantOnSchedule} and the \emph{HeatSys1 Operation Scheme} objects to set the range of the demand loads for which the boiler is operated during the simulation period. Operation schemes are especially useful and crucial when using multiple active components but it is required to enter set up a plant equipment operation scheme for every \emph{PlantLoop} that is used in a system. A flowchart detailing the heating loop plant equipment operation scheme is provided in Figure 84.
+The \emph{PlantEquipmentOperationschemes} object uses the \emph{PlantOnSchedule} and the \emph{HeatSys1 Operation Scheme} objects to set the range of the demand loads for which the boiler is operated during the simulation period. Operation schemes are especially useful and crucial when using multiple active components but it is required to enter set up a plant equipment operation scheme for every \emph{PlantLoop} that is used in a system. A flowchart detailing the heating loop plant equipment operation scheme is provided in Figure~\ref{fig:flowchart-for-heating-loop-plant-equipment-operation}.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 84
 \centering
-\includegraphics{media/image084.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image084.png}
+\caption{Flowchart for heating loop plant equipment operation schemes \protect \label{fig:flowchart-for-heating-loop-plant-equipment-operation}}
 \end{figure}
-
-Figure 84 -- Flowchart for heating loop plant equipment operation schemes
 
 \subsubsection{Heating Loop Setpoints}\label{heating-loop-setpoints}
 
-The \emph{HeatSys1 Loop Setpoint Manager} uses the \emph{HW Loop Temp Schedule} to set a temperature control point at the \emph{HeatSys1 Supply Outlet Node}. This setpoint allows the program to control the temperature (set to 82 degrees Celsius) at the node by operating the components in the Heating loop. The Heating Loop also uses another schedule (\emph{HeatSys1 Boiler Setpoint Manager)} to set the temperature of the boiler outlet to 82 degrees Celsius. If the \emph{HeatSys1 Boiler Setpoint Manager} is not entered the program assumes the overall loop setpoint for the boiler outlet node. Since, setpoint managers are high-level control objects, their usefulness is realized in much more complex systems, where multiple nodes have to be monitored in order to operate the system properly. A flowchart for heating loop setpoints is provided in Figure 85.
+The \emph{HeatSys1 Loop Setpoint Manager} uses the \emph{HW Loop Temp Schedule} to set a temperature control point at the \emph{HeatSys1 Supply Outlet Node}. This setpoint allows the program to control the temperature (set to 82 degrees Celsius) at the node by operating the components in the Heating loop. The Heating Loop also uses another schedule (\emph{HeatSys1 Boiler Setpoint Manager)} to set the temperature of the boiler outlet to 82 degrees Celsius. If the \emph{HeatSys1 Boiler Setpoint Manager} is not entered the program assumes the overall loop setpoint for the boiler outlet node. Since, setpoint managers are high-level control objects, their usefulness is realized in much more complex systems, where multiple nodes have to be monitored in order to operate the system properly. A flowchart for heating loop setpoints is provided in Figure~\ref{fig:flowchart-for-heating-loop-setpoints}.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 85
 \centering
-\includegraphics{media/image085.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image085.png}
+\caption{Flowchart for heating loop setpoints \protect \label{fig:flowchart-for-heating-loop-setpoints}}
 \end{figure}
-
-Figure 85 -- Flowchart for heating loop setpoints
 
 \subsubsection{Heating Loop Sizing}\label{heating-loop-sizing}
 

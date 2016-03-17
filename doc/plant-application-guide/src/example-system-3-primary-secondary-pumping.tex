@@ -2,15 +2,13 @@
 
 This example will discuss the basics of primary/secondary pumping systems and some of the controls that are used in managing such systems. The input file for this example can be found under the name: PlantApplicationsGuide\_Example3.idf.
 
-Although it is common for these systems to have a common pipe setup to allow for flow imbalance as shown in Figure 87 and even though there is a provision in EnergyPlus to model common pipes, this example will not discuss them. In the future, the common pipe is expected to be obsolesced, and therefore using a heat exchanger and two separate loops is recommended for future primary/secondary pumping arrangements.
+Although it is common for these systems to have a common pipe setup to allow for flow imbalance as shown in Figure~\ref{fig:example-of-a-common-pipe-setup} and even though there is a provision in EnergyPlus to model common pipes, this example will not discuss them. In the future, the common pipe is expected to be obsolesced, and therefore using a heat exchanger and two separate loops is recommended for future primary/secondary pumping arrangements.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 87
 \centering
-\includegraphics{media/image087.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image087.png}
+\caption{Example of a common pipe setup \protect \label{fig:example-of-a-common-pipe-setup}}
 \end{figure}
-
-Figure 87 -- Example of a common pipe setup
 
 This system services a three zone building by using, two chillers and purchased cooling on the primary chilled water loop to satisfy the demand loads. The chilled water from the supply side of the primary chilled water loop is passes through a plate heat exchanger which serves as the supply side for the secondary chilled water loop. The cooling coil is placed on the demand side of the secondary loop. The primary loop uses a constant speed pump to circulate the working fluid (water). The secondary loop uses a variable speed pump to manipulate the flow of the fluid such that the cooling coil demand is satisfied. The above mentioned pumps are considered as a primary/secondary pumping pair.
 

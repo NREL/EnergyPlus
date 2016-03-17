@@ -26,7 +26,7 @@ This series of flowcharts serve as a guide for identifying and inputting the Coo
 
 \subsubsection{CoolSysPrimary Supply Side Loop Construction}\label{coolsysprimary-supply-side-loop-construction}
 
-The main components on the supply side half loop for the primary cooling system are the electric chiller that supplies the chilled water, the variable speed pump that circulates the chilled water through the loop, and the TES tank that stores the supplied chilled water. This half loop supplies chilled water to the cooling coil which is placed on the demand side half loop. The supply side half loop contains five components, four branches, nine nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the primary cooling loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-006}. The flowchart for supply side branches and components is provided in Figure 50. The flowchart for supply side connectors is provided in Figure 51.
+The main components on the supply side half loop for the primary cooling system are the electric chiller that supplies the chilled water, the variable speed pump that circulates the chilled water through the loop, and the TES tank that stores the supplied chilled water. This half loop supplies chilled water to the cooling coil which is placed on the demand side half loop. The supply side half loop contains five components, four branches, nine nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the primary cooling loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-006}. The flowchart for supply side branches and components is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-supply-side-branches}. The flowchart for supply side connectors is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-supply-side-connectors}.
 
 \begin{figure}[hbtp] % fig 49
 \centering
@@ -34,45 +34,39 @@ The main components on the supply side half loop for the primary cooling system 
 \caption{EnergyPlus line diagram for the supply side of the primary cooling loop \protect \label{fig:energyplus-line-diagram-for-the-supply-side-006}}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 50
 \centering
 \includegraphics{media/image050.png}
-\caption{}
+\caption{Flowchart for primary cooling loop supply side branches and components \protect \label{fig:flowchart-for-primary-cooling-loop-supply-side-branches}}
 \end{figure}
 
-Figure 50 -- Flowchart for primary cooling loop supply side branches and components
-
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 51
 \centering
 \includegraphics{media/image051.png}
-\caption{}
+\caption{Flowchart for primary cooling loop supply side connectors \protect \label{fig:flowchart-for-primary-cooling-loop-supply-side-connectors}}
 \end{figure}
-
-Figure 51 -- Flowchart for primary cooling loop supply side connectors
 
 \subsubsection{CoolSysPrimary Demand Side Loop Construction}\label{coolsysprimary-demand-side-loop-construction}
 
-The main component on the demand side half loop is the cooling coil which cools the air in the building by using the chilled water that is supplied by the supply side half loop. This side of the loop has eight nodes, four components, four branches, and one splitter mixer pair. An EnergyPlus line diagram for the demand side is provided in Figure 52. The flowchart for demand side branch definition is provided in Figure 53. The flowchart for the demand side connectors is provided in Figure 54.
+The main component on the demand side half loop is the cooling coil which cools the air in the building by using the chilled water that is supplied by the supply side half loop. This side of the loop has eight nodes, four components, four branches, and one splitter mixer pair. An EnergyPlus line diagram for the demand side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-demand-side-006}. The flowchart for demand side branch definition is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-demand-side-branches}. The flowchart for the demand side connectors is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-demand-side-connectors}.
 
-\textbf{\includegraphics{media/image052.png}}
+\begin{figure}[htbp] % fig 52
+\centering
+\includegraphics{media/image052.png}
+\caption{EnergyPlus line diagram for the demand side of the primary cooling loop \protect \label{fig:energyplus-line-diagram-for-the-demand-side-006}}
+\end{figure}
 
-Figure 52 - EnergyPlus line diagram for the demand side of the primary cooling loop
-
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 53
 \centering
 \includegraphics{media/image053.png}
-\caption{}
+\caption{Flowchart for primary cooling loop demand side branches and components \protect \label{fig:flowchart-for-primary-cooling-loop-demand-side-branches}}
 \end{figure}
 
-Figure 53 -- Flowchart for primary cooling loop demand side branches and components
-
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 54
 \centering
 \includegraphics{media/image054.png}
-\caption{}
+\caption{Flowchart for primary cooling loop demand side connectors \protect \label{fig:flowchart-for-primary-cooling-loop-demand-side-connectors}}
 \end{figure}
-
-Figure 54 -- Flowchart for primary cooling loop demand side connectors
 
 \subsection{Flowcharts for Primary Cooling Loop Controls}\label{flowcharts-for-primary-cooling-loop-controls}
 
@@ -92,56 +86,46 @@ The \emph{TES Charge Schedule} is a very important schedule for the functioning 
 \caption{TES Charge Schedule \protect \label{fig:tes-charge-schedule}}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 56
 \centering
-\includegraphics{media/image056.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image056.png}
+\caption{Flowchart for primary cooling loop schedules \protect \label{fig:flowchart-for-primary-cooling-loop-schedules}}
 \end{figure}
-
-Figure 56 -- Flowchart for primary cooling loop schedules
 
 \subsubsection{CoolSysPrimary Plant Equipment Operation Schemes}\label{coolsysprimary-plant-equipment-operation-schemes}
 
-This loop has two plant equipment operation schemes, one for the chiller and one for the TES tank. The \emph{PlantEquipmentOperationschemes} object uses the \emph{PlantOnSchedule} and the \emph{CoolSysPrimary Operation Scheme} objects to set the range of demand loads for which the chiller is operated during the simulation period. Operation schemes are especially useful and crucial when using multiple active components. For example, the performance of multiple chillers can be optimized by carefully managing the load ranges on each of the chillers. It should be noted that it is required to enter a plant equipment operation scheme for every plant loop in the system. A flowchart detailing the chilled water loop plant equipment operation schemes is provided in Figure 57.
+This loop has two plant equipment operation schemes, one for the chiller and one for the TES tank. The \emph{PlantEquipmentOperationschemes} object uses the \emph{PlantOnSchedule} and the \emph{CoolSysPrimary Operation Scheme} objects to set the range of demand loads for which the chiller is operated during the simulation period. Operation schemes are especially useful and crucial when using multiple active components. For example, the performance of multiple chillers can be optimized by carefully managing the load ranges on each of the chillers. It should be noted that it is required to enter a plant equipment operation scheme for every plant loop in the system. A flowchart detailing the chilled water loop plant equipment operation schemes is provided in Figure~\ref{fig:flowchart-for-chiller-plant-equipment-operation}.
 
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 57
 \centering
-\includegraphics{media/image057.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image057.png}
+\caption{Flowchart for Chiller plant equipment operation schemes \protect \label{fig:flowchart-for-chiller-plant-equipment-operation}}
 \end{figure}
 
-Figure 57 -- Flowchart for Chiller plant equipment operation schemes
+The TES tank operation is modeled here. The \emph{PlantEquipmentOperationschemes} object uses the \emph{PlantOnSchedule} and the \emph{TES Operation Scheme} objects to set the range of the demand loads for which the TES tank is operated during the simulation period. A flowchart detailing the Secondary Cooling Loop plant equipment operation schemes is provided in Figure~\ref{fig:flowchart-for-thermal-energy-storage-plant-equipment-operation}.
 
-The TES tank operation is modeled here. The \emph{PlantEquipmentOperationschemes} object uses the \emph{PlantOnSchedule} and the \emph{TES Operation Scheme} objects to set the range of the demand loads for which the TES tank is operated during the simulation period. A flowchart detailing the Secondary Cooling Loop plant equipment operation schemes is provided in Figure 58.
-
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 58
 \centering
-\includegraphics{media/image058.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image058.png}
+\caption{Flowchart for Thermal Energy Storage plant equipment operation schemes \protect \label{fig:flowchart-for-thermal-energy-storage-plant-equipment-operation}}
 \end{figure}
-
-Figure 58 -- Flowchart for Thermal Energy Storage plant equipment operation schemes
 
 \subsubsection{CoolSysPrimary Setpoints}\label{coolsysprimary-setpoints}
 
-The \emph{CoolSysPrimary Loop Setpoint Manager} uses the \emph{CoolSysPrimary Loop Temp Schedule} to set a temperature control point at the \emph{CoolSysPrimary Supply Outlet Node}. This setpoint allows the program to control the temperature at the node by operating the components in the Primary Cooling loop. ~A flowchart for Secondary Cooling loop setpoints is provided in Figure 59.
+The \emph{CoolSysPrimary Loop Setpoint Manager} uses the \emph{CoolSysPrimary Loop Temp Schedule} to set a temperature control point at the \emph{CoolSysPrimary Supply Outlet Node}. This setpoint allows the program to control the temperature at the node by operating the components in the Primary Cooling loop. ~A flowchart for Secondary Cooling loop setpoints is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-setpoints}.
 
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 59
 \centering
-\includegraphics{media/image059.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image059.png}
+\caption{Flowchart for primary cooling loop setpoints \protect \label{fig:flowchart-for-primary-cooling-loop-setpoints}}
 \end{figure}
-
-Figure 59 -- Flowchart for primary cooling loop setpoints
 
 \subsubsection{CoolSysPrimary Sizing}\label{coolsysprimary-sizing}
 
-The chilled water loop is sized such a way that the design loop exit temperature is 6.7 degrees Celsius, and the loop design temperature difference is 5 degrees Celsius. A flowchart for the Secondary Cooling loop sizing is provided in Figure 60.
+The chilled water loop is sized such a way that the design loop exit temperature is 6.7 degrees Celsius, and the loop design temperature difference is 5 degrees Celsius. A flowchart for the Secondary Cooling loop sizing is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-sizing}.
 
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 60
 \centering
-\includegraphics{media/image060.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image060.png}
+\caption{Flowchart for primary cooling loop sizing \protect \label{fig:flowchart-for-primary-cooling-loop-sizing}}
 \end{figure}
-
-Figure 60 -- Flowchart for primary cooling loop sizing
