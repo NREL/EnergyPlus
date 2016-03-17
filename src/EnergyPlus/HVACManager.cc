@@ -821,6 +821,7 @@ namespace HVACManager {
 		ManageSystemAvailability();
 
 		ManageEMS( emsCallFromAfterHVACManagers, anyEMSRan ); // calling point
+		ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 		// first explicitly call each system type with FirstHVACIteration,
 
@@ -834,7 +835,6 @@ namespace HVACManager {
 		SetAllPlantSimFlagsToValue( true ); //set so loop to simulate at least once on non-first hvac
 
 		FirstHVACIteration = false;
-		ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 		// then iterate among all systems after first HVAC iteration is over
 
@@ -842,12 +842,11 @@ namespace HVACManager {
 		// true, then specific components must be resimulated.
 		while ( ( SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag ) && ( HVACManageIteration <= MaxIter ) ) {
 
-
+			ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 			// Manages the various component simulations
 			SimSelectedEquipment( SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag, FirstHVACIteration, SimWithPlantFlowUnlocked );
 
-			ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 			// Eventually, when all of the flags are set to false, the
 			// simulation has converged for this system time step.
 
@@ -855,8 +854,8 @@ namespace HVACManager {
 
 			++HVACManageIteration; // Increment the iteration counter
 
-			if ( anyEMSRan && HVACManageIteration == 1 ) {
-				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
+			if ( anyEMSRan && HVACManageIteration <= 2 ) {
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice 
 				SimAirLoopsFlag = true;
 			}
 
