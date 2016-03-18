@@ -11,7 +11,7 @@ Using the \textbf{ShadowCalculation} object, you can set how often the shadowing
 \begin{figure}[hbtp] % fig 38
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image601.png}
-\caption{  Overall Shadowing Scheme Depiction \protect \label{fig:overall-shadowing-scheme-depiction}}
+\caption{Overall Shadowing Scheme Depiction \protect \label{fig:overall-shadowing-scheme-depiction}}
 \end{figure}
 
 \subsection{Solar Position}\label{solar-position}
@@ -36,7 +36,12 @@ Solar HourAngle (\emph{H}) gives the apparent solar time for the current time pe
 
 % table 23
 \begin{longtable}[c]{@{}ll@{}}
-\caption{  Relationship of Angles (degrees) to Time \protect \label{table:relationship-of-angles-degrees-to-time}}\\
+\caption{Relationship of Angles (degrees) to Time \label{table:relationship-of-angles-degrees-to-time}} \tabularnewline
+\toprule 
+Unit of Angle & Equivalent time \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Relationship of Angles (degrees) to Time} \tabularnewline
 \toprule 
 Unit of Angle & Equivalent time \tabularnewline \midrule
 \endhead
@@ -47,12 +52,12 @@ Unit of Angle & Equivalent time \tabularnewline \midrule
 \bottomrule
 \end{longtable}
 
-The Solar Altitude Angle ($\beta$) is the angle of the sun above the horizontal (degrees).~ The Solar Azimuth Angle ($\phi$) is measured from the North (clockwise) and is expressed in degrees.~ This is shown more clearly in the following figure.
+The Solar Altitude Angle ($\beta$) is the angle of the sun above the horizontal (degrees). The Solar Azimuth Angle ($\phi$) is measured from the North (clockwise) and is expressed in degrees.~ This is shown more clearly in the following figure.
 
 \begin{figure}[hbtp] % fig 39
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image604.png}
-\caption{  Solar Position Illustration \protect \label{fig:solar-position-illustration}}
+\caption{Solar Position Illustration \protect \label{fig:solar-position-illustration}}
 \end{figure}
 
 \subsection{Surface Geometry}\label{surface-geometry}
@@ -72,7 +77,7 @@ Note that the resolution on surfaces/shadowing is 1 mm -- using resolution beyon
 \begin{figure}[hbtp] % fig 40
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image605.png}
-\caption{  EnergyPlus Coordinate System \protect \label{fig:energyplus-coordinate-system}}
+\caption{EnergyPlus Coordinate System \protect \label{fig:energyplus-coordinate-system}}
 \end{figure}
 
 The GlobalGeometryRules object specifies to EnergyPlus how the surface vertices will be presented in the input file.~ Of pertinent interest here is that the user may specify the vertices in either ``relative'' or ``world'' coordinates.~ Regardless of input specifications, when vertices are reported, they are reported in world coordinates, starting at the upper-left-corner (4-sided surface) and are listed counter-clockwise.
@@ -172,7 +177,7 @@ Surfaces 1, 4, and 5 are in sunlight; 2 and 3 are in shade. It is possible to th
 \begin{figure}[hbtp] % fig 41
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image622.png}
-\caption{  Basic shadowing concept structure \protect \label{fig:basic-shadowing-concept-structure}}
+\caption{Basic shadowing concept structure \protect \label{fig:basic-shadowing-concept-structure}}
 \end{figure}
 
 The expressions in equation are the direction cosines of the surface:
@@ -202,7 +207,7 @@ A shadow is projected from the vertices of the shadowing polygon (SP) along the 
 \begin{figure}[hbtp] % fig 42
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image628.png}
-\caption{  Illustration of Shadow Clipping \protect \label{fig:illustration-of-shadow-clipping}}
+\caption{Illustration of Shadow Clipping \protect \label{fig:illustration-of-shadow-clipping}}
 \end{figure}
 
 This is done by finding, through linear interpolation, the points on the perimeter of the SP, which intersect the plane of the RP. These points become new vertices of the SP, which together with the other positive vertices define a clipped SP that casts only a real shadow.
@@ -306,7 +311,7 @@ In Figure~\ref{fig:point-a-vertex-of-a-enclosed-by-b}, point a is the result of 
 \begin{figure}[hbtp] % fig 43
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image637.png}
-\caption{  Point a – Vertex of A Enclosed by B \protect \label{fig:point-a-vertex-of-a-enclosed-by-b}}
+\caption{Point a – Vertex of A Enclosed by B \protect \label{fig:point-a-vertex-of-a-enclosed-by-b}}
 \end{figure}
 
 Coordinate transformation retains the order of the vertices of a polygon, while a projection reverses the order. The sequence of vertices of the receiving polygons should be reversed so it and all shadow polygons will have the same sequence.
@@ -314,7 +319,7 @@ Coordinate transformation retains the order of the vertices of a polygon, while 
 \begin{figure}[hbtp] % fig 44
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image638.png}
-\caption{  Surface A Totally Overlaps Surface B. \protect \label{fig:surface-a-totally-overlaps-surface-b.}}
+\caption{Surface A Totally Overlaps Surface B. \protect \label{fig:surface-a-totally-overlaps-surface-b.}}
 \end{figure}
 
 A point is enclosed by a clockwise, convex polygon if the point lies to the right of all sides (or does not lie to the left of any side) of the polygon.~ The intercept of two sides may not lie beyond the ends of either side. These are ``line segments'' rather than ``lines''. It is possible to tell if line segments A and B intercept within their end points by noting that the ends of A must lie on both sides of B, and the ends of B must lie on both sides of A. This should be done before the intercept is calculated.
@@ -322,7 +327,7 @@ A point is enclosed by a clockwise, convex polygon if the point lies to the righ
 \begin{figure}[hbtp] % fig 45
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image639.png}
-\caption{  Figure Formed from Intercept Overlaps Between A and B \protect \label{fig:figure-formed-from-intercept-overlaps-between}}
+\caption{Figure Formed from Intercept Overlaps Between A and B \protect \label{fig:figure-formed-from-intercept-overlaps-between}}
 \end{figure}
 
 Once the vertices are determined, they must be sorted into clockwise order for the area to be computed.~ Given a closed, planar polygon of n sequential vertices (x\(_{1}\), y\(_{1}\)), (x\(_{2}\), y\(_{2}\)) \ldots{}, (x\(_{n}\), y\(_{n}\)), its \textbf{area} is given:
@@ -338,7 +343,7 @@ The area is positive if the vertices are counter-clockwise and negative if they 
 \begin{figure}[hbtp] % fig 46
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image641.png}
-\caption{  Complex Overlapping Condition \protect \label{fig:complex-overlapping-condition}}
+\caption{Complex Overlapping Condition \protect \label{fig:complex-overlapping-condition}}
 \end{figure}
 
 If two shadows overlap the receiving surface, they may also overlap each other as in Figure~\ref{fig:multiple-shadow-overlaps}. The vertices of this overlap can be computed.~ The areas of all overlaps can be computed.~ The total sunlit area can be expressed as the sum of all polygon areas given a proper sign on each of the areas.
@@ -347,10 +352,16 @@ The following convention was adopted:
 
 % table 24
 \begin{longtable}[c]{@{}ll@{}}
-\caption{  Surface / Area Characteristic / Convention \protect \label{table:surface-area-characteristic-convention}}\\
+\caption{Surface / Area Characteristic / Convention \label{table:surface-area-characteristic-convention}} \tabularnewline
+\toprule 
+Surface Characteristic & Area Convention \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Surface / Area Characteristic / Convention} \tabularnewline
 \toprule 
 Surface Characteristic & Area Convention \tabularnewline \midrule
 \endhead
+
 receiving surface & positive (A) \tabularnewline
 overlap between shadow and receiving & negative (B  \&  C) \tabularnewline
 overlap between two shadows & positive (D) \tabularnewline
@@ -362,7 +373,7 @@ and so on through multiple overlaps where the sign of the overlap area is the pr
 \begin{figure}[hbtp] % fig 47
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image642.png}
-\caption{  Multiple Shadow Overlaps \protect \label{fig:multiple-shadow-overlaps}}
+\caption{Multiple Shadow Overlaps \protect \label{fig:multiple-shadow-overlaps}}
 \end{figure}
 
 Partially transparent shadowing surfaces can also be modeled by giving a transparency ($\tau$) to every shadowing polygon. Let $\tau$ of the receiving polygon be one. Then the $\tau$ of every overlap of polygons i and j is the product of $\tau$\(_{i}\)and $\tau$\(_{j}\). The shaded area is then computed by summing A\(_{i}\)·(1 - $\tau$\(_{i}\)) for all overlap polygons.
@@ -693,8 +704,7 @@ Of course, the Ground Reflected Solar is never allowed to be negative.~ The Snow
 
 \subsection{Ground Reflectances (Snow)}\label{ground-reflectances-snow}
 
-When snow is on the ground, ground reflectances may change.~ (Ref Object: \\
-Site:GroundReflectance:SnowModifier).~ This object allows the user to specify two values, Ground Reflected Solar Modifier and Daylighting Ground Reflected Solar Modifier.
+When snow is on the ground, ground reflectances may change. (Ref Object: Site:\-Ground\-Re\-flect\-ance:\-Snow\-Modifier). This object allows the user to specify two values, Ground Reflected Solar Modifier and Daylighting Ground Reflected Solar Modifier.
 
 Ground Reflected Solar Modifier is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values). Values can range from 0.0 to 1.0.
 

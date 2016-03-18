@@ -51,13 +51,13 @@ If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}
 L = N * {P_e}
 \end{equation}
 
-If \textbf{cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity.~ This will be based on all the DX:Coils in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{W}\)}:
+If \textbf{cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity.~ This will be based on all the DX:Coils in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
 
 \begin{equation}
 L = N * {P_{kW}}
 \end{equation}
 
-If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the DX:Coils.~ This will be based on all the DX:Coils in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{P}\)}:
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the DX:Coils.~ This will be based on all the DX:Coils in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
 
 \begin{equation}
 L = N * {P_{kW - COP}}
@@ -73,13 +73,13 @@ If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}
 L = N * {P_e}
 \end{equation}
 
-If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity.~ This will be based on all the Coil:Heating:Gas objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{W}\)}:
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity.~ This will be based on all the Coil:Heating:Gas objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
 
 \begin{equation}
 L = N * {P_{kW}}
 \end{equation}
 
-If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity multiplied by the theoretical efficiency of the heater(s).~ (Here we are treating gas heating efficiency as a Coefficient of Performance (COP)).~ This will be based on all the Coil:Heating:Gas objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{P}\)}:
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity multiplied by the theoretical efficiency of the heater(s).~ (Here we are treating gas heating efficiency as a Coefficient of Performance (COP)).~ This will be based on all the Coil:Heating:Gas objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
 
 \begin{equation}
 L = N * {P_{kW - COP}}
@@ -95,13 +95,13 @@ If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}
 L = N * {P_e}
 \end{equation}
 
-If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity for the specified chiller.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{W}\)}:
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity for the specified chiller. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
 
 \begin{equation}
 L = N * {P_{kW}}
 \end{equation}
 
-If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0, then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the chiller.~ This will be based on the named chiller (if set to a valid coil name).~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{P}\)}:
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0, then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the chiller. This will be based on the named chiller (if set to a valid coil name). Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
 
 \begin{equation}
 L = N * {P_{kW - COP}}
@@ -139,7 +139,7 @@ If \textbf{cost per each} is greater than 0.0, then the number of units, \emph{N
 L = N * {P_e}
 \end{equation}
 
-If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts in the design level for electric lighting systems defined in Lights objects associated with the zone.~ The \textbf{Item Name} must be the name of a valid Zone defined elsewhere in the input.~ \emph{N} is then the sum of all the Lights associated with the named Zone. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{W}\)}:
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts in the design level for electric lighting systems defined in Lights objects associated with the zone.~ The \textbf{Item Name} must be the name of a valid Zone defined elsewhere in the input.~ \emph{N} is then the sum of all the Lights associated with the named Zone. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
 
 \begin{equation}
 L = N * {P_{kW}}
@@ -153,7 +153,7 @@ The costs of simple photovoltaic power systems can be modeled using cost per kil
 N = \frac{{{G_p} * A * E}}{{1000.0}}
 \end{equation}
 
-Where, the cell area A is calculated by multiplying the area of the surface associated with the simple photovoltaic system and the active area fraction defined in the PhotovoltaicPerformance:Simple. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{W}\)}:
+Where, the cell area A is calculated by multiplying the area of the surface associated with the simple photovoltaic system and the active area fraction defined in the PhotovoltaicPerformance:Simple. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
 
 \begin{equation}
 L = N * {P_{kW}}
@@ -169,7 +169,7 @@ The subtotal of individual line items, \emph{S\(_{L}\)}, is obtained by summing 
 {S_L} = \sum L
 \end{equation}
 
-For the reference building, \emph{S\(_{,}\)}is user input (typically from a prior run of baseline building model).
+For the reference building, \emph{S\(_{L,}\)}is user input (typically from a prior run of baseline building model).
 
 The subtotal for miscellaneous construction costs (typically those costs not explicitly included as line items), \emph{S\(_{m}\)}, are calculated by multiplying the \textbf{Miscellaneous Cost Model} (per Square Meter), \emph{C\(_{m}\)},~ by the total conditioned floor area, \emph{A\(_{c}\)}:
 
@@ -177,13 +177,13 @@ The subtotal for miscellaneous construction costs (typically those costs not exp
 {S_m} = {A_c} * {C_m}
 \end{equation}
 
-The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g.~when using national average data), \emph{S\(_{r}\)}, is determined by multiplying the Regional Adjustment Factor, \emph{R\(_{,}\)} by the sum of \emph{S\(_{ }\)}~and \emph{S\(_{:}\)}
+The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g.~when using national average data), \emph{S\(_{r}\)}, is determined by multiplying the Regional Adjustment Factor, \emph{R\(_{f\, ,}\)} by the sum of \emph{S\(_{L}\)}~and \emph{S\(_{m:}\)}
 
 \begin{equation}
 {S_r} = ({S_L} + {S_m}){R_f}
 \end{equation}
 
-Remaining adjustments are applied to the subtotal for construction costs, \emph{S\(_{c}\)}, which is the sum of \emph{S\(_{L}\)}, \emph{S\(_{,}\)}, and \emph{S\(_{:}\)}
+Remaining adjustments are applied to the subtotal for construction costs, \emph{S\(_{c}\)}, which is the sum of \emph{S\(_{L}\)}, \emph{S\(_{m,}\)}, and \emph{S\(_{r:}\)}
 
 \begin{equation}
 {S_C} = {S_L} + {S_m} + {S_r}
@@ -213,7 +213,7 @@ The \textbf{Permits, Bonding, Insurance Fraction,}\emph{F\(_{B}\)},is the fracti
 {S_B} = {S_c}*{F_B}
 \end{equation}
 
-The \textbf{Commissioning Fee Fraction,}\emph{F\(_{X}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for commissioning the building systems.~ The subtotal for these extra costs, \emph{S\(_{X}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{X}\)}:
+The \textbf{Commissioning Fee Fraction,}\emph{F\(_{CX}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for commissioning the building systems.~ The subtotal for these extra costs, \emph{S\(_{CX}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{CX}\)}:
 
 \begin{equation}
 {S_{CX}} = {S_c}*{F_{CX}}

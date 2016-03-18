@@ -2,9 +2,16 @@
 
 % table 36
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
-\caption{Fortran Variables used in Window Heat Balance Calculations \protect \label{table:fortran-variables-used-in-window-heat-balance}}\\
+\caption{Fortran Variables used in Window Heat Balance Calculations \label{table:fortran-variables-used-in-window-heat-balance}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Fortran Variables used in Window Heat Balance Calculations} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
 \endhead
 N & Number of glass layers & - & nlayer \tabularnewline
 $\alpha$ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline 
@@ -36,7 +43,7 @@ The window glass face temperatures are determined by solving the heat balance eq
 \begin{figure}[hbtp] % fig 95
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1470.png}
-\caption{  Glazing system with two glass layers showing variables used in heat balance equations. \protect \label{fig:glazing-system-with-two-glass-layers-showing}}
+\caption{  Glazing system with two glass layers showing variables used in heat balance equations. \protect \label{fig:glazing-system-with-two-glass-layers-showing}}
 \end{figure}
 
 The following assumptions are made in deriving the heat balance equations:
@@ -71,7 +78,7 @@ The four equations for double-glazing are as follows. The equations for single g
 
 \subsubsection{Absorbed Radiation}\label{absorbed-radiation}
 
-\emph{S\(_{i}\)} in Equations to is the radiation (short-wave and long-wave from zone lights and equipment) absorbed on the \emph{i}\(^{h}\) face. Short-wave radiation (solar and short-wave from lights) is assumed to be absorbed uniformly along a glass layer, so for the purposes of the heat balance calculation it is split equally between the two faces of a layer. Glass layers are assumed to be opaque to IR so that the thermal radiation from lights and equipment is assigned only to the inside (room-side) face of the inside glass layer. For \emph{N} glass layers \emph{S\(_{i}\)} is given by
+\emph{S\(_{i}\)} in Equations to is the radiation (short-wave and long-wave from zone lights and equipment) absorbed on the \emph{i}\(^{th}\) face. Short-wave radiation (solar and short-wave from lights) is assumed to be absorbed uniformly along a glass layer, so for the purposes of the heat balance calculation it is split equally between the two faces of a layer. Glass layers are assumed to be opaque to IR so that the thermal radiation from lights and equipment is assigned only to the inside (room-side) face of the inside glass layer. For \emph{N} glass layers \emph{S\(_{i}\)} is given by
 
 \begin{equation}
 {S_{2j - 1}} = {S_{2j}} = \frac{1}{2}\left( {I_{bm}^{ext}\cos \phi A_j^f(\phi ) + I_{dif}^{ext}A_j^{f,dif} + I_{sw}^{{\mathop{\rm int}} }A_j^{b,dif}} \right),{\rm{     }}j = 1{\rm{ to }}N
@@ -213,10 +220,16 @@ The value of the inside face temperature, \({\theta_{2N}}\) , determined in this
 
 % table 37
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
-\caption{Fortran Variables used in Edge of Glass calculations \protect \label{table:fortran-variables-used-in-edge-of-glass}}\\
+\caption{Fortran Variables used in Edge of Glass calculations \label{table:fortran-variables-used-in-edge-of-glass}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{  Fortran Variables used in Edge of Glass calculations} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
 \endhead
+
 \(\overline h\) & Area-weighted net conductance of glazing including edge-of-glass effects & W/m\(^{2}\)-K & - \tabularnewline
 A\(_{cg}\) & Area of center-of-glass region & m\(^{2}\) & CenterGlArea \tabularnewline
 A\(_{fe}\) & Area of frame edge region & m\(^{2}\) & FrameEdgeArea \tabularnewline
@@ -240,26 +253,26 @@ Because of thermal bridging across the spacer separating the glass layers in mul
 
 where
 
-\emph{h\(_{g}\)} = conductance of center-of-glass region (without air films)
+\emph{h\(_{cg}\)} = conductance of center-of-glass region (without air films)
 
-\emph{h\(_{e}\)} = conductance of frame edge region (without air films)
+\emph{h\(_{fe}\)} = conductance of frame edge region (without air films)
 
-\emph{h\(_{e}\)} = conductance of divider edge region (without air films)
+\emph{h\(_{de}\)} = conductance of divider edge region (without air films)
 
-\emph{A\(_{g}\)} = area of center-of-glass region
+\emph{A\(_{cg}\)} = area of center-of-glass region
 
-\emph{A\(_{e}\)} = area of frame edge region
+\emph{A\(_{fe}\)} = area of frame edge region
 
-\emph{A\(_{e}\)} = area of divider edge region
+\emph{A\(_{de}\)} = area of divider edge region
 
-\emph{A\(_{t}\)} = total glazing area = \({A_{cg}} + {A_{fe}} + {A_{de}}\)
+\emph{A\(_{tot}\)} = total glazing area = \({A_{cg}} + {A_{fe}} + {A_{de}}\)
 
 The different regions are shown in Figure~\ref{fig:different-types-of-glass-regions.}:
 
 \begin{figure}[hbtp] % fig 96
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1534.png}
-\caption{  Different types of glass regions. \protect \label{fig:different-types-of-glass-regions.}}
+\caption{Different types of glass regions. \label{fig:different-types-of-glass-regions.}}
 \end{figure}
 
 Equation can be rewritten as
@@ -367,9 +380,15 @@ For the zone heat balance calculation the inside surface temperature of the fram
 
 % table 38
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
-\caption{Fortran Variables used in Window/Frame and Divider calculations \protect \label{table:fortran-variables-used-in-windowframe}}\\
+\caption{Fortran Variables used in Window/Frame and Divider calculations \label{table:fortran-variables-used-in-windowframe}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN \quad variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Fortran Variables used in Window/Frame and Divider calculations} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
 \endhead
 Q\(_{ExtIR,abs}\) & IR from the exterior surround absorbed by outside frame surfaces & W & - \tabularnewline
 Q\(_{IR,emitted}\) & IR emitted by outside frame surfaces & W & - \tabularnewline
@@ -421,7 +440,7 @@ Figure~\ref{fig:cross-section-through-a-window-showing-frame} shows a cross sect
 \begin{figure}[hbtp] % fig 97
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1557.png}
-\caption{  Cross section through a window showing frame and divider (exaggerated horizontally). \protect \label{fig:cross-section-through-a-window-showing-frame}}
+\caption{Cross section through a window showing frame and divider (exaggerated horizontally). \protect \label{fig:cross-section-through-a-window-showing-frame}}
 \end{figure}
 
 \textbf{~}
@@ -454,7 +473,7 @@ The first term can be written as the sum of the exterior IR absorbed by the outs
 
 where \emph{ε\(_{1}\)} is the outside surface emissivity.
 
-The exterior IR incident on the plane of the window, \emph{E\(_{o}\)}, is the sum of the IR from the sky, ground and obstructions. For the purposes of the frame heat balance calculation it is assumed to be isotropic. For isotropic incident IR, \emph{F\(_{f}\)} = 1.0 and \emph{F\(_{1}\)} = 0.5, which gives
+The exterior IR incident on the plane of the window, \emph{E\(_{o}\)}, is the sum of the IR from the sky, ground and obstructions. For the purposes of the frame heat balance calculation it is assumed to be isotropic. For isotropic incident IR, \emph{F\(_{f}\)} = 1.0 and \emph{F\(_{p1}\)} = 0.5, which gives
 
 \begin{equation}
 {Q_{ExtIR,abs}} = {\varepsilon_1}{E_o}({A_f} + \frac{1}{2}{A_{p1}})
@@ -486,7 +505,7 @@ Adding these expressions for the \emph{Q} terms and dividing by* A\(_{f}\)*~give
 {E_0}{\varepsilon_1}\left( {1 + \frac{1}{2}{\eta_1}} \right) - {\varepsilon_1}\left( {1 + {\eta_1}} \right)\theta_1^4 + {h_{o,c}}\left( {1 + {\eta_1}} \right)\left( {{T_0} - {\theta_1}} \right) + k\left( {{\theta_2} - {\theta_1}} \right) + {S_1} = 0
 \end{equation}
 
-where \emph{S\(_{1}\)} = \emph{Q\(_{s}\)/A\(_{f}\)}~and
+where \emph{S\(_{1}\)} = \emph{Q\(_{abs}\)/A\(_{f}\)} and
 
 \begin{equation}
 {\eta_1} = \frac{{{A_{p1}}}}{{{A_f}}} = \left( {\frac{{{p_{f,1}}}}{{{w_f}}}} \right)\frac{{H + W - ({N_h} + {N_v}){w_d}}}{{H + W + 2{w_f}}}
@@ -588,7 +607,7 @@ The frame outside face and outside projections and inside projections absorb bea
 Q_{abs,sol}^{dif} = I_{ext}^{dif}{\alpha_{fr,sol}}\left( {{A_f} + {F_{p1}}{A_{p1}}} \right)/{A_f} = I_{ext}^{dif}{\alpha_{fr,sol}}\left( {1 + 0.5\frac{{{A_{p1}}}}{{{A_f}}}} \right)
 \end{equation}
 
-If there is no exterior window shade, \emph{~I\(^{f}\)\(_{t}\)} includes the effect of diffuse solar reflecting off of the glazing onto the outside frame projection, i.e.,
+If there is no exterior window shade, \emph{~I\(^{dif}\)\(_{ext}\)} includes the effect of diffuse solar reflecting off of the glazing onto the outside frame projection, i.e.,
 
 \begin{equation}
 I_{ext}^{dif} \to I_{ext}^{dif}\left( {1 + R_{gl}^{f,dif}} \right)
@@ -606,7 +625,7 @@ The beam solar absorbed by the frame outside projection parallel to the window x
 Q_{abs,sol}^{bm,h} = I_{ext}^{bm}{\alpha_{fr,sol}}\cos {\beta_h}{p_{f1}}\left( {W - {N_v}{w_d}} \right){f_{sunlit}}/{A_f}
 \end{equation}
 
-Here it is assumed that the sunlit fraction, \emph{f\(_{t}\)}, for the window can be applied to the window frame. Note that at any given time beam solar can strike only one of the two projection surfaces that are parallel to the window x-axis. If there is no exterior window shade, \emph{I\(^{m}\)\(_{t}\)} includes the effect of beam solar reflecting off of the glazing onto the outside frame projection, i.e.,
+Here it is assumed that the sunlit fraction, \emph{f\(_{sunlit}\)}, for the window can be applied to the window frame. Note that at any given time beam solar can strike only one of the two projection surfaces that are parallel to the window x-axis. If there is no exterior window shade, \emph{I\(^{bm}\)\(_{ext}\)} includes the effect of beam solar reflecting off of the glazing onto the outside frame projection, i.e.,
 
 \begin{equation}
 I_{ext}^{bm} \to I_{ext}^{bm}\left( {1 + R_{gl}^{f,bm}} \right)
@@ -622,7 +641,7 @@ Using a similar approach, the beam and diffuse solar absorbed by the \emph{insid
 
 \subsubsection{Error Due to Assuming a Rectangular Profile}\label{error-due-to-assuming-a-rectangular-profile}
 
-Assuming that the inside and outside frame profile is rectangular introduces an error in the surface heat transfer calculation if the profile is non-rectangular. The percent error in the calculation of convection and emitted IR is approximately 100\(\left| {{L_{profile,rect}} - {L_{profile,actual}}} \right|/{L_{profile,rect}}\) , where \emph{L\(_{t}\)} is the profile length for a rectangular profile (\emph{w\(_{f}\)} +* p\(_{1}\)* for outside of frame or \emph{w\(_{f}\)} + \emph{p\(_{2}\)}for inside of frame) and \emph{L\(_{l}\)} is the actual profile length. For example, for a circular profile \emph{vs} a square profile the error is about 22\%. The error in the calculation of absorbed beam radiation is close to zero since the beam radiation intercepted by the profile is insensitive to the shape of the profile. The error in the absorbed diffuse radiation and absorbed IR depends on details of the shape of the profile. For example, for a circular profile vs.~a square profile the error is about 15\%.
+Assuming that the inside and outside frame profile is rectangular introduces an error in the surface heat transfer calculation if the profile is non-rectangular. The percent error in the calculation of convection and emitted IR is approximately 100\(\left| {{L_{profile,rect}} - {L_{profile,actual}}} \right|/{L_{profile,rect}}\) , where \emph{L\(_{profile,rect}\)} is the profile length for a rectangular profile (\emph{w\(_{f}\)} +* p\(_{f1}\)* for outside of frame or \emph{w\(_{f}\)} + \emph{p\(_{f2}\)}for inside of frame) and \emph{L\(_{profile,actual}\)} is the actual profile length. For example, for a circular profile \emph{vs} a square profile the error is about 22\%. The error in the calculation of absorbed beam radiation is close to zero since the beam radiation intercepted by the profile is insensitive to the shape of the profile. The error in the absorbed diffuse radiation and absorbed IR depends on details of the shape of the profile. For example, for a circular profile vs.~a square profile the error is about 15\%.
 
 \subsubsection{Divider Temperature Calculation}\label{divider-temperature-calculation}
 
@@ -637,7 +656,7 @@ The amount of beam solar reflected from reveal surfaces depends, among other thi
 \begin{figure}[hbtp] % fig 98
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1593.png}
-\caption{  Example of shadowing of reveal surfaces by other reveal surfaces. \protect \label{fig:example-of-shadowing-of-reveal-surfaces-by}}
+\caption{Example of shadowing of reveal surfaces by other reveal surfaces. \protect \label{fig:example-of-shadowing-of-reveal-surfaces-by}}
 \end{figure}
 
 The size of the shadowed areas, and the size of the corresponding illuminated areas, depends on the following factors:
@@ -928,7 +947,7 @@ where
 
 \emph{$\tau$\(_{sh}\)} = IR diffuse transmittance of shading device
 
-\emph{$\varepsilon$\(_{h}\)} = diffuse emissivity of shading device
+\emph{$\varepsilon$\(_{sh}\)} = diffuse emissivity of shading device
 
 \emph{$\rho$\(_{sh}\)} = IR diffuse reflectance of shading device ( = 1 - ( \emph{$\tau$\(_{sh}\)} + \emph{$\varepsilon$\(_{sh}\)}))
 
@@ -944,9 +963,9 @@ The convective heat transfer from glass layer \#2 to the air in the gap is
 
 where
 
-\emph{T\(_{p}\)} = effective mean temperature of the gap air (K).
+\emph{T\(_{gap}\)} = effective mean temperature of the gap air (K).
 
-\emph{h\(_{v}\)} = convective heat transfer coefficient from glass or shading layer to gap air (W/m\(^{2}\)K).
+\emph{h\(_{cv}\)} = convective heat transfer coefficient from glass or shading layer to gap air (W/m\(^{2}\)K).
 
 The corresponding heat transfer from shading layer to gap air is
 
@@ -966,7 +985,7 @@ where
 
 \emph{v} = mean air velocity in the gap (m/s).
 
-The quantities \emph{h\(_{v}\)} and \emph{T\(_{p}\)} depend on the airflow velocity in the gap, which in turn depends on several factors, including height of shading layer, glass/shading layer separation (gap depth), zone air temperature for interior shading or outside air temperature for exterior shading, and shading layer and glass face temperatures. The calculation of \emph{h\(_{v}\)} and \emph{T\(_{p}\)} is described in the following sections.
+The quantities \emph{h\(_{cv}\)} and \emph{T\(_{gap}\)} depend on the airflow velocity in the gap, which in turn depends on several factors, including height of shading layer, glass/shading layer separation (gap depth), zone air temperature for interior shading or outside air temperature for exterior shading, and shading layer and glass face temperatures. The calculation of \emph{h\(_{cv}\)} and \emph{T\(_{gap}\)} is described in the following sections.
 
 The heat balance equation for the shading layer surface facing the gap is
 
@@ -1044,7 +1063,7 @@ where
 
 \emph{T\(_{gap}\)} = effective mean temperature of the gap air (K)
 
-\emph{T\(_{in}\)} = gap inlet temperature ( = zone air temperature for interior shading) (K)
+\emph{T\(_{gap,in}\)} = gap inlet temperature ( = zone air temperature for interior shading) (K)
 
 The \emph{Δp\(_{B}\)} term is due to the acceleration of air to velocity \emph{v} (Bernoulli's law). It is given by
 
@@ -1052,15 +1071,15 @@ The \emph{Δp\(_{B}\)} term is due to the acceleration of air to velocity \emph{
 \Delta {p_B} = \frac{\rho }{2}{v^2}{\rm{    (Pa)}}
 \end{equation}
 
-where \emph{$\rho$}is the gap air density evaluated at \emph{T\(_{p}\)} (kg/m\(^{3}\)).
+where \emph{$\rho$}is the gap air density evaluated at \emph{T\(_{gap}\)} (kg/m\(^{3}\)).
 
-The \emph{Δp\(_{P}\)} term represents the pressure drop due to friction with the shading layer and glass surfaces as the air moves through the gap. Assuming steady laminar flow, it is given by the Hagen-Poiseuille law for flow between parallel plates {[}Munson et al. 1998{]}:
+The \emph{Δp\(_{HP}\)} term represents the pressure drop due to friction with the shading layer and glass surfaces as the air moves through the gap. Assuming steady laminar flow, it is given by the Hagen-Poiseuille law for flow between parallel plates {[}Munson et al. 1998{]}:
 
 \begin{equation}
 \Delta {p_{HP}} = 12\mu \frac{H}{{{s^2}}}{v^{}}{\rm{    (Pa)}}
 \end{equation}
 
-where \emph{$\mu$} is the viscosity of air at temperature \emph{T\(_{p}\)} (Pa-s).
+where \emph{$\mu$} is the viscosity of air at temperature \emph{T\(_{gap}\)} (Pa-s).
 
 The \emph{Δp\(_{Z}\)} term is the sum of the pressure drops at the inlet and outlet openings:
 
@@ -1127,7 +1146,7 @@ Figure~\ref{fig:examples-of-openings-for-an-interior-shading} shows examples of 
 \begin{figure}[hbtp] % fig 103
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1679.png}
-\caption{  Examples of openings for an interior shading layer covering glass of height H and width W. Not to scale. (a) Horizontal section through shading layer with openings on the left and right sides (top view). (b) Vertical section through shading layer with openings at the top and bottom (side view). \protect \label{fig:examples-of-openings-for-an-interior-shading}}
+\caption{Examples of openings for an interior shading layer covering glass of height H and width W. Not to scale. (a) Horizontal section through shading layer with openings on the left and right sides (top view). (b) Vertical section through shading layer with openings at the top and bottom (side view). \protect \label{fig:examples-of-openings-for-an-interior-shading}}
 \end{figure}
 
 Expression for the Gap Air Velocity
@@ -1185,12 +1204,12 @@ The thermal equivalent mean temperature of the gap air is
 \begin{figure}[hbtp] % fig 104
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1687.png}
-\caption{  Variation of gap air temperature with distance from the inlet for upward flow. \protect \label{fig:variation-of-gap-air-temperature-with}}
+\caption{Variation of gap air temperature with distance from the inlet for upward flow. \protect \label{fig:variation-of-gap-air-temperature-with}}
 \end{figure}
 
 Solution Sequence for Gap Air Velocity and Outlet Temperature
 
-The routine WinShadeGapFlow is called within the glazing heat balance iterative loop in SolveForWindowTemperatures to determine \emph{v} and \emph{T\(_{t}\)}. The solution sequence in WinShadeGapFlow is as follows:
+The routine WinShadeGapFlow is called within the glazing heat balance iterative loop in SolveForWindowTemperatures to determine \emph{v} and \emph{T\(_{gap,out}\)}. The solution sequence in WinShadeGapFlow is as follows:
 
 At start of iteration, guess \emph{T\(_{gap}\)} as ((\emph{T\(_{gl}\)} + \emph{T\(_{sh}\)})/2 + \emph{T\(_{gap,in}\)})/2. Thereafter use value from previous iteration.
 
@@ -1424,7 +1443,7 @@ At start of iteration guess \({T_{gap,1}} = {T_{ave,1}}\) ~and \({T_{gap,2}} = {
 
 5)~~~~Get \({T_{ave,1}},{T_{ave,2}}\)
 
-6)~~~~Get \emph{H\(_{1}\)}, \emph{H\(_{2}\)}, \({\xi_1}\) and \({\xi_2}\) .
+6)~~~~Get \emph{H\(_{o,1}\)}, \emph{H\(_{o,2}\)}, \({\xi_1}\) and \({\xi_2}\) .
 
 7)~~~~Get \({T_{gap,1}}\) ,\({T_{gap,2}}\) from Equations and
 
@@ -1624,15 +1643,15 @@ Where:
 
 $\alpha$\(_{1}\), $\alpha$\(_{2}\) = Accommodation coefficients of the gas molecules with the two surfaces.~ These values depend on the temperature, surface conditions, etc.~ For the present configuration and conditions, it is expected that \emph{a} is approximately 0.5.~ If conservative value is needed than value of 1.0 could be used.~ With $\alpha$\(_{1}\), $\alpha$\(_{2}\) = 0.5, $\alpha$ = 0.333
 
-$\gamma$~~~~ = Specific heat ratio, $\gamma$\(_{r}\) = 1.40.
+$\gamma$ = Specific heat ratio, $\gamma$\(_{air}\) = 1.40.
 
-\emph{R}~~~ = Universal gas constant, \emph{R} = 8,314.462175 J/mol·K
+\emph{R} = Universal gas constant, \emph{R} = 8,314.462175 J/mol·K
 
-\emph{M}~~ = Molecular Weight, \emph{M}\(_{r}\) = 28.97 {[}mol/g{]}
+\emph{M} = Molecular Weight, \emph{M}\(_{air}\) = 28.97 {[}mol/g{]}
 
-\emph{T}~~~ = (\emph{T}\(_{1}\) + \emph{T}\(_{2}\))/2 {[}K{]}
+\emph{T} = (\emph{T}\(_{1}\) + \emph{T}\(_{2}\))/2 {[}K{]}
 
-\emph{P}~~~ = Pressure of the gas {[}N/m\(^{2}\){]}
+\emph{P} = Pressure of the gas {[}N/m\(^{2}\){]}
 
 From the paper Collins and Robinson (Collins, R., \& Robinson, S. (1991)), B is set at approximately 50 for Air, if pressure is given in torr.~ Therefore according to Collins and Robinson, for air and approximate conditions of EGU:
 
@@ -1662,11 +1681,11 @@ Radiation conductance for the two parallel plates is given by:
 
 Where:
 
-$\varepsilon$\(_{1}\)~~~ = emissivity of the first facing glass surface, {[} - {]}
+$\varepsilon$\(_{1}\) = emissivity of the first facing glass surface, {[} - {]}
 
-$\varepsilon$\(_{2}\)~~~ = emissivity of the second facing glass surface, {[} - {]}
+$\varepsilon$\(_{2}\) = emissivity of the second facing glass surface, {[} - {]}
 
-s~~~ = Stefan-Boltzmann Constant, 5.67 x 10\(^{8}\), {[}W/(m\(^{2}\)·K\(^{4}\)){]}
+\(\sigma\) = Stefan-Boltzmann Constant, 5.67 x 10\(^{8}\), {[}W/(m\(^{2}\)·K\(^{4}\)){]}
 
 T\(_{1}\)~~ = Temperature of the first facing glass surface, {[}K{]}
 
@@ -1718,7 +1737,7 @@ Where:
 
 \emph{t}\(_{glass}\) = glass thickness; {[}m{]}
 
-\emph{k}\(_{glass}\) = glass conductivity; \emph{k}\(_{s}\) = 1 W/(m·K)
+\emph{k}\(_{glass}\) = glass conductivity; \emph{k}\(_{glass}\) = 1 W/(m·K)
 
 \emph{R}\(_{glass}\) = 0.003 m\(^{2}\)K/W (for 3 mm glass pane)
 
@@ -1726,7 +1745,7 @@ Where:
 
 \emph{R}\(_{i}\) ≈ 0.14 m\(^{2}\)K/W
 
-U-factor of EGU without any pillars (pretending that this is possible) would be calculated using \emph{C}\(_{D}\) only.~ From above radiation conductance calculations:
+U-factor of EGU without any pillars (pretending that this is possible) would be calculated using \emph{C}\(_{RAD}\) only.~ From above radiation conductance calculations:
 
 \emph{Clear Glass: ~~~~~~~~~~ U = 2.64 W/(m\(^{2}\)·K) {[}0.464 Btu/(hr·ft\(^{2}\)·ºF){]}}
 
@@ -1734,7 +1753,7 @@ U-factor of EGU without any pillars (pretending that this is possible) would be 
 
 \emph{Soft Coat Low-e:~~~~~ U = 0.19 W/(m\(^{2}\)·K) {[}0.034 Btu/(hr·ft\(^{2}\)·ºF){]}}
 
-Adding conductance of the air at 0.001 torr (\emph{C}\(_{D}\) = 0.08 W/(m\(^{2}\)·K), these values become:
+Adding conductance of the air at 0.001 torr (\emph{C}\(_{COND}\) = 0.08 W/(m\(^{2}\)·K), these values become:
 
 \emph{Clear Glass: ~~~~~~~~~~ U = 2.66 W/(m\(^{2}\)·K) {[}0.468 Btu/(hr·ft\(^{2}\)·ºF){]}}
 
@@ -1742,7 +1761,7 @@ Adding conductance of the air at 0.001 torr (\emph{C}\(_{D}\) = 0.08 W/(m\(^{2}\
 
 \emph{Soft Coat Low-e:~~~~~ U = 0.27 W/(m\(^{2}\)·K) {[}0.048 Btu/(hr·ft\(^{2}\)·ºF){]}}
 
-In contrast, the U-factor of the same configuration with the air at atmospheric pressure will be (For the space width of 50 mm, C\(_{D}\) ≈ 450 W/m\(^{2}\)K):
+In contrast, the U-factor of the same configuration with the air at atmospheric pressure will be (For the space width of 50 mm, C\(_{COND}\) ≈ 450 W/m\(^{2}\)K):
 
 \emph{Clear Glass: ~~~~~~~~~~ U = 5.52 W/(m\(^{2}\)·K) {[}0.468 Btu/(hr·ft\(^{2}\)·ºF){]}}
 
@@ -1774,7 +1793,7 @@ Where:
 
 \emph{h}~~~ = pillar height, m
 
-For the square array of support pillars (Collins and Fischer-Cripps 1991) proposes the following formula for their conductance, \emph{C}\(_{a}\):
+For the square array of support pillars (Collins and Fischer-Cripps 1991) proposes the following formula for their conductance, \emph{C}\(_{pa}\):
 
 \begin{equation}
 {C_{pa}} = \frac{{2ka}}{{{\lambda ^2}\left( {1 + \frac{{2h}}{{\pi a}}} \right)}}
@@ -1854,7 +1873,7 @@ Where,
 
 Where,
 
-\emph{E} = Young's modulus (7.2 x 10\(^{0}\)) {[}Force per unit Area; SI: Pa, IP: psi{]}
+\emph{E} = Young's modulus (7.2 x 10\(^{10}\)) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
 \emph{t} = thickness of glazing pane {[}Length; SI: m, IP: in.{]}
 
@@ -1870,7 +1889,7 @@ $\nu$ = poison's ratio (0.22 for glass) {[}Non-Dimensional{]}
 
 Δ\emph{P\(_{i}\)} = \emph{P\(_{gap(1)}\)} - \emph{P\(_{a}\)} (first pane) {[}Force per unit Area; SI: Pa, IP: psi{]}\emph{~~~~~~~~~~~~~~~~~~}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{a}\) - P\(_{pag(n-1)}\)} (last pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
+Δ\emph{P\(_{i}\)} = \emph{P\(_{a}\) - P\(_{gap(n-1)}\)} (last pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
 Where,
 
@@ -2148,7 +2167,7 @@ The equivalent layer windows system is treated as a series of parallel layers se
 \caption{Multi-layer fenestration analysis structure (ASHRAE 1311-RP) \protect \label{fig:multi-layer-fenestration-analysis-structure}}
 \end{figure}
 
-Equivalent layer fenestration model uses two-step analysis. First, the flux of absorbed solar radiation at each layer, S\(_{i}\), caused by the incident radiation flux, I\(_{l}\), is determined using net radiation analysis. Second, an energy balance is applied at each layer, accounting for heat transfer and the known set of absorbed solar radiations S\(_{i}\) values, in order to solve for the set of layer temperatures, T\(_{i}\), and the corresponding heat fluxes. The fenestration model also accounts for the diathermanous shade layers in the longwave radiant exchange. The latter can be significant for shading layers. Glass is considered opaque with respect to longwave radiation.
+Equivalent layer fenestration model uses two-step analysis. First, the flux of absorbed solar radiation at each layer, S\(_{i}\), caused by the incident radiation flux, I\(_{sol}\), is determined using net radiation analysis. Second, an energy balance is applied at each layer, accounting for heat transfer and the known set of absorbed solar radiations S\(_{i}\) values, in order to solve for the set of layer temperatures, T\(_{i}\), and the corresponding heat fluxes. The fenestration model also accounts for the diathermanous shade layers in the longwave radiant exchange. The latter can be significant for shading layers. Glass is considered opaque with respect to longwave radiation.
 
 \subsubsection{Equivalent Layer Optical Model}\label{equivalent-layer-optical-model}
 
@@ -2220,7 +2239,7 @@ Each glazing or shading layer, in general, require eleven set of solar propertie
 
 \subsubsection{Equivalent Layer Thermal Model}\label{equivalent-layer-thermal-model}
 
-A surface energy balance is applied at each layer and the resulting set of equation is solved for layer temperatures and heat transfer fluxes. A schematic drawing of the multi-layer illustration and variables designation is shown in Figure~\ref{fig:radiosity-model-used-in-thermal-analysis-of}. The net radiation formulation based on the radiosities, Jf,i and Jb,i the radiant flux leaving the front and back surfaces of the i\(^{h}\) layer, respectively, is the used as a solution technique. The net radiant heat flux across a gap can be expressed as the difference between the radiosities of the bounding surfaces. The net radiation model analysis yields the layer temperatures and corresponding heat transfer coefficients that are used to determine U-factor and SHGC. The thermal analysis is done in ``ASHWAT\_Thermal'' routine.
+A surface energy balance is applied at each layer and the resulting set of equation is solved for layer temperatures and heat transfer fluxes. A schematic drawing of the multi-layer illustration and variables designation is shown in Figure~\ref{fig:radiosity-model-used-in-thermal-analysis-of}. The net radiation formulation based on the radiosities, Jf,i and Jb,i the radiant flux leaving the front and back surfaces of the i\(^{th}\) layer, respectively, is the used as a solution technique. The net radiant heat flux across a gap can be expressed as the difference between the radiosities of the bounding surfaces. The net radiation model analysis yields the layer temperatures and corresponding heat transfer coefficients that are used to determine U-factor and SHGC. The thermal analysis is done in ``ASHWAT\_Thermal'' routine.
 
 \begin{figure}[hbtp] % fig 116
 \centering
@@ -2238,11 +2257,11 @@ Gaps can be specified as sealed, vented indoors or vented outdoors. The sealed g
 
 \subsubsection{Shade Layer Analysis}\label{shade-layer-analysis}
 
-Equivalent layer fenestration model has a complete set of solar and longwave models for the four shading layer types: drapes, venetian blinds, roller blinds and insect screens developed under ASHRAE 1311-RP. And semi-empirical models are used to evaluate the off-normal properties of drape, roller blind and insect screen materials. The effective layer properties of venetian blinds and the effect of pleating in drapes are determined using a more fundamental net radiation scheme. The openness fraction, A\(_{o}\) and beam-beam solar transmittance at normal incidence, \emph{t}\(_{b}\) (q = 0) really represent a geometric quantity and it has been confirmed that they can be used interchangeably (ASHRAE 1311-RP). Openness is simply the fraction of a material, by area, that is open. In equivalent layer fenestration model, beam-beam transmittance at normal incidence (i.e., openness fraction), beam-diffuse transmittance and reflectance at normal incidence are required to characterize drapery fabric, roller blind and insect screen material. A conventional venetian blind in equivalent layer model can be characterized by specifying the geometry, solar reflectance and transmittance, and emissivity of the slats. The off-normal solar properties of drape, roller blind and insect screen materials were formulated based on measurements (ASHRAE 1311-RP). The longwave properties of the of the drape fabrics, roller blinds and insect screens can be calculated from the material emissivity and openness of the fabric (ASHRE 1311-RP). The optical model development for venetian blinds is presented by Yahoda and Wright (2004 and 2005), and Kotey et al. (2008).
+Equivalent layer fenestration model has a complete set of solar and longwave models for the four shading layer types: drapes, venetian blinds, roller blinds and insect screens developed under ASHRAE 1311-RP. And semi-empirical models are used to evaluate the off-normal properties of drape, roller blind and insect screen materials. The effective layer properties of venetian blinds and the effect of pleating in drapes are determined using a more fundamental net radiation scheme. The openness fraction, A\(_{o}\) and beam-beam solar transmittance at normal incidence, \emph{t}\(_{bb}\) (q = 0) really represent a geometric quantity and it has been confirmed that they can be used interchangeably (ASHRAE 1311-RP). Openness is simply the fraction of a material, by area, that is open. In equivalent layer fenestration model, beam-beam transmittance at normal incidence (i.e., openness fraction), beam-diffuse transmittance and reflectance at normal incidence are required to characterize drapery fabric, roller blind and insect screen material. A conventional venetian blind in equivalent layer model can be characterized by specifying the geometry, solar reflectance and transmittance, and emissivity of the slats. The off-normal solar properties of drape, roller blind and insect screen materials were formulated based on measurements (ASHRAE 1311-RP). The longwave properties of the of the drape fabrics, roller blinds and insect screens can be calculated from the material emissivity and openness of the fabric (ASHRE 1311-RP). The optical model development for venetian blinds is presented by Yahoda and Wright (2004 and 2005), and Kotey et al. (2008).
 
 \subsubsection{Drapes and Curtains}\label{drapes-and-curtains}
 
-The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence (q = 0) using empirical correlations (Kotey et al., 2009a). The input data required to characterize drapery fabric are the beam-beam transmittance of the material at normal incidence \emph{t}\(_{b}\) (q = 0) = Ao, the beam-diffuse transmittance of the material at normal incidence\emph{t}\(_{d}\) (q = 0), and the beam-diffuse (total) reflectance of the materialr\(_{t}\) (q = 0). The off-normal properties are calculated as follows.
+The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence (q = 0) using empirical correlations (Kotey et al., 2009a). The input data required to characterize drapery fabric are the beam-beam transmittance of the material at normal incidence \emph{t}\(_{bb}\) (q = 0) = Ao, the beam-diffuse transmittance of the material at normal incidence\emph{t}\(_{bd}\) (q = 0), and the beam-diffuse (total) reflectance of the materialr\(_{bt}\) (q = 0). The off-normal properties are calculated as follows.
 
 Off-normal Transmittance:
 
@@ -2385,7 +2404,7 @@ The diffuse-diffuse transmittance and reflectance are obtained by Rhomberg numer
 
 \subsubsection{Insect Screens}\label{insect-screens}
 
-The empirical correlations formulated to obtain the effective off-normal solar and longwave properties of insect screens were based on measurements (Kotey et al. (2009a). Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}. The calculation of effective solar properties requires a set of properties measured at normal incidence: \emph{t}\(_{b}\) (q = 0), \emph{t}\(_{d}\) (q = 0) and \emph{r}\(_{t}\) (q = 0).
+The empirical correlations formulated to obtain the effective off-normal solar and longwave properties of insect screens were based on measurements (Kotey et al. (2009a). Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}. The calculation of effective solar properties requires a set of properties measured at normal incidence: \emph{t}\(_{bb}\) (q = 0), \emph{t}\(_{bd}\) (q = 0) and \emph{r}\(_{bt}\) (q = 0).
 
 \begin{figure}[hbtp] % fig 119
 \centering
@@ -2393,13 +2412,13 @@ The empirical correlations formulated to obtain the effective off-normal solar a
 \caption{Geometry used for insect screen analysis \protect \label{fig:geometry-used-for-insect-screen-analysis}}
 \end{figure}
 
-Openness can be determined by optical measurement at normal incidence, A\(_{o}\) = \emph{t}\(_{b}\) (q = 0), but in the case of insect screens A\(_{o}\) can reliably be calculated knowing wire diameter (\emph{d}), and wire spacing (\emph{s}) as follows:
+Openness can be determined by optical measurement at normal incidence, A\(_{o}\) = \emph{t}\(_{bb}\) (q = 0), but in the case of insect screens A\(_{o}\) can reliably be calculated knowing wire diameter (\emph{d}), and wire spacing (\emph{s}) as follows:
 
 \begin{equation}
 {A_o} = {\left( {1 - {d \mathord{\left/ {\vphantom {d s}} \right. } s}} \right)^2}
 \end{equation}
 
-The incidence angle beyond which direct beam transmission is cut off, \emph{q}\(_{f}\), can also be estimated purely from geometry and is given by:
+The incidence angle beyond which direct beam transmission is cut off, \emph{q}\(_{CutOff}\), can also be estimated purely from geometry and is given by:
 
 \begin{equation}
 {\theta_{CutOff}} = co{s^{ - 1}}\left( {{d \mathord{\left/ {\vphantom {d S}} \right. } S}} \right)
@@ -2511,7 +2530,7 @@ Where,
 
 \emph{T\(_{a}\)~~ = ~~~~~~~~~} zone air temperature, °C (°F)
 
-\subsubsection{References:}\label{references-2-008}
+\subsubsection{References:}\label{references-2-009}
 
 Edwards, D.K. 1977. Solar absorption by each element in an absorber-coverglass array, Technical Note, Solar Energy, Vol. 19, pp.~401-402.
 

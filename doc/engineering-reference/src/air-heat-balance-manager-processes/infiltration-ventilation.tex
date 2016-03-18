@@ -186,7 +186,7 @@ If desired, a simple summation, instead of quadrature summation, can be realized
 
 \subsection{Zone Air Balance Outdoor Airflow (ZoneAirBalance:OutdoorAir)}\label{zone-air-balance-outdoor-airflow-zoneairbalanceoutdoorair}
 
-ASHRAE 2009 Handbook of Fundamentals specifies that any unbalanced supply or exhaust ventilation air, Q\(_{v}\), to a zone causes pressurization/depressurization that influences the flow of infiltration air and thus should be combined with natural infiltration, Q\(_{n}\), (and, if present, unbalanced duct leakage, Qu,l) in superposition. Balanced ventilation airflow, Q\(_{v}\), to a zone (such as an ERV or HRV with balanced exhaust and intake air flows) does not interact with infiltration air and is added in whole:
+ASHRAE 2009 Handbook of Fundamentals specifies that any unbalanced supply or exhaust ventilation air, Q\(_{u,v}\), to a zone causes pressurization/depressurization that influences the flow of infiltration air and thus should be combined with natural infiltration, Q\(_{n}\), (and, if present, unbalanced duct leakage, Qu,l) in superposition. Balanced ventilation airflow, Q\(_{b,v}\), to a zone (such as an ERV or HRV with balanced exhaust and intake air flows) does not interact with infiltration air and is added in whole:
 
 \begin{equation}
 Q = \sqrt {{Q_n}^2 + {Q_{u,v}}^2 + ({Q_{u,l}}^2)}  + {Q_{b,v}}
@@ -198,11 +198,11 @@ where,
 
 \emph{Q\(_{n}\)}~~ = Natural infiltration airflow {[}m\(^{3}\)/s{]}
 
-\emph{Q\(_{v}\)} = Balanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
+\emph{Q\(_{b,v}\)} = Balanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
 
-\emph{Q\(_{v}\)} = Unbalanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
+\emph{Q\(_{u,v}\)} = Unbalanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
 
-\emph{Q\(_{l}\)}~ = Unbalanced duct leakage: the difference between supply and return leaks {[}m\(^{3}\)/s{]}
+\emph{Q\(_{u,l}\)}~ = Unbalanced duct leakage: the difference between supply and return leaks {[}m\(^{3}\)/s{]}
 
 The natural infiltration airflow includes all outdoor airflows from all ZoneInfiltration:* objects for the same zone.
 
@@ -212,7 +212,7 @@ The natural infiltration airflow includes all outdoor airflows from all ZoneInfi
 
 where,
 
-\emph{Q\(_{i}\)}~~~~~ = Outdoor airflow rate given in the ith ZoneInfiltration:* objects for the same zone
+\emph{Q\(_{Infiltration,i}\)}~~~~~ = Outdoor airflow rate given in the ith ZoneInfiltration:* objects for the same zone
 
 The balanced ventilation airflow is the sum of outdoor airflows from all ZoneVentilation: DesignFlowRate objects with Ventilation Type = Balanced:
 
@@ -222,7 +222,7 @@ The balanced ventilation airflow is the sum of outdoor airflows from all ZoneVen
 
 where,
 
-\emph{Q\(_{i}\)}~~~~ = Ventilation rate with ``Balanced'' ventilation type defined in the ith ZoneVentilation:DesignFlowRate object for the same zone
+\emph{Q\(_{v,Balanced,i}\)}~~~~ = Ventilation rate with ``Balanced'' ventilation type defined in the ith ZoneVentilation:DesignFlowRate object for the same zone
 
 The unbalanced ventilation airflow is given by the following equation:
 

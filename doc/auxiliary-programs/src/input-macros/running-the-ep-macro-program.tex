@@ -4,10 +4,18 @@ The EP-Macro program is run automatically from the batch files (RunEPlus or EPL-
 
 % table 29
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Files used in EP-Macro program \protect \label{table:files-used-in-ep-macro-program}}\\
+\caption{Files used in EP-Macro program \label{table:files-used-in-ep-macro-program}} \tabularnewline
 \toprule 
-File Name & Description \tabularnewline \midrule
+File Name & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Files used in EP-Macro program} \tabularnewline
+\toprule 
+File Name & Description \tabularnewline
+\midrule
 \endhead
+
 in.imf & Input file containing the macro commands \tabularnewline
 audit.out & audit of the EPMacro run \tabularnewline
 out.idf & Output file that can be run with EnergyPlus \tabularnewline

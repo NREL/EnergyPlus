@@ -18,10 +18,16 @@ Table~\ref{table:built-in-math-functions-for-erl} lists the built-in functions f
 
 % table 4
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{Built-in Math Functions for Erl \protect \label{table:built-in-math-functions-for-erl}}\\
+\caption{Built-in Math Functions for Erl \label{table:built-in-math-functions-for-erl}} \tabularnewline
+\toprule 
+Function Name & Description & Number of Arguments \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Built-in Math Functions for Erl} \tabularnewline
 \toprule 
 Function Name & Description & Number of Arguments \tabularnewline \midrule
 \endhead
+
 @Round & Decreases precision of real number argument to nearest whole number, remains a real number. & 1 \tabularnewline
 @Mod & Returns remainder after dividing the first argument by the second. & 2 \tabularnewline
 @Sin & Sine, returns sine of angle given in radians. & 1 \tabularnewline
@@ -45,10 +51,16 @@ Function Name & Description & Number of Arguments \tabularnewline \midrule
 
 % table 5
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{Built-in EnergyPlus Simulation Management Functions for Erl \protect \label{table:built-in-energyplus-simulation-management}}\\
+\caption{Built-in EnergyPlus Simulation Management Functions for Erl \label{table:built-in-energyplus-simulation-management}} \tabularnewline
+\toprule 
+Function Name & Description & Number of Arguments \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Built-in EnergyPlus Simulation Management Functions for Erl} \tabularnewline
 \toprule 
 Function Name & Description & Number of Arguments \tabularnewline \midrule
 \endhead
+
 @FatalHaltEp & Throws fatal error with time of occurrence and stops execution of current model. Argument passes a number that can be used as an error code. & 1 \tabularnewline
 @SevereWarnEp & Throws severe error with time of occurrence and continues execution. Argument passes a number that can be used as an error code. & 1 \tabularnewline
 @WarnEp & Throws warning error and continues execution. Argument passes a number that can be used as an error code. & 1 \tabularnewline
@@ -61,10 +73,16 @@ For control algorithms, you often need to be able put a sensor reading into some
 
 % table 6
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{Built-in Functions for Trend Variables in Erl \protect \label{table:built-in-functions-for-trend-variables-in-erl}}\\
+\caption{Built-in Functions for Trend Variables in Erl \label{table:built-in-functions-for-trend-variables-in-erl}} \tabularnewline
+\toprule 
+Function Name & Description & Number of Arguments \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Built-in Functions for Trend Variables in Erl} \tabularnewline
 \toprule 
 Function Name & Description & Number of Arguments \tabularnewline \midrule
 \endhead
+
 @TrendValue & Returns history value for a particular number of timesteps into the past. Dereferences data stored in trend into another Erl variable. Takes trend variable name and the specific timestep into the past to return. & 2 \tabularnewline
 @TrendAverage & Returns historical average (mean) for values in trend variable. Takes trend variable name and number of steps into the past to analyze & 2 \tabularnewline
 @TrendMax & Returns historical maximum for values in trend variable. Takes trend variable name and number of steps into the past to analyze. & 2 \tabularnewline
@@ -82,10 +100,16 @@ Building modeling often involves calculations related to moist air. A comprehens
 
 % table 7
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Built-in Psychrometric Functions for Erl \protect \label{table:built-in-psychrometric-functions-for-erl}}\\
+\caption{Built-in Psychrometric Functions for Erl \label{table:built-in-psychrometric-functions-for-erl}} \tabularnewline
+\toprule 
+Function Name & Arguments & Description & Units \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Built-in Psychrometric Functions for Erl} \tabularnewline
 \toprule 
 Function Name & Arguments & Description & Units \tabularnewline \midrule
 \endhead
+
 @RhoAirFnPbTdbW & Result & Density of moist air & kg/m < sup > 3 < /sup > \tabularnewline
 Input 1 & Barometric pressure & Pa \tabularnewline
 Input 2 & Drybulb temperature & °C \tabularnewline
@@ -176,10 +200,16 @@ The first input argument is always an Erl variable that has been declared using 
 
 % table 8
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Built-in Function for Accessing Curves and Tables \protect \label{table:built-in-function-for-accessing-curves}}\\
+\caption{Built-in Function for Accessing Curves and Tables \label{table:built-in-function-for-accessing-curves}} \tabularnewline
+\toprule 
+Function Name & Arguments & Description & Notes \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Built-in Function for Accessing Curves and Tables} \tabularnewline
 \toprule 
 Function Name & Arguments & Description & Notes \tabularnewline \midrule
 \endhead
+
 @CurveValue & Result & Result from evaluating the curve or table as a function of the input arguments &  \tabularnewline
 Input 1 & Index variable that "points" to a specific curve or table object defined elsewhere in the IDF. & This variable needs to be declared and filled using an EnergyManagementSystem:CurveOrTableIndexVariable object. \tabularnewline
 Input 2 & First independent variable & Typically the "X" input value, always used \tabularnewline

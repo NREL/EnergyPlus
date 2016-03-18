@@ -11,7 +11,7 @@ The input object DaylightingDevice:Tubular provides a special model for fenestra
 \begin{figure}[hbtp] % fig 66
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image869.png}
-\caption{  Tubular Daylighting Devices \protect \label{fig:tubular-daylighting-devices}}
+\caption{Tubular Daylighting Devices \protect \label{fig:tubular-daylighting-devices}}
 \end{figure}
 
 The dome is typically a hemisphere made of clear plastic.~ It allows daylight into the pipe while keeping exterior weather out.~ The pipe is assumed to be a smooth cylinder with a highly reflective inside surface.~ The surface is usually either bare polished metal or a special reflective sheet adhered to the inside.~ The pipe channels the daylight from the dome to the diffuser via multiple internal reflections.~ The diffuser is typically a flat frosted plastic cover.~ The diffuser evenly distributes the daylight to the zone.~ The dome/diffuser area and pipe area must be approximately equal (within 2\%) for running the simulation successfully.
@@ -34,7 +34,7 @@ For both daylighting and heat balance simulations, the dome and diffuser are tre
 \begin{figure}[hbtp] % fig 67
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image870.png}
-\caption{  Dome and Diffuser Surfaces \protect \label{fig:dome-and-diffuser-surfaces}}
+\caption{Dome and Diffuser Surfaces \protect \label{fig:dome-and-diffuser-surfaces}}
 \end{figure}
 
 The pipe is simulated by a separate code module.~ While several different measures for characterizing TDD performance are in use (Zhang 2002; Harrison 1998), the total transmittance of the TDD is most compatible with the EnergyPlus daylighting and heat balance code.~ Calculation of the transmittance of the pipe and the TDD for different types of radiation is fundamental to all phenomena covered by the model.
@@ -46,7 +46,7 @@ The transmittance of beam radiation is derived from the integration of the trans
 \begin{figure}[hbtp] % fig 68
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image871.png}
-\caption{  Discrete Ray in a Pipe \protect \label{fig:discrete-ray-in-a-pipe}}
+\caption{Discrete Ray in a Pipe \protect \label{fig:discrete-ray-in-a-pipe}}
 \end{figure}
 
 For an opaque surface, the reflectivity is:
@@ -80,7 +80,7 @@ In the graph below, interpolated values from EnergyPlus are compared to the resu
 \begin{figure}[hbtp] % fig 69
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image874.png}
-\caption{  Pipe Transmittance Comparison. \protect \label{fig:pipe-transmittance-comparison.}}
+\caption{Pipe Transmittance Comparison. \protect \label{fig:pipe-transmittance-comparison.}}
 \end{figure}
 
 During initialization of each unique TDD, the program integrates and tabulates values for the visible and solar transmittance of the pipe.~ The results are subsequently used in the daylighting simulation and heat balance simulation respectively.
@@ -97,11 +97,11 @@ The beam transmittance of the TDD takes into account the dome and diffuser trans
 
 where
 
-t\(_{e}\)(q) = beam transmittance of the dome glazing at the incident angle
+\(\tau_{dome}\)(q) = beam transmittance of the dome glazing at the incident angle
 
-t\(_{e}\)(q) = beam transmittance of the pipe at the incident angle, as described above
+\(\tau_{pipe}\)(q) = beam transmittance of the pipe at the incident angle, as described above
 
-t\(_{r}\) = diffuse transmittance of the diffuser glazing
+\(\tau_{diffuser}\) = diffuse transmittance of the diffuser glazing
 
 The dome transmittance is calculated for a flat window.~ The model does not take into account refraction due to the curvature of the dome surface.
 
@@ -113,7 +113,7 @@ The calculation of TDD diffuse transmittance is considerably more complex and is
 
 The daylighting simulation of the TDD treats the diffuser surface as a regular window illuminated from the outside by sun, sky, and ground.~ However, the TDD model replaces the window glazing transmittance with the appropriate TDD transmittance and converts all transmitted light to diffuse.
 
-The illuminance due to the direct beam of the sun is found using the TDD beam transmittance t\(_{D}\)(q) as described above.~ The incident angle q is relative to the dome surface.
+The illuminance due to the direct beam of the sun is found using the TDD beam transmittance t\(_{TDD}\)(q) as described above.~ The incident angle q is relative to the dome surface.
 
 The illuminance due to sky radiation and ground reflected radiation is calculated with the normal daylighting model integration over the sky and ground within the viewable hemisphere of the dome.~ The transmittance of each sky or ground~ element is also found using the TDD beam transmittance at the incident angle of the sky or ground element relative to the dome.
 
@@ -123,7 +123,7 @@ Light from the diffuser is converted to diffuse inside the zone in the same way 
 
 Solar radiation incident on a window is calculated separately as sun, sky, and ground radiation.~ A different transmittance must be applied for each type of radiation.
 
-For beam radiation the TDD beam transmittance t\(_{D}\)(q) for the solar spectrum is used as described above.~ For sky and ground radiation a diffuse transmittance for the TDD must be developed.
+For beam radiation the TDD beam transmittance t\(_{TDD}\)(q) for the solar spectrum is used as described above.~ For sky and ground radiation a diffuse transmittance for the TDD must be developed.
 
 The transmittance of diffuse radiation can be defined as the total transmitted flux divided by the total incident flux.
 
@@ -147,7 +147,7 @@ For isotropic diffuse radiation P(q) is the cosine of the incident angle q.
 {\tau_{diff,iso}} = \frac{{\int_{\theta  = 0}^{\pi /2} {\tau (\theta )\cos \theta } \sin \theta d\theta }}{{\int_{\theta  = 0}^{\pi /2} {\cos \theta } \sin \theta d\theta }}
 \end{equation}
 
-For a given pipe or TDD, t\(_{o}\) is a constant.~ The program calculates t\(_{o}\) once during initialization using a numerical integration.
+For a given pipe or TDD, t\(_{diff,iso}\) is a constant.~ The program calculates t\(_{diff,iso}\) once during initialization using a numerical integration.
 
 The diffuse isotropic transmittance is useful, but not sufficient, for determining the transmittance of sky radiation.~ As described in the \emph{Sky Radiance Model} section, sky radiation has an anisotropic distribution modeled as the superposition of three simple distributions: a diffuse isotropic background, a circumsolar brightening near the sun, and a horizon brightening.~ While the daylighting model is capable of calculating the luminance of any position in the sky, the solar code only calculates the ultimate irradiance on a surface.~ For this reason it is not possible to integrate over an angular distribution function for sky radiance.~ Instead the three sky distributions must be handled piecewise.
 
@@ -163,11 +163,11 @@ Substituting in the appropriate transmittances:
 
 where
 
-t\(_{o}\) = diffuse isotropic transmittance
+\(\tau_{diff,iso}\) = diffuse isotropic transmittance
 
 t(q) = beam transmittance at incident angle q of sun
 
-t\(_{z}\) = diffuse transmittance of the horizon, derived below
+\(\tau_{diff,horiz}\) = diffuse transmittance of the horizon, derived below
 
 It is important to note that transmittances above are for the total TDD.~ The transmittance of the dome and diffuser must be included to account for their angular dependences as well.
 
@@ -203,23 +203,23 @@ The solar flux transmitted by a TDD due to beam, sky, and ground radiation is ca
 
 where
 
-I\(_{n}\) = solar beam intensity of the sun
+I\(_{sun}\) = solar beam intensity of the sun
 
-I\(_{y}\) = total horizontal diffuse solar radiation due to the sky
+I\(_{h,sky}\) = total horizontal diffuse solar radiation due to the sky
 
 q = incident angle of the beam on the dome
 
-f\(_{t}\) = sunlit beam fraction of the dome area
+f\(_{sunlit}\) = sunlit beam fraction of the dome area
 
-f\(_{t}\) = anisotropic sky view multiplier (see AnisoSkyMult)
+f\(_{skymult}\) = anisotropic sky view multiplier (see AnisoSkyMult)
 
-F\(_{g}\) = view from ground to dome
+F\(_{sg}\) = view from ground to dome
 
-t\(_{D}\)(q) = TDD beam transmittance
+\(\tau_{TDD}\)(q) = TDD beam transmittance
 
-t\(_{o}\) = TDD anisotropic sky transmittance
+\(\tau_{TDD,diff,aniso}\) = TDD anisotropic sky transmittance
 
-t\(_{o}\) = TDD isotropic diffuse transmittance
+\(\tau_{TDD,diff,iso}\) = TDD isotropic diffuse transmittance
 
 \subsubsection{Daylighting vs.~Solar}\label{daylighting-vs.solar}
 
@@ -266,7 +266,7 @@ The inward bound solar absorbed by the pipe is the difference between the solar 
 {Q_{abs,in}} = {q''_{trans,dome}}{A_{dome}} - {q''_{inc,diffuser}}{A_{diffuser}}
 \end{equation}
 
-The solar transmitted by the dome q``\(_{e}\) is calculated as usual for a window.~ The solar incident on the diffuser q''\(_{r}\) is more complicated because each component must be treated separately.
+The solar transmitted by the dome q``\(_{trans,dome}\) is calculated as usual for a window.~ The solar incident on the diffuser q''\(_{inc,diffuser}\) is more complicated because each component must be treated separately.
 
 \begin{equation}
 {q''_{inc,diffuser}} = {q''_{beam}}\frac{{{\tau_{TDD,beam}}(\theta )}}{{{\tau_{diffuser}}}} + {q''_{sky}}\frac{{{\tau_{TDD,aniso}}(Hour)}}{{{\tau_{diffuser}}}} + {q''_{gnd}}\frac{{{\tau_{TDD,iso}}}}{{{\tau_{diffuser}}}}
@@ -278,7 +278,7 @@ The outward bound solar absorbed by the pipe is given by:
 {Q_{abs,out}} = \left( {{{q''}_{refl,diffuser}}\frac{{\left( {1 - {\tau_{TDD}}} \right)}}{{{\tau_{diffuser}}}} + {{q''}_{zoneSW}}\left( {1 - {\tau_{TDD}}} \right)} \right){A_{diffuser}}
 \end{equation}
 
-where q``\(_{W}\) is the zone interior diffuse shortwave flux from window, lights, and ambient surface reflections, and
+where q``\(_{zoneSW}\) is the zone interior diffuse shortwave flux from window, lights, and ambient surface reflections, and
 
 \begin{equation}
 {q''_{refl,diffuser}} = {q''_{inc,diffuser}} - {q''_{abs,diffuser}} - {q''_{trans,diffuser}}
@@ -311,7 +311,7 @@ The window is divided into two window surfaces: an upper window and a lower wind
 \begin{figure}[hbtp] % fig 70
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image893.png}
-\caption{  Daylighting Shelf Diagram \protect \label{fig:daylighting-shelf-diagram}}
+\caption{Daylighting Shelf Diagram \protect \label{fig:daylighting-shelf-diagram}}
 \end{figure}
 
 Daylighting shelves are simulated separately for daylighting and the zone heat balance.~ The general model is similar in both cases, but the details vary.
@@ -332,9 +332,9 @@ In the daylighting simulation this is accomplished by forcing all the transmitte
 
 where
 
-F\(_{W}\) = upgoing flux
+F\(_{CW}\) = upgoing flux
 
-F\(_{W}\) = downgoing flux
+F\(_{FW}\) = downgoing flux
 
 F = total flux
 
@@ -370,34 +370,34 @@ where
 
 and
 
-E\(_{n}\) = exterior illuminance due to light from the sun
+E\(_{sun}\) = exterior illuminance due to light from the sun
 
-E\(_{y}\) = exterior horizontal illuminance due to light from the sky
+E\(_{h,\,sky}\) = exterior horizontal illuminance due to light from the sky
 
 q = incident angle of the beam on the shelf
 
-f\(_{t}\) = sunlit beam fraction of the shelf surface area
+f\(_{sunlit}\) = sunlit beam fraction of the shelf surface area
 
-f\(_{t}\) = anisotropic sky view multiplier (see AnisoSkyMult)
+f\(_{skymult}\) = anisotropic sky view multiplier (see AnisoSkyMult)
 
-r\(_{s}\) = shelf surface reflectivity in the visible spectrum
+r\(_{vis}\) = shelf surface reflectivity in the visible spectrum
 
-F\(_{s}\) = view factor from window to shelf
+F\(_{ws}\) = view factor from window to shelf
 
-t\(_{s}\) = diffuse window transmittance in the visible spectrum
+t\(_{diff,\, vis}\) = diffuse window transmittance in the visible spectrum
 
-The sunlit beam fraction f\(_{t}\) and the anisotropic sky view multiplier f\(_{t}\) are borrowed from the heat balance solar calculations.
+The sunlit beam fraction f\(_{sunlit}\) and the anisotropic sky view multiplier f\(_{skymult}\) are borrowed from the heat balance solar calculations.
 
-The sunlit beam fraction f\(_{t}\) takes into account the effect of shading due to other surfaces.~ Although shadows on the shelf surface change the luminance distribution of the shelf, there is no angular dependence because diffuse properties are assumed.~ Therefore, the flux is simply proportional to the sunlit fraction.
+The sunlit beam fraction f\(_{sunlit}\) takes into account the effect of shading due to other surfaces.~ Although shadows on the shelf surface change the luminance distribution of the shelf, there is no angular dependence because diffuse properties are assumed.~ Therefore, the flux is simply proportional to the sunlit fraction.
 
-The anisotropic sky view multiplier f\(_{t}\) takes into account the anisotropic distribution of sky radiation, the shelf view factor to the sky, and shading.~ This value is utilized in the heat balance simulation for solar calculations but is not currently available in the daylighting simulation.~ A value of 1.0 is assumed until a better model is developed.~ For this reason the sky-related flux may be over-predicted for some building and shelf geometries.~ However, for clear sky conditions the sun-related flux is dominant and the resulting error is small.
+The anisotropic sky view multiplier f\(_{skymult}\) takes into account the anisotropic distribution of sky radiation, the shelf view factor to the sky, and shading.~ This value is utilized in the heat balance simulation for solar calculations but is not currently available in the daylighting simulation.~ A value of 1.0 is assumed until a better model is developed.~ For this reason the sky-related flux may be over-predicted for some building and shelf geometries.~ However, for clear sky conditions the sun-related flux is dominant and the resulting error is small.
 
-The view factor to the outside shelf, F\(_{s}\), if not specified by the user in the input object, is an exact view factor calculated for adjacent perpendicular rectangles.
+The view factor to the outside shelf, F\(_{ws}\), if not specified by the user in the input object, is an exact view factor calculated for adjacent perpendicular rectangles.
 
 \begin{figure}[hbtp] % fig 71
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image899.png}
-\caption{  Window and Outside Shelf as Adjacent Perpendicular Rectangles. \protect \label{fig:window-and-outside-shelf-as-adjacent}}
+\caption{Window and Outside Shelf as Adjacent Perpendicular Rectangles. \protect \label{fig:window-and-outside-shelf-as-adjacent}}
 \end{figure}
 
 For this geometry the view factor is given by (Mills 1995):
@@ -438,21 +438,21 @@ where
 
 and
 
-I\(_{n}\) = solar beam intensity of the sun
+I\(_{sun}\) = solar beam intensity of the sun
 
-I\(_{y}\) = total horizontal diffuse solar radiation due to the sky
+I\(_{h,\, sky}\) = total horizontal diffuse solar radiation due to the sky
 
 q = incident angle of the beam on the shelf
 
-f\(_{t}\) = sunlit beam fraction of the surface area
+f\(_{sunlit}\) = sunlit beam fraction of the surface area
 
-f\(_{t}\) = anisotropic sky view multiplier (see AnisoSkyMult)
+f\(_{skymult}\) = anisotropic sky view multiplier (see AnisoSkyMult)
 
-r\(_{l}\) = shelf surface reflectivity in the solar spectrum
+r\(_{sol}\) = shelf surface reflectivity in the solar spectrum
 
-F\(_{s}\) = view factor from window to shelf
+F\(_{ws}\) = view factor from window to shelf
 
-The view factor F\(_{s}\) is the same as described above for daylighting.
+The view factor F\(_{ws}\) is the same as described above for daylighting.
 
 The total diffuse incident radiation due to the shelf is internally added to the ground diffuse incident radiation on the window.~ For reporting purposes the shelf radiation is included in the \emph{Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area} output variable.
 
@@ -464,7 +464,7 @@ With the incident radiation determined, the remaining window heat balance is cal
 
 where
 
-t\(_{l}\) = diffuse window transmittance in the solar spectrum
+\(\tau_{diff,\, sol}\) = diffuse window transmittance in the solar spectrum
 
 \subsubsection{References}\label{references-1-006}
 
@@ -499,7 +499,7 @@ The model in EnergyPlus was implemented by fitting a curve to the data presented
 \begin{figure}[hbtp] % fig 73
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image910.png}
-\caption{Graph showing light well efficiency vs. well cavity ratio (WCR) for well-wall visible reflectances of 80\% (upper curve), 60\% (middle curve) and 40\% (lower curve). Based on Fig. 8-21 of the Lighting Handbook: Reference and Application, 8\$\^{}\{h\}\$ Edition, 1993, Illuminating Engineering Society of North America. \protect \label{fig:graph-showing-light-well-efficiency-vs.-well}}
+\caption{Graph showing light well efficiency vs. well cavity ratio (WCR) for well-wall visible reflectances of 80\% (upper curve), 60\% (middle curve) and 40\% (lower curve). Based on Fig. 8-21 of the Lighting Handbook: Reference and Application, 8\(^{th}\) Edition, 1993, Illuminating Engineering Society of North America. \protect \label{fig:graph-showing-light-well-efficiency-vs.-well}}
 \end{figure}
 
 The well efficiency calculated using this curve fit and user inputs is then applied to daylight transmission rates to attenuate daylight as a result of the presence of the light well,

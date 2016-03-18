@@ -2,9 +2,19 @@
 
 % table 25
 \begin{longtable}[c]{p{1.25in}p{2.0in}p{1.25in}p{1.5in}}
-\caption{Variables in Daylighting Calculations \label{table:variables-in-daylighting-calculations}}\\
+
+\caption{Variables in Daylighting Calculations \label{table:variables-in-daylighting-calculations}} \tabularnewline
 \toprule 
-Mathematical Variable & Description & Units & Internal Variable \tabularnewline \midrule \endhead
+Mathematical Variable & Description & Units & Internal Variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Variables in Daylighting Calculations} \tabularnewline
+\toprule 
+Mathematical Variable & Description & Units & Internal Variable \tabularnewline
+\midrule
+\endhead
+
 $E_{h,\text{sky}}$ & Exterior horizontal illuminance due to light from the sky & lux & GILSK \tabularnewline
 $E_{h,\text{sun}}$ & Exterior horizontal illuminance due to light from the sun & lux & GILSU \tabularnewline
 $d_{\text{sky}}$, $d_{\text{sun}}$ & Interior illuminance factor due to sky, sun related light & --- & DFACSK,DFACSU \tabularnewline
@@ -222,7 +232,7 @@ where
 \begin{figure}[hbtp] % fig 57
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image733.png}
-\caption{  Angles appearing in the expression for the clear-sky luminance distribution. \protect \label{fig:angles-appearing-in-the-expression-for}}
+\caption{Angles appearing in the expression for the clear-sky luminance distribution. \protect \label{fig:angles-appearing-in-the-expression-for}}
 \end{figure}
 
 \subsubsection{Overcast Sky}\label{overcast-sky}
@@ -330,13 +340,13 @@ For the unshaded window case, the luminance of the window element is found by pr
 
 where \({\tau_{vis}}\) is the visible transmittance of the glass for incidence angle \emph{B}.
 
-Exterior obstructions are generally opaque (like fins, overhangs, neighboring buildings, and the building's own wall and roof surfaces) but can be transmitting (like a tree or translucent awning). Exterior obstructions are assumed to be non-reflecting. If \emph{L\(_{sky}\)} is the sky luminance and \emph{$\tau$\(_{obs}\)} is the transmittance of the obstruction (assumed independent of incidence angle), then \emph{L = * L\(_{y}\)$\tau$\(_{obs}\)}. Interior obstructions are assumed to be opaque ($\tau$\(_{obs}\) = 0).
+Exterior obstructions are generally opaque (like fins, overhangs, neighboring buildings, and the building's own wall and roof surfaces) but can be transmitting (like a tree or translucent awning). Exterior obstructions are assumed to be non-reflecting. If \emph{L\(_{sky}\)} is the sky luminance and \emph{$\tau$\(_{obs}\)} is the transmittance of the obstruction (assumed independent of incidence angle), then \(L = L_{sky} \tau_{obs}\). Interior obstructions are assumed to be opaque ($\tau$\(_{obs}\) = 0).
 
 \subsubsection{Shaded Window}\label{shaded-window}
 
 For the window-plus-shade case the shade is assumed to be a perfect diffuser, i.e., the luminance of the shade is independent of angle of emission of light, position on shade, and angle of incidence of solar radiation falling on the shade. Closely-woven drapery fabric and translucent roller shades are closer to being perfect diffusers than Venetian blinds or other slatted devices, which usually have non-uniform luminance characteristics.
 
-The calculation of the window luminance with the shade in place, \emph{L\(_{w,h}\)}, is described in {[}Winkelmann, 1983{]}. The illuminance contribution at the reference point from a shaded window element is then given by Eq. (152) with \({L_w} = {L_{w,sh}}\) .
+The calculation of the window luminance with the shade in place, \emph{L\(_{w,sh}\)}, is described in {[}Winkelmann, 1983{]}. The illuminance contribution at the reference point from a shaded window element is then given by Eq. (152) with \({L_w} = {L_{w,sh}}\) .
 
 \subsection{Internally-Reflected Component of Interior Daylight Illuminance}\label{internally-reflected-component-of-interior-daylight-illuminance}
 
@@ -346,7 +356,7 @@ Daylight reaching a reference point after reflection from interior surfaces is c
 {F_1} = {\Phi_{FW}}{\rho_{FW}} + {\Phi_{CW}}{\rho_{CW}}
 \end{equation}
 
-where \emph{$\rho$\(_{W}\)} is the area-weighted average reflectance of the floor and those parts of the walls below the window midplane, and \emph{$\rho$\(_{W}\)} is the area-weighted average reflectance of the ceiling and those parts of the walls above the window midplane.
+where \emph{$\rho$\(_{FW}\)} is the area-weighted average reflectance of the floor and those parts of the walls below the window midplane, and \emph{$\rho$\(_{CW}\)} is the area-weighted average reflectance of the ceiling and those parts of the walls above the window midplane.
 
 To find the final average internally-reflected illuminance, \emph{E\(_{r}\)}, on the room surfaces (which in this method is uniform throughout the room) a flux balance is used. The total reflected flux absorbed by the room surfaces (or lost through the windows) is \emph{AE\(_{r}\)(1-$\rho$)}, where \emph{A} is the total inside surface area of the floor, walls, ceiling and windows in the room, and \emph{$\rho$} is the area-weighted average reflectance of the room surfaces, including windows. From conservation of energy
 
@@ -546,7 +556,7 @@ where
 \begin{figure}[hbtp] % fig 59
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image794.png}
-\caption{  Geometry for calculation of displacement ratios used in the glare formula. \protect \label{fig:geometry-for-calculation-of-displacement}}
+\caption{Geometry for calculation of displacement ratios used in the glare formula. \protect \label{fig:geometry-for-calculation-of-displacement}}
 \end{figure}
 
 The factor \emph{p} can be obtained from graphs given in {[}Petherbridge \& Longmore, 1954{]} or it can be calculated from tabulated values of \emph{p\(_{H}\)}, the Hopkinson position factor {[}Hopkinson, 1966{]}, since \(p = p_H^{1.25}\) . The values resulting from the latter approach are given in Table~\ref{table:position-factor-for-glare-calculation}. Interpolation of this table is used in EnergyPlus to evaluate \emph{p} at intermediate values of \emph{x\(_{R}\)} and \emph{y\(_{R}\)}.

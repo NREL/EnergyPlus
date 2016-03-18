@@ -44,7 +44,7 @@ Since this default temperature profile may not be applicable to all locations, t
 
 \subsection{Sky Radiation Modeling}\label{sky-radiation-modeling}
 
-EnergyPlus calculates the Horizontal Infrared Radiation Intensity in Wh/m\(^{,}\) if it is missing on the weather file or for design days, from the Opaque Sky Cover field as shown in the following explanation.
+EnergyPlus calculates the Horizontal Infrared Radiation Intensity in Wh/m\(^{2,}\) if it is missing on the weather file or for design days, from the Opaque Sky Cover field as shown in the following explanation.
 
 \begin{equation}
 Horizontal_IR = Sk{y_{emissivity}}\cdot Sigma\cdot Temperature_{drybulb}^4
@@ -54,7 +54,7 @@ where
 
 Horizontal\_IR = horizontal IR intensity \{W/m\(^{2}\)\}
 
-Sky\(_{eimissivity}\) = sky emissivity
+Sky\(_{emissivity}\) = sky emissivity
 
 Sigma = Stefan-Boltzmann constant = 5.6697e-8 \{W/m\(^{2}\)-K\(^{4}\)\}
 
@@ -90,7 +90,7 @@ Sk{y_{Temperature}} = {\left( {\frac{{Horizontal_IR}}{{Sigma}}} \right)^{.25}} -
 
 Where
 
-Sky\(_{temperature}\) = Sky radiative temperature \{C\}
+Sky\(_{Temperature}\) = Sky radiative temperature \{C\}
 
 Horiizontal\_IR = Horizontal Infrared Radiation Intensity as described in the previous section \{Wh/m\(^{2}\)\}
 
@@ -124,7 +124,14 @@ Values of A and B vary during the year because of seasonal changes in the dust a
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{Extraterrestrial Solar Irradiance and Related Data Note: Data are for 21st day of each month during the base year of 1964. \protect \label{table:extraterrestrial-solar-irradiance-and-related}}\\
 \toprule 
-~ & I\(_{o}\)\{W/m\(^{2}\)\} & Equation of Time \{minutes\} & Declination \{degrees\} & A \{W/m\(^{2}\)\} & B \{\} & C \{\} \tabularnewline \midrule
+~ & I\(_{o}\)\{W/m\(^{2}\)\} & Equation of Time \{minutes\} & Declination \{degrees\} & A \{W/m\(^{2}\)\} & B \{\} & C \{\} \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Extraterrestrial Solar Irradiance and Related Data Note: Data are for 21st day of each month during the base year of 1964.} \tabularnewline
+\toprule 
+~ & I\(_{o}\)\{W/m\(^{2}\)\} & Equation of Time \{minutes\} & Declination \{degrees\} & A \{W/m\(^{2}\)\} & B \{\} & C \{\} \tabularnewline
+\midrule
 \endhead
 Jan & 1416 & -11.2 & -20.0 & 1202 & 0.141 & 0.103 \tabularnewline
 Feb & 1401 & -13.9 & -10.8 & 1187 & 0.142 & 0.104 \tabularnewline

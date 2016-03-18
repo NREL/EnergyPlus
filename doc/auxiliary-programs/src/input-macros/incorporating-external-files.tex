@@ -30,8 +30,15 @@ Example: Assume the following files contain the indicated lines:
 
 \begin{longtable}[c]{@{}lll@{}}
 \toprule 
-Main input file: & First external file: & Second external file: \tabularnewline \midrule
+Main input file: & First external file: & Second external file: \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Main input file: & First external file: & Second external file: \tabularnewline
+\midrule
 \endhead
+
 input1.inp & file2.inp & file3.inp \tabularnewline
 line 1a & line 2a & line 3a \tabularnewline
 \#\#include file2.inp & line 2b & line 3b \tabularnewline
@@ -70,8 +77,15 @@ External files can also contain \textbf{\#\#include} commands, as shown in the f
 
 \begin{longtable}[c]{@{}lll@{}}
 \toprule 
-Main input file: & First external file: & Second external file: \tabularnewline \midrule
+Main input file: & First external file: & Second external file: \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Main input file: & First external file: & Second external file: \tabularnewline
+\midrule
 \endhead
+
 input1.inp & file2.inp & file3.inp \tabularnewline
 line 1a & line 2a & line 3a \tabularnewline
 \#\#include file2.inp & line 2b & line 3b \tabularnewline

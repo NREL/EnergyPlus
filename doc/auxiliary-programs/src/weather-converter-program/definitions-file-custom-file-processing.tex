@@ -45,10 +45,16 @@ Note that strings in the ``def'' should be enclosed in single quotes if there is
 
 % table 4
 \begin{longtable}[c]{p{2.12in}p{1.5in}p{2.37in}}
-\caption{Definitions File \&location description \protect \label{table:definitions-file-location-description}}\\
+\caption{Definitions File \&location description \label{table:definitions-file-location-description}} \tabularnewline
+\toprule 
+\& location Field Description & Field Name & Type \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Definitions File \&location description} \tabularnewline
 \toprule 
 \& location Field Description & Field Name & Type \tabularnewline \midrule
 \endhead
+
 Name of City & City & String \tabularnewline
 State or Province & StateProv & String \tabularnewline
 Country Code & Country & String (3 characters) \tabularnewline
@@ -84,10 +90,16 @@ This field is the WMO (World Meterological Organization) number for the location
 
 % table 5
 \begin{longtable}[c]{@{}lll@{}}
-\caption{Definitions File - \&miscdata description \protect \label{table:definitions-file-miscdata-description}}\\
+\caption{Definitions File - \&miscdata description \label{table:definitions-file-miscdata-description}} \tabularnewline
+\toprule 
+\& mischata Field Description & Field Name & Type \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Definitions File - \&miscdata description} \tabularnewline
 \toprule 
 \& mischata Field Description & Field Name & Type \tabularnewline \midrule
 \endhead
+
 String for Comments 1 header & Comments1 & String \tabularnewline
 String for Comments 2 header & Comments2 & String \tabularnewline
 String for Source Data in Location header & SourceData & String \tabularnewline
@@ -111,10 +123,16 @@ When a list of files is being processed, one of the outputs that results from th
 
 % table 6
 \begin{longtable}[c]{p{2.71in}p{1.5in}p{1.79in}}
-\caption{Definitions file - \&wthdata description \protect \label{table:definitions-file-wthdata-description}}\\
+\caption{Definitions file - \&wthdata description \label{table:definitions-file-wthdata-description}} \tabularnewline
+\toprule 
+\& wthdata Field Description & Field Name & Type \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Definitions file - \&wthdata description} \tabularnewline
 \toprule 
 \& wthdata Field Description & Field Name & Type \tabularnewline \midrule
 \endhead
+
 Input File Type & InputFileType & String \tabularnewline
 Number of records per hour & NumInHour & Integer \tabularnewline
 Data Element Names & DataElements & Strings \tabularnewline
@@ -136,10 +154,16 @@ You can always use this field and def file to ``override'' the default input for
 
 % table 7
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Input File Type Values \protect \label{table:input-file-type-values}}\\
+\caption{Input File Type Values \label{table:input-file-type-values}} \tabularnewline
+\toprule 
+Value & File Type Description \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Input File Type Values} \tabularnewline
 \toprule 
 Value & File Type Description \tabularnewline \midrule
 \endhead
+
 Tmy or ,tm2 & TMY2 Data File \tabularnewline
 Iwec or iwc & IWEC Data File \tabularnewline
 Samson or dat & SAMSON Data File \tabularnewline
@@ -167,9 +191,19 @@ This field can be used to specify multi-interval (per hour) files. Without this 
 For custom files, you will need to indicate which data elements are in which positions of the raw data file. The fields must come from a standardized list of names see following tables that include internal names (short and long - as shown in Table 8) as well as the EnergyPlus CSV format names (short and long - shown in Table~\ref{table:names-from-the-energyplus-csv-files}) plus some further elements that can be specified when the standard data elements are not part of the raw data (as shown in Table~\ref{table:auxiliary-data-for-custom-files}). ``Ignore'' is used to skip a raw data field that is not applicable to the weather converter formats. Note that variables listed in the following table (in italics) are allowed for flexibility - i.e.~wetbulb temperature can be used to determine relative humidity and/or dewpoint temperature. The following three tables illustrate the names for data elements.
 
 \begin{longtable}[c]{p{1.5in}p{2.5in}p{1.0in}p{1.0in}}
-\caption{Internal Data Element Names (directly applicable to EPW) \label{table:internal-data-element-names-directly}}\\
+
+\caption{Internal Data Element Names (directly applicable to EPW) \label{table:internal-data-element-names-directly}} \tabularnewline
 \toprule 
-Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline \midrule \endhead
+Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Internal Data Element Names (directly applicable to EPW)} \tabularnewline
+\toprule
+Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline
+\midrule
+\endhead
+
 year & Year & - & n \tabularnewline
 month & Month & - & y \tabularnewline
 day & Day & - & y \tabularnewline
@@ -212,10 +246,16 @@ The following table illustrates that the EnergyPlus CSV header names can be used
 
 % table 9
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Names from the EnergyPlus CSV files \protect \label{table:names-from-the-energyplus-csv-files}}\\
+\caption{Names from the EnergyPlus CSV files \label{table:names-from-the-energyplus-csv-files}} \tabularnewline
+\toprule 
+Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Names from the EnergyPlus CSV files} \tabularnewline
 \toprule 
 Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline \midrule
 \endhead
+
 Date & Date (used to derive Month/Day) & - & N \tabularnewline
 hh:mm & HH:MM (used to derive hour/minute) & - & N \tabularnewline
 datasource & datasource & - & N \tabularnewline
@@ -257,10 +297,16 @@ Often raw data files will not have the preceding elements but similar elements t
 
 % table 10
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Auxiliary Data for Custom Files \protect \label{table:auxiliary-data-for-custom-files}}\\
+\caption{Auxiliary Data for Custom Files \label{table:auxiliary-data-for-custom-files}} \tabularnewline
+\toprule 
+Short Name & Long Name & Units & Useh by EnergyPlus \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Auxiliary Data for Custom Files} \tabularnewline
 \toprule 
 Short Name & Long Name & Units & Useh by EnergyPlus \tabularnewline \midrule
 \endhead
+
 wetbulb & wet\_bulb\_temperature & C & N \tabularnewline
 humratio & humidity\_ratio & g/kg & N \tabularnewline
 dirhorrad & direct\_horizontal\_radiation & Wh/m2 & N \tabularnewline
@@ -304,10 +350,16 @@ Dates can be entered as month, day, and year. The units field must be entered an
 
 % table 11
 \begin{longtable}[c]{@{}lll@{}}
-\caption{Allowable hate formats for Custom Data entries. \protect \label{table:allowable-hate-formats-for-custom-data}}\\
+\caption{Allowable hate formats for Custom Data entries. \label{table:allowable-hate-formats-for-custom-data}} \tabularnewline
+\toprule 
+Units Format & Interpretation & Example \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Allowable hate formats for Custom Data entries.} \tabularnewline
 \toprule 
 Units Format & Interpretation & Example \tabularnewline \midrule
 \endhead
+
 mm/dd/yyyy mm/dd/yy m/d/y & Month, day, year & 12/13/2009 \tabularnewline
 yyyy/mm/dd yy/mm/dd y/m/d & Year, month, day & 2009/12/13 \tabularnewline
 dd/mm/yyyy dd/mm/yy d/m/y & Day, month, year & 13/12/2009 \tabularnewline
@@ -344,10 +396,16 @@ If you are entering the aforementiond ``date'' Data Element and your date separa
 
 % table 12
 \begin{longtable}[c]{p{1.81in}p{1.65in}p{2.52in}}
-\caption{Definitions file - \&datacontrol description \protect \label{table:definitions-file-datacontrol-description}}\\
+\caption{Definitions file - \&datacontrol description \label{table:definitions-file-datacontrol-description}} \tabularnewline
+\toprule 
+\& datacontrol Field Description & Field Name & Type \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Definitions file - \&datacontrol description} \tabularnewline
 \toprule 
 \& datacontrol Field Description & Field Name & Type \tabularnewline \midrule
 \endhead
+
 Records to Skip & NumRecordsToSkip & Integer \tabularnewline
 Records to Read & MaxNumRecordsToRead & Integer \tabularnewline
 Missing Data Action & MissingDataAction &  \tabularnewline

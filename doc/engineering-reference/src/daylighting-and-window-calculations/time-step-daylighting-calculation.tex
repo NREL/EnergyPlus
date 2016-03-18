@@ -6,10 +6,18 @@ A daylighting calculation is performed each time step that the sun is up for eac
 
 % table 27
 \begin{longtable}[c]{p{1.0in}p{2.0in}p{1.0in}p{2.0in}}
-\caption{  Variables in Time-Step Calculations \protect \label{table:variables-in-time-step-calculations}}\\
+\caption{Variables in Time-Step Calculations \label{table:variables-in-time-step-calculations}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Variables in Time-Step Calculations} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 S\(_{norm,dir}\) & Direct normal solar irradiance & W/m\(^{2}\) & BeamSolarRad \tabularnewline
 S\(_{h,dif}\) & Exterior diffuse horizontal solar irradiance & W/m\(^{2}\) & SDIFH, DifSolarRad \tabularnewline
 S\(_{h,dir}\) & Exterior direct horizontal solar irradiance & W/m\(^{2}\) & SDIRH \tabularnewline
@@ -126,7 +134,7 @@ The interior illuminance from a window is calculated as
 {I_{win}}({i_L},{i_S}) = {\bar d_{sun}}{E_{h,sun}} + [{\bar d_{sky,k}}({i_L},{i_S}){f_k} + {\bar d_{sky,k'}}({i_L},{i_S}){f_{k'}}]{E_{h,sky}}
 \end{equation}
 
-where \emph{E\(_{sun}\)} and \emph{E\(_{sky}\)} are the exterior horizontal illuminance from the sun and sky, respectively, and \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are the fraction of the exterior horizontal illuminance from the sky that is due to sky type \emph{k} and \emph{k'}, respectively.
+where \emph{E\(_{h,sun}\)} and \emph{E\(_{h,sky}\)} are the exterior horizontal illuminance from the sun and sky, respectively, and \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are the fraction of the exterior horizontal illuminance from the sky that is due to sky type \emph{k} and \emph{k'}, respectively.
 
 The horizontal illuminance from sun and sky are given by
 
@@ -148,11 +156,11 @@ The fractions \emph{f\(_{k}\)} and \emph{f\(_{k’}\)} are given by
   \end{array}
 \end{equation}
 
-where \emph{E\(_{h,k}\)} and \emph{E\(_{h,k’}\)} are the horizontal illuminances from skies \emph{k} and \emph{k'}, respectively (see ``Exterior Horizontal Luminance,'' above), and \emph{s\(_{’}\)} is the interpolation factor for skies \emph{k}and \emph{k'}(see ``Time-Step Sky Luminance,'' above).~ For example, if~ \emph{$\varepsilon$} \textgreater{} 3, \emph{k} = \emph{cs} (clear sky), \emph{k'} = \emph{ts} (clear turbid sky) and
+where \emph{E\(_{h,k}\)} and \emph{E\(_{h,k’}\)} are the horizontal illuminances from skies \emph{k} and \emph{k'}, respectively (see ``Exterior Horizontal Luminance,'' above), and \emph{s\(_{k,k’}\)} is the interpolation factor for skies \emph{k}and \emph{k'}(see ``Time-Step Sky Luminance,'' above).~ For example, if~ \emph{$\varepsilon$} \textgreater{} 3, \emph{k} = \emph{cs} (clear sky), \emph{k'} = \emph{ts} (clear turbid sky) and
 
 ~\(s_{k,k'} = s_{cs,ts} = \min [1,(\varepsilon - 3)/3]\)
 
-Similarly, the window source luminance, \emph{S\(_{n}\)}, and window background luminance, \emph{B\(_{n}\)}, for a window are calculated from
+Similarly, the window source luminance, \emph{S\(_{win}\)}, and window background luminance, \emph{B\(_{win}\)}, for a window are calculated from
 
 \begin{equation}
 {S_{win}}({i_L},{i_S}) = {\bar w_{sun}}{E_{h,sun}} + [{\bar w_{sky,k}}({i_L},{i_S}){f_k} + {\bar w_{sky,k'}}({i_L},{i_S}){f_{k'}}]{E_{h,sky}}
@@ -194,23 +202,23 @@ In the last relationship, the background luminance is approximated as the larger
 
 \subsubsection{Glare Control Logic}\label{glare-control-logic}
 
-If glare control has been specified and the glare index at either reference point exceeds a user-specified maximum value, \emph{G\(_{x}\)}, then the windows in the zone are shaded one by one in attempt to bring the glare at both points below \emph{G\(_{x}\)}. (Each time a window is shaded the glare and illuminance at each reference point is recalculated.) The following logic is used:
+If glare control has been specified and the glare index at either reference point exceeds a user-specified maximum value, \emph{G\(_{I,max}\)}, then the windows in the zone are shaded one by one in attempt to bring the glare at both points below \emph{G\(_{I,max}\)}. (Each time a window is shaded the glare and illuminance at each reference point is recalculated.) The following logic is used:
 
-5)~~~If there is only one reference point, shade a window if it is unshaded and shading it decreases the glare, even if it does not decrease the glare below \emph{G\(_{x}\)}. Note that if a window~ has already been shaded, say to control solar gain, it will be left in the shaded state.
+5)~~~If there is only one reference point, shade a window if it is unshaded and shading it decreases the glare, even if it does not decrease the glare below \emph{G\(_{I,max}\)}. Note that if a window~ has already been shaded, say to control solar gain, it will be left in the shaded state.
 
 6)~~~If there are two reference points, then:
 
 *~If glare is too high at both points, shade the window if it decreases glare at both points.
 
-\emph{~If glare is too high only at the first point, shade the window if the glare at the first point decreases, and the glare at the second point stays below}G\(_{x}\)*.
+\emph{~If glare is too high only at the first point, shade the window if the glare at the first point decreases, and the glare at the second point stays below}G\(_{I,max}\)*.
 
 \begin{itemize}
 \tightlist
 \item
-  If glare is too high only at the second point, shade the window if the glare at the second point decreases, and the glare at the first point stays below \emph{G\(_{x}\)}.
+  If glare is too high only at the second point, shade the window if the glare at the second point decreases, and the glare at the first point stays below \emph{G\(_{I,max}\)}.
 \end{itemize}
 
-7)~~~Shades are closed in the order of window input until glare at both points is below \emph{G\(_{x}\)}, or until there are no more windows left to shade.
+7)~~~Shades are closed in the order of window input until glare at both points is below \emph{G\(_{I,max}\)}, or until there are no more windows left to shade.
 
 \subsection{Lighting Control System Simulation}\label{lighting-control-system-simulation}
 
@@ -220,13 +228,13 @@ Once the final daylight illuminance value at each reference point has been deter
 {f_L}({i_L}) = {\rm{max}}\left[ {0,\frac{{{I_{set}}({i_L}) - {I_{tot}}({i_L})}}{{{I_{set}}({i_L})}}} \right]
 \end{equation}
 
-Here, \emph{I\(_{t}\)} is the illuminance setpoint and \emph{I\(_{t}\)} is the daylight illuminance at the reference point. This relationship assumes that the electric lights at full power produce an illuminance equal to \emph{I\(_{t}\)} at the reference point.
+Here, \emph{I\(_{set}\)} is the illuminance setpoint and \emph{I\(_{tot}\)} is the daylight illuminance at the reference point. This relationship assumes that the electric lights at full power produce an illuminance equal to \emph{I\(_{set}\)} at the reference point.
 
 The fractional electric lighting input power, \emph{f\(_{P}\)}, corresponding to \emph{f\(_{L}\)} is then calculated. The relationship between \emph{f\(_{P}\)} and \emph{f\(_{L}\)} depends on the lighting control type.
 
 \subsubsection{Continuous Dimming Control}\label{continuous-dimming-control}
 
-For a continuously-dimmable control system, it is assumed that \emph{f\(_{P}\)} is constant and equal to \emph{f\(_{n}\)}for \emph{f\(_{L}\)\textless{}f\(_{n}\)} and that f\(_{P}\) increases linearly from \emph{f\(_{n}\)} to 1.0 as \emph{f\(_{L}\)} increases from \emph{f\(_{n}\)} to 1.0 (Figure~\ref{fig:control-action-for-a-continuous-dimming}). This gives
+For a continuously-dimmable control system, it is assumed that \emph{f\(_{P}\)} is constant and equal to \emph{f\(_{P,min}\)}for \emph{f\(_{L}\)\textless{}f\(_{L,min}\)} and that f\(_{P}\) increases linearly from \emph{f\(_{P,min}\)} to 1.0 as \emph{f\(_{L}\)} increases from \emph{f\(_{L,min}\)} to 1.0 (Figure~\ref{fig:control-action-for-a-continuous-dimming}). This gives
 
 \begin{equation}
   f_P = \left\{
@@ -240,16 +248,16 @@ For a continuously-dimmable control system, it is assumed that \emph{f\(_{P}\)} 
 \begin{figure}[hbtp] % fig 60
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image823.png}
-\caption{  Control action for a continuous dimming system. \protect \label{fig:control-action-for-a-continuous-dimming}}
+\caption{Control action for a continuous dimming system. \protect \label{fig:control-action-for-a-continuous-dimming}}
 \end{figure}
 
 \subsubsection{Continuous/Off Dimming Control}\label{continuousoff-dimming-control}
 
-A ``continuous/off'' dimming system has the same behavior as a continuous dimming system except that the lights switch off for \emph{f\(_{L}\) \textless{} f\(_{n}\)} rather than staying at \emph{f\(_{n}\)}.
+A ``continuous/off'' dimming system has the same behavior as a continuous dimming system except that the lights switch off for \emph{f\(_{L}\) \textless{} f\(_{L,min}\)} rather than staying at \emph{f\(_{P,min}\)}.
 
 \subsubsection{Stepped Control}\label{stepped-control}
 
-For a stepped control system, \emph{f\(_{P}\)} takes on discrete values depending on the range of \emph{f\(_{L}\)}and the number of steps, \emph{N\(_{L}\)}\(_{ }\) (Figure~\ref{fig:stepped-lighting-control-with-three-steps.}). This gives
+For a stepped control system, \emph{f\(_{P}\)} takes on discrete values depending on the range of \emph{f\(_{L}\)}and the number of steps, \emph{N\(_{L}\)} (Figure~\ref{fig:stepped-lighting-control-with-three-steps.}). This gives
 
 \begin{equation}
   f_P = \left\{
@@ -266,7 +274,7 @@ If a lighting control probability,* p\(_{L}\)\emph{, is specified,} f\(_{P}\)* i
 \begin{figure}[hbtp] % fig 61
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image825.png}
-\caption{  Stepped lighting control with three steps. \protect \label{fig:stepped-lighting-control-with-three-steps.}}
+\caption{Stepped lighting control with three steps. \protect \label{fig:stepped-lighting-control-with-three-steps.}}
 \end{figure}
 
 \subsubsection{Lighting Power Reduction}\label{lighting-power-reduction}

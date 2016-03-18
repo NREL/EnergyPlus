@@ -142,7 +142,7 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
 
 \paragraph{\texorpdfstring{\textbf{Coil in main air stream, outside air preconditioned} }{Coil in main air stream, outside air preconditioned }}\label{coil-in-main-air-stream-outside-air-preconditioned}
 
-The oustide air fraction is calculated as (where V\(_{r}\) is calculated as above)
+The oustide air fraction is calculated as (where V\(_{cc,air}\) is calculated as above)
 
 \begin{itemize}
 \item
@@ -195,7 +195,7 @@ The enthalpies are given by:
   h_{air,coil,des,out} & = \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right)
  \end{array}
 \end{equation}
-Where the inputs to those functions are the coil inlet design conditions. For coils in terminal units these are set at the system level to the system design supply air temperature. For zonal units they are set to design return air, mixed air, or outside air as appropriate to the unit. T\(_{s}\) is set to the zone cooling design supply air temperature as specified in the \emph{Zone:Sizing} inputs. W\(_{s}\) is set to the zone cooling design supply air humidity ratio as specified in the \emph{Zone:Sizing} inputs.
+Where the inputs to those functions are the coil inlet design conditions. For coils in terminal units these are set at the system level to the system design supply air temperature. For zonal units they are set to design return air, mixed air, or outside air as appropriate to the unit. T\(_{air,out,des}\) is set to the zone cooling design supply air temperature as specified in the \emph{Zone:Sizing} inputs. W\(_{air,out,des}\) is set to the zone cooling design supply air humidity ratio as specified in the \emph{Zone:Sizing} inputs.
 
 \subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - System Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - System Coils}}\label{design-water-flow-rate-m3s---system-coils}
 
@@ -205,7 +205,7 @@ The design water volumetric flow rate is calculated using:
 \dot{V}_{w,coil,des} = \frac{\dot{Q}_{coil,des}}{\rho_w c_{p,w} \Delta T_{w,des}}
 \end{equation}
 
-Where \(\Delta T_{w,des}\) is just the \emph{Loop Design Temperature Difference} user input from \emph{Sizing:Plant} (if the coil is in the outside air stream, 1/2 the \emph{Loop Design Temperature Difference} is used). The design coil load \emph{Load\(_{s}\)} is calculated from:
+Where \(\Delta T_{w,des}\) is just the \emph{Loop Design Temperature Difference} user input from \emph{Sizing:Plant} (if the coil is in the outside air stream, 1/2 the \emph{Loop Design Temperature Difference} is used). The design coil load \emph{Load\(_{coil,des}\)} is calculated from:
 
 \subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - Zone Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - Zone Coils}}\label{design-water-flow-rate-m3s---zone-coils}
 
@@ -269,7 +269,7 @@ The outlet air temperature depends on whether the coil is in the outside air str
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Coil in outside air stream: T\(_{s}\) = T\(_{l}\) (the specified Precool Design Temperature from the Sizing:System object).
+  Coil in outside air stream: T\(_{air,out,des}\) = T\(_{sys,des,precool}\) (the specified Precool Design Temperature from the Sizing:System object).
 \item
   Coil in main air stream: the design outlet air temperature is set to the temperature calculated in the Initial Calculation section above.
 \end{enumerate}
@@ -287,7 +287,7 @@ If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInductio
  \end{array}
 \end{equation}
 
-For all other cases T\(_{s}\) is set to T\(_{s}\) (the zone design supply air temperature as specified in Sizing:Zone).
+For all other cases T\(_{air,out,des}\) is set to T\(_{z,sup,des}\) (the zone design supply air temperature as specified in Sizing:Zone).
 
 \subsubsection{Design Inlet Air Humidity Ratio - System Coils}\label{design-inlet-air-humidity-ratio---system-coils}
 
@@ -322,9 +322,9 @@ The outlet air humidity ratio depends on whether the coil is in the outside air 
 
 \begin{itemize}
 \item
-  Coil in outside air stream: W\(_{s}\) = W\(_{l}\) (the specified Precool Design Humidity Ratio from the Sizing:System object)
+  Coil in outside air stream: W\(_{air,out,des}\) = W\(_{sys,des,precool}\) (the specified Precool Design Humidity Ratio from the Sizing:System object)
 \item
-  Coil in main air stream: W\(_{s}\) = PsyWFnTdbRhPb(T\(_{s}\),0.9,P\(_{d}\)), where PsyWFnTdbRhPb is the EnergyPlus psychrometric function to calculate humidity ratio from drybulb temperature, relative humidity, and atmospheric pressure. The design outlet humidity ratio is being set to the humidity ratio at 90\% relative humidity and design outlet temperature.
+  Coil in main air stream: W\(_{air,out,des}\) = PsyWFnTdbRhPb(T\(_{air,out,des}\),0.9,P\(_{air,std}\)), where PsyWFnTdbRhPb is the EnergyPlus psychrometric function to calculate humidity ratio from drybulb temperature, relative humidity, and atmospheric pressure. The design outlet humidity ratio is being set to the humidity ratio at 90\% relative humidity and design outlet temperature.
 \end{itemize}
 
 \subsubsection{Design Outlet Air Humidity Ratio - Zone Coils}\label{design-outlet-air-humidity-ratio---zone-coils}
@@ -336,11 +336,11 @@ The outlet air humidity ratio depends on whether the coil is in the outside air 
 \end{itemize}
 
 \begin{lstlisting}
--   Get the dewpoint temperature at W$_{s}$: $T_{dp,in} = \text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$
+-   Get the dewpoint temperature at W$_{air,in,des}$: $T_{dp,in} = \text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$
 \end{lstlisting}
 
 \begin{lstlisting}
--   If T$_{n}$ < = T$_{s}$ set W$_{s}$ = W$_{s}$. Otherwise set W$_{s}$ = min(PsyWFnTdbRhPb(T$_{s}$,0.9,P$_{d}$),W$_{s}$)
+-   If T$_{dp,in}$ < = T$_{w,in,des}$ set W$_{air,out,des}$ = W$_{air,in,des}$. Otherwise set W$_{air,out,des}$ = min(PsyWFnTdbRhPb(T$_{air,out,des}$,0.9,P$_{air,std}$),W$_{air,in,des}$)
 \end{lstlisting}
 
 \subsubsection{Design Inlet Water Temperature - System Coils}\label{design-inlet-water-temperature---system-coils}
@@ -365,7 +365,7 @@ The calculation is identical to that done for \emph{Coil:Cooling:Water}.
 Ntube/row = {\mathop{\rm Int}\nolimits} ({\rm{13750}}\cdot \dot Vcoil,water,max)
 \end{equation}
 
-\emph{N\(_{w}\)} = \textbf{Max}(\emph{N\(_{w}\)},3)
+\emph{N\(_{tube/row}\)} = \textbf{Max}(\emph{N\(_{tube/row}\)},3)
 
 \subsubsection{Fin Diameter}\label{fin-diameter}
 
@@ -447,19 +447,19 @@ AFinSurf = 78.5\cdot \dot mair,des
 
 \subsubsection{Total Tube Inside Area}\label{total-tube-inside-area}
 
-\emph{A\(_{e}\)} = 4.4 *\emph{D\(_{e}\)} *\emph{N\(_{s}\)} *\emph{N\(_{w}\)}
+\emph{A\(_{tube,total\, inside}\)} = 4.4 *\emph{D\(_{tube,inside}\)} *\emph{N\(_{tube\, rows}\)} *\emph{N\(_{tubes/row}\)}
 
-Where \emph{D\(_{e}\)} is the tube inside diameter.
+Where \emph{D\(_{tube,inside}\)} is the tube inside diameter.
 
 \subsubsection{Tube Outside Surf Area}\label{tube-outside-surf-area}
 
-\emph{A\(_{e}\)} = 4.1 *\emph{D\(_{e}\)} *\emph{N\(_{s}\)} *\emph{N\(_{w}\)}
+\emph{A\(_{tube,outside}\)} = 4.1 *\emph{D\(_{tube,outside}\)} *\emph{N\(_{tube\, rows}\)} *\emph{N\(_{tubes/row}\)}
 
-Where \emph{D\(_{e}\)} is the tube outside diameter.
+Where \emph{D\(_{tube,outside}\)} is the tube outside diameter.
 
 \subsubsection{Coil Depth}\label{coil-depth}
 
-\emph{Depth\(_{l}\)} = \emph{Depth\(_{g}\)} * \emph{N\(_{s}\)}
+\emph{Depth\(_{coil}\)} = \emph{Depth\(_{tube\, spacing}\)} * \emph{N\(_{tube\, rows}\)}
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:EquationFit Sizing}\label{coilcoolingwatertoairheatpumpequationfit-sizing}
 
@@ -505,7 +505,7 @@ TCC5 = user input for Total Cooling Capacity Coefficient 5
 TotCapTempModFac = \,TCC1 + TCC2\left( {{T_{WB,ratio}}} \right) + TCC3\left( {{T_{S,ratio}}} \right) + TCC4 + TCC5
 \end{equation}
 
-The 4\(^{h}\) and 5\(^{h}\) coefficient (TCC4 and TCC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
+The 4\(^{th}\) and 5\(^{th}\) coefficient (TCC4 and TCC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
 
 The enthalpy of the entering air is then compared with the enthalpy of the exiting air. The calculations for air enthalpy are identical to that done for \emph{Coil:Cooling:Water}. If the entering air enthalpy is less than the exiting air enthalpy, a reference value of 48,000 J/kg is used as the entering air enthalpy. If the TotCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
 
@@ -553,7 +553,7 @@ SCC6 = user input for Sensible Cooling Capacity Coefficient 6
   \end{array}
 \end{equation}
 
-The 5\(^{h}\) and 6\(^{h}\) coefficient (SCC5 and SCC6) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
+The 5\(^{th}\) and 6\(^{th}\) coefficient (SCC5 and SCC6) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
 
 The dry-bulb temperature of the entering air is then compared with the dry-bulb temperature of the exiting air. The calculations for air dry-bulb temperature are identical to that done for \emph{Coil:Cooling:Water}. If the entering air dry-bulb temperature is less than the exiting air dry-bulb temperature, a reference value of 24 C is used as the entering air dry-bulb temperature. If the SensCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil sensible cooling capacity is set equal to 0.
 
@@ -596,7 +596,7 @@ a-f = regression curve-fit coefficients.
 
 If the entering air enthalpy is less than the exiting air enthalpy, a reference value of 48,000 J/kg is used as the entering air enthalpy. If the \emph{TotCapTempModFac} calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the rated air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
 
-\emph{If H\(_{n}\) \textgreater{} H\(_{t}\) Then}
+\emph{If H\(_{in}\) \textgreater{} H\(_{out}\) Then}
 
 \begin{equation}
 {\dot Q_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
@@ -662,19 +662,19 @@ Using the zone design coil inlet and supply air conditions calculate the design 
 
 If the coil is not part of an induction unit then obtain the coil inlet temperature from the zone design data array;
 
-\emph{T\(_{r}\) = DesHeatCoilInTemp\(_{e}\)}
+\emph{T\(_{in,air}\) = DesHeatCoilInTemp\(_{zone}\)}
 
 If the coil is part of an induction unit take into account the induced air:
 
-\emph{Frac\(_{w}\)} = \emph{MinFlowFrac\(_{e}\)}
+\emph{Frac\(_{minflow}\)} = \emph{MinFlowFrac\(_{zone}\)}
 
-\emph{T\(_{r}\)} = \emph{DesHeatCoilInTemp\(_{e}\)} * \emph{Frac\(_{w}\)} +
+\emph{T\(_{in,air}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)} * \emph{Frac\(_{minflow}\)} +
 
-\emph{ZoneTempAtHeatPeak\(_{e}\)} *(1- \emph{Frac\(_{w}\)})
+\emph{ZoneTempAtHeatPeak\(_{zone}\)} *(1- \emph{Frac\(_{minflow}\)})
 
-\emph{T\(_{r}\) = HeatDesTemp\(_{e}\)}
+\emph{T\(_{out,air}\) = HeatDesTemp\(_{zone}\)}
 
-W\emph{\(_{r}\) = HeatDesHumRat\(_{e}\)}
+W\emph{\(_{out,air}\) = HeatDesHumRat\(_{zone}\)}
 
 If the coil is part of a terminal unit the mass flow rate is determined by the volumetric flow rate of the terminal unit:
 
@@ -692,7 +692,7 @@ Otherwise the design flow is obtained from the zone design data array:
 Qcoil,des = cp,air\dot mair,des\cdot (Tout,air - Tin,air)
 \end{equation}
 
-Here \emph{c\(_{r}\)} is calculated at the outlet humidity and the average of the inlet and outlet temperatures.
+Here \emph{c\(_{p,air}\)} is calculated at the outlet humidity and the average of the inlet and outlet temperatures.
 
 With the coil load and the user specified (in a Sizing:Plant object) design hot water temperature decrease, calculate the max water flow rate:
 
@@ -708,15 +708,15 @@ To obtain the UA of the coil, we specify the model inputs (other than the UA) at
 
 The design coil load is the system design sensible cooling capacity;
 
-\emph{Q\(_{s}\)} = \emph{HeatCap\(_{s}\)}
+\emph{Q\(_{coil,des}\)} = \emph{HeatCap\(_{sys}\)}
 
 The required inputs for the simple coil model are:
 
-\emph{T\(_{r}\)} = \emph{HeatMixTemp\(_{s}\)}
+\emph{T\(_{in,air}\)} = \emph{HeatMixTemp\(_{sys}\)}
 
-\emph{W\(_{r}\)} = \emph{HeatMixHumRat\(_{s}\)}
+\emph{W\(_{in,air}\)} = \emph{HeatMixHumRat\(_{sys}\)}
 
-\emph{T\(_{r}\)} = \emph{ExitTemp\(_{s}\)}
+\emph{T\(_{in,water}\)} = \emph{ExitTemp\(_{plt,hw,des}\)}
 
 \begin{equation}
 \dot min,water = \rho water\cdot \dot Vcoil,water,max
@@ -744,27 +744,27 @@ We now have all the data needed to obtain UA. The numerical inversion is carried
 
 If the coil is not part of an induction unit then obtain the coil inlet temperature from the zone design data array;
 
-\emph{T\(_{r}\) = DesHeatCoilInTemp\(_{e}\)}
+\emph{T\(_{in,air}\) = DesHeatCoilInTemp\(_{zone}\)}
 
 If the coil is part of an induction unit take into account the induced air:
 
-\emph{Frac\(_{w}\)} = \emph{MinFlowFrac\(_{e}\)}
+\emph{Frac\(_{minflow}\)} = \emph{MinFlowFrac\(_{zone}\)}
 
-\emph{T\(_{r}\)} = \emph{DesHeatCoilInTemp\(_{e}\)} * \emph{Frac\(_{w}\)} +
+\emph{T\(_{in,air}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)} * \emph{Frac\(_{minflow}\)} +
 
-\emph{ZoneTempAtHeatPeak\(_{e}\)} *(1- \emph{Frac\(_{w}\)})
+\emph{ZoneTempAtHeatPeak\(_{zone}\)} *(1- \emph{Frac\(_{minflow}\)})
 
-\emph{W\(_{r}\)} = \emph{DesHeatCoilInHumRat\(_{e}\)}
+\emph{W\(_{in,air}\)} = \emph{DesHeatCoilInHumRat\(_{zone}\)}
 
-\emph{T\(_{r}\)} = \emph{ExitTemp\(_{s}\)}
+\emph{T\(_{in,water}\)} = \emph{ExitTemp\(_{plt,hw,des}\)}
 
 \begin{equation}
 \dot min,water = \rho water\cdot \dot Vcoil,water,max
 \end{equation}
 
-\emph{T\(_{r}\) = HeatDesTemp\(_{e}\)}
+\emph{T\(_{out,air}\) = HeatDesTemp\(_{zone}\)}
 
-W\emph{\(_{r}\) = HeatDesHumRat\(_{e}\)}
+W\emph{\(_{out,air}\) = HeatDesHumRat\(_{zone}\)}
 
 If the coil is part of a terminal unit the mass flow rate is determined by the volumetric flow rate of the terminal unit:
 
@@ -782,7 +782,7 @@ Otherwise the design flow is obtained from the zone design data array:
 \dot Qcoil,des = cp,air\cdot \dot mair,des\cdot (Tout,air - Tin,air)
 \end{equation}
 
-Here \emph{c\(_{r}\)} is calculated at the outlet humidity and the average of the inlet and outlet temperatures.
+Here \emph{c\(_{p,air}\)} is calculated at the outlet humidity and the average of the inlet and outlet temperatures.
 
 We now have all the data needed to obtain UA. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function. In this case it finds the UA that will zero the residual function - the difference between the design coil load and the coil output divided by the design coil load. The residual is calculated in the function \emph{SimpleHeatingCoilUAResidual}.
 
@@ -800,15 +800,15 @@ The maximum steam volumetric flow rate is calculated using:
 {\dot V_{coil,steam,max}}\,\,\, = \,\,\,\,\,\frac{{Loa{d_{coil,des}}}}{{{\rho_{steam}}\left( {{h_{fg}} + {c_{p,w}}\cdot \Delta {T_{sc}}} \right)}}
 \end{equation}
 
-The steam density (\({\rho_{steam}}\) ) is for saturated steam at 100 degC (101325.0 Pa) and \emph{h\(_{g}\)} is the latent heat of vaporization of water at 100 degC (101325.0 Pa). \emph{C\(_{w}\)} is the heat capacity of saturated water (condensate) at 100 degC (101325.0 Pa) and \(\Delta {T_{sc}}\) is the Degree of Subcooling defined in the Coil:Heating:Steam object input. The design coil load \emph{Load\(_{s}\)} is calculated from:
+The steam density (\({\rho_{steam}}\) ) is for saturated steam at 100 degC (101325.0 Pa) and \emph{h\(_{fg}\)} is the latent heat of vaporization of water at 100 degC (101325.0 Pa). \emph{C\(_{p,w}\)} is the heat capacity of saturated water (condensate) at 100 degC (101325.0 Pa) and \(\Delta {T_{sc}}\) is the Degree of Subcooling defined in the Coil:Heating:Steam object input. The design coil load \emph{Load\(_{coil,des}\)} is calculated from:
 
 \begin{equation}
 Loa{d_{coil,des}} = {\dot m_{air,des}}({c_{p,air}})({T_{air,coil,des,out}} - {T_{air,coil,des,in}})
 \end{equation}
 
-The design air mass flow rate depends on the location of the coil (duct type). For duct type = \emph{main,} the flow rate is set to \emph{r\(_{r}\)} *\emph{DesMainVolFlow\(_{s}\)} *\emph{MinSysAirFlowRatio}. If the coil is in a cooling duct the flow rate is set to \emph{r\(_{r}\)} *\emph{DesCoolVolFlow\(_{s}\)} *\emph{MinSysAirFlowRatio}. If the coil is in a heating duct the flow rate is set to \emph{r\(_{r}\)} *\emph{DesHeatVolFlow\(_{s}\)}. If the coil is in any other kind of duct, the flow rate is set to \emph{r\(_{r}\)} *\emph{DesMainVolFlow\(_{s}\)}.
+The design air mass flow rate depends on the location of the coil (duct type). For duct type = \emph{main,} the flow rate is set to \emph{r\(_{air}\)} *\emph{DesMainVolFlow\(_{sys}\)} *\emph{MinSysAirFlowRatio}. If the coil is in a cooling duct the flow rate is set to \emph{r\(_{air}\)} *\emph{DesCoolVolFlow\(_{sys}\)} *\emph{MinSysAirFlowRatio}. If the coil is in a heating duct the flow rate is set to \emph{r\(_{air}\)} *\emph{DesHeatVolFlow\(_{sys}\)}. If the coil is in any other kind of duct, the flow rate is set to \emph{r\(_{air}\)} *\emph{DesMainVolFlow\(_{sys}\)}.
 
-For sizing, the design outlet air temperature (\emph{T\(_{t}\)}) is the Central Heating Design Supply Air Temperature specified in the Sizing:System object.
+For sizing, the design outlet air temperature (\emph{T\(_{air,coil,des,out}\)}) is the Central Heating Design Supply Air Temperature specified in the Sizing:System object.
 
 The design inlet air temperature depends on whether the coil is being sized for 100\% outdoor air or minimum outdoor air flow (per 100\% Outdoor Air in Heating input field in the Sizing:System object).
 
@@ -819,22 +819,21 @@ The design inlet air temperature depends on whether the coil is being sized for 
   Sizing based on 100\% Outdoor Air in Heating
 \end{enumerate}
 
-\emph{T\(_{n}\)} = \emph{HeatOutTemp\(_{s}\)} (the outdoor air temperature at the design heating peak)
+\emph{T\(_{air,coil,des,in}\)} = \emph{HeatOutTemp\(_{sys}\)} (the outdoor air temperature at the design heating peak)
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \setcounter{enumi}{1}
 \tightlist
 \item
-  Sizing based on minimum outdoor air flow. The outdoor air fraction is calculated as \emph{Frac}\(_{a}\) = \emph{DesOutAirVolFlow\(_{s}\)} / \emph{DesVolFlow}. \emph{DesVolFlow} is \({{{{\mathop m\limits^ \bullet }_{air,des}}} \mathord{\left/ {\vphantom {{{{\mathop m\limits^ \bullet }_{air,des}}} {{\rho_{air}}}}} \right. } {{\rho_{air}}}}\) \emph{.}
+  Sizing based on minimum outdoor air flow. The outdoor air fraction is calculated as \emph{Frac}\(_{oa}\) = \emph{DesOutAirVolFlow\(_{sys}\)} / \emph{DesVolFlow}. \emph{DesVolFlow} is \({{{{\mathop m\limits^ \bullet }_{air,des}}} \mathord{\left/ {\vphantom {{{{\mathop m\limits^ \bullet }_{air,des}}} {{\rho_{air}}}}} \right. } {{\rho_{air}}}}\) \emph{.}
 \end{enumerate}
 
-\emph{T\(_{n}\)} = \emph{Frac}\(_{a}\)* * HeatOutTemp\(_{s}\)* + (1.- \emph{Frac\(_{a}\)}) *\emph{HeatRetTemp\(_{s}\)} (see Table~\ref{table:system-sizing-data}. System Sizing Data)
+\emph{T\(_{air,coil,des,in}\)} = \emph{Frac}\(_{oa}\)* * HeatOutTemp\(_{sys}\)* + (1.- \emph{Frac\(_{oa}\)}) *\emph{HeatRetTemp\(_{sys}\)} (see Table~\ref{table:system-sizing-data}. System Sizing Data)
 
 \paragraph{Zone Coils}\label{zone-coils-2}
 
-If the coil is part of an \emph{AirTerminal:SingleDuct:*} unit \\
-(e.g., \emph{AirTerminal:SingleDuct:ConstantVolume:Reheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:SingleDuct:SeriesPIU:Reheat, etc.)}, the maximum steam flow rate is set equal to the terminal unit's maximum steam flow rate. Otherwise (e.g., the zone-level coil is part of \emph{ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:UnitVentilator, ZoneHVAC:UnitHeater or ZoneHVAC:VentilatedSlab}) the calculation is similar to that at the system level. A design load is calculated:
+If the coil is part of an \emph{AirTerminal:SingleDuct:*} unit (e.g., \emph{Air\-Terminal:\-Single\-Duct:\-Constant\-Volume\-:Re\-heat, Air\-Terminal:\-Single\-Duct:\-VAV:\-Re\-heat, Air\-Terminal:\-Single\-Duct:\-Series\-PIU:\-Re\-heat, etc.)}, the maximum steam flow rate is set equal to the terminal unit's maximum steam flow rate. Otherwise (e.g., the zone-level coil is part of \emph{Zone\-HVAC:\-Packaged\-Terminal\-Air\-Conditioner, Zone\-HVAC\-:Unit\-Ventilator, Zone\-HVAC\-:Unit\-Heater or Zone\-HVAC:\-Ventilated\-Slab}) the calculation is similar to that at the system level. A design load is calculated:
 
 \begin{equation}
 Loa{d_{coil,des}} = {\dot m_{air,des}}({c_{p,air}})({T_{air,coil,des,out}} - {T_{air,coil,des,in}})
@@ -842,19 +841,19 @@ Loa{d_{coil,des}} = {\dot m_{air,des}}({c_{p,air}})({T_{air,coil,des,out}} - {T_
 
 where:
 
-\({\dot m_{air,des}}\) = \emph{DesHeatMassFlow\(_{e}\)} (see Table~\ref{table:zone-sizing-data}. Zone Sizing Data)
+\({\dot m_{air,des}}\) = \emph{DesHeatMassFlow\(_{zone}\)} (see Table~\ref{table:zone-sizing-data}. Zone Sizing Data)
 
-\emph{T\(_{n}\)} = \emph{DesHeatCoilInTemp\(_{e}\)} (see Table~\ref{table:zone-sizing-data})
+\emph{T\(_{air,coil,des,in}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)} (see Table~\ref{table:zone-sizing-data})
 
-\emph{T\(_{t}\)} = \emph{HeatDesTemp\(_{e}\)} (user input from Sizing:Zone object)
+\emph{T\(_{air,coil,des,out}\)} = \emph{HeatDesTemp\(_{zone}\)} (user input from Sizing:Zone object)
 
-\({c_{p,air}}\) = Specific heat of air (evaluated at the average of inlet and outlet air temperatures, and at the zone heating design supply air humidity ratio \emph{HeatDesHumRat\(_{e}\)} {[}user input from Sizing:Zone object{]})
+\({c_{p,air}}\) = Specific heat of air (evaluated at the average of inlet and outlet air temperatures, and at the zone heating design supply air humidity ratio \emph{HeatDesHumRat\(_{zone}\)} {[}user input from Sizing:Zone object{]})
 
 \begin{equation}
 {\dot V_{coil,steam,max}}\,\,\, = \,\,\,\,\,\frac{{Loa{d_{coil,des}}}}{{{\rho_{steam}}\left( {{h_{fg}} + {c_{p,w}}\cdot \Delta {T_{sc}}} \right)}}
 \end{equation}
 
-The terms in the denominator of this equation (\emph{ρ\(_{m}\)}, \emph{h\(_{g}\)}, etc.) are evaluated in the same way as described above for steam System Coils.
+The terms in the denominator of this equation (\emph{ρ\(_{steam}\)}, \emph{h\(_{fg}\)}, etc.) are evaluated in the same way as described above for steam System Coils.
 
 \subsection{Sizing of Gas and Electric Heating Coils}\label{sizing-of-gas-and-electric-heating-coils}
 
@@ -866,7 +865,7 @@ The sizing calculation is done in subroutine \emph{SizeHeatingCoil} in module \e
 
 The value is obtained from the system design array.
 
-\emph{Cap\(_{m}\)} = \emph{HeatCap\(_{s}\)}
+\emph{Cap\(_{nom}\)} = \emph{HeatCap\(_{sys}\)}
 
 \paragraph{Zone Coils}\label{zone-coils-3}
 
@@ -874,23 +873,23 @@ The capacity is calculated from the design coil inlet and outlet conditions.
 
 If the coil is not part of an induction unit then obtain the coil inlet temperature from the zone design data array;
 
-\emph{T\(_{r}\) = DesHeatCoilInTemp\(_{e}\)}
+\emph{T\(_{in,air}\) = DesHeatCoilInTemp\(_{zone}\)}
 
 If the coil is part of an induction unit take into account the induced air:
 
-\emph{Frac\(_{w}\)} = \emph{MinFlowFrac\(_{e}\)}
+\emph{Frac\(_{minflow}\)} = \emph{MinFlowFrac\(_{zone}\)}
 
-\emph{T\(_{r}\)} = \emph{DesHeatCoilInTemp\(_{e}\)} * \emph{Frac\(_{w}\)} +
+\emph{T\(_{in,air}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)} * \emph{Frac\(_{minflow}\)} +
 
-\emph{ZoneTempAtHeatPeak\(_{e}\)} *(1- \emph{Frac\(_{w}\)})
+\emph{ZoneTempAtHeatPeak\(_{zone}\)} *(1- \emph{Frac\(_{minflow}\)})
 
-\emph{T\(_{r}\) = HeatDesTemp\(_{e}\)}
+\emph{T\(_{out,air}\) = HeatDesTemp\(_{zone}\)}
 
-W\emph{\(_{r}\) = HeatDesHumRat\(_{e}\)}
+W\emph{\(_{out,air}\) = HeatDesHumRat\(_{zone}\)}
 
-\emph{Q\(_{s}\)} = \emph{C\(_{r}\)} * \emph{DesHeatMassFlow\(_{e}\)} *(\emph{T\(_{r}\)}-\emph{T\(_{r}\)})
+\emph{Q\(_{coil,des}\)} = \emph{C\(_{p,air}\)} * \emph{DesHeatMassFlow\(_{zone}\)} *(\emph{T\(_{out,air}\)}-\emph{T\(_{in,air}\)})
 
-Here \emph{c\(_{r}\)} is calculated at the outlet humidity and the average of the inlet and outlet temperatures.
+Here \emph{c\(_{p,air}\)} is calculated at the outlet humidity and the average of the inlet and outlet temperatures.
 
 \subsection{DX Coil Sizing}\label{dx-coil-sizing}
 
@@ -930,31 +929,31 @@ The rated air flow rate is the maximum of the heating and cooling design flow ra
 
 The rated cooling capacity is obtained by dividing the peak cooling capacity by the \emph{Cooling Capacity Modifier Curve} evaluated at peak mixed wetbulb and outdoor drybulb temperatures.
 
-\emph{T\(_{x}\)} = \emph{CoolMixTemp\(_{s}\)}
+\emph{T\(_{mix}\)} = \emph{CoolMixTemp\(_{sys}\)}
 
-\emph{W\(_{x}\)} = \emph{CoolMixHumRat\(_{s}\)}
+\emph{W\(_{mix}\)} = \emph{CoolMixHumRat\(_{sys}\)}
 
-\emph{T\(_{p}\)} = \emph{CoolSupTemp\(_{s}\)}
+\emph{T\(_{sup}\)} = \emph{CoolSupTemp\(_{sys}\)}
 
-\emph{W\(_{p}\)} = \emph{CoolSupHumRat\(_{s}\)}
+\emph{W\(_{sup}\)} = \emph{CoolSupHumRat\(_{sys}\)}
 
-\emph{T\(_{e}\)} = \emph{CoolOutTemp\(_{s}\)}
+\emph{T\(_{outside}\)} = \emph{CoolOutTemp\(_{sys}\)}
 
-\emph{r\(_{r}\)} = \emph{PsyRhoAirFnPbTdbW}(\emph{p\(_{d}\)}, \emph{T\(_{x}\)},\emph{W\(_{x}\)})
+\emph{r\(_{air}\)} = \emph{PsyRhoAirFnPbTdbW}(\emph{p\(_{air,std}\)}, \emph{T\(_{mix}\)},\emph{W\(_{mix}\)})
 
-\emph{h\(_{x}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{x}\)},\emph{W\(_{x}\)})
+\emph{h\(_{mix}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{mix}\)},\emph{W\(_{mix}\)})
 
-\emph{h\(_{p}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{p}\)},\emph{W\(_{p}\)})
+\emph{h\(_{sup}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{sup}\)},\emph{W\(_{sup}\)})
 
-\emph{T\(_{b}\)} = \emph{PsyTwbFnTdbWPb}(\emph{T\(_{x}\)},\emph{W\(_{x}\)}, \emph{p\(_{d}\)})
+\emph{T\(_{mix,wb}\)} = \emph{PsyTwbFnTdbWPb}(\emph{T\(_{mix}\)},\emph{W\(_{mix}\)}, \emph{p\(_{air,std}\)})
 
-\emph{CapModFac} = \emph{CurveValue}(CCapFTemp,\emph{T\(_{b}\)},\emph{T\(_{e}\)})
+\emph{CapModFac} = \emph{CurveValue}(CCapFTemp,\emph{T\(_{mix,wb}\)},\emph{T\(_{outside}\)})
 
 \begin{equation}
 CCappeak = \rho air\cdot \dot Vair,rated\cdot (hmix - hsup)
 \end{equation}
 
-\emph{CCap\(_{d}\)} = \emph{CCap\(_{k}\)}/ \emph{CapModFac}
+\emph{CCap\(_{rated}\)} = \emph{CCap\(_{peak}\)}/ \emph{CapModFac}
 
 We check that the design volume flow per total capacity is within the prescribed range:
 
@@ -962,13 +961,13 @@ We check that the design volume flow per total capacity is within the prescribed
 FlowCapRatio = \dot Vair,rated/CCaprated
 \end{equation}
 
-If \emph{FlowCapRatio} \textless{} \emph{FlowCapRatio\(_{n}\)} then
+If \emph{FlowCapRatio} \textless{} \emph{FlowCapRatio\(_{min}\)} then
 
 \begin{equation}
 CCaprated = \dot Vair,rated/FlowCapRatiomin
 \end{equation}
 
-If \emph{FlowCapRatio} \textgreater{} \emph{FlowCapRatio\(_{x}\)} then
+If \emph{FlowCapRatio} \textgreater{} \emph{FlowCapRatio\(_{max}\)} then
 
 \begin{equation}
 CCaprated = \dot Vair,rated/FlowCapRatiomax
@@ -976,49 +975,49 @@ CCaprated = \dot Vair,rated/FlowCapRatiomax
 
 where
 
-\emph{FlowCapRatio\(_{n}\)} = 0.00004027 m\(^{3}\)/s per watt (300 cfm/ton)
+\emph{FlowCapRatio\(_{min}\)} = 0.00004027 m\(^{3}\)/s per watt (300 cfm/ton)
 
 And
 
-\emph{FlowCapRatio\(_{x}\)} = 0.00006041 m\(^{3}\)/s per watt (450 cfm/ton)
+\emph{FlowCapRatio\(_{max}\)} = 0.00006041 m\(^{3}\)/s per watt (450 cfm/ton)
 
 The sizing calculation for DX cooling coils for 100\% dedicated outdor air system (DOAS) are identical to regular DX cooling coils. However, they operate operate at different flow to capacity ratio ranges and are within the prescribed range below:
 
-\emph{FlowCapRatio\(_{n}\)} = 0.00001677 m\(^{3}\)/s per Watt (125 cfm/ton)
+\emph{FlowCapRatio\(_{min}\)} = 0.00001677 m\(^{3}\)/s per Watt (125 cfm/ton)
 
 And
 
-\emph{FlowCapRatio\(_{x}\)} = 0.00003355 m\(^{3}\)/s per Watt (250 cfm/ton)
+\emph{FlowCapRatio\(_{max}\)} = 0.00003355 m\(^{3}\)/s per Watt (250 cfm/ton)
 
 \subsubsection{Zone Coils}\label{zone-coils-5}
 
 The rated cooling capacity for zone coils is calculated in the same manner as for system coils.
 
-\emph{T\(_{x}\)} = \emph{DesCoolCoilInTemp\(_{e}\)}
+\emph{T\(_{mix}\)} = \emph{DesCoolCoilInTemp\(_{zone}\)}
 
-\emph{W\(_{x}\)} = \emph{DesCoolCoilInHumRat\(_{e}\)}
+\emph{W\(_{mix}\)} = \emph{DesCoolCoilInHumRat\(_{zone}\)}
 
-\emph{T\(_{p}\)} = \emph{CoolDesTemp\(_{e}\)}
+\emph{T\(_{sup}\)} = \emph{CoolDesTemp\(_{zone}\)}
 
-\emph{W\(_{p}\)} = \emph{CoolDesHumRat\(_{e}\)}
+\emph{W\(_{sup}\)} = \emph{CoolDesHumRat\(_{zone}\)}
 
-\emph{T\(_{e}\)} = \emph{T\(_{e}\),\(_{k}\)}
+\emph{T\(_{outside}\)} = \emph{T\(_{outside}\),\(_{desday,peak}\)}
 
-\emph{r\(_{r}\)} = \emph{PsyRhoAirFnPbTdbW}(\emph{p\(_{d}\)}, \emph{T\(_{x}\)},\emph{W\(_{x}\)})
+\emph{r\(_{air}\)} = \emph{PsyRhoAirFnPbTdbW}(\emph{p\(_{air,std}\)}, \emph{T\(_{mix}\)},\emph{W\(_{mix}\)})
 
-\emph{h\(_{x}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{x}\)},\emph{W\(_{x}\)})
+\emph{h\(_{mix}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{mix}\)},\emph{W\(_{mix}\)})
 
-\emph{h\(_{p}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{p}\)},\emph{W\(_{p}\)})
+\emph{h\(_{sup}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{sup}\)},\emph{W\(_{sup}\)})
 
-\emph{T\(_{b}\)} = \emph{PsyTwbFnTdbWPb}(\emph{T\(_{x}\)},\emph{W\(_{x}\)}, \emph{p\(_{d}\)})
+\emph{T\(_{mix,wb}\)} = \emph{PsyTwbFnTdbWPb}(\emph{T\(_{mix}\)},\emph{W\(_{mix}\)}, \emph{p\(_{air,std}\)})
 
-\emph{CapModFac} = \emph{CurveValue}(CCapFTemp,\emph{T\(_{b}\)},\emph{T\(_{e}\)})
+\emph{CapModFac} = \emph{CurveValue}(CCapFTemp,\emph{T\(_{mix,wb}\)},\emph{T\(_{outside}\)})
 
 \begin{equation}
 CCappeak = \rho air\cdot \dot Vair,rated\cdot (hmix - hsup)
 \end{equation}
 
-\emph{CCap\(_{d}\)} = \emph{CCap\(_{k}\)}/ \emph{CapModFac}
+\emph{CCap\(_{rated}\)} = \emph{CCap\(_{peak}\)}/ \emph{CapModFac}
 
 We check that the design volume flow per total capacity is within the prescribed range:
 
@@ -1026,13 +1025,13 @@ We check that the design volume flow per total capacity is within the prescribed
 FlowCapRatio = \dot Vair,rated/CCaprated
 \end{equation}
 
-If \emph{FlowCapRatio} \textless{} \emph{FlowCapRatio\(_{n}\)} then
+If \emph{FlowCapRatio} \textless{} \emph{FlowCapRatio\(_{min}\)} then
 
 \begin{equation}
 CCaprated = \dot Vair,rated/FlowCapRatiomin
 \end{equation}
 
-If \emph{FlowCapRatio} \textgreater{} \emph{FlowCapRatio\(_{x}\)} then
+If \emph{FlowCapRatio} \textgreater{} \emph{FlowCapRatio\(_{max}\)} then
 
 \begin{equation}
 CCaprated = \dot Vair,rated/FlowCapRatiomax
@@ -1040,19 +1039,19 @@ CCaprated = \dot Vair,rated/FlowCapRatiomax
 
 where
 
-\emph{FlowCapRatio\(_{n}\)} = 0.00004027 m\(^{3}\)/s per watt (300 cfm/ton)
+\emph{FlowCapRatio\(_{min}\)} = 0.00004027 m\(^{3}\)/s per watt (300 cfm/ton)
 
 And
 
-\emph{FlowCapRatio\(_{x}\)} = 0.00006041 m\(^{3}\)/s per watt (450 cfm/ton)
+\emph{FlowCapRatio\(_{max}\)} = 0.00006041 m\(^{3}\)/s per watt (450 cfm/ton)
 
 We check the design flow to the total cooling capacity rato for dedicated zone outdoor unit DX cooling coils to be within the limits prescribed below:
 
-\emph{FlowCapRatio\(_{n}\)} = 0.00001677 m\(^{3}\)/s per Watt (125 cfm/ton)
+\emph{FlowCapRatio\(_{min}\)} = 0.00001677 m\(^{3}\)/s per Watt (125 cfm/ton)
 
 And
 
-\emph{FlowCapRatio\(_{x}\)} = 0.00003355 m\(^{3}\)/s per Watt (250 cfm/ton)
+\emph{FlowCapRatio\(_{max}\)} = 0.00003355 m\(^{3}\)/s per Watt (250 cfm/ton)
 
 \subsubsection{Rated Total Heating Capacity}\label{rated-total-heating-capacity-2}
 
@@ -1062,35 +1061,35 @@ For Coil:Heating:DX:SingleSpeed the rated heating capacity is set equal to the c
 
 The rated sensible heat ratio is calculated to be the sensible cooling (from rated inlet conditions to user specified supply conditions) divided by the total cooling (from rated inlet to specified supply).
 
-\emph{T\(_{d}\)} = 26.6667 \(^{o}\)C (80 \(^{o}\)F)
+\emph{T\(_{in,rated}\)} = 26.6667 \(^{o}\)C (80 \(^{o}\)F)
 
-\emph{W\(_{d}\)} = 0.01125 (corresponds to 80 \(^{o}\)F drybulb, 67 \(^{o}\)F wetbulb)
+\emph{W\(_{in,rated}\)} = 0.01125 (corresponds to 80 \(^{o}\)F drybulb, 67 \(^{o}\)F wetbulb)
 
-\emph{C\(_{r}\)} = \emph{PsyCpAirFnWTdb}(\emph{W\(_{d}\)}, \emph{T\(_{d}\)})
+\emph{C\(_{p,air}\)} = \emph{PsyCpAirFnWTdb}(\emph{W\(_{in,rated}\)}, \emph{T\(_{in,rated}\)})
 
 For system coils
 
-\emph{T\(_{p}\)} = \emph{CoolSupTemp\(_{s}\)}
+\emph{T\(_{sup}\)} = \emph{CoolSupTemp\(_{sys}\)}
 
-\emph{W\(_{p}\)} = \emph{CoolSupHumRat\(_{s}\)}
+\emph{W\(_{sup}\)} = \emph{CoolSupHumRat\(_{sys}\)}
 
 For zone coils
 
-\emph{T\(_{p}\)} = \emph{CoolDesTemp\(_{e}\)}
+\emph{T\(_{sup}\)} = \emph{CoolDesTemp\(_{zone}\)}
 
-\emph{W\(_{p}\)} = \emph{CoolDesHumRat\(_{e}\)}
+\emph{W\(_{sup}\)} = \emph{CoolDesHumRat\(_{zone}\)}
 
 Then
 
-\emph{h\(_{d}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{d}\)}, \emph{W\(_{d}\)})
+\emph{h\(_{rated}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{in,rated}\)}, \emph{W\(_{in,rated}\)})
 
-\emph{h\(_{p}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{p}\)}, \emph{W\(_{p}\)})
+\emph{h\(_{sup}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{sup}\)}, \emph{W\(_{sup}\)})
 
-\emph{Dh}\(_{p}\) = \emph{h\(_{d}\)}-\emph{h\(_{p}\)}
+\emph{Dh}\(_{rated,sup}\) = \emph{h\(_{rated}\)}-\emph{h\(_{sup}\)}
 
-\emph{DQs\(_{p}\)} = \emph{C\(_{r}\)} *(\emph{T\(_{d}\)}-\emph{T\(_{p}\)})
+\emph{DQs\(_{rated,sup}\)} = \emph{C\(_{p,air}\)} *(\emph{T\(_{in,rated}\)}-\emph{T\(_{sup}\)})
 
-\emph{SHR\(_{d}\)} = \emph{DQs\(_{p}\)}/\emph{Dh}\(_{p}\)
+\emph{SHR\(_{rated}\)} = \emph{DQs\(_{rated,sup}\)}/\emph{Dh}\(_{rated,sup}\)
 
 \subsubsection{Evaporative Condenser Air Volume Flow Rate}\label{evaporative-condenser-air-volume-flow-rate}
 
@@ -1147,7 +1146,7 @@ where
 
 Value\(_{n}\) = Any autosizable variable at Speed n, except SHR
 
-SHR\(_{n}\) = SHR\(_{d}\)
+SHR\(_{n}\) = SHR\(_{NumberOfSpeed}\)
 
 n = Speed Index number from 1 to NumberOfSpeed-1
 
@@ -1175,7 +1174,7 @@ a-f = regression curve-fit coefficients.
 
 If the entering air enthalpy is less than the exiting air enthalpy, a reference value of 48,000 J/kg is used as the entering air enthalpy. If the \emph{TotCapTempModFac} calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the rated air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
 
-\emph{If H\(_{n}\) \textgreater{} H\(_{t}\) Then}
+\emph{If H\(_{in}\) \textgreater{} H\(_{out}\) Then}
 
 \begin{equation}
 {\dot Q_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
@@ -1215,13 +1214,13 @@ The first, and original, method is selected by choosing PowerPerFlowPerPressure.
 
 where,
 
-\emph{Eff\(_{t}\)} is the motor efficiency, often the default value of 0.9. This is defined as the shaft power output in Watts divided by the electric power in Watts.
+\emph{Eff\(_{mot}\)} is the motor efficiency, often the default value of 0.9. This is defined as the shaft power output in Watts divided by the electric power in Watts.
 
-\emph{V\(_{m}\)} is the design volume flow rate in m\(^{3}\)/s.
+\emph{V\(_{nom}\)} is the design volume flow rate in m\(^{3}\)/s.
 
 \emph{ScalingFactor} is an input called Design Shaft Power per Unit Flow Rate per Unit Head, with a default of 1.282051 W/((m\(^{3}\)/s)-Pa). (This is the inverse of 0.78 for impeller efficiency that was used prior to version 8.5.)
 
-\emph{H\(_{m}\)} the nominal head, or pressure rise across the pump, is an input in Pascals.
+\emph{H\(_{nom}\)} the nominal head, or pressure rise across the pump, is an input in Pascals.
 
 The second method is selected by choosing PowerPerFlow. Then the power is calculated more simply and does not use head pressure or motor efficiency
 
@@ -1247,11 +1246,11 @@ All chillers on a loop are sized to meet the full loop load. If there are multip
 
 where
 
-\emph{C\(_{w}\)} is the specific heat of water at 5 \(^{o}\)C;
+\emph{C\(_{p,w}\)} is the specific heat of water at 5 \(^{o}\)C;
 
 \emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{s}\)} is the chilled water loop design temperature rise;
+\emph{DT\(_{loop,des}\)} is the chilled water loop design temperature rise;
 
 \(\dot Vloop,des\) is the loop design volumetric flow rate.
 
@@ -1269,13 +1268,13 @@ where
 
 where
 
-\emph{C\(_{w}\)} is the specific heat of water at design condenser inlet temperature;
+\emph{C\(_{p,w}\)} is the specific heat of water at design condenser inlet temperature;
 
 \emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{s}\)} is the chilled water loop design temperature rise;
+\emph{DT\(_{loop,des}\)} is the chilled water loop design temperature rise;
 
-\emph{COP\(_{m}\)} is the chiller nominal COP.
+\emph{COP\(_{chiller,nom}\)} is the chiller nominal COP.
 
 Boiler Sizing
 
@@ -1291,11 +1290,11 @@ All boilers on a loop are sized to meet the full loop load. If there are multipl
 
 where
 
-\emph{C\(_{w}\)} is the specific heat of water at the boiler design outlet temperature;
+\emph{C\(_{p,w}\)} is the specific heat of water at the boiler design outlet temperature;
 
 \emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{s}\)} is the hot water loop design temperature decrease;
+\emph{DT\(_{loop,des}\)} is the hot water loop design temperature decrease;
 
 \(\dot Vloop,des\) is the loop design volumetric flow rate.
 
@@ -1357,7 +1356,7 @@ The rated power, or nominal electric power input of an Electric Steam Humidifier
 
 where
 
-\emph{C\(_{w}\) is the specific heat of water at average temperature ((100+20)/2 = 60.0} * degC), (J/kgK);*
+\emph{C\(_{p,w}\) is the specific heat of water at average temperature ((100+20)/2 = 60.0} * degC), (J/kgK);*
 
 \emph{r\(_{w}\) is the density of water at standard conditions (5.05} * degC);*
 
@@ -1365,7 +1364,7 @@ where
 
 \emph{\({\dot V_{rated}}\) is the rated capacity of the humidifier in volumetric flow rate.}
 
-\emph{h\(_{g}\) is the latent heat of vaporization of water at 100.0 degC, (J/kg);}
+\emph{h\(_{fg}\) is the latent heat of vaporization of water at 100.0 degC, (J/kg);}
 
 \subsubsection{Gas Fired Humidifier Sizing}\label{gas-fired-humidifier-sizing}
 
@@ -1505,7 +1504,7 @@ If \emph{Tower Performance Input Method} = \emph{NominalCapacity} then
 \dot Vtower,w,des = 5.382E - 8\cdot \dot Qtower,nom
 \end{equation}
 
-where 5.382 *10\(^{8}\) is m\(^{3}\)/s per watt corresponds to the rule-of-thumb of sizing the tower flow rate at 3 gallons per minute per ton. For the CoolingTower:VariableSpeed:Merkel model with NominalCapacity input method, the user can input the value used to scale design water flow rate from nominal capacity and the default is 5.382 *10\(^{8}\) m\(^{3}\)/s/W.
+where 5.382 *10\(^{-08}\) is m\(^{3}\)/s per watt corresponds to the rule-of-thumb of sizing the tower flow rate at 3 gallons per minute per ton. For the CoolingTower:VariableSpeed:Merkel model with NominalCapacity input method, the user can input the value used to scale design water flow rate from nominal capacity and the default is 5.382 *10\(^{-08}\) m\(^{3}\)/s/W.
 
 \subsubsection{Fan Power at Design Air Flow Rate}\label{fan-power-at-design-air-flow-rate}
 
@@ -1519,11 +1518,11 @@ If \emph{Tower Performance Input Method} = \emph{UFactorTimesAreaAndDesignWaterF
 
 where
 
-\emph{C\(_{w}\)} is the specific heat of water at the condenser loop design exit temperature;
+\emph{C\(_{p,w}\)} is the specific heat of water at the condenser loop design exit temperature;
 
 \emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{s}\)} is the condenser water loop design temperature rise;
+\emph{DT\(_{loop,des}\)} is the condenser water loop design temperature rise;
 
 Finally
 
@@ -1543,9 +1542,9 @@ We assume a fan efficiency of 0.5 and a fan pressure rise of 190 Pascals. Then
 
 where
 
-r\(_{r}\) is the density of air at standard conditions.
+r\(_{air}\) is the density of air at standard conditions.
 
-For the CoolingTower:VariableSpeed:Merkel model, the design air flow rate is determined from the nominal capacity using a scaling factor, \({f_{airflow/W}}\) ,in units of m\(^{3}\)/s/W. The default value is 2.76316*10\(^{5}\). When the input field is left blank, the default is used as follows
+For the CoolingTower:VariableSpeed:Merkel model, the design air flow rate is determined from the nominal capacity using a scaling factor, \({f_{airflow/W}}\) ,in units of m\(^{3}\)/s/W. The default value is 2.76316*10\(^{-5}\). When the input field is left blank, the default is used as follows
 
 \begin{equation}
 {\dot V_{tower,air,des}} = {\dot Q_{tower,nom}} \bullet {f_{airflow/W}} \bullet \frac{{101325}}{{{P_{std,altitude}}}}
@@ -1579,11 +1578,11 @@ Where, \({f_{des,heat,ratio}}\) is the ratio of actual heat rejection capacity t
 
 Then we assign the inputs needed for the model.
 
-\emph{T\(_{r}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design air inlet temperature)
+\emph{T\(_{in,air}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design air inlet temperature)
 
-\emph{T\(_{b}\)} = 25.6 \(^{o}\)C (78 \(^{o}\)F design air inlet wetbulb temperature)
+\emph{T\(_{in,air,wb}\)} = 25.6 \(^{o}\)C (78 \(^{o}\)F design air inlet wetbulb temperature)
 
-\emph{W\(_{n}\)} is calculated from the entering air drybulb and wetbulb.
+\emph{W\(_{in}\)} is calculated from the entering air drybulb and wetbulb.
 
 The inlet water mass flow rate is just the design volumetric flow rate times the density of water.
 
@@ -1591,11 +1590,11 @@ The inlet water temperature is set slightly differently for the 2 input methods.
 
 \emph{UFactorTimesAreaAndDesignWaterFlowRate}
 
-\emph{T\(_{r}\)} = \emph{T\(_{s}\)}+\emph{DT\(_{s}\)}
+\emph{T\(_{in,water}\)} = \emph{T\(_{loop,exit,des}\)}+\emph{DT\(_{loop,des}\)}
 
 \emph{NominalCapacity}
 
-\emph{T\(_{r}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design inlet water temperature).
+\emph{T\(_{in,water}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design inlet water temperature).
 
 We now have all the data needed to obtain UA. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function. In this case it finds the UA that will zero the residual function - the difference between the design tower load and the tower output divided by the design tower load. The residual is calculated in the function \emph{SimpleTowerUAResidual.}
 
@@ -1647,7 +1646,7 @@ where
 
 \begin{itemize}
 \item
-  C\(_{w}\)* is the specific heat of water at the condenser loop design exit temperature;
+  C\(_{p,w}\)* is the specific heat of water at the condenser loop design exit temperature;
 \item
   \begin{itemize}
   \tightlist
@@ -1658,7 +1657,7 @@ where
   \begin{itemize}
   \tightlist
   \item
-    \emph{DT\(_{s}\)} is the condenser water loop design temperature rise;
+    \emph{DT\(_{loop,des}\)} is the condenser water loop design temperature rise;
   \end{itemize}
 \end{itemize}
 
@@ -1702,9 +1701,9 @@ Where
 
 Where,
 
-\emph{T\(_{}\)} = Design entering water temperature provided by the user
+\emph{T\(_{in,water}\)} = Design entering water temperature provided by the user
 
-\emph{T\(_{}\)} = Design air inlet temperature provided by the user
+\emph{T\(_{in,air}\)} = Design air inlet temperature provided by the user
 
 \subsubsection{Fluid cooler UA Value at Design Air Flow Rate}\label{fluid-cooler-ua-value-at-design-air-flow-rate}
 
@@ -1730,11 +1729,11 @@ The design fluid cooler load is:
 
 Then we assign the inputs needed for the model.
 
-\emph{T\(_{}\)} = Design air inlet temperature provided by the user
+\emph{T\(_{in,air}\)} = Design air inlet temperature provided by the user
 
-\emph{T\(_{b}\)} = Design air inlet wetbulb temperature provided by the user
+\emph{T\(_{in,air,wb}\)} = Design air inlet wetbulb temperature provided by the user
 
-\emph{W\(_{n}\)} is calculated from the entering air drybulb and wetbulb.
+\emph{W\(_{in}\)} is calculated from the entering air drybulb and wetbulb.
 
 The inlet water mass flow rate is just the design entering volumetric flow rate times the density of water.
 
@@ -1794,7 +1793,7 @@ Else
 {\dot V_{fluidcooler,w,des}} = {\dot V_{loop,des}}
 \end{equation}
 
-where 5.382 *10\(^{8}\) is m\(^{3}\)/s per watt corresponds to the rule-of-thumb of sizing the fluid cooler flow rate at 3 gallons per minute per ton.
+where 5.382 *10\(^{-08}\) is m\(^{3}\)/s per watt corresponds to the rule-of-thumb of sizing the fluid cooler flow rate at 3 gallons per minute per ton.
 
 \subsubsection{Fan Power at Design Air Flow Rate}\label{fan-power-at-design-air-flow-rate-2}
 
@@ -1808,11 +1807,11 @@ If \emph{Performance Input Method} = \emph{UFactorTimesAreaAndDesignWaterFlowRat
 
 where
 
-\emph{C\(_{w}\)} is the specific heat of water at the condenser loop design exit temperature;
+\emph{C\(_{p,w}\)} is the specific heat of water at the condenser loop design exit temperature;
 
 \emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{s}\)} is the condenser water loop design temperature rise;
+\emph{DT\(_{loop,des}\)} is the condenser water loop design temperature rise;
 
 Finally
 
@@ -1840,7 +1839,7 @@ We assume a fan efficiency of 0.5 and a fan pressure rise of 190 Pascals. Then
 
 where
 
-r\(_{r}\) is the density of air at standard conditions.
+r\(_{air}\) is the density of air at standard conditions.
 
 \subsubsection{Fluid cooler UA Value at Design Air Flow Rate}\label{fluid-cooler-ua-value-at-design-air-flow-rate-1}
 
@@ -1868,11 +1867,11 @@ The design fluid cooler load is:
 
 Then we assign the inputs needed for the model.
 
-\emph{T\(_{}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design air inlet temperature)
+\emph{T\(_{in,air}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design air inlet temperature)
 
-\emph{T\(_{b}\)} = 25.6 \(^{o}\)C (78 \(^{o}\)F design air inlet wetbulb temperature)
+\emph{T\(_{in,air,wb}\)} = 25.6 \(^{o}\)C (78 \(^{o}\)F design air inlet wetbulb temperature)
 
-\emph{W\(_{n}\)} is calculated from the entering air drybulb and wetbulb.
+\emph{W\(_{in}\)} is calculated from the entering air drybulb and wetbulb.
 
 \begin{itemize}
 \tightlist
@@ -1888,11 +1887,11 @@ Where, \({f_{des,heat,ratio}}\) is the ratio of actual heat rejection capacity t
 
 Then we assign the inputs needed for the model.
 
-\emph{T\(_{}\)} = Design air inlet temperature provided by the user
+\emph{T\(_{in,air}\)} = Design air inlet temperature provided by the user
 
-\emph{T\(_{b}\)} = Design air inlet wetbulb temperature provided by the user
+\emph{T\(_{in,air,wb}\)} = Design air inlet wetbulb temperature provided by the user
 
-\emph{W\(_{n}\)} is calculated from the entering air drybulb and wetbulb.
+\emph{W\(_{in}\)} is calculated from the entering air drybulb and wetbulb.
 
 The inlet water mass flow rate is just the design entering volumetric flow rate times the density of water.
 
@@ -1960,9 +1959,9 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 \subsubsection{Maximum Hot Water Flow}\label{maximum-hot-water-flow}
 
-\emph{T\(_{n}\)} = \emph{DesHeatCoilInTemp\(_{e}\)}
+\emph{T\(_{coil,in}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)}
 
-\emph{T\(_{t}\)} = \emph{HeatDesTemp\(_{e}\)} \(_{}\)
+\emph{T\(_{coil,out}\)} = \emph{HeatDesTemp\(_{zone}\)} \(_{\)\dot Qcoil,des = cp,air\cdot DesHeatMassFlowzone\cdot (Tout,coil - Tin,coil)\(}\)
 
 \begin{equation}
 \dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)
@@ -1970,21 +1969,21 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 where
 
-\emph{c\(_{r}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
 
 \subsubsection{Maximum Cold Water Flow}\label{maximum-cold-water-flow}
 
-\emph{T\(_{n}\)} = \emph{DesColdCoilInTemp\(_{e}\)}
+\emph{T\(_{coil,in}\)} = \emph{DesColdCoilInTemp\(_{zone}\)}
 
-\emph{T\(_{t}\)} = \emph{ColdDesTemp\(_{e}\)}
+\emph{T\(_{coil,out}\)} = \emph{ColdDesTemp\(_{zone}\)}
 
-\emph{W\(_{n}\)} = \emph{DesCoolCoilInHumRat\(_{e}\)}
+\emph{W\(_{coil,in}\)} = \emph{DesCoolCoilInHumRat\(_{zone}\)}
 
-\emph{W\(_{t}\)} = \emph{CoolDesHumRat\(_{e}\)}
+\emph{W\(_{coil,out}\)} = \emph{CoolDesHumRat\(_{zone}\)}
 
-\emph{H\(_{n}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{n}\)}, \emph{W\(_{n}\)})
+\emph{H\(_{coil,in}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{coil,in}\)}, \emph{W\(_{coil,in}\)})
 
-\emph{H\(_{t}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{t}\)}, \emph{W\(_{t}\)}) \(_{}\)
+\emph{H\(_{coil,out}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{coil,out}\)}, \emph{W\(_{coil,out}\)}) \(_{\)\dot Qcoil,des = DesCoolMassFlowzone\cdot (hin,coil - hout,coil)\(}\)
 
 \begin{equation}
 \dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)
@@ -1992,7 +1991,7 @@ where
 
 where
 
-\emph{c\(_{r}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
 
 \subsection{Window Air Conditioner Sizing}\label{window-air-conditioner-sizing}
 
@@ -2200,7 +2199,7 @@ The coil load and max hot water flow rate are then:
 
 where
 
-\emph{c\(_{r}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
 
 The four-pipe induction unit sizes the heating coil differently: to meet the zone load rather than match the design zone supply temperature. The load on the hot water coil is then the zone load minus whatever the central system does.
 
@@ -2249,7 +2248,7 @@ If the cooler is part of the outdoor air path of a central air system, then the 
 The secondary DX coils model does not have a standalone object and it is models as add-on feature to the DX Coils. When the secondary DX coil is added to a primary DX cooling coil, the heat rejected to secondary zone is sensible only and is treated as tnternal gain, hence secondary air flow rate is not required in the model. Where as when the secondary DX coil is added to a primary DX heating coil, then the heat removed from secondary zone may have sensible and latent components and is treated as tnternal gain. The sensible/latent component split among other parameters requires secondary coil air flow rate. Hence secondary coil air flow rate sizing is added based on the primary DX cooling coil only.
 
 \begin{equation}
-  \dot{V}_{SecCoil} = \dot{V}_{PriHeatCoil} \cdot \text{ScalingFactor}
+\dot{V}_\rm{SecCoil} = \dot{V}_\rm{PriHeatCoil}\cdot \text{ScalingFactor}
 \end{equation}
 
 where
@@ -2430,7 +2429,7 @@ where
 
 \({\dot V_h}\) * is maximum hot water flow rate, m\(^{3}\)/s*
 
-\emph{c\(_{h}\) is specific heat of hot water at reference condition (60 degC), J/kgK}
+\emph{c\(_{p,h}\) is specific heat of hot water at reference condition (60 degC), J/kgK}
 
 \emph{r\(_{h}\) is the density of water at reference condition (60 degC), kg/m\(^{3}\)}
 
@@ -2442,7 +2441,7 @@ where
 
 \({\dot V_c}\) * is maximum chilled water flow rate, m\(^{3}\)/s*
 
-\emph{c\(_{c}\) is specific heat of hot water at reference condition (5 degC), J/kgK}
+\emph{c\(_{p,c}\) is specific heat of hot water at reference condition (5 degC), J/kgK}
 
 \emph{r\(_{c}\) is the density of chilled water at reference condition (5 degC), kg/m\(^{3}\)}
 

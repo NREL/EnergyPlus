@@ -20,10 +20,18 @@ The data stored in \emph{SysSizing}, \emph{CalcSysSizing} and \emph{FinalSysSizi
 
 % table 41
 \begin{longtable}[c]{p{2.0in}p{4.0in}}
-\caption{System Sizing Data \protect \label{table:system-sizing-data}}\\
+\caption{System Sizing Data \label{table:system-sizing-data}} \tabularnewline
 \toprule 
-Name & Description \tabularnewline \midrule
+Name & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{System Sizing Data} \tabularnewline
+\toprule
+Name & Description \tabularnewline
+\midrule
 \endhead
+
 All the data from SysSizInput &  \tabularnewline
 CoinCoolMassFlow & coincident peak cooling mass flow rate [kg/s] \tabularnewline
 CoinHeatMassFlow & coincident peak heating mass flow rate [kg/s] \tabularnewline
@@ -87,7 +95,7 @@ There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCa
 \def\labelenumi{(\alph{enumi})}
 \tightlist
 \item
-  \emph{NonCoinCoolMassFlow\(_{s}\)} = \emph{DesCoolMassFlow\(_{e}\)} 
+  \emph{NonCoinCoolMassFlow\(_{sys}\)} = \emph{DesCoolMassFlow\(_{zone}\)} 
 \end{enumerate}
 
 \begin{enumerate}
@@ -102,7 +110,7 @@ There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCa
 \def\labelenumi{(\alph{enumi})}
 \tightlist
 \item
-  \emph{NonCoinHeatMassFlow\(_{s}\)} = \emph{DesHeatMassFlow\(_{e}\)}
+  \emph{NonCoinHeatMassFlow\(_{sys}\)} = \emph{DesHeatMassFlow\(_{zone}\)}
 \end{enumerate}
 
 \subsubsection{DuringDay}\label{duringday}
@@ -114,47 +122,47 @@ There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCa
   Loop over the zones cooled by this air loop:
 \end{enumerate}
 
-\emph{CoolFlowSeq\(_{s}\)(i)} = \emph{CoolFlowSeq \(_{e}\)}(i)
+\emph{CoolFlowSeq\(_{sys}\)(i)} = \emph{CoolFlowSeq \(_{zone}\)}(i)
 
-\emph{SysCoolRetTemp(i)} = (\emph{CoolZoneRetTempSeq(i) * CoolFlowSeq\(_{e}\)(i)})\emph{/ CoolFlowSeq\(_{s}\)(i)}
+\emph{SysCoolRetTemp(i)} = (\emph{CoolZoneRetTempSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
 
-\emph{SysCoolRetHumRat(i)} = (\emph{CoolZoneHumRatSeq(i) * CoolFlowSeq\(_{e}\)(i)})\emph{/ CoolFlowSeq\(_{s}\)(i)}
+\emph{SysCoolRetHumRat(i)} = (\emph{CoolZoneHumRatSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{CoolFlowSeq\(_{s}\)(i)}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
 
-\emph{T\(_{x}\)} = \emph{T\(_{e}\)} * \emph{FracOA} + \emph{SysCoolRetTemp(i)}(1 - \emph{FracOA})
+\emph{T\(_{mix}\)} = \emph{T\(_{outside}\)} * \emph{FracOA} + \emph{SysCoolRetTemp(i)}(1 - \emph{FracOA})
 
-\emph{W\(_{x}\)} = \emph{W\(_{e}\)} * \emph{FracOA} + \emph{SysCoolRetHumRat (i)}(1 - \emph{FracOA})
+\emph{W\(_{mix}\)} = \emph{W\(_{outside}\)} * \emph{FracOA} + \emph{SysCoolRetHumRat (i)}(1 - \emph{FracOA})
 
-\emph{SysCoolOutTempSeq(i)} = \emph{T\(_{e}\)}
+\emph{SysCoolOutTempSeq(i)} = \emph{T\(_{outside}\)}
 
-\emph{SysCoolOutHumRatSeq(i)} = \emph{W\(_{e}\)}
+\emph{SysCoolOutHumRatSeq(i)} = \emph{W\(_{outside}\)}
 
 Get the current (zone time-step) system cooling capacity:
 
-\emph{SysSensCoolCap\(_{r}\)} = \emph{C\(_{r}\)} * \emph{CoolFlowSeq\(_{s}\)(i)} *( \emph{T\(_{x}\)}-\emph{T\(_{p}\)})
+\emph{SysSensCoolCap\(_{cur}\)} = \emph{C\(_{p,air}\)} * \emph{CoolFlowSeq\(_{sys}\)(i)} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
 
-\emph{SensCoolCapSeq(I)} = \emph{SysSensCoolCap\(_{r}\)}
+\emph{SensCoolCapSeq(I)} = \emph{SysSensCoolCap\(_{cur}\)}
 
-If \emph{SysSensCoolCap\(_{r}\)} is the maximum for the day so far then save \emph{SysSensCoolCap\(_{r}\)} as the design value:
+If \emph{SysSensCoolCap\(_{cur}\)} is the maximum for the day so far then save \emph{SysSensCoolCap\(_{cur}\)} as the design value:
 
-\emph{SensCoolCap(i )\(_{s}\)} = \emph{SysSensCoolCap\(_{r}\)}
+\emph{SensCoolCap(i )\(_{sys}\)} = \emph{SysSensCoolCap\(_{cur}\)}
 
 And save the corresponding mixed, return and outside conditions:
 
-\emph{CoolMixTemp\(_{s}\)} = \emph{T\(_{x}\)}
+\emph{CoolMixTemp\(_{sys}\)} = \emph{T\(_{mix}\)}
 
-\emph{CoolMixHumRat\(_{s}\)} = \emph{W\(_{x}\)}
+\emph{CoolMixHumRat\(_{sys}\)} = \emph{W\(_{mix}\)}
 
-\emph{CoolRetTemp\(_{s}\)} = \emph{SysCoolRetTemp(i)}
+\emph{CoolRetTemp\(_{sys}\)} = \emph{SysCoolRetTemp(i)}
 
-\emph{CoolRetHumRat\(_{s}\)} = \emph{SysCoolRetHumRat(I)}
+\emph{CoolRetHumRat\(_{sys}\)} = \emph{SysCoolRetHumRat(I)}
 
-\emph{CoolOutTemp\(_{s}\)} = \emph{T\(_{e}\)}
+\emph{CoolOutTemp\(_{sys}\)} = \emph{T\(_{outside}\)}
 
-\emph{CoolOutHumRat\(_{s}\)} = \emph{W\(_{e}\)}
+\emph{CoolOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
 
-Here \emph{r\(_{r}\)}is the density of dry air at 20C and standard elevation corrected pressure, {[}kg/m\(^{]}\);
+Here \emph{r\(_{air}\)}is the density of dry air at 20C and standard elevation corrected pressure, {[}kg/m\(^{3\]}\);
 
 \begin{lstlisting}
         *FracOA* is the outside air fraction;
@@ -162,23 +170,17 @@ Here \emph{r\(_{r}\)}is the density of dry air at 20C and standard elevation cor
 
 \begin{itemize}
 \item
-  C\(_{r}\)* is the specific heat of dry air at 20C, {[}J/kg-K{]};
+  C\(_{p,air}\)* is the specific heat of dry air at 20C, {[}J/kg-K{]};
 \item
-  T\(_{p}\)* is the user specified design cooling supply temperature {[}C{]};
+  T\(_{sup}\)* is the user specified design cooling supply temperature {[}C{]};
 \item
-  T\(_{x}\)* is the current mixed air temperature {[}C{]};
+  T\(_{mix}\)* is the current mixed air temperature {[}C{]};
 \item
-  W\(_{x}\)* is the current mixed air humidity ratio {[}kg water / kg dry air{]};
-\end{itemize}
-
-\begin{lstlisting}
-        *T$_{e}$* is the current outside air temperature [C];
-\end{lstlisting}
-
-\begin{itemize}
-\tightlist
+  W\(_{mix}\)* is the current mixed air humidity ratio {[}kg water / kg dry air{]};
 \item
-  W\(_{e}\)* is the current outside air humidity ratio {[}kg water / kg dry air{]}.
+  \(T_{outside}\) is the current outside air temperature {[}C{]};
+\item
+  \(W_{outside}\) is the current outside air humidity ratio {[}kg water / kg dry air{]}.
 \end{itemize}
 
 \begin{enumerate}
@@ -189,75 +191,75 @@ Here \emph{r\(_{r}\)}is the density of dry air at 20C and standard elevation cor
   Loop over the zones heated by this air loop.
 \end{enumerate}
 
-\emph{HeatFlowSeq\(_{s}\)(i)} = \emph{HeatFlowSeq \(_{e}\)}(i)
+\emph{HeatFlowSeq\(_{sys}\)(i)} = \emph{HeatFlowSeq \(_{zone}\)}(i)
 
-\emph{SysHeatRetTemp(i)} = (\emph{HeatZoneRetTempSeq(i) * HeatFlowSeq\(_{e}\)(i)})\emph{/}
+\emph{SysHeatRetTemp(i)} = (\emph{HeatZoneRetTempSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
 
-\emph{HeatFlowSeq\(_{s}\)(i)}
+\emph{HeatFlowSeq\(_{sys}\)(i)}
 
-\emph{SysHeatRetHumRat(i)} = (\emph{HeatZoneHumRatSeq(i) * HeatFlowSeq\(_{e}\)(i)})\emph{/}
+\emph{SysHeatRetHumRat(i)} = (\emph{HeatZoneHumRatSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
 
 \begin{itemize}
 \tightlist
 \item
-  HeatFlowSeq\(_{s}\)(i)*
+  HeatFlowSeq\(_{sys}\)(i)*
 \end{itemize}
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{HeatFlowSeq\(_{s}\)(i)}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{HeatFlowSeq\(_{sys}\)(i)}
 
-\emph{T\(_{x}\)} = \emph{T\(_{e}\)} * \emph{FracOA} + \emph{SysHeatRetTemp(i)}(1 - \emph{FracOA})
+\emph{T\(_{mix}\)} = \emph{T\(_{outside}\)} * \emph{FracOA} + \emph{SysHeatRetTemp(i)}(1 - \emph{FracOA})
 
-\emph{W\(_{x}\)} = \emph{W\(_{e}\)} * \emph{FracOA} + \emph{SysHeatRetHumRat (i)}(1 - \emph{FracOA})
+\emph{W\(_{mix}\)} = \emph{W\(_{outside}\)} * \emph{FracOA} + \emph{SysHeatRetHumRat (i)}(1 - \emph{FracOA})
 
-\emph{SysHeatOutTempSeq(i)} = \emph{T\(_{e}\)}
+\emph{SysHeatOutTempSeq(i)} = \emph{T\(_{outside}\)}
 
-\emph{SysHeatOutHumRatSeq(i)} = \emph{W\(_{e}\)}
+\emph{SysHeatOutHumRatSeq(i)} = \emph{W\(_{outside}\)}
 
 Get the current (zone time-step) system heating capacity:
 
-\emph{SysHeatCap\(_{r}\)} = \emph{C\(_{r}\)} * \emph{MinFlowRat\(_{s}\)} *\emph{HeatFlowSeq\(_{s}\)(i)} *( \emph{T\(_{p}\)}-\emph{T\(_{x}\)})
+\emph{SysHeatCap\(_{cur}\)} = \emph{C\(_{p,air}\)} * \emph{MinFlowRat\(_{sys}\)} *\emph{HeatFlowSeq\(_{sys}\)(i)} *( \emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
 
-\emph{HeatCapSeq(I)} = \emph{SysHeatCap\(_{r}\)}
+\emph{HeatCapSeq(I)} = \emph{SysHeatCap\(_{cur}\)}
 
-If \emph{SysHeatCap\(_{r}\)} is the maximum for the day so far then save \emph{SysHeatCap\(_{r}\)} as the design value:
+If \emph{SysHeatCap\(_{cur}\)} is the maximum for the day so far then save \emph{SysHeatCap\(_{cur}\)} as the design value:
 
-\emph{HeatCap(i )\(_{s}\)} = \emph{SysHeatCap\(_{r}\)}
+\emph{HeatCap(i )\(_{sys}\)} = \emph{SysHeatCap\(_{cur}\)}
 
 And save the corresponding mixed, return and outside conditions:
 
-\emph{HeatMixTemp\(_{s}\)} = \emph{T\(_{x}\)}
+\emph{HeatMixTemp\(_{sys}\)} = \emph{T\(_{mix}\)}
 
-\emph{HeatMixHumRat\(_{s}\)} = \emph{W\(_{x}\)}
+\emph{HeatMixHumRat\(_{sys}\)} = \emph{W\(_{mix}\)}
 
-\emph{HeatRetTemp\(_{s}\)} = \emph{SysHeatRetTemp(i)}
+\emph{HeatRetTemp\(_{sys}\)} = \emph{SysHeatRetTemp(i)}
 
-\emph{HeatRetHumRat\(_{s}\)} = \emph{SysHeatRetHumRat(I)}
+\emph{HeatRetHumRat\(_{sys}\)} = \emph{SysHeatRetHumRat(I)}
 
-\emph{HeatOutTemp\(_{s}\)} = \emph{T\(_{e}\)}
+\emph{HeatOutTemp\(_{sys}\)} = \emph{T\(_{outside}\)}
 
-\emph{HeatOutHumRat\(_{s}\)} = \emph{W\(_{e}\)}
+\emph{HeatOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
 
-Here \emph{MinFlowRat\(_{s}\)} is the user specified minimum supply flow ratio.
+Here \emph{MinFlowRat\(_{sys}\)} is the user specified minimum supply flow ratio.
 
 \subsubsection{EndDay}\label{endday}
 
 If the user has specified \emph{coincident} system sizing then:
 
-\emph{DesCoolVolFlow\(_{s}\)} = \emph{r\(_{r}\)} *\emph{CoinCoolMassFlow\(_{s}\)}
+\emph{DesCoolVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{CoinCoolMassFlow\(_{sys}\)}
 
-\emph{DesHeatVolFlow\(_{s}\)} = \emph{r\(_{r}\)} *\emph{CoinHeatMassFlow\(_{s}\)}
+\emph{DesHeatVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{CoinHeatMassFlow\(_{sys}\)}
 
-\emph{DesMainVolFlow\(_{s}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{s}\)}, \emph{DesHeatVolFlow\(_{s}\)})
+\emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
 
 If the user has specified \emph{noncoincident}system sizing then:
 
-\emph{DesCoolVolFlow\(_{s}\)} = \emph{r\(_{r}\)} *\emph{NonCoinCoolMassFlow\(_{s}\)}
+\emph{DesCoolVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{NonCoinCoolMassFlow\(_{sys}\)}
 
-\emph{DesHeatVolFlow\(_{s}\)} = \emph{r\(_{r}\)} *\emph{NonCoinHeatMassFlow\(_{s}\)}
+\emph{DesHeatVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{NonCoinHeatMassFlow\(_{sys}\)}
 
-\emph{DesMainVolFlow\(_{s}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{s}\)}, \emph{DesHeatVolFlow\(_{s}\)})
+\emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
 
-Based on the outdoor air method selected, the \emph{DesCoolVolFlow\(_{s}\)} and \emph{DesHeatVolFlow\(_{s}\)} are modified based on the system ventilation effciency calculated based on the maximum outdoor air fraction.
+Based on the outdoor air method selected, the \emph{DesCoolVolFlow\(_{sys}\)} and \emph{DesHeatVolFlow\(_{sys}\)} are modified based on the system ventilation effciency calculated based on the maximum outdoor air fraction.
 
 \subsubsection{EndSysSizingCalc}\label{endsyssizingcalc}
 
@@ -298,7 +300,7 @@ For noncoincident sizing the task is harder since we don't have a single time-st
 \item
   Loop over all of the zones cooled by this air loop
 \item
-  In \emph{FinalZoneSizing} replace the value in \emph{DesCoolCoilInTemp} with the user specified \emph{CoolSupTemp\(_{s}\)}. Do the same for \emph{DesCoolCoilInHumRat} and \emph{CoolSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions. 
+  In \emph{FinalZoneSizing} replace the value in \emph{DesCoolCoilInTemp} with the user specified \emph{CoolSupTemp\(_{sys}\)}. Do the same for \emph{DesCoolCoilInHumRat} and \emph{CoolSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions. 
 \end{enumerate}
 
 \begin{enumerate}
@@ -306,44 +308,44 @@ For noncoincident sizing the task is harder since we don't have a single time-st
 \setcounter{enumi}{1}
 \tightlist
 \item
-  \emph{NonCoinCoolMassFlow\(_{s}\)} = \emph{DesCoolMassFlow\(_{e}\)}
+  \emph{NonCoinCoolMassFlow\(_{sys}\)} = \emph{DesCoolMassFlow\(_{zone}\)}
 \end{enumerate}
 
-\emph{SysCoolRetTemp} = (\emph{ZoneRetTempAtCoolPeak *DesCoolMassFlow\(_{e}\)})
+\emph{SysCoolRetTemp} = (\emph{ZoneRetTempAtCoolPeak *DesCoolMassFlow\(_{zone}\)})
 
-/\emph{NonCoinCoolMassFlow\(_{s}\)}
+/\emph{NonCoinCoolMassFlow\(_{sys}\)}
 
 \emph{SysCoolRetHumRat} = (\emph{ZoneHumRatAtCoolPeak *}
 
-\emph{DesCoolMassFlow\(_{e}\)})/\emph{NonCoinCoolMassFlow\(_{s}\)}
+\emph{DesCoolMassFlow\(_{zone}\)})/\emph{NonCoinCoolMassFlow\(_{sys}\)}
 
-\emph{SysCoolOutTemp} = (\emph{T\(_{k}\) *DesCoolMassFlow\(_{e}\)})/
+\emph{SysCoolOutTemp} = (\emph{T\(_{OA,zone\, peak}\) *DesCoolMassFlow\(_{zone}\)})/
 
 \begin{itemize}
 \tightlist
 \item
-  NonCoinCoolMassFlow\(_{s}\)*
+  NonCoinCoolMassFlow\(_{sys}\)*
 \end{itemize}
 
-\emph{SysCoolOutHumRat} = (\emph{W\(_{k}\) *DesCoolMassFlow\(_{e}\)})/
+\emph{SysCoolOutHumRat} = (\emph{W\(_{OA,zone\\ peak}\) *DesCoolMassFlow\(_{zone}\)})/
 
 \begin{itemize}
 \tightlist
 \item
-  NonCoinCoolMassFlow\(_{s}\)*
+  NonCoinCoolMassFlow\(_{sys}\)*
 \end{itemize}
 
 At the end of the zone loop calculate mixed air conditions and the system sensible cooling capacity.
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{NonCoinCoolMassFlow\(_{s}\)}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinCoolMassFlow\(_{sys}\)}
 
-\emph{T\(_{x}\)} = \emph{SysCoolOutTemp} * \emph{FracOA} + \emph{SysCoolRetTemp} * (1 - \emph{FracOA})
+\emph{T\(_{mix}\)} = \emph{SysCoolOutTemp} * \emph{FracOA} + \emph{SysCoolRetTemp} * (1 - \emph{FracOA})
 
-\emph{W\(_{x}\)} = \emph{SysCoolOutHumRat} * \emph{FracOA} + \emph{SysCoolRetHumRat} *
+\emph{W\(_{mix}\)} = \emph{SysCoolOutHumRat} * \emph{FracOA} + \emph{SysCoolRetHumRat} *
 
 (1 - \emph{FracOA})
 
-\emph{SysSensCoolCap} = \emph{C\(_{r}\)} * \emph{NonCoinCoolMassFlow} *( \emph{T\(_{x}\)}-\emph{T\(_{p}\)})
+\emph{SysSensCoolCap} = \emph{C\(_{p,air}\)} * \emph{NonCoinCoolMassFlow} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
 
 Then (for noncoincident sizing) the variables calculated in section (ii) are moved into the \emph{CalcSysSizing} Array.
 
@@ -353,7 +355,7 @@ Then (for noncoincident sizing) the variables calculated in section (ii) are mov
 \item
   Loop over all of the zones heated by this air loop.
 \item
-  In \emph{FinalZoneSizing} replace the value in \emph{DesHeatCoilInTemp} with the user specified \emph{HeatSupTemp\(_{s}\)}. Do the same for \emph{DesHeatCoilInHumRat} and \emph{HeatSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions. 
+  In \emph{FinalZoneSizing} replace the value in \emph{DesHeatCoilInTemp} with the user specified \emph{HeatSupTemp\(_{sys}\)}. Do the same for \emph{DesHeatCoilInHumRat} and \emph{HeatSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions. 
 \end{enumerate}
 
 \begin{enumerate}
@@ -361,44 +363,44 @@ Then (for noncoincident sizing) the variables calculated in section (ii) are mov
 \setcounter{enumi}{1}
 \tightlist
 \item
-  \emph{NonCoinHeatMassFlow\(_{s}\)} = \emph{DesHeatMassFlow\(_{e}\)}
+  \emph{NonCoinHeatMassFlow\(_{sys}\)} = \emph{DesHeatMassFlow\(_{zone}\)}
 \end{enumerate}
 
-\emph{SysHeatRetTemp} = (\emph{ZoneRetTempAtHeatPeak *DesHeatMassFlow\(_{e}\)})
+\emph{SysHeatRetTemp} = (\emph{ZoneRetTempAtHeatPeak *DesHeatMassFlow\(_{zone}\)})
 
-/\emph{NonCoinHeatMassFlow\(_{s}\)}
+/\emph{NonCoinHeatMassFlow\(_{sys}\)}
 
 \emph{SysHeatRetHumRat} = (\emph{ZoneHumRatAtHeatPeak *}
 
-\emph{DesHeatMassFlow\(_{e}\)})/\emph{NonCoinHeatMassFlow\(_{s}\)}
+\emph{DesHeatMassFlow\(_{zone}\)})/\emph{NonCoinHeatMassFlow\(_{sys}\)}
 
-\emph{SysHeatOutTemp} = (\emph{T\(_{k}\) *DesHeatMassFlow\(_{e}\)})/
+\emph{SysHeatOutTemp} = (\emph{T\(_{OA,zone\\ peak}\) *DesHeatMassFlow\(_{zone}\)})/
 
 \begin{itemize}
 \tightlist
 \item
-  NonCoinHeatMassFlow\(_{s}\)*
+  NonCoinHeatMassFlow\(_{sys}\)*
 \end{itemize}
 
-\emph{SysHeatOutHumRat} = (\emph{W\(_{k}\) *DesHeatMassFlow\(_{e}\)})/
+\emph{SysHeatOutHumRat} = (\emph{W\(_{OA,zone\\ peak}\) *DesHeatMassFlow\(_{zone}\)})/
 
 \begin{itemize}
 \tightlist
 \item
-  NonCoinHeatMassFlow\(_{s}\)*
+  NonCoinHeatMassFlow\(_{sys}\)*
 \end{itemize}
 
 At the end of the zone loop calculate mixed air conditions and the system sensible cooling capacity.
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{NonCoinHeatMassFlow\(_{s}\)}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinHeatMassFlow\(_{sys}\)}
 
-\emph{T\(_{x}\)} = \emph{SysHeatOutTemp} * \emph{FracOA} + \emph{SysHeatRetTemp} * (1 - \emph{FracOA})
+\emph{T\(_{mix}\)} = \emph{SysHeatOutTemp} * \emph{FracOA} + \emph{SysHeatRetTemp} * (1 - \emph{FracOA})
 
-\emph{W\(_{x}\)} = \emph{SysHeatOutHumRat} * \emph{FracOA} + \emph{SysHeatRetHumRat} *
+\emph{W\(_{mix}\)} = \emph{SysHeatOutHumRat} * \emph{FracOA} + \emph{SysHeatRetHumRat} *
 
 (1 - \emph{FracOA})
 
-\emph{SysHeatlCap} = \emph{C\(_{r}\)} * \emph{NonCoinHeatlMassFlow} *( \emph{T\(_{p}\)}-\emph{T\(_{x}\)})
+\emph{SysHeatlCap} = \emph{C\(_{p,air}\)} * \emph{NonCoinHeatlMassFlow} *( \emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
 
 Then (for noncoincident sizing) the variables calculated in section (ii) are moved into the \emph{CalcSysSizing} Array.
 
@@ -418,14 +420,14 @@ Loop over the air loops.
 \def\labelenumi{(\roman{enumi})}
 \tightlist
 \item
-  As in the zone case, the user specified system design flow rates are turned into sizing ratios by dividing the user input value by the calculated value. The same strategy is employed for sizing on the ventilation requirement: the design ventilation flow rate is divided by the calculated design flow rate value. For each air loop this gives us a \emph{SizRat\(_{l}\)} and \emph{SizRat\(_{t}\)}.
+  As in the zone case, the user specified system design flow rates are turned into sizing ratios by dividing the user input value by the calculated value. The same strategy is employed for sizing on the ventilation requirement: the design ventilation flow rate is divided by the calculated design flow rate value. For each air loop this gives us a \emph{SizRat\(_{cool}\)} and \emph{SizRat\(_{heat}\)}.
 \end{enumerate}
 
-\emph{CoinCoolMassFlow} = \emph{SizRat\(_{l}\)} * \emph{CoinCoolMassFlow\(_{c}\)}
+\emph{CoinCoolMassFlow} = \emph{SizRat\(_{cool}\)} * \emph{CoinCoolMassFlow\(_{calc}\)}
 
-\emph{NonCoinCoolMassFlow} = \emph{SizRat\(_{l}\)} * \emph{NonCoinCoolMassFlow\(_{c}\)}
+\emph{NonCoinCoolMassFlow} = \emph{SizRat\(_{cool}\)} * \emph{NonCoinCoolMassFlow\(_{calc}\)}
 
-\emph{DesCoolVolFlow} = \emph{SizRat\(_{l}\)} * \emph{DesCoolVolFlow\(_{c}\)}
+\emph{DesCoolVolFlow} = \emph{SizRat\(_{cool}\)} * \emph{DesCoolVolFlow\(_{calc}\)}
 
 Since the flow rates have been altered the outside air fraction will change. This will alter the design mixed air conditions and lead to an altered value for the cooling capacity. This must be done for the time-step sequence and for the peak value.
 
@@ -437,15 +439,15 @@ Since the flow rates have been altered the outside air fraction will change. Thi
   Loop over the zone timesteps (index = \emph{i}).
 \end{enumerate}
 
-\emph{CoolFlowSeq\(_{s}\)(i)} = \emph{SizRat\(_{l}\)} * \emph{CoolFlowSeq\(_{c}\)(i)}
+\emph{CoolFlowSeq\(_{sys}\)(i)} = \emph{SizRat\(_{cool}\)} * \emph{CoolFlowSeq\(_{sys,calc}\)(i)}
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{CoolFlowSeq\(_{s}\)(i)}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
 
-\emph{T\(_{x}\)} = \emph{SysCoolOutTempSeq(i) *FracOA +}
+\emph{T\(_{mix}\)} = \emph{SysCoolOutTempSeq(i) *FracOA +}
 
 \emph{SysCoolRetTempSeq(i) *(}1-FracOA)
 
-\emph{SensCoolCapSeq(i)} = \emph{C\(_{r}\)} * \emph{CoolFlowSeq\(_{s}\)(i)} *( \emph{T\(_{x}\)}-\emph{T\(_{p}\)})
+\emph{SensCoolCapSeq(i)} = \emph{C\(_{p,air}\)} * \emph{CoolFlowSeq\(_{sys}\)(i)} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
 
 \begin{enumerate}
 \def\labelenumi{(\roman{enumi})}
@@ -455,17 +457,17 @@ Since the flow rates have been altered the outside air fraction will change. Thi
   Do the same calculation for peak cooling.
 \end{enumerate}
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{DesCoolVolFlow}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesCoolVolFlow}
 
-\emph{T\(_{x}\)} = \emph{CoolOutTemp\(_{s}\) *FracOA + CoolRetTemp\(_{s}\) *(}1-FracOA)
+\emph{T\(_{mix}\)} = \emph{CoolOutTemp\(_{sys}\) *FracOA + CoolRetTemp\(_{sys}\) *(}1-FracOA)
 
-\emph{W\(_{x}\)} = \emph{CoolOutHumRat\(_{s}\) *FracOA + CoolRetHumRat\(_{s}\) *}
+\emph{W\(_{mix}\)} = \emph{CoolOutHumRat\(_{sys}\) *FracOA + CoolRetHumRat\(_{sys}\) *}
 
 \emph{(}1-FracOA)
 
-\emph{SensCoolCap\(_{s}\)} = \emph{C\(_{r}\)} * \emph{DesCoolVolFlow\(_{s}\)} *( \emph{T\(_{x}\)}-\emph{T\(_{p}\)})
+\emph{SensCoolCap\(_{sys}\)} = \emph{C\(_{p,air}\)} * \emph{DesCoolVolFlow\(_{sys}\)} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
 
-\emph{T\(_{x}\)} and \emph{W\(_{x}\)} are saved in \emph{FinalSysSizing} \emph{.}
+\emph{T\(_{mix}\)} and \emph{W\(_{mix}\)} are saved in \emph{FinalSysSizing} \emph{.}
 
 \begin{enumerate}
 \def\labelenumi{(\roman{enumi})}
@@ -475,11 +477,11 @@ Since the flow rates have been altered the outside air fraction will change. Thi
   Do the same calculation for the heating case.
 \end{enumerate}
 
-\emph{CoinHeatMassFlow} = \emph{SizRat\(_{t}\)} * \emph{CoinHeatMassFlow\(_{c}\)}
+\emph{CoinHeatMassFlow} = \emph{SizRat\(_{heat}\)} * \emph{CoinHeatMassFlow\(_{calc}\)}
 
-\emph{NonCoinHeatMassFlow} = \emph{SizRat\(_{t}\)} * \emph{NonCoinHeatMassFlow\(_{c}\)}
+\emph{NonCoinHeatMassFlow} = \emph{SizRat\(_{heat}\)} * \emph{NonCoinHeatMassFlow\(_{calc}\)}
 
-\emph{DesHeatVolFlow} = \emph{SizRat\(_{t}\)} * \emph{DesHeatVolFlow\(_{c}\)}
+\emph{DesHeatVolFlow} = \emph{SizRat\(_{heat}\)} * \emph{DesHeatVolFlow\(_{calc}\)}
 
 \begin{enumerate}
 \def\labelenumi{(\alph{enumi})}
@@ -489,11 +491,11 @@ Since the flow rates have been altered the outside air fraction will change. Thi
   Loop over the zone timesteps (index = \emph{i}).
 \end{enumerate}
 
-\emph{HeatFlowSeq\(_{s}\)(i)} = \emph{SizRat\(_{t}\)} * \emph{HeatFlowSeq\(_{c}\)(i)}
+\emph{HeatFlowSeq\(_{sys}\)(i)} = \emph{SizRat\(_{Heat}\)} * \emph{HeatFlowSeq\(_{sys,calc}\)(i)}
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{HeatFlowSeq\(_{s}\)(i)}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{HeatFlowSeq\(_{sys}\)(i)}
 
-\emph{T\(_{x}\)} = \emph{SysHeatOutTempSeq(i) * FracOA +}
+\emph{T\(_{mix}\)} = \emph{SysHeatOutTempSeq(i) * FracOA +}
 
 \begin{itemize}
 \tightlist
@@ -501,7 +503,7 @@ Since the flow rates have been altered the outside air fraction will change. Thi
   SysHeatRetTempSeq(i) ** \emph{(}1-FracOA)
 \end{itemize}
 
-\emph{HeatCapSeq(i)} = \emph{C\(_{r}\)} * \emph{HeatFlowSeq\(_{s}\)(i)} *(\emph{T\(_{p}\)}-\emph{T\(_{x}\)})
+\emph{HeatCapSeq(i)} = \emph{C\(_{p,air}\)} * \emph{HeatFlowSeq\(_{sys}\)(i)} *(\emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
 
 \begin{enumerate}
 \def\labelenumi{(\roman{enumi})}
@@ -511,19 +513,19 @@ Since the flow rates have been altered the outside air fraction will change. Thi
   Do the same calculation for peak heating.
 \end{enumerate}
 
-\emph{FracOA = r\(_{r}\)} * \emph{DesOutAirVolFlow\(_{s}\)}/ \emph{DesHeatVolFlow}
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesHeatVolFlow}
 
-\emph{T\(_{x}\)} = \emph{HeatOutTemp\(_{s}\) *FracOA + HeatRetTemp\(_{s}\) *} \emph{(}1-FracOA)
+\emph{T\(_{mix}\)} = \emph{HeatOutTemp\(_{sys}\) *FracOA + HeatRetTemp\(_{sys}\) *} \emph{(}1-FracOA)
 
-\emph{W\(_{x}\)} = \emph{HeatOutHumRat\(_{s}\) *FracOA + HeatRetHumRat\(_{s}\) *}
+\emph{W\(_{mix}\)} = \emph{HeatOutHumRat\(_{sys}\) *FracOA + HeatRetHumRat\(_{sys}\) *}
 
 \emph{(}1-FracOA)
 
-\emph{HeatCap\(_{s}\)} = \emph{C\(_{r}\)} * \emph{DesHeatVolFlow\(_{s}\)} *( \emph{T\(_{p}\)}-\emph{T\(_{x}\)})
+\emph{HeatCap\(_{sys}\)} = \emph{C\(_{p,air}\)} * \emph{DesHeatVolFlow\(_{sys}\)} *( \emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
 
-\emph{T\(_{x}\)} and \emph{W\(_{x}\)} are saved in \emph{FinalSysSizing} \emph{.}
+\emph{T\(_{mix}\)} and \emph{W\(_{mix}\)} are saved in \emph{FinalSysSizing} \emph{.}
 
-(vii)\emph{DesMainVolFlow\(_{s}\)} = \textbf{MAX}(\emph{DesCoolVolFlow\(_{s}\)},\emph{DesHeatVolFlow\(_{s}\)})
+(vii)\emph{DesMainVolFlow\(_{sys}\)} = \textbf{MAX}(\emph{DesCoolVolFlow\(_{sys}\)},\emph{DesHeatVolFlow\(_{sys}\)})
 
 \textbf{This concludes the system design calculation.}
 

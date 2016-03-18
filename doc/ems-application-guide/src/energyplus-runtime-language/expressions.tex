@@ -19,10 +19,16 @@ The operators shown in Table~\ref{table:operators-for-erl} are available for use
 
 % table 3
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Operators for Erl \protect \label{table:operators-for-erl}}\\
+\caption{Operators for Erl \label{table:operators-for-erl}} \tabularnewline
+\toprule 
+Operator Symbol & Description & Evaluation Order & Example \tabularnewline \midrule
+\endfirsthead
+
+\caption[]{Operators for Erl} \tabularnewline
 \toprule 
 Operator Symbol & Description & Evaluation Order & Example \tabularnewline \midrule
 \endhead
+
 ( ) & Parentheses & left-to-right & SET z = 23/(3 + 2) \tabularnewline
 - & Addition & right-to-left & SET a = 4 + 5 \tabularnewline
 - & Subtraction & right-to-left & SET b = a - 3 \tabularnewline

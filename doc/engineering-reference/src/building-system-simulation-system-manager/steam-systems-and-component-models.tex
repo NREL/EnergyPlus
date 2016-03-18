@@ -160,7 +160,7 @@ A heating coil can be used either as a zone coil or a coil in the air loop depen
 
 This model accounts for the latent heat transfer and sensible cooling of water; the question of superheat is eliminated because steam is assumed to be saturation conditions.~ Steam enters the coil at quality equal to 1.0, at saturation temperature and leaves the coil with desired degree of sub cooling.~ The user inputs the desired degree of subcooling, which determines the condensate outlet condition from the coil.
 
-EnergyPlus heat balance methods determine the amount of heating required in the zone to maintain the zone at the desired conditions.~ Based on this value of heating load, the zone coil determines the mass flow rate of steam required since the heating coil load is the control variable in a zone coil.~ The following equation describes this calculation to determine steam mass flow rate required for the desired heating capacity. The steam latent heat of vaporization, \emph{h}\(_{g}\) and the condensate heat capacity, \emph{C}\(_{w}\) are evaluated at the steam coil inlet node temperature and standard barometric pressure of 101325.0 Pa.
+EnergyPlus heat balance methods determine the amount of heating required in the zone to maintain the zone at the desired conditions.~ Based on this value of heating load, the zone coil determines the mass flow rate of steam required since the heating coil load is the control variable in a zone coil.~ The following equation describes this calculation to determine steam mass flow rate required for the desired heating capacity. The steam latent heat of vaporization, \emph{h}\(_{fg}\) and the condensate heat capacity, \emph{C}\(_{p,w}\) are evaluated at the steam coil inlet node temperature and standard barometric pressure of 101325.0 Pa.
 
 \begin{equation}
 {\dot m_{zc}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{zc}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}
@@ -455,7 +455,7 @@ A simple schematic describing the flow across the pump is shown in the following
 \begin{figure}[hbtp] % fig 131
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2040.png}
-\caption{  Schematic of Condensate Pump in Steam Loop \protect \label{fig:schematic-of-condensate-pump-in-steam-loop}}
+\caption{Schematic of Condensate Pump in Steam Loop \protect \label{fig:schematic-of-condensate-pump-in-steam-loop}}
 \end{figure}
 
 \subsubsection{Model Assumptions}\label{model-assumptions-1}

@@ -45,7 +45,7 @@ Step 8. Based on the base date, accumulate the monthly costs into yearly costs.
 
 Step 1. For each year of the study compute the discount factor (SPV) using the following formula:
 
-SPV\(_{r}\) = 1 / ((1 + curDiscountRate) ** effectiveYear)
+SPV\(_{yr}\) = 1 / ((1 + curDiscountRate) ** effectiveYear)
 
 This formula is based on formula D.2.1.1 from NIST Handbook 135 Life Cycle Costing Manual for the Federal Energy Management Program by Sieglinde K. Fuller and Stephen R. Petersen.
 
@@ -69,6 +69,6 @@ Step 4. Taxes are the taxable income times the tax rate.
 
 Step 5. The after tax present value is
 
-AfterTaxPresentValue\(_{r}\) = GrandTotal\(_{r}\) - Taxes\(_{r}\) * SPV\(_{r}\)
+AfterTaxPresentValue\(_{yr}\) = GrandTotal\(_{yr}\) - Taxes\(_{yr}\) * SPV\(_{yr}\)
 
 All major results are presented on the tabular report.

@@ -98,9 +98,16 @@ This call sets the value for the DB trigger shown earlier. Both values passed in
 
 % table 24
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Trigger Limit Call Values \protect \label{table:trigger-limit-call-values}}\\
+\caption{Trigger Limit Call Values \label{table:trigger-limit-call-values}} \tabularnewline
 \toprule 
-Trigger    Limit & Result & Ignore    Calc    Trigger & Result \tabularnewline \midrule
+Trigger Limit & Result & Ignore Calc Trigger & Result \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Trigger Limit Call Values} \tabularnewline
+\toprule 
+Trigger Limit & Result & Ignore Calc Trigger & Result \tabularnewline
+\midrule
 \endhead
 0 & use only calculated trigger & 0 & Uses Calculated Trigger \tabularnewline
 1 & use 5°C & 1 & Ignores calculated trigger \tabularnewline
@@ -147,10 +154,18 @@ Valid values for the Input File Data Type are shown in the following table:
 
 % table 25
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Valid Input File Types for "ProcessWeather" call \protect \label{table:valid-input-file-types-for-processweather}}\\
+\caption{Valid Input File Types for ``ProcessWeather'' call \label{table:valid-input-file-types-for-processweather}} \tabularnewline
 \toprule 
-Input File Type & Source Data file Format Type \tabularnewline \midrule
+Input File Type & Source Data file Format Type \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Valid Input File Types for ``ProcessWeather'' call} \tabularnewline
+\toprule 
+Input File Type & Source Data file Format Type \tabularnewline
+\midrule
 \endhead
+
 TMY2 or TM2 & TMY2 data file \tabularnewline
 IWEC or IWC & IWEC data file \tabularnewline
 SAMSON or DAT & SAMSON data file \tabularnewline
@@ -171,10 +186,18 @@ Valid values for the Output File Type(s) are shown in the following table:
 
 % table 26
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Valid Output File Types for the "ProcessWeather" call \protect \label{table:valid-output-file-types-for}}\\
+\caption{Valid Output File Types for the ``ProcessWeather'' call \label{table:valid-output-file-types-for}} \tabularnewline
 \toprule 
-Output File Type & File(s) produced \tabularnewline \midrule
+Output File Type & File(s) produced \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Valid Output File Types for the ``ProcessWeather'' call} \tabularnewline
+\toprule 
+Output File Type & File(s) produced \tabularnewline
+\midrule
 \endhead
+
 EPW & EPW and RPT files \tabularnewline
 CSV & CSV and RPT files \tabularnewline
 BOTH & EPW, CSV and RPT files \tabularnewline

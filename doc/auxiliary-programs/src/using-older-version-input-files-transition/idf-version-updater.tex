@@ -16,10 +16,18 @@ The converted file becomes the new \textless{}file\textgreater{}.idf and the ori
 
 % table 27
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{IDF Version Updater Output Files and Descriptions. \protect \label{table:idf-version-updater-output-files}}\\
+\caption{IDF Version Updater Output Files and Descriptions. \label{table:idf-version-updater-output-files}} \tabularnewline
 \toprule 
-Transition Output File Name & Description \tabularnewline \midrule
+Transition Output File Name & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{IDF Version Updater Output Files and Descriptions.} \tabularnewline
+\toprule 
+Transition Output File Name & Description \tabularnewline
+\midrule
 \endhead
+
 < filename > \_Transition.audit & This is the contents of what you would see on the screen if you sat and watched the transition process during a console run. If you convert multiple versions, all the messages are shown in this file. \tabularnewline
 < filename > .idf & Converted results to the latest version or version selected. \tabularnewline
 < filename > \_Vxxx.idf & If you don't select "create intermediate versions", this will only be the original version. Otherwise will have each version. \tabularnewline
