@@ -365,7 +365,7 @@ and so on through multiple overlaps where the sign of the overlap area is the pr
 \caption{  Multiple Shadow Overlaps \protect \label{fig:multiple-shadow-overlaps}}
 \end{figure}
 
-Partially transparent shadowing surfaces can also be modeled by giving a transparency ($\tau$) to every shadowing polygon. Let $\tau$ of the receiving polygon be one. Then the $\tau$ of every overlap of polygons i and j is the product of $\tau$\(_{i}\)and $\tau$\(_{j}\). The shaded area is then computed by summing A\(_{i}\)·(1 - $\tau$\(_{i}\)) for all overlap polygons.
+Partially transparent shadowing surfaces can also be modeled by giving a transparency ($\tau$) to every shadowing polygon. Let $\tau$ of the receiving polygon be one. Then the $\tau$ of every overlap of polygons i and j is the product of $\tau$\(_{i}\)and $\tau$\(_{j}\). The shaded area is then computed by summing A\(_{i}\)*(1 - $\tau$\(_{i}\)) for all overlap polygons.
 
 It is easy to determine the sunlit area of a window once all the shadow and overlap vertices on the wall have been computed. Consider wall 2 of Figure~\ref{fig:overall-shadowing-scheme-depiction}. First, the wall is considered a simple rectangle and the window on it is ignored. The shadow overlapping is performed and the sunlit portion of the gross wall area is computed. Then the window rectangle is overlapped with the shadow to determine its sunlit area. The sunlit area of the window is subtracted from the gross wall sunlit area to determine the net wall sunlit area. During this calculation it is not necessary to recompute the shadows, because they were precisely determined on the wall.
 

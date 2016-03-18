@@ -367,7 +367,7 @@ The quartic polynomial curves in Figure~\ref{fig:belt-maximum-efficiency-vs.-fan
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
 \caption{Belt Maximum Efficiency Curve Coefficients \protect \label{table:belt-maximum-efficiency-curve-coefficients}}\\
 \toprule 
-Efficiency Class (Loss) & c & c & c & c & c \tabularnewline \midrule
+Efficiency Class (Loss) & c\(_1\) & c\(_2\) & c\(_3\) & c\(_4\) & c\(_5\) \tabularnewline \midrule
 \endhead
 High (Low Loss) & -6.502E-2 & 2.475E-2 & -6.841E-3 & 9.383E-4 & -5.168E-5 \tabularnewline
 Medium (Medium Loss) & -9.504E-2 & 3.415E-2 & -8.897E-3 & 1.159E-3 & -6.132E-5 \tabularnewline
@@ -408,17 +408,17 @@ Belt input power (mechanical, W) at the motor shaft is:
 \({H_{belt}} = \frac{{{H_{fan}}}}{{{\eta_{belt}}({x_{belt}})}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
 
 % table 69
-\begin{longtable}[c]{@{}llllll@{}}
+\begin{longtable}[l]{@{}llllll@{}}
 \caption{Belt Normalized Efficiency Curve Coefficients \protect \label{table:belt-normalized-efficiency-curve-coefficients}}\\
 \toprule 
-Belt Type & x belt,trans & Region & a & b & c \tabularnewline \midrule
+Belt Type & x\(_{belt,trans}\) & Region & a\(_{belt}\) & b\(_{belt}\) & c\(_{belt}\) \tabularnewline \midrule
 \endhead
 V-Belt & 0.167 & 1 & 0.920797 & 0.026269 & 0.151594 \tabularnewline
-2 & 1.011965 & -0.339038 & -3.43626 \tabularnewline
-3 & 1.037778 & 0.010307 & -0.026815 \tabularnewline
+ & & 2 & 1.011965 & -0.339038 & -3.43626 \tabularnewline
+ & & 3 & 1.037778 & 0.010307 & -0.026815 \tabularnewline
 Synchronous & 0.137 & 1 & 0.982167 & 0.049135 & 0.158164 \tabularnewline
-2 & 1.002134 & -0.531885 & -5.295707 \tabularnewline
-3 & 1 & 0 & 0 \tabularnewline
+ & & 2 & 1.002134 & -0.531885 & -5.295707 \tabularnewline
+ & & 3 & 1 & 0 & 0 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -444,7 +444,7 @@ The maximum motor efficiency curves in Figure~\ref{fig:maximum-motor-efficiency-
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Motor Maximum Efficiency Curve Coefficients \protect \label{table:motor-maximum-efficiency-curve-coefficients}}\\
 \toprule 
-Case & a & b & c \tabularnewline \midrule
+Case & a\(_{motor,max}\) & b\(_{motor,max}\) & c\(_{motor,max}\) \tabularnewline \midrule
 \endhead
 High-Efficiency & 0.196205 & 3.653654 & 0.839926 \tabularnewline
 Mid-Efficiency & 0.292280 & 3.368739 & 0.762471 \tabularnewline
@@ -468,17 +468,17 @@ The example motor normalized efficiency curves (single rectangular hyperbola typ
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
 \caption{Example Motor Normalized Efficiency Curve Coefficients \protect \label{table:example-motor-normalized-efficiency-curve}}\\
 \toprule 
-Poles & Motor Rated Output (hp) & Maximum Efficiency & a Plmotor & b Plmotor & c Plmotor \tabularnewline \midrule
+Poles & Motor Rated Output (hp) & Maximum Efficiency & a\(_{Plmotor}\) & b\(_{Plmotor}\) & c\(_{Plmotor}\) \tabularnewline \midrule
 \endhead
 8 & 1 & 0.6675 & 1.096694 & 0.097126 & 0.002011 \tabularnewline
 4 & 1 & 0.7787 & 1.092165 & 0.08206 & -0.0072 \tabularnewline
-5 & 0.84 & 1.223684 & 0.08467 & -0.135186 \tabularnewline
-10 & 0.8745 & 1.146258 & 0.045766 & -0.110367 \tabularnewline
-25 & 0.8991 & 1.137209 & 0.050236 & -0.08915 \tabularnewline
-50 & 0.9129 & 1.088803 & 0.029753 & -0.064058 \tabularnewline
-75 & 0.9259 & 1.07714 & 0.029005 & -0.04935 \tabularnewline
-100 & 0.9499 & 1.035294 & 0.012948 & -0.024708 \tabularnewline
-125 & 0.9527 & 1.030968 & 0.010696 & -0.023514 \tabularnewline
+ & 5 & 0.84 & 1.223684 & 0.08467 & -0.135186 \tabularnewline
+ & 10 & 0.8745 & 1.146258 & 0.045766 & -0.110367 \tabularnewline
+ & 25 & 0.8991 & 1.137209 & 0.050236 & -0.08915 \tabularnewline
+ & 50 & 0.9129 & 1.088803 & 0.029753 & -0.064058 \tabularnewline
+ & 75 & 0.9259 & 1.07714 & 0.029005 & -0.04935 \tabularnewline
+ & 100 & 0.9499 & 1.035294 & 0.012948 & -0.024708 \tabularnewline
+ & 125 & 0.9527 & 1.030968 & 0.010696 & -0.023514 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -514,7 +514,7 @@ Example coefficients derived from the DOE data as a function of the fraction of 
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Example VFD Efficiency Curve Coefficients \protect \label{table:example-vfd-efficiency-curve-coefficients}}\\
 \toprule 
-VFD Rated Output Power (hp) & a & b & c \tabularnewline \midrule
+VFD Rated Output Power (hp) & a\(_{vfd}\) & b\(_{vfd}\) & c\(_{vfd}\) \tabularnewline \midrule
 \endhead
 3 & 0.978856 & 0.034247 & -0.007862 \tabularnewline
 5 & 0.977485 & 0.028413 & -0.002733 \tabularnewline

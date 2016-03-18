@@ -100,57 +100,60 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 
 \subsubsection{Inputs}\label{inputs}
 
-§~Controller Name
-
-§~Relief air node
-
-§~Return air node
-
-§~Control node (the mixed air node)
-
-§~Actuated node (the outside air inlet node)
-
-§~Minimum outside air flow rate (at design) {[}m\(^{3}\)/s{]}
-
-§~Maximum outside air flow rate~ (\({\dot V_{oa,\max }}\) ) {[}m\(^{3}\)/s{]}
-
-§~EconomizerChoice: \emph{FixedDryBulbr} \textbar{} \emph{FixedEnthalpy} \textbar{} \emph{~DifferentialDryBulb~} \textbar{} \emph{~DifferentialEnthalpy} \textbar{} \emph{~~ElectronicEnthalpy} \textbar{} \emph{~~FixedDewPointAndDryBulb~~~} \textbar{} \emph{DifferentialDryBulbAndEnthalpy~} \textbar{} \emph{NoEconomizer}
-
-§~Bypasschoice: \emph{MinimumFlowWithBypass} \textbar{} \emph{ModulateFlow}
-
-§~High temperature limit (\({T_{high}}\) ) {[}C{]}
-
-§~High specific enthalpy limit (\({h_{high}}\) ~) {[}J/kg{]}
-
-§~High dewpoint temperature limit (\({T_{DP,high}}\) ) {[}C{]}
-
-§~Electronic Enthalpy limit (quadratic or cubic curve object)
-
-§~Low temperature limit (\({T_{low}}\) ) {[}C{]}
-
-§~Lockout: \emph{LockoutWithHeating} \textbar{} \emph{LockoutWithCompressor}
-
-§~MinimumLimit: \emph{FixedMinimum} \textbar{} \emph{ProportionalMinimum}
-
-§~Minimum outside air schedule (schedule values multiply the minimum outside air flow rate)
-
-§~Minimum Outside air flow Schedule(schedule values sets the limit on minimum outside air)
-
-§~Maximum Outside air flow Schedule(schedule values sets the maximum amount of outside air possible in the system)
-
-§~Name of Controller:MechanicalVentilation object
-
-§~Time-of-day economizer control schedule (economizer active when schedule values are greater than 0)
-
-§~High humidity control flag: \emph{Yes} \textbar{} \emph{No}
-
-§~Humidstat control zone name (zone name where humidistat is located)
-
-§~Control high indoor humidity based on outdoor humidity ratio: \emph{Yes} \textbar{} \emph{No}
-
-§~High humidity outside air flow ratio (this flow ratio is multiplied by the maximum outside air flow rate during periods of high indoor relative humidity)
-
-§~Heat Recovery Bypass Control Type: BypassWhenWithinEconomizerLimits \textbar{} BypassWhenOAFlowGreaterThanMinimum
+\begin{itemize}
+\item
+  Controller Name
+\item
+  Relief air node
+\item
+  Return air node
+\item
+  Control node (the mixed air node)
+\item
+  Actuated node (the outside air inlet node)
+\item
+  Minimum outside air flow rate (at design) {[}m\(^{3}\)/s{]}
+\item
+  Maximum outside air flow rate~ (\({\dot V_{oa,\max }}\) ) {[}m\(^{3}\)/s{]}
+\item
+  EconomizerChoice: \emph{FixedDryBulbr} \textbar{} \emph{FixedEnthalpy} \textbar{} \emph{~DifferentialDryBulb~} \textbar{} \emph{~DifferentialEnthalpy} \textbar{} \emph{~~ElectronicEnthalpy} \textbar{} \emph{~~FixedDewPointAndDryBulb~~~} \textbar{} \emph{DifferentialDryBulbAndEnthalpy~} \textbar{} \emph{NoEconomizer}
+\item
+  Bypasschoice: \emph{MinimumFlowWithBypass} \textbar{} \emph{ModulateFlow}
+\item
+  High temperature limit (\({T_{high}}\) ) {[}C{]}
+\item
+  High specific enthalpy limit (\({h_{high}}\) ~) {[}J/kg{]}
+\item
+  High dewpoint temperature limit (\({T_{DP,high}}\) ) {[}C{]}
+\item
+  Electronic Enthalpy limit (quadratic or cubic curve object)
+\item
+  Low temperature limit (\({T_{low}}\) ) {[}C{]}
+\item
+  Lockout: \emph{LockoutWithHeating} \textbar{} \emph{LockoutWithCompressor}
+\item
+  MinimumLimit: \emph{FixedMinimum} \textbar{} \emph{ProportionalMinimum}
+\item
+  Minimum outside air schedule (schedule values multiply the minimum outside air flow rate)
+\item
+  Minimum Outside air flow Schedule(schedule values sets the limit on minimum outside air)
+\item
+  Maximum Outside air flow Schedule(schedule values sets the maximum amount of outside air possible in the system)
+\item
+  Name of Controller:MechanicalVentilation object
+\item
+  Time-of-day economizer control schedule (economizer active when schedule values are greater than 0)
+\item
+  High humidity control flag: \emph{Yes} \textbar{} \emph{No}
+\item
+  Humidstat control zone name (zone name where humidistat is located)
+\item
+  Control high indoor humidity based on outdoor humidity ratio: \emph{Yes} \textbar{} \emph{No}
+\item
+  High humidity outside air flow ratio (this flow ratio is multiplied by the maximum outside air flow rate during periods of high indoor relative humidity)
+\item
+  Heat Recovery Bypass Control Type: BypassWhenWithinEconomizerLimits \textbar{} BypassWhenOAFlowGreaterThanMinimum
+\end{itemize}
 
 \subsubsection{Economizer Limits}\label{economizer-limits}
 

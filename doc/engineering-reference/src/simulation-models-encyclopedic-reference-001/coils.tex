@@ -355,7 +355,13 @@ Effectiveness η used in equation is defined in equation and Condensation Temper
 \eta  = 1 - Exp\left\{ { - \frac{{CoilU{A_{\,External}}}}{{Capacitanc{e_{Air}}}}} \right\}
 \end{equation}
 
-\(Condensatio{n_{Temp}} = {\rm{PsyTsatFnHPb(Ent}}{{\rm{h}}_{{\rm{AirCondensateTemp}}}}{\rm{,Patm) }}\) ~~~~~~~~~~~~~~~ \(Ent{h_{\,AirCondensateTemp}} = Ent{h_{\,AirInlet}} - \frac{{\left( {Ent{h_{\,AirInlet}} - Ent{h_{\,AirOutlet}}} \right)}}{\eta }\)
+\begin{equation}
+\(Condensatio{n_{Temp}} = {\rm{PsyTsatFnHPb(Ent}}{{\rm{h}}_{{\rm{AirCondensateTemp}}}}{\rm{,Patm) }}\)
+\end{equation}
+
+\begin{equation}
+\(Ent{h_{\,AirCondensateTemp}} = Ent{h_{\,AirInlet}} - \frac{{\left( {Ent{h_{\,AirInlet}} - Ent{h_{\,AirOutlet}}} \right)}}{\eta }\)
+\end{equation}
 
 Once the air outlet temperature are known, then sensible load is calculated as a product of capacitance of air and temperature difference at inlet and outlet, as in equation
 
@@ -500,25 +506,24 @@ The input object Coil:Cooling:Water:DetailedGeometry provides a coil model that 
 The cooling coil may be completely dry, completely wet with condensation, or it may have wet and dry sections.~ The actual condition of the coil surface depends on the humidity and temperature of the air passing over the coil and the coil surface temperature.~ The partly wet-partly dry case represents the most general scenario for the coil surface conditions.~ The all dry and all wet cases can be considered as limiting solutions of the wet or dry areas respectively going to zero.~ In the general case, equations are written for both the dry and wet regions of the coil.~ For each region the heat transfer rate from air to water may be defined by the rate of enthalpy change in the air and in the water.~ The rates must balance between each medium for energy to be conserved.~ Equations through express the energy balance between the water and the air for the case of dry and wet coils respectively.~ Equations and represent the heat transfer rate between water and air based on the actual performance of the coil.~ The UA parameter can be calculated from the parameters in the following table.
 
 % table 55
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\begin{longtable}[c]{p{0.5in}p{2.5in}p{0.5in}p{2.5in}}
 \caption{Coil Geometry and Flow Variables for Coils \protect \label{table:coil-geometry-and-flow-variables-for-coils}}\\
 \toprule 
-A & area & LMHD & log mean enthalpy difference \tabularnewline \midrule
-\endhead
+A & area & LMHD & log mean enthalpy difference \tabularnewline
 A & air, air side & LMTD & log mean temperature difference \tabularnewline
 aa, bb & coeff. in enthalpy approximation & $\dot m$ & mass flow rate \tabularnewline
 C1, C2 & coeff. in air side film coeff. & mf & metal and fouling \tabularnewline
-Cp & specific heat & m & viscosity \tabularnewline
+Cp & specific heat & $\mu$ & viscosity \tabularnewline
 D & diameter, effective diameter & o & outside (air side) \tabularnewline
 Dhdr & hydraulic diameter on air side & Pr & Prandtl number \tabularnewline
 D & dry region & $\dot Q$ & heat transfer rate \tabularnewline
-d & thickness & R & overall thermal resistance \tabularnewline
-D & spacing & Re & Reynolds number \tabularnewline
-F & heat transfer film coefficient & r & ratio of diameters \tabularnewline
+$\delta$ & thickness & R & overall thermal resistance \tabularnewline
+$\Delta$ & spacing & Re & Reynolds number \tabularnewline
+F & heat transfer film coefficient & $\rho$ & ratio of diameters \tabularnewline
 Fai & variable in fin eff. calculation & s & surface, outside of metal \tabularnewline
 fin, fins & air side fin geometry & St & Stanton number \tabularnewline
 H & enthalpy & T & temperature \tabularnewline
-h & efficiency & tube & water tube \tabularnewline
+$\eta$ & efficiency & tube & water tube \tabularnewline
 I0() & mod Bessel fn, 1st kind, ord 0 & UAdry & dry heat xfer coeff. * dry area \tabularnewline
 I1() & mod Bessel fn, 1st kind, ord 1 & UcAw & wet heat xfer coeff. * wet area \tabularnewline
 K0() & mod Bessel fn, 2nd kind, ord 0 & ub, ue & variables in fin eff. calculation \tabularnewline
@@ -861,7 +866,7 @@ Wetter, M. 1999. Simulation Model: Finned Water-to-Air Coil Without Condensation
 
 \subsubsection{Overview}\label{overview-1-004}
 
-This model (object names Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode, with CoilPerformance:DX:Cooling) simulates the performance of an air-cooled or evaporative-cooled direct expansion (DX) air conditioner. The model uses performance information at rated conditions along with curve fits for variations in total capacity, energy input ratio and part-load fraction to determine the performance of the unit at part-load conditions (Henderson et al. 1992, ASHRAE 1993). Sensible/latent capacity splits are determined by the rated sensible heat ratio (SHR) and the apparatus dewpoint (ADP)/bypass factor (BF) approach. This approach is analogous to the NTU-effectiveness calculations used for sensible-only heat exchanger calculations, extended to a cooling and dehumidifying coil.
+This model (object names Coil:Cooling:DX:SingleSpeed and \\ Coil:Cooling:DX:TwoStageWithHumidityControlMode, with CoilPerformance:DX:Cooling) simulates the performance of an air-cooled or evaporative-cooled direct expansion (DX) air conditioner. The model uses performance information at rated conditions along with curve fits for variations in total capacity, energy input ratio and part-load fraction to determine the performance of the unit at part-load conditions (Henderson et al. 1992, ASHRAE 1993). Sensible/latent capacity splits are determined by the rated sensible heat ratio (SHR) and the apparatus dewpoint (ADP)/bypass factor (BF) approach. This approach is analogous to the NTU-effectiveness calculations used for sensible-only heat exchanger calculations, extended to a cooling and dehumidifying coil.
 
 This model simulates the thermal performance of the DX cooling coil and the power consumption of the outdoor condensing unit (compressor, fan, crankcase heater and evap condenser water pump). The total amount of heat rejected by the condenser is also calculated and stored for use by other waste heat recovery models (e.g., Coil:Heating:Desuperheater). The performance of the indoor supply air fan varies widely from system to system depending on control strategy (e.g., constant fan vs.~AUTO fan, constant air volume vs.~variable air volume, etc.), fan type, fan motor efficiency and pressure losses through the air distribution system. Therefore, this DX system model does not account for the thermal effects or electric power consumption of the indoor supply air fan. EnergyPlus contains separate models for simulating the performance of various indoor fan configurations, and these models can be easily linked with the DX system model described here to simulate the entire DX air conditioner being considered (e.g., see AirLoopHVAC:Unitary:Furnace:HeatCool, AirLoopHVAC:UnitaryHeatCool, ZoneHVAC:WindowAirConditioner or AirLoopHVAC:UnitaryHeatPump:AirToAir).
 
@@ -1364,9 +1369,10 @@ ton,heating = \frac{{3600}}{{4Nmax\left( {1 - Xheating} \right)}}
 toff,heating = \frac{{3600}}{{4Nmax\left( {Xheating} \right)}}
 \end{equation}
 
+{\scriptsize
 \begin{equation}
 ton,heating = ton,heating + MAX\left( {0,MIN\left( {ton,heating,\left( {\left( {ton + toff} \right) - \left( {ton,heating + toff,heating} \right)} \right)} \right)} \right)
-\end{equation}
+\end{equation}}
 
 \begin{equation}
 toff = MIN\left( {toff,ton,heating - ton} \right)
@@ -1589,7 +1595,10 @@ Powe{r_{Total,{\kern 1pt} PartLoad}} = LF\left( {{C_D} \cdot Powe{r_{CompCondFan
 \end{equation}
 
 \begin{equation}
-  Power_{CompCondFan,PartLoad} = \dot{Q}_{Total,Rated}\PB{TotCapTempModFac_{PartLoad}}\PB{TotCapFlowModFac_{Rated}} \cdot EIR_{PartLoad}
+\begin{split}
+Power_{CompCondFan,PartLoad} = \dot{Q}_{Total,Rated}\PB{TotCapTempModFac_{PartLoad}} \\ 
+\cdot \PB{TotCapFlowModFac_{Rated}} \cdot EIR_{PartLoad}
+\end{split}
 \end{equation}
 
 \begin{equation}
@@ -1628,15 +1637,15 @@ For computer and data processing room unitary air conditioners single-speed dire
 
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
 \toprule 
-Rated Cooling Tests \tabularnewline \midrule
+\multicolumn{6}{l}{Rated Cooling Tests} \tabularnewline \midrule
 \endhead
- & Application Class & A & B & C & D \tabularnewline
-Tdb, Indoor & Class 1 & 23.9°C(75.0°F) & 23.9°C(75.0°F) & 23.9°C(75.0°F) & 23.9°C(75.0°F) \tabularnewline
-Class 2 & 29.4°C(85.0°F) & 29.4°C(85.0°F) & 29.4°C(85.0°F) & 29.4°C(85.0°F) \tabularnewline
-Class 3 & 35.0°C(95.0°F) & 35.0°C(95.0°F) & 35.0°C(95.0°F) & 35.0°C(95.0°F) \tabularnewline
-Class 4 & 40.5°C(105°F) & 40.5°C(105°F) & 40.5°C(105°F) & 40.5°C(105°F) \tabularnewline
-Tdp, Indoor & 35.0°C(95.0°F) & 26.7°C(80.0°F) & 18.3°C(65.0°F) & 4.4°C(40.0°F) \tabularnewline
-Tdb, Outdoor & 35.0°C(95.0°F) & 26.7°C(80.0°F) & 18.3°C(65.0°F) & 4.4°C(40.0°F) \tabularnewline
+& Application Class & A & B & C & D \tabularnewline
+& Class 1 & 23.9°C(75.0°F) & 23.9°C(75.0°F) & 23.9°C(75.0°F) & 23.9°C(75.0°F) \tabularnewline
+Tdb, Indoor & Class 2 & 29.4°C(85.0°F) & 29.4°C(85.0°F) & 29.4°C(85.0°F) & 29.4°C(85.0°F) \tabularnewline
+& Class 3 & 35.0°C(95.0°F) & 35.0°C(95.0°F) & 35.0°C(95.0°F) & 35.0°C(95.0°F) \tabularnewline
+& Class 4 & 40.5°C(105°F) & 40.5°C(105°F) & 40.5°C(105°F) & 40.5°C(105°F) \tabularnewline
+Tdp, Indoor &  & 35.0°C(95.0°F) & 26.7°C(80.0°F) & 18.3°C(65.0°F) & 4.4°C(40.0°F) \tabularnewline
+Tdb, Outdoor &  & 35.0°C(95.0°F) & 26.7°C(80.0°F) & 18.3°C(65.0°F) & 4.4°C(40.0°F) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2133,9 +2142,10 @@ T\(_{n}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatical
 \begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
 \caption{Heating Mode Test Conditions for Units Having Two-Capacity Compressor \protect \label{table:heating-mode-test-conditions-for-units-having-001}}\\
 \toprule 
-Test Description & Air Entering Indoor Unit Temperature & Air Entering Outdoor Unit Temperature & Compressor Speed & Heating Air Volume Flow Rate \tabularnewline \midrule
+Test & \multicolumn{2}{l}{Air Entering Indoor Unit} & \multicolumn{2}{l}{Air Entering Outdoor Unit} & Compressor & Heating Air  \tabularnewline
+Description & Temperature &  & Temperature &  & Speed & Volume Flow Rate \tabularnewline \midrule
+ & Dry Bulb C (F) & Wet Bulb C (F) & Dry Bulb C (F) & Wet Bulb C (F) \tabularnewline \midrule
 \endhead
-Dry Bulb C (F) & Wet Bulb C (F) & Dry Bulb C (F) & Wet Bulb C (F) \tabularnewline
 H01 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & 16.7 (62) & 18.3 (56.5) & Low & Heating Minimum (1) \tabularnewline
 H12 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47) & 6.11 (43) & High & Heating Full-Load (2) \tabularnewline
 H1C2 Test (required, cyclic) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47) & 6.11 (43) & High &  \tabularnewline
@@ -2170,7 +2180,7 @@ The rated conditions for obtaining the capacities and COPs~ are at indoor dry-bu
 
 \subsubsection{Model Description}\label{model-description-3-003}
 
-The Coil:Heating:DX:VariableSpeed object is modeled similar to Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit. Of course, rather than referencing a water source evaporator, the new coil object references an air source and has defrosting operation. The evaporator entering air temperature is used in~ lieu of the entering~ water temperature.
+The Coil:Heating:DX:VariableSpeed object is modeled similar to \\ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit. Of course, rather than referencing a water source evaporator, the new coil object references an air source and has defrosting operation. The evaporator entering air temperature is used in~ lieu of the entering~ water temperature.
 
 It shall be noted for the capacity and flow rate inputs, two fields are autosizable, which are Rated Heating Capacity at the Selected Nominal Speed Level and the Rated Volumetric Air Flow Rate at the Selected Nominal Speed Level. They are used to scale the performances of a specific unit and correlate with the actual loop flow. Except these two fields, all other capacity and flow rate inputs at individual speed levels should be directly obtained from Reference Unit catalog data, specific to an actual unit.
 
@@ -2376,11 +2386,17 @@ And the fractions of air flow is given:
 The total heating capacities and EIRs at Speed x-1 and Speed x are given:
 
 \begin{equation}
-{{\rm{Q}}_{{\rm{total}},{\rm{x}} - 1}} = {\rm{RatedTotalHeatingCapacity}}@{\rm{SpeedLevel}}\left( {{\rm{x}} - 1} \right){\rm{*TotCapTempModFa}}{{\rm{c}}_{{\rm{x}} - 1}}{\rm{*TotCapAirFlowModFa}}{{\rm{c}}_{{\rm{x}} - 1}}
+\begin{split}
+{{\rm{Q}}_{{\rm{total}},{\rm{x}} - 1}} = {\rm{RatedTotalHeatingCapacity}}@{\rm{SpeedLevel}}\left( {{\rm{x}} - 1} \right) \\
+{\rm{*TotCapTempModFa}}{{\rm{c}}_{{\rm{x}} - 1}} {\rm{*TotCapAirFlowModFa}}{{\rm{c}}_{{\rm{x}} - 1}}
+\end{split}
 \end{equation}
 
 \begin{equation}
-{{\rm{Q}}_{{\rm{total}},{\rm{x}}}} = {\rm{RatedTotalHeatingCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right){\rm{*TotCapTempModFa}}{{\rm{c}}_{\rm{x}}}{\rm{*TotCapAirFlowModFa}}{{\rm{c}}_{\rm{x}}}
+\begin{split}
+{{\rm{Q}}_{{\rm{total}},{\rm{x}}}} = {\rm{RatedTotalHeatingCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) \\
+{\rm{*TotCapTempModFa}}{{\rm{c}}_{\rm{x}}} {\rm{*TotCapAirFlowModFa}}{{\rm{c}}_{\rm{x}}}
+\end{split}
 \end{equation}
 
 \begin{equation}
@@ -2830,7 +2846,9 @@ Desuperheater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P
 \end{equation}
 
 \begin{equation}
-Desuperheater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasiticload,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}
+\begin{split}
+Desuperheater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \\{P_{parasiticload,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}
+\end{split}
 \end{equation}
 
 \begin{equation}
@@ -2838,7 +2856,9 @@ Desuperheater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{
 \end{equation}
 
 \begin{equation}
-Desuperheater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasiticload,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)
+\begin{split}
+Desuperheater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \\{P_{parasiticload,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)
+\end{split}
 \end{equation}
 
 where:
@@ -2863,7 +2883,8 @@ As shown in Figure~\ref{fig:schematic-of-a-heat-exchanger-assisted}, the air-to-
 \caption{Schematic of a Heat Exchanger Assisted Cooling Coil \protect \label{fig:schematic-of-a-heat-exchanger-assisted}}
 \end{figure}
 
-NOTE: Node naming shown in Figure~\ref{fig:schematic-of-a-heat-exchanger-assisted} is representative for HeatExchanger:AirToAir:SensibleAndLatent. For HeatExchanger:AirToAir:FlatPlate, the exhaust air nodes are referred to as `secondary air' nodes. For HeatExchanger:Desiccant:BalancedFlow (heat exchanger assisted DX coil only), the supply air nodes are referred to as `regeneration air' nodes and the exhaust air nodes as `process air' nodes.
+NOTE: Node naming shown in Figure~\ref{fig:schematic-of-a-heat-exchanger-assisted} is representative for \\
+HeatExchanger:AirToAir:SensibleAndLatent. For HeatExchanger:AirToAir:FlatPlate, the exhaust air nodes are referred to as `secondary air' nodes. For HeatExchanger:Desiccant:BalancedFlow (heat exchanger assisted DX coil only), the supply air nodes are referred to as `regeneration air' nodes and the exhaust air nodes as `process air' nodes.
 
 The dehumidification performance of cooling coils can be enhanced using a sensible-only heat exchanger (e.g., heat pipes, runaround coils, cross-flow heat exchangers). For example, a CoilSystem:Cooling:DX:HeatExchangerAssisted object could be used with a HeatExchanger:AirToAir:FlatPlate object or HeatExchanger:AirToAir:SensibleAndLatent object with only sensible effectiveness specified (see resulting psychrometric process in Figure~\ref{fig:psychrometric-process-for-heat-exchanger}). The dehumidification performance of cooling coils can also be enhanced using heat exchangers that transfer both sensible and latent energy (e.g., rotary desiccant heat exchanger). For example, a CoilSystem:Cooling:DX:HeatExchangerAssisted object could be used with a HeatExchanger:Desiccant:BalancedFlow object (see resulting psychrometric process in Figure~\ref{fig:psychrometric-process-for-heat-exchanger-001}).
 
@@ -3283,11 +3304,11 @@ where:
 
 \subsection{Water Source Electric DX Air Cooling Coil}\label{water-source-electric-dx-air-cooling-coil}
 
-There are two objects for water-to-air heat pumps in cooling mode: Coil:Cooling:WaterToAirHeatPump:EquationFit and Coil:Cooling:WaterToAirHeatPump:ParameterEstimation.~ These are described elsewhere.
+There are two objects for water-to-air heat pumps in cooling mode: \\ Coil:Cooling:WaterToAirHeatPump:EquationFit and Coil:Cooling:WaterToAirHeatPump:ParameterEstimation.~ These are described elsewhere.
 
 \subsection{Water Source Electric Heat Pump DX Air Heating Coil}\label{water-source-electric-heat-pump-dx-air-heating-coil}
 
-There are two objects for water-to-air heat pumps in heating mode: ~Coil:Heating:WaterToAirHeatPump:EquationFit and Coil:Heating:WaterToAirHeatPump:ParameterEstimation.~ These are described elsewhere.
+There are two objects for water-to-air heat pumps in heating mode: \\ ~Coil:Heating:WaterToAirHeatPump:EquationFit and Coil:Heating:WaterToAirHeatPump:ParameterEstimation.~ These are described elsewhere.
 
 \subsection{Steam-Based Air Heating Coil}\label{steam-based-air-heating-coil}
 
@@ -3569,9 +3590,10 @@ It shall be noted for the capacity and flow rate inputs, three fields are autosi
 
 The Rated Heating Capacity at Selected Nominal Speed Level contains the rated capacity to match the building heating load at the design day.~ The rated heating capacity is used to determine a capacity scaling factor, as compared to the Reference Unit capacity at the nominal speed level.
 
+{\scriptsize
 \begin{equation}
 CapacityScaleFactor = \frac{{RatedTotalHeatingCapacity}}{{ReferenceUnitTotalHeatingCapacity@NominalSpeedLevel}}
-\end{equation}
+\end{equation}}
 
 And then, this scaling factor is used to determine capacities at rated conditions for other speed levels, as below:
 
@@ -3579,9 +3601,10 @@ RatedTotalHeatingCapacity@SpeedLevel(x) = CapacityScaleFactor * ReferenceUnitTot
 
 The Rated Volumetric Air Flow Rate is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects, as follows:
 
+{\scriptsize
 \begin{equation}
 AirFlowScaleFactor = \frac{{RatedVolumetricAirFlowRate}}{{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}
-\end{equation}
+\end{equation}}
 
 And the loop volumetric air flow rates at various speed levels in the parent objects are calculated as below:
 
@@ -3591,9 +3614,10 @@ If the volumetric air flow rate at one speed level is higher than the flow rate 
 
 This Rated Volumetric Water Flow Rate is used to determine an internal scaling factor, and calculate the loop water flow rates.
 
+{\scriptsize
 \begin{equation}
 WaterFlowScaleFactor = \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}
-\end{equation}
+\end{equation}}
 
 And the required volumetric water flow rates in the parent objects are calculated as below,
 
@@ -3842,13 +3866,19 @@ The total amount of heat absorbed by the evaporator is calculated as:
 The fraction of the actual air mass flow to the design air mass flow rate is calculated:
 
 \begin{equation}
-  ff_{a,1} = actualairmassflowrate/(ReferenceUnitAirMassFlowRate@SpeedLevel(1)*CapacityScaleFactor)
+\begin{split}
+  ff_{a,1} = actualairmassflowrate/(ReferenceUnitAirMassFlowRate@SpeedLevel(1) \\
+  *CapacityScaleFactor)
+\end{split}
 \end{equation}
 
 The fraction of the actual water mass flow to the design water mass flow rate is calculated:
 
 \begin{equation}
-  ff_{w,1} = actualwatermassflowrate/(ReferenceUnitWaterMassFlowRate@SpeedLevel(1)*CapacityScaleFactor)
+\begin{split}
+  ff_{w,1} = actualwatermassflowrate/(ReferenceUnitWaterMassFlowRate@SpeedLevel(1) \\
+  *CapacityScaleFactor)
+\end{split}
 \end{equation}
 
 Higher Speed Operation:
@@ -4006,33 +4036,44 @@ CapacityScaleFactor = \frac{{RatedTotalCoolingCapacity}}{{ReferenceUnitTotalCool
 And then, this scaling factor is used to determine capacities at rated condition for other speed levels, as below,
 
 \begin{equation}
-  RatedTotalCoolingCapacity@SpeedLevel(x) = CapacityScaleFactor * ReferenceUnitTotalCoolingCapacity@SpeedLevel(x)
+\begin{split}
+  RatedTotalCoolingCapacity@SpeedLevel(x) = CapacityScaleFactor \\
+  * ReferenceUnitTotalCoolingCapacity@SpeedLevel(x)
+\end{split}
 \end{equation}
 
 The Rated Volumetric Air Flow Rate is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects, as follows:
 
+{\scriptsize
 \begin{equation}
-  AirFlowScaleFactor = \frac{RatedVolumetricAirFlowRate}{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}
-\end{equation}
+  AirFlowScaleFactor = \frac{RatedVolumetricAirFlowRate}{ReferenceUnitVolAirFlowRate@NominalSpeedLevel * CapacityScaleFactor}
+\end{equation}}
 
 And the loop volumetric air flow rates in the parent objects are calculated as below,
 
 \begin{equation}
-  LoopVolumetricAirFlowRate@SpeedLevel\left( x \right) = AirFlowScaleFactor \times ReferenceUnitVolAirFlowRate@SpeedLevel(x) \times CapacityScaleFactor
+\begin{split}
+  LoopVolumetricAirFlowRate@SpeedLevel\left( x \right) = AirFlowScaleFactor \\
+  * ReferenceUnitVolAirFlowRate@SpeedLevel(x) * CapacityScaleFactor
+\end{split}
 \end{equation}
 
 If the volumetric air flow rate at one speed level is higher than the flow rate allowed by the fan in the parent object, the flow rate will be set back to the fan flow rate.
 
 This Rated Volumetric Water Flow Rate is used to determine an internal scaling factor, and calculate the loop water flow rates.
 
+{\scriptsize
 \begin{equation}
   WaterFlowScaleFactor = \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}
-\end{equation}
+\end{equation}}
 
 And the required volumetric water flow rates in the parent objects are calculated as below,
 
 \begin{equation}
-  LoopVolumetricWaterFlowRate@SpeedLevel\left( x \right) = WaterFlowScaleFactor \times ReferenceUnitVolWaterFlowRate@SpeedLevel(x) \times CapacityScaleFactor
+\begin{split}
+  LoopVolumetricWaterFlowRate@SpeedLevel\left( x \right) = WaterFlowScaleFactor \\
+  * ReferenceUnitVolWaterFlowRate@SpeedLevel(x) * CapacityScaleFactor
+\end{split}
 \end{equation}
 
 The required volumetric water flow rate as above is restricted by the pump in the parent object.
@@ -4098,7 +4139,10 @@ where
 ff\(_{a}\) = actual air mass flow rate/design air mass flow rate, at one speed level;
 
 \begin{equation}
-  DesignAirMassFlowRate@SpeedLevel(x) = ReferenceUnitAirMassFlowRate@SpeedLevel(x) \times CapacityScaleFactor
+\begin{split}
+  DesignAirMassFlowRate@SpeedLevel(x) = ReferenceUnitAirMassFlowRate@SpeedLevel(x) \\
+  * CapacityScaleFactor
+\end{split}
 \end{equation}
 
 a-d = regression curve fit coefficients, if no data for correction, the user can simply put a = 1.0, and the other coefficients as 0.0.
@@ -4116,7 +4160,10 @@ where
 ff\(_{w}\) = actual water mass flow rate/design water mass flow rate, at one speed level;
 
 \begin{equation}
-  DesignWaterMassFlowRate@SpeedLevel(x) = ReferenceUnitWaterMassFlowRate@SpeedLevel(x) \times CapacityScaleFactor
+\begin{split}
+  DesignWaterMassFlowRate@SpeedLevel(x) = ReferenceUnitWaterMassFlowRate@SpeedLevel(x) \\
+  * CapacityScaleFactor
+\end{split}
 \end{equation}
 
 a-d = regression curve-fit coefficients, if no data available for the correction, the user can simply put a = 1.0, and the other coefficients as 0.0.
@@ -4394,9 +4441,11 @@ S.A. Klein 2011, User Manual of Engineering Equation Solver V8
 
 Secondary coils reject to or remove heat from a secondary zone. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g.~condenser) of DX system or heat pumps is commonly installed outdoor but when installed indoor either heat is dumped to or extracted from the secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coil objects but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in single speed and multi speed DX coil objects: The additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary coil serves another controlled zone as shown in \protect\hyperlink{SchematicDXCoil}{Figure}. A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. The operating mode of a secondary DX coil is determined by the primary DX coil serving the conditioned zone. If the primary DX coil is in cooling mode, then the secondary coil is rejecting heat (heating mode) to the secondary zone, or else if the primary DX coil is in heating mode, then the secondary coil is extracting heat (cooling mode) from the secondary zone. Heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only. Whereas energy extracted from a secondary zone may contain sensible and latent components. The condenser type of the primary DX coils should be AirCooled. There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. Air drawn by the secondary coil fan passes through the secondary coil and dumped back into the secondary zone. The previous time step zone condition is used as an inlet condition to the current time for the secondary DX coil model.
 
-\includegraphics{media/image8002.png}
-
-Figure: Schematic of DX System in cooling operating mode
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image8002.png}
+\caption{Schematic of DX System in cooling operating mode \protect \label{fig:schematic-of-dx-system-in-cooling-operating-mode}}
+\end{figure}
 
 Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is placed inside the Warehouse. The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: \emph{Coil:Cooling:DX:SingleSpeed}, \emph{Coil:Heating:DX:SingleSpeed}, \emph{Coil:Cooling:DX:TwoSpeed}, \emph{Coil:Cooling:DX:MultiSpeed}, and \emph{Coil:Heating:DX:MultiSpeed}.
 
@@ -4424,9 +4473,11 @@ where
 
 Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in \protect\hyperlink{SchematicDXAndSecondary}{Figure}. Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked. New input field required as add-on to the DX cooling coil objects is ``\emph{Zone Name for Secondary Coil (condenser) Placement}''.
 
-\includegraphics{media/image8003.png}
-
-Figure: Schematic of DX system and secondary coil (condenser)
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image8003.png}
+\caption{Schematic of DX system and secondary coil (condenser) \protect \label{fig:schematic-of-dx-system-and-secondary-coil}}
+\end{figure}
 
 \textbf{Heating Operating Mode:} When a heat pump operates in heating mode then energy is extracted from the secondary zone. The total energy extracted is estimated by rearranging the equation above as follows:
 
