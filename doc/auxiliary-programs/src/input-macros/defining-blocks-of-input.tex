@@ -108,16 +108,18 @@ gives the result X OP Y. The allowed values for X, OP, and Y, and the correspond
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \toprule 
-X* & OP ** & Y & Result \tabularnewline \midrule
+X* & OP ** & Y & Result \tabularnewline
+\midrule
 \endfirsthead
 
 \toprule 
-X* & OP ** & Y & Result \tabularnewline \midrule
+X* & OP ** & Y & Result \tabularnewline
+\midrule
 \endhead
 
-number & -   (plus) & number & number \tabularnewline
-number & -   (minus) & number & number \tabularnewline
-number & -   (times) & number & number \tabularnewline
+number & + (plus) & number & number \tabularnewline
+number & - (minus) & number & number \tabularnewline
+number & * (times) & number & number \tabularnewline
 number & / (divided by) & number & number \tabularnewline
 number & min & number & number \tabularnewline
 number & max & number & number \tabularnewline
@@ -136,27 +138,25 @@ LOG10 & OF & number & number \tabularnewline
 LOG & OF & number & number \tabularnewline
 literal1 & // (concatenate) & literal2 & literal "literal1literal2" \tabularnewline
 literal1 & /// (concatenate) & literal2 & literal "literal1 literal2" \tabularnewline
-literal & EQS ( = ) & literal & logical (true or false) case sensitive \tabularnewline
-literal & NES (≠) & literal & logical (true or false) case sensitive \tabularnewline
-literal & EQSU ( = ) & literal & logical (true or false) not case sensitive \tabularnewline
-literal & NESU (≠) & literal & logical (true or false) not case sensitive \tabularnewline
+literal & EQS (=) & literal & logical (true or false) case sensitive \tabularnewline
+literal & NES (\(\neq\)) & literal & logical (true or false) case sensitive \tabularnewline
+literal & EQSU (=) & literal & logical (true or false) not case sensitive \tabularnewline
+literal & NESU (\(\neq\)) & literal & logical (true or false) not case sensitive \tabularnewline
 logical & AND & logical & logical (true or false) \tabularnewline
 logical & OR & logical & logical (true or false) \tabularnewline
  & NOT & logical & logical (true or false) \tabularnewline
-number & EQ ( = ) & number & logical (true or false) \tabularnewline
-number & NE (≠) & number & logical (true or false) \tabularnewline
-number & GT ( > ) & number & logical (true or false) \tabularnewline
-number & GE (≥) & number & logical (true or false) \tabularnewline
-number & LT ( < ) & number & logical (true or false) \tabularnewline
-number & LE (≤) & number & logical (true or false) \tabularnewline
--   Upper or lower case is allowed for SIN, COS, etc. \tabularnewline
+number & EQ (=) & number & logical (true or false) \tabularnewline
+number & NE (\(\neq\)) & number & logical (true or false) \tabularnewline
+number & GT (>) & number & logical (true or false) \tabularnewline
+number & GE (\(\geq\)) & number & logical (true or false) \tabularnewline
+number & LT (<) & number & logical (true or false) \tabularnewline
+number & LE (\(\leq\)) & number & logical (true or false) \tabularnewline
+* Upper or lower case is allowed for SIN, COS, etc. \tabularnewline
 ** Upper or lower case is allowed for OF, EQS, etc. \tabularnewline
 \bottomrule
 \end{longtable}
 
-\begin{lstlisting}
-            Example
-\end{lstlisting}
+Example
 
 \textbf{\#eval{[}** 1 + 2 **{]}} when expanded becomes 3.
 

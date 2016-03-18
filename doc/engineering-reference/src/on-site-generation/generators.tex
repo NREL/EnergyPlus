@@ -30,7 +30,7 @@ The exhaust flow rate is then calculated as:
 {\dot m_{exhaust}} = \frac{{Total\,\,Exhaust\,\,heat}}{{C{p_{exhaust}} \cdot \left( {{T_{exhaust}} - {T_{reference}}} \right)}}
 \end{equation}
 
-where T\(_{e}\) is the reference temperature for the fuel lower heating value, and is given as 25°C in manufacturer's data, and
+where T\(_{reference}\) is the reference temperature for the fuel lower heating value, and is given as 25°C in manufacturer's data, and
 
 \begin{equation}
 {T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}
@@ -207,7 +207,7 @@ where:
 
 \({\dot Q_{Fuel,LHV}}\) ~ = Fuel energy consumption rate, LHV basis (W)
 
-If \emph{ElecEff\(_{g}\)} is equal to zero, then \emph{P\(_{g}\)} and \({\dot Q_{Fuel,LHV}}\) \(_{ }\)are set to zero. The fuel mass flow rate is then calculated.
+If \emph{ElecEff\(_{Operating}\)} is equal to zero, then \emph{P\(_{Operating}\)} and \({\dot Q_{Fuel,LHV}}\) are set to zero. The fuel mass flow rate is then calculated.
 
 \begin{equation}
 \dot{m}_{fuel} = \frac{\dot{Q}_{Fuel,LHV}}{LHV*1000}
@@ -237,7 +237,7 @@ where:
 
 \({P_{Ancillary,Operating}}\) ~ = Ancillary electric power at the current fuel mass flow rate (W), report variable ``Generator Ancillary Electric Power {[}W{]}''.
 
-If ancillary power is constant for the simulation (e.g., no modifier curve defined), then the calculations continue as described below. However, if an ancillary power modifier curve has been defined, then the calculations described above for \emph{P\(_{g}\)}, \emph{ElecEff\(_{g}\)}, \({\dot Q_{Fuel,LHV}}\) \(_{ }\)and \emph{P\(_{g}\)} are recalculated in sequence until the solution converges.
+If ancillary power is constant for the simulation (e.g., no modifier curve defined), then the calculations continue as described below. However, if an ancillary power modifier curve has been defined, then the calculations described above for \emph{P\(_{ElecOperating}\)}, \emph{ElecEff\(_{Operating}\)}, \({\dot Q_{Fuel,LHV}}\) and \emph{P\(_{Ancillary,Operating}\)} are recalculated in sequence until the solution converges.
 
 The generator's ``net'' electrical power output is calculated as the difference between the generator's actual power output and the ancillary electric power as follows.
 
@@ -447,7 +447,6 @@ where:
 
 In an analogous fashion, the exhaust air temperature is calculated using the Nominal (reference) Exhaust Air Outlet Temperature and two modifier curves.
 
-
 \begin{equation}
   T_{a,o} = T_{a,o,Nom} \PB{\text{ExhAirTempFTemp}} \PB{\text{ExhAirTempFPLR}}
 \end{equation}
@@ -612,7 +611,7 @@ where,
 
 \({[\dot m{c_p}]_{cw}}\) ~is the thermal capacity flow rate associated with the cooling water (W/K)
 
-The functional forms for \({\eta_e}\) ~and \({\eta_q}\) ~are 2\(^{d}\) order trivariate polynomials with all of the cross terms.
+The functional forms for \({\eta_e}\) ~and \({\eta_q}\) ~are 2\(^{nd}\) order trivariate polynomials with all of the cross terms.
 
 EnergyPlus solves these for state values for the engine mass temperature, \({T_{eng}}\) , and the outlet plant node, \({T_{cw,o}}\) , in the following manner. The last two equations are interrelated but otherwise ordinary differential equations with the general form
 
@@ -660,19 +659,261 @@ Number of iterations \textgreater{} 3\textbackslash{}
 
 The Micro CHP model has a number of different operating modes.~ The operating mode for a given system timestep is determined from the mode during the previous timestep, user inputs, and high-level controls from elsewhere in EnergyPlus.~ The operating mode is reported for the state at the end of each timestep.~ The following table summarizes the various operating modes and the criteria for switching to a new mode for any given timestep.~ The EnergyPlus implementation adds the ``Off'' mode to the modes specified by Annex 42 which corresponds to the unit being scheduled to be unavailable.~ The difference between OFF and Standby modes determines whether or not standby power is consumed.
 
-\begin{longtable}[c]{p{1.5in}p{2.05in}p{2.44in}}
+\begin{longtable}[c]{p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}}
 \toprule 
-Operating mode & Main Criteria & Notes \tabularnewline \midrule
+Constituent & A & B & C & D & E & F & H & Source \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Constituent & A & B & C & D & E & F & H & Source \tabularnewline
+\midrule
 \endhead
-Off & Availability schedule value = 0 & No consumption of power or fuel. \tabularnewline
-Stand By & Availability schedule value  \&neq;  0 & Consumes stand by power but no fuel \tabularnewline
-Warm Up & Load (thermal or electric)  >  0.0 Availability schedule value  \&neq;  0 Time Delay  <  elapsed time since entering warm up mode Engine temp  <  nominal engine temp & Two alternate sub-modes:~ Stirling Engines use warm up by “nominal engine temperature” while Internal Combustion Engines use “time delay” Fuel is consumed but no power is produced \tabularnewline
-Normal Operation & Load (thermal or electric)  >  0.0 Availability schedule value  \&neq;  0 Time Delay  >  elapsed time since entering warm up mode Engine temp  >  = nominal temp & Fuel is consumed and power is produced \tabularnewline
-Cool Down & Load (thermal or electric) = 0.0 Availability schedule value  \&neq;  0 & Two alternate sub-modes where engine can be forced to go thru a complete cool down cycle before allowed to go back into warm up or normal mode. No fuel is consumed and no power is produced. \tabularnewline
+
+N & 26.092 & 8.218801 & -1.976141 & 0.159274 & 0.044434 & -7.98923 & 0.0 & NIST \tabularnewline
+O & 29.659 & 6.137261 & -1.186521 & 0.09578 & -0.219663 & -9.861391 & 0.0 & NIST \tabularnewline
+Ar & 20.786 & 2.8259E-7 & -1.4642E-7 & 1.0921E-8 & -3.6614E-8 & -6.19735 & 0.0 & NIST \tabularnewline
+CO & 24.99735 & 55.18696 & -33.69137 & 7.948387 & -0.136638 & -403.6075 & -393.5224 & NIST \tabularnewline
+H  O(gas) & 29.0373 & 10.2573 & 2.81048 & -0.95914 & 0.11725 & -250.569 & -241.8264 & CHEMKIN \tabularnewline
+H  O(liq) & -203.606 & 1523.29 & -3196.413 & 2474.455 & 3.85533 & -256.5478 & -285.8304 & NIST \tabularnewline
+H & 33.066178 & -11.363417 & 11.432816 & -2.772874 & -0.158558 & -9.9808 & 0.0 & NIST \tabularnewline
+CH & -0.703029 & 108.4773 & -42.52157 & 5.862788 & 0.678565 & -76.84376 & -74.8731 & NIST \tabularnewline
+C  H & -3.03849 & 199.202 & -84.9812 & 11.0348 & 0.30348 & -90.0633 & -83.8605 & CHEMKIN \tabularnewline
+C  H & -23.1747 & 363.742 & -222.981 & 56.253 & 0.61164 & -109.206 & -103.855 & CHEMKIN \tabularnewline
+C  H & -5.24343 & 426.442 & -257.955 & 66.535 & -0.26994 & -149.365 & -133.218 & CHEMKIN \tabularnewline
+C  H & -34.9431 & 576.777 & -338.353 & 76.8232 & 1.00948 & -155.348 & -146.348 & CHEMKIN \tabularnewline
+C  H & -46.7786 & 711.187 & -438.39 & 103.784 & 1.23887 & -176.813 & -166.966 & CHEMKIN \tabularnewline
+CH  OH & 14.1952 & 97.7218 & -9.73279 & -12.8461 & 0.15819 & -209.037 & -201.102 & CHEMKIN \tabularnewline
+C  H  OH & -8.87256 & 282.389 & -178.85 & 46.3528 & 0.48364 & -241.239 & -234.441 & CHEMKIN \tabularnewline
 \bottomrule
 \end{longtable}
 
+For timesteps where the generator switches from warm up mode to normal mode in the middle of the timestep, part load ration values are calculated for the portion of the time step that the generator is in normal operation.
+
+The engine and heat recovery thermal conditions are modeled for all modes so, for example, an engine that is off but still warm could provide some hot water recovery.
+
+The engine model can use an arbitray fuel mixture that is defined by the user -- see the entry for Generator:FuelSupply.
+
 \subsubsection{References}\label{references-024}
+
+Kelly, N. and A. Ferguson. 2007. A Generic Model Specification for Combustion-based Residential Cogeneration Devices. In \emph{Specifications for Modelling Fuel Cell and Combustion-Based Residential Cogeneration Device within Whole-Building Simulation Programs}. I. Beausoleil-Morrison and N. Kelly editors.~ Draft report of Annex 42 of the International Energy Agency ECBCS.
+
+\subsection{Fuel Cell Cogenerator}\label{fuel-cell-cogenerator}
+
+The Generator:FuelCell input objects provides a model which is a direct implementation of a model developed by IEA Annex 42 -- The Simulation of Building-Integrated Fuel Cell and Other Cogeneration Systems (FC+COGEN-SIM).~ Annex 42 was formed as a working group within the International Energy Agency (IEA) program on Energy Conservation in Buildings and Community Systems (ECBCS).~ A full description of the model specification can be found in the report by Subtask B of FC+COGEN-SIM with the title ``Specifications for Modelling Fuel Cell and Combustion-Based Residential Cogeneration Device within Whole-Building Simulation Programs.''~ The ``Specifications for Modelling Fuel Cell Cogeneration Devices within Whole-Building Simulation Programs.''
+
+The Annex 42 Fuel Cell model is characterized as a ``grey box'' empirical model where a mixture of thermodynamic principles and empirical performance maps are used to model the cogeneration performance of a fairly complex device with many individual subsystems.~ In EnergyPlus, the individual subsystems are separate into individual input objects such as Generator:FuelCell:PowerModule or Generator:FuelCell:ExhaustGasToWaterHeatExchanger. The resulting model is relatively complex requiring on the order of one hundred inputs.~ The model is not for the faint of heart; this model is far more involved than most component models in building simulation.~ This stems from the fact that fuel cell cogenerators are complicated devices that interact with the built environment in a number of ways.~ Fuel cells could drawn in gas/fuel, air, and water with as many as six separate streams.~ In addition to electricity and heated water, they also give off heat in the form of convection and radiation and exhaust air out of the zone.~ The devices may take a long time to start up and include storage to follow loads rather than attempt to vary the power the fuel cell.~ The fuel cell model allows examining system level interactions over annual timeframes that include all the important interactions with a building's energy and comfort systems.
+
+The Annex 42 fuel cell model is described more thoroughly in the references (see below).~ Here we provide a summary of the relevant model equations which are taken from the Annex 42 model specification.~ The first equation is the main energy balance for the fuel cell power module (includes the fuel reformation and fuel cell stacks).~ This energy balance is used to model the enthalpy of the product gases that leave the fuel cell power module.
+
+\begin{equation}
+  \begin{array}{l}
+    {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{fuel}} + {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{air}} + {{\dot N}_{liq - water}} \cdot \left( {{{\left[ {\hat h - {\Delta_f}{{\hat h}^o}} \right]}_{{H_2}O,liq}} - {\Delta_f}\hat h_{{H_2}O,fg}^o} \right) \\
+    \quad \quad  + {{\dot H}_{dilution - air - in}} + {{\dot N}_{fuel}} \cdot LH{V_{fuel}} + {P_{el,ancillaries - AC}} \\
+    = {P_{el}} + {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\ddot h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{FCPM - cg}} + {q_{s - cool}} + {q_{skin - loss}} + {{\dot H}_{dilution - air - out}}
+  \end{array}
+\end{equation}
+
+The remaining equations describe various terms and the balance of systems.~ The electrical efficiency is modeled using:
+
+\begin{equation}
+{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot {P_{el}} + {\varepsilon_2} \cdot P_{el}^2} \right] \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_{} {dt - {t_{threshold}},0.0))}  \cdot L} \right]
+\end{equation}
+
+\begin{equation}
+{P_{blower - el}} = {b_0} + {b_1} \cdot {\dot N_{air}} + {b_2} \cdot \dot N_{air}^2 + {b_3} \cdot \dot N_{air}^3
+\end{equation}
+
+In several places the model is formulated to offer different options.~ For example, the flow rate of process air can be described either as a function of electrical power produced or the fuel flow rate.
+
+\begin{equation}
+{\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]
+\end{equation}
+
+or
+
+\begin{equation}
+{\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]
+\end{equation}
+
+\begin{equation}
+{\dot N_{liq - water}} = {w_0} + {w_1} \cdot {\dot N_{fuel}} + {w_2} \cdot \dot N_{fuel}^2
+\end{equation}
+
+\begin{equation}
+{P_{pump - el}} = {p_0} + {p_1} \cdot {\dot N_{water}} + {p_2} \cdot \dot N_{water}^2 + {p_3} \cdot \dot N_{water}^3
+\end{equation}
+
+\begin{equation}
+{P_{comp - el}} = {c_0} + {c_1} \cdot {\dot N_{fuel}} + {c_2} \cdot \dot N_{fuel}^2 + {c_3} \cdot \dot N_{fuel}^3
+\end{equation}
+
+\begin{equation}
+{P_{el,ancillaries - AC}} = an{c_0} + an{c_1} \cdot {\dot N_{fuel}}
+\end{equation}
+
+\begin{equation}
+{P_{el,aux - ancillaries}} = {x_0} + {x_1} \cdot {\dot N_{aux - fuel}}
+\end{equation}
+
+\begin{equation}
+{q_{HX}} = {\varepsilon_{HX}} \cdot {\left( {\dot N{{\hat c}_p}} \right)_{\min }} \cdot \left( {{T_{aux - mix}} - {T_{water,in}}} \right)
+\end{equation}
+
+\begin{equation}
+{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}}
+\end{equation}
+
+\begin{equation}
+{\left( {UA} \right)_{eff}} = h{x_{s,0}} + h{x_{s,1}} \cdot {\dot N_{water}} + h{x_{s,2}} \cdot \dot N_{water}^2 + h{x_{s,3}} \cdot {\dot N_{aux - mix}} + h{x_{s,4}} \cdot \dot N_{aux - mix}^2
+\end{equation}
+
+or
+
+\begin{equation}
+{\left( {UA} \right)_{eff}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{gas}}}} + \frac{1}{{{{(hA)}_{water}}}} + {F_{HX}}} \right]^{ - 1}}
+\end{equation}
+
+where,
+
+\(F_{HX}\) is an adjustment factor,
+
+\begin{equation}
+h_{gas} = h_{gas}^0 \left( \frac{\dot{N}_{gas}}{\dot{N}_{gas}^0} \right)^n
+\end{equation}
+
+\begin{equation}
+{h_{water}} = h_{water}^0 \cdot {\left( {\frac{{{{\dot N}_{water}}}}{{\dot N_{water}^0}}} \right)^m}
+\end{equation}
+
+\begin{equation}
+{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}} + {\dot N_{{H_2}O - cond}} \cdot {\hat h_{fg}}
+\end{equation}
+
+\begin{equation}
+{\dot N_{{H_2}O - cond}} = \left( {{T_{cond - threshold}} - {T_{water,in}}} \right) \cdot \left[ {h{x_{l,1}} \cdot \left( {\frac{{{{\dot N}_{{H_2}O}}}}{{{{\dot N}_{aux - mix}}}}} \right) + h{x_{l,2}} \cdot {{\left( {\frac{{{{\dot N}_{{H_2}O}}}}{{{{\dot N}_{aux - mix}}}}} \right)}^2}} \right]
+\end{equation}
+
+\begin{equation}
+{q_{aux - skin - losses}} = {(UA)_{aux}} \cdot ({T_{aux - mix}} - {T_{room}})
+\end{equation}
+
+\begin{equation}
+{q_{skin - loss}} = {s_0} + {s_1} \cdot {\dot N_{fuel}} + {s_2} \cdot \dot N_{fuel}^2
+\end{equation}
+
+\begin{equation}
+Q_{battery}^{t + \Delta t} = Q_{battery}^t + {P_{battery - charge}} \cdot {\varepsilon_{charge}} \cdot \Delta t
+\end{equation}
+
+\begin{equation}
+{\eta_{PCU}} = {u_0} + {u_1} \cdot {P_{PCU - in}} + {u_2} \cdot P_{PCU - in}^2
+\end{equation}
+
+\begin{equation}
+{q_{s - cool}} = \left[ {{r_0} + {r_1}\left( {{T_{stack}} - T_{stack}^o} \right)} \right] \cdot \left[ {1 + {r_2}{P_{el}} + {r_3}P_{el}^2} \right]
+\end{equation}
+
+\begin{equation}
+{\left( {UA} \right)_{s - cogen}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{s - cogen}}}} + {F_{s - cogen}}} \right]^{ - 1}}
+\end{equation}
+
+\begin{equation}
+{h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}
+\end{equation}
+
+\begin{equation}
+{P_{s - air - el}} = {f_0} + {f_1} \cdot {q_{s - air}} + {f_2} \cdot q_{s - air}^2
+\end{equation}
+
+The Annex 42 fuel cell was implemented directly in EnergyPlus.~ A sequential substitution method is used to handle all the interactions between the different subsystems.~ The main energy balance drawn for the fuel cell power module is rearranged to put all the terms on the right hand side.~ The enthalpy of the product gas stream is determined from this energy balance.~ The Shomate equation is used to evaluate the enthalpy and specific heat of the various streams.~ The EnergyPlus implementation evaluates fluid properties using the average temperature of inlet and outlet streams whereas the Annex 42 specification often uses just the inlet temperature.~ The Shomate equation is inverted using the regula falsi numerical method available within EnergyPlus to calculate the temperature of the product gases from their enthalpy.
+
+\subsubsection{References}\label{references-1-009}
+
+Beausoleil-Morrison, I., A. Schatz, and F. Marechal. 2006. A model for simulating the thermal and electrical production of small-scale solid-oxide fuel cell cogeneration systems within building simulation programs.~ \emph{HVAC \& R Research}. Amer. Soc. Heating, Ref. Air-Conditioning Eng. Inc. Atlanta, GA.
+
+Beausoleil-Morrison, I., A. Weber, F. Marechal, and B. Griffith. 2007. Specifications for Modelling Fuel Cell Cogeneration Devices within Whole-Building Simulation Programs. In \emph{Specifications for Modelling Fuel Cell and Combustion-Based Residential Cogeneration Device within Whole-Building Simulation Programs}. I. Beausoleil-Morrison and N. Kelly editors.~ \textbf{Draft} report of Annex 42 of the International Energy Agency ECBCS.
+
+\subsection{Custom Fuel Supply for Generators}\label{custom-fuel-supply-for-generators}
+
+The Generator:FuelSupply input object in EnergyPlus implements a fairly comprehensive capability to calculate properties of fuel mixtures from a description of the molar composition of all the constituents.~ The fuel supply modeling is based on the specifications prepared by IEA Annex 42 for their generator models.~ This modeling capability allows taking into consideration the exact gas composition of local natural gas service.~ Or the user can explore the implications of an various alternative fuels such as alcohols or biogas.~ An unlimited number of possible mixtures can be analyzed.
+
+Gas phase thermochemistry calculations and data are programmed into EnergyPlus to handle the set of constituents listed in the table below.~ The relevant properties of each fuel constituent, \emph{i}, are calculated as a function of temperature using the Shomate equation:
+
+\begin{equation}
+{\hat h_i} - {\Delta_f}\hat h_i^o = A \cdot \left( {\frac{T}{{1000}}} \right) + \frac{B}{2} \cdot {\left( {\frac{T}{{1000}}} \right)^2} + \frac{C}{3} \cdot {\left( {\frac{T}{{1000}}} \right)^3} + \frac{D}{4} \cdot {\left( {\frac{T}{{1000}}} \right)^4} - \frac{E}{{\left( {\frac{T}{{1000}}} \right)}} + F - H
+\end{equation}
+
+where,
+
+\({\hat h_i}\) ~is the enthalpy (J/kmol)
+
+\({\Delta_f}\hat h_i^o\) ~is the molar enthalpy at the standard state (J/kmol)
+
+\(T\) ~is the temperature of the gas (K)
+
+A, B, C, D, E, F, H are the coefficients for the Shomate equation.
+
+The lower heating value (LHV) of a fuel mixture is calculated from the molar fractions using:
+
+\begin{equation}
+LH{V_{fuel}} = \sum\limits_i {\left( {{\chi_i} \cdot LH{V_i}} \right)}
+\end{equation}
+
+Where,
+
+\begin{equation}
+LH{V_i} = \left[ {{\Delta_f}\hat h_{{C_x}{H_y}}^o - x \cdot {\Delta_f}\hat h_{C{O_2}}^o - \frac{y}{2} \cdot {\Delta_f}\hat h_{{H_2}O}^o} \right]
+\end{equation}
+
+\emph{x} is the number of carbon atoms
+
+\emph{y} is the number of hydrogen atoms
+
+Similarly, the higher heating value (HHV) of the fuel mixture is calculated using:
+
+\begin{equation}
+HH{V_{fuel}} = \sum\limits_i {\left( {{\chi_i} \cdot HH{V_i}} \right)}
+\end{equation}
+
+Where,
+
+\begin{equation}
+HH{V_i} = \left[ {{\Delta_f}\hat h_{{C_x}{H_y}}^o - x \cdot {\Delta_f}\hat h_{C{O_2}}^o - \frac{y}{2} \cdot {\Delta_f}\hat h_{{H_2}O}^o + \frac{y}{2} \cdot \left( {{\Delta_f}\hat h_{{H_2}O}^o - {H_{liq}}} \right)} \right]
+\end{equation}
+
+The Shomate coefficients used in EnergyPlus are listed in the table below.~ Data source ``NIST'' indicates the data were directly from Chemistry WebBook.~ Data source ``CHEMKIN'' indicates the data were developed by curve fitting library data for the CHEMKIN commercial program (which uses the Gorden-McBride polynomial rather than the Shomate formulation).
+
+\begin{longtable}[c]{p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}}
+\toprule 
+Constituent & A & B & C & D & E & F & H & Source \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Constituent & A & B & C & D & E & F & H & Source \tabularnewline
+\midrule
+\endhead
+
+N & 26.092 & 8.218801 & -1.976141 & 0.159274 & 0.044434 & -7.98923 & 0.0 & NIST \tabularnewline
+O & 29.659 & 6.137261 & -1.186521 & 0.09578 & -0.219663 & -9.861391 & 0.0 & NIST \tabularnewline
+Ar & 20.786 & 2.8259E-7 & -1.4642E-7 & 1.0921E-8 & -3.6614E-8 & -6.19735 & 0.0 & NIST \tabularnewline
+CO & 24.99735 & 55.18696 & -33.69137 & 7.948387 & -0.136638 & -403.6075 & -393.5224 & NIST \tabularnewline
+H  O(gas) & 29.0373 & 10.2573 & 2.81048 & -0.95914 & 0.11725 & -250.569 & -241.8264 & CHEMKIN \tabularnewline
+H  O(liq) & -203.606 & 1523.29 & -3196.413 & 2474.455 & 3.85533 & -256.5478 & -285.8304 & NIST \tabularnewline
+H & 33.066178 & -11.363417 & 11.432816 & -2.772874 & -0.158558 & -9.9808 & 0.0 & NIST \tabularnewline
+CH & -0.703029 & 108.4773 & -42.52157 & 5.862788 & 0.678565 & -76.84376 & -74.8731 & NIST \tabularnewline
+C  H & -3.03849 & 199.202 & -84.9812 & 11.0348 & 0.30348 & -90.0633 & -83.8605 & CHEMKIN \tabularnewline
+C  H & -23.1747 & 363.742 & -222.981 & 56.253 & 0.61164 & -109.206 & -103.855 & CHEMKIN \tabularnewline
+C  H & -5.24343 & 426.442 & -257.955 & 66.535 & -0.26994 & -149.365 & -133.218 & CHEMKIN \tabularnewline
+C  H & -34.9431 & 576.777 & -338.353 & 76.8232 & 1.00948 & -155.348 & -146.348 & CHEMKIN \tabularnewline
+C  H & -46.7786 & 711.187 & -438.39 & 103.784 & 1.23887 & -176.813 & -166.966 & CHEMKIN \tabularnewline
+CH  OH & 14.1952 & 97.7218 & -9.73279 & -12.8461 & 0.15819 & -209.037 & -201.102 & CHEMKIN \tabularnewline
+C  H  OH & -8.87256 & 282.389 & -178.85 & 46.3528 & 0.48364 & -241.239 & -234.441 & CHEMKIN \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{References}\label{references-2-005}
 
 Beausoleil-Morrison, I., A. Weber, F. Marechal, and B. Griffith. 2007. Specifications for Modelling Fuel Cell Cogeneration Devices within Whole-Building Simulation Programs. In \emph{Specifications for Modelling Fuel Cell and Combustion-Based Residential Cogeneration Device within Whole-Building Simulation Programs}. I. Beausoleil-Morrison and N. Kelly editors.~ Report of Annex 42 of the International Energy Agency ECBCS.
 
@@ -698,7 +939,7 @@ The user must input the required information according to the IO Reference Manua
 
 HAWT systems need a maximum power coefficient and empirical power coefficient parameters \emph{C\(_{1}\)} through \emph{C\(_{6}\)}. The maximum power coefficient controls overall performance of the rotor which defines the power extraction efficiency from the ambient air stream. The model predicts power generation more accurately when the user inputs the empirical power coefficients \emph{C\(_{1}\)} through \emph{C\(_{6}\)} for a specific wind turbine. Three additional inputs for VAWT system are required. The model requests blade lift and drag coefficients corresponding to the maximum tip speed ratio so that tangential and normal force coefficients are obtained. Blade chord area is also requested for calculating forces on a single blade.
 
-\subsubsection{Simulation and Control}\label{simulation-and-control-002}
+\subsubsection{Simulation and Control}\label{simulation-and-control-003}
 
 Given the inputs needed, the wind turbine model analyzes local wind speed since wind speed is critical to determine the production of electricity of wind turbine systems. To minimize uncertainty involved with wind data, it factors differences between annual average wind speed from weather data and local annual average wind speed at the particular height of the local meteorological station. It reads annual average wind speed from statistical weather file that is automatically copied during the simulation. Note that the user should attach a weather data to the simulation (for a design day simulation, the wind speed data from the design day description is used). This annual average wind speed is converted into a wind speed at the height at which local annual average wind speed that the user inputs is measured and then factored as:
 
@@ -736,7 +977,7 @@ The model converts TMY wind speed into a wind speed at the specific height of th
 {V_Z} = WindSpeedAt(Z)
 \end{equation}
 
-The local wind speed at the rotor height (\emph{V\(_{l}\)}) at the location is thus:
+The local wind speed at the rotor height (\emph{V\(_{Local}\)}) at the location is thus:
 
 \begin{equation}
 {V_{Local}} = \frac{{{V_Z}}}{{{F_v}}}
@@ -880,10 +1121,18 @@ P = \eta {P_W}
 
 % table 92
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{Nomenclature for Wind Turbine model \protect \label{table:nomenclature-for-wind-turbine-model}}\\
+\caption{Nomenclature for Wind Turbine model \label{table:nomenclature-for-wind-turbine-model}} \tabularnewline
 \toprule 
-Variable & Description & Units \tabularnewline \midrule
+Variable & Description & Units \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature for Wind Turbine model} \tabularnewline
+\toprule 
+Variable & Description & Units \tabularnewline
+\midrule
 \endhead
+
 A & swept area of rotor & m2 \tabularnewline
 A & blade chord area & m2 \tabularnewline
 a & site wind exponent, 0.22 & ~ \tabularnewline
@@ -935,7 +1184,7 @@ x & exponent, 1.5 & ~ \tabularnewline
 \bottomrule
 \end{longtable}
 
-\subsubsection{References}\label{references-1-009}
+\subsubsection{References}\label{references-3-002}
 
 Siegfried Heier. 2006. Grid Integration of Wind Energy Conversion Systems, Second Edition. Wiley, Chap. 2, pp.31-44.
 

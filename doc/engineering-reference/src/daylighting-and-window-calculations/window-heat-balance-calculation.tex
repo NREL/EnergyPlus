@@ -13,6 +13,7 @@ Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
 Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
 \midrule
 \endhead
+
 N & Number of glass layers & - & nlayer \tabularnewline
 $\alpha$ & Stefan-Boltzmann constant & ~ & sigma \tabularnewline 
 $\varepsilon$\(_{i}\) & Emissivity of face i & - & emis \tabularnewline
@@ -222,12 +223,14 @@ The value of the inside face temperature, \({\theta_{2N}}\) , determined in this
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
 \caption{Fortran Variables used in Edge of Glass calculations \label{table:fortran-variables-used-in-edge-of-glass}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
 \endfirsthead
 
-\caption[]{  Fortran Variables used in Edge of Glass calculations} \tabularnewline
+\caption[]{Fortran Variables used in Edge of Glass calculations} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
 \endhead
 
 \(\overline h\) & Area-weighted net conductance of glazing including edge-of-glass effects & W/m\(^{2}\)-K & - \tabularnewline
@@ -388,8 +391,10 @@ Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
 
 \caption[]{Fortran Variables used in Window/Frame and Divider calculations} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 Q\(_{ExtIR,abs}\) & IR from the exterior surround absorbed by outside frame surfaces & W & - \tabularnewline
 Q\(_{IR,emitted}\) & IR emitted by outside frame surfaces & W & - \tabularnewline
 Q\(_{conv}\) & Convection from outside air to outside frame surfaces & W & - \tabularnewline
@@ -440,7 +445,7 @@ Figure~\ref{fig:cross-section-through-a-window-showing-frame} shows a cross sect
 \begin{figure}[hbtp] % fig 97
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1557.png}
-\caption{Cross section through a window showing frame and divider (exaggerated horizontally). \protect \label{fig:cross-section-through-a-window-showing-frame}}
+\caption{Cross section through a window showing frame and divider (exaggerated horizontally). \label{fig:cross-section-through-a-window-showing-frame}}
 \end{figure}
 
 \textbf{~}
@@ -505,7 +510,7 @@ Adding these expressions for the \emph{Q} terms and dividing by* A\(_{f}\)*~give
 {E_0}{\varepsilon_1}\left( {1 + \frac{1}{2}{\eta_1}} \right) - {\varepsilon_1}\left( {1 + {\eta_1}} \right)\theta_1^4 + {h_{o,c}}\left( {1 + {\eta_1}} \right)\left( {{T_0} - {\theta_1}} \right) + k\left( {{\theta_2} - {\theta_1}} \right) + {S_1} = 0
 \end{equation}
 
-where \emph{S\(_{1}\)} = \emph{Q\(_{abs}\)/A\(_{f}\)} and
+where \emph{S\(_{1}\)} = \emph{Q\(_{abs}\)/A\(_{f}\)}~and
 
 \begin{equation}
 {\eta_1} = \frac{{{A_{p1}}}}{{{A_f}}} = \left( {\frac{{{p_{f,1}}}}{{{w_f}}}} \right)\frac{{H + W - ({N_h} + {N_v}){w_d}}}{{H + W + 2{w_f}}}
