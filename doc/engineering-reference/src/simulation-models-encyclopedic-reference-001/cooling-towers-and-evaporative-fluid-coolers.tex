@@ -96,7 +96,7 @@ Assuming that the heat capacity rate (\(\dot mcp\) ) for the cooling tower water
 
 where
 
-\emph{ε} = heat exchanger effectiveness
+\emph{$\varepsilon$} = heat exchanger effectiveness
 
 \emph{T\(_{n}\)} = inlet water temperature, \(^{o}\)C
 
@@ -345,12 +345,12 @@ Coeff(\#) = correlation coefficients
 If the user selects Tower Model Type = CoolToolsCrossFlow, then the 35 coefficients derived for the CoolTools simulation model (Benton et al. 2002) are used and these coefficients are already defined within EnergyPlus as shown in Table~\ref{table:approach-temperature-correlation-coefficients}. If the user specifies Tower Model Type = CoolToolsUserDefined, then the user must enter a CoolingTowerPerformance:CoolTools object to define the 35 coefficients that will be used by the CoolTools approach temperature correlation.
 
 % table 63
-\begin{longtable}[c]{@{}lll@{}}
+\begin{longtable}[c]{2.0}{2.0in}{2.0in}
 \caption{Approach Temperature Correlation Coefficients \protect \label{table:approach-temperature-correlation-coefficients}}\\
 \toprule 
-Coefficient Number & Coefficient Value \tabularnewline \midrule
+Coefficient Number & \multicolumn{2}{c}{Coefficient Value} \tabularnewline
+ & CoolTools & YorkCalc \tabularnewline \midrule
 \endhead
-CoolTools & YorkCalc \tabularnewline
 Coeff(1) & 0.52049709836241 & -0.359741205 \tabularnewline
 Coeff(2) & -10.617046395344 & -0.055053608 \tabularnewline
 Coeff(3) & 10.7292974722538 & 0.0023850432 \tabularnewline

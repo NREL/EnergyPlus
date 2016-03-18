@@ -2,19 +2,19 @@
 
 This system will detail the process required to model a Plant Loop coupled with Thermal Energy Storage (TES) in EnergyPlus. The input file for this example can be found under the name: PlantApplicationsGuide\_Example2.idf.
 
-The TES tank will be charged by using a chiller loop, which will in turn be cooled by a condenser loop. The schedules for this system are setup such that the TES tank will be charged by the chiller during the night and then the stored chilled water is used to satisfy the building cooling load during the day. The TES tank used in this system is a stratified tank. This system also includes one heating loop which satisfies the heating load. The cooling and heating system operate in conjunction with an air loop that is spread across a total of five zones. The air loop modeling will not be discussed in this guide. This system consists of a total of three separate plant loops, the cooling side is comprised of two loops and the heating side contains one loop. A simple line diagram for the cooling system is provided in Figure 41. The EnergyPlus line diagram for the cooling loop is provided in Figure~\ref{fig:energyplus-line-diagram-for-cooling-system}. A simple line diagram for the heating loop is provided in Figure 42, whereas its EnergyPlus line diagram is provided in Figure~\ref{fig:energyplus-line-diagram-for-heating-loop}.
+The TES tank will be charged by using a chiller loop, which will in turn be cooled by a condenser loop. The schedules for this system are setup such that the TES tank will be charged by the chiller during the night and then the stored chilled water is used to satisfy the building cooling load during the day. The TES tank used in this system is a stratified tank. This system also includes one heating loop which satisfies the heating load. The cooling and heating system operate in conjunction with an air loop that is spread across a total of five zones. The air loop modeling will not be discussed in this guide. This system consists of a total of three separate plant loops, the cooling side is comprised of two loops and the heating side contains one loop. A simple line diagram for the cooling system is provided in Figure~\ref{fig:simple-line-diagram-for-cooling-system}. The EnergyPlus line diagram for the cooling loop is provided in Figure~\ref{fig:energyplus-line-diagram-for-cooling-system}. A simple line diagram for the heating loop is provided in Figure~\ref{fig:simple-line-diagram-for-heating-loop}, whereas its EnergyPlus line diagram is provided in Figure~\ref{fig:energyplus-line-diagram-for-heating-loop}.
 
-\begin{figure}[htbp]
+\begin{figure}[htbp] % fig 41
 \centering
 \includegraphics{media/image041.png}
-\caption{}
+\caption{Simple line diagram for cooling system \protect \label{fig:simple-line-diagram-for-cooling-system}}
 \end{figure}
 
-Figure 41 -- Simple line diagram for cooling system
-
-~~~~~ \includegraphics{media/image042.png}
-
-Figure 42 - Simple line diagram for heating loop
+\begin{figure}[htbp] % fig 42
+\centering
+\includegraphics{media/image042.png}
+\caption{Simple line diagram for heating loop \protect \label{fig:simple-line-diagram-for-heating-loop}}
+\end{figure}
 
 \begin{figure}[hbtp] % fig 43
 \centering

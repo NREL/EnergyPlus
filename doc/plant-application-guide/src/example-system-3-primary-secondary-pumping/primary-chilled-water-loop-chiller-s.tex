@@ -26,7 +26,7 @@ This series of flowcharts serve as a guide for identifying and inputting the Pri
 
 \subsubsection{Primary Cooling System Supply Side Loop Construction}\label{primary-cooling-system-supply-side-loop-construction}
 
-The main components on the supply side half loop for the primary chilled water loop are two chillers and district cooling object that supply chilled water and the constant speed pump that circulates the chilled water through the loop. This pump (`CW Primary Circ Pump') is the primary pump in the primary/secondary pumping setup. This half loop supplies chilled water to the plate heat exchanger which is placed on the demand side half loop. The supply side half loop contains six components, six branches, twelve nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the Primary Cooling loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-005}. The flowchart for supply side branches and components is provided in Figure 94. The flowchart for supply side connectors is provided in Figure 95.
+The main components on the supply side half loop for the primary chilled water loop are two chillers and district cooling object that supply chilled water and the constant speed pump that circulates the chilled water through the loop. This pump (`CW Primary Circ Pump') is the primary pump in the primary/secondary pumping setup. This half loop supplies chilled water to the plate heat exchanger which is placed on the demand side half loop. The supply side half loop contains six components, six branches, twelve nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the Primary Cooling loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-005}. The flowchart for supply side branches and components is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-supply-side-branches-and-components}. The flowchart for supply side connectors is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-supply-side-connectors}.
 
 \begin{figure}[hbtp] % fig 93
 \centering
@@ -34,45 +34,39 @@ The main components on the supply side half loop for the primary chilled water l
 \caption{EnergyPlus line diagram for the supply side of the primary chilled water loop \protect \label{fig:energyplus-line-diagram-for-the-supply-side-005}}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 94
 \centering
-\includegraphics{media/image094.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image094.png}
+\caption{Flowchart for Primary Cooling Loop supply side branches and components \protect \label{fig:flowchart-for-primary-cooling-loop-supply-side-branches-and-components}}
 \end{figure}
 
-Figure 94 -- Flowchart for Primary Cooling Loop supply side branches and components
-
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 95
 \centering
-\includegraphics{media/image095.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image095.png}
+\caption{Flowchart for Primary Cooling Loop supply side branches and components \protect \label{fig:flowchart-for-primary-cooling-loop-supply-side-connectors}}
 \end{figure}
-
-Figure 95 -- Flowchart for Primary Cooling Loop supply side connectors
 
 \subsubsection{Primary Cooling Loop Demand Side Loop Construction}\label{primary-cooling-loop-demand-side-loop-construction}
 
-The main component on the demand side half loop is the plate heat exchanger that facilitates the exchange of heat between the fluids of the primary and secondary chilled water loop. The plate heat exchanger will not be discussed in this loop. Instead the object will be discussed in the supply side half loop of the secondary chilled water loop. This side of the loop also has eight nodes, four components, four branches, and one splitter mixer pair. An EnergyPlus schematic for the demand side is provided in Figure 96. The flowchart for demand side branch definition is provided in Figure 97. The flowchart for the demand side connectors is provided in Figure 98.
+The main component on the demand side half loop is the plate heat exchanger that facilitates the exchange of heat between the fluids of the primary and secondary chilled water loop. The plate heat exchanger will not be discussed in this loop. Instead the object will be discussed in the supply side half loop of the secondary chilled water loop. This side of the loop also has eight nodes, four components, four branches, and one splitter mixer pair. An EnergyPlus schematic for the demand side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-demand-side-005}. The flowchart for demand side branch definition is provided in Figure~\ref{fig:flowchart-for-primary-chilled-water-loop-demand-side-branches-and-components}. The flowchart for the demand side connectors is provided in Figure~\ref{fig:flowchart-for-primary-chilled-water-loop-demand-side-connectors}.
 
-\textbf{\includegraphics{media/image096.png}}
-
-Figure 96 - EnergyPlus line diagram for the demand side of the primary chilled water loop
-
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 96
 \centering
-\includegraphics{media/image097.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image096.png}
+\caption{EnergyPlus line diagram for the demand side of the primary chilled water loop \protect \label{fig:energyplus-line-diagram-for-the-demand-side-005}}
 \end{figure}
 
-Figure 97 -- Flowchart for primary chilled water loop demand side branches and components
-
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 97
 \centering
-\includegraphics{media/image098.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image097.png}
+\caption{Flowchart for primary chilled water loop demand side branches and components \protect \label{fig:flowchart-for-primary-chilled-water-loop-demand-side-branches-and-components}}
 \end{figure}
 
-Figure 98 -- Flowchart for primary chilled water loop demand side connectors
+\begin{figure}[hbtp] % fig 98
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image098.png}
+\caption{Flowchart for primary chilled water loop demand side connectors \protect \label{fig:flowchart-for-primary-chilled-water-loop-demand-side-connectors}}
+\end{figure}
 
 \subsection{Flowcharts for Primary Chilled Water Loop Controls}\label{flowcharts-for-primary-chilled-water-loop-controls}
 
@@ -80,27 +74,23 @@ The Primary Cooling loop is operated by using set-points, plant equipment operat
 
 \subsubsection{Primary Chilled Water Loop Schedules}\label{primary-chilled-water-loop-schedules}
 
-The Primary Cooling loop uses three different schedules to operate properly. \emph{On Peak} is a compact schedule that defines the on peak hours (9 AM to 6 PM). The \emph{Off Peak} is a compact schedule that defines the off peak hours (6 PM to 9 AM). This plant loop also uses another compact schedule named \emph{CW Loop Temp Schedule} declare that the temperature of the chilled water loop outlet flow is 6.7 degrees Celsius at all times. This schedule is used by the setpoint manager (\emph{Primary CW Loop Setpoint Manager)}. This schedule uses a schedule type limit named \emph{Temperature,} which defines the loop upper and lower temperature limits. The flowchart for Primary Cooling loop schedule definition is provided in Figure 99.
+The Primary Cooling loop uses three different schedules to operate properly. \emph{On Peak} is a compact schedule that defines the on peak hours (9 AM to 6 PM). The \emph{Off Peak} is a compact schedule that defines the off peak hours (6 PM to 9 AM). This plant loop also uses another compact schedule named \emph{CW Loop Temp Schedule} declare that the temperature of the chilled water loop outlet flow is 6.7 degrees Celsius at all times. This schedule is used by the setpoint manager (\emph{Primary CW Loop Setpoint Manager)}. This schedule uses a schedule type limit named \emph{Temperature,} which defines the loop upper and lower temperature limits. The flowchart for Primary Cooling loop schedule definition is provided in Figure~\ref{fig:flowchart-for-primary-chilled-water-loop-schedules}.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 99
 \centering
-\includegraphics{media/image099.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image099.png}
+\caption{Flowchart for primary chilled water loop schedules \protect \label{fig:flowchart-for-primary-chilled-water-loop-schedules}}
 \end{figure}
-
-Figure 99 -- Flowchart for primary chilled water loop schedules
 
 \subsubsection{Primary Chilled Water Loop Plant Equipment Operation Schemes}\label{primary-chilled-water-loop-plant-equipment-operation-schemes}
 
-There are two important operation schemes in the primary chilled water loop. The \emph{CW Loop Operation} plant equipment operation scheme used two schedules (\emph{On Peak} and \emph{off Peak}) to control the supply components in the primary cooling loop. \emph{Peak Operation} is set up such that different components or combinations of components are operated for different values of cooling load during the peak hours (9AM to 6PM everyday) of the simulation period. Up to 25,000 W of cooling load, the small constant COP chiller is operated, for 25,000-245,000 W the big electric chiller and purchased cooling are used and for 245,000-500,000 W purchased cooling is used. This setup serves to increase the efficiency of the system. \emph{Off Peak Operation} is set up such that both the chillers are operated during the off peak hours (6 PM to 9 AM). Flowcharts detailing the chilled water loop plant equipment operation schemes are provided in Figure 100 and Figure~\ref{fig:flowchart-for-off-peak-plant-operation-of}.
+There are two important operation schemes in the primary chilled water loop. The \emph{CW Loop Operation} plant equipment operation scheme used two schedules (\emph{On Peak} and \emph{off Peak}) to control the supply components in the primary cooling loop. \emph{Peak Operation} is set up such that different components or combinations of components are operated for different values of cooling load during the peak hours (9AM to 6PM everyday) of the simulation period. Up to 25,000 W of cooling load, the small constant COP chiller is operated, for 25,000-245,000 W the big electric chiller and purchased cooling are used and for 245,000-500,000 W purchased cooling is used. This setup serves to increase the efficiency of the system. \emph{Off Peak Operation} is set up such that both the chillers are operated during the off peak hours (6 PM to 9 AM). Flowcharts detailing the chilled water loop plant equipment operation schemes are provided in Figure~\ref{fig:flowchart-for-on-peak-operation-of} and Figure~\ref{fig:flowchart-for-off-peak-plant-operation-of}.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 100
 \centering
-\includegraphics{media/image100.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image100.png}
+\caption{Flowchart for on peak operation of the primary chilled water loop \protect \label{fig:flowchart-for-on-peak-operation-of}}
 \end{figure}
-
-Figure 100 -- Flowchart for on peak operation of the primary chilled water loop
 
 \begin{figure}[hbtp] % fig 101
 \centering
@@ -110,12 +100,10 @@ Figure 100 -- Flowchart for on peak operation of the primary chilled water loop
 
 \subsubsection{Primary Chilled Water Loop Setpoints}\label{primary-chilled-water-loop-setpoints}
 
-The \emph{Primary CW Loop Setpoint Manager} uses the \emph{CW Loop Temp Schedule} to set a temperature control point at the \emph{CW Primary Supply Outlet Node}. This setpoint allows the program to control the temperature at the node by operating the components in the Primary Cooling loop. ~Since, setpoint managers are high-level control objects, their usefulness is realized in much more complex systems, where multiple nodes have to be monitored in order to operate the system properly. A flowchart for Secondary Cooling loop setpoints is provided in Figure 102.
+The \emph{Primary CW Loop Setpoint Manager} uses the \emph{CW Loop Temp Schedule} to set a temperature control point at the \emph{CW Primary Supply Outlet Node}. This setpoint allows the program to control the temperature at the node by operating the components in the Primary Cooling loop. ~Since, setpoint managers are high-level control objects, their usefulness is realized in much more complex systems, where multiple nodes have to be monitored in order to operate the system properly. A flowchart for Secondary Cooling loop setpoints is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-setpoints}.
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp] % fig 102
 \centering
-\includegraphics{media/image102.png}
-\caption{}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image102.png}
+\caption{Flowchart for Primary Cooling Loop setpoints \protect \label{fig:flowchart-for-primary-cooling-loop-setpoints}}
 \end{figure}
-
-Figure 102 -- Flowchart for Primary Cooling Loop setpoints

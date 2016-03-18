@@ -399,12 +399,21 @@ The calculation of~ subzone temperatures follows the method used in the \textbf{
 T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + MCP_{tot})
 \end{equation}}
 
+{\scriptsize
 \begin{equation}
   \begin{array}{l}
-    T_{oc} = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + T_{fl} \cdot MCP_{tot}) / (11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})
-    T_{mx} = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
+    T_{oc} = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + T_{fl} \cdot MCP_{tot}) \\
+    / ((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})
+\end{array}
+\end{equation}}
+
+{\scriptsize
+\begin{equation}
+  \begin{array}{l}
+    T_{mx} = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) \\
+    / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
   \end{array}
-\end{equation}
+\end{equation}}
 
 Here \({C_{air,fl}}\) , \({C_{air,oc}}\) , and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
 
@@ -436,7 +445,10 @@ Then the code iterates over these steps.
 
 {\scriptsize
 \begin{equation}
-T_{avg} = (C_{air,z} \cdot (3 \cdot T_{ - 1,z} - (3/2) \cdot T_{ - 2,z} + (1/3) \cdot T_{ - 3,z}) + \dot Q_{tot,conv} + HAT_{oc} + HAT_{mx} + HAT_{fl} + MCPT_{tot}) / ((11/6) \cdot C_{air,z} + HA_{oc} + HA_{mx} + HA_{fl} + MCP_{tot})
+\begin{array}{l}
+T_{avg} = (C_{air,z} \cdot (3 \cdot T_{ - 1,z} - (3/2) \cdot T_{ - 2,z} + (1/3) \cdot T_{ - 3,z}) + \dot Q_{tot,conv} + HAT_{oc} + HAT_{mx} + HAT_{fl} + MCPT_{tot}) \\
+\quad \qaud \quad \qaud / ((11/6) \cdot C_{air,z} + HA_{oc} + HA_{mx} + HA_{fl} + MCP_{tot})
+\end{array}
 \end{equation}}
 
 \begin{equation}
@@ -1911,7 +1923,7 @@ V = Zone air volume
 
 W\(_{z,i}\) = Air humidity ratio at the ith zone RoomAir node
 
-N\(_{i,g}\) = The number of internal gains for the ith node, defined in the RoomAir:Node:Airflownetwork:InternalGains object
+N\(_{i,g}\) = The number of internal gains for the ith node, defined in the \\ RoomAir:Node:Airflownetwork:InternalGains object
 
 F\(_{gain,j}\) = Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
 
