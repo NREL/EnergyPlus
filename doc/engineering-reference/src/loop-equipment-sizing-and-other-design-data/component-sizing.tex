@@ -1961,10 +1961,16 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 \emph{T\(_{coil,in}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)}
 
-\emph{T\(_{coil,out}\)} = \emph{HeatDesTemp\(_{zone}\)} \(_{\)\dot Qcoil,des = cp,air\cdot DesHeatMassFlowzone\cdot (Tout,coil - Tin,coil)\(}\)
+\begin{equation}
+  T_{coil,out} = HeatDesTemp_{zone}
+\end{equation}
 
 \begin{equation}
-\dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)
+  \dot{Q}_{coil,des} = c_{p,air} \cdot DesHeatMassFlow_{zone} \cdot (T_{out,coil} - T_{in,coil})
+\end{equation}
+
+\begin{equation}
+  \dot{V}_{max,hw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_{w} \cdot \Delta T_{loop,des})
 \end{equation}
 
 where
@@ -1983,10 +1989,14 @@ where
 
 \emph{H\(_{coil,in}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{coil,in}\)}, \emph{W\(_{coil,in}\)})
 
-\emph{H\(_{coil,out}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{coil,out}\)}, \emph{W\(_{coil,out}\)}) \(_{\)\dot Qcoil,des = DesCoolMassFlowzone\cdot (hin,coil - hout,coil)\(}\)
+\emph{H\(_{coil,out}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{coil,out}\)}, \emph{W\(_{coil,out}\)})
 
 \begin{equation}
-\dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)
+  \dot{Q}_{coil,des} = DesCoolMassFlow_{zone} \cdot (h_{in,coil} - h_{out,coil})
+\end{equation}
+
+\begin{equation}
+  \dot{V}_{max,hw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
 \end{equation}
 
 where
@@ -2248,7 +2258,7 @@ If the cooler is part of the outdoor air path of a central air system, then the 
 The secondary DX coils model does not have a standalone object and it is models as add-on feature to the DX Coils. When the secondary DX coil is added to a primary DX cooling coil, the heat rejected to secondary zone is sensible only and is treated as tnternal gain, hence secondary air flow rate is not required in the model. Where as when the secondary DX coil is added to a primary DX heating coil, then the heat removed from secondary zone may have sensible and latent components and is treated as tnternal gain. The sensible/latent component split among other parameters requires secondary coil air flow rate. Hence secondary coil air flow rate sizing is added based on the primary DX cooling coil only.
 
 \begin{equation}
-\dot{V}_\rm{SecCoil} = \dot{V}_\rm{PriHeatCoil}\cdot \text{ScalingFactor}
+  \dot{V}_{\rm{SecCoil}} = \dot{V}_{\rm{PriHeatCoil}} \cdot \text{ScalingFactor}
 \end{equation}
 
 where
