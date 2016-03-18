@@ -46,7 +46,7 @@ The single duct air terminals may also be used to provide a minimum outdoor air 
 
 \subsubsection{Overview}\label{overview-001}
 
-The VAV Heating and Cooling Single Duct Reheat and No Reheat terminal units (objects AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and \\ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat provide models for variable-air-volume (VAV) terminal units are widely used in commercial and industrial applications. The VAV terminal units contain actuated dampers that vary the amount of central system air supplied to a zone. These terminal units may also contain a heating coil to trim the supply air temperature when overcooling is possible. The heating coil may also serve as the primary air heating source when the central system contains cooling-only equipment.
+The VAV Heating and Cooling Single Duct Reheat and No Reheat terminal units (objects AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and Air\-Ter\-minal:\-Single\-Duct:\-VAV:\-Heat\-And\-Cool:\-No\-Re\-heat provide models for variable-air-volume (VAV) terminal units are widely used in commercial and industrial applications. The VAV terminal units contain actuated dampers that vary the amount of central system air supplied to a zone. These terminal units may also contain a heating coil to trim the supply air temperature when overcooling is possible. The heating coil may also serve as the primary air heating source when the central system contains cooling-only equipment.
 
 The VAV terminal units described here are used primarily with central air handling equipment with cooling and heating capability. The terminal unit dampers modulate in \textbf{both} cooling and heating mode to maintain the zone setpoint temperature(s). The central air handling equipment may be either variable air volume or constant volume where a bypass duct is used to shunt excess system air flow back to the inlet of the central air handler as terminal unit dampers modulate to satisfy the zone thermostat (i.e., AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass).
 
@@ -212,7 +212,7 @@ so
 {\dot m_{air,sec}} = {\dot m_{air,tot}}\cdot {R_{induc}}/(1 + {R_{induc}})
 \end{equation}
 
-where \emph{R\(_{c}\)} is the user-input induction ratio.
+where \emph{R\(_{induc}\)} is the user-input induction ratio.
 
 All input data for the four pipe induction terminal units is stored in the array \emph{IndUnit}.
 
@@ -734,13 +734,13 @@ The chilled beam system is modeled as an EnergyPlus terminal unit. In terms of c
 
 The model is an empirical model developed at the equipment manufacturer Halton Oy. It consists of the following relationships.
 
-\emph{P\(_{m}\)} = \emph{A·K·DT~~~~~~~} ~~~~~~~~~~~~~~~~~~~~~~~ beam cooling output per unit length W/m
+\emph{P\(_{beam}\)} = \emph{A·K·DT~~~~~~~} ~~~~~~~~~~~~~~~~~~~~~~~ beam cooling output per unit length W/m
 
-\emph{K = a·DT\(^{1}\)·vr\(^{2}\)·w\(^{3}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~ coil heat transfer coefficient W/(m\(^{2}\)K)
+\emph{K = a·DT\(^{n1}\)·vr\(^{n2}\)·w\(^{n3}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~ coil heat transfer coefficient W/(m\(^{2}\)K)
 
-\emph{vr = (q\(_{n}\)}/a\emph{\(_{0}\))·r\(_{r}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ room air mass flow rate across coil kg/(m\(^{2}\)s)
+\emph{vr = (q\(_{in}\)}/a\emph{\(_{0}\))·r\(_{air}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ room air mass flow rate across coil kg/(m\(^{2}\)s)
 
-\emph{q\(_{n}\) = K\(_{1}\)·DT\(^{n}\)+K\(_{n}\)·q\(_{r}\)}~~~~~~~~~~~~~~~~ ~~~~~~~~~~~ room air volumetric flow rate across coil per
+\emph{q\(_{in}\) = K\(_{1}\)·DT\(^{n}\)+K\(_{in}\)·q\(_{pr}\)}~~~~~~~~~~~~~~~~ ~~~~~~~~~~~ room air volumetric flow rate across coil per
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ unit length m\(^{3}\)/(s-m)
 
@@ -748,7 +748,7 @@ DT is the room air --water temperature difference (average water temperature is 
 
 w is the water velocity in m/s.
 
-q\(_{r}\) is the supply air flow rate per unit length m\(^{3}\)/(s-m)
+q\(_{pr}\) is the supply air flow rate per unit length m\(^{3}\)/(s-m)
 
 The other symbols are the model parameters input by the user (see the IO Ref for descriptions).
 
@@ -774,35 +774,35 @@ The input \emph{Length of an individual beam unit} is autosized by using the mod
 
 4)~~~~The design water velocity -- obtained by dividing the design water flow per beam by the cross sectional inside area of a water tube (pD\(^{2}\)/4, where D is the input \emph{Pipe inside diameter}.
 
-5)~~~~Average air to water \emph{DT = T\(_{k}\)} - \emph{0.5(T\(_{t}\)} \emph{+ T\(_{t}\))}; where~~~~~~~ \emph{T\(_{k}\)} is the zone air temperature at the cooling peak and the \emph{T\(_{s}\)} `s are the water design inlet and outlet temperatures.
+5)~~~~Average air to water \emph{DT = T\(_{z,\, cool\, peak}\)} - \emph{0.5(T\(_{w,des\, inlet}\)} \emph{+ T\(_{w,des\, outlet}\))}; where~~~~~~~ \emph{T\(_{z,\, cool\, peak}\)} is the zone air temperature at the cooling peak and the \emph{T\(_{w,des}\)} `s are the water design inlet and outlet temperatures.
 
 With these inputs the model equations can be solve directly for beam length for passive cooled beams, and iteratively for active cooled beams.
 
 \subsubsection{Calculation}\label{calculation-3}
 
-The subroutine \emph{CalcCoolBeam} ~uses the model equations to calculate the cooling power \emph{P\(_{t}\)} delivered to the room air and the outlet water temperature given the water flow rate (and the room air temperature and water inlet temperature). Since the model equations are nonlinear they must be solved iteratively. The subroutine does this by varying the outlet water temperature \emph{T\(_{t}\)} and calculating the water-side cooling power
+The subroutine \emph{CalcCoolBeam} ~uses the model equations to calculate the cooling power \emph{P\(_{beams,out}\)} delivered to the room air and the outlet water temperature given the water flow rate (and the room air temperature and water inlet temperature). Since the model equations are nonlinear they must be solved iteratively. The subroutine does this by varying the outlet water temperature \emph{T\(_{w,out}\)} and calculating the water-side cooling power
 
-P\(_{w}\) = q\(_{m}\)·c\(_{w}\)·(T\(_{t}\)-T\(_{n}\))
+P\(_{w}\) = q\(_{w,beam}\)·c\(_{p,w}\)·(T\(_{w,out}\)-T\(_{w,in}\))
 
 and comparing it to the air-side cooling power
 
-P\(_{r}\) = K·A·DT·L\(_{m}\)
+P\(_{air}\) = K·A·DT·L\(_{beam}\)
 
-where \emph{q\(_{m}\)} is the water mass flow rate (kg/s) per beam and \emph{L\(_{m}\)} is the length of a beam (m). When \emph{P}\(_{w}\) ~and \emph{P\(_{r}\)} match to within 0.1 W the subroutine terminates the iteration.
+where \emph{q\(_{w,beam}\)} is the water mass flow rate (kg/s) per beam and \emph{L\(_{beam}\)} is the length of a beam (m). When \emph{P}\(_{w}\) ~and \emph{P\(_{air}\)} match to within 0.1 W the subroutine terminates the iteration.
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-4}
 
 From the result of the zone simulation we have the heating/cooling demand for the zone equipment. For the cooling demand, we use the load to cooling set point \emph{P\(_{c}\)}. Part of the demand may be satisfied by the zone supply air:
 
-P\(_{p}\) = q\(_{r}\)·(c\(_{s}\)·T\(_{s}\) - c\(_{z}\)·T\(_{z}\))
+P\(_{sup}\) = q\(_{air}\)·(c\(_{p,air,sys}\)·T\(_{sys}\) - c\(_{p,air,z}\)·T\(_{z}\))
 
 The demand on the actual beams is then
 
-P\(_{m}\) = P\(_{c}\) - P\(_{p}\)
+P\(_{beams,dem}\) = P\(_{c}\) - P\(_{sup}\)
 
-We want to know the chilled water flow rate that will give a beam cooling output of \emph{P\(_{s}\)}. To obtain this we need to numerically invert \emph{CalcCoolBeam}: given its desired output, we want to know the chilled water flow rate. This numerical inversion is carried out by calling the subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function is basically
+We want to know the chilled water flow rate that will give a beam cooling output of \emph{P\(_{beams}\)}. To obtain this we need to numerically invert \emph{CalcCoolBeam}: given its desired output, we want to know the chilled water flow rate. This numerical inversion is carried out by calling the subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function is basically
 
-(P\(_{t}\)-P\(_{m}\))/P\(_{x}\)
+(P\(_{beams,out}\)-P\(_{beams,dem}\))/P\(_{beams,out,max}\)
 
 \emph{SolveRegulaFalsi} varies the cold water mass flow rate to zero the residual. The water inlet and outlet node flow rates are set to the flow rate found by \emph{SolveRegulaFalsi} and the water outlet node temperature is set to the outlet water temperature from \emph{SolveRegulaFalsi}.
 

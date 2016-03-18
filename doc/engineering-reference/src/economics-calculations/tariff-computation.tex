@@ -71,12 +71,12 @@ Any charges included in the EnergyCharges category are added together. The Energ
 \begin{lstlisting}
 
 UtilityCost:Charge:Simple,
-    TaxOfFivePercent,        ! Charge Variable Name
-    TariffExample1,          ! Tariff Name
-    Subtotal,                ! Source Variable
-    Annual,                  ! Season
-    Taxes,                   ! Category Variable Name
-    0.05;                    ! Cost Per Unit Value (or Variable)
+    TaxOfFivePercent,        ! Charge Variable Name
+    TariffExample1,          ! Tariff Name
+    Subtotal,                ! Source Variable
+    Annual,                  ! Season
+    Taxes,                   ! Category Variable Name
+    0.05;                    ! Cost Per Unit Value (or Variable)
 \end{lstlisting}
 
 As you can see, the UtilityCost:Charge:Simple and UtilityCost:Charge:Block objects do most of the ``work'' of computing the annual energy cost.~ The benefit of using this categorization is that totals of each category are shown in the output reports and it organizes the charges in the monthly calculations in a logical way that fits almost all tariffs.~ If no categorization is desired, theoretically, all charges could be assigned to the Total category. The categories themselves are simply variable names. Charges may also be assigned to the ``NotIncluded'' category if the result of the charge is used as an intermediate calculation and should not be included in the Total.
