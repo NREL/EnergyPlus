@@ -46,7 +46,44 @@ By choosing Type of Load to Size On = \emph{Sensible} or \emph{Total} in Sizing:
 
 Choosing Central Cooling Capacity Control Method = \emph{VAV}, \emph{Bypass}, \emph{VT}, or \emph{OnOff} indicates which type of cooling output control the program should assume when calculating the design air flow rate. The function \emph{GetCoilDesFlowT} in module \emph{ReportSizingManager} calculates the air flow rate and exit air temperature for each capacity control method.
 
-DID NOT CONVERT TABLE
+\begin{longtable}{@{}lp{4in}@{}}
+
+  \caption{Cooling coil calculations for different capacity control methods \label{table:cooling-coil-calculations-for-different-capacity-control-methods}} \tabularnewline
+  \toprule
+  Control Method & Calculations \tabularnewline
+  \midrule
+  \endfirsthead
+
+  \caption[]{Cooling coil calculations for different capacity control methods} \tabularnewline
+  \toprule
+  Control Method & Calculations \tabularnewline
+  \midrule
+  \endhead
+
+  VAV &
+  \(\begin{array}{rl}
+    T_{cc,exit} &= T_{cool,supply} \\ 
+    \dot{V}_{cc,air} &= \frac{\dot{m}_{cc,air,peak}}{\rho_{air}}
+  \end{array}\) \tabularnewline
+  Bypass &
+  \(\begin{array}{rl}
+    T_{cc,exit} &= T_{cool,supply} \\ 
+    \dot{V}_{cc,air} &=
+      \dot{V}_{cc,air,max}\cdot\max \left(0, \min \left(1,
+        \frac{T_{mix,at-peak}-T_{sup,avg}}{T_{mix,at-peak}-T_{cc,exit}} \right) \right)
+  \end{array}\) \tabularnewline
+  VT &
+  \(\begin{array}{rl}
+    T_{cc,exit} &= \max\left(T_{cool,supply}, T_{sup,avg}\right) \\ 
+    \dot{V}_{cc,air} &= \dot{V}_{cc,air,max}
+  \end{array}\) \tabularnewline
+  OnOff &
+  \(\begin{array}{rl}
+    T_{cc,exit} &= T_{cool,supply} \\
+    \dot{V}_{cc,air} &=\dot{V}_{sys,air,max}
+  \end{array}\) \tabularnewline
+\bottomrule
+\end{longtable}
 
 Where:
 
