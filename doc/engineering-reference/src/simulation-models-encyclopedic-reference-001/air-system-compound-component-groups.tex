@@ -175,17 +175,17 @@ where:
 Δ\(_{*}\) = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,HighestSpeed} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{HighestSpeed} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,full load} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,HighestSpeed} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{HighestSpeed} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,full load} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,coil off} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,coil off} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 where:
@@ -207,10 +207,10 @@ where
 Δ\(_{*}\) \(_{*}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,Speed1} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{Speed1} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,Speed1} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{Speed1} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 ·~~~~~~~~If the sensible cooling energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
@@ -371,10 +371,10 @@ where:
 Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,full load} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{full load} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,full load} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,full load} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{full load} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,full load} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 where:
@@ -384,10 +384,10 @@ Frac = Control zone air fraction with respect to the system mass flow rate
 Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,coil off} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,coil off} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 With the calculated sensible heating energy rates and the total sensible heating load to be met by the system, the part-load ratio for the unitary system is estimated.
@@ -453,10 +453,10 @@ where:
 Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,HighestSpeed} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{HighestSpeed} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,HighestSpeed} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{HighestSpeed} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 where:
@@ -466,10 +466,10 @@ Frac = Control zone air fraction with respect to the system mass flow rate
 Δ\emph{\(_{f}\)} = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,coil off} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,coil off} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 If the unitary system's DX heating coil output full load at the highest speed is insufficient to meet the entire heating load, the remaining heating load is passed to the supplemental heating coil. If the unitary system model determines that the outdoor air temperature is below the minimum outdoor air temperature for compressor operation (specified by the user), the compressor is turned off and the entire heating load is passed to the supplemental gas or electric heating coil. The unitary system exiting air conditions and energy consumption are calculated and reported by the individual component models (fan, DX heating coil, and supplemental gas or electric heating coil).
@@ -489,10 +489,10 @@ where:
 Δ\emph{\(_{,}\) \(_{1}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
-  \begin{array}{rl}
-    \Delta_{sen,Speed1} &= \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
-                              += \PB{\dot{m}_{Speed1} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{array}
+  \begin{split}
+    \Delta_{sen,Speed1} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
+                              &+ \PB{\dot{m}_{Speed1} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
+  \end{split}
 \end{equation}
 
 2.~~~~If the sensible heating energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
@@ -558,8 +558,9 @@ where:
 
 \begin{equation}
   \begin{array}{rl}
-    UnitarySystemOutput_{SpeedRatio} &= \PB{SpeedRatio} FullHeatOutput_{speedn} + \\
-                                     &+ \PB{1 - SpeedRatio} FullHeatOutput_{speedn - 1} - AddedFanHeat_{SpeedRatio}
+    UnitarySystemOutput_{SpeedRatio} &= \PB{SpeedRatio} FullHeatOutput_{speedn} \\
+                                     &+ \PB{1 - SpeedRatio} FullHeatOutput_{speedn - 1} \\ 
+                                     &- AddedFanHeat_{SpeedRatio}
   \end{array}
 \end{equation}
 
@@ -709,7 +710,8 @@ where:
 
 \subsubsection{Overview}\label{overview-1}
 
-The input objects AirLoopHVAC:Unitary:Furnace:HeatOnly and AirLoopHVAC:Unitary:Furnace:HeatCool provide a ``virtual'' component that collect and control a set of components:~ an on/off or constant volume fan component and a gas or electric heating coil component. If the HeatCool version is selected, then a DX cooling coil is also modeled as part of the system as shown in Figure~\ref{fig:schematic-of-the-energyplus-furnace-blow} below. For the HeatCool version, an optional reheat coil may also be modeled for controlling high zone humidity levels and the furnace's configuration when specifying this option is shown in Figure~\ref{fig:schematic-for-blow-through-furnace-with-high} below. The unit may be configured to have either a blow through or draw through fan. If a blow through fan configuration is specified, the furnace fan is placed before the heating coil for the HeatOnly version, or before the cooling coil for the HeatCool version as shown in the figure below. If a draw through fan configuration is specified, the fan is placed directly after the heating coil.
+The input objects AirLoopHVAC:Unitary:Furnace:HeatOnly and \\
+AirLoopHVAC:Unitary:Furnace:HeatCool provide a ``virtual'' component that collect and control a set of components:~ an on/off or constant volume fan component and a gas or electric heating coil component. If the HeatCool version is selected, then a DX cooling coil is also modeled as part of the system as shown in Figure~\ref{fig:schematic-of-the-energyplus-furnace-blow} below. For the HeatCool version, an optional reheat coil may also be modeled for controlling high zone humidity levels and the furnace's configuration when specifying this option is shown in Figure~\ref{fig:schematic-for-blow-through-furnace-with-high} below. The unit may be configured to have either a blow through or draw through fan. If a blow through fan configuration is specified, the furnace fan is placed before the heating coil for the HeatOnly version, or before the cooling coil for the HeatCool version as shown in the figure below. If a draw through fan configuration is specified, the fan is placed directly after the heating coil.
 
 Note: the coil order shown here has been revised from previous versions of Energyplus to configure the cooling coil upstream of the heating coil. This configuration provides uniformity with all unitary equipment. However, for unitary HeatCool systems that do not use a reheat coil, the heating coil can also be placed upstream of the cooling coil. This optional coil placement is retained to allow compatibility with previous versions of Energyplus. For input files developed using previous versions of Energyplus, it is recommended that the coil order be revised according to the figure below.
 
@@ -1564,7 +1566,9 @@ Heat\;Pump\;Cooling\;Load = \frac{{Control\;Zone\;Cooling\;Load}}{{Control\;Zone
 
 The model then calculates the heat pump's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multispeed DX cooling coil. The multispeed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the heat pump is calculated as follows:
 
+\begin{equation}
 \(FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}}\) \(NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,coil\;off}}\)
+\end{equation}
 
 where:
 
@@ -1583,17 +1587,23 @@ where:
 Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
-{\Delta_{sen,HighestSpeed}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} + \left( {{{\dot m}_{HighestSpeed}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {h_{Out,full\;load} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\begin{split}
+{\Delta_{sen,HighestSpeed}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} \\
++ \left( {{{\dot m}_{HighestSpeed}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {h_{Out,full\;load} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\end{split}
 \end{equation}
 
 where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\)** = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
+Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 \begin{equation}
-{\Delta_{sen,coil\;off}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} + \left( {{{\dot m}_{coil\;off}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,coil\;off}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\begin{split}
+{\Delta_{sen,coil\;off}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} \\ 
++ \left( {{{\dot m}_{coil\;off}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,coil\;off}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\end{split}
 \end{equation}
 
 If the heat pump's sensible cooling rate at the highest speed (full load, no cycling) is insufficient to meet the entire cooling load, the controlled zone conditions will not be met. The reported cycling rate and speed ratio are 1, and the speed number is set to the highest index number. If the total sensible cooling load to be met by the system is less than the sensible cooling rate at the highest speed, then the following steps are performed.
@@ -1611,7 +1621,10 @@ where
 Δ\(_{,}\) \(_{1}\)** = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
-{\Delta_{sen,Speed1}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} + \left( {{{\dot m}_{Speed1}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,full\;load}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\begin{split}
+{\Delta_{sen,Speed1}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} \\
++ \left( {{{\dot m}_{Speed1}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,full\;load}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\end{split}
 \end{equation}
 
 ·~~~~~~~~If the sensible cooling energy rate delivered by the heat pump at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the heat pump is estimated.
@@ -1664,7 +1677,11 @@ For this case where speed 1 operation was able to meet the required cooling load
 
 ·~~~~~~~~If the heat pump's cooling output at full load for Speed 1 is insufficient to meet the entire cooling load, the Cycling ratio is set equal to 1.0 (compressor and fan are not cycling). Then the cooling speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the heat pump is estimated:
 
-\(Speed{\kern 1pt} Ratio = \frac{{ABS(Heat{\kern 1pt} Pump{\kern 1pt} Cooling{\kern 1pt} Load - AddeFanHeat - Full{\kern 1pt} Cool{\kern 1pt} Outpu{t_{Speed{\kern 1pt} n - 1}})}}{{ABS(Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n}} - Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n - 1}})}}\) Although a linear relationship is assumed by applying the speed ratio to obtain the effective capacity and mass flow rate between speed n and n-1, the outlet air node conditions are dependent on the combined outputs and may not be linear. In addition, the supply air fan heat varies with the speed ratio due to different supply mass flow rates between speed n and n-1 . Therefore, the final speed ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the heat pump's cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the heat pump's cooling output divided by the load to be met.
+\begin{equation}
+Speed{\kern 1pt} Ratio = \frac{{ABS(Heat{\kern 1pt} Pump{\kern 1pt} Cooling{\kern 1pt} Load - AddeFanHeat - Full{\kern 1pt} Cool{\kern 1pt} Outpu{t_{Speed{\kern 1pt} n - 1}})}}{{ABS(Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n}} - Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n - 1}})}} 
+\end{equation}
+
+Although a linear relationship is assumed by applying the speed ratio to obtain the effective capacity and mass flow rate between speed n and n-1, the outlet air node conditions are dependent on the combined outputs and may not be linear. In addition, the supply air fan heat varies with the speed ratio due to different supply mass flow rates between speed n and n-1 . Therefore, the final speed ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the heat pump's cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the heat pump's cooling output divided by the load to be met.
 
 \begin{equation}
 Tolerance = 0.001 \ge \frac{{Heat\,Pump\,Cooling\,Load - HeatPumpOutpu{t_{SpeedRatio}}}}{{Heat\,Pump\,Cooling\,Load}}
@@ -1767,17 +1784,23 @@ where:
 Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
-{\Delta_{sen,HighestSpeed}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} + \left( {{{\dot m}_{HighestSpeed}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {h_{Out,full\;load} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\begin{split}
+{\Delta_{sen,HighestSpeed}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} \\
++ \left( {{{\dot m}_{HighestSpeed}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {h_{Out,full\;load} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\end{split}
 \end{equation}
 
 where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\)** = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
-{\Delta_{sen,coil\;off}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} + \left( {{{\dot m}_{coil\;off}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,coil\;off}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\begin{split}
+{\Delta_{sen,coil\;off}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} \\
++ \left( {{{\dot m}_{coil\;off}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,coil\;off}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\end{split}
 \end{equation}
 
 If the heat pump's DX heating coil output full load at the highest speed is insufficient to meet the entire heating load, the remaining heating load is passed to the supplemental heating coil. If the heat pump model determines that the outdoor air temperature is below the minimum outdoor air temperature for compressor operation (specified by the user), the compressor is turned off and the entire heating load is passed to the supplemental gas or electric heating coil. The heat pump exiting air conditions and energy consumption are calculated and reported by the individual component models (fan, DX heating coil, and supplemental gas or electric heating coil).
@@ -1797,7 +1820,10 @@ where:
 Δ\(_{,}\) \(_{1}\)** = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
-{\Delta_{sen,Speed1}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} + \left( {{{\dot m}_{Speed1}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,full\;load}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\begin{split}
+{\Delta_{sen,Speed1}} = \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}{\left( {{h_{Out,full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }} \\
++ \left( {{{\dot m}_{Speed1}} - \frac{{{{\dot m}_{Zone\;Inlet}}}}{{Frac}}} \right){\left( {{h_{Out,full\;load}} - {h_{Control\;Zone}}} \right)_{HR\min }}
+\end{split}
 \end{equation}
 
 2.~~~~If the sensible heating energy rate delivered by the heat pump at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the heat pump is estimated.
@@ -1932,7 +1958,8 @@ If dehumidification controls are active, the leaving humidity ratio resulting fr
 
 \paragraph{Step 2a -- Humidity Control = MultiMode}\label{step-2a-humidity-control-multimode-1}
 
-If the humidity control type is MultiMode, then the coil's enhanced dehumidification mode is activated when the coil type is Coil:Cooling:DX:TwoStageWithHumidityControlMode or the heat exchanger is activated when the coil type is CoilSystem:Cooling:DX:CoolingHeatExchangerAssisted and Step 1 above is repeated to meet the sensible load using the coil performance resulting from the enhanced dehumidificaiton mode. This is a semi-passive approach to dehumidification which may fall short or may exceed the dehumidification requirement. If the user has specified Run on Latent Load = Yes in the CoilSystem:Cooling:DX object, and there is no sensible load to be met, then the system will try to meet the entire dehumidification load. If dehumidification mode should not be active when there is no sensible load, then choose Run on Latent Load = No.
+If the humidity control type is MultiMode, then the coil's enhanced dehumidification mode is activated when the coil type is Coil:Cooling:DX:TwoStageWithHumidityControlMode or the heat exchanger is activated when the coil type is \\
+CoilSystem:Cooling:DX:CoolingHeatExchangerAssisted and Step 1 above is repeated to meet the sensible load using the coil performance resulting from the enhanced dehumidificaiton mode. This is a semi-passive approach to dehumidification which may fall short or may exceed the dehumidification requirement. If the user has specified Run on Latent Load = Yes in the CoilSystem:Cooling:DX object, and there is no sensible load to be met, then the system will try to meet the entire dehumidification load. If dehumidification mode should not be active when there is no sensible load, then choose Run on Latent Load = No.
 
 \paragraph{Step 2b -- Humidity Control = CoolReheat}\label{step-2b-humidity-control-coolreheat-1}
 
@@ -2090,7 +2117,7 @@ There are two different models for water-to-air heat pump cooling and heating co
 
 \subsubsection{Single Speed Equation-Fit Model:}\label{single-speed-equation-fit-model}
 
-This section describes the equation-fit model for Water-to-Air heat pump ~(Object names: \textbf{Coil:Cooling:WaterToAirHeatPump:EquationFit} and \textbf{Coil:Heating:WaterToAirHeatPump:EquationFit}). This documentation is derived from the M.S. dissertation of Tang (2005) which is available on the Oklahoma State University web site . The model uses five non-dimensional equations or curves to predict the heat pump performance in cooling and heating mode. The methodology involved using the generalized least square method to generate a set of performance coefficients from the catalog data at indicated reference conditions. Then the respective coefficients and indicated reference conditions are used in the model to simulate the heat pump performance. The variables or inlet conditions that influenced the water-to-air heat pump performance are load side inlet water temperature, source side inlet temperature, source side water flow rate and load side water flow rate. The governing equations for the cooling and heating mode are as following:
+This section describes the equation-fit model for Water-to-Air heat pump ~(Object names: \textbf{Coil:Cooling:WaterToAirHeatPump:EquationFit} and \\ \textbf{Coil:Heating:WaterToAirHeatPump:EquationFit}). This documentation is derived from the M.S. dissertation of Tang (2005) which is available on the Oklahoma State University web site . The model uses five non-dimensional equations or curves to predict the heat pump performance in cooling and heating mode. The methodology involved using the generalized least square method to generate a set of performance coefficients from the catalog data at indicated reference conditions. Then the respective coefficients and indicated reference conditions are used in the model to simulate the heat pump performance. The variables or inlet conditions that influenced the water-to-air heat pump performance are load side inlet water temperature, source side inlet temperature, source side water flow rate and load side water flow rate. The governing equations for the cooling and heating mode are as following:
 
 Cooling Mode:
 
@@ -2242,7 +2269,8 @@ If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-pr
 
 \subsubsection{Parameter Estimation Model}\label{parameter-estimation-model}
 
-The steady state simulation model (Object: AirLoopHVAC:UnitaryHeatPump:WaterToAir) for a water-to-air vapor compression heat pump is described in this section. The model is implemented under the air-loop manager similar to the algorithm discussed under AirLoopHVAC:UnitaryHeatPump. The heat pump `coil' objects (Coil:Cooling:WaterToAirHeatPump:ParameterEstimation and Coil:Heating:WaterToAirHeatPump:ParameterEstimation) actually consist of a steady state simulation of the unitary heat pump in cooling or heating mode respectively.~ This documentation is derived from the Ph.D.~dissertation of Hui Jin which is available on the Oklahoma State University web site . ~The model parameters, solution technique and solution algorithm are all identical to that of the water to water heat pump.~ The only difference between the two models is in the modeling of the water to air heat exchanger.
+The steady state simulation model (Object: AirLoopHVAC:UnitaryHeatPump:WaterToAir) for a water-to-air vapor compression heat pump is described in this section. The model is implemented under the air-loop manager similar to the algorithm discussed under AirLoopHVAC:UnitaryHeatPump. The heat pump `coil' objects \\
+(Coil:Cooling:WaterToAirHeatPump:ParameterEstimation and Coil:Heating:WaterToAirHeatPump:ParameterEstimation) actually consist of a steady state simulation of the unitary heat pump in cooling or heating mode respectively.~ This documentation is derived from the Ph.D.~dissertation of Hui Jin which is available on the Oklahoma State University web site . ~The model parameters, solution technique and solution algorithm are all identical to that of the water to water heat pump.~ The only difference between the two models is in the modeling of the water to air heat exchanger.
 
 The effectiveness of this heat exchanger is given by
 

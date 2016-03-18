@@ -18,12 +18,17 @@ The sensible and latent air-to-air heat exchanger is typically used for exhaust 
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \caption{  Operating Conditions for Defining Heat Exchanger Performance \protect \label{table:operating-conditions-for-defining-heat}}\\
 \toprule 
-Parameter & Conditions \tabularnewline \midrule
+Parameter & Conditions \tabularnewline
+ & Heating & Cooling \tabularnewline \midrule
 \endhead
-Heating & Cooling \tabularnewline
-Entering supply air temperature:  Dry-bulb  Wet-bulb & 1.7°C (35°F)  0.6°C (33°F) & 35°C (95°F)  26°C (78°F) \tabularnewline
-Entering exhaust air temperature:  Dry-bulb  Wet-bulb & 21°C (70°F)  14°C (58°F) & 24°C (75°F)  17°C (63°F) \tabularnewline
-Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute’s Standard 1060 (ARI 2001). \tabularnewline
+Entering supply air temperature: \tabularnewline
+Dry-bulb & 1.7°C (35°F) & 35°C (95°F) \tabularnewline
+Wet-bulb & 0.6°C (33°F) & 26°C (78°F) \tabularnewline
+Entering exhaust air temperature: \tabularnewline
+Dry-bulb & 21°C (70°F) & 24°C (75°F) \tabularnewline
+Wet-bulb & 14°C (58°F) & 17°C (63°F) \tabularnewline
+\multicolumn{3}{l}{Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute’s}  \tabularnewline
+\multicolumn{3}{l}{Standard 1060 (ARI 2001).} \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -503,7 +508,7 @@ EnergyPlus has another air-to-air heat exchanger object for modeling sensible an
 
 This heat exchanger is a simple object that performs three basic functions:
 
-1.~~~~Informs the associated performance data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1) if it should calculate heat exchange for a simulation time step, or if heat exchange is suspended for the time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger),
+1.~~~~Informs the associated performance data type object (e.g., \\ HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1) if it should calculate heat exchange for a simulation time step, or if heat exchange is suspended for the time step (i.e., bypass air flow around a fixed-plate heat exchanger or stop the rotation of a rotary heat exchanger),
 
 2.~~~~Passes the process and regeneration air inlet conditions (e.g., dry-bulb temperature, humidity ratio, air mass flow rate) to the associated performance data type object, and
 
@@ -1108,13 +1113,14 @@ This model reuses much of the same code including the load aggregation and tempe
 
 Equation used for calculating the g-function temperature response factors for the horizontal Slinky HX are seen below.
 
+{\scriptsize
 \begin{equation}
 g_s\left(t\right) = \sum_{i = 1}^{N_{ring}} \sum_{j = 1}^{N_{ring}} \frac{R}{4\pi N_{ring}} \int_0^{2\pi} \int_0^{2\pi} 
             \left[ 
                 \frac{erfc\left(d\left(P_j,P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_j,P_i\right)} - 
                 \frac{erfc\left(\sqrt{d\left(P_j,P_i\right)^2+4h^2/\left(2\sqrt{\alpha t}\right)}\right)}{\sqrt{d\left(P_j,P_i\right)^2+4h^2} }
             \right]d\omega d\varphi
-\end{equation}
+\end{equation}}
 
 Where:
 
@@ -1152,21 +1158,25 @@ d\left(P_j,P_i\right) = \frac{d\left(P_{ii},P_j\right) + d\left(P_{io},P_j\right
 d\left(P_{j'},P_i\right) = \frac{d\left(P_{ii},P_{j'}\right) + d\left(P_{io},P_{j'}\right)}{2}
 \end{equation}
 
+{\scriptsize
 \begin{equation}
 d\left(P_{ii},P_j\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R-r\right)\sin \varphi - z_{0j}-R\sin \omega\right]^2}
-\end{equation}
+\end{equation}}
 
+{\scriptsize
 \begin{equation}
 d\left(P_{io},P_j\right) = \sqrt{\left[x_{0i} + \left(R+r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R+r\right)\sin \varphi - z_{0j}-R\sin \omega\right]^2}
-\end{equation}
+\end{equation}}
 
+{\scriptsize
 \begin{equation}
 d\left(P_{ii},P_{j'}\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R-r\right)\sin \varphi - z_{0j} - 2h - R\sin \omega\right]^2}
-\end{equation}
+\end{equation}}
 
+{\scriptsize
 \begin{equation}
 d\left(P_{io},P_{j'}\right) = \sqrt{\left[x_{0i} + \left(R+r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R+r\right)\sin \varphi - z_{0j} - 2h - R\sin \omega\right]^2}
-\end{equation}
+\end{equation}}
 
 \subsubsection{Model Simplifications for Computational Efficiency}\label{model-simplifications-for-computational-efficiency}
 
