@@ -56,6 +56,7 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+
 // C++ Headers
 #include <cmath>
 
@@ -217,8 +218,8 @@ namespace VariableSpeedCoils {
 	void
 	clear_state()
 	{
-		NumWatertoAirHPs = 0;
-		GetCoilsInputFlag = true ;
+		NumWatertoAirHPs = 0; 
+		GetCoilsInputFlag = true ; 
 		SourceSideMassFlowRate = 0.0;
 		SourceSideInletTemp = 0.0;
 		SourceSideInletEnth = 0.0;
@@ -232,12 +233,12 @@ namespace VariableSpeedCoils {
 		LoadSideOutletEnth = 0.0;
 		QSensible = 0.0;
 		QLoadTotal = 0.0;
-		QLatRated = 0.0;
-		QLatActual = 0.0;
-		QSource = 0.0;
-		Winput = 0.0;
+		QLatRated = 0.0; 
+		QLatActual = 0.0; 
+		QSource = 0.0; 
+		Winput = 0.0; 
 		PLRCorrLoadSideMdot = 0.0;
-		VSHPWHHeatingCapacity = 0.0;
+		VSHPWHHeatingCapacity = 0.0; 
 		VSHPWHHeatingCOP = 0.0;
 		VarSpeedCoil.deallocate();
 	}
@@ -508,6 +509,7 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
+			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false; 
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPCoolingEquationFit;
@@ -883,6 +885,7 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
+			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_CoolingAirToAirVariableSpeed;
@@ -896,6 +899,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
+			if ((VarSpeedCoil(DXCoilNum).AirInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).AirOutletNodeNum > 0)) // IHP allows no node inputs for coil
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
@@ -1232,6 +1236,7 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
+			VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "HEATING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPHeatingEquationFit;
@@ -1587,6 +1592,7 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
+			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "HEATING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_HeatingAirToAirVariableSpeed;
@@ -1598,6 +1604,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
+			if ((VarSpeedCoil(DXCoilNum).AirInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).AirOutletNodeNum > 0)) // IHP allows no node inputs for coil
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
@@ -1914,6 +1921,7 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
+			VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
 			VarSpeedCoil(DXCoilNum).CondenserType = WaterHeater;
 			VarSpeedCoil(DXCoilNum).CoolHeatType = "WATERHEATING";
 			VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum = CoilDX_HeatPumpWaterHeaterVariableSpeed;
@@ -2018,16 +2026,18 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
+			if ((VarSpeedCoil(DXCoilNum).AirInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).AirOutletNodeNum > 0)) // IHP allows no node inputs for coil
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
 			VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum );
-
+			
 			//Water nodes
 			VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
 			VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
+			if ((VarSpeedCoil(DXCoilNum).WaterInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).WaterOutletNodeNum > 0)) // IHP allows no node inputs for coil
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(7), AlphArray(8), "Water Nodes");
 
 			VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(10);
@@ -2330,7 +2340,7 @@ namespace VariableSpeedCoils {
 			SetupOutputVariable("Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergySensible, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergyLatent, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Water Side Heat Transfer Energy [J]", VarSpeedCoil(DXCoilNum).EnergySource, "System", "Summed", VarSpeedCoil(DXCoilNum).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System");
-
+			
 			if( VarSpeedCoil( DXCoilNum ).IsDXCoilInZone ){
 				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			} else {
@@ -2720,6 +2730,14 @@ namespace VariableSpeedCoils {
 		if ( BeginEnvrnFlag && MyEnvrnFlag( DXCoilNum ) && ! MyPlantScanFlag( DXCoilNum ) ) {
 			// Do the initializations to start simulation
 
+			//check air side nodes
+			if ((0 == VarSpeedCoil(DXCoilNum).AirInletNodeNum) || (0 == VarSpeedCoil(DXCoilNum).AirOutletNodeNum)) {
+				ShowFatalError("InitVarSpeedCoil: Invalid inlet or outlet air node" + TrimSigDigits(DXCoilNum) +
+					", Inlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).AirInletNodeNum) + 
+					", Outlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).AirOutletNodeNum));
+			}
+
+
 			AirInletNode = VarSpeedCoil( DXCoilNum ).AirInletNodeNum;
 
 			//Initialize all report variables to a known state at beginning of simulation
@@ -2753,6 +2771,15 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).FanDelayTime = FanDelayTime;
 
 			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) ) {
+				
+				//check water side nodes
+				if ((0 == VarSpeedCoil(DXCoilNum).WaterInletNodeNum) || (0 == VarSpeedCoil(DXCoilNum).WaterOutletNodeNum)) {
+					ShowFatalError("InitVarSpeedCoil: Invalid inlet or outlet water node" + TrimSigDigits(DXCoilNum) +
+						", Inlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).WaterInletNodeNum) +
+						", Outlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).WaterOutletNodeNum));
+				}
+				
+				
 				WaterInletNode = VarSpeedCoil( DXCoilNum ).WaterInletNodeNum;
 
 				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
@@ -4000,6 +4027,7 @@ namespace VariableSpeedCoils {
 		Real64 RhoWater; // condensed water density
 		Real64 SpecHumIn; // inlet air specific humidity
 		Real64 SpecHumOut; // outlet air specific humidity
+		Real64 rhoair(0);//entering air density
 
 		if ( firstTime ) {
 			//Set indoor air conditions to the rated condition
@@ -4403,6 +4431,8 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil( DXCoilNum ).RunFrac = RuntimeFrac;
 		VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
 		VarSpeedCoil( DXCoilNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
+		rhoair = PsyRhoAirFnPbTdbW(OutBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName);
+		VarSpeedCoil(DXCoilNum).AirVolFlowRate = VarSpeedCoil(DXCoilNum).AirMassFlowRate / rhoair; 
 
 		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = 0.0;
@@ -4531,6 +4561,8 @@ namespace VariableSpeedCoils {
 		int CondOutletNode; // Condenser water outlet node number
 		int MaxSpeed; // maximum speed level
 		int SpeedCal; // calculated speed level
+		Real64 rhoair(0.0);//entering air density
+		Real64 RhoWater(0.0);//water density
 
 		//note: load side is the evaporator side, and source side is the condenser side
 
@@ -4599,6 +4631,16 @@ namespace VariableSpeedCoils {
 		SourceSideInletTemp = InletWaterTemp;
 		SourceSideInletEnth = Node(CondInletNode).Enthalpy;
 		VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = SourceSideInletEnth;
+
+		//Check for flows, do not perform simulation if no flow in load side or source side.
+		if ((SourceSideMassFlowRate <= 0.0) || (LoadSideMassFlowRate <= 0.0)) {
+			VarSpeedCoil(DXCoilNum).SimFlag = false;
+			return;
+		}
+		else {
+			VarSpeedCoil(DXCoilNum).SimFlag = true;
+		}
+
 
 		MaxSpeed = VarSpeedCoil(DXCoilNum).NumOfSpeeds;
 
@@ -4749,6 +4791,7 @@ namespace VariableSpeedCoils {
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
 			Winput = OperatingHeatingCapacity / COP;
+			OperatingHeatingPower = Winput;
 			Winput1 = Winput;
 			WHCAP1 = OperatingHeatingCapacity;
 
@@ -4760,8 +4803,7 @@ namespace VariableSpeedCoils {
 			COPAirFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(SpeedCal), AirMassFlowRatio);
 			COPWaterFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
 
-			COP = (1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal)) * COPTempModFac *
-				COPAirFFModFac * COPWaterFFModFac;
+			COP = VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) * COPTempModFac * COPAirFFModFac * COPWaterFFModFac;
 
 			TOTCAPTempModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal),
 				InletAirTemp, SourceSideInletTemp);
@@ -4776,6 +4818,7 @@ namespace VariableSpeedCoils {
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
 			Winput = OperatingHeatingCapacity / COP;
+			OperatingHeatingPower = Winput;
 
 			Winput2 = Winput;
 			WHCAP2 = OperatingHeatingCapacity;
@@ -4847,15 +4890,21 @@ namespace VariableSpeedCoils {
 		if (EvapInletNode != 0) {
 			if (CBFSpeed > 0.999) CBFSpeed = 0.999;
 
-			hDelta = QLoadTotal / LoadSideMassFlowRate;
-			hADP = LoadSideInletEnth - hDelta / (1.0 - CBFSpeed);
-			tADP = PsyTsatFnHPb(hADP, LoadPressure, RoutineName);
-			wADP = PsyWFnTdbH(tADP, hADP, RoutineName);
-			hTinwADP = PsyHFnTdbW(LoadSideInletDBTemp, wADP);
-			if ((LoadSideInletEnth - hADP) > 1.e-10) {
-				SHR = min((hTinwADP - hADP) / (LoadSideInletEnth - hADP), 1.0);
-			} else {
-				SHR = 1.0;
+			if (CBFSpeed < 0.001){
+				SHR = 1.0; 
+			}
+			else{
+				hDelta = QLoadTotal / LoadSideMassFlowRate;
+				hADP = LoadSideInletEnth - hDelta / (1.0 - CBFSpeed);
+				tADP = PsyTsatFnHPb(hADP, LoadPressure, RoutineName);
+				wADP = PsyWFnTdbH(tADP, hADP, RoutineName);
+				hTinwADP = PsyHFnTdbW(LoadSideInletDBTemp, wADP);
+				if ((LoadSideInletEnth - hADP) > 1.e-10) {
+					SHR = min((hTinwADP - hADP) / (LoadSideInletEnth - hADP), 1.0);
+				}
+				else {
+					SHR = 1.0;
+				}
 			}
 		}
 
@@ -4955,11 +5004,29 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil(DXCoilNum).RunFrac = RuntimeFrac;
 		VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
 		VarSpeedCoil(DXCoilNum).AirMassFlowRate = PLRCorrLoadSideMdot;
-
+		rhoair = PsyRhoAirFnPbTdbW(OutBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName);
+		VarSpeedCoil(DXCoilNum).AirVolFlowRate = VarSpeedCoil(DXCoilNum).AirMassFlowRate / rhoair;
 		VarSpeedCoil(DXCoilNum).WaterMassFlowRate = SourceSideMassFlowRate;
+		RhoWater = RhoH2O(InletWaterTemp); // initialize
+		VarSpeedCoil(DXCoilNum).WaterVolFlowRate = VarSpeedCoil(DXCoilNum).WaterMassFlowRate / RhoWater;
+
 		VarSpeedCoil(DXCoilNum).OutletWaterTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpWater);
 		VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SourceSideMassFlowRate;
 		VarSpeedCoil(DXCoilNum).QWasteHeat = 0.0;
+
+		if (true == VarSpeedCoil(DXCoilNum).bIsDesuperheater)//desuperheater doesn't save power and cooling energy variables
+		{
+			//source side is the water side; load side is the air side
+			VarSpeedCoil(DXCoilNum).Power = 0.0;
+			VarSpeedCoil(DXCoilNum).QLoadTotal = 0.0;
+			VarSpeedCoil(DXCoilNum).QSensible = 0.0;
+			VarSpeedCoil(DXCoilNum).QLatent = 0.0;
+			VarSpeedCoil(DXCoilNum).Energy = 0.0;
+			VarSpeedCoil(DXCoilNum).EnergyLoadTotal = 0.0;
+			VarSpeedCoil(DXCoilNum).EnergySensible = 0.0;
+			VarSpeedCoil(DXCoilNum).EnergyLatent = 0.0;
+			VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption = 0.0; 
+		}
 	}
 
 	void
@@ -5043,6 +5110,7 @@ namespace VariableSpeedCoils {
 		Real64 QWasteHeat2; // recoverable waste heat at high speed
 		Real64 PLF; // part-load function
 		Real64 ReportingConstant;
+		Real64 rhoair(0.0);//entering air density
 
 		// ADDED VARIABLES FOR air source coil
 		static Real64 OutdoorCoilT( 0.0 ); // Outdoor coil temperature (C)
@@ -5382,6 +5450,8 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil( DXCoilNum ).RunFrac = RuntimeFrac;
 		VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
 		VarSpeedCoil( DXCoilNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
+		rhoair = PsyRhoAirFnPbTdbW(OutBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName);
+		VarSpeedCoil(DXCoilNum).AirVolFlowRate = VarSpeedCoil(DXCoilNum).AirMassFlowRate / rhoair;
 
 		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = 0.0;
@@ -5537,7 +5607,7 @@ namespace VariableSpeedCoils {
 		IndexNum = FindItemInList( CoilName, VarSpeedCoil );
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
+		//	ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );//screen the message for IHP coil call
 			ErrorsFound = true;
 		}
 
@@ -5832,6 +5902,124 @@ namespace VariableSpeedCoils {
 
 		return NodeNumber;
 
+	}
+
+	void SetAirNodes(std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound, // set to true if problem
+		int const InNode,
+		int const OutNode
+		)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bo Shen
+		//       DATE WRITTEN   Jan 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		//pass air side nodes from an IHP parent object to the coil object
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and Allocates WatertoAirHP related parameters from input file
+		if (GetCoilsInputFlag) { //First time subroutine has been entered
+			GetVarSpeedCoilInput();
+			//    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
+			GetCoilsInputFlag = false;
+		}
+
+		WhichCoil = FindItemInList(CoilName, VarSpeedCoil);
+		if (WhichCoil != 0) {
+			VarSpeedCoil(WhichCoil).AirInletNodeNum = InNode;
+			VarSpeedCoil(WhichCoil).AirOutletNodeNum = OutNode;
+		}
+
+		if (WhichCoil == 0) {
+			ShowSevereError("SetAirNodes: Could not find Coil=\"" + CoilName + "\"");
+			ErrorsFound = true;
+		}
+	}
+
+	void SetWaterNodes(std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound, // set to true if problem
+		int const InNode,
+		int const OutNode
+		)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bo Shen
+		//       DATE WRITTEN   Jan 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		//pass water side nodes from an IHP parent object to the coil object
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and Allocates WatertoAirHP related parameters from input file
+		if (GetCoilsInputFlag) { //First time subroutine has been entered
+			GetVarSpeedCoilInput();
+			//    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
+			GetCoilsInputFlag = false;
+		}
+
+		WhichCoil = FindItemInList(CoilName, VarSpeedCoil);
+		if (WhichCoil != 0) {
+			VarSpeedCoil(WhichCoil).WaterInletNodeNum = InNode;
+			VarSpeedCoil(WhichCoil).WaterOutletNodeNum = OutNode;
+		}
+
+		if (WhichCoil == 0) {
+			ShowSevereError("SetAirNodes: Could not find Coil=\"" + CoilName + "\"");
+			ErrorsFound = true;
+		}
 	}
 
 	int
@@ -6493,30 +6681,38 @@ namespace VariableSpeedCoils {
 
 			}
 
-			//   Calculate apparatus dew point conditions using TotCap and CBF
-			hDelta = TotCapCalc / AirMassFlow;
-			hADP = InletEnthalpy - hDelta / ( 1.0 - CBF );
-			tADP = PsyTsatFnHPb( hADP, Pressure );
-			wADP = PsyWFnTdbH( tADP, hADP );
-			hTinwADP = PsyHFnTdbW( InletDryBulb, wADP );
-			SHRCalc = min( ( hTinwADP - hADP ) / ( InletEnthalpy - hADP ), 1.0 );
-			//   Check for dry evaporator conditions (win < wadp)
-			if ( wADP > InletHumRatCalc || ( Counter >= 1 && Counter < MaxIter ) ) {
-				if ( InletHumRatCalc == 0.0 ) InletHumRatCalc = 0.00001;
-				werror = ( InletHumRatCalc - wADP ) / InletHumRatCalc;
-				//     Increase InletHumRatCalc at constant inlet air temp to find coil dry-out point. Then use the
-				//     capacity at the dry-out point to determine exiting conditions from coil. This is required
-				//     since the TotCapTempModFac doesn't work properly with dry-coil conditions.
-				InletHumRatCalc = RF * wADP + ( 1.0 - RF ) * InletHumRatCalc;
-				InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure );
-				++Counter;
-				if ( std::abs( werror ) > Tolerance ) {
-					LoopOn = true; //go to 50   ! Recalculate with modified inlet conditions
-				} else {
+			if (CBF < 0.001) {
+				SHRCalc = 1.0; 
+				LoopOn = false;
+			}
+			else{
+				//   Calculate apparatus dew point conditions using TotCap and CBF
+				hDelta = TotCapCalc / AirMassFlow;
+				hADP = InletEnthalpy - hDelta / (1.0 - CBF);
+				tADP = PsyTsatFnHPb(hADP, Pressure);
+				wADP = PsyWFnTdbH(tADP, hADP);
+				hTinwADP = PsyHFnTdbW(InletDryBulb, wADP);
+				SHRCalc = min((hTinwADP - hADP) / (InletEnthalpy - hADP), 1.0);
+				//   Check for dry evaporator conditions (win < wadp)
+				if (wADP > InletHumRatCalc || (Counter >= 1 && Counter < MaxIter)) {
+					if (InletHumRatCalc == 0.0) InletHumRatCalc = 0.00001;
+					werror = (InletHumRatCalc - wADP) / InletHumRatCalc;
+					//     Increase InletHumRatCalc at constant inlet air temp to find coil dry-out point. Then use the
+					//     capacity at the dry-out point to determine exiting conditions from coil. This is required
+					//     since the TotCapTempModFac doesn't work properly with dry-coil conditions.
+					InletHumRatCalc = RF * wADP + (1.0 - RF) * InletHumRatCalc;
+					InletWetBulbCalc = PsyTwbFnTdbWPb(InletDryBulb, InletHumRatCalc, Pressure);
+					++Counter;
+					if (std::abs(werror) > Tolerance) {
+						LoopOn = true; //go to 50   ! Recalculate with modified inlet conditions
+					}
+					else {
+						LoopOn = false;
+					}
+				}
+				else {
 					LoopOn = false;
 				}
-			} else {
-				LoopOn = false;
 			}
 		}
 
@@ -6589,7 +6785,7 @@ namespace VariableSpeedCoils {
 		if ( ADiff >= EXP_LowerLimit ) {
 			CBFAdj = std::exp( ADiff );
 		} else {
-			CBFAdj = 0.0;
+			CBFAdj = 1.0e-6;
 		}
 
 		return CBFAdj;
@@ -6650,26 +6846,29 @@ namespace VariableSpeedCoils {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InletAirEnthalpy; // Enthalpy of inlet air to evaporator at given conditions [J/kg]
-		Real64 DeltaH( 0.0 ); // Enthalpy drop across evaporator at given conditions [J/kg]
-		Real64 DeltaT( 0.0 ); // Temperature drop across evaporator at given conditions [C]
-		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
-		Real64 OutletAirTemp( InletAirTemp ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
-		Real64 OutletAirEnthalpy; // Enthalpy of outlet air at given conditions [J/kg]
-		Real64 OutletAirHumRat( InletAirHumRat ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
-		Real64 OutletAirRH; // relative humidity of the outlet air
+		Real64 DeltaH(0.0); // Enthalpy drop across evaporator at given conditions [J/kg]
+		Real64 DeltaT(0.0); // Temperature drop across evaporator at given conditions [C]
+		Real64 DeltaHumRat(0.0); // Humidity ratio drop across evaporator at given conditions [kg/kg]
+		Real64 OutletAirTemp(0.0); // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 OutletAirEnthalpy(0.0); // Enthalpy of outlet air at given conditions [J/kg]
+		Real64 OutletAirHumRat(0.0); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
+		Real64 OutletAirRH(0.0); // relative humidity of the outlet air
 		Real64 Error; // Error term used in given coil bypass factor (CBF) calculations
 		Real64 ErrorLast; // Error term, from previous iteration
 		int Iter; // Iteration loop counter in CBF calculations
-		int IterMax( 50 ); // Maximum number of iterations in CBF calculations
+		int IterMax(50); // Maximum number of iterations in CBF calculations
 		Real64 ADPTemp; // Apparatus dewpoint temperature used in CBF calculations [C]
 		Real64 ADPHumRat; // Apparatus dewpoint humidity used in CBF calculations [kg/kg]
 		Real64 ADPEnthalpy; // Air enthalpy at apparatus dew point [J/kg]
 		Real64 DeltaADPTemp; // Change in Apparatus Dew Point used in CBF calculations [C]
-		Real64 SlopeAtConds( 0.0 ); // Slope (DeltaHumRat/DeltaT) at given conditions
-		Real64 Slope( 0.0 ); // Calculated Slope used while hunting for Tadp
+		Real64 SlopeAtConds(0.0); // Slope (DeltaHumRat/DeltaT) at given conditions
+		Real64 Slope(0.0); // Calculated Slope used while hunting for Tadp
 		Real64 Tolerance; // Convergence tolerance for CBF calculations
 		Real64 HTinHumRatOut; // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
 		static bool CBFErrors( false ); // Set to true if errors in CBF calculation, fatal at end of routine
+
+		OutletAirTemp = InletAirTemp;
+		OutletAirHumRat = InletAirHumRat;
 
 		DeltaH = TotCap / AirMassFlowRate;
 		InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
