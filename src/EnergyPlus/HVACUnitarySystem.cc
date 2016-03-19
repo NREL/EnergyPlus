@@ -426,17 +426,17 @@ namespace HVACUnitarySystem {
 		if ( present( HeatActive ) ) HeatActive = false;
 		if ( present( CoolActive ) ) CoolActive = false;
 
-		// MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
-		// temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
-		TempMassFlowRateMaxAvail = Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail;
-		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = UnitarySystem( UnitarySysNum ).DesignMassFlowRate;
-
 		FanSpeedRatio = 1.0;
 		if ( present( ZoneEquipment ) ) {
 			InitUnitarySystems( UnitarySysNum, 0, FirstHVACIteration, OAUnitNum, OAUCoilOutTemp );
 		} else {
 			InitUnitarySystems( UnitarySysNum, AirLoopNum, FirstHVACIteration, OAUnitNum, OAUCoilOutTemp );
 		}
+
+		// MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
+		// temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
+		TempMassFlowRateMaxAvail = Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail;
+		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = UnitarySystem( UnitarySysNum ).DesignMassFlowRate;
 
 		HXUnitOn = false;
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).ControlType );
