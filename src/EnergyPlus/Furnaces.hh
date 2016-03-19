@@ -56,6 +56,7 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+
 #ifndef Furnaces_hh_INCLUDED
 #define Furnaces_hh_INCLUDED
 
@@ -283,6 +284,7 @@ namespace Furnaces {
 		Array1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
 		Array1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
 		Array1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
+		bool bIsIHP;
 		int CompSpeedNum;
 		Real64 CompSpeedRatio;
 		int ErrIndexCyc;
@@ -423,6 +425,7 @@ namespace Furnaces {
 			CoolMassFlowRate( MaxSpedLevels, 0.0 ),
 			MSHeatingSpeedRatio( MaxSpedLevels, 0.0 ),
 			MSCoolingSpeedRatio( MaxSpedLevels, 0.0 ),
+			bIsIHP(false),
 			CompSpeedNum( 0 ),
 			CompSpeedRatio( 0.0 ),
 			ErrIndexCyc( 0 ),
@@ -438,7 +441,7 @@ namespace Furnaces {
 	// Functions
 
 	void
-	clear_state();
+		clear_state();
 
 	void
 	SimFurnace(
