@@ -851,7 +851,10 @@ Kutscher's relation was formulated for triangular hole layout, but based on Van 
 Van Decker et. al. extended Kutscher's measurements to include a wider range of collector parameters including plate thickness, pitch, suction velocities, and square hole patterns.~ Their model formulation differs from Kutscher's in that the model was built up from separate effectiveness models for the front, back, and holes of the collector.~ Their published correlation is:
 
 \begin{equation}
-{\varepsilon_{HX}} = \left[ {1 - \left( {1 + {{{\mathop{\rm Re}\nolimits} }_s}Max{{\left( {1.733{\mathop{\rm Re}\nolimits}_w^{ - {\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{2}}},0.02136} \right)}^{ - 1}}} \right)} \right] \times \left[ {1 - {{\left( {1 + 0.2273{\mathop{\rm Re}\nolimits}_b^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{2}}}} \right)}^{ - 1}}} \right] \times {e^{\left( { - 0.01895\frac{P}{D} - \frac{{20.62}}{{{{{\mathop{\rm Re}\nolimits} }_D}}}\frac{t}{D}} \right)}}
+\begin{split}
+{\varepsilon_{HX}} =& \left[ {1 - \left( {1 + {{{\mathop{\rm Re}\nolimits} }_s}Max{{\left( {1.733{\mathop{\rm Re}\nolimits}_w^{ - {\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{2}}},0.02136} \right)}^{ - 1}}} \right)} \right] \times \left[ {1 - {{\left( {1 + 0.2273{\mathop{\rm Re}\nolimits}_b^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{2}}}} \right)}^{ - 1}}} \right] \\
+&\times {e^{\left( { - 0.01895\frac{P}{D} - \frac{{20.62}}{{{{{\mathop{\rm Re}\nolimits} }_D}}}\frac{t}{D}} \right)}}
+\end{split}
 \end{equation}
 
 where,
@@ -950,9 +953,10 @@ All terms are positive for net flux to the collector except the heat exchanger t
 
 Substituting models into and solving for \({T_{s,coll}}\) ~yields the following equation when the UTSC is active (``on''):
 
+{\scriptsize
 \begin{equation}
 {T_{s,coll}} = \frac{{\left( {{I_s}\alpha  + {h_{r,atm}}{T_{amb}} + {h_{r,sky}}{T_{sky}} + {h_{r,gnd}}{T_{amb}} + {h_{r,plen}}{T_{so}} + {h_{c,wind}}{T_{amb}} + \frac{{\dot m{c_p}}}{A}{T_{amb}} - \frac{{\dot m{c_p}}}{A}\left( {1 - {\varepsilon_{HX}}} \right){T_{amb}} + {{q''}_{source}}} \right)}}{{\left( {{h_{r,atm}} + {h_{r,sky}} + {h_{r,gnd}} + {h_{r,plen}} + {h_{c,wind}} + \frac{{\dot m{c_p}}}{A}{\varepsilon_{HX}}} \right)}}
-\end{equation}
+\end{equation}}
 
 and substituting into yields the following equation when the UTSC is passive (``off''):
 
@@ -1104,7 +1108,7 @@ where z is the height of the centroid of the UTSC, z\(_{t}\) is the height of th
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Terrain-Dependent Coefficients (ASHRAE 2001). \protect \label{table:terrain-dependent-coefficients-ashrae-2001.-001}}\\
 \toprule 
-Terrain & Description & Exponent, a & Layer Thickness,d (m) \tabularnewline \midrule
+Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline \midrule
 \endhead
 1 & Flat, open country & 0.14 & 270 \tabularnewline
 2 & Rough, wooded country & 0.22 & 370 \tabularnewline

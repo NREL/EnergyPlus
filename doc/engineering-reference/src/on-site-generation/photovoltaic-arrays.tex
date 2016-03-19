@@ -17,7 +17,7 @@ The Generator:PV:Simple object describes about the simplest model for predicting
 \subsubsection{Mathematical Description}\label{mathematical-description}
 
 % table 89
-\begin{longtable}[c]{p{1.51in}p{4.48in}}
+\begin{longtable}[l]{p{1.2in}p{4.8in}}
 \caption{Nomenclature for Simple Photovoltaic model \label{table:nomenclature-for-simple-photovoltaic-model}} \tabularnewline
 \toprule 
 Mathematical variable & Description \tabularnewline
@@ -31,11 +31,11 @@ Mathematical variable & Description \tabularnewline
 \endhead
 
 P & Electrical power produced by photovoltaics [W] \tabularnewline
-A & Net area of surface~ [m  ] \tabularnewline
-f & Fraction of surface area with active solar cells [](\#section) \tabularnewline
-G & Total solar radiation incident on PV array [W/m  ] \tabularnewline
-h & Module conversion efficiency [](\#section) \tabularnewline
-h & DC to AC conversion efficiency~ [](\#section) \tabularnewline
+A\(_{surf}\) & Net area of surface~ [m\(^{2}\)] \tabularnewline
+f\(_{activ}\) & Fraction of surface area with active solar cells [] \tabularnewline
+G\(_{T}\) & Total solar radiation incident on PV array [W/m\(^{2}\)] \tabularnewline
+$\eta$\(_{cell}\) & Module conversion efficiency [] \tabularnewline
+$\eta$\(_{invert}\) & DC to AC conversion efficiency~ [] \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -60,7 +60,7 @@ The module employs a ``four-parameter'' equivalent circuit to model crystalline 
 The module determines PV current as a function of load voltage. Other OUTPUTS include current and voltage at the maximum power point along the IV curve, open-circuit voltage, short circuit current as well as electrical load met and unmet.
 
 % table 90
-\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\begin{longtable}[l]{p{1.2in}p{4.8in}}
 \caption{General Nomenclature for the PV model \label{table:general-nomenclature-for-the-pv-model}} \tabularnewline
 \toprule 
 Mathematical variable & Description \tabularnewline
@@ -73,49 +73,49 @@ Mathematical variable & Description \tabularnewline
 \midrule
 \endhead
 
-b & Slope of PV array [degrees] \tabularnewline
-g & Empirical PV curve-fitting parameter \tabularnewline
-e & Semiconductor bandgap [eV] \tabularnewline
-h & Module conversion efficiency \tabularnewline
-m & Temperature coefficient of short-circuit current [A/K] \tabularnewline
-m & Temperature coefficient of open-circuit voltage [V/K] \tabularnewline
-q & Angle of incidence for solar radiation [degrees] \tabularnewline
-ta & Module transmittance-absorptance product \tabularnewline
-ta & Module transmittance-absorptance product at normal incidence \tabularnewline
-G & Total radiation incident on PV array \tabularnewline
-G & Beam component of incident radiation \tabularnewline
-G & Diffuse component of incident radiation \tabularnewline
-G & Ground-reflected component of incident radiation \tabularnewline
-G & Incident radiation at NOCT conditions \tabularnewline
-G & Incident radiation at reference conditions \tabularnewline
+$\beta$ & Slope of PV array [degrees] \tabularnewline
+$\gamma$ & Empirical PV curve-fitting parameter \tabularnewline
+$\varepsilon$\(_{\gamma}\) & Semiconductor bandgap [eV] \tabularnewline
+$\eta$\(_{c}\) & Module conversion efficiency \tabularnewline
+$\mu$\(_{I\alpha\gamma}\) & Temperature coefficient of short-circuit current [A/K] \tabularnewline
+$\mu$\(_{\zeta}\)\(_o\)\(_{\gamma}\) & Temperature coefficient of open-circuit voltage [V/K] \tabularnewline
+$\theta$ & Angle of incidence for solar radiation [degrees] \tabularnewline
+$\tau\alpha$ & Module transmittance-absorptance product \tabularnewline
+$\tau\alpha$\(_{normal}\) & Module transmittance-absorptance product at normal incidence \tabularnewline
+G\(_{T}\) & Total radiation incident on PV array \tabularnewline
+G\(_{T,beam}\) & Beam component of incident radiation \tabularnewline
+G\(_{T,diff}\) & Diffuse component of incident radiation \tabularnewline
+G\(_{T,gnd}\) & Ground-reflected component of incident radiation \tabularnewline
+G\(_{T,NOCT}\) & Incident radiation at NOCT conditions \tabularnewline
+G\(_{T,ref}\) & Incident radiation at reference conditions \tabularnewline
 I & Current \tabularnewline
-I & Module photocurrent \tabularnewline
-I & Module photocurrent at reference conditions \tabularnewline
-I & Diode reverse saturation current \tabularnewline
-I & Diode reverse saturation current at reference conditions \tabularnewline
-I & Short-circuit current \tabularnewline
-I & Short-circuit current at reference conditions \tabularnewline
-I & Current at maximum power point along IV curve \tabularnewline
-I & Current at maximum power point along IV curve, reference conditions \tabularnewline
+I\(_{L}\) & Module photocurrent \tabularnewline
+I\(_{L,ref}\) & Module photocurrent at reference conditions \tabularnewline
+I\(_{o}\) & Diode reverse saturation current \tabularnewline
+I\(_{o,ref}\) & Diode reverse saturation current at reference conditions \tabularnewline
+I\(_{sc}\) & Short-circuit current \tabularnewline
+I\(_{sc,ref}\) & Short-circuit current at reference conditions \tabularnewline
+I\(_{mp}\) & Current at maximum power point along IV curve \tabularnewline
+I\(_{mp,ref}\) & Current at maximum power point along IV curve, reference conditions \tabularnewline
 IAM & Dimensionless incidence angle modifier \tabularnewline
 K & Boltzmann constant [J/K] \tabularnewline
 NP & Number of modules in parallel in array \tabularnewline
 NS & Number of modules in series in array \tabularnewline
-N & Number of individual cells in module \tabularnewline
+N\(_{s}\) & Number of individual cells in module \tabularnewline
 P & PV output power \tabularnewline
-P & PV output power at maximum power point along IV curve \tabularnewline
+P\(_{max}\) & PV output power at maximum power point along IV curve \tabularnewline
 Q & Electron charge constant \tabularnewline
-R & Module series resistance [W] \tabularnewline
-R & Module shunt resistance [W] \tabularnewline
-T­ & Module temperature [K] \tabularnewline
-T & Module temperature at NOCT conditions [K] \tabularnewline
-T & Module temperature at reference conditions [K] \tabularnewline
-U & Array thermal loss coefficient \tabularnewline
+R\(_{s}\) & Module series resistance [$\Omega$] \tabularnewline
+R\(_{sh}\) & Module shunt resistance [$\Omega$] \tabularnewline
+T\(_{c}\)­ & Module temperature [K] \tabularnewline
+T\(_{c,NOCT}\) & Module temperature at NOCT conditions [K] \tabularnewline
+T\(_{c,ref}\) & Module temperature at reference conditions [K] \tabularnewline
+U\(_{L}\) & Array thermal loss coefficient \tabularnewline
 V & Voltage \tabularnewline
-V & Voltage at maximum power point along IV curve \tabularnewline
-V & Voltage at maximum power point along IV curve, reference conditions \tabularnewline
-V­ & Open-circuit voltage \tabularnewline
-V & Open-circuit voltage at reference conditions [V] \tabularnewline
+V\(_{mp}\) & Voltage at maximum power point along IV curve \tabularnewline
+V\(_{mp,ref}\) & Voltage at maximum power point along IV curve, reference conditions \tabularnewline
+V\(_{oc}\)­ & Open-circuit voltage \tabularnewline
+V\(_{oc,ref}\) & Open-circuit voltage at reference conditions [V] \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -264,7 +264,7 @@ There are several climate and solar orientation inputs to the model that are man
 This section presents the mathematical description of the Sandia model from a draft report by King et, al. (2003). The core of the model predicts the performance of a single PV module. The following nomenclature and equations summarize the Sandia model.
 
 % table 91
-\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\begin{longtable}[c]{p{1.2in}p{4.8in}}
 \caption{Nomenclature for Sandia PV model \label{table:nomenclature-for-sandia-pv-model}} \tabularnewline
 \toprule 
 Mathematical variable & Description \tabularnewline
@@ -277,58 +277,58 @@ Mathematical variable & Description \tabularnewline
 \midrule
 \endhead
 
-I & Short-circuit current (A) \tabularnewline
-I & Current at the maximum-power point (A) \tabularnewline
-I & Current at module V = 0.5 V  , defines 4th point on I-V curve \tabularnewline
-I & Current at module V = 0.5 (V   + V  ), defines a 5th point on the I-V curve \tabularnewline
-V & Open-circuit voltage (V) \tabularnewline
-V & Voltage at maximum-power point (V) \tabularnewline
-P & Power at maximum-power point (W) \tabularnewline
+I\(_{sc}\) & Short-circuit current (A) \tabularnewline
+I\(_{mp}\) & Current at the maximum-power point (A) \tabularnewline
+I\(_{x}\) & Current at module V = 0.5 V\(_{oc}\), defines 4th point on I-V curve \tabularnewline
+I\(_{xx}\) & Current at module V = 0.5 (V\(_{oc}\) + V\(_{mp}\)), defines a 5th point on the I-V curve \tabularnewline
+V\(_{oc}\) & Open-circuit voltage (V) \tabularnewline
+V\(_{mp}\) & Voltage at maximum-power point (V) \tabularnewline
+P\(_{mp}\) & Power at maximum-power point (W) \tabularnewline
 fd & Fraction of diffuse irradiance used by module \tabularnewline
-N & Number of cells in series in a module’s cell-string \tabularnewline
-N & Number of cell-strings in parallel in module \tabularnewline
+N\(_{s}\) & Number of cells in series in a module’s cell-string \tabularnewline
+N\(_{p}\) & Number of cell-strings in parallel in module \tabularnewline
 k & Boltzmann’s constant, 1.38066E-23 (J/k) \tabularnewline
 q & Elementary charge, 1.60218E-19 (coulomb) \tabularnewline
-T & Cell temperature inside module (°C) \tabularnewline
-σ(T  ) & ‘Thermal voltage’ per cell at temperature T  , approximately 1 volt for a typical 26-cell crystalline silicon module \tabularnewline
-E & ‘Effective’ solar irradiance \tabularnewline
-E & Beam solar irradiance \tabularnewline
-E & Diffuse solar irradiance \tabularnewline
-C   , C & Empirical coefficients relating I   to E   , C   + C   = 1 (both dimensionless) \tabularnewline
-C   , C & Empirical coefficients relating V   to E  (C   dimensionless, C   is 1/V) \tabularnewline
-C   , C & Empirical coefficients relating I   to E  , C   + C   = 1 (both dimensionless) \tabularnewline
-C   , C & Empirical coefficients relating I   to E   C   + C   = 1 (both dimensionless) \tabularnewline
+T\(_{c}\) & Cell temperature inside module (°C) \tabularnewline
+$\delta$(T\(_{c}\)) & ‘Thermal voltage’ per cell at temperature T\(_{c}\), approximately 1 volt for a typical 26-cell crystalline silicon module \tabularnewline
+E\(_{e}\) & ‘Effective’ solar irradiance \tabularnewline
+E\(_{b}\) & Beam solar irradiance \tabularnewline
+E\(_{diff}\) & Diffuse solar irradiance \tabularnewline
+C\(_{0}\), C\(_{1}\) & Empirical coefficients relating I\(_{mp}\) to E\(_{e}\), C\(_{0}\) + C\(_{1}\) = 1 (both dimensionless) \tabularnewline
+C\(_{2}\), C\(_{3}\) & Empirical coefficients relating V\(_{mp}\) to E\(_{e}\) (C\(_{2}\) dimensionless, C\(_{3}\) is 1/V) \tabularnewline
+C\(_{4}\), C\(_{5}\) & Empirical coefficients relating I\(_{x}\) to E\(_{e}\), C\(_{4}\) + C\(_{5}\) = 1 (both dimensionless) \tabularnewline
+C\(_{6}\), C\(_{7}\) & Empirical coefficients relating I\(_{xx}\) to E\(_{e}\) C\(_{6}\) + C\(_{7}\) = 1 (both dimensionless) \tabularnewline
 n & Empirically determined ‘diode factor’ for individual cells \tabularnewline
 AMa & Absolute Air Mas \tabularnewline
 AOI & Solar angle-of-incidence (degrees) from normal \tabularnewline
-f  (AM  ) & Empirical polynomial function used to relate short-circuit current to the solar spectrum via air mass \tabularnewline
-f  (AOI) & Empirical polynomial function used to relate short-circuit current to the solar angle-of-incidence \tabularnewline
-a  , a  , a  , a  , a & Empirical coefficients for f  (AM  ) polynomial \tabularnewline
-b  , b  , b  , b  , b  ,b  ,b & Empirical coefficients for f  (AOI) polynomial \tabularnewline
-T & Reference cell temperature for rating, typically fixed at 25°C \tabularnewline
-I & Short circuit current at reference conditions \tabularnewline
-I & Max power point current at reference conditions \tabularnewline
-V & Voltage at max power at reference conditions \tabularnewline
-V & Open circuit voltage at reference conditions \tabularnewline
-I & Current at V = 0.5 Voc and at reference conditions \tabularnewline
-I & Current at V = 0.5 (Vmp + Voc) and at reference conditions \tabularnewline
-α & Normalized temperature coefficient for I   (1/°C) \tabularnewline
-α & Normalized temperature coefficient for I   (1/°C) \tabularnewline
-β  (E  ) & Temperature coefficient for module open-circuit-voltage as function of E \tabularnewline
-β & Temperature coefficient for module open-circuit-voltage at reference conditions \tabularnewline
-m & Coefficient for irradiance dependence of open-circuit-voltage-temperature coefficient, often zero (V/°C) \tabularnewline
-β  (E  ) & Temperature coefficient for module maximum-power-voltage as a function of E \tabularnewline
-β & Temperature coefficient for module maximum-power-voltage at reference conditions \tabularnewline
-m & Cofficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/°C) \tabularnewline
-T & PV module temperature at back suface (°C) \tabularnewline
-T & Ambient outdoor drybulb temperature (°C) \tabularnewline
-E & Solar irradiance incident on module surface (W/m  ) \tabularnewline
+f\(_{1}\)(AM\(_{a}\)) & Empirical polynomial function used to relate short-circuit current to the solar spectrum via air mass \tabularnewline
+f\(_{2}\)(AOI) & Empirical polynomial function used to relate short-circuit current to the solar angle-of-incidence \tabularnewline
+a\(_{0}\), a\(_{1}\), a\(_{2}\), a\(_{3}\), a\(_{4}\) & Empirical coefficients for f\(_{1}\)(AM\(_{a}\)) polynomial \tabularnewline
+b\(_{0}\), b\(_{1}\), b\(_{2}\), b\(_{3}\), b\(_{4}\),b\(_{5}\),b\(_{6}\) & Empirical coefficients for f\(_{2}\)(AOI) polynomial \tabularnewline
+T\(_{o}\) & Reference cell temperature for rating, typically fixed at 25°C \tabularnewline
+I\(_{sco}\) & Short circuit current at reference conditions \tabularnewline
+I\(_{mpo}\) & Max power point current at reference conditions \tabularnewline
+V\(_{mpo}\) & Voltage at max power at reference conditions \tabularnewline
+V\(_{oco}\) & Open circuit voltage at reference conditions \tabularnewline
+I\(_{xo}\) & Current at V = 0.5 Voc and at reference conditions \tabularnewline
+I\(_{xxo}\) & Current at V = 0.5 (Vmp + Voc) and at reference conditions \tabularnewline
+$\alpha$\(_{Isc}\) & Normalized temperature coefficient for I\(_{sc}\) (1/°C) \tabularnewline
+$\alpha$\(_{Imp}\) & Normalized temperature coefficient for I\(_{mp}\) (1/°C) \tabularnewline
+$\beta$\(_{Voc}\)(E\(_{e}\)) & Temperature coefficient for module open-circuit-voltage as function of E\(_{e}\) \tabularnewline
+$\beta$\(_{Voco}\) & Temperature coefficient for module open-circuit-voltage at reference conditions \tabularnewline
+m\(_{\beta}\)\(_{Voco}\) & Coefficient for irradiance dependence of open-circuit-voltage-temperature coefficient, often zero (V/°C) \tabularnewline
+$\beta$\(_{Vmp}\)(E\(_{e}\)) & Temperature coefficient for module maximum-power-voltage as a function of E \tabularnewline
+$\beta$\(_{Vmpo}\) & Temperature coefficient for module maximum-power-voltage at reference conditions \tabularnewline
+m\(_{\beta}\)\(_{Voco}\) & Cofficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/°C) \tabularnewline
+T\(_{m}\) & PV module temperature at back suface (°C) \tabularnewline
+T\(_{a}\) & Ambient outdoor drybulb temperature (°C) \tabularnewline
+E & Solar irradiance incident on module surface (W/m\(^{2}\)) \tabularnewline
 WS & Wind speed at standard 10-m height (m/s) \tabularnewline
 a & Empirical coefficient relating module temperature at low wind and high solar irradiance \tabularnewline
 b & Empirical coefficient relating module temperature decrease with increasing wind speed \tabularnewline
-T & Temperature of solar cell inside module (°C) \tabularnewline
-E & Reference solar irradiance (1000 W/m  ) \tabularnewline
-δT & Temperature difference between T   and T  at E  (°C), (This is d(Tc) in Sandia database) \tabularnewline
+T\(_{c}\) & Temperature of solar cell inside module (°C) \tabularnewline
+E\(_{o}\) & Reference solar irradiance (1000 W/m\(^{2}\)) \tabularnewline
+$\Delta$T & Temperature difference between T\(_{c}\) and T\(_{m}\) at E\(_{o}\) (°C), (This is d(Tc) in Sandia database) \tabularnewline
 \bottomrule
 \end{longtable}
 

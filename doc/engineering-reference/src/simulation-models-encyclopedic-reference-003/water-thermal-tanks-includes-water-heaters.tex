@@ -450,7 +450,23 @@ Heat\,Pump\,Water\,Heater\,Compressor\,Part{\rm{ - }}Load\,Ratio = PLR\,\,
 Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P_{parasitic,on}}\left( {PLR} \right)
 \end{equation}
 
-\(Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasitic,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}\) \(Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P_{parasitic,off}}\left( {1 - PLR} \right)\) \(Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasitic,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)\)
+\begin{equation}
+\begin{split}
+Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \\{P_{parasitic,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \\{P_{parasitic,off}}\left( {1 - PLR} \right)
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \\{P_{parasitic,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)
+\end{split}
+\end{equation}
 
 where:
 
@@ -698,19 +714,19 @@ The volume a water heater can be sized in the following ways depending on the de
 \end{itemize}
 
 % table 85
-\begin{longtable}[c]{p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}p{0.46in}}
+\begin{longtable}[c]{p{0.8in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}}
 \caption{Residential HUD-FHA Minimum \protect \label{table:residential-hud-fha-minimum}}\\
 \toprule 
-Residential HUD-FHA Minimum DHW Storage and Burner Capacity (ASHRAE 1999) \tabularnewline \midrule
+\multicolumn{13}{c}{Residential HUD-FHA Minimum DHW Storage and Burner Capacity (ASHRAE 1999)} \tabularnewline \midrule
 \endhead
-\# Bedrooms & 1 & 2 & 3 & 4 & 5 & 6 \tabularnewline
-\# Bathrooms & All & <  = 1.5 & 2 - 2.5 & >  = 3 & <  = 1.5 & 2 - 2.5 & >  = 3 & <  = 1.5 & 2 - 2.5 & >  = 3 & All & All \tabularnewline
+\# Bedrooms & 1 & \multicolumn{3}{c}{2} & \multicolumn{3}{c}{3} & \multicolumn{3}{c}{4} & 5 & 6 \tabularnewline
+\# Bathrooms & All & <=1.5 & 2-2.5 & >=3 & <=1.5 & 2-2.5 & >=3 & <=1.5 & 2-2.5 & >=3 & All & All \tabularnewline
 Gas &  &  &  &  &  &  &  &  &  &  &  &  \tabularnewline
-Storage (gal) & 20 & 30 & 30 & 40 & 30 & 40 & 40 & 40 & 40 & 50 & 50 & 50 \tabularnewline
-Burner (kBtu/hr) & 27 & 36 & 36 & 36 & 36 & 36 & 38 & 36 & 38 & 38 & 47 & 50 \tabularnewline
+\;\;Storage (gal) & 20 & 30 & 30 & 40 & 30 & 40 & 40 & 40 & 40 & 50 & 50 & 50 \tabularnewline
+\;\;Burner (kBtu/hr) & 27 & 36 & 36 & 36 & 36 & 36 & 38 & 36 & 38 & 38 & 47 & 50 \tabularnewline
 Electric &  &  &  &  &  &  &  &  &  &  &  &  \tabularnewline
-Storage (gal) & 20 & 30 & 40 & 50 & 40 & 50 & 50 & 50 & 50 & 66 & 66 & 80 \tabularnewline
-Burner (kW) & 2.5 & 3.5 & 4.5 & 5.5 & 4.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 \tabularnewline
+\;\;Storage (gal) & 20 & 30 & 40 & 50 & 40 & 50 & 50 & 50 & 50 & 66 & 66 & 80 \tabularnewline
+\;\;Burner (kW) & 2.5 & 3.5 & 4.5 & 5.5 & 4.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 \tabularnewline
 \bottomrule
 \end{longtable}
 

@@ -1501,9 +1501,9 @@ Again, the condensing temperature is not allowed to fall below the system's mini
 
 \begin{equation}
   \begin{array}{rl}
-    0 &= C_2 \times HRCF^2 + \RB{C_1 + C_4 T_{wetbulb} - \PB{T_{condense} - T_{wetbulb}}} \times HRCF + C_3 \\
-    \text{Reduced Rated Heat Rejection} &= HRCF \times Hrej \\
-    \text{Air Volume Ratio} = \PB{\frac{\text{Reduced Rated Heat Rejection}}{Hrej_{Rated}}}^{1/N}
+    0 = C_2 \times HRCF^2 + \left( \RB{C_1 + C_4 T_{wetbulb} - \left( \PB{T_{condenser} - T_{wetbulb}}}\right) \right) \times HRCF + C_3 \\
+    \text{Reduced Rated Heat Rejection} = HRCF \times Hrej \\
+    \text{Air Volume Ratio} = \left( \PB{\frac{\text{Reduced Rated Heat Rejection}}{Hrej_{Rated}}}\right) ^{1/N}
   \end{array}
 \end{equation}
 

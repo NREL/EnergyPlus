@@ -263,7 +263,7 @@ The 4 pipe fan coil unit is modeled as a compound component consisting of 4 sub-
 \begin{enumerate}
   \item \emph{OutdoorAir:Mixer}
   \item \emph{Fan:ConstantVolume}
-  \item \emph{Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry,} or \emph{CoilSystem:Cooling:Water:HeatExchangerAssisted}
+  \item \emph{Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry,} or \\ \emph{CoilSystem:Cooling:Water:HeatExchangerAssisted}
   \item \emph{Coil:Heating:Water or Coil:Heating:Electric}
 \end{enumerate}
 
@@ -1790,11 +1790,12 @@ Relative humidity, \emph{r\(_{a}\)}, is also calculated from EnergyPlus weather 
 
 The soil thermal diffusivity (m\(^{2}\)/s), \emph{α\(_{s}\)}, and conductivity (W/m°C), \emph{k\(_{s}\)}, varies with the density and moisture content. From Table 3.3, pg. 26 of ASHRAE's Ground Source Heat Pumpss--Design of Geothermal Systems for Commercial and Institutional Buildings, 1997, the following values are recommended under different conditions.
 
-\begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+{\scriptsize
+\begin{longtable}[c]{p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}}
 \toprule 
- & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline \midrule
+ & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline
+Soil   Type & Dry Density  [kg/m3] & k  [W/m-K] & $\alpha$ [m2/s] & k  [W/m-K] & $\alpha$ [m2/s] & k  [W/m-K] & $\alpha$ [m2/s] & k  [W/m-K] & $\alpha$ [m2/s] \tabularnewline \midrule
 \endhead
-Soil   Type & Dry Density  [kg/m3] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] \tabularnewline
 Coarse 100\%  Sand & 1922 & 2.77 & 1.34E-06 & 2.94 & 1.24E-06 & 3.29 & 1.18E-06 &  &  \tabularnewline
  & 1602 & 1.90 & 1.18E-06 & 2.34 & 1.18E-06 & 2.51 & 1.08E-06 & 2.68 & 8.82E-07 \tabularnewline
  & 1281 & 1.38 & 1.18E-06 & 1.56 & 9.14E-07 & 1.56 & 8.06E-07 & 1.47 & 6.99E-07 \tabularnewline
@@ -1802,7 +1803,7 @@ Fine Grain  100\% Clay & 1922 & 1.21 & 5.91E-07 & 1.21 & 4.84E-07 & 1.64 & 5.70E
  & 1602 & 0.95 & 5.70E-07 & 0.95 & 4.73E-07 & 1.12 & 4.73E-07 & 1.21 & 5.16E-07 \tabularnewline
  & 1281 & 0.69 & 4.84E-07 & 0.74 & 4.62E-07 & 0.81 & 4.73E-07 & 0.87 & 4.09E-07 \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Annual angular frequency, \emph{w}, is equal to 1.992 x 10\(^{7}\)rad/s, and dampening depth (m), D, is calculated from the following equation:
 
@@ -1862,9 +1863,10 @@ In this expression, the unit of time, \emph{t}, and phase constant of the soil s
 
 By integrating the expression with respect to depth, the average temperature of a vertical soil profile ranging between depth z\(_{1}\) and z\(_{2}\) (°C ) can be determined as follows \(^{)}\).
 
+{\scriptsize
 \begin{equation}
 {T_{{z_1},{z_2},t}} = {T_m} + \frac{{{A_s}}}{{\left( {{z_2} - {z_1}} \right)\gamma \sqrt 2 }}\left\{ {{e^{ - \gamma {z_1}}}\cos \left[ {\frac{{2\pi }}{{{\rm{365}}}}\left( {t - {t_0} - {z_1}L - 45.6} \right)} \right] - {e^{ - \gamma {z_2}}}\cos \left[ {\frac{{2\pi }}{{{\rm{365}}}}\left( {t - {t_0} - {z_2}L - 45.6} \right)} \right]} \right\}
-\end{equation}
+\end{equation}}
 
 where,
 
@@ -1947,53 +1949,53 @@ where \emph{U\(_{t}\)} is overall heat transfer coefficient of the whole earth t
 Initial condition of inlet air temperature is equal to the ambient air temperature. Outlet air temperature is finally evaluated by solving the heat transfer equation above.
 
 % table 87
-\begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
+\begin{longtable}[c]{p{1.0in}p{3.5in}p{1.5in}}
 \caption{  Nomenclature for Earthtube Model \protect \label{table:nomenclature-for-earthtube-model}}\\
 \toprule 
 Variable & Description & Units \tabularnewline \midrule
 \endhead
-A & amplitude of the soil surface temperature variation & (°C) \tabularnewline
-C & specific heat of air & (J/kg°C) \tabularnewline
-h & convective heat transfer coefficient at the inner pipe surface & (W/m  °C) \tabularnewline
-h & convective heat transfer coefficient at the soil surface & (W/m  °C) \tabularnewline
-k & thermal conductivity of the air & (W/m°C) \tabularnewline
-k & pipe thermal conductivity & (W/m°C) \tabularnewline
-k & soil thermal conductivity & (W/m°C) \tabularnewline
+A\(_{s}\) & amplitude of the soil surface temperature variation & (°C) \tabularnewline
+C\(_{a}\) & specific heat of air & (J/kg°C) \tabularnewline
+h\(_{c}\) & convective heat transfer coefficient at the inner pipe surface & (W/m\(^{2}\)°C) \tabularnewline
+h\(_{s}\) & convective heat transfer coefficient at the soil surface & (W/m\(^{2}\)°C) \tabularnewline
+k\(_{air}\) & thermal conductivity of the air & (W/m°C) \tabularnewline
+k\(_{p}\) & pipe thermal conductivity & (W/m°C) \tabularnewline
+k\(_{s}\) & soil thermal conductivity & (W/m°C) \tabularnewline
 L & pipe length & (m) \tabularnewline
-m & mass flow rate of ambient air through pipe & (kg/s) \tabularnewline
-r & relative humidity & ~ \tabularnewline
-R & thermal resistance due to convection heat transfer between the air in the pipe and the pipe inner surface & (m-C/W) \tabularnewline
-R & thermal resistance due to conduction heat transfer between the pipe inner and outer surface & (m-C/W) \tabularnewline
-R & thermal resistance due to conduction heat transfer between the pipe outer surface and undisturbed soil & (m-C/W) \tabularnewline
-R & total thermal resistance between pipe air and soil & (m-C/W) \tabularnewline
-ΔR & radiation constant & (63W/m  ) \tabularnewline
-r & inner pipe radius & (m) \tabularnewline
-r & pipe thickness & (m) \tabularnewline
-r & distance between the pipe outer surface and undisturbed soil & (m) \tabularnewline
-S & average solar radiation & (W/m  ) \tabularnewline
-S & amplitude of the solar radiation & (W/m  ) \tabularnewline
+m\(_{a}\) & mass flow rate of ambient air through pipe & (kg/s) \tabularnewline
+r\(_{1}\) & relative humidity & ~ \tabularnewline
+R\(_{c}\) & thermal resistance due to convection heat transfer between the air in the pipe and the pipe inner surface & (m-C/W) \tabularnewline
+R\(_{p}\) & thermal resistance due to conduction heat transfer between the pipe inner and outer surface & (m-C/W) \tabularnewline
+R\(_{s}\) & thermal resistance due to conduction heat transfer between the pipe outer surface and undisturbed soil & (m-C/W) \tabularnewline
+R\(_{t}\) & total thermal resistance between pipe air and soil & (m-C/W) \tabularnewline
+ΔR & radiation constant & (63W/m\(^{2}\)) \tabularnewline
+r\(_{1}\) & inner pipe radius & (m) \tabularnewline
+r\(_{2}\) & pipe thickness & (m) \tabularnewline
+r\(_{3}\) & distance between the pipe outer surface and undisturbed soil & (m) \tabularnewline
+S\(_{m}\) & average solar radiation & (W/m\(^{2}\)) \tabularnewline
+S\(_{v}\) & amplitude of the solar radiation & (W/m\(^{2}\)) \tabularnewline
 t & time elapsed from beginning of calendar year & (days) \tabularnewline
-T  (y) & air temperature of the pipe at the distance y from the pipe inlet & (°C) \tabularnewline
-T & average soil surface temperature & (°C) \tabularnewline
-T & average air temperature & (°C) \tabularnewline
-t & phase constant of the soil surface & (sec; days) \tabularnewline
-t & phase constant of the air & (sec; days) \tabularnewline
-T & amplitude of the air temperature & (°C) \tabularnewline
-T & ground temperature at time t and depth z & (°C) \tabularnewline
-T & soil profile temperature at time t, averaged over depths between z   and z & (°C) \tabularnewline
+T\(_{a}\)(y) & air temperature of the pipe at the distance y from the pipe inlet & (°C) \tabularnewline
+T\(_{m}\) & average soil surface temperature & (°C) \tabularnewline
+T\(_{ma}\) & average air temperature & (°C) \tabularnewline
+t\(_{o}\) & phase constant of the soil surface & (sec; days) \tabularnewline
+t\(_{oa}\) & phase constant of the air & (sec; days) \tabularnewline
+T\(_{va}\) & amplitude of the air temperature & (°C) \tabularnewline
+T\(_{z,t}\) & ground temperature at time t and depth z & (°C) \tabularnewline
+T\(_{z1,z2,t}\) & soil profile temperature at time t, averaged over depths between z\(_{1}\) and z\(_{2}\) & (°C) \tabularnewline
 u & ~wind velocity above the ground surface & (m/s) \tabularnewline
-U & overall heat transfer coefficient of the whole earth tube system & (W/m-C) \tabularnewline
-V & average pipe air velocity & (m/s) \tabularnewline
+U\(_{t}\) & overall heat transfer coefficient of the whole earth tube system & (W/m-C) \tabularnewline
+V\(_{a}\) & average pipe air velocity & (m/s) \tabularnewline
 z & depth of the radial center of pipe below soil surface & (m) \tabularnewline
-z & upper bounds of some vertical profile in soil & (m) \tabularnewline
-z & lower bounds of some vertical profile in soil & (m) \tabularnewline
-α & soil thermal diffusivity & (m  /s; m  /days) \tabularnewline
-β & soil absorption coefficient ( = 1 – soil albedo) & ~ \tabularnewline
-ε & hemispherical emittance of the ground surface & ~ \tabularnewline
-φ & phase angle between the insolation and the air temperature & (rad) \tabularnewline
-Φ & phase angle difference between the air and soil surface temperature & (rad) \tabularnewline
-υ & kinetic viscosity of air & (m  /s) \tabularnewline
-w & annual angular frequency ( = 1.992 x 10  rad/s) & ~ \tabularnewline
+z\(_{1}\) & upper bounds of some vertical profile in soil & (m) \tabularnewline
+z\(_{2}\) & lower bounds of some vertical profile in soil & (m) \tabularnewline
+$\alpha$\(_{s}\) & soil thermal diffusivity & (m\(^{2}\)/s; m\(^{2}\)/days) \tabularnewline
+$\beta$ & soil absorption coefficient ( = 1 – soil albedo) & ~ \tabularnewline
+$\varepsilon$ & hemispherical emittance of the ground surface & ~ \tabularnewline
+$\varphi$\(_{1}\) & phase angle between the insolation and the air temperature & (rad) \tabularnewline
+$\phi$\(_{s}\) & phase angle difference between the air and soil surface temperature & (rad) \tabularnewline
+υ & kinetic viscosity of air & (m\(^{2}\)/s) \tabularnewline
+w & annual angular frequency ( = 1.992 x 10\(^{-7}\)rad/s) & ~ \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2103,50 +2105,50 @@ Where, \emph{Q\(_{n}\)} is the air flow rate passing through nth inlet (m\(^{3}\
 The discharged amount of interior air from each zone caused by the presence of the thermal chimney is assumed to be replaced by the outdoor air infiltration.
 
 % table 88
-\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\begin{longtable}[l]{p{1.5in}p{4.5in}}
 \caption{Nomenclature of Thermal Chimney Model \protect \label{table:nomenclature-of-thermal-chimney-model}}\\
 \toprule 
 Model Nomenclature \tabularnewline \midrule
 \endhead
 Variable & Description \tabularnewline
-A & cross sectional area of air channel inlet (m 2 ) \tabularnewline
-A & cross sectional area of air channel outlet (m 2 ) \tabularnewline
-C & discharge coefficient \tabularnewline
-C & specific heat of air (J/kg°C) \tabularnewline
-E & room air specific enthalpy corresponding to nth inlet (J/kg) \tabularnewline
-g & acceleration due to gravity (9.8 m/s 2 ) \tabularnewline
-h & convective heat transfer coefficients between the glass and ambient air (W/m 2 °C ) \tabularnewline
-h & convective heat transfer coefficients between the glass and the fluid (W/m 2 °C ) \tabularnewline
-h & convective heat transfer coefficients between absorber wall inner surface and the room air (W/m 2 °C ) \tabularnewline
-h & convective heat transfer coefficients between the absorber wall and the fluid (W/m 2 °C ) \tabularnewline
-h & The convective heat transfer coefficient due to the wind (W/m 2 °C ) \tabularnewline
-H & incident solar radiation on vertical surface (W/m 2 ) \tabularnewline
-k & thermal conductivity of air (W/m°C) \tabularnewline
+A\(_{i}\) & cross sectional area of air channel inlet (m\(^{2}\)) \tabularnewline
+A\(_{o}\) & cross sectional area of air channel outlet (m\(^{2}\)) \tabularnewline
+C\(_{d}\) & discharge coefficient \tabularnewline
+C\(_{p}\) & specific heat of air (J/kg°C) \tabularnewline
+E\(_{n}\) & room air specific enthalpy corresponding to nth inlet (J/kg) \tabularnewline
+g & acceleration due to gravity (9.8 m/s\(^{2}\)) \tabularnewline
+h\(_{gam}\) & convective heat transfer coefficients between the glass and ambient air (W/m\(^{2}\)°C ) \tabularnewline
+h\(_{gf}\) & convective heat transfer coefficients between the glass and the fluid (W/m\(^{2}\)°C ) \tabularnewline
+h\(_{iw}\) & convective heat transfer coefficients between absorber wall inner surface and the room air (W/m\(^{2}\)°C ) \tabularnewline
+h\(_{wf}\) & convective heat transfer coefficients between the absorber wall and the fluid (W/m\(^{2}\)°C ) \tabularnewline
+h\(_{wind}\) & The convective heat transfer coefficient due to the wind (W/m\(^{2}\)°C ) \tabularnewline
+H\(_{sr}\) & incident solar radiation on vertical surface (W/m\(^{2}\)) \tabularnewline
+k\(_{air}\) & thermal conductivity of air (W/m°C) \tabularnewline
 L & total length of the thermal chimney (m) \tabularnewline
 M & mass flow rate of the air (kg/s) \tabularnewline
-r & relative ratio of air flow rate passing through nth inlet \tabularnewline
-S & solar radiation absorbed by the glass cover (W/m 2 ) \tabularnewline
-S & solar radiation absorbed by the absorber wall (W/m 2 ) \tabularnewline
-T & ambient air temperature (K) \tabularnewline
-T & fluid temperature averaged over the entire length of the thermal chimney (K) \tabularnewline
-T & inlet air temperature of the thermal chimney (K) \tabularnewline
-T & outlet air temperature of the thermal chimney (K) \tabularnewline
-T & glass cover temperature (K) \tabularnewline
-T & room air temperature (K) \tabularnewline
-T & surface temperature (K) \tabularnewline
-T & absorber wall temperature (K) \tabularnewline
-T & fluid temperature (K) \tabularnewline
+r\(_{n}\) & relative ratio of air flow rate passing through nth inlet \tabularnewline
+S\(_{g}\) & solar radiation absorbed by the glass cover (W/m\(^{2}\)) \tabularnewline
+S\(_{w}\) & solar radiation absorbed by the absorber wall (W/m\(^{2}\)) \tabularnewline
+T\(_{am}\) & ambient air temperature (K) \tabularnewline
+T\(_{f}\) & fluid temperature averaged over the entire length of the thermal chimney (K) \tabularnewline
+T\(_{fi}\) & inlet air temperature of the thermal chimney (K) \tabularnewline
+T\(_{fo}\) & outlet air temperature of the thermal chimney (K) \tabularnewline
+T\(_{g}\) & glass cover temperature (K) \tabularnewline
+T\(_{r}\) & room air temperature (K) \tabularnewline
+T\(_{s}\) & surface temperature (K) \tabularnewline
+T\(_{w}\) & absorber wall temperature (K) \tabularnewline
+T\(_{\infty}\) & fluid temperature (K) \tabularnewline
 u & wind speed (m/s) \tabularnewline
-U & Overall heat transfer coefficient from the room air and the absorber wall (W/m 2 °C ) \tabularnewline
+U\(_{w}\) & Overall heat transfer coefficient from the room air and the absorber wall (W/m\(^{2}\)°C ) \tabularnewline
 w & width of the absorber wall (m) \tabularnewline
 x & elemental length of the absorber wall (m) \tabularnewline
-alpha & absorptance of glass cover \tabularnewline
-alpha & absorptance of absorber wall \tabularnewline
-beta & air volumetric coefficient of expansion (K -1 ) \tabularnewline
-epsilon & emissivity of the glass cover \tabularnewline
-sigma & Stefan-Boltzmann constant (5.67x10 -8 W/m 2 K 4 ) \tabularnewline
-T & transmittance of the glass cover \tabularnewline
-nu & kinematic viscosity of air (m 2 /s) \tabularnewline
+$\alpha$\(_{g}\) & absorptance of glass cover \tabularnewline
+$\alpha$\(_{w}\) & absorptance of absorber wall \tabularnewline
+$\beta$ & air volumetric coefficient of expansion (K\(^{-1}\)) \tabularnewline
+$\varepsilon$\(_{g}\) & emissivity of the glass cover \tabularnewline
+$\sigma$ & Stefan-Boltzmann constant (5.67x10 -8 W/m\(^{2}\)K\(^{4}\)) \tabularnewline
+$\tau$ & transmittance of the glass cover \tabularnewline
+$\nu$ & kinematic viscosity of air (m\(^{2}\)/s) \tabularnewline
 \bottomrule
 \end{longtable}
 
