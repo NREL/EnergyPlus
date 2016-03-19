@@ -1567,7 +1567,10 @@ Heat\;Pump\;Cooling\;Load = \frac{{Control\;Zone\;Cooling\;Load}}{{Control\;Zone
 The model then calculates the heat pump's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multispeed DX cooling coil. The multispeed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the heat pump is calculated as follows:
 
 \begin{equation}
-\(FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}}\) \(NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,coil\;off}}\)
+FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}} \end{equation}
+
+\begin{equation}
+NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,coil\;off}}
 \end{equation}
 
 where:
