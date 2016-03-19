@@ -56,6 +56,7 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+
 #ifndef WaterThermalTanks_hh_INCLUDED
 #define WaterThermalTanks_hh_INCLUDED
 
@@ -232,6 +233,7 @@ namespace WaterThermalTanks {
 			HPWHWrappedCondenserHeatingFrac(0.0)
 		{}
 
+
 	};
 
 	struct WaterHeaterSizingData
@@ -281,6 +283,7 @@ namespace WaterThermalTanks {
 			TotalFloorArea( 0.0 ),
 			TotalSolarCollectorArea( 0.0 )
 		{}
+
 
 	};
 
@@ -769,6 +772,7 @@ namespace WaterThermalTanks {
 		Array1D< Real64 > HPWHWaterMassFlowRate; // water mass flow rate during heating operation
 		Array1D< Real64 > MSAirSpeedRatio; // air speed ratio in heating mode
 		Array1D< Real64 > MSWaterSpeedRatio; // water speed ratio in heating mode
+		bool bIsIHP; //whether the HP is a part of Integrated Heat Pump
 		//end of variables for variable-speed HPWH
 
 		// Default Constructor
@@ -874,7 +878,8 @@ namespace WaterThermalTanks {
 			HPWHWaterVolFlowRate( MaxSpedLevels, 0.0 ),
 			HPWHWaterMassFlowRate( MaxSpedLevels, 0.0 ),
 			MSAirSpeedRatio( MaxSpedLevels, 0.0 ),
-			MSWaterSpeedRatio( MaxSpedLevels, 0.0 )
+			MSWaterSpeedRatio( MaxSpedLevels, 0.0 ),
+			bIsIHP(false)
 		{}
 
 	};
