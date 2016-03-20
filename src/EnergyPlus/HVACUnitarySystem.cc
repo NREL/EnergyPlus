@@ -210,11 +210,11 @@ namespace HVACUnitarySystem {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	Real64 const MinAirMassFlow( 0.001 );
-	int iterationCounter( 0 ); // track time step iterations
 
 	// Last mode of operation
 	int const CoolingMode( 1 ); // last compressor operating mode was in cooling
 	int const HeatingMode( 2 ); // last compressor operating mode was in heating
+	int const NoCoolHeat( 3 ); // last operating mode was no cooling or heating
 
 	// Compressor operation
 	int const On( 1 ); // normal compressor operation
@@ -873,7 +873,10 @@ namespace HVACUnitarySystem {
 
 		// get operating capacity of water and steam coil
 		if ( FirstHVACIteration || UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_CoolReheat ) {
-			iterationCounter = 0;
+			if ( FirstHVACIteration ) {
+				UnitarySystem( UnitarySysNum ).iterationCounter = 0;
+				UnitarySystem( UnitarySysNum ).iterationMode = 0;
+			}
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				//     set air-side and steam-side mass flow rates
 				mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow );
@@ -936,7 +939,7 @@ namespace HVACUnitarySystem {
 
 			} // from IF(UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingSteam) THEN
 		} // from IF( FirstHVACIteration ) THEN
-		iterationCounter += 1;
+		UnitarySystem( UnitarySysNum ).iterationCounter += 1;
 
 		if ( MySetPointCheckFlag( UnitarySysNum ) ) {
 			if ( ! SysSizingCalc && DoSetPointTest ) {
@@ -1334,6 +1337,10 @@ namespace HVACUnitarySystem {
 		Real64 SensOutputOff;
 		Real64 LatOutputOff;
 		bool HXUnitOn;
+		int OperatingMode; // track cooling, heating, and no cooling or heating modes
+		int OperatingModeMinusOne;
+		int OperatingModeMinusTwo;
+		bool Oscillate; // detection of oscillating operating modes
 
 		if ( InitLoadBasedControlOneTimeFlag ) {
 
@@ -1704,24 +1711,41 @@ namespace HVACUnitarySystem {
 			} else {
 			}}
 
+			if( UnitarySystem( UnitarySysNum ).iterationCounter > size( UnitarySystem( UnitarySysNum ).iterationMode ) ) {
+				UnitarySystem( UnitarySysNum ).iterationMode.allocate( size( UnitarySystem( UnitarySysNum ).iterationMode ) + 20 );
+			}
+			if( CoolingLoad ) {
+				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = CoolingMode;
+			} else if( HeatingLoad ) {
+				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = HeatingMode;
+			} else {
+				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = NoCoolHeat;
+			}
 			// IF small loads to meet or not converging, just shut down unit
 			if ( std::abs( ZoneLoad ) < Small5WLoad ) {
 				ZoneLoad = 0.0;
 				CoolingLoad = false;
 				HeatingLoad = false;
-			} else if( iterationCounter  > 4 ) { // attempt to lock output (air flow) if oscillations are detected
-				if( QToCoolSetPt < 0.0 ) {
-					HeatingLoad = false;
-					CoolingLoad = true;
-					ZoneLoad = QToCoolSetPt;
-				} else if( QToHeatSetPt > 0.0 ) {
-					HeatingLoad = true;
-					CoolingLoad = false;
-					ZoneLoad = QToHeatSetPt;
-				} else {
-					HeatingLoad = false;
-					CoolingLoad = false;
-					ZoneLoad = 0.0;
+			} else if ( UnitarySystem( UnitarySysNum ).iterationCounter > 4 )  { // attempt to lock output (air flow) if oscillations are detected
+				OperatingMode = UnitarySystem( UnitarySysNum ).iterationMode( 5 );
+				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 4 );
+				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 3 );
+				Oscillate = true;
+				if( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
+				if( Oscillate ) {
+					if( QToCoolSetPt < 0.0 ) {
+						HeatingLoad = false;
+						CoolingLoad = true;
+						ZoneLoad = QToCoolSetPt;
+					} else if( QToHeatSetPt > 0.0 ) {
+						HeatingLoad = true;
+						CoolingLoad = false;
+						ZoneLoad = QToHeatSetPt;
+					} else {
+						HeatingLoad = false;
+						CoolingLoad = false;
+						ZoneLoad = 0.0;
+					}
 				}
 			}
 
@@ -3102,6 +3126,7 @@ namespace HVACUnitarySystem {
 			CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 			UnitarySystem( UnitarySysNum ).UnitarySystemType = CurrentModuleObject;
 			UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
+			UnitarySystem( UnitarySysNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, UnitarySysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
