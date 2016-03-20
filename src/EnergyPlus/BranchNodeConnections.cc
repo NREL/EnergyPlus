@@ -665,6 +665,7 @@ namespace BranchNodeConnections {
 					}
 				}
 				if ( ! IsValid ) {
+					if (NodeConnections(Loop1).ObjectType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") continue;
 					ShowSevereError( "(Developer) Node Connection Error, Object=" + NodeConnections( Loop1 ).ObjectType + ':' + NodeConnections( Loop1 ).ObjectName );
 					ShowContinueError( "Object has multiple connections on both inlet and outlet fluid streams." );
 					for ( Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2 ) {
@@ -1859,6 +1860,7 @@ namespace BranchNodeConnections {
 			for ( Other = 1; Other <= NumCompSets; ++Other ) {
 				if ( Count == Other ) continue;
 				if ( CompSets( Count ).CType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) continue;
+				if (CompSets(Count).CType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") continue; // ingore the connnection error for IHP coil; Bo Shen, ORNL
 				if ( CompSets( Count ).CType != CompSets( Other ).CType || CompSets( Count ).CName != CompSets( Other ).CName ) continue;
 				if ( CompSets( Count ).Description != CompSets( Other ).Description ) {
 					if ( CompSets( Count ).Description != "UNDEFINED" && CompSets( Other ).Description != "UNDEFINED" ) continue;
@@ -1868,6 +1870,11 @@ namespace BranchNodeConnections {
 				if ( AlreadyNoted( Count ) ) continue;
 				//  All other values must match
 				AlreadyNoted( Other ) = true;
+
+				if ("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" == CompSets(Count).CType)	{
+					continue; //ignore the error for IHP objects, BOS, 03/2016
+				}
+
 				ShowSevereError( "Same component name and type has differing Node Names." );
 				ShowContinueError( "   Component:    " + CompSets( Count ).CType + ", name=" + CompSets( Count ).CName );
 				ShowContinueError( "   Nodes, inlet: " + CompSets( Count ).InletNodeName + ", outlet: " + CompSets( Count ).OutletNodeName );
