@@ -1711,14 +1711,11 @@ namespace HVACUnitarySystem {
 			} else {
 			}}
 
-			if( UnitarySystem( UnitarySysNum ).iterationCounter > size( UnitarySystem( UnitarySysNum ).iterationMode ) ) {
-				UnitarySystem( UnitarySysNum ).iterationMode.allocate( size( UnitarySystem( UnitarySysNum ).iterationMode ) + 20 );
-			}
-			if( CoolingLoad ) {
+			if ( CoolingLoad && UnitarySystem( UnitarySysNum ).iterationCounter <= 20 ) {
 				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = CoolingMode;
-			} else if( HeatingLoad ) {
+			} else if ( HeatingLoad && UnitarySystem( UnitarySysNum ).iterationCounter <= 20 ) {
 				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = HeatingMode;
-			} else {
+			} else if( UnitarySystem( UnitarySysNum ).iterationCounter <= 20 ) {
 				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = NoCoolHeat;
 			}
 			// IF small loads to meet or not converging, just shut down unit
@@ -1731,13 +1728,13 @@ namespace HVACUnitarySystem {
 				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 4 );
 				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 3 );
 				Oscillate = true;
-				if( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
-				if( Oscillate ) {
-					if( QToCoolSetPt < 0.0 ) {
+				if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
+				if ( Oscillate ) {
+					if ( QToCoolSetPt < 0.0 ) {
 						HeatingLoad = false;
 						CoolingLoad = true;
 						ZoneLoad = QToCoolSetPt;
-					} else if( QToHeatSetPt > 0.0 ) {
+					} else if ( QToHeatSetPt > 0.0 ) {
 						HeatingLoad = true;
 						CoolingLoad = false;
 						ZoneLoad = QToHeatSetPt;

@@ -5055,19 +5055,16 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).iterationMode = 0;
 		}
 		Furnace( FurnaceNum ).iterationCounter += 1;
-		if ( Furnace( FurnaceNum ).iterationCounter > size( Furnace( FurnaceNum ).iterationMode ) ) {
-			Furnace( FurnaceNum ).iterationMode.allocate( size( Furnace( FurnaceNum ).iterationMode ) + 20 );
-		}
 
-		if( CoolingLoad ) {
+		if ( CoolingLoad && Furnace( FurnaceNum ).iterationCounter  <= 20 ) {
 			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = CoolingMode;
-		} else if( HeatingLoad ) {
+		} else if ( HeatingLoad && Furnace( FurnaceNum ).iterationCounter <= 20 ) {
 			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = HeatingMode;
-		} else {
+		} else if ( Furnace( FurnaceNum ).iterationCounter <= 20 ) {
 			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = NoCoolHeat;
 		}
 		// IF small loads to meet or not converging, just shut down unit
-		if( std::abs( ZoneLoad ) < Small5WLoad ) {
+		if ( std::abs( ZoneLoad ) < Small5WLoad ) {
 			ZoneLoad = 0.0;
 			CoolingLoad = false;
 			HeatingLoad = false;
@@ -5076,13 +5073,13 @@ namespace Furnaces {
 			OperatingModeMinusOne = Furnace( FurnaceNum ).iterationMode( 4 );
 			OperatingModeMinusTwo = Furnace( FurnaceNum ).iterationMode( 3 );
 			Oscillate = true;
-			if( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
-			if( Oscillate ) {
-				if( QToCoolSetPt < 0.0 ) {
+			if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
+			if ( Oscillate ) {
+				if ( QToCoolSetPt < 0.0 ) {
 					HeatingLoad = false;
 					CoolingLoad = true;
 					ZoneLoad = QToCoolSetPt;
-				} else if( QToHeatSetPt > 0.0 ) {
+				} else if ( QToHeatSetPt > 0.0 ) {
 					HeatingLoad = true;
 					CoolingLoad = false;
 					ZoneLoad = QToHeatSetPt;
@@ -8176,7 +8173,7 @@ namespace Furnaces {
 
 		{ auto const SELECT_CASE_var( CoilTypeNum );
 		if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
-			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, _, SuppHeatingCoilFlag, FanMode );
+			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode );
 		} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 			if ( QCoilLoad > SmallLoad ) {
 				SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
