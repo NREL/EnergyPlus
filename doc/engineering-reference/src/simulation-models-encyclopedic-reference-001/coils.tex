@@ -2095,7 +2095,7 @@ Basin heater for the object Coil:Cooling:DX:MultiSpeed operates in the same mann
 
 \subsubsection{Standard Rating of Multi-Speed DX Cooling Coils}\label{standard-rating-of-multi-speed-dx-cooling-coils}
 
-For multi-speed direct expansion cooling coils, the industry standard ratings of Standard Rating Seasonal Energy Efficiency Ratio (SEER) are calculated according to ANSI/AHRI Standard 210/240 (AHRI 2008). These standard ratings can be calculated using the user-entered information for the Coil:Cooling:DX:MultiSpeed object.~ According to Standard 210/240, the Standard Rating SEER applies to air-to-air unitary heat pumps and air conditions with rated cooling capacities under 19,000 Watts (\textless{}65,000 Btu/h). The Cooling Mode Test Conditions for Units Having two-capacity Compressor standard tests A\(_{2}\), B\(_{2}\), B\(_{1}\), and F\(_{1}\) are also provided in Table~\ref{table:cooling-mode-test-conditions-for-units-having}. Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor. The equations required to calculate the net cooling capacity and SEER value are described next.
+For multi-speed direct expansion cooling coils, the industry standard ratings of Standard Rating Seasonal Energy Efficiency Ratio (SEER) are calculated according to ANSI/AHRI Standard 210/240 (AHRI 2008). These standard ratings can be calculated using the user-entered information for the Coil:Cooling:DX:MultiSpeed object. According to Standard 210/240, the Standard Rating SEER applies to air-to-air unitary heat pumps and air conditions with rated cooling capacities under 19,000 Watts (\textless{}65,000 Btu/h). The Cooling Mode Test Conditions for Units Having two-capacity Compressor standard tests A\(_{2}\), B\(_{2}\), B\(_{1}\), and F\(_{1}\) are also provided in Table~\ref{table:cooling-mode-test-conditions-for-units-having}. Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor. The equations required to calculate the net cooling capacity and SEER value are described next.
 
 \subsubsection{Standard Rating Cooling Capacity}\label{standard-rating-cooling-capacity}
 
@@ -2342,21 +2342,25 @@ For units when operating continuously at maximum (high) compressor speed (k = 2)
 \end{equation}
 
 % table 56
-\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\begin{longtable}[c]{>{\raggedright}p{2.0in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}>{\raggedright}p{1.5in}}
 \caption{Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor \label{table:cooling-mode-test-conditions-for-units-having}} \tabularnewline
 \toprule 
-Source: AHRI Standard 210-240, 2008; Table 5, Page 65 \tabularnewline
+Test & \multicolumn{2}{p{1.0in}}{\raggedright Air Entering Indoor Unit Temperature (F / C)} & \multicolumn{2}{p{1.0in}}{\raggedright Air Entering Outdoor Unit Temperature (F / C)} \tabularnewline
+\cmidrule(r){2-3}
+\cmidrule(l){4-5}
+Description & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & Compressor Capacity & Cooling Air Volume Rate \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor} \tabularnewline
 \toprule 
-Source: AHRI Standard 210-240, 2008; Table 5, Page 65 \tabularnewline
+Test & \multicolumn{2}{p{1.0in}}{\raggedright Air Entering Indoor Unit Temperature (F / C)} & \multicolumn{2}{p{1.0in}}{\raggedright Air Entering Outdoor Unit Temperature (F / C)} \tabularnewline
+\cmidrule(r){2-3}
+\cmidrule(l){4-5}
+Description & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & Compressor Capacity & Cooling Air Volume Rate \tabularnewline
 \midrule
 \endhead
 
-Test Description & Air Entering Indoor Unit Temperature (F / C) &  & Air Entering Outdoor Unit Temperature (F / C) &  &  &  \tabularnewline
- & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & Compressor Capacity & Cooling Air Volume Rate \tabularnewline
 A2 Test-required (steady, wet coil) & 80.0/26.7 & 67.0/19.4 & 95.0/35.0 & 75.0/23.9 & High & Cooling Full-load \tabularnewline
 B2 Test-required (steady, wet coil) & 80.0/26.7 & 67.0/19.4 & 82.0/27.8 & 65.0/18.3 & High & Cooling Full-load \tabularnewline
 B1 Test-required (steady, wet coil) & 80.0/26.7 & 67.0/19.4 & 82.0/27.8 & 65.0/18.3 & Low & Cooling Minimum \tabularnewline
@@ -2366,6 +2370,7 @@ C1 Test-optional (steady, dry coil) & 80.0/26.7 &  & 82.0/27.8 &  & Low & Coolin
 D1 Test-optional (cyclic, dry coil) & 80.0/26.7 &  & 82.0/27.8 &  & Low &  \tabularnewline
 F1 Test-optional (steady, dry coil) & 80.0/26.7 & 67.0/19.4 & 67.0/19.4 & 53.5/11.9 & High & Cooling Minimum \tabularnewline
 \bottomrule
+\multicolumn{7}{l}{\scriptsize Source: AHRI Standard 210-240, 2008; Table 5, Page 65}
 \end{longtable}
 
 % table 57
@@ -3684,7 +3689,6 @@ Calculate \(\mathop {{Q_h}}\limits^ \cdot ({T_j})\) and \(\mathop {{E_h}}\limits
 Test description & \multicolumn{2}{p{1.5in}}{\raggedright Air Entering Indoor UnitTemperature (°C)} & \multicolumn{2}{p{1.5in}}{\raggedright Air Entering Outdoor UnitTemperature (°C)} & Heating Air Volume Rate \tabularnewline
 \cmidrule(r){2-3}
 \cmidrule(l){4-5}
-\tabularnewline
 & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & \tabularnewline
 \midrule
 \endfirsthead
@@ -3694,7 +3698,6 @@ Test description & \multicolumn{2}{p{1.5in}}{\raggedright Air Entering Indoor Un
 Test description & \multicolumn{2}{p{1.5in}}{\raggedright Air Entering Indoor UnitTemperature (°C)} & \multicolumn{2}{p{1.5in}}{\raggedright Air Entering Outdoor UnitTemperature (°C)} & Heating Air Volume Rate \tabularnewline
 \cmidrule(r){2-3}
 \cmidrule(l){4-5}
-\tabularnewline
 & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & \tabularnewline
 \midrule
 \endhead
