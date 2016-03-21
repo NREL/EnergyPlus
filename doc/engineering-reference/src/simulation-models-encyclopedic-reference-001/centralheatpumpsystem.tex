@@ -36,11 +36,11 @@ The following nomenclature is used in the following equations:
 
 \({\dot m_{src,bypass}}\) ~ = source water bypass mass flow rate in the system {[}kg/s{]}
 
-\({\dot m_{cw,CH}}\) ~ = chilled water mass flow rate of i\(^{h}\) chiller-heater's evaporator {[}kg/s{]}
+\({\dot m_{cw,CH}}\) ~ = chilled water mass flow rate of i\(^{th}\) chiller-heater's evaporator {[}kg/s{]}
 
-\({\dot m_{hw,CH}}\) ~ = hot water mass flow rate of i\(^{h}\) chiller-heater's condenser {[}kg/s{]}
+\({\dot m_{hw,CH}}\) ~ = hot water mass flow rate of i\(^{th}\) chiller-heater's condenser {[}kg/s{]}
 
-\({\dot m_{src,CH}}\) ~ = source water mass flow rate of i\(^{h}\) chiller-heater, which varies with operating modes {[}kg/s{]}
+\({\dot m_{src,CH}}\) ~ = source water mass flow rate of i\(^{th}\) chiller-heater, which varies with operating modes {[}kg/s{]}
 
 \({\dot m_{cw,sys}}\) ~ = chilled water mass flow rate of the system {[}kg/s{]}
 
@@ -72,13 +72,13 @@ The following nomenclature is used in the following equations:
 
 \({T_{src,i}}\) ~ = source water inlet temperature of the system {[}C{]}
 
-\({T_{cw,out}}\) ~ = chilled water outlet temperature of i\(^{h}\) chiller-heater {[}C{]}
+\({T_{cw,out}}\) ~ = chilled water outlet temperature of i\(^{th}\) chiller-heater {[}C{]}
 
-\({T_{hw,out}}\) ~ = hot water outlet temperature of i\(^{h}\) chiller-heater {[}C{]}
+\({T_{hw,out}}\) ~ = hot water outlet temperature of i\(^{th}\) chiller-heater {[}C{]}
 
-\({T_{src,out}}\) ~ = source water outlet temperature of i\(^{h}\) chiller-heater {[}C{]}
+\({T_{src,out}}\) ~ = source water outlet temperature of i\(^{th}\) chiller-heater {[}C{]}
 
-The model reads node information and local variables of individual chiller-heaters. The nodes and local variables vary with the operating modes as described above in order to calculate mass-weighed temperatures. In the cooling-only mode, it calculates a mass-weighed chilled water temperature (\emph{T\(_{H}\)}) and a source water temperature (\emph{T\(_{H}\)}) as follows:
+The model reads node information and local variables of individual chiller-heaters. The nodes and local variables vary with the operating modes as described above in order to calculate mass-weighed temperatures. In the cooling-only mode, it calculates a mass-weighed chilled water temperature (\emph{T\(_{cw,CH}\)}) and a source water temperature (\emph{T\(_{src,CH}\)}) as follows:
 
 \begin{equation}
 {T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}
@@ -86,19 +86,19 @@ The model reads node information and local variables of individual chiller-heate
 
 \textbf{\emph{\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\) ~}}.
 
-In heating-only mode, it calculates a mass-weighed hot water temperature (\emph{T\(_{H}\)}) and a source water temperature (\emph{T\(_{H}\)}) as follows:
+In heating-only mode, it calculates a mass-weighed hot water temperature (\emph{T\(_{hw,CH}\)}) and a source water temperature (\emph{T\(_{src,CH}\)}) as follows:
 
 \textbf{\emph{\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\) ~}}
 
 \textbf{\emph{\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\) ~}}.
 
-When all chiller-heaters are in heat recovery mode, it calculates a mass-weighed chilled water temperature (\emph{T\(_{H}\)}) and hot water temperature (\emph{T\(_{H}\)}) as follows:
+When all chiller-heaters are in heat recovery mode, it calculates a mass-weighed chilled water temperature (\emph{T\(_{cw,CH}\)}) and hot water temperature (\emph{T\(_{hw,CH}\)}) as follows:
 
 \textbf{\emph{\({T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\)}}
 
 \textbf{\emph{\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\) ~}}.
 
-In cooling or heating dominant simultaneous cooling-heating mode (mode 4 and 5), at least one chiller-heater should be in heat recovery mode, and the other(s) are in either mode 4 or mode 5. The system is connected to three loops such as chilled water loop, hot water loop, and source water loop. The model thus calculates a mass-weighed chilled water temperature (\emph{T\(_{H}\)}), hot water temperature (\emph{T\(_{H}\)}), and source water temperature (\emph{T\(_{H}\)}) as follows:
+In cooling or heating dominant simultaneous cooling-heating mode (mode 4 and 5), at least one chiller-heater should be in heat recovery mode, and the other(s) are in either mode 4 or mode 5. The system is connected to three loops such as chilled water loop, hot water loop, and source water loop. The model thus calculates a mass-weighed chilled water temperature (\emph{T\(_{cw,CH}\)}), hot water temperature (\emph{T\(_{hw,CH}\)}), and source water temperature (\emph{T\(_{src,CH}\)}) as follows:
 
 \textbf{\emph{\({T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\)}}
 

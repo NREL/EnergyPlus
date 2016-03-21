@@ -120,7 +120,7 @@ The simulation of the main algorithm of this water baseboard model with radiatio
 
 This model initializes all the conditions at the inlet node such as mass flow rates, temperatures, and specific heat capacities. It calculates the UA value once from standard conditions of the air and water during initialization and it is kept throughout the simulation of the unit.
 
-In case that the user has manufacturer's information regarding the rated capacity, the rated water flow rate, and the rated average water temperature, standard conditions such as the rated heating capacity, \emph{q\(_{d}\)}, average water temperature, \({T_{w,avg}}\) , and water mass flow rate, \(\dot m{}_w\) , are known from the user inputs. The standard water inlet temperature, \({T_{w,in}}\) , and outlet temperature, \({T_{w,out}}\) , are thus obtained from expressions
+In case that the user has manufacturer's information regarding the rated capacity, the rated water flow rate, and the rated average water temperature, standard conditions such as the rated heating capacity, \emph{q\(_{std}\)}, average water temperature, \({T_{w,avg}}\) , and water mass flow rate, \(\dot m{}_w\) , are known from the user inputs. The standard water inlet temperature, \({T_{w,in}}\) , and outlet temperature, \({T_{w,out}}\) , are thus obtained from expressions
 
 \begin{equation}
 {T_{w,in}} = \frac{{{q_{std}}}}{{2\dot m{}_w{c_{p,w}}}} + {T_{w,avg}}
@@ -192,15 +192,15 @@ The model then determines the radiant heat addition by
 
 $q_{rad} = q \cdot Frac_{rad}$
 
-where \emph{q} is the total heating capacity of the heater and \emph{Frac\(_{d}\)} is the user-defined fraction.
+where \emph{q} is the total heating capacity of the heater and \emph{Frac\(_{rad}\)} is the user-defined fraction.
 
-The model now distributes the radiant heat additions to the appropriate surfaces, people for thermal comfort purpose, and the air in the zone. The surface heat balances are then recalculated to determine all heat sources or sinks for radiant systems in the zone. It is assumed that the radiant heat incident on people in the zone is converted to convection to the zone so that the zone heat balance includes this amount of heat which will be lost (see High Temperature Radiant Heater Model). The load met, the actual convective system impact, for the baseboard heater, \emph{q\(_{q}\)}, is therefore determined as
+The model now distributes the radiant heat additions to the appropriate surfaces, people for thermal comfort purpose, and the air in the zone. The surface heat balances are then recalculated to determine all heat sources or sinks for radiant systems in the zone. It is assumed that the radiant heat incident on people in the zone is converted to convection to the zone so that the zone heat balance includes this amount of heat which will be lost (see High Temperature Radiant Heater Model). The load met, the actual convective system impact, for the baseboard heater, \emph{q\(_{req}\)}, is therefore determined as
 
 \begin{equation}
 {q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
 \end{equation}
 
-where \emph{q\(_{c}\)} ~is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{v}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{e}\)} is radiant heat to the people.
+where \emph{q\(_{surf,c}\)} ~is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{surf,z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{conv}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{people}\)} is radiant heat to the people.
 
 The radiant heat simulation in the water baseboard heater is very similar to the high temperature radiant system model. The controls are the same as shown in Figure~\ref{fig:variable-flow-low-temperature-radiant-system}.~ Variable Flow Low Temperature Radiant System Controls.~ After all system time steps have been simulated, an ``average'' zone heat balance calculation is done (similar to the radiant systems). If the unit was scheduled off or there is no water flow rate through the baseboard unit, then, there will be no heat transfer from the unit. The model assumes no heat storage in the unit itself and thus no residual heat transfer in future system time steps due to heat storage in the water or metal of the unit.
 
