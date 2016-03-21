@@ -964,7 +964,7 @@ This numeric field contains the design water flow rate through the tower in m\(^
 
 \paragraph{Field: Design Water Flow Rate per Unit of Nominal Capacity}\label{field-design-water-flow-rate-per-unit-of-nominal-capacity}
 
-This numeric field contains a scalable sizing factor for design water flow rate that scales with nominal capacity, in units of m\(^{3}\)/s/W. The default value is 5.382*10\(^{8}\). This field is only used if the previous field is set to autocalculate and performance input method is NominalCapacity.~ (If the performance input method is set to UFactorTimesAreaAndDesignWaterFlowRate then the design water flow rate is obtained from the plant sizing result.)
+This numeric field contains a scalable sizing factor for design water flow rate that scales with nominal capacity, in units of m\(^{3}\)/s/W. The default value is 5.382*10\(^{-8}\). This field is only used if the previous field is set to autocalculate and performance input method is NominalCapacity.~ (If the performance input method is set to UFactorTimesAreaAndDesignWaterFlowRate then the design water flow rate is obtained from the plant sizing result.)
 
 \paragraph{Field: Design Air Flow Rate}\label{field-design-air-flow-rate-1}
 
@@ -972,7 +972,7 @@ This numeric field contains the tower air flow rate at full fan speed, in m\(^{3
 
 \paragraph{Field: Design Air Flow Rate Per Unit of Nominal Capacity}\label{field-design-air-flow-rate-per-unit-of-nominal-capacity}
 
-This numeric field contains the sizing factor to use when calculating the design air flow rate from the nominal capacity, in units of m\(^{3}\)/s/W.~ The default is 2.76316*10\(^{5}\).~ When this field is left blank, then the default value is used but the flow rate is also scaled to account for elevation (with larger volume flow rates at higher altitudes).~ When a hard value is entered, even if it is the same as the default, then the design air flow rate is not also adjusted for elevation and the scaling factor is used directly.
+This numeric field contains the sizing factor to use when calculating the design air flow rate from the nominal capacity, in units of m\(^{3}\)/s/W.~ The default is 2.76316*10\(^{-5}\).~ When this field is left blank, then the default value is used but the flow rate is also scaled to account for elevation (with larger volume flow rates at higher altitudes).~ When a hard value is entered, even if it is the same as the default, then the design air flow rate is not also adjusted for elevation and the scaling factor is used directly.
 
 \paragraph{Field: Minimum Air Flow Rate Ratio}\label{field-minimum-air-flow-rate-ratio}
 
@@ -1696,9 +1696,9 @@ Coeff(26)•(FRwater)\(^{2}\)•Tr~ +~ Coeff(27)•Twb•Tr~ +
 
 Coeff(28)•FRair•Twb•Tr~ +~ Coeff(29)•FRwater•Twb•Tr~ +
 
-Coeff(30)•(Twb)\(^{2}\)•Tr~ +~ Coeff(31)•(Tr)\(^{2}\) + Coeff(32)•FRair•(Tr)\(^{ }\) +
+Coeff(30)•(Twb)\(^{2}\)•Tr~ +~ Coeff(31)•(Tr)\(^{2}\) + Coeff(32)•FRair•(Tr)\(^{2}\) +
 
-Coeff(33)•FRwater•(Tr)\(^{ }\) +~ Coeff(34)•Twb•(Tr)\(^{ }\) +~ Coeff(35)•(Tr)\(^{3}\)
+Coeff(33)•FRwater•(Tr)\(^{2}\) +~ Coeff(34)•Twb•(Tr)\(^{2}\) +~ Coeff(35)•(Tr)\(^{3}\)
 
 This object allows the user to specify model coefficients for use with the CoolTools correlation shown above. It is recommended that a broad set of cooling tower performance data be used to generate these model coefficients. The data set used to create the model coefficients should cover the entire range of water and air flow rate ratios and inlet air wet-bulb, range, and approach temperatures expected during the simulation.
 
@@ -1807,11 +1807,11 @@ The user must specify a name for the model coefficient object, and this name mus
 
 The YorkCalc correlation has three independent variables: inlet air wet-bulb temperature (Twb), tower range temperature (Tr), and the liquid-to-gas ratio (ratio of water flow rate ratio to air flow rate ratio = LGRatio). Temperatures are in units of ˚C and liquid-to-gas ratio is dimensionless. Using these independent variables, an approach temperature (˚C) is calculated as follows:
 
-~~~ Approach = ~~~~~ Coeff(1)~ +~ Coeff(2)•Twb~ +~ Coeff(3)•Twb\(^{ }\) +~ Coeff(4)•Tr~ +
+~~~ Approach = ~~~~~ Coeff(1)~ +~ Coeff(2)•Twb~ +~ Coeff(3)•Twb\(^{2}\) +~ Coeff(4)•Tr~ +
 
 Coeff(5)•Twb•Tr~ +~ Coeff(6)•Twb\(^{2}\)•Tr~ +~ Coeff(7)•Tr\(^{2}\)~ +
 
-Coeff(8)•Twb•Tr\(^{ }\) +~ Coeff(9)•Twb\(^{2}\)•Tr\(^{2}\) + Coeff(10)•LGRatio~ +
+Coeff(8)•Twb•Tr\(^{2}\) +~ Coeff(9)•Twb\(^{2}\)•Tr\(^{2}\) + Coeff(10)•LGRatio~ +
 
 Coeff(11)•Twb•LGRatio~ +~ Coeff(12)•Twb\(^{2}\)•LGRatio~ +
 
@@ -1821,13 +1821,13 @@ Coeff(15)•Twb\(^{2}\)•Tr•LGRatio~ +~ Coeff(16)•Tr\(^{2}\)•LGRatio~ +
 
 Coeff(17)•Twb•Tr\(^{2}\)•LGRatio~ +~ Coeff(18)•Twb\(^{2}\)•Tr\(^{2}\)•LGRatio +
 
-Coeff(19)•LGRatio\(^{ }\) +~ Coeff(20)•Twb•LGRatio\(^{2}\)~ +
+Coeff(19)•LGRatio\(^{2}\) +~ Coeff(20)•Twb•LGRatio\(^{2}\)~ +
 
-Coeff(21)• Twb\(^{2}\)•LGRatio\(^{ }\) +~ Coeff(22)•Tr•LGRatio\(^{ }\) +
+Coeff(21)• Twb\(^{2}\)•LGRatio\(^{2}\) +~ Coeff(22)•Tr•LGRatio\(^{2}\) +
 
-Coeff(23)•Twb•Tr•LGRatio\(^{ }\) +~ Coeff(24)•Twb\(^{2}\)•Tr•LGRatio\(^{ }\) +
+Coeff(23)•Twb•Tr•LGRatio\(^{2}\) +~ Coeff(24)•Twb\(^{2}\)•Tr•LGRatio\(^{2}\) +
 
-Coeff(25)•Tr\(^{2}\)•LGRatio\(^{ }\) +~ Coeff(26)•Twb•Tr\(^{2}\)•LGRatio\(^{ }\) +
+Coeff(25)•Tr\(^{2}\)•LGRatio\(^{2}\) +~ Coeff(26)•Twb•Tr\(^{2}\)•LGRatio\(^{2}\) +
 
 Coeff(27)•Twb\(^{2}\)•Tr\(^{2}\)•LGRatio\(^{2}\)
 
@@ -3064,8 +3064,8 @@ GroundHeatExchanger:Slinky,
   40,               !- Trench Length [m]
   15,               !- Number of Parallel Trenches
   2,                !- Trench Spacing [m]
-    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
-    KATemps,          !- Name of Undisturbed Ground Temperature Object
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,          !- Name of Undisturbed Ground Temperature Object
   10;               !- Maximum length of simulation [years]
 \end{lstlisting}
 
@@ -3240,7 +3240,7 @@ This numeric field contains the pond depth \{m\}.
 
 \paragraph{Field: Pond Area}\label{field-pond-area}
 
-This numeric field contains the pond area \{m\}.
+This numeric field contains the pond area m\(^{2}\).
 
 \paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter}
 

@@ -4,10 +4,18 @@ The following fans may be defined either in the air loop or as a zone equipment 
 
 % table 29
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
-\caption{Fan Coefficient Values \protect \label{table:fan-coefficient-values}}\\
+\caption{Fan Coefficient Values \label{table:fan-coefficient-values}} \tabularnewline
 \toprule 
-Type of Fan & Fan Coeff. 1 & Fan Coeff. 2 & Fan Coeff. 3 & Fan Coeff. 4 & Fan Coeff. 5 \tabularnewline \midrule
+Type of Fan & Fan Coeff. 1 & Fan Coeff. 2 & Fan Coeff. 3 & Fan Coeff. 4 & Fan Coeff. 5 \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Fan Coefficient Values} \tabularnewline
+\toprule 
+Type of Fan & Fan Coeff. 1 & Fan Coeff. 2 & Fan Coeff. 3 & Fan Coeff. 4 & Fan Coeff. 5 \tabularnewline
+\midrule
 \endhead
+
 Inlet Vane Dampers & 0.35071223 & 0.30850535 & -0.54137364 & 0.87198823 & 0.000 \tabularnewline
 Discharge Dampers & 0.37073425 & 0.97250253 & -0.34240761 & 0.000 & 0.000 \tabularnewline
 Var. Speed Motor & 0.0015302446 & 0.0052080574 & 1.1086242 & -0.11635563 & 0.000 \tabularnewline
@@ -256,26 +264,26 @@ The fraction of the motor heat that is added to the air stream. A value of 0 mea
 
 The constant coefficient (C\(_{1}\)) in a fourth order polynomial curve giving the fraction of full load power (PLF) as a function of flow fraction (FF). Flow fraction is the air mass flow rate divided by the maximum air mass flow rate. The curve is:
 
-PLF = C\(_{1}\) + C\(_{2}\)\(^{.}\) FF + C\(_{3}\)\(^{.}\) FF\(^{+}\) C\(_{4}\)\(^{.}\) FF\(^{3}\) + C\(_{5}\)\(^{.}\) FF\(^{4}\)
+PLF = C\(_{1}\) + C\(_{2}\)\(^{.}\) FF + C\(_{3}\)\(^{.}\) FF\(^{2\\ +}\) C\(_{4}\)\(^{.}\) FF\(^{3}\) + C\(_{5}\)\(^{.}\) FF\(^{4}\)
 
 \paragraph{Field: Fan Power Coefficient 2}\label{field-fan-power-coefficient-2}
 
 The linear coefficient (C\(_{2}\)) in a fourth order polynomial curve giving the fraction of full load power (PLF) as a function of flow fraction (FF). Flow fraction is the air mass flow rate divided by the maximum air mass flow rate. The curve is:
 
-PLF = C\(_{1}\) + C\(_{2}\)\(^{.}\) FF + C\(_{3}\)\(^{.}\) FF\(^{+}\) C\(_{4}\)\(^{.}\) FF\(^{3}\) + C\(_{5}\)\(^{.}\) FF\(^{4}\)
+PLF = C\(_{1}\) + C\(_{2}\)\(^{.}\) FF + C\(_{3}\)\(^{.}\) FF\(^{2\\ +}\) C\(_{4}\)\(^{.}\) FF\(^{3}\) + C\(_{5}\)\(^{.}\) FF\(^{4}\)
 
 \paragraph{Field: Fan Power Coefficient 3}\label{field-fan-power-coefficient-3}
 
 The quadratic coefficient (C\(_{3}\)) in a fourth order polynomial curve giving the fraction of full load power (PLF) as a function of flow fraction (FF). Flow fraction is the air mass flow rate divided by the maximum air mass flow rate. The curve is:
 
-PLF = C\(_{1}\) + C\(_{2}\)\(^{.}\) FF + C\(_{3}\)\(^{.}\) FF\(^{+}\) C\(_{4}\)\(^{.}\) FF\(^{3}\) + C\(_{5}\)\(^{.}\) FF\(^{4}\)
+PLF = C\(_{1}\) + C\(_{2}\)\(^{.}\) FF + C\(_{3}\)\(^{.}\) FF\(^{2\\ +}\) C\(_{4}\)\(^{.}\) FF\(^{3}\) + C\(_{5}\)\(^{.}\) FF\(^{4}\)
 
 \paragraph{Field: Fan Power Coefficient 4}\label{field-fan-power-coefficient-4}
 
 The cubic coefficient (C\(_{1}\)) in a fourth order polynomial curve giving the fraction of full load power (PLF) as a function of flow fraction (FF). Flow fraction is the air mass flow rate divided by the maximum air mass flow rate. The curve is:
 
 \begin{lstlisting}
-       PLF = C$_{1}$ + C$_{2}$$^{.}$ FF + C$_{3}$$^{.}$ FF$^{+}$ C$_{4}$$^{.}$ FF$^{3}$ + C$_{5}$$^{.}$ FF$^{4}$
+       PLF = C$_{1}$ + C$_{2}$$^{.}$ FF + C$_{3}$$^{.}$ FF$^{2\\ +}$ C$_{4}$$^{.}$ FF$^{3}$ + C$_{5}$$^{.}$ FF$^{4}$
 \end{lstlisting}
 
 \paragraph{Field: Fan Power Coefficient 5}\label{field-fan-power-coefficient-5}
@@ -283,7 +291,7 @@ The cubic coefficient (C\(_{1}\)) in a fourth order polynomial curve giving the 
 The coefficient C\(_{5}\) in a fourth order polynomial curve giving the fraction of full load power (PLF) as a function of flow fraction (FF). Flow fraction is the air mass flow rate divided by the maximum air mass flow rate. The curve is:
 
 \begin{lstlisting}
-       PLF = C$_{1}$ + C$_{2}$$^{.}$ FF + C$_{3}$$^{.}$ FF$^{+}$ C$_{4}$$^{.}$ FF$^{3}$ + C$_{5}$$^{.}$ FF$^{4}$
+       PLF = C$_{1}$ + C$_{2}$$^{.}$ FF + C$_{3}$$^{.}$ FF$^{2\\ +}$ C$_{4}$$^{.}$ FF$^{3}$ + C$_{5}$$^{.}$ FF$^{4}$
 \end{lstlisting}
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-2-000}
@@ -570,41 +578,41 @@ The minimum volumetric airflow (m\(^{3}\)/sec) through the fan at standard tempe
 
 \paragraph{Field: Fan Sizing Factor}\label{field-fan-sizing-factor}
 
-The numeric dimensionless factor (\emph{F\(_{n}\)}) used to multiply the specified or autosized full-load volumetric airflow (see Maximum Flow Rate field above for details) for fan sizing. If specified, minimum value is 1.0. Default is 1.0 if field is blank.
+The numeric dimensionless factor (\emph{F\(_{fan}\)}) used to multiply the specified or autosized full-load volumetric airflow (see Maximum Flow Rate field above for details) for fan sizing. If specified, minimum value is 1.0. Default is 1.0 if field is blank.
 
 \paragraph{Field: Fan Wheel Diameter}\label{field-fan-wheel-diameter}
 
-The required numeric outer diameter of the fan wheel (\emph{D\(_{n}\)}, m). This value is determined from manufacturer s data. In general, larger diameter fans have higher maximum efficiency than smaller diameter fans of the same type (Ref: AMCA Standard 205-10: Energy Efficiency Classification for Fans). Must be greater than zero.
+The required numeric outer diameter of the fan wheel (\emph{D\(_{fan}\)}, m). This value is determined from manufacturer s data. In general, larger diameter fans have higher maximum efficiency than smaller diameter fans of the same type (Ref: AMCA Standard 205-10: Energy Efficiency Classification for Fans). Must be greater than zero.
 
 \paragraph{Field: Fan Outlet Area}\label{field-fan-outlet-area}
 
-The required numeric outlet area of the fan (\emph{A\(_{t}\)}, m\(^{2}\)). This value is determined from manufacturer s data. It is used to convert fan total pressure rise to fan static pressure rise. Fan static pressure rise is the fan total pressure rise minus the fan outlet velocity pressure; it is not the difference between fan outlet and inlet static pressures (Ref: ANSI/AMCA Standard 210-07, ANSI/ASHRAE Standard 51-07: Laboratory Methods of Testing Fans for Certified Aerodynamic Performance Rating). Must be greater than zero.
+The required numeric outlet area of the fan (\emph{A\(_{fan,out}\)}, m\(^{2}\)). This value is determined from manufacturer s data. It is used to convert fan total pressure rise to fan static pressure rise. Fan static pressure rise is the fan total pressure rise minus the fan outlet velocity pressure; it is not the difference between fan outlet and inlet static pressures (Ref: ANSI/AMCA Standard 210-07, ANSI/ASHRAE Standard 51-07: Laboratory Methods of Testing Fans for Certified Aerodynamic Performance Rating). Must be greater than zero.
 
 \paragraph{Field: Maximum Fan Static Efficiency}\label{field-maximum-fan-static-efficiency}
 
-The required numeric maximum ratio (\(\eta_{fan,max}\) ) between the power delivered to the air (\emph{H\(_{r}\)}, W) and the fan shaft input power (\emph{H\(_{n}\)}, W). For this parameter, \emph{H\(_{r}\)} is the volumetric airflow through the fan multiplied by the fan static pressure rise. Maximum fan static efficiency is determined from analyses of manufacturers data using:
+The required numeric maximum ratio (\(\eta_{fan,max}\) ) between the power delivered to the air (\emph{H\(_{air}\)}, W) and the fan shaft input power (\emph{H\(_{fan}\)}, W). For this parameter, \emph{H\(_{air}\)} is the volumetric airflow through the fan multiplied by the fan static pressure rise. Maximum fan static efficiency is determined from analyses of manufacturers data using:
 
 \begin{equation}
 {\eta_{fan,\max }} = \max \left[ {\frac{{\left( {\Delta {P_{fan}} * {Q_{fan}}} \right)}}{{{H_{fan}}}}} \right]
 \end{equation}
 
-where \emph{P\(_{n}\)} is fan static pressure rise (Pa) and \emph{Q\(_{n}\)} is airflow through the fan (m\(^{3}\)/sec). Typically, do not select curves on fan performance maps of pressure rise versus flow correspond to or are near maximum efficiency. Must be greater than zero and less than or equal to 1.0.
+where \emph{P\(_{fan}\)} is fan static pressure rise (Pa) and \emph{Q\(_{fan}\)} is airflow through the fan (m\(^{3}\)/sec). Typically, do not select curves on fan performance maps of pressure rise versus flow correspond to or are near maximum efficiency. Must be greater than zero and less than or equal to 1.0.
 
 Calculated fan static efficiency at design flow condition (including part-load effects of oversized fan) is reported in the .eio file as Design Fan Efficiency {[}-{]}.
 
 \paragraph{Field: Euler Number at Maximum Fan Static Efficiency}\label{field-euler-number-at-maximum-fan-static-efficiency}
 
-The required numeric Euler number (\emph{Eu\(_{x}\)}), which is also called the throttling or pressure coefficient, and is the ratio of pressure forces to inertial forces. The Euler number is determined from analyses of manufacturer s data using:
+The required numeric Euler number (\emph{Eu\(_{max}\)}), which is also called the throttling or pressure coefficient, and is the ratio of pressure forces to inertial forces. The Euler number is determined from analyses of manufacturer s data using:
 
 \begin{equation}
 Eu = \frac{{\left( {\Delta {P_{fan}} * D_{fan}^4} \right)}}{{\left( {\rho  * Q_{fan}^2} \right)}}
 \end{equation}
 
-where \emph{P\(_{n}\)} is fan static pressure rise (Pa; see \emph{Fan Pressure Rise Curve Name} field), \emph{D\(_{n}\)} is wheel diameter (m), \(\rho\) is the manufacturer s reference air density (kg/m\(^{3}\)), and \emph{Q\(_{n}\)} is airflow through the fan (m\(^{3}\)/sec). \emph{Eu\(_{x}\)} is calculated using any pair of pressure rise and airflow values that correspond with maximum fan static efficiency for the specified fan. Must be greater than zero.
+where \emph{P\(_{fan}\)} is fan static pressure rise (Pa; see \emph{Fan Pressure Rise Curve Name} field), \emph{D\(_{fan}\)} is wheel diameter (m), \emph{ρ} is the manufacturer s reference air density (kg/m\(^{3}\)), and \emph{Q\(_{fan}\)} is airflow through the fan (m\(^{3}\)/sec). \emph{Eu\(_{max}\)} is calculated using any pair of pressure rise and airflow values that correspond with maximum fan static efficiency for the specified fan. Must be greater than zero.
 
 \paragraph{Field: Maximum Dimensionless Fan Airflow}\label{field-maximum-dimensionless-fan-airflow}
 
-The required numeric maximum dimensionless airflow (\(\psi_{max}\)) through the fan, which corresponds to the maximum ratio between the airflow through the fan (\(Q_n\), m\(^{3}\)/sec) and the fan shaft rotational speed (\(\omega_n\)\emph{, rpm}) for the specified fan wheel diameter (D\(_n\)\emph{, m}). \(\varphi_{x}\) is determined from manufacturers data using:
+The required numeric maximum dimensionless airflow (\(\psi_{max}\)) through the fan, which corresponds to the maximum ratio between the airflow through the fan (\(Q_{fan}\), m\(^{3}\)/sec) and the fan shaft rotational speed (\(\omega_{fan}\)\emph{, rpm}) for the specified fan wheel diameter (D\(_{fan}\)\emph{, m}). \(\varphi_{max}\) is determined from manufacturers data using:
 
 \begin{equation}
 \varphi_{\max} = \frac{30}{\pi D_{fan}^3} \cdot \max \left( \frac{Q_{fan}}{\omega_{fan}} \right)
@@ -614,7 +622,7 @@ The required numeric maximum dimensionless airflow (\(\psi_{max}\)) through the 
 
 \paragraph{Field: Motor Fan Pulley Ratio}\label{field-motor-fan-pulley-ratio}
 
-The numeric dimensionless ratio of the motor pulley diameter to the fan pulley diameter (\emph{D\(_{y}\) / D\(_{y}\)}). If specified, must be greater than zero. This ratio can be adjusted to account for belt slip if the fractional slip is known (multiply the drive ratio with no slip by 1+s, where s is the belt fractional slip). Default is 1.0 if field is blank (leave blank if no belt; i.e., direct drive). Can be autosized (assumes no slip).
+The numeric dimensionless ratio of the motor pulley diameter to the fan pulley diameter (\emph{D\(_{motor,pulley}\) / D\(_{fan,pulley}\)}). If specified, must be greater than zero. This ratio can be adjusted to account for belt slip if the fractional slip is known (multiply the drive ratio with no slip by 1+s, where s is the belt fractional slip). Default is 1.0 if field is blank (leave blank if no belt; i.e., direct drive). Can be autosized (assumes no slip).
 
 Specified or autosized motor/fan pulley diameter ratio is reported in the .eio file as Drive Ratio {[}-{]}. Autosized ratio is based on fan speed in revolutions per minute (rpm), calculated at design flow condition, divided by Field: Motor Maximum Speed.
 
@@ -626,25 +634,25 @@ Specified or autosized belt maximum output torque (including effects of scaling 
 
 \paragraph{Field: Belt Sizing Factor}\label{field-belt-sizing-factor}
 
-The numeric dimensionless factor (\emph{F\(_{t}\)}) used to multiply the specified or autosized fan shaft maximum output torque (\(_{x}\)*). If specified, minimum value is 1.0. Default is 1.0 if field is blank.
+The numeric dimensionless factor (\emph{F\(_{belt}\)}) used to multiply the specified or autosized fan shaft maximum output torque (\(_{belt,max}\)*). If specified, minimum value is 1.0. Default is 1.0 if field is blank.
 
 \paragraph{Field: Belt Fractional Torque Transition}\label{field-belt-fractional-torque-transition}
 
-The numeric transition point (\emph{x\(_{s}\)}) between performance curves for Regions 1 and 2 for the drive belt normalized part-load efficiency. Must be between 0.0 and 1.0. Default is 0.167 (corresponds to generic V-belt) if field is blank.
+The numeric transition point (\emph{x\(_{belt,trans}\)}) between performance curves for Regions 1 and 2 for the drive belt normalized part-load efficiency. Must be between 0.0 and 1.0. Default is 0.167 (corresponds to generic V-belt) if field is blank.
 
 \paragraph{Field: Motor Maximum Speed}\label{field-motor-maximum-speed}
 
-The required numeric maximum rotational speed of the fan motor shaft (\(\omega_{x}\)) in revolutions per minute (rpm). Typical values for motors supplied by 60 Hz power are near 900, 1200, 1800, and 3600 rpm. Must be greater than zero.
+The required numeric maximum rotational speed of the fan motor shaft (\(\omega_{motor,max}\)) in revolutions per minute (rpm). Typical values for motors supplied by 60 Hz power are near 900, 1200, 1800, and 3600 rpm. Must be greater than zero.
 
 \paragraph{Field: Maximum Motor Output Power}\label{field-maximum-motor-output-power}
 
-The required numeric maximum output power (input power to the fan drive belt) by the motor (\emph{H\(_{x}\)}, W). If specified, must be greater than zero. Can be autosized. In the case of direct drive, \emph{H\(_{x}\)} corresponds to the maximum fan shaft power (\emph{H\(_{x}\)}).
+The required numeric maximum output power (input power to the fan drive belt) by the motor (\emph{H\(_{belt,max}\)}, W). If specified, must be greater than zero. Can be autosized. In the case of direct drive, \emph{H\(_{belt,max}\)} corresponds to the maximum fan shaft power (\emph{H\(_{fan,max}\)}).
 
 Specified or autosized maximum motor output power (including effects of scaling by Field: Motor Sizing Factor) is reported in the .eio file as Design Motor Output Power {[}W{]}. Also, calculated maximum motor efficiency corresponding to Design Motor Output Power, along with motor efficiency at design flow condition (including part-load effects of oversized motor), are reported in the .eio file as, respectively, Maximum Motor Efficiency {[}-{]} and Design Motor Efficiency {[}-{]}. Note that maximum motor efficiency often occurs at less than full load.
 
 \paragraph{Field: Motor Sizing Factor}\label{field-motor-sizing-factor}
 
-The numeric dimensionless sizing factor (\emph{F\(_{r}\)}) used to multiply the specified or autosized fan motor output power (\emph{H\(_{x}\)}). If specified, minimum value is 1.0. Default is 1.0.
+The numeric dimensionless sizing factor (\emph{F\(_{motor}\)}) used to multiply the specified or autosized fan motor output power (\emph{H\(_{belt,max}\)}). If specified, minimum value is 1.0. Default is 1.0.
 
 \paragraph{Field: Motor In Airstream Fraction}\label{field-motor-in-airstream-fraction-4}
 
@@ -652,29 +660,29 @@ The numeric fraction of the combined motor and belt heat that is added to the ai
 
 \paragraph{Field: VFD Efficiency Type}\label{field-vfd-efficiency-type}
 
-The alpha basis for calculating fan variable-frequency-drive (VFD) efficiency: Power , which corresponds to a function of the fraction of full-load motor input power (\emph{H\(_{r}\)} / \emph{H\(_{x}\)}), or Speed , which corresponds to a function of the fraction of full-load speed (\(\omega_r / \omega_x\)). If this field is blank, then it is assumed that the VFD efficiency is 0.97. If no VFD is used, then specify Power and also specify a VFD efficiency curve with a constant value of 1.0 (see VFD Efficiency Curve Name field for details).
+The alpha basis for calculating fan variable-frequency-drive (VFD) efficiency: Power , which corresponds to a function of the fraction of full-load motor input power (\emph{H\(_{motor}\)} / \emph{H\(_{motor,max}\)}), or Speed , which corresponds to a function of the fraction of full-load speed (\(\omega_{motor} / \omega_{max}\)). If this field is blank, then it is assumed that the VFD efficiency is 0.97. If no VFD is used, then specify Power and also specify a VFD efficiency curve with a constant value of 1.0 (see VFD Efficiency Curve Name field for details).
 
 \paragraph{Field: Maximum VFD Output Power}\label{field-maximum-vfd-output-power}
 
-The required numeric maximum output power (input power to the fan motor) by the variable frequency drive (\emph{H\(_{x}\)}, W). If specified, must be greater than zero. Can be autosized.
+The required numeric maximum output power (input power to the fan motor) by the variable frequency drive (\emph{H\(_{motor,max}\)}, W). If specified, must be greater than zero. Can be autosized.
 
 Specified or autosized maximum VFD output power (including effects of scaling by Field: VFD Sizing Factor) and corresponding VFD input power are reported in the .eio file as, respectively, Design VFD Output Power {[}W{]} and Rated Power {[}W{]}. Also, calculated VFD efficiency corresponding to Design VFD Output Power (including part-load effects of oversized VFD) along with corresponding combined system efficiency (fan, belt, motor, and VFD efficiencies multiplied together) at design flow condition are reported in the .eio file as, respectively, Design VFD Efficiency {[}-{]} and Design Combined Efficiency {[}-{]}.
 
 \paragraph{Field: VFD Sizing Factor}\label{field-vfd-sizing-factor}
 
-The numeric dimensionless factor (\emph{F\(_{D}\)}) used to multiply the specified or autosized motor maximum input power (\emph{H\(_{x}\)}). If specified, minimum value is 1.0. Default is 1.0 if field is blank.
+The numeric dimensionless factor (\emph{F\(_{VFD}\)}) used to multiply the specified or autosized motor maximum input power (\emph{H\(_{motor,max}\)}). If specified, minimum value is 1.0. Default is 1.0 if field is blank.
 
 \paragraph{Field: Fan Pressure Rise Curve Name}\label{field-fan-pressure-rise-curve-name}
 
-The required alpha name of the fan total pressure rise performance curve (ref: Curve:FanPressureRise in Performance Curves) that parameterizes the variation of fan total pressure rise (\emph{P\(_{t}\)}, Pa) as a function of volumetric flow through the fan (\emph{Q\(_{n}\)}, m\(^{3}\)/s) and duct static pressure set point (\emph{P\(_{m}\)}, Pa). The fan outlet velocity pressure is subtracted from the output of this curve to determine fan static pressure rise, which is then used to calculate a dimensionless Euler number at each time step. The Euler number is in turn used to determine fan efficiency, speed, and torque (the Euler number is defined in the \emph{Euler Number at Maximum Fan Static Efficiency} field). This curve should be valid for the range of volumetric flows, distribution system leakage, duct static pressures, and static pressures surrounding the ducts anticipated for the simulation period.
+The required alpha name of the fan total pressure rise performance curve (ref: Curve:FanPressureRise in Performance Curves) that parameterizes the variation of fan total pressure rise (\emph{P\(_{fan,tot}\)}, Pa) as a function of volumetric flow through the fan (\emph{Q\(_{fan}\)}, m\(^{3}\)/s) and duct static pressure set point (\emph{P\(_{sm}\)}, Pa). The fan outlet velocity pressure is subtracted from the output of this curve to determine fan static pressure rise, which is then used to calculate a dimensionless Euler number at each time step. The Euler number is in turn used to determine fan efficiency, speed, and torque (the Euler number is defined in the \emph{Euler Number at Maximum Fan Static Efficiency} field). This curve should be valid for the range of volumetric flows, distribution system leakage, duct static pressures, and static pressures surrounding the ducts anticipated for the simulation period.
 
 \paragraph{Field: Duct Static Pressure Reset Curve Name}\label{field-duct-static-pressure-reset-curve-name}
 
-The required alpha name of the performance curve that parameterizes the variation of the duct static pressure set point (\(P_m\), Pa) as a function of volumetric flow through the fan (\(Q_n\), m\(^3\)/s), which is used so that the resistance associated with VAV box damper operation is reduced.
+The required alpha name of the performance curve that parameterizes the variation of the duct static pressure set point (\(P_{sm}\), Pa) as a function of volumetric flow through the fan (\(Q_{fan}\), m\(^{3}\)/s), which is used so that the resistance associated with VAV box damper operation is reduced.
 
 The output of this curve is used to calculate the duct static pressure set point at each time step. This curve should be valid for the range of duct static pressure set points and volumetric flows, anticipated for the simulation period.
 
-For an ad hoc linear duct static pressure reset scheme, the relation (ref: Curve:Linear in Performance Curves) between duct static pressure (\(P_m\), Pa) and flow through the fan (\(Q_n\), m\(^3\)/s) for \(Q_n \le Q_n \le Q_x\) is:
+For an ad hoc linear duct static pressure reset scheme, the relation (ref: Curve:Linear in Performance Curves) between duct static pressure (\(P_{sm}\), Pa) and flow through the fan (\(Q_{fan}\), m\(^{3}\)/s) for \(Q_{fan,min} \le Q_{fan} \le Q_{fan,max}\) is:
 
 \begin{equation}
 P_{sm} = P_{sm,\min } + \left( P_{sm,\max } - P_{sm,\min } \right) * \frac{{\left( {{Q_{fan}} - {Q_{fan,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}
@@ -682,9 +690,9 @@ P_{sm} = P_{sm,\min } + \left( P_{sm,\max } - P_{sm,\min } \right) * \frac{{\lef
 
 where \({C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}\) and \({C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}\)
 
-For \emph{Q\(_{n}\)} \textless{} \emph{Q\(_{n}\)}, \emph{P\(_{m}\)} = \emph{P\(_{n}\)};for \emph{Q\(_{n}\)} \textgreater{} \emph{Q\(_{x}\)}, \emph{P\(_{m}\)} = \emph{P\(_{x}\)}
+For \emph{Q\(_{fan}\)} \textless{} \emph{Q\(_{fan,min}\)}, \emph{P\(_{sm}\)} = \emph{P\(_{sm,min}\)};for \emph{Q\(_{fan}\)} \textgreater{} \emph{Q\(_{fan,max}\)}, \emph{P\(_{sm}\)} = \emph{P\(_{sm,max}\)}
 
-The minimum and maximum fan airflows (\emph{Q\(_{n}\)} and \emph{Q\(_{x}\)}) correspond respectively to the minimum and maximum duct static pressure set points (\emph{P\(_{n}\)} and \emph{P\(_{x}\)}).
+The minimum and maximum fan airflows (\emph{Q\(_{fan,min}\)} and \emph{Q\(_{fan,max}\)}) correspond respectively to the minimum and maximum duct static pressure set points (\emph{P\(_{sm,min}\)} and \emph{P\(_{sm,max}\)}).
 
 If no duct static pressure reset scheme is used and the duct static pressure set point is constant, then parameter \emph{C\(_{2}\)} is set to zero and \emph{C\(_{1}\)} represents the constant duct static pressure set point.
 
