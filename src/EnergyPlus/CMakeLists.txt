@@ -324,6 +324,8 @@ SET( SRC
   IceThermalStorage.hh
   InputProcessor.cc
   InputProcessor.hh
+  IntegratedHeatPump.cc
+  IntegratedHeatPump.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
