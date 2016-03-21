@@ -122,7 +122,6 @@ namespace IntegratedHeatPumps {
 		Real64 WaterFlowAccumVol;// water flow accumulated volume
 		Real64 SHDWHRunTime; 
 		bool NodeConnected; 
-		Real64 TotalHeatingEnergyRate; 
 		Real64 CoolVolFlowScale;// max fan cooling volumetric flow rate
 		Real64 HeatVolFlowScale;// max fan heating volumetric flow rate
 		Real64 MaxHeatAirMassFlow;//maximum air mass flow rate for heating mode
@@ -140,6 +139,22 @@ namespace IntegratedHeatPumps {
 		Real64 TankSourceWaterMassFlowRate;//tank source water flow rate
 		Real64 AirFlowSavInWaterLoop; //air flow saving for SCWH mode
 		Real64 AirFlowSavInAirLoop; //air flow saving for SCWH mode
+
+		//new output variables
+		Real64 AirLoopFlowRate;//air loop mass flow rate [kg/s]
+		Real64 TotalCoolingRate;// total cooling rate [w]
+		Real64 TotalWaterHeatingRate;//total water heating rate [w]
+		Real64 TotalSpaceHeatingRate;//total space heating rate [w]
+		Real64 TotalPower;//total power consumption  [w]
+		Real64 TotalLatentLoad;// total latent cooling rate [w]
+		Real64 Qsource;//source energy rate, [w]
+		Real64 Energy;//total electric energy consumption [J]
+		Real64 EnergyLoadTotalCooling;//total cooling energy [J]
+		Real64 EnergyLoadTotalHeating;//total heating energy [J]
+		Real64 EnergyLoadTotalWaterHeating;//total heating energy [J]
+		Real64 EnergyLatent; // total latent energy [J]
+		Real64 EnergySource;//total source energy
+		Real64 TotalCOP;//total COP
 
 		// Default Constructor
 		IntegratedHeatPumpData() :
@@ -178,7 +193,6 @@ namespace IntegratedHeatPumps {
 			WaterFlowAccumVol(0),
 			SHDWHRunTime(0),
 			NodeConnected(false),
-			TotalHeatingEnergyRate(0),
 			CoolVolFlowScale(0),
 			HeatVolFlowScale(0),
 			MaxHeatAirMassFlow(0),
@@ -190,7 +204,21 @@ namespace IntegratedHeatPumps {
 			IDFanPlace(0),
 			TankSourceWaterMassFlowRate(0),
 			AirFlowSavInWaterLoop(0),
-			AirFlowSavInAirLoop(0)
+			AirFlowSavInAirLoop(0),
+			AirLoopFlowRate(0.0),//air loop mass flow rate
+			TotalCoolingRate(0.0),// total cooling rate [w]
+			TotalWaterHeatingRate(0.0),//total water heating rate [w]
+			TotalSpaceHeatingRate(0.0),//total space heating rate [w]
+			TotalPower(0.0),//total power consumption  [w]
+			TotalLatentLoad(0),// total latent cooling rate [w]
+			Qsource(0.0),//source energy rate, [w]
+			Energy(0.0),//total electric energy consumption [J]
+			EnergyLoadTotalCooling(0.0),//total cooling energy [J]
+			EnergyLoadTotalHeating(0.0),//total heating energy [J]
+			EnergyLoadTotalWaterHeating(0.0),//total heating energy [J]
+			EnergyLatent(0.0), // total latent energy [J]
+			EnergySource(0.0),//total source energy
+			TotalCOP(0.0)//total COP
 		{}
 
 	};

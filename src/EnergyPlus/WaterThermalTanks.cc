@@ -8523,7 +8523,7 @@ namespace WaterThermalTanks {
 			Real64 *CoilTotalHeatingEnergyRatePtr;
 			if ( isVariableSpeed ) {
 				if (true == HPWH.bIsIHP)
-					CoilTotalHeatingEnergyRatePtr = &IntegratedHeatPumps::IntegratedHeatPumpUnits(HPWH.DXCoilNum).TotalHeatingEnergyRate;
+					CoilTotalHeatingEnergyRatePtr = &IntegratedHeatPumps::IntegratedHeatPumpUnits(HPWH.DXCoilNum).TotalWaterHeatingRate;
 				else 
 					CoilTotalHeatingEnergyRatePtr = &VariableSpeedCoils::VarSpeedCoil( HPWH.DXCoilNum ).TotalHeatingEnergyRate;
 			} else {

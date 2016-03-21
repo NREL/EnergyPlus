@@ -1,3 +1,62 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
+
 // C++ Headers
 #include <cmath>
 
@@ -145,8 +204,8 @@ namespace EnergyPlus {
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int DXCoilNum(0); // The IHP No that you are currently dealing with
-			double waterMassFlowRate(0); 
-			double airMassFlowRate(0); 
+			Real64 waterMassFlowRate(0);
+			Real64 airMassFlowRate(0);
 
 			// Obtains and Allocates ASIHP related parameters from input file
 			if (GetCoilsInputFlag) { //First time subroutine has been entered
@@ -180,6 +239,8 @@ namespace EnergyPlus {
 
 			airMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate; 
 			waterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+			IntegratedHeatPumpUnits(DXCoilNum).AirLoopFlowRate = airMassFlowRate; 
+
 			//IntegratedHeatPumpUnits(DXCoilNum).AirFlowSavInWaterLoop = 0.0; 
 			//IntegratedHeatPumpUnits(DXCoilNum).AirFlowSavInAirLoop = 0.0; 
 			switch (IntegratedHeatPumpUnits(DXCoilNum).CurMode)
@@ -797,6 +858,40 @@ namespace EnergyPlus {
 			if (ErrorsFound) {
 				ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
 			}
+			else
+			{
+				//set up output variables, not reported in the individual coil models
+				SetupOutputVariable("Operation Mode []", IntegratedHeatPumpUnits(DXCoilNum).CurMode, "System", "Average", IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Air Loop Flow Rate [kg/s]", IntegratedHeatPumpUnits(DXCoilNum).AirLoopFlowRate, "System", "Average", 
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Condenser Water Flow Rate [kg/s]", IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Cooling Coil Total Cooling Rate [W]", IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Heating Coil Total Air Heating Rate [W]", IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Water Heating Rate [W]", IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Electric Power [W]", IntegratedHeatPumpUnits(DXCoilNum).TotalPower, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Latent Cooling Rate [W]", IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Source Energy Rate [W]", IntegratedHeatPumpUnits(DXCoilNum).Qsource, "System", "Average",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total COP []", IntegratedHeatPumpUnits(DXCoilNum).TotalCOP, "System", "Average", IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Electric Energy [J]", IntegratedHeatPumpUnits(DXCoilNum).Energy, "System", "Summed",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Cooling Energy [J]", IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalCooling, "System", "Summed",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Air Heating Energy [J]", IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalHeating, "System", "Summed",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Water Heating Energy [J]", IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalWaterHeating, "System", "Summed",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Latent Cooling Energy [J]", IntegratedHeatPumpUnits(DXCoilNum).EnergyLatent, "System", "Summed",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+				SetupOutputVariable("Total Source Energy [J]", IntegratedHeatPumpUnits(DXCoilNum).EnergySource, "System", "Summed",
+					IntegratedHeatPumpUnits(DXCoilNum).Name);
+			}
 
 		}
 
@@ -947,6 +1042,21 @@ namespace EnergyPlus {
 					", Number of Integrated HPs=" + TrimSigDigits(NumIHPs) + ", IHP name=" + "AS-IHP");
 			}
 
+			IntegratedHeatPumpUnits(DXCoilNum).AirLoopFlowRate = 0.0;//air loop mass flow rate [kg/s]
+			IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = 0.0;//water loop mass flow rate [kg/s]
+			IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = 0.0;// total cooling rate [w]
+			IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = 0.0;//total water heating rate [w]
+			IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = 0.0;//total space heating rate [w]
+			IntegratedHeatPumpUnits(DXCoilNum).TotalPower = 0.0;//total power consumption  [w]
+			IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = 0.0;// total latent cooling rate [w]
+			IntegratedHeatPumpUnits(DXCoilNum).Qsource = 0.0;//source energy rate, [w]
+			IntegratedHeatPumpUnits(DXCoilNum).Energy = 0.0;//total electric energy consumption [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalCooling = 0.0;//total cooling energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalHeating = 0.0;//total heating energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalWaterHeating = 0.0;//total heating energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLatent = 0.0; // total latent energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergySource = 0.0;//total source energy
+			IntegratedHeatPumpUnits(DXCoilNum).TotalCOP = 0.0; 
 		}
 
 
@@ -954,6 +1064,12 @@ namespace EnergyPlus {
 			UpdateIHP(int const DXCoilNum)
 		{
 			using General::TrimSigDigits;
+			using DataHVACGlobals::TimeStepSys;
+			using VariableSpeedCoils::VarSpeedCoil;
+
+			int VSCoilIndex(0); 
+			Real64 ReportingConstant(0.0);
+			Real64 TotalDelivery(0.0); 
 
 			// Obtains and Allocates AS-IHP related parameters from input file
 			if (GetCoilsInputFlag) { //First time subroutine has been entered
@@ -966,6 +1082,90 @@ namespace EnergyPlus {
 					", Number of Integrated HPs=" + TrimSigDigits(NumIHPs) + ", IHP name=" + "AS-IHP");
 			}
 
+			switch (IntegratedHeatPumpUnits(DXCoilNum).CurMode)
+			{
+			case SCMode:
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = VarSpeedCoil(VSCoilIndex).QLoadTotal;// total cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = 0.0;//total water heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = 0.0;//total space heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalPower = VarSpeedCoil(VSCoilIndex).Power;//total power consumption  [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = VarSpeedCoil(VSCoilIndex).QLatent;// total latent cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).Qsource = VarSpeedCoil(VSCoilIndex).QSource;//source energy rate, [w]
+				break;
+			case SHMode:
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = 0.0;// total cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = 0.0;//total water heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = VarSpeedCoil(VSCoilIndex).QLoadTotal;//total space heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalPower = VarSpeedCoil(VSCoilIndex).Power;//total power consumption  [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = 0.0;// total latent cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).Qsource = VarSpeedCoil(VSCoilIndex).QSource;//source energy rate, [w]
+				break;
+			case DWHMode:
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).DWHCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = 0.0;// total cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = VarSpeedCoil(VSCoilIndex).QSource;//total water heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = 0.0;//total space heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalPower = VarSpeedCoil(VSCoilIndex).Power;//total power consumption  [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = 0.0;// total latent cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).Qsource = VarSpeedCoil(VSCoilIndex).QLoadTotal;//source energy rate, [w]
+				break;
+			case SCWHMatchSCMode:
+			case SCWHMatchWHMode:
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = VarSpeedCoil(VSCoilIndex).QLoadTotal;// total cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = VarSpeedCoil(VSCoilIndex).QSource;//total water heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = 0.0;//total space heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalPower = VarSpeedCoil(VSCoilIndex).Power;//total power consumption  [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = VarSpeedCoil(VSCoilIndex).QLatent;// total latent cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).Qsource = 0.0;//source energy rate, [w]
+				break;
+			case SCDWHMode:
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCDWHCoolCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = VarSpeedCoil(VSCoilIndex).QLoadTotal;// total cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = 0.0;//total space heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalPower = VarSpeedCoil(VSCoilIndex).Power;//total power consumption  [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = VarSpeedCoil(VSCoilIndex).QLatent;// total latent cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).Qsource = VarSpeedCoil(VSCoilIndex).QSource;//source energy rate, [w]
+
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCDWHWHCoilIndex; 
+				IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = VarSpeedCoil(VSCoilIndex).QSource;//total water heating rate [w]
+
+				break;
+			case SHDWHElecHeatOffMode:
+			case SHDWHElecHeatOnMode:
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHDWHHeatCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate = 0.0;// total cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate = VarSpeedCoil(VSCoilIndex).QLoadTotal;//total space heating rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalPower = VarSpeedCoil(VSCoilIndex).Power;//total power consumption  [w]
+				IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad = 0.0;// total latent cooling rate [w]
+				IntegratedHeatPumpUnits(DXCoilNum).Qsource = VarSpeedCoil(VSCoilIndex).QSource;//source energy rate, [w]
+
+				VSCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHDWHWHCoilIndex;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate = VarSpeedCoil(VSCoilIndex).QSource;//total water heating rate [w]
+
+				break;
+			case IdleMode:
+			default:
+				break;
+			}
+
+			ReportingConstant = TimeStepSys * SecInHour;
+
+			IntegratedHeatPumpUnits(DXCoilNum).Energy = IntegratedHeatPumpUnits(DXCoilNum).TotalPower * ReportingConstant;//total electric energy consumption [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalCooling = IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate * ReportingConstant;//total cooling energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalHeating = IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate * ReportingConstant;//total heating energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLoadTotalWaterHeating = IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate * ReportingConstant;//total heating energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergyLatent = IntegratedHeatPumpUnits(DXCoilNum).TotalLatentLoad* ReportingConstant; // total latent energy [J]
+			IntegratedHeatPumpUnits(DXCoilNum).EnergySource = IntegratedHeatPumpUnits(DXCoilNum).Qsource * ReportingConstant;//total source energy
+
+			if (IntegratedHeatPumpUnits(DXCoilNum).TotalPower > 0.0)
+			{
+				TotalDelivery = IntegratedHeatPumpUnits(DXCoilNum).TotalCoolingRate + IntegratedHeatPumpUnits(DXCoilNum).TotalSpaceHeatingRate +
+					IntegratedHeatPumpUnits(DXCoilNum).TotalWaterHeatingRate;
+				IntegratedHeatPumpUnits(DXCoilNum).TotalCOP = TotalDelivery / IntegratedHeatPumpUnits(DXCoilNum).TotalPower;
+			}
 
 		}
 
@@ -1763,6 +1963,7 @@ namespace EnergyPlus {
 			Real64 AirMassFlowRate(0.0);
 			Real64 FlowScale(1.0);
 			bool IsResultFlow(false); //IsResultFlow = true, the air flow rate will be from a simultaneous mode, won't be re-calculated
+			Real64 WaterDensity(986.0); //standard water density at 60 C
 
 			// Obtains and Allocates WatertoAirHP related parameters from input file
 			if (GetCoilsInputFlag) { //First time subroutine has been entered
@@ -1816,7 +2017,7 @@ namespace EnergyPlus {
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex;
 				FlowScale = IntegratedHeatPumpUnits(DXCoilNum).CoolVolFlowScale;
 				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate = 
-					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * 986.0; 
+					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
 				if (true == IsCallbyWH)
 				{
 					IsResultFlow = true;
@@ -1836,7 +2037,7 @@ namespace EnergyPlus {
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCDWHCoolCoilIndex;
 				FlowScale = IntegratedHeatPumpUnits(DXCoilNum).CoolVolFlowScale;
 				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate =
-					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * 986.0;
+					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
 				if (true == IsCallbyWH)
 				{
 					IsResultFlow = true;
@@ -1848,7 +2049,7 @@ namespace EnergyPlus {
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHDWHHeatCoilIndex;
 				FlowScale = IntegratedHeatPumpUnits(DXCoilNum).HeatVolFlowScale;
 				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate =
-					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * 986.0;
+					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
 				if (true == IsCallbyWH)
 				{
 					IsResultFlow = true;
@@ -2005,29 +2206,6 @@ namespace EnergyPlus {
 
 
 		}
-
-		//     NOTICE
-
-		//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-		//     and The Regents of the University of California through Ernest Orlando Lawrence
-		//     Berkeley National Laboratory.  All rights reserved.
-
-		//     Portions of the EnergyPlus software package have been developed and copyrighted
-		//     by other individuals, companies and institutions.  These portions have been
-		//     incorporated into the EnergyPlus software package under license.   For a complete
-		//     list of contributors, see "Notice" located in main.cc.
-
-		//     NOTICE: The U.S. Government is granted for itself and others acting on its
-		//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-		//     reproduce, prepare derivative works, and perform publicly and display publicly.
-		//     Beginning five (5) years after permission to assert copyright is granted,
-		//     subject to two possible five year renewals, the U.S. Government is granted for
-		//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-		//     worldwide license in this data to reproduce, prepare derivative works,
-		//     distribute copies to the public, perform publicly and display publicly, and to
-		//     permit others to do so.
-
-		//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 	} // IntegratedHeatPumps
 
