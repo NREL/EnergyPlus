@@ -3086,7 +3086,7 @@ This numeric field defines the number of compressors in the heat pump condensing
 
 \paragraph{Field: Ratio of Compressor Size to Total Compressor Capacity}\label{field-ratio-of-compressor-size-to-total-compressor-capacity}
 
-This numeric field defines the size of the first stage compressor to the total compressor capacity and is used exclusively for calculating crankcase heater energy. If this field and the previous field are left blank, the default value is 0.5. If this field is left blank and the previous field is not blank, the compressors are assumed to be equally sized. When the number of compressors is greater than 2, the 2\(^{d}\) stage compressor and all additional compressors are assumed to be equally sized. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+This numeric field defines the size of the first stage compressor to the total compressor capacity and is used exclusively for calculating crankcase heater energy. If this field and the previous field are left blank, the default value is 0.5. If this field is left blank and the previous field is not blank, the compressors are assumed to be equally sized. When the number of compressors is greater than 2, the 2\(^{nd}\) stage compressor and all additional compressors are assumed to be equally sized. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater}
 
@@ -3130,11 +3130,11 @@ Tcond\,inlet = \,\left( {Twb,o} \right)\,\, + \,\,\left( {1 - EvapCondEffectiven
 
 where
 
-\emph{T\(_{t}\)} = the temperature of the air entering the condenser coil (C)
+\emph{T\(_{cond\\ inlet}\)} = the temperature of the air entering the condenser coil (C)
 
-\emph{T\(_{o}\)} = the wet-bulb temperature of the outdoor air (C)
+\emph{T\(_{wb,o}\)} = the wet-bulb temperature of the outdoor air (C)
 
-\emph{T\(_{o}\)} = the dry-bulb temperature of the outdoor air (C)
+\emph{T\(_{db,o}\)} = the dry-bulb temperature of the outdoor air (C)
 
 The resulting condenser inlet air temperature is used by the Cooling Capacity Ratio Modifier Curve (function of temperature) and the Cooling Energy Input Ratio Modifier Curve (function of temperature). The default value for this field is 0.9, although valid entries can range from 0.0 to 1.0. This field is not used when Condenser Type = Air Cooled and the simulation is calculating heating performance.
 

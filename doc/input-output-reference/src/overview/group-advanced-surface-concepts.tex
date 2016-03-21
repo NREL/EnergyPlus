@@ -969,52 +969,500 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Key choice & Applies to Inside or Outside \tabularnewline \midrule
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
 \endhead
-Value & Both \tabularnewline
-Schedule & Both \tabularnewline
-Simple & Inside \tabularnewline
-SimpleCombined & Outside \tabularnewline
-TARP & Both \tabularnewline
-DOE-2 & Outside \tabularnewline
-MoWitt & Outside \tabularnewline
-AdaptiveConvectionAlgorithm & Both \tabularnewline
-ASHRAEVerticalWall & Both \tabularnewline
-WaltonUnstableHorizontalOrTilt & Both \tabularnewline
-WaltonStableHorizontalOrTilt & Both \tabularnewline
-FisherPedersenCeilingDiffuserWalls & Inside \tabularnewline
-FisherPedersenCeilingDiffuserCeiling & Inside \tabularnewline
-FisherPedersenCeilingDiffuserFloor & Inside \tabularnewline
-AlamdariHammondStableHorizontal & Both \tabularnewline
-AlamdariHammondUnstableHorizontal & Both \tabularnewline
-AlamdariHammondVerticalWall & Both \tabularnewline
-KhalifaEq3WallAwayFromHeat & Inside \tabularnewline
-KhalifaEq4CeilingAwayFromHeat & Inside \tabularnewline
-KhalifaEq5WallNearHeat & Inside \tabularnewline
-KhalifaEq6NonHeatedWalls & Inside \tabularnewline
-KhalifaEq7Ceiling & Inside \tabularnewline
-AwbiHattonHeatedFloor & Inside \tabularnewline
-AwbiHattonHeatedWall & Inside \tabularnewline
-BeausoleilMorrisonMixedAssistedWall & Inside \tabularnewline
-BeausoleilMorrisonMixedOpposingWall & Inside \tabularnewline
-BeausoleilMorrisonMixedStableFloor & Inside \tabularnewline
-BeausoleilMorrisonMixedUnstableFloor & Inside \tabularnewline
-BeausoleilMorrisonMixedStableCeiling & Inside \tabularnewline
-BeausoleilMorrisonMixedUnstableCeiling & Inside \tabularnewline
-FohannoPolidoriVerticalWall & Both \tabularnewline
-KaradagChilledCeiling & Inside \tabularnewline
-ISO15099Windows & Inside \tabularnewline
-GoldsteinNovoselacCeilingDiffuserWindow & Inside \tabularnewline
-GoldsteinNovoselacCeilingDiffuserWalls & Inside \tabularnewline
-GoldsteinNovoselacCeilingDiffuserFloor & Inside \tabularnewline
-SimpleCombined & Outside \tabularnewline
-NusseltJurges & Outside \tabularnewline
-McAdams & Outside \tabularnewline
-Mitchell & Outside \tabularnewline
-BlockenWindard & Outside \tabularnewline
-Emmel & Outside \tabularnewline
-ClearRoof & Outside \tabularnewline
-UserCurve & Both \tabularnewline
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Convection Coefficient 1}\label{field-convection-coefficient-1}
+
+\paragraph{Field: Convection Coefficient 2}\label{field-convection-coefficient-2}
+
+If the Convection type was ``Value'', then this field is filled and contains the simple value to be used. Otherwise, this can be blank.
+
+\paragraph{Field: Convection Coefficient 1 Schedule Name}\label{field-convection-coefficient-1-schedule-name}
+
+\paragraph{Field: Convection Coefficient 2 Schedule Name}\label{field-convection-coefficient-2-schedule-name}
+
+If the Convection type was ``Schedule'', then this field contains the name of a schedule describing the value to be used during the time intervals for the schedule.
+
+The complete IDD definition for the ConvectionCoefficients object follows:
+
+\paragraph{Field: Convection Coefficient 1 User Curve Name}\label{field-convection-coefficient-1-user-curve-name}
+
+\paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name}
+
+If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+
+In IDF usage:
+
+\begin{lstlisting}
+
+SurfaceProperty:ConvectionCoefficients,
+  Zn001:Wall001,  ! Surface Name
+  Outside,        ! Convection Coefficient 1 Location
+  Value,          ! Convection Coefficient 1 Type
+  9.8,            ! Convection Coefficient 1
+  ,               ! Convection Coefficient 1 Schedule Name
+  ,               ! Convection Coefficient 1 User Curve Name
+  Inside,         ! Convection Coefficient 2 Location
+  Schedule,       ! Convection Coefficient 2 Type
+  ,               ! Convection Coefficient 2 {blank because using schedule}
+  MyInteriorCC,   ! Convection Coefficient 2 Schedule Name
+  ;               ! Convection Coefficient 2 User Curve Name
+
+  SurfaceProperty:ConvectionCoefficients,
+  Zn001:Wall002,  ! Surface Name
+  Inside,         ! Convection Coefficient 1 Location
+  Value,          ! Convection Coefficient 1 Type
+  .8,             ! Convection Coefficient 1
+  ,               ! Convection Coefficient 1 Schedule Name
+  ,               ! Convection Coefficient 1 User Curve Name
+  Outside,        ! Convection Coefficient 2 Location
+  Value,          ! Convection Coefficient 2 Type
+  5.5,            ! Convection Coefficient 2
+  ;               ! Convection Coefficient 2 User Curve Name
+
+  SurfaceProperty:ConvectionCoefficients,
+  Zn001:Wall003,  ! Surface Name
+  Outside,        ! Convection Coefficient 1 Location
+  Value,          ! Convection Coefficient 1 Type
+  9.8;            ! Convection Coefficient 1
+\end{lstlisting}
+
+\subsection{SurfaceProperty:ConvectionCoefficients:MultipleSurface}\label{surfacepropertyconvectioncoefficientsmultiplesurface}
+
+The convection coefficients of each surface, both outside and inside, are automatically calculated during EnergyPlus execution. These calculations are ``governed'' by other objects such as the Inside Convection Algorithm (overall default) and the Zone Inside Convection Algorithm (Zone Default) and the Outside Convection Algorithm (overall default) and/or the Zone Outside Convection Algorithm (Zone Default). Usually, that will be enough flexibility for most users. However, if you need to match pre-existing convection coefficients (from another program) or are trying to match a test suite of results, you may wish to use the ``override'' convection coefficients in the following object. This object is similar to the preceding ``ConvectionCoefficients'' object but allows multiple surfaces to be assigned a type with one object entry.
+
+Note that using these in conjunction, in particular, the ``Simple'' option on either the Outside Convection Algorithm or the Zone Outside Convection Algorithm field will result in a combined coefficient regardless of choice chosen here.
+
+Note that surfaces with ``SurfaceProperty:OtherSideCoefficients'' cannot use this object with the ``outside'' coefficient -- attempting to do so will ignore OSC surfaces during a multiple surface ``apply''; SurfaceProperty:OtherSideCoefficients surfaces can apply an ``inside'' coefficient. And, surfaces with ``Ground'' exposure do not use the ``outside'' coefficient that might be supplied here. Note, too, that some lower boundaries are used regardless by certain surface types (i.e.~Window) or certain algorithm types.
+
+\subsubsection{Inputs}\label{inputs-11}
+
+\paragraph{Field: Surface Type}\label{field-surface-type-1}
+
+This field is the applicable surface name for the user supplied convection coefficient. The allowable surface types are:
+
+\begin{itemize}
+\item
+  AllExteriorSurfaces~ (all surfaces that are ``external environment'' surfaces)
+\item
+  AllExteriorWindows (all windows that are ``external environment'' surfaces)
+\item
+  AllExteriorWalls
+\item
+  AllExteriorRoofs
+\item
+  AllExteriorFloors
+\item
+  AllInteriorSurface (all surfaces that are ``internal'' surfaces)
+\item
+  AllInteriorWindows
+\item
+  AllInteriorCeilings
+\item
+  AllInteriorFloors
+\end{itemize}
+
+\paragraph{Fields (Convection Location, Type, Coefficient \& Schedule Name)}\label{fields-convection-location-type-coefficient-schedule-name-1}
+
+For simplicity, the descriptions of these field occur together -- however, the fields are used sequentially when put into the IDF file (reference the IDF examples following the descriptions).
+
+\paragraph{Field: Convection Coefficient 1 Location}\label{field-convection-coefficient-1-location-1}
+
+\paragraph{Field: Convection Coefficient 2 Location}\label{field-convection-coefficient-2-location-1}
+
+This field contains the word ``Outside'' or ``Inside'' depending on which location is being described.
+
+\paragraph{Field: Convection Coefficient 1 Type}\label{field-convection-coefficient-1-type-1}
+
+\paragraph{Field: Convection Coefficient 2 Type}\label{field-convection-coefficient-2-type-1}
+
+The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.~ The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endhead
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Convection Coefficient 1}\label{field-convection-coefficient-1-1}
+
+\paragraph{Field: Convection Coefficient 2}\label{field-convection-coefficient-2-1}
+
+If the Convection type was ``Value'', then this field is filled and contains the simple value to be used. Otherwise, this can be blank.
+
+\paragraph{Field: Convection Coefficient 1 Schedule Name}\label{field-convection-coefficient-1-schedule-name-1}
+
+\paragraph{Field: Convection Coefficient 2 Schedule Name}\label{field-convection-coefficient-2-schedule-name-1}
+
+If the Convection type was ``Schedule'', then this field contains the name of a schedule describing the value to be used during the time intervals for the schedule.
+
+\paragraph{Field: Convection Coefficient 1 User Curve Name}\label{field-convection-coefficient-1-user-curve-name-1}
+
+\paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name-1}
+
+If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+
+In IDF usage:
+
+\begin{lstlisting}
+
+SurfaceProperty:ConvectionCoefficients:MultipleSurface,
+  AllExteriorWindows,  ! Surface Types
+  Outside,             ! Convection Coefficient 1 Location
+  MoWitt;              ! Convection Coefficient 1 Type
+\end{lstlisting}
+
+\subsection{Convection Coefficient Application Hierarchy}\label{convection-coefficient-application-hierarchy}
+
+Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilties in EnergyPlus. The objects that control how convection models are assigned to individual surfaces~ are:
+
+\begin{itemize}
+\item
+  SurfaceConvectionAlgorithm:Inside
+\item
+  SurfaceConvectionAlgorithm:Outside
+\item
+  Zone, Field: Zone Inside Convection Algorithm
+\item
+  Zone, Field: Zone Outside Convection Algorithm
+\item
+  SurfaceProperty:ConvectionCoefficients
+\item
+  SurfaceProperty:ConvectionCoefficients:MultipleSurface
+\end{itemize}
+
+General to Specific, they are assigned in this order:
+
+% table 9
+\begin{longtable}[c]{p{2.96in}p{3.03in}}
+\caption{Convection Coefficient Assignment Hierarchy \label{table:convection-coefficient-assignment-hierarchy}} \tabularnewline
+\toprule 
+Objects/Description & Action \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Convection Coefficient Assignment Hierarchy} \tabularnewline
+\toprule 
+Objects/Description & Action \tabularnewline
+\midrule
+\endhead
+
+SurfaceConvectionAlgorithm:* & Assigns for all surfaces in the run. \tabularnewline
+Zone, Fields: Zone * Convection Algorithm & Trumps global assignment and assigns for all surfaces in Zone. \tabularnewline
+SurfaceProperty:...:MultipleSurfaces & Trumps above and assigns for specific types of surfaces. \tabularnewline
+Two Multiple Surface Assignments overlapping (such as AllExteriorSurfaces vs AllExteriorWalls) & Order in IDF is now important. Whichever is first gets the cookie and the second gets a warning. \tabularnewline
+Specific Surface Assignment & Trumps all Above. \tabularnewline
+\bottomrule
+\end{longtable}
+
+There are additional objects that provide fine control over the models that get assigned.
+
+\begin{itemize}
+\item
+  SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections
+\item
+  SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections
+\item
+  SurfaceConvectionAlgorithm:Inside:UserCurve
+\item
+  SurfaceConvectionAlgorithm:Outside:UserCurve
+\end{itemize}
+
+\subsection{Convection Coefficients Outputs}\label{convection-coefficients-outputs}
+
+Outputs for the User Supplied Convection Coefficients appear as values in the Surface Output Variables (\emph{Surface Inside Face Convection Heat Transfer Coefficient} and \emph{Surface Outside Face Convection Heat Transfer Coefficient}). What the program expects to use is shown in the Surface Details report (\emph{Output:Surfaces:List, Details;})
+
+When EnergyPlus is set to Display Advanced Variables (Output:Diagnostics, DisplayAdvancedVariables;), then additional output variables are available that indicate the status of convection modeling by identifying which models are in effect at a given time.~ The adaptive convection algorithms may switch between models over time and the following output variables provide a way to monitor this behavior.~ These outputs are integer codes and the integer values are explained in tables.
+
+\subsubsection{Surface Inside Face Convection Classification Index}\label{surface-inside-face-convection-classification-index}
+
+This variable reports how the surface was classified as part of the adaptive convection algorithm for the inside face.~ The algorithm examines probable flow regimes, heat flow directions, orientations, HVAC equipment connections, and current operating status to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endhead
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Surface Inside Face Convection Model Equation Index}\label{surface-inside-face-convection-model-equation-index}
+
+This variable reports the specific model equation used to calculate the inside face convection coefficient.~ This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.~ The following table lists the models associated with specific interger codes reported here.~ The models correspond to key words used in input objects.
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endhead
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Surface Inside Face Convection Reference Air Index}\label{surface-inside-face-convection-reference-air-index}
+
+The inside face convection heat transfer calculations can be based on different reference air temperatures.~ This reference air temperature can vary during the simulation when the adaptive algorithm selects models that use different references.~ The following table lists the meaning of the integer codes.
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endhead
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Surface Outside Face Convection Classification Index}\label{surface-outside-face-convection-classification-index}
+
+This variable reports how the surface was classified as part of the adaptive convection algorithm for the outside face.~ The algorithm examines the wind direction, heat flow directions and orientations to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endhead
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Surface Outside Face Forced Convection Model Equation Index}\label{surface-outside-face-forced-convection-model-equation-index}
+
+\subsubsection{Surface Outside Face Natural Convection Model Equation Index}\label{surface-outside-face-natural-convection-model-equation-index}
+
+These variables report the specific model equation used to calculate the outside face's convection coefficient.~ They can vary when using the adaptive convection algorithm and so the results of that selection algorithm are reported in these variables.~ The following table lists the models associated with specific integer codes that might be reported here.~ The models correspond to key words used in input objects.
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Report Code & Related key and model \tabularnewline
+\midrule
+\endhead
+
+300 & None~ \tabularnewline
+301 & UserValue \tabularnewline
+302 & UserSchedule \tabularnewline
+303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
+305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
+306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
+307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
+308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
+320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
 \bottomrule
 \end{longtable}
 

@@ -24,10 +24,18 @@ The cost estimate line item calculation will be controlled by the name entered i
 
 % table 37
 \begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
-\caption{Cost Line Item Types (ref Objects) \protect \label{table:cost-line-item-types-ref-objects}}\\
+\caption{Cost Line Item Types (ref Objects) \label{table:cost-line-item-types-ref-objects}} \tabularnewline
 \toprule 
-Object Types available (choice keys) & Cost per each & Cost per m & Cost per kW & Cost per kW *COP & Cost per m & Cost per m  /s & Cost per W/K & Qty & Wildcard for Name \tabularnewline \midrule
+Object Types available (choice keys) & Cost per each & Cost per m & Cost per kW & Cost per kW *COP & Cost per m & Cost per m  /s & Cost per W/K & Qty & Wildcard for Name \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Cost Line Item Types (ref Objects)} \tabularnewline
+\toprule 
+Object Types available (choice keys) & Cost per each & Cost per m & Cost per kW & Cost per kW *COP & Cost per m & Cost per m  /s & Cost per W/K & Qty & Wildcard for Name \tabularnewline
+\midrule
 \endhead
+
 General & X & ~ & ~ & ~ & ~ & ~ & ~ & X & ~ \tabularnewline
 Construction & ~ & X & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
 Coil:DX Coil:Cooling:DX: SingleSpeed & X & ~ & X & X & ~ & ~ & ~ & ~ & X \tabularnewline

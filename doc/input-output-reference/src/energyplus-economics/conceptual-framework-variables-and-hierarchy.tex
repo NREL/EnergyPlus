@@ -4,10 +4,18 @@ To understand how to use the utility bill calculation portion of EnergyPlus you 
 
 % table 35
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Example Electric Energy Use (for Economics Calculation) \protect \label{table:example-electric-energy-use-for-economics}}\\
+\caption{Example Electric Energy Use (for Economics Calculation) \label{table:example-electric-energy-use-for-economics}} \tabularnewline
 \toprule 
-Month & Electric Energy Use \tabularnewline \midrule
+Month & Electric Energy Use \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Example Electric Energy Use (for Economics Calculation)} \tabularnewline
+\toprule 
+Month & Electric Energy Use \tabularnewline
+\midrule
 \endhead
+
 January & 12143 \tabularnewline
 February & 13454 \tabularnewline
 March & 14178 \tabularnewline
@@ -40,12 +48,12 @@ Any charges included in the EnergyCharges category are added together. The Energ
 \begin{lstlisting}
 
 UtilityCost:Charge:Simple,
-    TaxOfFivePercent,        ! Charge Variable Name
-    TariffExample1,          ! Tariff Name
-    Subtotal,                ! Source Variable
-    Annual,                  ! Season
-    Taxes,                   ! Category Variable Name
-    0.05;                    ! Cost Per Unit Value or Variable Name
+    TaxOfFivePercent,        ! Charge Variable Name
+    TariffExample1,          ! Tariff Name
+    Subtotal,                ! Source Variable
+    Annual,                  ! Season
+    Taxes,                   ! Category Variable Name
+    0.05;                    ! Cost Per Unit Value or Variable Name
 \end{lstlisting}
 
 As you can see, the UtilityCost:Charge:Simple and UtilityCost:Charge:Block objects do most of the ``work'' of computing the annual energy cost. The benefit of using this categorization is that totals of each category are shown in the output reports and it organizes the charges in the monthly calculations in a logical way that fits almost all tariffs. If no categorization is desired, theoretically, all charges could be assigned to the Total category. The categories themselves are simply variable names. Charges may also be assigned to the ``NotIncluded'' category if the result of the charge is used as an intermediate calculation and should not be included in the Total.

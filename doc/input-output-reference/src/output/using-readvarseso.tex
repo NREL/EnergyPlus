@@ -10,10 +10,18 @@ You can override the 255 variable limit by specifying an argument on the command
 
 % table 41
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{ReadVarsESO Command Line Options \protect \label{table:readvarseso-command-line-options}}\\
+\caption{ReadVarsESO Command Line Options \label{table:readvarseso-command-line-options}} \tabularnewline
 \toprule 
-Option & Description \tabularnewline \midrule
+Option & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{ReadVarsESO Command Line Options} \tabularnewline
+\toprule 
+Option & Description \tabularnewline
+\midrule
 \endhead
+
 < filename > & To use any of these options, you must include a file name (“rvi” file) as the first argument. \tabularnewline
 Unlimited (or Nolimit) & Variables of any number will be produced on the output file. \tabularnewline
 Timestep & Only variables with reported frequency “timestep” (or detailed) will be produced on the output file. \tabularnewline
@@ -30,10 +38,18 @@ The program is run automatically from the \textbf{EP-Launch} program or the \tex
 
 % table 42
 \begin{longtable}[c]{p{2.1in}p{3.9in}}
-\caption{"RVI" file contents \protect \label{table:rvi-file-contents}}\\
+\caption{"RVI" file contents \label{table:rvi-file-contents}} \tabularnewline
 \toprule 
-.rvi line description & Actual .rvi File Contents \tabularnewline \midrule
+.rvi line description & Actual .rvi File Contents \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{"RVI" file contents} \tabularnewline
+\toprule 
+.rvi line description & Actual .rvi File Contents \tabularnewline
+\midrule
 \endhead
+
 Input File & eplusout.eso \tabularnewline
 Output File & eplusout.csv \tabularnewline
 Variable Name & Site Outdoor Drybulb Temperature \tabularnewline
@@ -73,10 +89,18 @@ The above message was generated from an IDF that requested reporting of the ``SY
 
 % table 43
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{Example ReadVarsESO command lines and results \protect \label{table:example-readvarseso-command-lines-and-results}}\\
+\caption{Example ReadVarsESO command lines and results \label{table:example-readvarseso-command-lines-and-results}} \tabularnewline
 \toprule 
-Command Line & Description/Result \tabularnewline \midrule
+Command Line & Description/Result \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Example ReadVarsESO command lines and results} \tabularnewline
+\toprule 
+Command Line & Description/Result \tabularnewline
+\midrule
 \endhead
+
 ReadVarsESO & Take eplusout.eso and produce an eplusout.csv file with all variables (up to 255) on it \tabularnewline
 ReadVarsESO my.rvi & Use the contents of “my.rvi” to produce the appropriate output file (limited to 255 variables) \tabularnewline
 ReadVarsESO my.rvi unlimited & Use the contents of “my.rvi” to produce the appropriate output file (no longer limited to 255 variables) \tabularnewline

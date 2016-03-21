@@ -284,9 +284,9 @@ If Wind Pressure Coefficient Type = \textbf{SurfaceAverageCalculation}, a value 
 
 Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation. The choices for Building Type are LowRise and HighRise, with the default being LowRise.
 
-LowRise corresponds to a rectangular building whose height is less than three times the width of the footprint (\emph{w\(_{t}\)} in Figure~\ref{fig:footprint-of-a-rectangular-building-showing}) and is less than three times the length of the footprint (\emph{w\(_{g}\)} in the same figure).
+LowRise corresponds to a rectangular building whose height is less than three times the width of the footprint (\emph{w\(_{short}\)} in Figure~\ref{fig:footprint-of-a-rectangular-building-showing}) and is less than three times the length of the footprint (\emph{w\(_{long}\)} in the same figure).
 
-HighRise corresponds to a rectangular building whose height is more than three times the width of the footprint (\emph{w\(_{t}\)} in Figure~\ref{fig:footprint-of-a-rectangular-building-showing}) or is more than three times the length of the footprint (\emph{w\(_{g}\)} in the same figure).
+HighRise corresponds to a rectangular building whose height is more than three times the width of the footprint (\emph{w\(_{short}\)} in Figure~\ref{fig:footprint-of-a-rectangular-building-showing}) or is more than three times the length of the footprint (\emph{w\(_{long}\)} in the same figure).
 
 \paragraph{Field: Maximum Number of Iterations}\label{field-maximum-number-of-iterations}
 
@@ -298,11 +298,11 @@ Designates which method is used for AirflowNetwork initialization. The choices f
 
 \paragraph{Field: Relative Airflow Convergence Tolerance}\label{field-relative-airflow-convergence-tolerance}
 
-The solution is assumed to have converged when \({{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|} }}\) is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (\(\left| {\sum {{{\mathop m\limits^ \bullet }_{_i}}} } \right|\) ) to the sum of network airflow magnitudes (\(\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|}\) ). The default value is 1.0x10\(^{4}\).
+The solution is assumed to have converged when \({{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|} }}\) is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (\(\left| {\sum {{{\mathop m\limits^ \bullet }_{_i}}} } \right|\) ) to the sum of network airflow magnitudes (\(\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|}\) ). The default value is 1.0x10\(^{-4}\).
 
 \paragraph{Field: Absolute Airflow Convergence Tolerance}\label{field-absolute-airflow-convergence-tolerance}
 
-The solution is assumed to have converged when the summation of the absolute value of all network airflows (\(\left| {\sum {{{\mathop m\limits^ \bullet }_{_i}}} } \right|\) ) is less than the value specified for this input field. The default value is 1.0x10\(^{6}\).
+The solution is assumed to have converged when the summation of the absolute value of all network airflows (\(\left| {\sum {{{\mathop m\limits^ \bullet }_{_i}}} } \right|\) ) is less than the value specified for this input field. The default value is 1.0x10\(^{-6}\).
 
 \paragraph{Field: Convergence Acceleration Limit}\label{field-convergence-acceleration-limit}
 
@@ -319,7 +319,7 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 \begin{figure}[hbtp] % fig 95
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image221.png}
-\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w\$\_\{t\}\$*/*w\$\_\{g\}\$* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.” \protect \label{fig:footprint-of-a-rectangular-building-showing}}
+\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w\$\_\{short\}\$*/*w\$\_\{long\}\$* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.” \protect \label{fig:footprint-of-a-rectangular-building-showing}}
 \end{figure}
 
 \paragraph{Field: Height Dependence of External Node Temperature}\label{field-height-dependence-of-external-node-temperature}
@@ -399,13 +399,13 @@ The name of the EnergyPlus thermal zone corresponding to the AirflowNetwork zone
 
 Specifies the type of zone-level natural ventilation control.
 
-Let T\(_{t}\) equal the outdoor air temperature, T\(_{e}\) equal the previous timestep's zone air temperature, T\(_{t}\) equal the Vent Temperature Schedule value, H\(_{e}\) equal the specific enthalpy of zone air from the previous timestep, and H\(_{t}\) equal the specific enthalpy of outdoor air. Then the four allowed choices for Ventilation Control Mode are:
+Let T\(_{out}\) equal the outdoor air temperature, T\(_{zone}\) equal the previous timestep's zone air temperature, T\(_{set}\) equal the Vent Temperature Schedule value, H\(_{zone}\) equal the specific enthalpy of zone air from the previous timestep, and H\(_{out}\) equal the specific enthalpy of outdoor air. Then the four allowed choices for Ventilation Control Mode are:
 
 \textbf{NoVent}: All of the zone's openable windows and doors are closed at all times independent of indoor or outdoor conditions. The Venting Availability Schedule is ignored in this case. This is the default value for this field.
 
-\textbf{Temperature}: All of the zone's openable windows and doors are opened if T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} Venting Availability Schedule (see below) allows venting.
+\textbf{Temperature}: All of the zone's openable windows and doors are opened if T\(_{zone}\) \textgreater{} T\(_{out}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule (see below) allows venting.
 
-\textbf{Enthalpy:} All of the zone's openable windows and doors are opened if H\(_{e}\) \textgreater{} H\(_{t}\) \textbf{and} T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} Venting Availability Schedule allows venting.
+\textbf{Enthalpy:} All of the zone's openable windows and doors are opened if H\(_{zone}\) \textgreater{} H\(_{out}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule allows venting.
 
 \textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, all of the zone's openable windows and doors are open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of each opening is fixed while venting; the air flow through each opening can, of course, vary from timestep to timestep.
 
@@ -427,11 +427,11 @@ The following five fields can be used to modulate the window/door openings when 
 
 The modulation takes the following form when Ventilation Control Mode = Temperature:
 
-\textbf{if} T\(_{e}\) - T\(_{t}\) ~\textless{} = ~ {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~~\textbf{then}~~Multiplication factor = 1.0
+\textbf{if} T\(_{zone}\) - T\(_{out}\) ~\textless{} = ~ {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~~\textbf{then}~~Multiplication factor = 1.0
 
-\textbf{if} {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]} \textless{} T\(_{e}\) - T\(_{t}\) \textless{} {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~ \textbf{then} Multiplication factor varies linearly from 1.0 to {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
+\textbf{if} {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]} \textless{} T\(_{zone}\) - T\(_{out}\) \textless{} {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~ \textbf{then} Multiplication factor varies linearly from 1.0 to {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
 
-\textbf{if} T\(_{e}\) - T\(_{t}\)~\textgreater{} = ~ {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]} \textbf{then} Multiplication factor = {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
+\textbf{if} T\(_{zone}\) - T\(_{out}\)~\textgreater{} = ~ {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]} \textbf{then} Multiplication factor = {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
 
 One way of ``tuning'' the following modulation control parameters is to perform a sensitivity analysis for winter and/or summer design days to determine what combination of values causes the biggest reduction in zone air temperature fluctuations due to venting.
 
@@ -579,7 +579,11 @@ The AirflowNetwork model uses a combination of factors to determine the actual o
 
 If, in addition, the window is in a thermal zone for which opening modulation has been specified (ref: AirflowNetwork:Multizone:Zone) and the multiplication factor due to modulation is 0.3 in a particular timestep, then the actual opening factor that timestep = 0.3x0.75 = 0.225 and the actual opening area that timestep = 0.3x0.9 = 0.27 m\(^{2}\).
 
-If this linkage is associated with an AirflowNetwork:MultiZone:Surface:Crack object, the following crack air flow equation is used. \(^{}\)
+If this linkage is associated with an AirflowNetwork:MultiZone:Surface:Crack object, the following crack air flow equation is used. 
+
+\begin{equation}
+Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
+\end{equation}
 
 Where
 
@@ -599,13 +603,13 @@ Where
 
 Specifies the type of surface-level natural ventilation control.
 
-Let T\(_{t}\) equal the outdoor air temperature, T\(_{e}\) equal the previous timestep's zone air temperature, T\(_{t}\) equal the Vent Temperature Schedule value, H\(_{e}\) equal the specific enthalpy of zone air from the previous timestep, and H\(_{t}\) equal the specific enthalpy of outdoor air. Then the four allowed choices for Ventilation Control Mode are:
+Let T\(_{out}\) equal the outdoor air temperature, T\(_{zone}\) equal the previous timestep's zone air temperature, T\(_{set}\) equal the Vent Temperature Schedule value, H\(_{zone}\) equal the specific enthalpy of zone air from the previous timestep, and H\(_{out}\) equal the specific enthalpy of outdoor air. Then the four allowed choices for Ventilation Control Mode are:
 
 \textbf{NoVent}: The openable window or door associated with this surface is closed at all times independent of indoor or outdoor conditions. The Venting Availability Schedule is ignored in this case.
 
-\textbf{Temperature}: The openable window or door associated with this surface is opened if T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} Venting Availability Schedule (see below) allows venting.
+\textbf{Temperature}: The openable window or door associated with this surface is opened if T\(_{zone}\) \textgreater{} T\(_{out}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule (see below) allows venting.
 
-\textbf{Enthalpy:} The openable window or door associated with this surface is opened if H\(_{e}\) \textgreater{} H\(_{t}\) \textbf{and} T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} Venting Availability Schedule allows venting.
+\textbf{Enthalpy:} The openable window or door associated with this surface is opened if H\(_{zone}\) \textgreater{} H\(_{out}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule allows venting.
 
 \textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, the openable window or door associated with this surface is open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of this opening is fixed while venting; the air flow through this opening can, of course, vary from timestep to timestep.
 
@@ -615,9 +619,9 @@ Let T\(_{t}\) equal the outdoor air temperature, T\(_{e}\) equal the previous ti
 
 \textbf{ZoneLevel}: Venting of the window or door is not controlled individually, but is controlled instead at the zone level. This means that the venting is determined by the AirflowNetwork:Multizone:Zone object for the thermal zone containing the window or door (ref: AirflowNetwork:Multizone:Zone object). This is the default value for this field.
 
-\textbf{AdjacentTemperature}: This choice is used for an interior surface only. The openable interior window or door associated with this surface is opened if T\(_{e}\) \textgreater{} T\(_{e}\) \textbf{and} T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} Venting Availability Schedule (see below) allows venting, where T\(_{e}\)is the adjacent zone temperature.
+\textbf{AdjacentTemperature}: This choice is used for an interior surface only. The openable interior window or door associated with this surface is opened if T\(_{zone}\) \textgreater{} T\(_{adjacent\\ zone}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule (see below) allows venting, where T\(_{adjacent\\ zone}\)is the adjacent zone temperature.
 
-\textbf{AdjacentEnthalpy:} This choice is also used for an interior surface only. The interior openable window or door associated with this surface is opened if H\(_{e}\) \textgreater{} H\(_{e}\) \textbf{and} T\(_{e}\) \textgreater{} T\(_{t}\) \textbf{and} Venting Availability Schedule allows venting, where H\(_{e}\)is the adjacent zone specific enthalpy.
+\textbf{AdjacentEnthalpy:} This choice is also used for an interior surface only. The interior openable window or door associated with this surface is opened if H\(_{zone}\) \textgreater{} H\(_{adjacent\\ zone}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule allows venting, where H\(_{adjacent\\ zone}\)is the adjacent zone specific enthalpy.
 
 \subsubsection{Field: Ventilation Control Zone Temperature Setpoint Schedule Name}\label{field-ventilation-control-zone-temperature-setpoint-schedule-name-1}
 
@@ -633,11 +637,11 @@ The following five fields can be used to modulate this window/door opening when 
 
 The modulation takes the following form when Ventilation Control Mode = Temperature:
 
-\textbf{if} T\(_{e}\) - T\(_{t}\)~\textless{} = {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~~\textbf{then}~~Multiplication factor = 1.0
+\textbf{if} T\(_{zone}\) - T\(_{out}\)~\textless{} = {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~~\textbf{then}~~Multiplication factor = 1.0
 
-\textbf{if} {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]} \textless{} T\(_{e}\) - T\(_{t}\) \textless{} {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~ \textbf{then} Multiplication factor varies linearly from 1.0 to {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
+\textbf{if} {[}Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]} \textless{} T\(_{zone}\) - T\(_{out}\) \textless{} {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~ \textbf{then} Multiplication factor varies linearly from 1.0 to {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
 
-\textbf{if} T\(_{e}\) - T\(_{t}\)~\textgreater{} = ~ {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~ \textbf{then} Multiplication factor = {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
+\textbf{if} T\(_{zone}\) - T\(_{out}\)~\textgreater{} = ~ {[}Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor{]}~ \textbf{then} Multiplication factor = {[}Limit Value on Multiplier for Modulating Venting Open Factor{]}
 
 One way of ``tuning'' the following modulation control parameters is to perform a sensitivity analysis for winter and/or summer design days to determine what combination of values causes the biggest reduction in zone air temperature fluctuations due to venting.
 
@@ -707,7 +711,7 @@ AirflowNetwork:MultiZone:Surface,
       Zn001:Wall001:Win002,    !- Name of Associated Heat Transfer Surface
       WiOpen2,                 !- Leakage Component Name
       WFacade,                 !- External Node Name
-  0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+      0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
       Temperature,             !- Ventilation Control Mode
       WindowVentSched,         !- Vent Temperature Schedule Name
       0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
@@ -758,7 +762,11 @@ AirflowNetwork:MultiZone:ReferenceCrackConditions,
 
 \subsection{AirflowNetwork:MultiZone:Surface:Crack}\label{airflownetworkmultizonesurfacecrack}
 
-This object specifies the properties of air flow through a crack and the associated measurement conditions. The following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack: \(^{}\)
+This object specifies the properties of air flow through a crack and the associated measurement conditions. The following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack: 
+
+\begin{equation}
+Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
+\end{equation}
 
 Where
 
@@ -813,7 +821,7 @@ AirflowNetwork:MultiZone:Surface:Crack,
   CR-1,                   !- Name of Surface Crack Component
   0.01,                   !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
   0.667,                  !- Air Mass Flow Exponent {dimensionless}
-  ReferenceCrackConditio; !- Reference Crack Conditions
+  ReferenceCrackConditions; !- Reference Crack Conditions
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}\label{airflownetworkmultizonesurfaceeffectiveleakagearea}
@@ -1087,7 +1095,11 @@ This object specifies the properties of air flow through an exterior heat transf
 
 When the fan is on, the air mass flow rate modeled for the airflow network is based on the value defined in the MaximumFlow Rate field of the Fan:ZoneExhaust object. The airflow direction is from the corresponding zone to outdoors.
 
-When the fan is off, the following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack: \(^{}\)
+When the fan is off, the following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack: 
+
+\begin{equation}
+Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
+\end{equation}
 
 Where
 
@@ -1140,8 +1152,8 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
-     Zone3 Exhaust Fan,       !- Name
-     0.01,     !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
+      Zone3 Exhaust Fan,       !- Name
+      0.01,     !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
       0.667;    !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off{dimensionless}
       ReferenceCrackConditions; !- Reference Crack Conditions
 \end{lstlisting}
@@ -1192,8 +1204,8 @@ AirflowNetwork:MultiZone:ExternalNode,
 
   AirflowNetwork:MultiZone:ExternalNode,
       Horizontal,              !- Name
-  3.028,                   !- External Node Height {m}
-  Horizontal_WPCValue;     !- Wind Pressure Coefficient Values Object Name
+      3.028,                   !- External Node Height {m}
+      Horizontal_WPCValue;     !- Wind Pressure Coefficient Values Object Name
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:WindPressureCoefficientArray}\label{airflownetworkmultizonewindpressurecoefficientarray}
@@ -1658,7 +1670,7 @@ where
 
 \(n\) = Air mass flow exponent
 
-\(C_{u}\) = Equivalent air mass flow coefficient
+\(C_{equ}\) = Equivalent air mass flow coefficient
 
 \begin{equation}
 {C_{equ}}\,\,\,\,\,\, = r*{Q_r}*\rho *{\left( {\Delta {P_r}} \right)^{ - n}}
@@ -1809,8 +1821,7 @@ AirflowNetwork:Distribution:Component:Duct,
       0.2827,                  !- Cross Section Area {m2}
       0.0009,                  !- Surface Roughness {m}
       0.01,                    !- Coefficient for local dynamic loss due to fitting {dimensionless}
-      0.772,                   !- Overall heat transmittance coefficient (U value) from air to air
-                               !- {W/m2-K}
+      0.772,                   !- Overall heat transmittance coefficient (U value) from air to air {W/m2-K}
       0.0001;                  !- Overall moisture transmittance coefficient from air to air {kg/m2}
 \end{lstlisting}
 
@@ -1898,7 +1909,7 @@ A = Duct cross section area {[}m\(^{2}\){]}
 
 P = Perimeter of cross section {[}m{]}
 
-For this component, the relationship between airflow and pressure is similar to the component AirflowNetwork:Distribution:Component:Duct. However, the model assumes very small surface roughness (10\(^{4}\)) and no local dynamic loss due to fittings for this component. Therefore, this component only requires two numerical fields. Heat and moisture exchange from surroundings is ignored.
+For this component, the relationship between airflow and pressure is similar to the component AirflowNetwork:Distribution:Component:Duct. However, the model assumes very small surface roughness (10\(^{-4}\)) and no local dynamic loss due to fittings for this component. Therefore, this component only requires two numerical fields. Heat and moisture exchange from surroundings is ignored.
 
 Note: Make sure that the volumetric air flow rates for the fan, coils, and parent components (e.g., unitary system or furnace) are the same so that fan energy and air distribution system losses/gains are properly calculated.
 
@@ -1910,7 +1921,7 @@ AirflowNetwork:Distribution:Component:Coil,
       ACDXCoil 1,                            !- Name of Associated EnergyPlus Coil
       Coil:Cooling:DX:SingleSpeed,           !- EnergyPlus Coil Type
       0.1,                                   !- Air Path Length {m}
-  1.00;                                  !- Air Path Hydraulic Diameter {m}
+      1.00;                                  !- Air Path Hydraulic Diameter {m}
 
 
   AirflowNetwork:Distribution:Component:Coil,
@@ -1963,7 +1974,7 @@ A = Duct cross section area {[}m\(^{2}\){]}
 
 P = Perimeter of cross section {[}m{]}
 
-For this component, the relationship between airflow and pressure is similar to the component AirflowNetwork:Distribution:Component:Duct. However, the model assumes very small surface roughness (10\(^{4}\)) and no local dynamic loss due to fittings for this component. Therefore, this component only requires two numerical fields. Heat and moisture exchange from surroundings are ignored.
+For this component, the relationship between airflow and pressure is similar to the component AirflowNetwork:Distribution:Component:Duct. However, the model assumes very small surface roughness (10\(^{-4}\)) and no local dynamic loss due to fittings for this component. Therefore, this component only requires two numerical fields. Heat and moisture exchange from surroundings are ignored.
 
 Note: When a heat exchanger is used as a component of either CoilSystem:Cooling:DX:HeatExchangerAssisted or CoilSystem:Cooling:Water:HeatExchangerAssisted, the heat exchanger acts as two components in an air primary loop. For example, an air-to-air heat exchanger has a component connected to the supply air side (equivalent to a supply coil) and a component connected to exhaust air side (equivalent to an exhaust coil). The desiccant heat exchanger has a component connected to regeneration air side (equivalent to a regeneration air coil) and a component connected to process air side (equivalent to a process air coil). Therefore, each air-to-air heat exchanger used in this configuration requires two linkage objects (instead of only one linkage object as required for other AirflowNetwork components).
 
@@ -2021,7 +2032,7 @@ A = Duct cross section area {[}m\(^{2}\){]}
 
 P = Perimeter of cross section {[}m{]}
 
-It should be noted that the relationship for this component between airflow and pressure is similar to the component AirflowNetwork:Distribution:Component:Duct. However, the model assumes very small surface roughness (10\(^{4}\)) and no local dynamic loss due to fittings for this component. Therefore, this component only requires two numerical fields. Heat and moisture exchange from surroundings is ignored.
+It should be noted that the relationship for this component between airflow and pressure is similar to the component AirflowNetwork:Distribution:Component:Duct. However, the model assumes very small surface roughness (10\(^{-4}\)) and no local dynamic loss due to fittings for this component. Therefore, this component only requires two numerical fields. Heat and moisture exchange from surroundings is ignored.
 
 Note: The AirflowNetwork:Distribution:Component:TerminalUnit object is used to represent an AirTerminal:SingleDuct:ConstantVolume:Reheat or an AirTerminal:SingleDuct:VAV:Reheat object in an AirflowNetwork simulation. The AirflowNetwork:Distribution:Component:TerminalUnit should not be used to represent any other air terminal unit types. When the ZoneHVAC:EquipmentList object specifies an Air:Terminal:SingleDuct:Uncontrolled object, the AirflowNetwork:Distribution:Component:Duct object should be used instead.
 
@@ -2424,10 +2435,18 @@ When modulation is in effect the value of the multiplier is between 0.0 and 1.0.
 
 % table 25
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Value of opening factor multiplier for different venting conditions. \protect \label{table:value-of-opening-factor-multiplier-for}}\\
+\caption{Value of opening factor multiplier for different venting conditions. \label{table:value-of-opening-factor-multiplier-for}} \tabularnewline
 \toprule 
-Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline \midrule
+Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Value of opening factor multiplier for different venting conditions.} \tabularnewline
+\toprule 
+Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
+\midrule
 \endhead
+
 Yes & Temperature & Yes & 0.0 to 1.0 \tabularnewline
 No & -1.0 \tabularnewline
 Enthalpy & Yes & 0.0 to 1.0 \tabularnewline

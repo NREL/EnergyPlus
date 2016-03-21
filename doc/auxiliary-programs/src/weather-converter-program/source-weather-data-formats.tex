@@ -151,21 +151,22 @@ Meteonorm software can be used when there is no measured data near the location 
 The data sets and formats described above are some of the newest formats available for use with building simulation programs. Source data comes in various formats. Typically the files are ASCII, but the data items, units, item location, and record length vary from format to format. NCDC can provide historical data in a variety of formats: TD-3280, TD-3510, TD-9950 (DATSAV2), TD-9956 (DATSAV3) and TD-1440 (CD144). The EnergyPlus weather processor cannot process any of the types directly.
 
 % table 18
-\begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+{\scriptsize
+\begin{longtable}[c]{p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}}
 \caption{Summary of Downloadable Weather Data by Type \label{table:summary-of-downloadable-weather-data-by-type}} \tabularnewline
 \toprule 
-Source & WMO Region &  \tabularnewline
+Source & \multicolumn{8}{l}{WMO Region} &  \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Summary of Downloadable Weather Data by Type} \tabularnewline
 \toprule 
-Source & WMO Region &  \tabularnewline
+Source & \multicolumn{8}{l}{WMO Region} &  \tabularnewline
 \midrule
 \endhead
 
-North and Central America &  &  &  &  &  &  \tabularnewline
-USA & Canada & Central America & Africa & Asia & South America & Southwest Pacific & Europe & Total \tabularnewline
+ & \multicolumn{3}{l}{North and Central America} &  &  &  &  &  &  \tabularnewline
+ & USA & Canada & Central America & Africa & Asia & South America & Southwest Pacific & Europe & Total \tabularnewline
 ETMY &  &  &  & 11 &  &  &  &  & 11 \tabularnewline
 IGDG &  &  &  &  &  &  &  & 66 & 66 \tabularnewline
 IMGW &  &  &  &  &  &  &  & 61 & 61 \tabularnewline
@@ -185,7 +186,7 @@ TMY2 & 235 &  & 1 &  &  &  & 1 &  & 237 \tabularnewline
 TMY3 & 1011 &  & 7 &  &  &  & 2 &  & 1020 \tabularnewline
 Totals & 1476 & 0 & 51 & 58 & 176 & 39 & 123 & 305 &  \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 One other format worth mentioning is TRY. TRY is ``test reference year'' data that did not include solar radiation data. ``Test Reference Year'' is a term that usually denotes selection of a specific year of ``real'' data based on some statistical procedure. The original TRY data (TD-9706) was based on an ASHRAE procedure to select the data from a ``period of record''. ``The principle of the selection is to eliminate years in the period of record containing months with extremely high or low mean temperatures until only one year remains.'' The weather conversion utility cannot process data in ``TRY'' format. However, many organizations develop data for reference year data (e.g.~European TRY, Moisture Reference Data).
 

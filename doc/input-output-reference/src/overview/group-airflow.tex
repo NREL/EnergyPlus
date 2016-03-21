@@ -28,7 +28,7 @@ The source of the DOE-2 defaults is based on examining the infiltration relation
 
 The EnergyPlus example files use all of the above, the BLAST defaults in some (e.g., GeometryTest), the DOE-2 defaults in some (e.g., 5ZoneAirCooled), and the EnergyPlus defaults in some (e.g., LgOffVAVDetCoil).
 
-The local outdoor dry-bulb temperature used in the above basic equation (T\(_{b}\)) is typically a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor dry-bulb temperature calculation procedure is given in the section of ``Local Outdoor Air Temperature Calculation'' in the Engineering Reference.
+The local outdoor dry-bulb temperature used in the above basic equation (T\(_{odb}\)) is typically a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor dry-bulb temperature calculation procedure is given in the section of ``Local Outdoor Air Temperature Calculation'' in the Engineering Reference.
 
 The local outdoor wind speed used in the above basic equation (WindSpeed) is also a function of the height of the zone centroid above ground. The corresponding zone name is given in the second filed. The local outdoor wind speed calculation procedure is given in the section of ``Local Wind Speed Calculation'' in the Engineering Reference.
 
@@ -52,7 +52,7 @@ The name of the actual infiltration object becomes \textless{}Zone Name\textgrea
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-000}
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (I\(_{n}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{e}\) in the above equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (I\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
 
 \paragraph{Field: Design Flow Rate Calculation Method}\label{field-design-flow-rate-calculation-method}
 
@@ -100,7 +100,7 @@ With this choice, the method used will be the number of air changes per hour for
 
 \paragraph{Field: Design Flow Rate}\label{field-design-flow-rate}
 
-This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as I\(_{n}\) in the above equation) is the maximum amount of infiltration expected at design conditions. The design value is modified by the schedule fraction (see Field:Schedule Name) and user specified coefficients (see ''coefficient'' fields below). The resulting volume flow rate is converted to mass flow using the current outdoor air density at each time step.
+This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as I\(_{design}\) in the above equation) is the maximum amount of infiltration expected at design conditions. The design value is modified by the schedule fraction (see Field:Schedule Name) and user specified coefficients (see ''coefficient'' fields below). The resulting volume flow rate is converted to mass flow using the current outdoor air density at each time step.
 
 \paragraph{Field: Flow per Zone Floor Area}\label{field-flow-per-zone-floor-area}
 
@@ -197,7 +197,7 @@ This field is the name of the zone (ref: Zone) and attaches a particular infiltr
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1}
 
-This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{e}\) in the above equation.
+This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
 
 \paragraph{Field: Effective Air Leakage Area}\label{field-effective-air-leakage-area}
 
@@ -207,11 +207,163 @@ This field is the effective air leakage area, in cm\(^{2}\), at 4 Pa. This is th
 
 This field is the value of the stack coefficient, \({C_s}\) in the equation above. The coefficient has units of (L/s)\(^{2}\)/(cm\(^{4}\)·K). Values for the ``Basic Model Stack Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
-\begin{longtable}[c]{@{}lll@{}}
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
-One story house & Two story house & Three story house \tabularnewline \midrule
+Shelter class & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
 \endhead
-0.000145 & 0.000290 & 0.000435 \tabularnewline
+
+1 & No obstructions or local shielding \tabularnewline
+2 & Typical shelter for an isolated rural house \tabularnewline
+3 & Typical shelter caused by other buildings across the street \tabularnewline
+4 & Typical shelter for urban buildings on larger lots \tabularnewline
+5 & Typical shelter produced by buildings that are immediately adjacent. \tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Wind Coefficient}\label{field-wind-coefficient}
+
+This field is the value of the wind coefficient, \({C_w}\) ~in the equation above.~ The coefficient has units of (L/s)\(^{2}\)/(cm\(^{4}\)·(m/s)\(^{2}\)).~ Values for the ``Basic Model Wind Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endhead
+
+1 & No obstructions or local shielding \tabularnewline
+2 & Typical shelter for an isolated rural house \tabularnewline
+3 & Typical shelter caused by other buildings across the street \tabularnewline
+4 & Typical shelter for urban buildings on larger lots \tabularnewline
+5 & Typical shelter produced by buildings that are immediately adjacent. \tabularnewline
+\bottomrule
+\end{longtable}
+
+An example IDF object is
+
+\begin{lstlisting}
+
+ZoneInfiltration:EffectiveLeakageArea,
+      LIVING ZONE Infil 1,     !- Name
+      LIVING ZONE,             !- Zone Name
+      INF-SCHED,               !- Schedule Name
+      500.0,                   !- Effective Air Leakage Area
+      0.000145,                !- Stack Coefficient
+      0.000174 ;               !- Wind Coefficient
+\end{lstlisting}
+
+\subsection{ZoneInfiltration:FlowCoefficient}\label{zoneinfiltrationflowcoefficient}
+
+ZoneInfiltration:FlowCoefficient model is similar to the other infiltration objects but uses a different equation to model the unintended flow of air from the outdoor environment directly into a thermal zone.~ Infiltration is generally caused by the opening and closing of exterior doors, cracks around windows, and even in very small amounts through building elements.~ This reformulated model is based on the AIM-2 model by Walker and Wilson (1998) and is appropriate for smaller, residential-type buildings.~ The equation used to calculate infiltration in the flow coefficient model is:
+
+\begin{equation}
+Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}}
+\end{equation}
+
+Where \(\Delta T\) ~is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+
+Note that the coefficients for the ``Flow Coefficient'' model are not interchangeable with the similarly named coefficients in the ``Effective Leakage Area'' model (see ZoneInfiltration:EffectiveLeakageArea object).
+
+One or more infiltration objects of different types can be defined for each zone, and the resulting infiltration rate for the zone will simply be the summation of the flow rates specified by the infiltration objects.
+
+\subsubsection{Inputs}\label{inputs-2-005}
+
+\paragraph{Field: Name}\label{field-name-2-004}
+
+The name of the ZoneInfiltration:FlowCoefficient object. This needs to be unique across all different ZoneInfiltration objects.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-1-001}
+
+This field is the name of the zone (ref: Zone) and attaches a particular infiltration statement to a thermal zone in the building.
+
+\paragraph{Field: Schedule Name}\label{field-schedule-name-2}
+
+This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
+
+\paragraph{Field: Flow Coefficient}\label{field-flow-coefficient}
+
+This field is the flow coefficient in m\(^{3}\)/(s·Pa\(^{n}\)).~ This is the value \(c\) ~in the equation above.~ The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
+
+\paragraph{Field: Stack Coefficient}\label{field-stack-coefficient-1}
+
+This field is the value of the stack coefficient, \({C_s}\) ~in the equation above.~ The coefficient has units of (Pa/K)\(^{n}\). Values for the ``Enhanced Model Stack Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endhead
+
+1 & No obstructions or local shielding \tabularnewline
+2 & Typical shelter for an isolated rural house \tabularnewline
+3 & Typical shelter caused by other buildings across the street \tabularnewline
+4 & Typical shelter for urban buildings on larger lots \tabularnewline
+5 & Typical shelter produced by buildings that are immediately adjacent. \tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Pressure Exponent}\label{field-pressure-exponent}
+
+This field is the value of the pressure exponent, \emph{n} in the equation above.~ The pressure exponent generally lies between 0.6 and 0.7 with a typical value of \emph{n} = 0.67 for the enhanced model.
+
+\paragraph{Field: Wind Coefficient}\label{field-wind-coefficient-1}
+
+This field is the value of the wind coefficient, \({C_w}\) ~in the equation above.~ The coefficient has units of (Pa·s\(^{2}\)/m\(^{2}\))\(^{n}\) .~ Values for the ``Enhanced Model Wind Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endhead
+
+1 & No obstructions or local shielding \tabularnewline
+2 & Typical shelter for an isolated rural house \tabularnewline
+3 & Typical shelter caused by other buildings across the street \tabularnewline
+4 & Typical shelter for urban buildings on larger lots \tabularnewline
+5 & Typical shelter produced by buildings that are immediately adjacent. \tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Shelter Factor}\label{field-shelter-factor}
+
+This field is the value of the wind coefficient, \(s\) ~in the equation above.~ The coefficient is dimensionless.~ Values for the ``Enhanced Model Shelter Factor'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Shelter class & Description \tabularnewline
+\midrule
+\endhead
+
+1 & No obstructions or local shielding \tabularnewline
+2 & Typical shelter for an isolated rural house \tabularnewline
+3 & Typical shelter caused by other buildings across the street \tabularnewline
+4 & Typical shelter for urban buildings on larger lots \tabularnewline
+5 & Typical shelter produced by buildings that are immediately adjacent. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -330,7 +482,7 @@ The source of the BLAST defaults is noted in the BLAST documentation as:
 
 The source of the DOE-2 defaults is based on examining the \emph{infiltration} relationships described in the ASHRAE Handbook of Fundamentals.
 
-The local outdoor dry-bulb temperature used in the above basic equation (T\(_{b}\)) is typically a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor dry-bulb temperature calculation procedure is described in the ``Local Outdoor Air Temperature Calculation'' section of the Engineering Reference.
+The local outdoor dry-bulb temperature used in the above basic equation (T\(_{odb}\)) is typically a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor dry-bulb temperature calculation procedure is described in the ``Local Outdoor Air Temperature Calculation'' section of the Engineering Reference.
 
 The local outdoor wind speed used in the above basic equation (WindSpeed) is also a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor wind speed calculation procedure is described in the ``Local Wind Speed Calculation'' section of the Engineering Reference.
 
@@ -354,7 +506,7 @@ The name of the actual ventilation object becomes \textless{}Zone Name\textgreat
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-2}
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (V\(_{n}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{e}\) in the above equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (V\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
 
 \paragraph{Field: Design Flow Rate Calculation Method}\label{field-design-flow-rate-calculation-method-1}
 
@@ -394,7 +546,7 @@ With this choice, the method used will be the number of air changes per hour for
 
 \paragraph{Field: Design Flow Rate}\label{field-design-flow-rate-1}
 
-This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as V\(_{n}\) in the above equation) is the maximum amount of ventilation expected at design conditions. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
+This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as V\(_{design}\) in the above equation) is the maximum amount of ventilation expected at design conditions. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
 \paragraph{Field: Flow Rate per Zone Floor Area}\label{field-flow-rate-per-zone-floor-area}
 
@@ -591,9 +743,9 @@ where,
 
 ~~~~~ \emph{C\(_{w}\)}~~~~~~~ = Opening effectiveness {[}dimensionless{]}
 
-~~~~~ \emph{A\(_{g}\)}~ = Opening area {[}m\(^{2}\){]}
+~~~~~ \emph{A\(_{opening}\)}~ = Opening area {[}m\(^{2}\){]}
 
-~~~~~ \emph{F\(_{e}\)} = Open area fraction {[}user-defined schedule value, dimensionless{]}
+~~~~~ \emph{F\(_{schedule}\)} = Open area fraction {[}user-defined schedule value, dimensionless{]}
 
 ~~~~~ \emph{V}~~~~~~~~~ = Local wind speed {[}m/s{]}
 
@@ -609,17 +761,17 @@ where,
 
 ~~~~~ \emph{C\(_{D}\)}~~~~~~~ = Discharge coefficient for opening {[}dimensionless{]}
 
-~~~~~ \emph{A\(_{g}\)}~ = Opening area {[}m\(^{2}\){]}
+~~~~~ \emph{A\(_{opening}\)}~ = Opening area {[}m\(^{2}\){]}
 
-~~~~~ \emph{F\(_{e}\)} = Open area fraction {[}user-defined schedule value, dimensionless{]}
+~~~~~ \emph{F\(_{schedule}\)} = Open area fraction {[}user-defined schedule value, dimensionless{]}
 
-~~~~~ \emph{ΔH\(_{L}\)}~ = Height from midpoint of lower opening to the neutral pressure level {[}m{]}.
+~~~~~ \emph{ΔH\(_{NPL}\)}~ = Height from midpoint of lower opening to the neutral pressure level {[}m{]}.
 
 Estimation of this value is difficult; refer to Chapter 16 of the 2009 ASHRAE Handbook of Fundamentals for guidance.
 
-~~~~~ \emph{T\(_{e}\)}~~~~~ = Zone air dry-bulb temperature {[}K{]}
+~~~~~ \emph{T\(_{zone}\)}~~~~~ = Zone air dry-bulb temperature {[}K{]}
 
-\emph{T\(_{b}\)}\(_{ }\) = Local outdoor air dry-bulb temperature {[}K{]}
+\emph{T\(_{odb}\)} = Local outdoor air dry-bulb temperature {[}K{]}
 
 The total ventilation rate calculated by this model is the quadrature sum of the wind and stack air flow components:
 
@@ -627,7 +779,7 @@ The total ventilation rate calculated by this model is the quadrature sum of the
 Ventilatio{n_{WindAndStack}} = \sqrt {{Q_s}^2 + {Q_w}^2}
 \end{equation}
 
-The local outdoor air dry-bulb temperature used in the stack effect equation (T\(_{b}\)) is typically a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor air dry-bulb temperature calculation procedure is described in the ``Local Outdoor Air Temperature Calculation'' section of the Engineering Reference.
+The local outdoor air dry-bulb temperature used in the stack effect equation (T\(_{odb}\)) is typically a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor air dry-bulb temperature calculation procedure is described in the ``Local Outdoor Air Temperature Calculation'' section of the Engineering Reference.
 
 The local outdoor wind speed used in the above wind-driven equation (V) is also a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor wind speed calculation procedure is described in the ``Local Wind Speed Calculation'' section of the Engineering Reference.
 
@@ -856,11 +1008,11 @@ where,
 
 \emph{Q\(_{n}\)}~~ = Natural infiltration airflow from ZoneInfiltration:* objects {[}m\(^{3}\)/s{]}
 
-\emph{Q\(_{v}\)} = Balanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
+\emph{Q\(_{b,v}\)} = Balanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
 
-\emph{Q\(_{v}\)} = Unbalanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
+\emph{Q\(_{u,v}\)} = Unbalanced ventilation airflow, excluding infiltration {[}m\(^{3}\)/s{]}
 
-\emph{Q\(_{l}\)}~ = Unbalanced duct leakage: the difference between supply and return leaks {[}m\(^{3}\)/s{]}
+\emph{Q\(_{u,l}\)}~ = Unbalanced duct leakage: the difference between supply and return leaks {[}m\(^{3}\)/s{]}
 
 This object cannot be used simultaneously with the EnergyPlus AirflowNetwork model.~ If the AirflowNetwork model is active for a simulation time step, the Air Balance Method is reset to ``None'' for that time step. More advanced outdoor airflow calculations are possible using the EnergyPlus AirflowNetwork model.
 
@@ -1115,9 +1267,9 @@ ZoneMixing,
     Hours_of_operation,  !- Schedule Name
     Flow/Zone,  !- Design Flow Rate Calculation Method
     1.4540,  !- Design Level
-     ,  !- Volume Flow Rate per Area {m3/s/m2}
-     ,  !- Volume Flow Rate Per Person {m3/s/person}
-     ,  !- Air Changes per Hour {ACH}
+    ,  !- Volume Flow Rate per Area {m3/s/m2}
+    ,  !- Volume Flow Rate Per Person {m3/s/person}
+    ,  !- Air Changes per Hour {ACH}
     CAFETERIA_ZN_1_FLR_1,  !- Source Zone Name
     0.0;  !- Delta Temperature
 \end{lstlisting}
@@ -1559,11 +1711,11 @@ This field is the name of the zone (ref: Zone) and attaches a particular earth t
 
 \subsubsection{Field: Schedule Name}\label{field-schedule-name-6}
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate parameter (see next field). This fraction between 0.0 and 1.0 is noted as F\(_{e}\) in the above equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate parameter (see next field). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
 
 \subsubsection{Field: Design Flow Rate}\label{field-design-flow-rate-4}
 
-This number (noted as E\(_{n}\) in the above equation) is the maximum amount of air mass flow rate of the earth tube expected at design conditions. The flow rate is expressed in units of m\(^{3}\)/s. The design value is modified by the schedule fraction (see previous field) and user specified coefficients (see last four fields).
+This number (noted as E\(_{design}\) in the above equation) is the maximum amount of air mass flow rate of the earth tube expected at design conditions. The flow rate is expressed in units of m\(^{3}\)/s. The design value is modified by the schedule fraction (see previous field) and user specified coefficients (see last four fields).
 
 \subsubsection{Field: Minimum Zone Temperature when Cooling}\label{field-minimum-zone-temperature-when-cooling}
 

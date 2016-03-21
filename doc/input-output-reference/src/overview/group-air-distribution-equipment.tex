@@ -1554,13 +1554,13 @@ The nominal or design outlet water temperature in degrees Celsius. The default i
 
 \emph{The following inputs are parameters used to characterize the performance of the chilled beam units. Values for a given unit can be obtained from the manufacturer. The parameters are used in the following equations.~~~~~}
 
-\emph{P\(_{m}\)} = \emph{A·K·DT~~~~~~~} ~~~~~~~~~~~~~~~~~~~~~~~ beam cooling output per unit length W/m
+\emph{P\(_{beam}\)} = \emph{A·K·DT~~~~~~~} ~~~~~~~~~~~~~~~~~~~~~~~ beam cooling output per unit length W/m
 
-\emph{K = a·DT\(^{1}\)·vr\(^{2}\)·w\(^{3}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~ coil heat transfer coefficient W/(m\(^{2}\)K)
+\emph{K = a·DT\(^{n1}\)·vr\(^{n2}\)·w\(^{n3}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~ coil heat transfer coefficient W/(m\(^{2}\)K)
 
-\emph{vr = (q\(_{n}\)}/a\emph{\(_{0}\))·r\(_{r}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ room air mass flow rate across coil kg/(m\(^{2}\)s)
+\emph{vr = (q\(_{in}\)}/a\emph{\(_{0}\))·r\(_{air}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ room air mass flow rate across coil kg/(m\(^{2}\)s)
 
-\emph{q\(_{n}\) = K\(_{1}\)·DT\(^{n}\)+K\(_{n}\)·q\(_{r}\)}~~~~~~~~~~~~~~~~ room air volumetric flow rate across coil per
+\emph{q\(_{in}\) = K\(_{1}\)·DT\(^{n}\)+K\(_{in}\)·q\(_{pr}\)}~~~~~~~~~~~~~~~~ room air volumetric flow rate across coil per
 
 unit length m\(^{3}\)/(s-m)
 
@@ -1568,7 +1568,7 @@ DT is the room air --water temperature difference (average water temperature is 
 
 w is the water velocity in m/s.
 
-q\(_{r}\) is the supply air flow rate per unit length m\(^{3}\)/(s-m)
+q\(_{pr}\) is the supply air flow rate per unit length m\(^{3}\)/(s-m)
 
 \paragraph{Field: Coil Surface Area per Coil Length}\label{field-coil-surface-area-per-coil-length}
 
@@ -1602,9 +1602,9 @@ This is K\(_{1}\) in the above equations. The default is 0.005.
 
 This is n in the above equations. The default is 0.4.
 
-\paragraph{\texorpdfstring{Field: Coefficient of Induction K\(_{n}\) (Kin)}{Field: Coefficient of Induction K\_\{n\} (Kin)}}\label{field-coefficient-of-induction-kux5fn-kin}
+\paragraph{\texorpdfstring{Field: Coefficient of Induction K\(_{in}\) (Kin)}{Field: Coefficient of Induction K\_\{in\} (Kin)}}\label{field-coefficient-of-induction-kux5fin-kin}
 
-The coefficient of induction K\(_{n}\) in the above equations. The default is 2.0 for active beams and 0.0 for passive beams.
+The coefficient of induction K\(_{in}\) in the above equations. The default is 2.0 for active beams and 0.0 for passive beams.
 
 \paragraph{Field: Pipe Inside Diameter}\label{field-pipe-inside-diameter}
 
