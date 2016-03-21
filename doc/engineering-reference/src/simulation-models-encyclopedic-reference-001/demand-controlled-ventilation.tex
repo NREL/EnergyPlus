@@ -114,11 +114,11 @@ Where:
 
 \textbf{\emph{For single-path systems,}}
 
-Evz = 1+ Xs-- Z\(_{i}\)
+Evz = 1+ Xs-- Z\(_{d,i}\)
 
 \textbf{\emph{For multi-path systems,}}
 
-\emph{Evz =} \emph{(Fa+ Xs·Fb-- Z\(_{i}\)·Ep·Fc)/Fa}
+\emph{Evz =} \emph{(Fa+ Xs·Fb-- Z\(_{d,i}\)·Ep·Fc)/Fa}
 
 where system air fractions \emph{Fa}, \emph{Fb}, and \emph{Fc}are determined as follows
 
@@ -153,7 +153,7 @@ The method used to calculate the outdoor ventilation air flow rate for each syst
 \begin{figure}[hbtp] % fig 196
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4731.png}
-\caption{  Demand Control Ventilation -- Air Flow Paths \protect \label{fig:demand-control-ventilation-air-flow-paths}}
+\caption{Demand Control Ventilation -- Air Flow Paths \protect \label{fig:demand-control-ventilation-air-flow-paths}}
 \end{figure}
 
 The minimum outdoor air flow rate is first calculated based on the minimum outdoor air flow rate and the minimum outdoor air schedule value as defined by the user inputs for the object Controller:OutdoorAir:
@@ -282,13 +282,13 @@ n~\textbf{Controller:OutdoorAir} to control the outside air flow rate introduced
 
 For the i-th zone, the outdoor air mass flow rate provided by the air loop is calculated as below:
 
-1)~~~The required intake flow of outdoor air for the design zone population, \emph{P\(_{i}\)}
+1)~~~The required intake flow of outdoor air for the design zone population, \emph{P\(_{z,i}\)}
 
 \begin{equation}
 {V_{ot - design,i}} = \frac{{\left( {{R_{p,i}}.{P_{z,i}}} \right) + ({R_{a,i}}.{A_{z,i}})}}{{{E_i}}}
 \end{equation}
 
-2)~~~The required intake flow of outdoor air when the zone is unoccupied i.e.~ \emph{P\(_{i}\)} = 0
+2)~~~The required intake flow of outdoor air when the zone is unoccupied i.e.~ \emph{P\(_{z,i}\)} = 0
 
 \begin{equation}
 {V_{ot - min,i}} = \frac{{({R_{a,i}}.{A_{z,i}})}}{{{E_i}}}

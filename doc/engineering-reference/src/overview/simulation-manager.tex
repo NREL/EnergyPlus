@@ -5,11 +5,17 @@ The simulation manager of EnergyPlus is contained in a single module. The main s
 % table 1
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Simulation Flags \label{table:simulation-flags}} \tabularnewline
-\toprule 
+\toprule
+\tabularnewline
+\endfirsthead
+
+\caption[]{Simulation Flags} \tabularnewline
+\toprule
+\tabularnewline
 \endhead
 
 BeginSimulationFlag & EndSimulationFlag \tabularnewline
-BeginEnvironmentFlag & EndEnvironmentFlag(one to many days) \tabularnewline
+BeginEnvironmentFlag & EndEnvironmentFlag (one to many days) \tabularnewline
 BeginDayFlag & EndDayFlag \tabularnewline
 BeginHourFlag & EndHourFlag \tabularnewline
 BeginTimeStepFlag & EndTimeStepFlag \tabularnewline

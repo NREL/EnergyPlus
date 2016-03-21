@@ -18,7 +18,7 @@ where
 
 \({\dot Q_{evap,\,rated}}\) ~ = rated chiller evaporator capacity {[}W{]}
 
-This absorption chiller model is based on a polynomial fit of absorber performance data.~ The Generator Heat Input Part Load Ratio Curve is a quadratic equation that determines the ratio of the generator heat input to the \emph{demand} on the chiller's evaporator (Q\(_{p}\)).
+This absorption chiller model is based on a polynomial fit of absorber performance data.~ The Generator Heat Input Part Load Ratio Curve is a quadratic equation that determines the ratio of the generator heat input to the \emph{demand} on the chiller's evaporator (Q\(_{evap}\)).
 
 \begin{equation}
 GeneratorHeatInputRatio = \frac{{C1}}{{PLR}} + C2 + C3\left( {PLR} \right)
@@ -238,7 +238,7 @@ where
 
 \({\dot Q_{evap}}\) ~ = chiller evaporator operating capacity {[}W{]}
 
-The generator's heat input is also a function of several parameters. The primary input for determining the heat input requirements is the Generator Heat Input function of Part-Load Ratio Curve. The curve is a quadratic or cubic equation that determines the ratio of the generator heat input to the chiller's maximum capacity (Q\(_{x}\)) and is solely a function of part-load ratio. Typical generator heat input ratios at full load (i.e., PLR = 1) are between 1 and 2. Two additional curves are available to modifiy the heat input requirement based on the generator inlet water temperature and the evaporator outlet water temperature.
+The generator's heat input is also a function of several parameters. The primary input for determining the heat input requirements is the Generator Heat Input function of Part-Load Ratio Curve. The curve is a quadratic or cubic equation that determines the ratio of the generator heat input to the chiller's maximum capacity (Q\(_{evap,\, max}\)) and is solely a function of part-load ratio. Typical generator heat input ratios at full load (i.e., PLR = 1) are between 1 and 2. Two additional curves are available to modifiy the heat input requirement based on the generator inlet water temperature and the evaporator outlet water temperature.
 
 \begin{equation}
 GeneratorHIR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2} + d{\left( {PLR} \right)^3}
@@ -438,13 +438,13 @@ The chiller's temperature rise coefficient which is defined as the ratio of the 
 
 Where:
 
-TCEnt\(_{d}\) = Required entering condenser air or water temperature to maintain rated capacity.
+TCEnt\(_{required}\) = Required entering condenser air or water temperature to maintain rated capacity.
 
-TCEnt\(_{d}\) = Rated entering condenser air or water temperature at rated capacity.
+TCEnt\(_{rated}\) = Rated entering condenser air or water temperature at rated capacity.
 
-TELv\(_{d}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
+TELv\(_{required}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
 
-TELv\(_{d}\) = Rated leaving evaporator water outlet temperature at rated capacity.
+TELv\(_{rated}\) = Rated leaving evaporator water outlet temperature at rated capacity.
 
 The Capacity Ratio Curve is a quadratic equation that determines the Ratio of Available Capacity to Nominal Capacity.~ The defining equation is:
 
@@ -491,19 +491,19 @@ FuelEnergyInput =& PLoad * (FI{C_1} + FI{C_2}RLoad + FI{C_3}RLoa{d^2}) \\
 \end{split}
 \end{equation}
 
-Where FIC represents the Fuel Input Curve Coefficients, TBFIC represents the Temperature Based Fuel Input Curve Coefficients, Rload is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the current ambient and design ambient temperatures.
+Where FIC represents the Fuel Input Curve Coefficients, TBFIC represents the Temperature Based Fuel Input Curve Coefficients, Rload is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{air}\) is the difference between the current ambient and design ambient temperatures.
 
 The Exhaust Flow Curve is a quadratic equation that determines the Ratio of Exhaust Gas Flow Rate to Engine Capacity.~ The defining equation is:
 
 \emph{\(ExhaustFlowRate = GTCapacity * ({C_1} + {C_2}A{T_{air}} + {C_3}AT_{air}^2)\) ~}
 
-Where GTCapacity is the Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the current ambient and design ambient temperatures.
+Where GTCapacity is the Combustion Turbine Engine Capacity, and AT\(_{air}\) is the difference between the current ambient and design ambient temperatures.
 
 The Exhaust Gas Temperature Curve is a polynomial equation that determines the Exhaust Gas Temperature.~ The equation combines both the Exhaust Gas Temperature Curve Coefficients (Based on the Part Load Ratio) and the (Ambient) Temperature Based Exhaust Gas Temperature Curve Coefficients.~ The defining equation is:
 
 ~\(ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15\)
 
-Where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the actual ambient and design ambient temperatures.
+Where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{air}\) is the difference between the actual ambient and design ambient temperatures.
 
 The Recovery Lubricant Heat Curve is a quadratic equation that determines the recovery lube energy.~ The defining equation is:
 
@@ -577,9 +577,9 @@ The following nomenclature is used in the cooling equations:
 
 \emph{RunFrac}~~~~~~~~~~~~~~~~~~ = ~~ fraction of time step which the chiller is running
 
-\emph{T\(_{d}\)}~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ entering or leaving condenser fluid temperature {[}C{]}. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower) if the entering condenser fluid temperature option is used. For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively, if the entering condenser fluid temperature option is used.
+\emph{T\(_{cond}\)}~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ entering or leaving condenser fluid temperature {[}C{]}. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower) if the entering condenser fluid temperature option is used. For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively, if the entering condenser fluid temperature option is used.
 
-\emph{T\(_{l}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ leaving chilled water temperature {[}C{]}
+\emph{T\(_{cw,l}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ leaving chilled water temperature {[}C{]}
 
 Five performance curves are used in the calculation of cooling capacity and efficiency:
 
@@ -811,9 +811,9 @@ The following nomenclature is used in the cooling equations:
 
 \({T_{abs,gen,o}}\) ~~~~~~~~~~~~~~~~ = ~ Temperature of exhaust leaving the chiller (the generator ~~~~~~~~~~~~~~~~~~~component~ of the absorption chiller)
 
-\emph{T\(_{d}\)}~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ entering condenser fluid temperature {[}°C{]}. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
+\emph{T\(_{cond}\)}~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ entering condenser fluid temperature {[}°C{]}. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
 
-\emph{T\(_{l}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ leaving chilled water temperature {[}°C{]}
+\emph{T\(_{cw,l}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ leaving chilled water temperature {[}°C{]}
 
 The selection of entering or leaving condense fluid temperature can be made through the optional field-Temperature Curve Input Variable.
 
@@ -874,7 +874,7 @@ To make sure that the exhaust mass flow rate and temperature from microturbine a
 {Q_{Recovery}} = {\dot m_{ExhAir}} \cdot {\rm{}}C{p_{Air}} \cdot {\rm{}}({T_{a,o}} - {T_{Abs,gen,o}})
 \end{equation}
 
-T\(_{ }\) is the minimum temperature required for the proper operation of the double-effect chiller. It will be defaulted to 176°C.
+T\(_{abs,gen,o}\) is the minimum temperature required for the proper operation of the double-effect chiller. It will be defaulted to 176°C.
 
 The electric input to cooling output ratio as function of temperature (\emph{CEIRfT}) curve represents the fraction of electricity to the chiller at full load as it varies with temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature.
 
@@ -1075,7 +1075,7 @@ This chiller's basin heater (for evaporatively-cooled condenser type) operates i
 \begin{figure}[hbtp] % fig 161
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image3175.png}
-\caption{  Diagram of Chiller:Electric with Heat Recovery \protect \label{fig:diagram-of-chiller-electric-with-heat}}
+\caption{Diagram of Chiller:Electric with Heat Recovery \protect \label{fig:diagram-of-chiller-electric-with-heat}}
 \end{figure}
 
 The algorithm for the heat recovery portion of the chiller needs to be determined from relatively simple inputs to estimate the amount of the heat that is recovered and then send the rest of the heat to the cooling tower. For the chiller models associated with the object Chiller:Electric,~ air- or evaporatively-cooled condensers are allowed to be used with heat recovery and, when used, the condenser specific heat, mass flow rate, and temperatures shown below refer to outdoor air. A condenser air volume flow rate must be specified when using heat recovery with air- or evaporatively-cooled chillers.
@@ -1202,13 +1202,13 @@ TempRiseRatio = \frac{{{T_{cond, in,required}} - {T_{cond,in,rated}}}}{{{T_{evap
 
 Where:
 
-\emph{T\(_{d}\)} = Required entering condenser air or water temperature to maintain rated capacity (C)
+\emph{T\(_{cond,in,required}\)} = Required entering condenser air or water temperature to maintain rated capacity (C)
 
-\emph{T\(_{d}\)} = Rated entering condenser air or water temperature at rated capacity (C)
+\emph{T\(_{cond,in,rated}\)} = Rated entering condenser air or water temperature at rated capacity (C)
 
-\emph{T\(_{d}\)} = Required leaving evaporator water outlet temperature to maintain rated capacity (C)
+\emph{T\(_{evap,out,required}\)} = Required leaving evaporator water outlet temperature to maintain rated capacity (C)
 
-\emph{T\(_{d}\)} = Rated leaving evaporator water outlet temperature at rated capacity (C)
+\emph{T\(_{evap,out,rated}\)} = Rated leaving evaporator water outlet temperature at rated capacity (C)
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power.~ The defining equation is:
 
@@ -1262,9 +1262,9 @@ The chiller model uses user-supplied performance information at reference condit
 
 \emph{ChillerCapFTemp} = cooling capacity factor, equal to 1 at reference conditions
 
-\emph{T\(_{l}\)}~~~~~~~~~~~ = leaving chilled water temperature, ˚C
+\emph{T\(_{cw,l}\)}~~~~~~~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{e}\)}~~~~~~~~ = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
+\emph{T\(_{cond,e}\)}~~~~~~~~ = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
 
 ·~~~~~~~~The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the entering condenser fluid temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
@@ -1276,9 +1276,9 @@ where
 
 \emph{ChillerEIRFTemp} = energy input to cooling output factor, equal to 1 at reference conditions
 
-\emph{T\(_{l}\)}~~~~~ = leaving chilled water temperature, ˚C
+\emph{T\(_{cw,l}\)}~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{e}\)}\(_{ }\) = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{cond,e}\)} = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
@@ -1295,9 +1295,9 @@ where
 
 \emph{PLR} = part-load ratio = (cooling load) / (chiller's available cooling capacity)
 
-\emph{P\(_{r}\) = chiller power at specific PLR}
+\emph{P\(_{chiller}\) = chiller power at specific PLR}
 
-\emph{P\(_{f}\) = \({\mathop Q\limits^ \bullet_{ref}}\) /COP\(_{f}\)}
+\emph{P\(_{ref}\) = \({\mathop Q\limits^ \bullet_{ref}}\) /COP\(_{ref}\)}
 
 All three of the performance curves are accessed through EnergyPlus' built-in performance curve equation manager (curve:quadratic and curve:biquadratic). It is not imperative that the user utilize all coefficients in the performance curve equations if their performance equation has fewer terms (e.g., if the user's ChillerEIRFPLR performance curve is linear instead of quadratic, simply enter the values for a and b, and set coefficient c equal to zero). Performance curves for more than 160 chillers, including the default DOE-2.1E reciprocating and centrifugal chillers, are provided in the EnergyPlus Reference DataSets (Chillers.idf and AllDataSets.idf).
 
@@ -1325,13 +1325,13 @@ The evaporator heat transfer rate is then compared to the available capacity. If
 
 where
 
-\emph{T\(_{l}\)}~~~~~~~~~~~ = water temperature leaving the evaporator, ˚C
+\emph{T\(_{cw,l}\)}~~~~~~~~~~~ = water temperature leaving the evaporator, ˚C
 
-\emph{T\(_{e}\)}~~~~~~~~~~ = water temperature entering the evaporator, ˚C
+\emph{T\(_{cw,e}\)}~~~~~~~~~~ = water temperature entering the evaporator, ˚C
 
 \({\mathop m\limits^ \bullet_{evap}}\) ~~~~~~~~ = evaporator mass flow rate, kg/s
 
-\emph{C\(_{p}\)}~~~~~~~~ = specific heat of water entering evaporator at \emph{T\(_{e}\)}, J/kg-˚C
+\emph{C\(_{p,evap}\)}~~~~~~~~ = specific heat of water entering evaporator at \emph{T\(_{cw,e}\)}, J/kg-˚C
 
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
@@ -1345,7 +1345,7 @@ where
 
 \({\mathop Q\limits^ \bullet_{evap}}\) ~~~~~~~~ = load to be met by the chiller, W
 
-\emph{PLR\(_{ }\)} = maximum part-load ratio (specified by the user in the input data file)
+\emph{PLR\(_{max}\)} = maximum part-load ratio (specified by the user in the input data file)
 
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g.~hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part load ratio yielding constant electrical power consumption under these conditions. Below the minimum part load ratio, the chiller cycles on and off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part load ratio is less than the minimum part load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
@@ -1369,11 +1369,11 @@ The electrical power consumption for the chiller compressor(s) for any simulatio
 
 \({P_{chiller}}\, = \,\,\left( {{{\mathop Q\limits^ \bullet }_{avail}}\,} \right)\,\left( {\frac{1}{{CO{P_{ref}}}}} \right)\,\left( {ChillerEIRFTemp} \right)\left( {ChillerEIRFPLR} \right)\left( {ChillerCyclingRatio} \right)\) where
 
-\emph{P\(_{r}\)}~~~~~~~~ = chiller compressor power, W
+\emph{P\(_{chiller}\)}~~~~~~~~ = chiller compressor power, W
 
-\emph{COP\(_{f}\)}~~~~~~ = reference coefficient of performance, W/W
+\emph{COP\(_{ref}\)}~~~~~~ = reference coefficient of performance, W/W
 
-Heat rejected by the chiller condenser includes the heat transferred in the evaporator plus a portion or all of the compressor electrical energy consumption. For electric chillers with hermetic compressors, all compressor energy consumption is rejected by the condenser (compressor motor efficiency = \emph{eff\(_{r}\)} = 1.0). For chillers with semi-hermetic or open compressors, only a portion of the compressor energy use is rejected by the condenser. The heat transfer rate for the chiller condenser is calculated as follows:
+Heat rejected by the chiller condenser includes the heat transferred in the evaporator plus a portion or all of the compressor electrical energy consumption. For electric chillers with hermetic compressors, all compressor energy consumption is rejected by the condenser (compressor motor efficiency = \emph{eff\(_{motor}\)} = 1.0). For chillers with semi-hermetic or open compressors, only a portion of the compressor energy use is rejected by the condenser. The heat transfer rate for the chiller condenser is calculated as follows:
 
 \begin{equation}
 {\mathop Q\limits^ \bullet_{cond}} = \left( {{P_{chiller}} * ef{f_{motor}}} \right) + {\mathop Q\limits^ \bullet_{evap}} + {\mathop Q\limits^ \bullet_{falseloading}}
@@ -1393,13 +1393,13 @@ For water-cooled chillers, the water temperature leaving the condenser is then c
 
 where:
 
-\emph{T\(_{l}\)}~~~~~~~~~ = water temperature leaving the condenser, ˚C
+\emph{T\(_{cond,l}\)}~~~~~~~~~ = water temperature leaving the condenser, ˚C
 
-\emph{T\(_{e}\)}~~~~~~~~ = water temperature entering the condenser, ˚C
+\emph{T\(_{cond,e}\)}~~~~~~~~ = water temperature entering the condenser, ˚C
 
 \({\mathop m\limits^ \bullet_{cond}}\) ~~~~~~~~ = mass flow rate through the condenser, kg/s
 
-\({C_{p,cond}}\) ~~~~~~ = specific heat of water entering the condenser at \emph{T\(_{e}\)}, J/kg-˚C
+\({C_{p,cond}}\) ~~~~~~ = specific heat of water entering the condenser at \emph{T\(_{cond,e}\)}, J/kg-˚C
 
 For air- and evaporatively-cooled condensers, the exiting air temperature is not calculated and is set equal to the entering air or wet-bulb temperature, respectively.
 
@@ -1411,9 +1411,9 @@ The model then calculates the condenser fan energy for air- and evaporatively-co
 
 where
 
-\emph{P\(_{d}\)}~~~~~~~~~~ = chiller condenser fan electric power, W
+\emph{P\(_{cond}\)}~~~~~~~~~~ = chiller condenser fan electric power, W
 
-\emph{P\(_{o}\)}~~ = condenser fan power ratio, W/W
+\emph{P\(_{condfanratio}\)}~~ = condenser fan power ratio, W/W
 
 The final calculations determine the total heat transfer energy for the condenser and evaporator, as well as the total electric energy consumed by the chiller compressor motor(s) and condenser fan(s). The results are available as output variables.
 
@@ -1435,13 +1435,13 @@ The final calculations determine the total heat transfer energy for the condense
 
 where
 
-\emph{Q\(_{d}\)}~~~~~~~~~ = chiller condenser heat transfer energy, J
+\emph{Q\(_{cond}\)}~~~~~~~~~ = chiller condenser heat transfer energy, J
 
-\emph{Q\(_{p}\)}~~~~~~~~~~ = chiller evaporator cooling energy, J
+\emph{Q\(_{evap}\)}~~~~~~~~~~ = chiller evaporator cooling energy, J
 
-\emph{E\(_{r}\)}~~~~~~~~ = chiller (compressor) electric energy, J
+\emph{E\(_{chiller}\)}~~~~~~~~ = chiller (compressor) electric energy, J
 
-\emph{E\(_{d}\)}~~~~~~~~~~ = chiller condenser fan electric energy, J
+\emph{E\(_{cond}\)}~~~~~~~~~~ = chiller condenser fan electric energy, J
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -1455,7 +1455,9 @@ Heat from the electric EIR chiller condenser may be recovered when a water-coole
 
 For the Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR objects in EnergyPlus, the industry standard rating of Integrated Part Load Value (IPLV) is calculated according to ANSI/AHRI Standard 550/590 (2011). This standard rating is not direct input to the model and is calculated using user-entered information for these objects. These standard rating values are provided in the eplusout.eio output file (Ref. Output Details document) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary).
 
+\begin{callout}
 Note: The standard ratings described in this section require that the EIR/Reformulated EIR chiller models be evaluated at specific operating conditions (e.g., specific evaporator outlet temperature (6.67 C) and dry-bulb temperatures for air entering the air-cooled {[}outdoor{]} condenser). If the chiller~ performance curves can not be evaluated at the required test conditions, then the standard rating value will be determined at user specified curve limit and warning error message is provided. For example, if the curve object (Curve:Biquadratic) for Cooling Capacity Function of Temperature Curve has a minimum value of 21C for dry-bulb temperature entering the air-cooled condenser coil, the IPLV calculation requires that EER\(_{D}\) be calculated at 13 C -- so, this would result in IPLV value calculated at 21C and reported in the output and a warning message in the eplusout.err file.
+\end{callout}
 
 The IPLV is a single number part-load performance figure of merit for Water-Chilling Packages. The IPLV equations and procedures described below are taken from Appendix D of ANSI/AHRI Std. 550/590, 2011 and provide a consistent method for calculating IPLV. These equations provide representative average part-load efficiency for a single chiller. ~For equipment covered by this standard, the \emph{IPLV} is calculated using the following formula:
 
@@ -1555,18 +1557,25 @@ where,
 
 % table 51
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\caption{Standard Rating (Integrated Part Load Value) \protect \label{table:standard-rating-integrated-part-load-value}}\\
-\toprule 
-\multicolumn{5}{c}{Standard Rating (Integrated Part Load Value)} \tabularnewline
-\multicolumn{5}{c}{Source: Table 3, Page 10, ANSI/AHRI Standard 550/590-2011} \tabularnewline \midrule
-\endhead
+\caption{Standard Rating (Integrated Part Load Value) \label{table:standard-rating-integrated-part-load-value}} \tabularnewline
+\toprule
  & \multicolumn{2}{c}{IPLV} & \multicolumn{2}{c}{NPLV} \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Standard Rating (Integrated Part Load Value)} \tabularnewline
+\toprule
+ & \multicolumn{2}{c}{IPLV} & \multicolumn{2}{c}{NPLV} \tabularnewline
+\midrule
+\endhead
+
 Evaporator (All types)  100 \% Load LWT  0\% Load LWT  Flow Rate (gpm)  F.F.A & 2 44.0°F  44.0°F  3 2.4 gpm/ton  0.0001  h- ft 2 -°F/Btu & 6.7°C  6.7°C  0.043 L/s per  kW  0.000018  m 2 -°C/W & 2 Selected LWT  Same as 100\%  load  3 Selected  gpm/ton  As Specified & 2 Selected  LWT  Same as 100\%  load  3 [L/s per kW]  As Specified \tabularnewline
 1 Condenser (Water  Cooled)  100\% load EWT  75\% load EWT  50\% load EWT  25\% load EWT  0\% load EWT  Flow rate (gpm) [L/s]  F.F.A. & 2 85.0°F  75.0°F  65.0°F  65.0°F  65.0°F  3 3.0 gpm/ton  0.00025  h- ft 2 -°F/Btu & 29.4°C  23.9°C  18.3°C  18.3°C  18.3°C  0.054 L/s per  kW  0.000044  m 2 -°C/W & 2 Selected LWT  4 65.0°F  3 Selected  gpm/ton  As Specified & 2 Selected LWT  4 18.3°C  3 Selected  L/s per kW  As Specified \tabularnewline
 1 Condenser (Air Cooled)  100\% load EDB  75\% load EDB  50\% load EDB  25\% load EDB  0\% load EDB  F.F.A. & 95.0°F  80.0°F  65.0°F  55.0°F  55.0°F  0.0 h- ft 2  -°F/Btu & 35°C  26.7°C  18.3°C  12.8°C  12.8°C  0.0 m 2 -°C/W & \multicolumn{2}{l}{No Rating Requirements} \tabularnewline
 1 Condenser  (Evaporatively Cooled)  100\% load EWB  0\% load EWB  F.F.A. & 75.0°F  50.0°F  0.0 h- ft 2  -°F/Btu & 23.9°C  10.0°C  0.0 m 2 -°C/W & \multicolumn{2}{l}{No Rating Requirements} \tabularnewline
 Air-Cooled Without  Condenser  100\% load SDT  0\% load SDT & 125.0°F  55.0°F & 51.7°C  12.8°C & \multicolumn{2}{l}{No Rating Requirements} \tabularnewline
 Water and Evaporatively-  Cooled Without  Condenser  100\% load SDT  0\% load SDT & 105.0°F  65.0°F & 40.6°C  18.3°C & \multicolumn{2}{l}{No Rating Requirements} \tabularnewline
+\bottomrule
 \multicolumn{5}{l}{1 If the unit Manufacturer’s recommended minimum temperatures are greater than those} \tabularnewline
 \multicolumn{5}{l}{specified in  Table 3, then those may be used in lieu of the specified temperatures.} \tabularnewline
 \multicolumn{5}{l}{2 Correction for Fouling Factor Allowance} \tabularnewline
@@ -1580,7 +1589,7 @@ Water and Evaporatively-  Cooled Without  Condenser  100\% load SDT  0\% load SD
 \multicolumn{5}{l}{EDB - entering air dry-bulb temperature} \tabularnewline
 \multicolumn{5}{l}{EWB - entering air wet-bulb temperature} \tabularnewline
 \multicolumn{5}{l}{F.F.A. - Fouling Factor Allowance} \tabularnewline
-\bottomrule
+\multicolumn{5}{c}{\scriptsize Source: Table 3, Page 10, ANSI/AHRI Standard 550/590-2011}
 \end{longtable}
 
 \subsection{Electric Chiller Model Based on Condenser Leaving Temperature}\label{electric-chiller-model-based-on-condenser-leaving-temperature}
@@ -1613,9 +1622,9 @@ where
 
 \emph{ChillerCapFTemp} = Cooling capacity factor, equal to 1 at reference conditions
 
-\emph{T\(_{l}\)}~~~~~~~~~~~ = leaving chilled water temperature, ˚C
+\emph{T\(_{cw,l}\)}~~~~~~~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{cond,l}\)} = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·~~~~~~~~The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
@@ -1623,9 +1632,9 @@ where
 
 \emph{ChillerEIRFTemp} = Energy input to cooling output factor, equal to 1 at reference conditions
 
-\emph{T\(_{l}\)}~~~~~ = leaving chilled water temperature, ˚C
+\emph{T\(_{cw,l}\)}~~~~~ = leaving chilled water temperature, ˚C
 
-\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{cond,l}\)} = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve parameterizes the variation of the energy input ratio (EIR). The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 at the reference leaving condenser water temperature with part-load ratio equal to 1.0. It is recommended that this performance curve be developed using both full- and part-load performance data. The bicubic curve should be valid for the range of condenser water temperatures and part-load ratios anticipated for the simulation (otherwise the program issues warning messages). Either of the following two types of curves can be used.
 
@@ -1643,13 +1652,13 @@ where
 
 \emph{ChillerEIRFPLR} = Energy input to cooling output factor, equal to 1 at the reference leaving condenser water temperature and PLR = 1.0
 
-\emph{T\(_{l}\)}\(_{ }\) = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+\emph{T\(_{cond,l}\)} = leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 \emph{PLR}~~~~~ = Part load ratio = (cooling load) / (chiller's available cooling capacity)
 
-\emph{P\(_{r}\) = chiller power at specific PLR}
+\emph{P\(_{chiller}\) = chiller power at specific PLR}
 
-\emph{P\(_{f}\) = \({\mathop Q\limits^ \bullet_{ref}}\) /COP\(_{f}\)}
+\emph{P\(_{ref}\) = \({\mathop Q\limits^ \bullet_{ref}}\) /COP\(_{ref}\)}
 
 Note: Although a bicubic curve requires 10 coefficients (ref. Curve:Bicubic), coefficients 7, 9 and 10 are typically not used in the performance curve described here and should be entered as 0 unless sufficient performance data and regression accuracy exist to justify the use of these terms of the bicubic curve.
 
@@ -1712,13 +1721,13 @@ The evaporator heat transfer rate is then compared to the available capacity. If
 
 where
 
-\emph{T\(_{l}\)}~~~~~~~~~~~ = water temperature leaving the evaporator, ˚C
+\emph{T\(_{cw,l}\)}~~~~~~~~~~~ = water temperature leaving the evaporator, ˚C
 
-\emph{T\(_{e}\)}~~~~~~~~~~ = water temperature entering the evaporator, ˚C
+\emph{T\(_{cw,e}\)}~~~~~~~~~~ = water temperature entering the evaporator, ˚C
 
 \({\mathop m\limits^ \bullet_{evap}}\) ~~~~~~~~ = evaporator mass flow rate, kg/s
 
-\emph{C\(_{p}\)}~~~~~~~~ = specific heat of water entering evaporator at \emph{T\(_{e}\)}, J/kg-˚C
+\emph{C\(_{p,evap}\)}~~~~~~~~ = specific heat of water entering evaporator at \emph{T\(_{cw,e}\)}, J/kg-˚C
 
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
@@ -1732,9 +1741,9 @@ where
 
 \({\mathop Q\limits^ \bullet_{evap}}\) ~~~~~~~~ = load to be met by the chiller, W
 
-\emph{PLR\(_{ }\)} = maximum part-load ratio (specified by the user in the input data file)
+\emph{PLR\(_{max}\)} = maximum part-load ratio (specified by the user in the input data file)
 
-Note that the maximum part-load ratio (PLR\(_{x}\), specified in the Chiller:Electric:ReformulatedEIR object) used in the equation should be less than or equal to the maximum part-load ratio specified in the ``Energy Input to Cooling Output Ratio Function of Part-Load Ratio'' performance curve object.
+Note that the maximum part-load ratio (PLR\(_{max}\), specified in the Chiller:Electric:ReformulatedEIR object) used in the equation should be less than or equal to the maximum part-load ratio specified in the ``Energy Input to Cooling Output Ratio Function of Part-Load Ratio'' performance curve object.
 
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g.~hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part-load ratio yielding constant electrical power consumption under these conditions. Below the minimum part-load ratio, the chiller cycles on/off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part-load ratio is less than the minimum part-load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
@@ -1758,11 +1767,11 @@ The electrical power consumption for the chiller compressor(s) for any simulatio
 
 \({P_{chiller}}\, = \,\,\left( {{{\mathop Q\limits^ \bullet }_{avail}}\,} \right)\,\left( {\frac{1}{{CO{P_{ref}}}}} \right)\,\left( {ChillerEIRFTemp} \right)\left( {ChillerEIRFPLR} \right)\left( {ChillerCyclingRatio} \right)\) where
 
-\emph{P\(_{r}\)}~~~~~~~~ = Chiller compressor power, W
+\emph{P\(_{chiller}\)}~~~~~~~~ = Chiller compressor power, W
 
-\emph{COP\(_{f}\)}~~~~~~ = Reference coefficient of performance, W/W
+\emph{COP\(_{ref}\)}~~~~~~ = Reference coefficient of performance, W/W
 
-Heat rejected by the chiller condenser includes the heat transferred in the evaporator plus a portion or all of the compressor electrical energy consumption. For electric chillers with hermetic compressors, all compressor energy consumption is rejected by the condenser (compressor motor efficiency = \emph{eff\(_{r}\)} = 1.0). For chillers with semi-hermetic or open compressors, only a portion of the compressor energy use is rejected by the condenser. The heat transfer rate for the chiller condenser is calculated as follows:
+Heat rejected by the chiller condenser includes the heat transferred in the evaporator plus a portion or all of the compressor electrical energy consumption. For electric chillers with hermetic compressors, all compressor energy consumption is rejected by the condenser (compressor motor efficiency = \emph{eff\(_{motor}\)} = 1.0). For chillers with semi-hermetic or open compressors, only a portion of the compressor energy use is rejected by the condenser. The heat transfer rate for the chiller condenser is calculated as follows:
 
 \begin{equation}
 {\mathop Q\limits^ \bullet_{cond}} = \left( {{P_{chiller}} * ef{f_{motor}}} \right) + {\mathop Q\limits^ \bullet_{evap}} + {\mathop Q\limits^ \bullet_{falseloading}}
@@ -1782,13 +1791,13 @@ The above curve values are calculated based on the leaving condenser water tempe
 
 where:
 
-\emph{T\(_{l}\)}~~~~~~~~~ = water temperature leaving the condenser, ˚C
+\emph{T\(_{cond,l}\)}~~~~~~~~~ = water temperature leaving the condenser, ˚C
 
-\emph{T\(_{e}\)}~~~~~~~~ = water temperature entering the condenser, ˚C
+\emph{T\(_{cond,e}\)}~~~~~~~~ = water temperature entering the condenser, ˚C
 
 \({\mathop m\limits^ \bullet_{cond}}\) ~~~~~~~~ = mass flow rate through the condenser, kg/s
 
-\({C_{p,cond}}\) ~~~~~~ = specific heat of water entering the condenser at \emph{T\(_{e}\)}, J/kg-˚C
+\({C_{p,cond}}\) ~~~~~~ = specific heat of water entering the condenser at \emph{T\(_{cond,e}\)}, J/kg-˚C
 
 The final calculations determine the total heat transfer energy for the condenser and evaporator, as well as the total electric energy consumed by the chiller compressor motor(s) and condenser fan(s). The results are available as output variables.
 
@@ -1810,13 +1819,13 @@ The final calculations determine the total heat transfer energy for the condense
 
 where
 
-\emph{Q\(_{d}\)}~~~~~~~~~ = chiller condenser heat transfer energy, J
+\emph{Q\(_{cond}\)}~~~~~~~~~ = chiller condenser heat transfer energy, J
 
-\emph{Q\(_{p}\)}~~~~~~~~~~ = chiller evaporator cooling energy, J
+\emph{Q\(_{evap}\)}~~~~~~~~~~ = chiller evaporator cooling energy, J
 
-\emph{E\(_{r}\)}~~~~~~~~ = chiller (compressor) electric energy, J
+\emph{E\(_{chiller}\)}~~~~~~~~ = chiller (compressor) electric energy, J
 
-\emph{E\(_{d}\)}~~~~~~~~~~ = chiller condenser fan electric energy, J
+\emph{E\(_{cond}\)}~~~~~~~~~~ = chiller condenser fan electric energy, J
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -1864,7 +1873,7 @@ The exhaust flow rate is then calculated as:
 {\dot m_{exhaust}} = \frac{{Total\,\,Exhaust\,\,heat}}{{C{p_{exhaust}} \cdot \left( {{T_{exhaust}} - {T_{reference}}} \right)}}
 \end{equation}
 
-where T\(_{e}\) is the reference temperature for the fuel lower heating value, and is given as 25°C in manufacturer's data, and
+where T\(_{reference}\) is the reference temperature for the fuel lower heating value, and is given as 25°C in manufacturer's data, and
 
 \begin{equation}
 {T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}
@@ -1909,12 +1918,12 @@ where:
 
 \({E_{heater,basin}}\) = Chiller basin heater electric consumption (J)
 
-\emph{T\(_{n}\)} = Basin heater setpoint temperature, user input (\(^{o}\)C)
+\emph{T\(_{setpoint,basin}\)} = Basin heater setpoint temperature, user input (\(^{o}\)C)
 
-\emph{T\(_{r}\)}~~~ = Outdoor air dry-bulb temperature (\(^{o}\)C)
+\emph{T\(_{db,outdoor}\)}~~~ = Outdoor air dry-bulb temperature (\(^{o}\)C)
 
-\emph{CAP\(_{n}\)} = Basin heater capacity, user input (W/K)
+\emph{CAP\(_{heater,basin}\)} = Basin heater capacity, user input (W/K)
 
-\emph{Schedule\(_{n}\)} = Basin heater schedule, user input (schedule value \textgreater{} 0 means ON)
+\emph{Schedule\(_{heater,basin}\)} = Basin heater schedule, user input (schedule value \textgreater{} 0 means ON)
 
 \emph{ChillerIsOFF =}Logical variable denoting that the chiller is not operating for the current simulation time step (e.g.,~ there is no cooling load to be met by the chiller, or if there is no water flow through the chiller due to a chiller or pump availability schedule, etc.) 

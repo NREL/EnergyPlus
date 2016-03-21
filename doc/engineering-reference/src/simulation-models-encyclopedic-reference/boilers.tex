@@ -77,7 +77,7 @@ The steam boiler is a variable mass flow rate device.~ The mass flow rate of ste
 \begin{figure}[hbtp] % fig 158
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2932.png}
-\caption{  Schematic of Steam Boiler in the Steam loop \protect \label{fig:schematic-of-steam-boiler-in-the-steam-loop}}
+\caption{Schematic of Steam Boiler in the Steam loop \protect \label{fig:schematic-of-steam-boiler-in-the-steam-loop}}
 \end{figure}
 
 Figure~\ref{fig:schematic-of-steam-boiler-in-the-steam-loop} describes the rudimentary loop structure with steam flowing from coils to boiler.~ It is essential to mention that it is the coils that determine the mass of steam required and the boiler simply delivers the required mass flow at desired temperature provided it is adequately sized.~ The algorithm for determining the mass flow rate is structured on the demand side and the variable flow boiler has no role to play in determining the steam mass flow.
@@ -89,7 +89,7 @@ The advantage of steam heating systems over hot water is the high latent heat ca
 \begin{figure}[hbtp] % fig 159
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2933.png}
-\caption{  Schematic of Steam Boiler Operation \protect \label{fig:schematic-of-steam-boiler-operation}}
+\caption{Schematic of Steam Boiler Operation \protect \label{fig:schematic-of-steam-boiler-operation}}
 \end{figure}
 
 Boiler Load is a summation of sensible and latent heat addition to the water stream as described with the following equation.~ The mass flow rate through the boiler is known, while delta temp is the temperature difference between the boiler inlet and boiler outlet.~ Latent heat of steam is calculated at loop operating temperature.
@@ -232,9 +232,18 @@ It is assumed that the steam boiler operates to maintain a desired temperature, 
 
 % table 50
 \begin{longtable}[c]{p{1.0in}p{4.0in}}
-\caption{  Steam Loop Nomenclature \protect \label{table:steam-loop-nomenclature}}\\
+\caption{Steam Loop Nomenclature \label{table:steam-loop-nomenclature}} \tabularnewline
 \toprule 
-\({Q_{B}}\) & Boiler Heat Transfer.~ W. \tabularnewline
+\({Q_{B}}\) & Boiler Heat Transfer. W. \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Steam Loop Nomenclature} \tabularnewline
+\toprule 
+\({Q_{B}}\) & Boiler Heat Transfer. W. \tabularnewline
+\midrule
+\endhead
+
 \({Q_{B,N}}\) & Boiler Nominal Capacity.~ W. \tabularnewline
 \({O_{PLR}}\) & Boiler Operating Part Load Ratio.~ \tabularnewline
 \(\Delta\)T\(_{sc}\) & Degree of subcooling in coil.~ \tabularnewline

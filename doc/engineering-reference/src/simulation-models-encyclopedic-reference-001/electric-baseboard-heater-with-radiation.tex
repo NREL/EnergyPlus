@@ -12,7 +12,7 @@ Like many other HVAC components, the electric baseboard model requires a unique 
 
 All inputs for the radiant heat calculation are the same as the water and steam baseboard heater with radiation and convection models in EnergyPlus. Users are required to input fractions that specify total radiant heat directly delivered to surfaces as well as people in a space. The sum of radiant energy of these distribution fractions must sum to unity, and each baseboard heater is allowed to distribute energy to up to 20 surfaces.
 
-\subsubsection{Simulation and Control}\label{simulation-and-control-001}
+\subsubsection{Simulation and Control}\label{simulation-and-control-002}
 
 When the unit is available and there is a heating load within a space, the electric baseboard unit will meet the entire remaining provided that it has enough capacity to do so. The model sets the heating capacity of a baseboard unit to the remaining heating load in the space, which any primary heating system does not meet. Note that it is set to the maximum nominal capacity of the unit, if a heating load in a space is greater than the maximum. The model then determines the radiant heat source through the simulation as
 
@@ -20,7 +20,7 @@ When the unit is available and there is a heating load within a space, the elect
 {q_{rad}} = q \cdot Fra{c_{rad}}
 \end{equation}
 
-where \emph{q\(_{d}\)} is the total radiant heating capacity, \emph{q} is the heating capacity of the unit, and \emph{Frac\(_{d}\)} is the user-defined fraction for the radiation. The radiant heat additions to people and surfaces are thus
+where \emph{q\(_{rad}\)} is the total radiant heating capacity, \emph{q} is the heating capacity of the unit, and \emph{Frac\(_{rad}\)} is the user-defined fraction for the radiation. The radiant heat additions to people and surfaces are thus
 
 \begin{equation}
 {q_{people}} = {q_{rad}} \cdot Fra{c_{people}}
@@ -30,7 +30,7 @@ where \emph{q\(_{d}\)} is the total radiant heating capacity, \emph{q} is the he
 {q_{surface}} = \sum {{q_{rad}} \cdot Fra{c_{surface,i}}}
 \end{equation}
 
-where \emph{q\(_{e}\)} is the radiant heat transfer to people, \emph{q\(_{e}\)} is the heat radiated to surfaces, \emph{Frac\(_{e}\)} is the fraction of the heat radiated to people, and \emph{Frac\(_{i}\)} is the fraction of the heat radiated to surface i.
+where \emph{q\(_{people}\)} is the radiant heat transfer to people, \emph{q\(_{surface}\)} is the heat radiated to surfaces, \emph{Frac\(_{people}\)} is the fraction of the heat radiated to people, and \emph{Frac\(_{surface,i}\)} is the fraction of the heat radiated to surface i.
 
 Once the radiant heat sources are determined, the model distributes the radiant heat sources to the appropriate surfaces and people for thermal comfort purposes, and EnergyPlus recalculates the surface heat balances. The model then determines differences in convection from the surfaces to the air before and after the surface heat balances are impacted due to radiant heat additions from the unit. Note that the model converts the radiant heat transfer to people to convective energy so that the heat balance includes this amount of energy, which will be lost (see High Temperature Radiant Heater Model). The model calculates the actual convective system impact of an electric baseboard heater unit as
 
@@ -38,7 +38,7 @@ Once the radiant heat sources are determined, the model distributes the radiant 
 {q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
 \end{equation}
 
-where \emph{q\(_{q}\)} is the actual heating load that the unit should meet, \emph{q\(_{c}\)} is the convection from the surfaces to the air after the radiant heat distribution, \emph{q\(_{z}\)} is the convection from the surfaces to the air before the radiant heat distribution, and \emph{q\(_{v}\)} is the convective heat transfer to the air.
+where \emph{q\(_{req}\)} is the actual heating load that the unit should meet, \emph{q\(_{surf,c}\)} is the convection from the surfaces to the air after the radiant heat distribution, \emph{q\(_{surf,z}\)} is the convection from the surfaces to the air before the radiant heat distribution, and \emph{q\(_{conv}\)} is the convective heat transfer to the air.
 
 The energy consumption of the baseboard heater is calculated using the user-supplied efficiency and the actual convective system impact calculated as
 
@@ -46,7 +46,7 @@ The energy consumption of the baseboard heater is calculated using the user-supp
 {Q_{elec}} = \frac{q}{\eta }
 \end{equation}
 
-where \emph{Q\(_{c}\)} is the energy consumption and \textbf{\emph{η}} is the efficiency of the unit.
+where \emph{Q\(_{elec}\)} is the energy consumption and \textbf{\emph{η}} is the efficiency of the unit.
 
 If the unit was scheduled off or there is no heating load for the zone, then there will be no heat transfer from the unit. The model assumes no heat storage in the baseboard unit itself and thus no residual heat transfer in future system time steps due to heat storage in the metal of the baseboard unit.
 
@@ -92,15 +92,15 @@ Once the heating capacity of the unit is determined, the model determines the ra
 {q_{rad}} = q \cdot Fra{c_{rad}}
 \end{equation}
 
-where \emph{q} is the total heating capacity of the heater and \emph{Frac\(_{d}\)} is the user-defined fraction.
+where \emph{q} is the total heating capacity of the heater and \emph{Frac\(_{rad}\)} is the user-defined fraction.
 
-The model now distributes the radiant heat additions to the appropriate surfaces, people for thermal comfort purpose, and the air in the zone. The surface heat balances are then recalculated to determine all heat sources or sinks for radiant systems in the zone. It is assumed that the radiant heat incident on people in the zone is converted to convection to the zone so that the zone heat balance includes this amount of heat which will be lost (see High Temperature Radiant Heater Model). The load met, the actual convective system impact, for the baseboard heater, \emph{q\(_{q}\)}, is therefore determined as
+The model now distributes the radiant heat additions to the appropriate surfaces, people for thermal comfort purpose, and the air in the zone. The surface heat balances are then recalculated to determine all heat sources or sinks for radiant systems in the zone. It is assumed that the radiant heat incident on people in the zone is converted to convection to the zone so that the zone heat balance includes this amount of heat which will be lost (see High Temperature Radiant Heater Model). The load met, the actual convective system impact, for the baseboard heater, \emph{q\(_{req}\)}, is therefore determined as
 
 \begin{equation}
 {q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
 \end{equation}
 
-where \emph{q\(_{ }\)} is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{v}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{e}\)} is radiant heat to the people.
+where \emph{q\(_{surf,c}\)} is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{surf,z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{conv}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{people}\)} is radiant heat to the people.
 
 The simulation of radiant heat addition is the same as the water baseboard heater model. The controls are the same as shown in Figure~\ref{fig:variable-flow-low-temperature-radiant-system}.~ Variable Flow Low Temperature Radiant System Controls. After all system time steps have been simulated, an ``average'' zone heat balance calculation is done (similar to the high temperature radiant system). If the unit was scheduled off or there is no steam flow rate through the baseboard unit, then, there will be no heat transfer from the unit. The model assumes no heat storage in the unit itself and thus no residual heat transfer in future system time steps due to heat storage in the steam or metal of the unit.
 
@@ -108,7 +108,7 @@ The simulation of radiant heat addition is the same as the water baseboard heate
 
 No specific reference.~ Refer to the ASHRAE Handbook series for general information on different system types as needed.
 
- Simulation Models -- Encyclopedic Reference = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+﻿ Simulation Models -- Encyclopedic Reference = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of ``Heat Balance'', ``HVAC'', and ``Plant''.~ With the integrated solution, these designations signify where the effects of these models have their first impacts.
 
