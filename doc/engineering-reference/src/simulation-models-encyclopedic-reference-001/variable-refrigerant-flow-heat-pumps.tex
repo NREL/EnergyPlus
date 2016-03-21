@@ -298,6 +298,518 @@ Table 2 -- Outdoor unit compressor power at different Loading Index
 \setcounter{enumi}{1}
 \tightlist
 \item
+  Compare the calculated \(N_{comp}\) above with the initialized \({N_{comp}}'\) in Step 2c.2:
+\end{enumerate}
+
+\begin{itemize}
+\item
+  If \({N_{comp}}'-N_{comp}>\delta\) then go to Step 2c.2 for a new round of iteration.
+\item
+  Else, end the iteration and go to Step 2c.7.
+\end{itemize}
+
+\paragraph{Step 2c.7: Total power consumption of the outdoor unit}\label{step-2c.7-total-power-consumption-of-the-outdoor-unit}
+
+Calculate the total electric power consumption by the outdoor unit:
+
+\begin{equation}
+N_{out} = N_{fan}+N_{comp}/e_{inv}
+\end{equation}
+
+Where
+
+\(e_{inv}\) efficiency of the inverter of compressor
+
+\(N_{fan}\) electric power consumption by the outdoor fan (W)
+
+\(N_{out}\) total electric power consumption by the outdoor unit (W)
+
+\subsubsection{\texorpdfstring{\emph{Modeling of the outdoor unit (O/U) - Heating Mode}}{Modeling of the outdoor unit (O/U) - Heating Mode}}\label{modeling-of-the-outdoor-unit-ou---heating-mode}
+
+\paragraph{Step 2h.1: Piping loss calculation in the heating mode}\label{step-2h.1-piping-loss-calculation-in-the-heating-mode}
+
+Similarly to that in the cooling mode, the piping loss analysis in the heating mode needs to address the coupling effect between the piping loss and system operations. However, due to the control strategy difference between the two modes, the piping loss algorithm in the heating mode requires different calculation steps and more numerical iterations, as shown below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed \(h_{Hexin}\) :
+
+\begin{equation}
+G_i = Q_i/(h_{Hexin}-h_{Hexout,i})
+\end{equation}
+
+Where
+
+\(G_i\) refrigerant flow rate for the i\(^{th}\) indoor unit (kg/s)
+
+\(Q_i\) total heating load of the i\(^{th}\) zone (W)
+
+\(h_{Hexin}\) enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+\(h_{Hexout,i}\) enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+\(h_{Hexout,i}\) is a function of \(P_c\) , \(T_c\) , and \(SC_i\) . It can be calculated using refrigerant thermodynamic property equations \(f_{g_h}(P_c,T_c-SC_i)\) .
+
+The refrigerant flow rate in the main loop can be obtained by summing up the flow rate in each indoor unit:
+
+\begin{equation}
+G_{tot} = \sum{G_i}
+\end{equation}
+
+Where
+
+\(G_{tot}\) refrigerant flow rate in the main loop (kg/s)
+
+Calculate the average refrigerant pressure and enthalpy within the pipes, using assumed piping pressure loss \(\Delta{P_{pipe}}\) and \(h_{Tdi}\) :
+
+\begin{equation}
+P_{ave} = P_c+\Delta{P_{pipe}}/2
+\end{equation}
+
+\begin{equation}
+h_{ave} = (h_{Hexin}+h_{Tdi})/2
+\end{equation}
+
+Where
+
+\(h_{ave}\) average refrigerant enthalpy within the main pipe (kJ/kg)
+
+\(h_{Hexin}\) enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+\(h_{Tdi}\) enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+\(P_{ave}\) average refrigerant pressure within the main pipe (Pa)
+
+\(P_c\) condensing pressure (Pa)
+
+\(\Delta{P_{pipe}}\) pressure drop in the main pipe (Pa)
+
+The viscosity of the refrigerant within the pipe can be calculated given \(P_{ave}\) and \(h_{ave}\) , using the following equations:
+
+\begin{equation}
+k_{v,1} = P_{ave}/4926000
+\end{equation}
+
+\begin{equation}
+k_{v,2} = h_{ave}/383.55
+\end{equation}
+
+\begin{equation}
+k_{v,3} = (T_{ave}+273.15)/344.39
+\end{equation}
+
+\begin{equation}
+\mu = 10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)
+\end{equation}
+
+Where
+
+\(\mu\) viscosity of the refrigerant within the pipe (Pa-s)
+
+\(k_{v,i}\) coefficients to calculate the refrigerant viscosity
+
+\(h_{ave}\) average refrigerant enthalpy within the pipes (kJ/kg)
+
+\(P_{ave}\) average refrigerant pressure within the pipes (Pa)
+
+\(T_{ave}\) average temperature of refrigerant leaving indoor units, which corresponds to \(P_{ave}\) and \(h_{ave}\) (°C)
+
+Given \(P_{ave}\) and \(h_{ave}\) , the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+\begin{equation}
+Re = G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu
+\end{equation}
+
+\begin{equation}
+Pr = \mu\times{f_{g_Cp}(P_{ave},h_{ave})}\times{0.001}/f_{g_\lambda}(P_{ave},h_{ave})
+\end{equation}
+
+\begin{equation}
+Nu = 0.023\times{Re^{0.8}\times{Pr^{0.4}}}
+\end{equation}
+
+\begin{equation}
+St = Nu/Re/Pr
+\end{equation}
+
+Where
+
+\(Re\) Reynolds number
+
+\(Pr\) Prandtl number
+
+\(Nu\) Nusselt number
+
+\(St\) Stanton number
+
+\(\mu\) viscosity of the refrigerant within the pipe (Pa-s)
+
+\(f_{g_Cp}\) functions calculating the specific heat of superheating refrigerant
+
+\(f_{g_\lambda}\) functions calculating the conductivity of superheating refrigerant
+
+Then the piping pressure loss \(\Delta{P_{pipe}}\) can be obtained using the above dimensionless quantities:
+
+\begin{equation}
+\Delta{P_{pipe}} = 8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g_\rho}(P_{ave},h_{ave})}\times{V^2}/2-H\times{f_{g_\rho}(P_{ave},h_{ave})}\times9.80665
+\end{equation}
+
+Where
+
+\(f_{g_\rho}\) functions calculating the density of superheating refrigerant
+
+\(D\) main pipe diameter (m)
+
+\(H\) height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+\(L\) main pipe length (m)
+
+\(St\) Stanton number
+
+\(Re\) Reynolds number
+
+\(Pr\) Prandtl number
+
+\(\Delta{P_{pipe}}\) pressure drop in the pipe (Pa)
+
+\(V\) refrigerant flow velocity (m/s)
+
+Compare the calculated \(\Delta{P_{pipe}}\) and the one assumed above. If the difference is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(\Delta{P_{pipe}}\) .
+
+The compressor discharge saturated temperature \(T'_c\) (i.e., saturated vapor temperature corresponding to compressor discharge pressure) can be obtained via:
+
+\begin{equation}
+T'_c = f_{s_t}(P_c+\Delta{P_{pipe}})
+\end{equation}
+
+Where
+
+\(f_{s_t}\) functions calculating the temperature of saturated refrigerant
+
+\(T'_c\) discharge saturated temperature at the compressor outlet (°C)
+
+\(P_c\) condensing pressure (Pa)
+
+\(\Delta{P_{pipe}}\) pressure drop in the pipe (Pa)
+
+The heat loss through the pipe can be obtained via:
+
+\begin{equation}
+k_1 = Nu\times{f_{g_\lambda}(P_{ave},h_{ave})}
+\end{equation}
+
+\begin{equation}
+k_2 = 2\times{\lambda_i}/Ln(1+2\times{W_i}/D)
+\end{equation}
+
+\begin{equation}
+k_3 = h\times(D+2\times{W_i})
+\end{equation}
+
+\begin{equation}
+Q_{pipe} = (\pi\times{L})\times(T_a-T_{Hexin})/(1/k_1+1/k_2+1/k_3)
+\end{equation}
+
+Where
+
+\(f_{g_\lambda}\) functions calculating the conductivity of superheating refrigerant
+
+\(Q_{pipe}\) heat loss through the pipe (W)
+
+\(T_a\) average of outdoor air temperature and indoor temperature (°C)
+
+\(T_{Hexin}\) average of entering indoor units (°C)
+
+\(w_i\) pipe insulation thickness (m)
+
+\(k_i\) coefficients for the piping loss calculation
+
+The enthalpy of the refrigerant entering the indoor unit can be updated using the calculated \(Q_{pipe}\) :
+
+\begin{equation}
+h_{Tdi} = h_{Hexin}+Q_{pipe}/G_{tot}
+\end{equation}
+
+Where
+
+\(h_{Hexin}\) enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+\(h_{Tdi}\) enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+\(G_{tot}\) refrigerant flow rate in the main loop (kg/s)
+
+Compare the calculated \(h_{Tdi}\) and the one assumed above. If the difference is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Tdi}\) .
+
+Note that \(Q_{pipe}\) is calculated using an assumed \(h_{Hexin}\) at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2\textasciitilde{}2h.6 and may change the value of evaporating temperature \(T_e\) . This leads to an updated \(h_{Hexin} = f(P_e,T_e+SH,N_{comp},G_{tot})\) . If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Hexin}\) .
+
+\paragraph{Step 2h.2: Initialize O/U operation conditions}\label{step-2h.2-initialize-ou-operation-conditions}
+
+Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h. 2 to Step 2h. 6).
+
+For the first iteration,
+
+\begin{itemize}
+\item
+  Initialize outdoor unit \(SH\) with the reference value (from IDF input, e.g., 1.5°C)
+\item
+  Iinitialize the compressor power \(N_{comp}\) with the value calculated from the reference \(COP\) (e.g., 3.5):
+\end{itemize}
+
+\begin{equation}
+N'_{comp} = \frac{\sum_iQ_{in,total,i}}{COP}
+\end{equation}
+
+Where
+
+\(N_{comp}\) compressor power (W)
+
+\(N'_{comp}\) assumed compressor power for the first iteration (W)
+
+\(Q_{in,total,i}\) total heating load for zone \(i\) (W)
+
+For the following iterations,
+
+\begin{itemize}
+\item
+  Initialize \(SH\) with the calculated value in the previous iteration
+\item
+  Initialize the compressor power \(N_{comp}\) with the calculated value in the previous iteration
+\end{itemize}
+
+Calculate the heat rate extracted by the outdoor unit by:
+
+\begin{equation}
+Q_{out} = \sum_iQ_{in,total,i}+Q_{pipe}-N_{comp}
+\end{equation}
+
+Where
+
+\(Q_{out}\) heat rate extracted by the outdoor unit (W)
+
+\(Q_{pipe}\) heat loss through the pipe (W)
+
+\paragraph{Step 2h.3: Calculate O/U effective evaporating temperature}\label{step-2h.3-calculate-ou-effective-evaporating-temperature}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Calculate the required coil surface air temperature \({T_{fs}}'\) for the outdoor unit.
+\end{enumerate}
+
+The enthalpy of the air leaving the outdoor unit can be calculated by:
+
+\begin{equation}
+{H_{fs}}' = {H_{in}}'-Q_{out}/({G_{a,rate}}'\times{\rho_o})/(1-BF')
+\end{equation}
+
+The coil surface air temperature \({T_{fs}}'\) can be calculated from the \({H_{fs}}'\) :
+
+\begin{equation}
+if\quad{H_{fs}}'<H_{98\%,W_o}\quad{then}\quad{T_{fs}}' = f({H_{fs}}',98\%)
+\end{equation}
+
+\begin{equation}
+if\quad{H_{fs}}'\ge{H_{98\%,W_o}}\quad{then}\quad{T_{fs}}' = f({H_{fs}}',W_o)
+\end{equation}
+
+Where
+
+\(BF'\) bypass factor for the outdoor unit
+
+\({G_{a,rate}}'\) volumetric flow rate of the air through the outdoor unit, at the rating conditions (m\(^{3}\)/s)
+
+\({H_{fs}}'\) enthalpy of the air leaving the outdoor unit (kJ/kg)
+
+\({H_{in}}'\) enthalpy of the air entering the outdoor unit, i.e., outdoor air (kJ/kg)
+
+\(W_o\) humidity ratio of the outdoor air (kg/kg)
+
+\(\rho_o\) density of the outdoor air (kg/m\(^{3}\))
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Calculate required evaporating temperature for the outdoor unit \(Te_{req}\) and then the effective evaporating temperature \(Te\) .
+\end{enumerate}
+
+\begin{equation}
+Te_{req} = {T_{fs}}'-[{A_c}'\cdot SH^2+{B_c}'\cdot SH+{C_c}']
+\end{equation}
+
+\begin{equation}
+Te = Te_{req}
+\end{equation}
+
+Where
+
+\({A_c}'\) ,\({B_c}'\) ,\({C_c}'\) coefficients (°C)
+
+\(SH\) superheating degrees for the outdoor unit (°C)
+
+\(SH_{ref}\) reference superheating degrees for the outdoor unit (°C)
+
+\(Te_{req}\) required evaporating temperature for the outdoor unit (°C)
+
+\(Te\) effective evaporating temperature (°C)
+
+\paragraph{Step 2h.4: Calculate required compressor Loading Index}\label{step-2h.4-calculate-required-compressor-loading-index}
+
+Calculate the required compressor Loading Index by the following procedures.
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  Calculate the evaporative capacity at a variety of speeds:
+\end{enumerate}
+
+\[M_{cap} = C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)\] \[Q_{rps} = C_{cap,system} \times M_{cap} \times Q_{ref}\]
+
+Where
+
+\(C_{cap,system}\) evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (obtained from manufacturer data)
+
+\(r_1\) ,\ldots{},\(r_6\) empirical coefficients corresponding to \(rps\)
+
+\(rps\) compressor speed (r/s)
+
+\(T_e\) effective evaporating temperature (°C)
+
+\(M_{cap}\) multiplier for the evaporative capacity calculation (--)
+
+\({T_c}'\) discharge saturated temperature at the compressor outlet (°C)
+
+\(Q_{rps}\) evaporative capacity corresponding to \(rps\) (W)
+
+\(Q_{ref}\) rated evaporative capacity (W)
+
+An example of resulting capacity for different \(rps\) (at \({T_c}'\) = 36°C and \(T_e\) = 9°C) is presented in Table 3.
+
+Table 3-- evaporative capacity at different Loading Index
+
+
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Find the \(rps\) range that covers the required evaporative capacity \(Q_{rps,modify}\) .
+\end{enumerate}
+
+\begin{equation}
+Q_{rps,modify} = C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe}-N_{comp})
+\end{equation}
+
+\begin{equation}
+C_{cap,operation} = C_{cap,density}\times{C_{cap,enthalpy}}
+\end{equation}
+
+\begin{equation}
+C_{cap,density} = \rho_{test}/\rho_{real}
+\end{equation}
+
+\begin{equation}
+C_{cap,enthalpy} = \frac{h_{Evapout,test}-h_{Condout,test}}{h_{Compin,real}-h_{Condout,real}}
+\end{equation}
+
+Where
+
+\(C_{cap,operation}\) evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., \(SH\) and \(SC\) )
+
+\(C_{cap,density}\) evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions
+
+\(C_{cap,enthalpy}\) evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions
+
+\(h_{Condout,test}\) enthalpy of refrigerant leaving the condensers (IU) at test conditions (It corresponds to \(SH\) at test condition(e.g., 8°C) and \(Te\) ) (kJ/kg)
+
+\(h_{Condout,real}\) average enthalpy of refrigerant leaving the condensers (IU) at real conditions (kJ/kg)
+
+\(h_{Compin,real}\) enthalpy of refrigerant entering the compressor at real conditions (It corresponds to \(SH\) and \(Te\) at real conditions) (kJ/kg)
+
+\(Q_{pipe}\) heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36 \(rps\) based on Table 3.
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{2}
+\item
+  Calculate the \(rps\) that meets the need by interpolation. In the above example, the resulting \(rps\) is 34.5 \(rps\) .
+\item
+  If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), go to Step 2h. 5; otherwise, skip Step 2h. 5 and go to Step 2h. 6.
+\end{enumerate}
+
+\paragraph{Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity}\label{step-2h.5-modify-evaporating-temperature-to-further-reduce-outdoor-unit-capacity}
+
+If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18 \(rps\) ), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(Te\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\item
+  Set \(rps\) at its minimum value (e.g., 18 \(rps\) ).
+\item
+  Update \(Te\) to meet the required evaporative capacity, using equations described in Step 2h.4a.
+\item
+  \(SH\) for each indoor unit can be updated using the equations shown in Step 1.2.
+\end{enumerate}
+
+It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the \(Te\) and \(SH\) updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be repeated here.
+
+\paragraph{Step 2h.6: Calculate the compressor power}\label{step-2h.6-calculate-the-compressor-power}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Calculate the compressor power by the following procedures. 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  Calculate the compressor power at a variety of Loading Index using the following equation. The resulting table (Table~\ref{table:atmospheric-variables-at-two-different}) from the same example is shown below.
+\end{enumerate}
+
+\[M_{comp} = c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2\] \[N_{comp,rps} = M_{comp} \times N_{comp,ref}\]
+
+Where
+
+\(c_1\) ,\ldots{},\(c_6\) empirical coefficients corresponding to \(rps\)
+
+\(T_e\) effective evaporating temperature (°C)
+
+\(T_{e,ref}\) reference evaporating temperature (°C)
+
+\({T_c}'\) discharge saturated temperature at the compressor outlet (°C)
+
+\(T_{c,ref}\) reference condensing temperature (°C)
+
+\(M_{comp}\) multiplier for the compressor power calculation (--)
+
+\(N_{comp,ref}\) rated compressor power (W)
+
+\(N_{comp,rps}\) compressor power corresponding to \(rps\) (W)
+
+Table~\ref{table:atmospheric-variables-at-two-different} -- Outdoor unit compressor power at different Loading Index
+
+
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  According to the \(rps\) range determined, calculate the compressor power \(N_{comp}\) by interpolation. In the above example, the compressor power is 1.155 kW. 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
   Compare the calculated \(N_{comp}\) above with the initialized \({N_{comp}}'\) in Step 2h.2:
 \end{enumerate}
 
