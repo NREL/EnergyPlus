@@ -272,7 +272,7 @@ Note that for heating \({\dot Q_z} > 0.\) The highest \({T_{set,z}}\) is chosen 
 
 The input object SetpointManager:ReturnAirBypassFlow provides a setpoint manager that sets the air flow rate in a bypass duct such that when the bypassed and non-bypassed air are mixed the resutant air stream will be at the user-specified setpoint temperature.
 
-The user specifies the desired setpoint temperature \emph{T\(_{t}\)} through a input temperature schedule.
+The user specifies the desired setpoint temperature \emph{T\(_{set}\)} through a input temperature schedule.
 
 This temperature is modified to account for any potential fan heat gain:
 
@@ -338,13 +338,13 @@ where,
 
 \(NumControlZones\) = number of controlled zones (i.e., zones that contain thermostat objects) served by the air loop (-)
 
-\({\dot Q_{Zj}}\) = sensible heating load required to reach the zone air temperature setpoint for the \emph{j}\(^{h}\) controlled zone at current time step (W)
+\({\dot Q_{Zj}}\) = sensible heating load required to reach the zone air temperature setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (W)
 
-\({\dot m_{Zj}}\) = air mass flow rate being supplied by the air loop to the \emph{j}\(^{h}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
+\({\dot m_{Zj}}\) = air mass flow rate being supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
 
-\(C{p_j}\) = specific heat of supply air for the j\(^{h}\) controlled zone (J/kg-K)
+\(C{p_j}\) = specific heat of supply air for the j\(^{th}\) controlled zone (J/kg-K)
 
-\({T_{Zj}}\) = air node temperature for the \emph{j}\(^{h}\) controlled zone (°C)
+\({T_{Zj}}\) = air node temperature for the \emph{j}\(^{th}\) controlled zone (°C)
 
 \({\overline T_Z}\) = average zone air node temperature weighted by the heat capacity rate of the supply air streams for the controlled zones served by the air loop (°C)
 
@@ -368,7 +368,7 @@ END IF
 {\bar T_z} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}
 \end{equation}
 
-Note that for cooling \({\dot Q_{Zj}} < 0.\) ~The average supply air setpoint temperature \({\bar T_{SP}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. \({\bar T_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
+Note that for cooling \({\dot Q_{Zj}} < 0.\) The average supply air setpoint temperature \({\bar T_{SP}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. \({\bar T_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
 
 \subsection{Multizone Minimum Humidity Average}\label{multizone-minimum-humidity-average}
 
@@ -392,9 +392,9 @@ where,
 
 \(NumControlZones\) = number of controlled zones (i.e., zones that contain humidistat objects with humidifying setpoint schedule) served by the air loop (-)
 
-\({\dot Q_{lZj}}\) = latent (humidification) load required to reach the zone air humidifying setpoint for the \emph{j}\(^{h}\) controlled zone at current time step (kg H\(_{2}\)O/s)
+\({\dot Q_{lZj}}\) = latent (humidification) load required to reach the zone air humidifying setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (kg H\(_{2}\)O/s)
 
-\({\dot m_{Zj}}\) = air mass flow rate being supplied by the air loop to the \emph{j}\(^{h}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
+\({\dot m_{Zj}}\) = air mass flow rate being supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
 
 \({\omega_{Zj}}\) = air node humidity ratio for the jth controlled zone (kg H\(_{2}\)O/kg air)
 
@@ -448,13 +448,13 @@ where,
 
 \({\omega_{SP}}\) = supply air humidity ratio setpoint (kg/kg)
 
-\({\dot Q_{lzj}}\) = latent load required to reach the zone air setpoint for the \emph{j}\(^{h}\) controlled zone at current time step (kg H\(_{2}\)O/s)
+\({\dot Q_{lzj}}\) = latent load required to reach the zone air setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (kg H\(_{2}\)O/s)
 
-\({\dot m_{Zj}}\) = actual mass flow rate supplied by the air loop to the \emph{j}\(^{h}\) controlled zone, (kg/s)
+\({\dot m_{Zj}}\) = actual mass flow rate supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, (kg/s)
 
-\({\omega_{Zj}}\) = air node humidity ratio for the j\(^{h}\) controlled zone (kg/kg)
+\({\omega_{Zj}}\) = air node humidity ratio for the j\(^{th}\) controlled zone (kg/kg)
 
-\({\omega_{SP\;Zj}}\) = supply air humidity ratio setpoint for the j\(^{h}\) controlled zones (kg/kg)
+\({\omega_{SP\;Zj}}\) = supply air humidity ratio setpoint for the j\(^{th}\) controlled zones (kg/kg)
 
 \({\omega_{SP\;Min}}\) = user-specified supply air minimum humidity ratio setpoint (kg/kg)
 
@@ -684,11 +684,11 @@ The object determines a ``near-optimal'' condenser water entering set point at e
 
 4)~~~If dTEC\(_{1}\) is negative, stop the iteration and set the ``optimal'' setpoint to Toptset\(_{1}\).
 
-5)~~~If dTEC\(_{1}\) is positive, Decrease the setpoint value by 1˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{N}\) = TEC\(_{N}\)--TEC\(_{1}\)) until either Toptset\(_{1}\) reaches to the minimum boundary value or dTEC\(_{N}\) becomes negative.
+5)~~~If dTEC\(_{1}\) is positive, Decrease the setpoint value by 1˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{N}\) = TEC\(_{N}\)--TEC\(_{N+1}\)) until either Toptset\(_{N+1}\) reaches to the minimum boundary value or dTEC\(_{N}\) becomes negative.
 
-6)~~~If Toptset\(_{N}\) reaches to the minimum boundary value and still dTEC\(_{N}\) is positive, set the ``optimal'' setpoint to Toptset\(_{1}\).
+6)~~~If Toptset\(_{N}\) reaches to the minimum boundary value and still dTEC\(_{N}\) is positive, set the ``optimal'' setpoint to Toptset\(_{N+1}\).
 
-7)~~~If TEC\(_{N}\) becomes negative, decrease Toptset\(_{1}\) by 0.2˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{M}\) = TEC\(_{M}\)--TEC\(_{1}\)) until dTEC\(_{M}\) becomes negative. Then set the ``optimal'' setpoint to Toptset\(_{1}\).
+7)~~~If TEC\(_{N}\) becomes negative, decrease Toptset\(_{N-1}\) by 0.2˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{M}\) = TEC\(_{M}\)--TEC\(_{M+1}\)) until dTEC\(_{M}\) becomes negative. Then set the ``optimal'' setpoint to Toptset\(_{M+1}\).
 
 \subsection{Plant Return Water Control Setpoint Reset}\label{plant-return-water-control-setpoint-reset}
 

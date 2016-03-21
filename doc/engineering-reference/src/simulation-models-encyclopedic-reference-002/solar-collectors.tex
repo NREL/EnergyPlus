@@ -26,9 +26,9 @@ q = useful heat gain
 
 A = gross area of the collector
 
-I\(_{r}\) = total incident solar radiation
+I\(_{solar}\) = total incident solar radiation
 
-Notice that the efficiency h is only defined for I\(_{r}\) \textgreater{} 0.
+Notice that the efficiency h is only defined for I\(_{solar}\) \textgreater{} 0.
 
 An energy balance on a solar collector with double glazing shows relationships between the glazing properties, absorber plate properties, and environmental conditions.
 
@@ -38,23 +38,23 @@ An energy balance on a solar collector with double glazing shows relationships b
 
 where
 
-t\(_{1}\) = transmittance of the first glazing layer
+t\(_{g1}\) = transmittance of the first glazing layer
 
-t\(_{2}\) = transmittance of the second glazing layer
+t\(_{g2}\) = transmittance of the second glazing layer
 
-a\(_{s}\) = absorptance of the absorber plate
+a\(_{abs}\) = absorptance of the absorber plate
 
-R\(_{d}\) = radiative resistance from absorber to inside glazing
+R\(_{rad}\) = radiative resistance from absorber to inside glazing
 
-R\(_{v}\) = convective resistance from absorber to inside glazing
+R\(_{conv}\) = convective resistance from absorber to inside glazing
 
-R\(_{d}\) = conductive resistance from absorber to outdoor air through the insulation
+R\(_{cond}\) = conductive resistance from absorber to outdoor air through the insulation
 
-T\(_{s}\) = temperature of the absorber plate
+T\(_{abs}\) = temperature of the absorber plate
 
-T\(_{2}\) = temperature of the inside glazing
+T\(_{g2}\) = temperature of the inside glazing
 
-T\(_{r}\) = temperature of the outdoor air
+T\(_{air}\) = temperature of the outdoor air
 
 The equation above can be approximated with a simpler formulation as:
 
@@ -70,7 +70,7 @@ F\(_{R}\) = an empirically determined correction factor
 
 U\(_{L}\) = overall heat loss coefficient combining radiation, convection, and conduction terms
 
-T\(_{n}\) = inlet temperature of the working fluid
+T\(_{in}\) = inlet temperature of the working fluid
 
 Substituting this into Equation ,
 
@@ -150,7 +150,7 @@ Equation is also modified accordingly.
 
 \subsubsection{Outlet Temperature}\label{outlet-temperature}
 
-Outlet temperature is calculated using the useful heat gain q as determined by Equation , the inlet fluid temperature T\(_{n}\), and the mass flow rate available from the plant simulation:
+Outlet temperature is calculated using the useful heat gain q as determined by Equation , the inlet fluid temperature T\(_{in}\), and the mass flow rate available from the plant simulation:
 
 \begin{equation}
 \frac{q}{A} = \dot m{c_p}({T_{out}} - {T_{in}})
@@ -162,13 +162,13 @@ where
 
 c\(_{p}\) = specific heat of the working fluid
 
-Solving for T\(_{t}\),
+Solving for T\(_{out}\),
 
 \begin{equation}
 {T_{out}} = {T_{in}} + \frac{q}{{\dot m{c_p}A}}
 \end{equation}
 
-If there is no flow through the collector, T\(_{t}\) is the stagnation temperature of the fluid.~ This is calculated by setting the left side of Equation to zero and solving for T\(_{n}\) (which also equals T\(_{t}\) for the no flow case).
+If there is no flow through the collector, T\(_{out}\) is the stagnation temperature of the fluid.~ This is calculated by setting the left side of Equation to zero and solving for T\(_{in}\) (which also equals T\(_{out}\) for the no flow case).
 
 \subsubsection{References}\label{references-042}
 
@@ -208,7 +208,7 @@ The integral-collector-storage (ICS) solar collector is represented using two tr
 
 Where,
 
-\emph{m\(_{p}\)C\(_{p}\)}\(_{ }\) = thermal capacity of the absorber surface, J/°C
+\emph{m\(_{p}\)C\(_{p}\)} = thermal capacity of the absorber surface, J/°C
 
 A~~~~~~~ = collector gross area, m\(^{2}\)
 
@@ -216,7 +216,7 @@ A~~~~~~~ = collector gross area, m\(^{2}\)
 
 \emph{I\(_{t}\)}~~~~~~~ = total solar irradiation, (W/m\(^{2}\))
 
-\emph{h\(_{w}\)}~~~~~ = convective heat transfer coefficient from absorber plate to water, (W/m2°K)
+\emph{h\(_{pw}\)}~~~~~ = convective heat transfer coefficient from absorber plate to water, (W/m2°K)
 
 \emph{U\(_{t}\)}~~~~~~~ = overall heat loss coefficient from absorber to the ambient air, (W/m2 °K)
 
@@ -226,19 +226,19 @@ A~~~~~~~ = collector gross area, m\(^{2}\)
 
 \emph{T\(_{a}\)}~~~~~~~ = ambient air temperature, (°C)
 
-\emph{m\(_{w}\)C\(_{w}\)} = thermal capacity of the water mass in the collector, (J/°C)
+\emph{m\(_{w}\)C\(_{pw}\)} = thermal capacity of the water mass in the collector, (J/°C)
 
 \emph{U\(_{s}\)}~~~~~~ = area-weighted conductance of the collector side insulation, (W/m\(^{2}\)×°K)
 
 \emph{U\(_{b}\)}~~~~~~ = conductance of the collector bottom insulation, (W/m\(^{2}\)×°K)
 
-\emph{T\(_{c}\)}~~~~~ = ~~~ outside temperature of bottom insulation determined from the other side condition model, (°C)
+\emph{T\(_{osc}\)}~~~~~ = ~~~ outside temperature of bottom insulation determined from the other side condition model, (°C)
 
-\emph{T\(_{i}\)}~~~~~~ = Entering makeup or mains water temperature, (°C)
+\emph{T\(_{wi}\)}~~~~~~ = Entering makeup or mains water temperature, (°C)
 
 \({\dot m_w}{C_w}\) = water capacity flow through the collector, (W/°C)
 
-The other side condition model boundary condition represented by the \emph{T\(_{c}\)}, allows us to apply a realistic outside boundary condition for a collector mounted on a building roof.~ This also accounts for the shading impact of the collector on the under-laying surface (roof).~ On the other hand if ambient air boundary condition is specified, then the collector does not shade the underlying surface it is mounted on.
+The other side condition model boundary condition represented by the \emph{T\(_{osc}\)}, allows us to apply a realistic outside boundary condition for a collector mounted on a building roof.~ This also accounts for the shading impact of the collector on the under-laying surface (roof).~ On the other hand if ambient air boundary condition is specified, then the collector does not shade the underlying surface it is mounted on.
 
 The two energy balance equation can be written as non-homogeneous first order DE with constant coefficients. The initial conditions for these equations are the absorber plate average temperature and the collector water average temperature at previous time steps.
 
@@ -290,7 +290,7 @@ This auxiliary quadratic equation has always two distinct real roots (l\(_{1}\) 
 {T_w} =  {r_1}{c_1}{e^{{l_1}t}} + {r_2}{c_2}{e^{{l_2}t}} + B
 \end{equation}
 
-The constant terms \emph{A} and \emph{B} are the particular solution of the non-homogeneous differential equations, the coefficients of the exponential terms (\emph{c\(_{1}\)}, \emph{c\(_{2}\)}, \emph{r\(_{1}\)}, and \emph{r\(_{2}\)}) are determined from the initial conditions of the absorber and collector water temperatures (\emph{T\(_{0}\)}, \emph{T\(_{0}\)}) and are given by:
+The constant terms \emph{A} and \emph{B} are the particular solution of the non-homogeneous differential equations, the coefficients of the exponential terms (\emph{c\(_{1}\)}, \emph{c\(_{2}\)}, \emph{r\(_{1}\)}, and \emph{r\(_{2}\)}) are determined from the initial conditions of the absorber and collector water temperatures (\emph{T\(_{p0}\)}, \emph{T\(_{w0}\)}) and are given by:
 
 \begin{equation}
 {r_1} =  ({l_1} - {a_1})/{a_2};\quad {r_2} =  ({l_2} - {a_1})/{a_2}
@@ -356,33 +356,33 @@ Where,
 
 \emph{a\(_{c}\)} ~ = the weighted average solar absorptance of covers \emph{1} and \emph{2}, (-)
 
-\emph{h\(_{a}\)}~~~~~~~~~~ = adjusted radiation heat transfer coefficient between cover \emph{1} and the ambient air, (W/m\(^{2}\)×K)
+\emph{h\(_{r,c1-a}\)}~~~~~~~~~~ = adjusted radiation heat transfer coefficient between cover \emph{1} and the ambient air, (W/m\(^{2}\)×K)
 
-\emph{h\(_{a}\)}~~~~~~~~~~ = convection heat transfer coefficient between cover \emph{1} and the ambient, (W/m\(^{2}\)×K)
+\emph{h\(_{c,c1-a}\)}~~~~~~~~~~ = convection heat transfer coefficient between cover \emph{1} and the ambient, (W/m\(^{2}\)×K)
 
-\emph{h\(_{1}\)}~~~~~~~~~ = radiation heat transfer coefficient between covers \emph{1} and \emph{2}, (W/m\(^{2}\)×K)
+\emph{h\(_{r,c2-c1}\)}~~~~~~~~~ = radiation heat transfer coefficient between covers \emph{1} and \emph{2}, (W/m\(^{2}\)×K)
 
-\emph{h\(_{1}\)}~~~~~~~~~ = convection heat transfer coefficient between covers \emph{1} and \emph{2}, (W/m\(^{2}\)×K)
+\emph{h\(_{c,c2-c1}\)}~~~~~~~~~ = convection heat transfer coefficient between covers \emph{1} and \emph{2}, (W/m\(^{2}\)×K)
 
-\emph{h\(_{2}\)}~~~~~~~~~~ = radiation heat transfer coefficient between covers \emph{2} and the absorber plate, (W/m\(^{2}\)×K)
+\emph{h\(_{r,p-c2}\)}~~~~~~~~~~ = radiation heat transfer coefficient between covers \emph{2} and the absorber plate, (W/m\(^{2}\)×K)
 
-\emph{h\(_{2}\)}~~~~~~~~~~ = convection heat transfer coefficient between covers \emph{2} and the absorber plate, (W/m\(^{2}\)×K)
+\emph{h\(_{c,p-c2}\)}~~~~~~~~~~ = convection heat transfer coefficient between covers \emph{2} and the absorber plate, (W/m\(^{2}\)×K)
 
-\emph{q\(_{1}\)}~~~~~~~~~ = longwave radiation exchange flux on side \emph{1} of the collector cover, (W/m\(^{2}\))
+\emph{q\(_{LWR,1}\)}~~~~~~~~~ = longwave radiation exchange flux on side \emph{1} of the collector cover, (W/m\(^{2}\))
 
-\emph{q\(_{1}\)}~~~~~~~~ = convection heat flux on side \emph{1} of the collector cover, (W/m\(^{2}\))
+\emph{q\(_{CONV,1}\)}~~~~~~~~ = convection heat flux on side \emph{1} of the collector cover, (W/m\(^{2}\))
 
-\emph{q\(_{2}\)}~~~~~~~~~ = longwave radiation exchange flux on side \emph{2} of the collector cover, (W/m\(^{2}\))
+\emph{q\(_{LWR,2}\)}~~~~~~~~~ = longwave radiation exchange flux on side \emph{2} of the collector cover, (W/m\(^{2}\))
 
-\emph{q\(_{2}\)}~~~~~~~~ = convection heat flux on side \emph{2} of the collector cover, (W/m\(^{2}\))
+\emph{q\(_{CONV,2}\)}~~~~~~~~ = convection heat flux on side \emph{2} of the collector cover, (W/m\(^{2}\))
 
-\emph{q\(_{s}\)}~~~~~~~~ = net solar radiation absorbed by the collector cover, (W/m\(^{2}\))
+\emph{q\(_{solar,abs}\)}~~~~~~~~ = net solar radiation absorbed by the collector cover, (W/m\(^{2}\))
 
 \emph{R}~~~ = thermal resistance for each section along the heat flow path, (m\(^{2}\)K/W)
 
 \subsubsection{Other Side Condition Model}\label{other-side-condition-model}
 
-ICS Solar Collectors are commonly mounted on building heat transfer surfaces hence the collectors shade the underlying heat transfer surface and require a unique boundary condition that reflects the air cavity environment created between the bottom of the collector surface and the underlying surface. The other side condition model that allows us to estimate the other side temperature, \emph{T\(_{c}\)}, can be determined based on steady state heat balance using the known collector water temperature at the previous time step.
+ICS Solar Collectors are commonly mounted on building heat transfer surfaces hence the collectors shade the underlying heat transfer surface and require a unique boundary condition that reflects the air cavity environment created between the bottom of the collector surface and the underlying surface. The other side condition model that allows us to estimate the other side temperature, \emph{T\(_{osc}\)}, can be determined based on steady state heat balance using the known collector water temperature at the previous time step.
 
 \begin{figure}[hbtp] % fig 298
 \centering
@@ -416,19 +416,19 @@ The cavity air temperature is determined from cavity air heat balance as follows
 
 Where
 
-\emph{h\(_{v}\)}~~~~~~~~~~~ = linearized radiation coefficient for underlying surface in the cavity, (W/m\(^{2}\)×K)
+\emph{h\(_{r,\, cav}\)}~~~~~~~~~~~ = linearized radiation coefficient for underlying surface in the cavity, (W/m\(^{2}\)×K)
 
-\emph{h\(_{v}\)}~~~~~~~~~~ = convection coefficient for underlying surface in the cavity, (W/m\(^{2}\)×K)
+\emph{h\(_{c,\, cav}\)}~~~~~~~~~~ = convection coefficient for underlying surface in the cavity, (W/m\(^{2}\)×K)
 
-\emph{T\(_{o}\)} ~ = the outside face temperature of the underlying heat transfer surface, (ºC)
+\emph{T\(_{so}\)} ~ = the outside face temperature of the underlying heat transfer surface, (ºC)
 
 \({\dot m_{vent}}\) ~~~~~~~~~ = air mass flow rate due to natural ventilation, (kg/s)
 
-\emph{q\(_{d}\)}~~~~~~~~~~~ = conduction heat flux though the insulation bottom and, (W/m\(^{2}\))
+\emph{q\(_{cond}\)}~~~~~~~~~~~ = conduction heat flux though the insulation bottom and, (W/m\(^{2}\))
 
-\emph{q\(_{v}\)}~~~~~~~~ = convection heat flux between the collector bottom outside surface and the cavity air, (W/m\(^{2}\))
+\emph{q\(_{conv,cav}\)}~~~~~~~~ = convection heat flux between the collector bottom outside surface and the cavity air, (W/m\(^{2}\))
 
-\emph{q\(_{v}\)}~~~~~~~~~ = ~~~~~~~~~ longwave radiation exchange flux between the collector bottom outside surface and the outside surface of the underlying surface, (W/m\(^{2}\))
+\emph{q\(_{rad,cav}\)}~~~~~~~~~ = ~~~~~~~~~ longwave radiation exchange flux between the collector bottom outside surface and the outside surface of the underlying surface, (W/m\(^{2}\))
 
 The cavity air temperature is determined from the cavity air energy balance.~ The air heat balance requires the ventilated cavity air natural ventilation rates.~ The calculation of the ventilation rate is described else where in this document. The SurfaceProperty:ExteriorNaturalVentedCavity, object is required to describe the surface properties, the characteristics of the cavity and opening for natural ventilation.
 
@@ -546,17 +546,17 @@ The overall loss coefficient through the bottom and side of the collector-storag
 
 Where,
 
-\emph{e\(_{1}\)} ~ = thermal emissivity of collector cover \emph{1}, (-)
+\emph{e\(_{c1}\)} ~ = thermal emissivity of collector cover \emph{1}, (-)
 
-\emph{e\(_{2}\)} ~ = thermal emissivity of collector cover \emph{2}, (-)
+\emph{e\(_{c2}\)} ~ = thermal emissivity of collector cover \emph{2}, (-)
 
 \emph{F\(_{s}\)} ~ = view factor from the collector to the sky, (-)
 
 \emph{F\(_{g}\)} ~ = view factor from the collector to the ground, (-)
 
-\emph{T\(_{1}\)} = temperature of collector cover \emph{1}, (K)
+\emph{T\(_{c1}\)} = temperature of collector cover \emph{1}, (K)
 
-\emph{T\(_{2}\)} = temperature of collector cover \emph{2}, (K)
+\emph{T\(_{c2}\)} = temperature of collector cover \emph{2}, (K)
 
 \emph{T\(_{s}\)} ~ = sky temperature, (K)
 
@@ -570,15 +570,15 @@ Where,
 
 \emph{V\(_{w}\)} = wind speed, (m/s)
 
-\emph{U\(_{b}\)}~ = user specified bottom heat loss conductance, W/m\(^{2}\)×K
+\emph{U\(_{Lb}\)}~ = user specified bottom heat loss conductance, W/m\(^{2}\)×K
 
-\emph{U\(_{s}\)}~ = user specified side heat loss conductance, W/m\(^{2}\)×K
+\emph{U\(_{Ls}\)}~ = user specified side heat loss conductance, W/m\(^{2}\)×K
 
 \emph{A\(_{b}\)}~~ = collector bottom heat transfer area, m\(^{2}\)
 
 \emph{A\(_{s}\)}~~ = collector side area, m\(^{2}\)
 
-\emph{h\(_{b}\)}~~~~~~~~~~~ = combined conductance from the outer cover to the ambient air, W/m\(^{2}\)×K
+\emph{h\(_{comb}\)}~~~~~~~~~~~ = combined conductance from the outer cover to the ambient air, W/m\(^{2}\)×K
 
 \textbf{\emph{Transmittance-Absorptance Product}}
 
@@ -654,7 +654,7 @@ where,
 
 \emph{L} ~~ = thickness of a cover material, (m)
 
-\emph{K} ~~ = extinction coefficient of a cover material, (m\(^{1}\))
+\emph{K} ~~ = extinction coefficient of a cover material, (m\(^{-1}\))
 
 \emph{q}\(_{1}\) ~ = angle of incidence, degree
 
@@ -666,9 +666,9 @@ where,
 
 \emph{b} ~~ = slope of the collector, degree
 
-\emph{q}\(_{d}\) = equivalent incident angle for sky diffuse solar radiation, degree
+\emph{q}\(_{sd}\) = equivalent incident angle for sky diffuse solar radiation, degree
 
-\emph{q}\(_{d}\)~ = equivalent incident angle for ground diffuse solar radiation, degree
+\emph{q}\(_{gd}\)~ = equivalent incident angle for ground diffuse solar radiation, degree
 
 The integral collector storage unit thermal performance parameters are calculated as follows:
 
@@ -774,9 +774,9 @@ Substituting and solving for \({T_{col}}\) ~we obtain the following model for co
 
 Then the outlet temperature can be calculated and heat losses determined.~ However, the model allows only sensible cooling of the air stream and limits the outlet temperature to not go below the dewpoint temperature of the inlet.
 
-PVT collectors have a design volume flow rate for the working fluid that is autosizable.~ For air-based systems used as pre-conditioners, the volume flow rate is sized to meet the maximum outdoor air flow rate.~ For water-based systems on the supply side of a plant loop, each of the PVT collectors are sized to the overall loop flow rate.~ For water-based systems on the demand side of a plant loop, the collectors are sized using a rule-of-thumb for typical flow rates per unit of collector area.~ This rule-of-thumb is based on a constant factor of 1.905x10\(^{5}\) m\(^{3}\)/s-m\(^{2}\) that was developed by analyzing SRCC data set for conventional solar collectors (see data set SolarCollectors.idf) and averaging the ratio for all 171 different collectors.
+PVT collectors have a design volume flow rate for the working fluid that is autosizable.~ For air-based systems used as pre-conditioners, the volume flow rate is sized to meet the maximum outdoor air flow rate.~ For water-based systems on the supply side of a plant loop, each of the PVT collectors are sized to the overall loop flow rate.~ For water-based systems on the demand side of a plant loop, the collectors are sized using a rule-of-thumb for typical flow rates per unit of collector area.~ This rule-of-thumb is based on a constant factor of 1.905x10\(^{-5}\) m\(^{3}\)/s-m\(^{2}\) that was developed by analyzing SRCC data set for conventional solar collectors (see data set SolarCollectors.idf) and averaging the ratio for all 171 different collectors.
 
-\subsubsection{References}\label{references-2-007}
+\subsubsection{References}\label{references-2-008}
 
 Charalambous, P.G., Maidment, G.G., Kalagirou, S.A., and Yiakoumetti, K., Photovoltaic thermal (PV/T) collectors: A review. Applied Thermal Engineering 27 (2007) 275-286.
 
@@ -900,7 +900,7 @@ Observe that for the passive case, we do not use the heat exchanger relations to
 \begin{figure}[hbtp] % fig 299
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6620.png}
-\caption{  Transpired Collector Heat Balance \protect \label{fig:transpired-collector-heat-balance}}
+\caption{Transpired Collector Heat Balance \protect \label{fig:transpired-collector-heat-balance}}
 \end{figure}
 
 When the UTSC is active, the heat balance on the collector surface control volume is:
@@ -909,13 +909,13 @@ When the UTSC is active, the heat balance on the collector surface control volum
 {q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,wind}} - {q''_{HX}} + {q''_{LWR,plen}} + {q''_{source}} = 0
 \end{equation}
 
-where: \(_{ }\)is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
+where: \(q''_{\alpha sol}\) is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
 
-\({q''_{LWR,Env}}\) ~is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
+\({q''_{LWR,Env}}\) is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
 
-\({q''_{conv,wind}}\) ~is surface convection flux exchange with outdoor air under high wind and rain conditions.~ Note that this term is usually assumed to be zero in UTSC model development but we add the term to allow for deteriorated performance of the UTSC under poor conditions. \(_{ }\) is heat exchanger flux from collector to incoming outdoor air. \(_{ }\)is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
+\({q''_{conv,wind}}\) is surface convection flux exchange with outdoor air under high wind and rain conditions.~ Note that this term is usually assumed to be zero in UTSC model development but we add the term to allow for deteriorated performance of the UTSC under poor conditions. \(q''_{HX}\) is heat exchanger flux from collector to incoming outdoor air. \(q''_{LWR,plen}\) is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
 
-\({q''_{source}}\) ~is a source/sink term that accounts for energy exported out of the control volume when the collecter's absorber plate is a hybrid device such as a photovoltaic panel.
+\({q''_{source}}\) is a source/sink term that accounts for energy exported out of the control volume when the collecter's absorber plate is a hybrid device such as a photovoltaic panel.
 
 While the heat balance on the passive collector surface control volume is:
 
@@ -923,13 +923,13 @@ While the heat balance on the passive collector surface control volume is:
 {q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,Env}} + {q''_{LWR,plen}} + {q''_{conv,plen}} + {q''_{source}} = 0
 \end{equation}
 
-where: \(_{ }\) = surface convection flux exchange with outdoor air. \(_{ }\) = surface convection flux exchange with plenum air.
+where: \(q''_{conv,Env}\) = surface convection flux exchange with outdoor air. \(q''_{conv,plen}\) = surface convection flux exchange with plenum air.
 
 All terms are positive for net flux to the collector except the heat exchanger term, which is taken to be positive in the direction from collector to incoming air stream.~ Each of these heat balance components is introduced briefly below.
 
 \subsubsection{External SW Radiation}\label{external-sw-radiation-000}
 
-\(_{ }\)~is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.
+\(q''_{\alpha sol}\) is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.
 
 \subsubsection{External LW Radiation}\label{external-lw-radiation-000}
 
@@ -937,11 +937,11 @@ All terms are positive for net flux to the collector except the heat exchanger t
 
 \subsubsection{External Convection}\label{external-convection-000}
 
-\(_{ }\)is modeled using the classical formulation: \({q''_{conv}}\) ~\(_{ }\) = h\(_{o}\)(T\(_{r}\) - T\(_{o}\)) where h\(_{o}\), is the convection coefficient.~ This coefficient will differ depending on whether or not the UTSC is active or passive.~ When the UTSC is passive, h\(_{o}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ When the UTSC is active, the special suction airflow situation of a transpired collector during operation means that h\(_{o}\) is often zero because the suction situation can eliminate mass transport away from the collector.~ However when the winds are high, the strong turbulence and highly varying pressures can cause the suction flow situation to breakdown.~ Therefore, we include the \({q''_{conv,wind}}\) ~term in the heat balance and use a special coefficient \({h_{c,wind}}\) ~to model this lost heat transfer.~ In addition, when it is raining outside, we assume the collector gets wet and model the enhanced surface heat transfer using a large value for \({h_{c,wind}}\) .
+\(q''_{conv,Env}\) is modeled using the classical formulation: \({q''_{conv}}\) ~ = h\(_{co}\)(T\(_{air}\) - T\(_{o}\)) where h\(_{co}\), is the convection coefficient.~ This coefficient will differ depending on whether or not the UTSC is active or passive.~ When the UTSC is passive, h\(_{co}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ When the UTSC is active, the special suction airflow situation of a transpired collector during operation means that h\(_{co}\) is often zero because the suction situation can eliminate mass transport away from the collector.~ However when the winds are high, the strong turbulence and highly varying pressures can cause the suction flow situation to breakdown.~ Therefore, we include the \({q''_{conv,wind}}\) ~term in the heat balance and use a special coefficient \({h_{c,wind}}\) ~to model this lost heat transfer.~ In addition, when it is raining outside, we assume the collector gets wet and model the enhanced surface heat transfer using a large value for \({h_{c,wind}}\) .
 
 \subsubsection{Heat Exchanger}\label{heat-exchanger}
 
-\(_{ }\)is modeled using the classical formulation \({q''_{HX}} = \frac{{\dot m{c_p}({T_{a,HX}} - {T_{amb}})}}{A}\) \(_{ }\)where \({T_{{\rm{a,HX}}}}\) ~is determined using correlations described above.~ When the UTSC is active, the air mass flow is determined from the operation of the outdoor air mixer component.~ When the UTSC is off, this term is zero.
+\(q''_{HX}\) is modeled using the classical formulation \({q''_{HX}} = \frac{{\dot m{c_p}({T_{a,HX}} - {T_{amb}})}}{A}\) where \({T_{{\rm{a,HX}}}}\) ~is determined using correlations described above.~ When the UTSC is active, the air mass flow is determined from the operation of the outdoor air mixer component.~ When the UTSC is off, this term is zero.
 
 \subsubsection{Plenum LW Radation}\label{plenum-lw-radation}
 
@@ -949,7 +949,7 @@ All terms are positive for net flux to the collector except the heat exchanger t
 
 \subsubsection{Plenum Convection}\label{plenum-convection}
 
-\(_{ }\)is modeled using the classical formulation: \({q''_{conv}}\) ~\(_{ }\) = h\(_{p}\)(T\(_{r}\) - T\(_{o}\)) where h\(_{p}\), is the convection coefficient.~ This coefficient is taken as zero when the UTSC is operating because of the suction airflow situation.~ When the UTSC is off, the value for h\(_{p}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+\(q''_{conv,plen}\) is modeled using the classical formulation: \({q''_{conv}}\) = h\(_{cp}\)(T\(_{air}\) - T\(_{o}\)) where h\(_{cp}\), is the convection coefficient.~ This coefficient is taken as zero when the UTSC is operating because of the suction airflow situation.~ When the UTSC is off, the value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
 Substituting models into and solving for \({T_{s,coll}}\) ~yields the following equation when the UTSC is active (``on''):
 
@@ -1007,7 +1007,7 @@ Note that we have formulated the control volumes with slight differences for the
 \begin{figure}[hbtp] % fig 300
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6664.png}
-\caption{  Transpired Collector Plenum Air Heat Balance \protect \label{fig:transpired-collector-plenum-air-heat-balance}}
+\caption{Transpired Collector Plenum Air Heat Balance \protect \label{fig:transpired-collector-plenum-air-heat-balance}}
 \end{figure}
 
 When the UTSC is active, the heat balance on the plenum air control volume is:
@@ -1018,7 +1018,7 @@ When the UTSC is active, the heat balance on the plenum air control volume is:
 
 where,
 
-\({\dot Q_{air}}\) is the net rate of energy added by suction air convecting through the control volume. \(_{ }\)~is the net rate of energy added by surface convection heat transfer with the underlying surface.
+\({\dot Q_{air}}\) is the net rate of energy added by suction air convecting through the control volume. \(\dot{Q}_{co}\) is the net rate of energy added by surface convection heat transfer with the underlying surface.
 
 When the UTSC is passive, the heat balance on the plenum air control volume is:
 
@@ -1102,14 +1102,22 @@ The wind speed is modified from the measured meteorological wind speed by the eq
 {U_\infty } = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{a_{met}}}}{\left( {\frac{z}{\delta }} \right)^a}
 \end{equation}
 
-where z is the height of the centroid of the UTSC, z\(_{t}\) is the height of the standard metereological wind speed measurement, and a and d are terrain-dependent coefficients.~ d is the boundary layer thickness for the given terrain type.~ The values of a and d are shown in the following tables:
+where z is the height of the centroid of the UTSC, z\(_{met}\) is the height of the standard metereological wind speed measurement, and a and d are terrain-dependent coefficients.~ d is the boundary layer thickness for the given terrain type.~ The values of a and d are shown in the following tables:
 
 % table 77
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Terrain-Dependent Coefficients (ASHRAE 2001). \protect \label{table:terrain-dependent-coefficients-ashrae-2001.-001}}\\
+\caption{Terrain-Dependent Coefficients (ASHRAE 2001). \label{table:terrain-dependent-coefficients-ashrae-2001.-001}} \tabularnewline
 \toprule 
-Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline \midrule
+Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Terrain-Dependent Coefficients (ASHRAE 2001).} \tabularnewline
+\toprule 
+Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline
+\midrule
 \endhead
+
 1 & Flat, open country & 0.14 & 270 \tabularnewline
 2 & Rough, wooded country & 0.22 & 370 \tabularnewline
 3 & Towns and cities & 0.33 & 460 \tabularnewline
@@ -1200,7 +1208,7 @@ The thermal efficiency of the collector is a useful output report and is defined
 
 Note that the efficiency \(\eta\) ~is only defined for \({I_{solar}} > 0\)
 
-\subsubsection{References}\label{references-3-003}
+\subsubsection{References}\label{references-3-004}
 
 Kutscher, C.F. 1994. Heat exchange effectiveness and pressure drop for air flow through perforated plates with and without crosswind. \emph{Journal of Heat Transfer}. May 1994, Vol. 116, p.~391. American Society of Mechanical Engineers.
 

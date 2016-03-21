@@ -356,7 +356,7 @@ C\frac{{d{T_2}}}{{dt}} = hA\left( {{T_i} - {T_2}} \right) + \frac{{{T_1} - {T_2}
 \begin{figure}[hbtp] % fig 270
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6034.svg.png}
-\caption{  Two Node State Space Example with a Heat Source \protect \label{fig:two-node-state-space-example-with-a-heat}}
+\caption{Two Node State Space Example with a Heat Source \protect \label{fig:two-node-state-space-example-with-a-heat}}
 \end{figure}
 
 In obtaining the matrix equivalent for this set of equations, it should be noted that the source term is not a constant but rather an input that varies with time.~ Thus, it must be grouped with the environmental temperatures as inputs.~ The resulting matrix equations take the following form:
@@ -476,13 +476,13 @@ In the constant flow-variable temperature systems, the controls are also conside
 \begin{figure}[hbtp] % fig 271
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6053.png}
-\caption{  Variable Flow Low Temperature Radiant System Controls \protect \label{fig:variable-flow-low-temperature-radiant-system}}
+\caption{Variable Flow Low Temperature Radiant System Controls \protect \label{fig:variable-flow-low-temperature-radiant-system}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 272
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6054.png}
-\caption{  Variable Temperature Low Temperature Radiant System Controls \protect \label{fig:variable-temperature-low-temperature-radiant}}
+\caption{Variable Temperature Low Temperature Radiant System Controls \protect \label{fig:variable-temperature-low-temperature-radiant}}
 \end{figure}
 
 The constant flow (variable temperature) low temperature radiant system model is actually a combination of mixing valves, a pump (constant speed, but the maximum flow can be modified by a schedule), and the radiant system (surface, panel, or group of surfaces/panels).~ This is connected to the main loop through the standard inlet connections as shown in Figure~\ref{fig:variable-temperature-low-temperature-radiant-001}.~ The system controls determine the desired inlet temperature and system flow rate while loop controls determine the flow rate and temperature of the loop.~ Note that pump heat also factors into the model through a simple constant speed pump model and user input.
@@ -492,7 +492,7 @@ There are four possible conditions (separate for heating and cooling).~ First, i
 \begin{figure}[hbtp] % fig 273
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6055.png}
-\caption{  Variable Temperature Low Temperature Radiant System Component Details \protect \label{fig:variable-temperature-low-temperature-radiant-001}}
+\caption{Variable Temperature Low Temperature Radiant System Component Details \protect \label{fig:variable-temperature-low-temperature-radiant-001}}
 \end{figure}
 
 One remaining challenge is the merging of the low temperature radiant system model with an integrated building simulation program.~ In the past, most simulation programs have simulated the building envelope, the space conditioning systems, and the central plant equipment in three separate steps.~ While this had some advantages and was partly due to a lack of computing capacity, the large drawback for this arrangement is that there is no feedback from the space conditioning system or central plant response to the building conditions.~ Thus, if the system or plant was undersized, it was reported as an ``unmet load'' and does not affect the temperatures experienced within the building.~ IBLAST, a predecessor (Taylor 1991) to EnergyPlus, resolved this issue by integrating all three major components of a building simulation and thus allowing feedback between the equipment and the building envelope.
@@ -508,7 +508,7 @@ Despite the fact that the simulation algorithm described above may either over- 
 \begin{figure}[hbtp] % fig 274
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6056.png}
-\caption{  Resolution of Radiant System Response at Varying Time Steps \protect \label{fig:resolution-of-radiant-system-response-at}}
+\caption{Resolution of Radiant System Response at Varying Time Steps \protect \label{fig:resolution-of-radiant-system-response-at}}
 \end{figure}
 
 \subsubsection{Heat Exchanger Formulation for Hydronic Systems}\label{heat-exchanger-formulation-for-hydronic-systems}
@@ -647,11 +647,11 @@ It should be noted that Equations through are a slight simplification of the act
 {T_{source}} = {C_g} + {C_h}q'' + {C_i}{T_{inside}} + {C_j}{T_{outside}}
 \end{equation}
 
-where:~ T\(_{e}\) is the temperature at the inside surface
+where: T\(_{inside}\) is the temperature at the inside surface
 
-T\(_{e}\) is the temperature at the outside surface
+T\(_{outside}\) is the temperature at the outside surface
 
-T\(_{e}\) is the temperature within the radiant system at the location of the source/sink
+T\(_{source}\) is the temperature within the radiant system at the location of the source/sink
 
 C\(_{a}\) is all of the other terms in the inside heat balance (solar, LW exchange, conduction history terms, etc.)
 
@@ -673,7 +673,7 @@ C\(_{i}\) is the CTF inside term for the current inside surface temperature
 
 C\(_{j}\) is the CTF outside term for the current outside surface temperature
 
-Equations and above can be solved to remove the other surface temperature.~ Substituting the new equations for T\(_{e}\) and T\(_{e}\) as a function of C and q" into the equation for Tsource and simplifying results in the following equation:
+Equations and above can be solved to remove the other surface temperature. Substituting the new equations for T\(_{inside}\) and T\(_{outside}\) as a function of C and q" into the equation for Tsource and simplifying results in the following equation:
 
 \begin{equation}
 {T_{source}} = {C_k} + {C_l}q''
@@ -701,7 +701,7 @@ The previous equation combines with the following equation which is valid for an
 {{\rm{q}}_{\rm{j}}}{\rm{  =  }}{{\rm{\dot m}}_{\rm{j}}}{{\rm{c}}_{\rm{p}}}{\rm{(}}{{\rm{T}}_{{\rm{water,in}}}}{\rm{  -  }}{{\rm{T}}_{{\rm{water,out,j}}}}{\rm{)}}
 \end{equation}
 
-where q\(_{j}\) is the heat transfer to the jth surface in the radiant system, m\(_{j}\) is the mass flow rate only to this surface, and T\(_{j}\) is the outlet temperature for the jth surface.~ Combining the previous two equations results in:
+where q\(_{j}\) is the heat transfer to the jth surface in the radiant system, m\(_{j}\) is the mass flow rate only to this surface, and T\(_{water,out,j}\) is the outlet temperature for the jth surface.~ Combining the previous two equations results in:
 
 \begin{equation}
 {\rm{(}}{{\rm{T}}_{{\rm{water,in}}}}{\rm{  -  }}{{\rm{T}}_{{\rm{water,out,j}}}}{\rm{)}} = \frac{{{\varepsilon_j}\left( {{{\rm{T}}_{{\rm{water,in}}}} - {C_{k,j}}} \right)}}{{1 + \frac{{{\varepsilon_j}{{\dot m}_j}{c_p}{C_{l,j}}}}{A}}}
@@ -725,15 +725,15 @@ Rearranging to obtain the outlet temperature for the jth surface:
 {{\rm{T}}_{{\rm{water,out,j}}}} = \left( {1 - {C_{m,j}}} \right){{\rm{T}}_{{\rm{water,in}}}} + {C_{m,j}}{C_{k,j}}
 \end{equation}
 
-The overall outlet temperature from the radiant system is just a simple mixing of all of the surface outlet temperatures based on flow fraction and results in T\(_{t}\).
+The overall outlet temperature from the radiant system is just a simple mixing of all of the surface outlet temperatures based on flow fraction and results in T\(_{water,out}\).
 
-An energy balance on the mixing valve-pump group results in the following equation that relates the radiant system inlet temperature (T\(_{n}\)) to the loop inlet water temperature (T\(_{n}\)), the radiant system outlet temperature (T\(_{t}\)), and the pump heat addition:
+An energy balance on the mixing valve-pump group results in the following equation that relates the radiant system inlet temperature (T\(_{water,in}\)) to the loop inlet water temperature (T\(_{loop,in}\)), the radiant system outlet temperature (T\(_{water,out}\)), and the pump heat addition:
 
 \begin{equation}
 {{\rm{T}}_{{\rm{water,in}}}} = \frac{{{{\dot m}_{loop}}}}{{{{\dot m}_{system}}}}{{\rm{T}}_{{\rm{loop,in}}}} + \frac{{{{\dot m}_{recirc}}}}{{{{\dot m}_{system}}}}{{\rm{T}}_{{\rm{water,out}}}} + \frac{{PumpHeat}}{{{{\dot m}_{system}}{c_p}}}
 \end{equation}
 
-Plugging in the definition of T\(_{t}\) based on the summation of T\(_{j}\) equations results in:
+Plugging in the definition of T\(_{water,out}\) based on the summation of T\(_{water,out,j}\) equations results in:
 
 \begin{equation}
 {{\rm{T}}_{{\rm{water,in}}}} = \frac{{LoopTerm + {\mathop{\rm Re}\nolimits} circTerm}}{{TwiCoeff}}
