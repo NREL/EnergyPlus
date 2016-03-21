@@ -9590,6 +9590,8 @@ namespace Furnaces {
 		using DataHVACGlobals::MSHPMassFlowRateHigh;
 		using IntegratedHeatPumps::GetAirMassFlowRateIHP;
 		using IntegratedHeatPumps::GetMaxSpeedNumIHP; 
+		using IntegratedHeatPumps::IntegratedHeatPumpUnits; 
+		using IntegratedHeatPumps::SCWHMatchWHMode; 
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9700,6 +9702,12 @@ namespace Furnaces {
 					FanSpeedRatio = CompOnFlowRatio;
 				}
 			}
+
+			if (SCWHMatchWHMode == IntegratedHeatPumpUnits(Furnace(FurnaceNum).CoolingCoilIndex).CurMode)
+			{
+				CompOnMassFlow = GetAirMassFlowRateIHP(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, SpeedRatio, false);
+				AverageUnitMassFlow = CompOnMassFlow; 
+			};
 		}		
 		else {
 			if ( ! CurDeadBandOrSetback( Furnace( FurnaceNum ).ControlZoneNum ) && present( SpeedNum ) ) {

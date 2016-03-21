@@ -145,6 +145,8 @@ namespace EnergyPlus {
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int DXCoilNum(0); // The IHP No that you are currently dealing with
+			double waterMassFlowRate(0); 
+			double airMassFlowRate(0); 
 
 			// Obtains and Allocates ASIHP related parameters from input file
 			if (GetCoilsInputFlag) { //First time subroutine has been entered
@@ -176,6 +178,8 @@ namespace EnergyPlus {
 
 			InitializeIHP(DXCoilNum);
 
+			airMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate; 
+			waterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 			switch (IntegratedHeatPumpUnits(DXCoilNum).CurMode)
 			{
 			case SCMode:
@@ -202,7 +206,7 @@ namespace EnergyPlus {
 						CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 				}
 
-
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = 0.0;
 				break;
 			case SHMode:
 				if (false == IsCallbyWH)//process when called from air loop
@@ -227,7 +231,7 @@ namespace EnergyPlus {
 					SimVariableSpeedCoils(BlankString, IntegratedHeatPumpUnits(DXCoilNum).DWHCoilIndex,
 						CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 				}
-
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = 0.0;
 				break;
 			case DWHMode:
 				if (true == IsCallbyWH)//process when called from water loop
@@ -253,6 +257,7 @@ namespace EnergyPlus {
 					//IntegratedHeatPumpUnits(DXCoilNum).TotalHeatingEnergyRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).DWHCoilIndex).TotalHeatingEnergyRate;
 				}
 
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 				break;
 			case SCWHMatchSCMode:
 				if (false == IsCallbyWH)//process when called from air loop
@@ -277,6 +282,7 @@ namespace EnergyPlus {
 						CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 				}
 
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 
 				break;
 			case SCWHMatchWHMode:
@@ -301,8 +307,11 @@ namespace EnergyPlus {
 
 					SimVariableSpeedCoils(BlankString, IntegratedHeatPumpUnits(DXCoilNum).SHCoilIndex,
 						CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+
+					IntegratedHeatPumpUnits(DXCoilNum).SCWHAirFlowSav = airMassFlowRate;
 				}
 
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 				break;
 			case SCDWHMode:
 				if (false == IsCallbyWH)//process when called from air loop
@@ -329,6 +338,7 @@ namespace EnergyPlus {
 						CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 				}
 
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 				break;
 			case SHDWHElecHeatOffMode:
 			case SHDWHElecHeatOnMode:
@@ -355,6 +365,7 @@ namespace EnergyPlus {
 						SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat);
 				}
 
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate;
 				break;
 			case IdleMode:
 			default://clear up
@@ -374,8 +385,10 @@ namespace EnergyPlus {
 					CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 				SimVariableSpeedCoils(BlankString, IntegratedHeatPumpUnits(DXCoilNum).DWHCoilIndex,
 					CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+				IntegratedHeatPumpUnits(DXCoilNum).TankSourceWaterMassFlowRate = 0.0;
 				break;
 			}
+
 
 			UpdateIHP(DXCoilNum);
 
@@ -1000,6 +1013,7 @@ namespace EnergyPlus {
 			}
 			else
 			{
+				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate = GetWaterVolFlowRateIHP(DXCoilNum, 1.0, 1.0, true) * 987.0; //987.0 water density at 60 C. 
 				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterOutletNodeNum).Temp =
 					Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).Temp;
 				SimWaterThermalTank(
@@ -1684,10 +1698,10 @@ namespace EnergyPlus {
 				WaterVolFlowRate = 0.0;
 				break;
 			case SCMode:
-				WaterVolFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SCCoilIndex).WaterVolFlowRate;
+				WaterVolFlowRate = 0.0;
 				break;
 			case SHMode:
-				WaterVolFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SHCoilIndex).WaterVolFlowRate;
+				WaterVolFlowRate = 0.0;
 				break;
 			case DWHMode:
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).DWHCoilIndex;
@@ -1696,8 +1710,6 @@ namespace EnergyPlus {
 					(1.0 - SpeedRatio) * VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum - 1);
 				break;
 			case SCWHMatchSCMode:
-				WaterVolFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex).WaterVolFlowRate;
-				break;
 			case SCWHMatchWHMode:
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex;
 				if (1 == SpeedNum)  WaterVolFlowRate = VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum);
@@ -1705,11 +1717,17 @@ namespace EnergyPlus {
 					(1.0 - SpeedRatio) * VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum - 1);
 				break;
 			case SCDWHMode:
-				WaterVolFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SCDWHWHCoilIndex).WaterVolFlowRate;
+				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCDWHWHCoilIndex;
+				if (1 == SpeedNum)  WaterVolFlowRate = VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum);
+				else WaterVolFlowRate = SpeedRatio * VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum) +
+					(1.0 - SpeedRatio) * VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum - 1);
 				break;
 			case SHDWHElecHeatOffMode:
 			case SHDWHElecHeatOnMode:
-				WaterVolFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SHDWHWHCoilIndex).WaterVolFlowRate;
+				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHDWHWHCoilIndex;
+				if (1 == SpeedNum)  WaterVolFlowRate = VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum);
+				else WaterVolFlowRate = SpeedRatio * VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum) +
+					(1.0 - SpeedRatio) * VarSpeedCoil(IHPCoilIndex).MSRatedWaterVolFlowRate(SpeedNum - 1);
 				break;
 			default:
 				WaterVolFlowRate = 0.0;
@@ -1757,12 +1775,22 @@ namespace EnergyPlus {
 				{
 					FlowScale = IntegratedHeatPumpUnits(DXCoilNum).CoolVolFlowScale;
 				}
+				else
+				{
+					IsResultFlow = true;
+					AirMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate; 
+				}
 				break;
 			case SHMode:
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHCoilIndex;
 				if (false == IsCallbyWH)
 				{
 					FlowScale = IntegratedHeatPumpUnits(DXCoilNum).HeatVolFlowScale;
+				}
+				else
+				{
+					IsResultFlow = true;
+					AirMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
 				}
 				break;
 			case DWHMode:
@@ -1772,10 +1800,12 @@ namespace EnergyPlus {
 			case SCWHMatchSCMode:
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex;
 				FlowScale = IntegratedHeatPumpUnits(DXCoilNum).CoolVolFlowScale;
+				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate = 
+					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * 986.0; 
 				if (true == IsCallbyWH)
 				{
 					IsResultFlow = true;
-					AirMassFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex).AirMassFlowRate;
+					AirMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
 				}
 				break;
 			case SCWHMatchWHMode:
@@ -1784,26 +1814,30 @@ namespace EnergyPlus {
 				if (false == IsCallbyWH)
 				{
 					IsResultFlow = true;
-					AirMassFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SCWHCoilIndex).AirMassFlowRate;
+					AirMassFlowRate = IntegratedHeatPumpUnits(DXCoilNum).SCWHAirFlowSav;
 				}
 				break;
 			case SCDWHMode:
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SCDWHCoolCoilIndex;
 				FlowScale = IntegratedHeatPumpUnits(DXCoilNum).CoolVolFlowScale;
+				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate =
+					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * 986.0;
 				if (true == IsCallbyWH)
 				{
 					IsResultFlow = true;
-					AirMassFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SCDWHCoolCoilIndex).AirMassFlowRate;
+					AirMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
 				}
 				break;
 			case SHDWHElecHeatOffMode:
 			case SHDWHElecHeatOnMode:
 				IHPCoilIndex = IntegratedHeatPumpUnits(DXCoilNum).SHDWHHeatCoilIndex;
 				FlowScale = IntegratedHeatPumpUnits(DXCoilNum).HeatVolFlowScale;
+				Node(IntegratedHeatPumpUnits(DXCoilNum).WaterInletNodeNum).MassFlowRate =
+					GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * 986.0;
 				if (true == IsCallbyWH)
 				{
 					IsResultFlow = true;
-					AirMassFlowRate = VarSpeedCoil(IntegratedHeatPumpUnits(DXCoilNum).SHDWHHeatCoilIndex).AirMassFlowRate;
+					AirMassFlowRate = Node(IntegratedHeatPumpUnits(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
 				}
 				break;
 			default:
