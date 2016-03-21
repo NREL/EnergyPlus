@@ -445,7 +445,7 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 	
 		"EnergyManagementSystem:Program,",
 		"Test_InsideHVACSystemIterationLoop,",
-		"set dumm1 = Node_mdot_EquipInlet;",
+		"set dumm1 = Node_mdot;",
 
 		} );
 
