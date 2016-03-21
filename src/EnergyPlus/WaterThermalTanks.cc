@@ -7733,6 +7733,8 @@ namespace WaterThermalTanks {
 					else
 					{
 						SpeedNum = GetLowSpeedNumIHP(HeatPump.DXCoilNum);
+
+						SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 						SimIHP(HeatPump.DXCoilName, HeatPump.DXCoilNum, CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0,
 							true, false, 1.0);
 
@@ -7743,6 +7745,7 @@ namespace WaterThermalTanks {
 						else
 						{
 							Tank.SourceMassFlowRate = IntegratedHeatPumpUnits(HeatPump.DXCoilNum).TankSourceWaterMassFlowRate; 
+							MdotWater = Tank.SourceMassFlowRate; 
 						}
 
 						if (SHDWHElecHeatOffMode == IHPMode)//turn off heater element

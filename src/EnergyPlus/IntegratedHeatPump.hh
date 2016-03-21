@@ -138,7 +138,8 @@ namespace IntegratedHeatPumps {
 		int ODAirInletNodeNum; // oudoor coil inlet Nod
 		int ODAirOutletNodeNum; // oudoor coil outlet Nod
 		Real64 TankSourceWaterMassFlowRate;//tank source water flow rate
-		Real64 SCWHAirFlowSav; //air flow saving for SCWH mode
+		Real64 AirFlowSavInWaterLoop; //air flow saving for SCWH mode
+		Real64 AirFlowSavInAirLoop; //air flow saving for SCWH mode
 
 		// Default Constructor
 		IntegratedHeatPumpData() :
@@ -188,7 +189,8 @@ namespace IntegratedHeatPumps {
 			IDFanID(0),
 			IDFanPlace(0),
 			TankSourceWaterMassFlowRate(0),
-			SCWHAirFlowSav(0)
+			AirFlowSavInWaterLoop(0),
+			AirFlowSavInAirLoop(0)
 		{}
 
 	};
