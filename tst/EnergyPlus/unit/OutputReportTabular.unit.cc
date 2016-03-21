@@ -1333,6 +1333,15 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 	// DATE WRITTEN: Sep 2015
 
 	std::string const idf_objects = delimited_string( {
+
+	// test for problems found trying to reuse this for issue 5521
+	// back this out... 
+		"Output:Variable,",
+		"DOAS Air Loop Inlet,",
+		"System Node Mass Flow Rate,",
+		"detailed;",
+	// back this out... 
+
 		" Version,8.3;",
 		" Output:Diagnostics, DisplayExtraWarnings;",
 		" Timestep, 4;",

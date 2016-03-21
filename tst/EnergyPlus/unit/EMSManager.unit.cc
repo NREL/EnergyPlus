@@ -68,6 +68,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -419,3 +422,51 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 	EXPECT_NEAR( DataLoopNode::Node( 1 ).TempSetPoint, 1.0, 0.0000001 );
 
 }
+
+
+TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
+		// small test to demonstrate new boolean argument. 
+		// shows a simple way to setup sensor on a node, need to call SetupNodeVarsForReporting()
+
+		std::string const idf_objects = delimited_string( { 
+		"Version,8.5;",
+
+		"OutdoorAir:Node, Test node;",
+
+		"EnergyManagementSystem:Sensor,",
+		"Node_mdot,",
+		"Test node,",
+		"System Node Mass Flow Rate;",
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Test inside HVAC system iteration Loop,",
+		"InsideHVACSystemIterationLoop,",
+		"Test_InsideHVACSystemIterationLoop;",
+	
+		"EnergyManagementSystem:Program,",
+		"Test_InsideHVACSystemIterationLoop,",
+		"set dumm1 = Node_mdot_EquipInlet;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		OutAirNodeManager::SetOutAirNodes();
+		NodeInputManager::SetupNodeVarsForReporting();
+		EMSManager::CheckIfAnyEMS();
+
+		EMSManager::FinishProcessingUserInput = true;
+
+		bool anyRan;
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+		EXPECT_FALSE( anyRan );
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
+		EXPECT_FALSE( anyRan );
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromHVACIterationLoop, anyRan );
+		EXPECT_TRUE( anyRan );
+
+}
+
+
