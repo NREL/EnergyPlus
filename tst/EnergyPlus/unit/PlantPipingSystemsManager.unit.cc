@@ -143,7 +143,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs ) {
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( false, errorsFound );
+	EXPECT_FALSE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName ) {
@@ -214,7 +214,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName ) {
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation ) {
@@ -285,7 +285,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation ) {
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName ) {
@@ -356,7 +356,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName 
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection ) {
@@ -427,7 +427,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialName ) {
@@ -498,7 +498,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialN
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSelection ) {
@@ -569,7 +569,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSe
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWidth ) {
@@ -640,7 +640,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationW
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection ) {
@@ -711,7 +711,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection 
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialName ) {
@@ -782,7 +782,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNa
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth ) {
@@ -853,7 +853,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth ) {
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection ) {
@@ -924,7 +924,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection
 
 	ReadZoneCoupledDomainInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs ) {
@@ -995,7 +995,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs ) 
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( false, errorsFound );
+	EXPECT_FALSE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName ) {
@@ -1066,7 +1066,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName ) {
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelection ) {
@@ -1137,7 +1137,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelec
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMaterial ) {
@@ -1208,7 +1208,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMater
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtents ) {
@@ -1279,7 +1279,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExten
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth ) {
@@ -1350,7 +1350,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName ) {
@@ -1421,7 +1421,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelection ) {
@@ -1492,7 +1492,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelect
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName ) {
@@ -1563,7 +1563,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName )
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelection ) {
@@ -1634,5 +1634,5 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelec
 
 	ReadBasementInputs( 1, 1, errorsFound );
 
-	EXPECT_EQ( true, errorsFound );
+	EXPECT_TRUE( errorsFound );
 }
