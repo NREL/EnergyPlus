@@ -8,7 +8,7 @@ In order for EnergyPlus to successfully calculate zone design heating and coolin
 
 \begin{itemize}
 \item
-  The input file should contain a SimulationControl object. The 1\(^{t}\) field \emph{Do Zone Sizing Calculation} should be entered as \emph{Yes}. This will cause a zone sizing simulation to be done using all the sizing periods in the input file as weather. If there are no air or water loops in the HVAC input fields 2 and 3 can be set to \emph{No.} If there are one or more air loops (i.e., there is at least one AirLoopHVAC object in the input file) then the 2\(^{d}\) field \emph{Do System Sizing Calculation} should be entered as \emph{Yes}. If there are one or more water loops (Plant Loop objects) then the 3\(^{d}\) field \emph{Do Plant Sizing Calculation} should be set to \emph{Yes}. Finally either the 4\(^{h}\) field (\emph{Run Simulation for Sizing Periods}) or the 5\(^{h}\) field (\emph{Run Simulation for Weather File Run Periods}) should be set to \emph{Yes} in order to autosize the components and do a real simulation using the autosized components. The component autosizing calculations are done on the first pass through the HVAC system in the real simulation.
+  The input file should contain a SimulationControl object. The 1\(^{st}\) field \emph{Do Zone Sizing Calculation} should be entered as \emph{Yes}. This will cause a zone sizing simulation to be done using all the sizing periods in the input file as weather. If there are no air or water loops in the HVAC input fields 2 and 3 can be set to \emph{No.} If there are one or more air loops (i.e., there is at least one AirLoopHVAC object in the input file) then the 2\(^{nd}\) field \emph{Do System Sizing Calculation} should be entered as \emph{Yes}. If there are one or more water loops (Plant Loop objects) then the 3\(^{rd}\) field \emph{Do Plant Sizing Calculation} should be set to \emph{Yes}. Finally either the 4\(^{th}\) field (\emph{Run Simulation for Sizing Periods}) or the 5\(^{th}\) field (\emph{Run Simulation for Weather File Run Periods}) should be set to \emph{Yes} in order to autosize the components and do a real simulation using the autosized components. The component autosizing calculations are done on the first pass through the HVAC system in the real simulation.
 \item
   There must be at least 2 (up to any number) SizingPeriod objects present. Normally one will be for summer conditions and one for winter. The summer day should normally have the field \emph{Day Type} set to \emph{SummerDesignDay}. The winter design day should normally have \emph{Day Type} set to \emph{WinterDesignDay}.
 \item
@@ -18,7 +18,7 @@ In order for EnergyPlus to successfully calculate zone design heating and coolin
 \item
   Only controlled zones are included in the zone and system sizing calculations. Thus for a design air flow rate to be calculated for a zone, it must contain a thermostat \emph{even though it might not need or have a thermostat in the full simulation}. An illustration would be a three zone building with a packaged single zone system and a thermostat in one of the zones. In order for the two slave zones to be included in the design air flow calculations they must be treated as if they have a thermostat: there must be a ZoneControl:Thermostat for each of the slave zones.
 \item
-  Some attention should be paid to schedules. In a weekly schedule object the 9\(^{h}\) and 10\(^{h}\) day schedules are for summer and winter design days respectively. This means that if a SizingPeriod object has field \emph{Day Type} set to \emph{SummerDesignDay} ~the day schedule for summer sizing periods will be in effect. Similarly if a SizingPeriod object has field \emph{Day Type} set to \emph{WinterDesignDay} ~the day schedule for winter sizing periods will be in effect. Some possible applications of this capability are:
+  Some attention should be paid to schedules. In a weekly schedule object the 9\(^{th}\) and 10\(^{th}\) day schedules are for summer and winter design days respectively. This means that if a SizingPeriod object has field \emph{Day Type} set to \emph{SummerDesignDay} ~the day schedule for summer sizing periods will be in effect. Similarly if a SizingPeriod object has field \emph{Day Type} set to \emph{WinterDesignDay} ~the day schedule for winter sizing periods will be in effect. Some possible applications of this capability are:
 \end{itemize}
 
 1)~~~setting internal loads (lights, equipment, occupancy) to maximum all day for cooling and to zero all day for heating;
@@ -42,10 +42,18 @@ For autosizing to occur at the component level the user must enter the special v
 
 % table 22
 \begin{longtable}[c]{p{2.75in}p{3.24in}}
-\caption{Details of Autosizable Objects/Fields \protect \label{table:details-of-autosizable-objectsfields}}\\
+\caption{Details of Autosizable Objects/Fields \label{table:details-of-autosizable-objectsfields}} \tabularnewline
 \toprule 
-Component / Object Name & Autosizable Fields \tabularnewline \midrule
+Component / Object Name & Autosizable Fields \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Details of Autosizable Objects/Fields} \tabularnewline
+\toprule 
+Component / Object Name & Autosizable Fields \tabularnewline
+\midrule
 \endhead
+
 AirConditioner:VariableRefrigerantFlow \tabularnewline
  & Gross Rated Total Cooling Capacity \tabularnewline
  & Gross Rated Heating Capacity \tabularnewline
@@ -740,10 +748,18 @@ The complete list of objects that have autosized fields is shown in the followin
 
 % table 23
 \begin{longtable}[c]{p{3.02in}p{2.97in}}
-\caption{Complete list of Objects with autosized Fields \protect \label{table:complete-list-of-objects-with-autosized}}\\
+\caption{Complete list of Objects with autosized Fields \label{table:complete-list-of-objects-with-autosized}} \tabularnewline
 \toprule 
-Object Name & Object Name \tabularnewline \midrule
+Object Name & Object Name \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Complete list of Objects with autosized Fields} \tabularnewline
+\toprule 
+Object Name & Object Name \tabularnewline
+\midrule
 \endhead
+
 AirConditioner:VariableRefrigerantFlow & AirLoopHVAC \tabularnewline
 AirLoopHVAC:Unitary:Furnace:HeatCool & AirLoopHVAC:Unitary:Furnace:HeatOnly \tabularnewline
 AirLoopHVAC:UnitaryHeatCool & AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass \tabularnewline
@@ -1159,11 +1175,11 @@ Sizing:Zone,
       ,                        !- heating max air flow per zone area {m3/s-m2}
       ,                        !- heating max air flow {m3/s}
       ,                        !- fraction of the cooling design air flow rate
-  DSZADO1,                 !- Design Specification Zone Air Distribution Object Name
-  Yes,                     !- Account for Dedicated Outside Air System
-  ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-  12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-  14.4;                    !- Dedicated Outside Air High Setpoint for Design
+      DSZADO1,                 !- Design Specification Zone Air Distribution Object Name
+      Yes,                     !- Account for Dedicated Outside Air System
+      ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+      12.2,                    !- Dedicated Outside Air Low Setpoint for Design
+      14.4;                    !- Dedicated Outside Air High Setpoint for Design
 
   DesignSpecification:OutdoorAir,
   DSOA1,                   !- Name

@@ -1220,7 +1220,7 @@ ElectricLoadCenter:Storage:Battery,
   86.1,                                 !- Maximum Module Capacity {Ah}
   1.0,                                   !- Initial Fractional State of Charge
   0.3747,                             !- Fraction of Available Charge Capacity
-  0.5874,                             !- Change Rate from Bound Charge to Available Charge {hr$^{1}$}
+  0.5874,                             !- Change Rate from Bound Charge to Available Charge {hr$^{-1}$}
   12.60,                               !- Fully Charged Module Open Circuit Voltage {V}
   12.37,                               !- Fully Discharged Module Open Circuit Voltage {V}
   BatteryChargeCurve,     !- Voltage Change Curve Name for Charging
@@ -3506,10 +3506,18 @@ This field is used to control how heat losses from three other subsystems within
 
 % table 32
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Air Intake Heat Recovery Mode Choices \protect \label{table:air-intake-heat-recovery-mode-choices}}\\
+\caption{Air Intake Heat Recovery Mode Choices \label{table:air-intake-heat-recovery-mode-choices}} \tabularnewline
 \toprule 
-Field Choice & Inverter Heat Losses Recovered? & Electrical Storage Heat Losses Recovered? & Auxiliary Heater Losses Recovered? \tabularnewline \midrule
+Field Choice & Inverter Heat Losses Recovered? & Electrical Storage Heat Losses Recovered? & Auxiliary Heater Losses Recovered? \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Air Intake Heat Recovery Mode Choices} \tabularnewline
+\toprule 
+Field Choice & Inverter Heat Losses Recovered? & Electrical Storage Heat Losses Recovered? & Auxiliary Heater Losses Recovered? \tabularnewline
+\midrule
 \endhead
+
 NoRecovery & No & No & No \tabularnewline
 RecoverBurnerInverterStorage & Yes & Yes & Yes \tabularnewline
 RecoverAuxiliaryBurner & No & No & Yes \tabularnewline
@@ -4285,10 +4293,18 @@ The following table shows several sample PV array types with their input values.
 
 % table 33
 \begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
-\caption{Photovoltaics Array Types with Values \protect \label{table:photovoltaics-array-types-with-values}}\\
+\caption{Photovoltaics Array Types with Values \label{table:photovoltaics-array-types-with-values}} \tabularnewline
 \toprule 
- & Short Circuit Current & Open Circuit Voltage & Voltage at Maximum Power & Current at Maximum Power & Temperature Coefficient of Short Circuit Current & Temperature Coefficient of Open Circuit Voltage & Number of Cells in Series per Module & Cell Temperature at NOCT Conditions & Module Area \tabularnewline \midrule
+ & Short Circuit Current & Open Circuit Voltage & Voltage at Maximum Power & Current at Maximum Power & Temperature Coefficient of Short Circuit Current & Temperature Coefficient of Open Circuit Voltage & Number of Cells in Series per Module & Cell Temperature at NOCT Conditions & Module Area \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Photovoltaics Array Types with Values} \tabularnewline
+\toprule 
+ & Short Circuit Current & Open Circuit Voltage & Voltage at Maximum Power & Current at Maximum Power & Temperature Coefficient of Short Circuit Current & Temperature Coefficient of Open Circuit Voltage & Number of Cells in Series per Module & Cell Temperature at NOCT Conditions & Module Area \tabularnewline
+\midrule
 \endhead
+
 Units: & [A] & [V] & [V] & [A] & \{A/K] & [V/K] & [-] & [K] & [m2] \tabularnewline
 ASE 300-DFG/50 & 6.2 & 60 & 50.5 & 5.6 & 0.001 & -0.0038 & 216 & 318 & 2.43 \tabularnewline
 BPsolar 275 & 4.75 & 21.4 & 17 & 4.45 & 0.00065 & -0.08 & 36 & 320 & 0.63 \tabularnewline
@@ -4819,8 +4835,15 @@ If the user does not input any field of these parameters, the simple approximati
 
 \begin{longtable}[c]{@{}llllll@{}}
 \toprule 
-C & C & C & C & C & C \tabularnewline \midrule
+C & C & C & C & C & C \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+C & C & C & C & C & C \tabularnewline
+\midrule
 \endhead
+
 0.5176 & 116 & 0.4 & 0.0 & 5.0 & 21 \tabularnewline
 \bottomrule
 \end{longtable}

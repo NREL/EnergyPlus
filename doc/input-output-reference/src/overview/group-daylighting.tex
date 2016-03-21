@@ -74,10 +74,18 @@ For Lighting Control Type = 2 (stepped), the electric power input and light outp
 
 % table 18
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Example of a Stepped Lighting Control System with Three Steps \protect \label{table:stepped-lighting-control-example}}\\
+\caption{Example of a Stepped Lighting Control System with Three Steps \label{table:stepped-lighting-control-example}} \tabularnewline
 \toprule 
-Daylight illuminance & Fraction of lights that are on \tabularnewline \midrule
+Daylight illuminance & Fraction of lights that are on \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Example of a Stepped Lighting Control System with Three Steps} \tabularnewline
+\toprule 
+Daylight illuminance & Fraction of lights that are on \tabularnewline
+\midrule
 \endhead
+
 0-200 & 1.0 \tabularnewline
 200-400 & 2/3 \tabularnewline
 400-600 & 1/3 \tabularnewline
@@ -101,10 +109,18 @@ The following table gives recommended values of Maximum Allowable Discomfort Gla
 
 % table 19
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \protect \label{table:recommended-values-discomfort-glare-index}}\\
+\caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \label{table:recommended-values-discomfort-glare-index}} \tabularnewline
 \toprule 
-Activity or Zone Type & Maximum Allowable DGI \tabularnewline \midrule
+Activity or Zone Type & Maximum Allowable DGI \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI)} \tabularnewline
+\toprule 
+Activity or Zone Type & Maximum Allowable DGI \tabularnewline
+\midrule
 \endhead
+
 Art Galleries & 16 \tabularnewline
 Factories: Rough work & 28 \tabularnewline
 Factories: Engine assembly & 26 \tabularnewline
@@ -339,10 +355,18 @@ For Lighting Control Type = 2 (stepped), the electric power input and light outp
 
 % table 20
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Example of a Stepped Lighting Control System with Three Steps \protect \label{table:stepped-lighting-control-example-001}}\\
+\caption{Example of a Stepped Lighting Control System with Three Steps \label{table:stepped-lighting-control-example-001}} \tabularnewline
 \toprule 
-Daylight illuminance & Fraction of lights that are on \tabularnewline \midrule
+Daylight illuminance & Fraction of lights that are on \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Example of a Stepped Lighting Control System with Three Steps} \tabularnewline
+\toprule 
+Daylight illuminance & Fraction of lights that are on \tabularnewline
+\midrule
 \endhead
+
 0-200 & 1.0 \tabularnewline
 200-400 & 2/3 \tabularnewline
 400-600 & 1/3 \tabularnewline
@@ -823,8 +847,7 @@ DaylightingDevice:Tubular,
   Reflective Aluminum,      !- Construction Name
   0.3556,                   !- Diameter [m] (approximately 14", a standard size)
   1.4,                      !- Total Length [m] (subtract zone lengths to get outdoor exposed length)
-  0.28,                     !- Effective Thermal Resistance [m2-K/W] between TubularDaylightDome and
-                            !- TubularDaylightDiffuser
+  0.28,                     !- Effective Thermal Resistance [m2-K/W] between TubularDaylightDome and TubularDaylightDiffuser
   Attic Zone,               !- Transition Zone 1 Name
   1.1;                      !- Transition Zone 1 Length [m]
 
@@ -1172,10 +1195,18 @@ The following table shows what input objects/fields to use to model different da
 % table 21
 {\scriptsize
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}>{\raggedright}p{1.5in}}
-\caption{Daylighting Modeling Options \protect \label{table:daylighting-modeling-options}}\\
+\caption{Daylighting Modeling Options \label{table:daylighting-modeling-options}} \tabularnewline
 \toprule 
-Option & Object/Field or Output Variable & Input File \tabularnewline \midrule
+Option & Object/Field or Output Variable & Input File \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Daylighting Modeling Options} \tabularnewline
+\toprule 
+Option & Object/Field or Output Variable & Input File \tabularnewline
+\midrule
 \endhead
+
 Allow a thermal zone to be daylit & Daylighting:Controls, Daylighting:DELight:Controls & PurchAirWithDaylighting.idf, DElight-Detailed-Comparison.idf \tabularnewline
 Specify visible transmittance of the glazing & WindowMaterial:Glazing & PurchAirWithDaylighting.idf \tabularnewline
 Specify the visible transmittance of a shading device & WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blind & PurchAirWindowBlind.idf \tabularnewline
