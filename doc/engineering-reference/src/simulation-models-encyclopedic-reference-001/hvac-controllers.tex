@@ -8,6 +8,7 @@ The input object Controller:WaterCoil provides a simple controller model for adj
 
 The figure below illustrates the use of a simple controller used with a central chilled water coil (control variable Temperature). The controller reads the desired temperature setpoint from the control node (established by a SetpointManager) and modulates the chilled water flow rate at the actuator node in order to meet the desired supply (coil outlet) air temperature.
 
+ % fig 190
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image4384.png}
@@ -58,7 +59,7 @@ The supply air dewpoint temperature required to meet the humidity ratio setpoint
 
 where:
 
-\({T_{dp,SP}}\) = dewpoint temperature corresponding to \emph{w\(_{P}\)}, ˚C
+\({T_{dp,SP}}\) = dewpoint temperature corresponding to \emph{w\(_{SP}\)}, ˚C
 
 \({\omega_{SP}}\) = humidity ratio setpoint, kg/kg
 
@@ -84,7 +85,7 @@ where:
 
 \({T_{Temp,SP}}\) = supply air temperature setpoint required for zone temperature control, ˚C
 
-As described previously, the controller varies the chilled water flow rate through the coil using a root finding technique until the actual supply air temperature reaches \emph{T\(_{p}\)}within the specified tolerance:
+As described previously, the controller varies the chilled water flow rate through the coil using a root finding technique until the actual supply air temperature reaches \emph{T\(_{sp}\)}within the specified tolerance:
 
 \begin{equation}
 {T_{Actual}} - {T_{SP}}\,\, \le \,\,\,Controller\,Convergence\,Tolerance
@@ -211,7 +212,7 @@ Finally, \({S_{oa,init}}\) is constrained to be: \({f_{oa,\min }} \le {S_{oa,ini
 
 \emph{~~~~~ T\(_{i}\)} is the outside air inlet temperature {[}C{]};
 
-\emph{~~~~~ T\(_{t}\)} is the mixed air setpoint {[}C{]};
+\emph{~~~~~ T\(_{mix,set}\)} is the mixed air setpoint {[}C{]};
 
 \emph{~~~~~ \(\Delta {T_{small}}\)}is a small temperature difference {[}delta C{]}, equal to .00001.
 
@@ -241,13 +242,13 @@ Setpoints are checked after this which include check for Fixed dry-bulb temperat
 
 ·~~~~~~~~Limits are checked as follows
 
-o~~~If a high temperature limit was input and \({T_{oa}} > {T_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{T\(_{a}\)}~is the outside air temperature.
+o~~~If a high temperature limit was input and \({T_{oa}} > {T_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{T\(_{oa}\)} is the outside air temperature.
 
-o~~~If an enthalpy limit was input and \({h_{oa}} > {h_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{h\(_{a}\)} is the outside air specific enthalpy.
+o~~~If an enthalpy limit was input and \({h_{oa}} > {h_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{h\(_{oa}\)} is the outside air specific enthalpy.
 
-o~~~If a dewpoint temperature limit was input and \({T_{DP,OA}} > {T_{DP,high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where T\(_{A}\) is the outside air dewpoint temperature and T\(_{h}\) is dewpoint temperature limit.
+o~~~If a dewpoint temperature limit was input and \({T_{DP,OA}} > {T_{DP,high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where T\(_{DP,OA}\) is the outside air dewpoint temperature and T\(_{DP,high}\) is dewpoint temperature limit.
 
-o~~~If an electronic enthalpy curve was input and \({w_{OA}} > {w_{CurveOutput}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{w}\(_{A}\) is the outside air humidity ratio and \emph{w}\(_{t}\) is the curve's humidity ratio output as a function of outdoor air dry-bulb temperature.
+o~~~If an electronic enthalpy curve was input and \({w_{OA}} > {w_{CurveOutput}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{w}\(_{OA}\) is the outside air humidity ratio and \emph{w}\(_{CurveOutput}\) is the curve's humidity ratio output as a function of outdoor air dry-bulb temperature.
 
 ·~~~~~~~~Another Economizer choice called DifferentialDryBulbAndEnthalpy checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
 
@@ -261,9 +262,9 @@ The economizer schedule is then checked to determine if a ``push-button'' type e
 
 \subsubsection{Step 4: calculate the final outside air signal}\label{step-4-calculate-the-final-outside-air-signal}
 
-If \emph{S\(_{t}\)} is greater than \({f_{oa,\min }}\) and less than 1 and the mixed air mass flow rate is greater than \({\dot m_{verysmall}}\) (\({10^{ - 30}}\) ) and night venting is not occuring and \emph{HighHumidityOperationFlag} is false then
+If \emph{S\(_{oa,init}\)} is greater than \({f_{oa,\min }}\) and less than 1 and the mixed air mass flow rate is greater than \({\dot m_{verysmall}}\) (\({10^{ - 30}}\) ) and night venting is not occuring and \emph{HighHumidityOperationFlag} is false then
 
-·~~~~~~~~we calculate a final outside air signal \emph{S\(_{a}\)} by using the regula falsi method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{x}\)} from the mixed air enthalpy and humidity ratio.
+·~~~~~~~~we calculate a final outside air signal \emph{S\(_{oa}\)} by using the regula falsi method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
 
 Otherwise
 
@@ -283,9 +284,9 @@ Otherwise
 
 ·~~~~~~~~If the Minimum Outside air flow Schedule and the Maximum outside air flow schedule is available , Out Air signal \emph{S oa},\emph{init} ~is checked against those fractions from the schedule.
 
-~~~~~ S\(_{a}\)~ = Maximum( Minimum OA fraction, S\(_{a}\))
+~~~~~ S\(_{oa}\)~ = Maximum( Minimum OA fraction, S\(_{oa}\))
 
-~~~~~ S\(_{a}\)~~~ = Minimum(Maximum OA fraction, S\(_{a}\))
+~~~~~ S\(_{oa}\)~~~ = Minimum(Maximum OA fraction, S\(_{oa}\))
 
 Now the outside air flow rate is calculated:
 

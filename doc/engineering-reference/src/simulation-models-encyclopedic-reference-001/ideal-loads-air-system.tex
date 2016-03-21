@@ -8,7 +8,7 @@ The input object ZoneHVAC:IdealLoadsAirSystem provides a model for an ideal HVAC
 
 The ZoneHVAC:IdealLoadsAirSystem object is modeled as an ideal VAV terminal unit with variable supply temperature and humidity. The supply air flow rate is varied between zero and the maximum in order to satisfy the zone heating or cooling load, zone humidity controls, outdoor air requirements, and other constraints, if specified.
 
-\subsubsection{Inputs and Data}\label{inputs-and-data-001}
+\subsubsection{Inputs and Data}\label{inputs-and-data-002}
 
 The user specifies some or all of the following data for each ZoneHVAC:IdealLoadsAirSystem object:
 
@@ -18,13 +18,13 @@ The user specifies some or all of the following data for each ZoneHVAC:IdealLoad
 
 ·~~~~~~~~name of the zone exhaust node;
 
-·~~~~~~~~maximum supply air temperature when in heating mode \emph{T\(_{g}\)} {[}C{]};
+·~~~~~~~~maximum supply air temperature when in heating mode \emph{T\(_{max,heating}\)} {[}C{]};
 
-·~~~~~~~~minimum supply air temperature when in cooling mode \emph{T\(_{g}\)} {[}C{]};
+·~~~~~~~~minimum supply air temperature when in cooling mode \emph{T\(_{min,cooling}\)} {[}C{]};
 
-·~~~~~~~~maximum supply air humidity ratio when in heating mode \emph{W\(_{d}\)} {[}kg water/kg dry air{]};
+·~~~~~~~~maximum supply air humidity ratio when in heating mode \emph{W\(_{max,humid}\)} {[}kg water/kg dry air{]};
 
-·~~~~~~~~minimum supply air humidity ratio when in cooling mode \emph{W\(_{m}\)} {[}kg water/kg dry air{]};
+·~~~~~~~~minimum supply air humidity ratio when in cooling mode \emph{W\(_{min,dehum}\)} {[}kg water/kg dry air{]};
 
 ·~~~~~~~~heating limit type flag (\emph{LimitFlowRate, LimitCapacity, LimitFlowRateAndCapacity} or \emph{NoLimit}) \emph{HeatingLimit};
 
@@ -88,15 +88,15 @@ o~~~If outdoor air flow rate exceeds applicable maximum flow rate (heating or co
 
 Else
 
-o~~~Calculate supply air mass flow rate required to meet zone sensible load at the applicable (heating or cooling) supply temperature limit (\emph{T\(_{g}\)} or \emph{T\(_{g}\)})
+o~~~Calculate supply air mass flow rate required to meet zone sensible load at the applicable (heating or cooling) supply temperature limit (\emph{T\(_{max,heating}\)} or \emph{T\(_{min,cooling}\)})
 
 \begin{equation}
 {\dot m_s} = {\dot Q_z}/({c_{p,air}}\cdot ({T_s} - {T_z}))
 \end{equation}
 
-o~~~If \emph{DehumidCtrlType} = Humidistat (and other conditions are met, see below), then calculate the supply air mass flow rate required to meet the humidistat dehumidification setpoint at \emph{W\(_{m}\)}
+o~~~If \emph{DehumidCtrlType} = Humidistat (and other conditions are met, see below), then calculate the supply air mass flow rate required to meet the humidistat dehumidification setpoint at \emph{W\(_{min,dehum}\)}
 
-o~~~If \emph{HumidCtrlType} = Humidistat (and other conditions are met, see below), then calculate the supply air mass flow rate required to meet the humidistat humidification setpoint at \emph{W\(_{d}\)}
+o~~~If \emph{HumidCtrlType} = Humidistat (and other conditions are met, see below), then calculate the supply air mass flow rate required to meet the humidistat humidification setpoint at \emph{W\(_{max,humid}\)}
 
 o~~~Set the supply air mass flow rate to the greatest of these, but limit to the applicable (heating or cooling) maximum flow rate
 
@@ -122,7 +122,7 @@ If \({\dot m_s}\) \textgreater{} \({\dot m_{oa}}\) ~then
 
 Otherwise the entering air conditions are set equal to the outside air conditions.
 
-·~~~~~~~~Calculate the supply air temperature required to meet the zone sensible load at the supply air mass flow rate, but limit to the applicable (heating or cooling) supply temperature limit (\emph{T\(_{g}\)} or \emph{T\(_{g}\)})
+·~~~~~~~~Calculate the supply air temperature required to meet the zone sensible load at the supply air mass flow rate, but limit to the applicable (heating or cooling) supply temperature limit (\emph{T\(_{max,heating}\)} or \emph{T\(_{min,cooling}\)})
 
 \begin{equation}
 {T_s} = {T_z} + {\dot Q_z}/({c_{p,air}}\cdot {\dot m_s})
@@ -136,13 +136,13 @@ o~~~\emph{DehumidCtrlType = Humidistat,} this will actively dehumidify to the hu
 
 o~~~\emph{DehumidCtrlType = ConstantSensibleHeatRatio} sets the supply air humidity ratio using the cooling sensible heat ratio.
 
-o~~~\emph{DehumidCtrlType = ConstantSupplyHumidityRatio} sets the supply air humidity ratio = \emph{W\(_{m}\)}.
+o~~~\emph{DehumidCtrlType = ConstantSupplyHumidityRatio} sets the supply air humidity ratio = \emph{W\(_{min,dehum}\)}.
 
 o~~~\emph{HumidCtrlType = None} sets the supply air humidity ratio equal to the mixed air humidity ratio.
 
 o~~~\emph{HumidCtrlType = Humidistat,} this will actively humidify to the humidistat humidifying setpoint during heating and deadband operation, and during cooling operation if \emph{DehumidCtrlType = Humidistat}
 
-o~~~\emph{HumidCtrlType = ConstantSupplyHumidityRatio} sets the supply air humidity ratio = \emph{W\(_{d}\)}.
+o~~~\emph{HumidCtrlType = ConstantSupplyHumidityRatio} sets the supply air humidity ratio = \emph{W\(_{max,humid}\)}.
 
 ·~~~~~~~~Limit supply humidity ratio to saturation at the supply temperature
 
