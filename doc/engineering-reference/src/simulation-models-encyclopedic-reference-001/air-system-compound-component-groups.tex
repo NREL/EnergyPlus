@@ -88,11 +88,11 @@ where:
 
 \(h_{\rm{control zone}}\) = enthalpy of air in the control zone (where thermostat is located), J/kg
 
-\emph{HR\(_{min}\)} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air in the control zone
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air in the control zone
 
 \emph{Mass Flow Rate\(_{coil off}\)} = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
 
-\emph{h\(_{out,coil off}\)}~ = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
+\emph{h\(_{out,coil off}\)} = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
 
 Δ\(_{sen,full load}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
@@ -107,7 +107,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ\(_{sen,coil off}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -158,34 +158,32 @@ The model calculates the unitary system's sensible cooling energy rate delivered
 
 where:
 
-\emph{\({\dot m_{HighestSpeed}}\)}~ = air mass flow rate through unitary system at the highest cooling speed {[}kg/s{]}
+\({\dot m_{HighestSpeed}}\) = air mass flow rate through unitary system at the highest cooling speed {[}kg/s{]}
 
-\emph{h\(_{out,full load}\)}~~~ = enthalpy of air exiting the unitary system at full-load conditions {[}J/kg{]}
+\(h_{out,full load}\) = enthalpy of air exiting the unitary system at full-load conditions {[}J/kg{]}
 
-\emph{h\(_{control zone}\)}~~ = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
+\(h_{control zone}\) = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
 
-\emph{HR\(_{min}\) =} the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone {[}kg/kg{]}
+\(HR_{min}\) = the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone {[}kg/kg{]}
 
-\emph{\(\dot m_{CoilOff}\)} ~ = air mass flow rate through the unitary system with the cooling coil OFF {[}kg/s{]}
+\({\dot m_{CoilOff}}\) = air mass flow rate through the unitary system with the cooling coil OFF {[}kg/s{]}
 
-\emph{h\(_{f}\)}~~~ = enthalpy of air exiting the unitary system with the cooling coil OFF {[}J/kg{]}
+\(h_{out,coil off}\) = enthalpy of air exiting the unitary system with the cooling coil OFF {[}J/kg{]}
 
-Δ\(_{*}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+\(\Delta_{sen,\,HighestSpeed}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
-Δ\(_{*}\) = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
+\(\Delta_{sen,coil off}\) = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 \begin{equation}
-  \begin{split}
-    \Delta_{sen,HighestSpeed} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,full load} - h_{ZoneInlet}}_{HRmin} \\
-                              &+ \PB{\dot{m}_{HighestSpeed} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,full load} - h_{ControlZone}}_{HRmin}
-  \end{split}
+\begin{array}{l}
+{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}
+\end{array}
 \end{equation}
 
 \begin{equation}
-  \begin{split}
-    \Delta_{sen,coil off} =& \frac{\dot{m}_{ZoneInlet}}{Frac} \PB{h_{Out,coil off} - h_{ZoneInlet}}_{HRmin} \\
-                              &+ \PB{\dot{m}_{coil off} - \frac{\dot{m}_{ZoneInlet}}{Frac}} \PB{h_{Out,coil off} - h_{ControlZone}}_{HRmin}
-  \end{split}
+\begin{array}{l}
+{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}
+\end{array}
 \end{equation}
 
 where:
@@ -204,7 +202,7 @@ where
 
 \emph{\({\dot m_{Speed1}}\)}~ = air mass flow rate through unitary system at Speed 1 {[}kg/s{]}
 
-Δ\(_{*}\) \(_{*}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ\(_{*sen,*}\) \(_{*Speed1*}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
   \begin{split}
@@ -226,7 +224,7 @@ where
 
 \emph{AddedFanHeat}~ = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load {[}W{]}.
 
-\emph{AddedFanHeat\(_{1}\)}~~~~~~~ = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
+\emph{AddedFanHeat\(_{Speed1}\)}~~~~~~~ = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
 
 Since the part-load performance of the DX cooling coil is frequently non-linear,and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the unitary system's cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system's cooling output divided by the load to be met.
 
@@ -236,7 +234,7 @@ Tolerance = 0.001 \ge \frac{{\left( {UnitarySystemOutpu{t_{cycling}} - {Q_{Unita
 
 where:
 
-Unitary systemOutput\(_{g}\) = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+Unitary systemOutput\(_{Cycling}\) = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
 \begin{equation}
 UnitarySystemOutpu{t_{cycling}} = {\mathop m\limits^ \bullet_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}
@@ -246,9 +244,9 @@ where
 
 \({\dot m{_{UnitarySystem}}}\) ~~~~~ = average air mass flow rate defined in the next section {[}kg/s{]}
 
-\emph{h\(_{,}\)} ~~~~~ ~ = enthalpy of air exiting the unitary system at part load conditions {[}J/kg{]}
+\emph{h\(_{out,}\)} ~~~~~ ~ = enthalpy of air exiting the unitary system at part load conditions {[}J/kg{]}
 
-Δ\(_{*}\) ~~ = average sensible load difference between the system output node and the zone inlet node
+Δ\(_{cycling}\) = average sensible load difference between the system output node and the zone inlet node
 
 \begin{equation}
 {\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)
@@ -272,7 +270,7 @@ Tolerance = 0.001 \ge \frac{{\left( {UnitarySystemCoolingLoad - UnitarySystemOut
 
 where:
 
-\emph{UnitarySystemOutput\(_{n}\)} = unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
+\emph{UnitarySystemOutput\(_{Speedn}\)} = unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
 
 \begin{equation}
   \begin{array}{rl}
@@ -284,7 +282,7 @@ where:
 
 Where
 
-\emph{AddedFanHeat\(_{o}\)}~~~~~~~~~ = generated supply air fan heat at a specific speed ratio {[}W{]}
+\emph{AddedFanHeat\(_{SpeedRatio}\)} = generated supply air fan heat at a specific speed ratio {[}W{]}
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -356,19 +354,19 @@ No\;Heat\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_
 
 where:
 
-\emph{Mass Flow Rate \(_{d}\)}~ = air mass flow rate through unitary system at full-load conditions, kg/s
+\emph{Mass Flow Rate \(_{full load}\)} = air mass flow rate through unitary system at full-load conditions, kg/s
 
-\emph{h\(_{d}\)}~ = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+\emph{h\(_{out, full load}\)} = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}~ = enthalpy of air leaving the control zone (where thermostat is located), J/kg
+\emph{h\(_{control zone}\)} = enthalpy of air leaving the control zone (where thermostat is located), J/kg
 
-\emph{HR\(_{n}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
+\emph{HR\(_{min}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
-\emph{Mass Flow Rate \(_{f}\)}~ = air mass flow rate through the unitary system with the heating coil OFF, kg/s
+\emph{Mass Flow Rate \(_{coil off}\)} = air mass flow rate through the unitary system with the heating coil OFF, kg/s
 
-\emph{h\(_{f}\)}~ = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
+\emph{h\(_{out, coil off}\)} = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ\(_{sen,}\) \emph{\(_{full load}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
   \begin{split}
@@ -381,7 +379,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ\(_{sen,coil off}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{split}
@@ -440,17 +438,17 @@ where:
 
 \emph{\({\dot m_{HighestSpeed}}\)}~ = air mass flow rate through unitary system at the highest heating speed {[}kg/s{]}
 
-\emph{h\(_{d}\)}~~~ = enthalpy of air exiting the unitary system at full-load conditions {[}J/kg{]}
+\emph{h\(_{out, full load}\)} = enthalpy of air exiting the unitary system at full-load conditions {[}J/kg{]}
 
-\emph{h\(_{e}\)}~~ = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
+\emph{h\(_{control zone}\)} = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
 
-\emph{HR\(_{n}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
+\emph{HR\(_{min}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
 \({\dot m_{CoilOff}}\) = air mass flow rate through the unitary system with the heating coil OFF {[}kg/s{]}
 
-\emph{h\(_{f}\)}~~~ = enthalpy of air exiting the unitary system with the heating coil OFF {[}J/kg{]}
+\emph{h\(_{out,coil off}\)} = enthalpy of air exiting the unitary system with the heating coil OFF {[}J/kg{]}
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ\(_{sen,}\) \emph{\(_{full load}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
   \begin{split}
@@ -463,7 +461,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\emph{\(_{f}\)} = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ\emph{\(_{sen,coil off}\)} = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{split}
@@ -476,7 +474,7 @@ If the unitary system's DX heating coil output full load at the highest speed is
 
 If the total heating load to be met by the system is less than the sensible heating rate at the highest speed, then the following steps are performed.
 
-1.~~~~Calculate the sensible heating energy rate at Speed 1
+1. Calculate the sensible heating energy rate at Speed 1
 
 \begin{equation}
 FullHeatOutpu{t_{Speed1}} = ({\dot m_{Speed1}}){({h_{out,fullload}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;Speed1}}
@@ -486,7 +484,7 @@ where:
 
 \emph{\({\dot m_{Speed1}}\)}~ = air mass flow rate through unitary system at Speed 1 {[}kg/s{]}
 
-Δ\emph{\(_{,}\) \(_{1}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ\emph{\(_{sen,}\) \(_{Speed1}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
   \begin{split}
@@ -495,7 +493,7 @@ where:
   \end{split}
 \end{equation}
 
-2.~~~~If the sensible heating energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
+2.If the sensible heating energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
 
 \begin{equation}
   \begin{array}{rl}
@@ -508,7 +506,7 @@ where
 
 \emph{AddedFanHeat}~~~~~~~ = generated supply air fan heat, which is a function of part load ratio and as internal component heating load {[}W{]}.
 
-\emph{AddedFanHeat\(_{1}\)}~ = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
+\emph{AddedFanHeat\(_{Speed1}\)} = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
 
 Since the part-load performance of the DX heating coil is frequently non-linear, and the supply air fan heat varies based on heating coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the heating coil compressor and fan are determined through iterative calculations (successive modeling of the heating coil and fan) until the unitary system's heating output matches the heating load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system's heating output divided by the load to be met.
 
@@ -518,7 +516,7 @@ Tolerance = 0.001 \ge \frac{{\left( {UnitarySystemHeatingLoad - UnitarySystemOut
 
 where:
 
-\emph{UnitarySystemOutput\(_{g}\)} = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+\emph{UnitarySystemOutput\(_{cycling}\)} = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
 \begin{equation}
 UnitarySystemOutpu{t_{cycling}} = {{\mathop m\limits^ \bullet  }_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}
@@ -528,9 +526,9 @@ where
 
 \({{\mathop m\limits^ \bullet }_{UnitarySystem}}\) ~ = average air mass flow rate defined in the next section {[}kg/s{]}
 
-\emph{h\(_{,}\)} ~~~~~~~~~~~ ~ = enthalpy of air exiting the unitary system at part load conditions {[}J/kg{]}
+\emph{h\(_{out,}\)} = enthalpy of air exiting the unitary system at part load conditions {[}J/kg{]}
 
-Δ\emph{\(_{g}\)} ~~~~~~~~ = average sensible load difference between the system output node and the zone inlet node
+Δ\emph{\(_{cycling}\)} = average sensible load difference between the system output node and the zone inlet node
 
 \begin{equation}
 {\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)
@@ -554,7 +552,7 @@ Tolerance = 0.001 \ge \frac{{\left( {UnitarySystemHeatingLoad - UnitarySystemOut
 
 where:
 
-\emph{UnitarySystemOutput\(_{Speed,n}\)} = unitary system delivered sensible capacity between two consecutive speeds at a specific ratio {[}W{]}
+\emph{UnitarySystemOutput\(_{SpeedRatio}\)} = unitary system delivered sensible capacity between two consecutive speeds at a specific ratio {[}W{]}
 
 \begin{equation}
   \begin{array}{rl}
@@ -566,7 +564,7 @@ where:
 
 Where
 
-\emph{AddedFanHeat\(_{o}\)}~~~~~~~~~ = generated supply air fan heat at a specific speed ratio {[}W{]}
+\emph{AddedFanHeat\(_{SpeedRatio}\)}~~~~~~~~~ = generated supply air fan heat at a specific speed ratio {[}W{]}
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -650,11 +648,11 @@ Waste heat calculations are done when the multi speed cooling and heating coils 
 
 where
 
-\emph{T\(_{t}\)}~~~~~~~~~~~ = outlet node temperature of heat recovery, C
+\emph{T\(_{outlet}\)}~~~~~~~~~~~ = outlet node temperature of heat recovery, C
 
-\emph{T\(_{t}\)} = inlet node temperature of heat recovery, C
+\emph{T\(_{inlet}\)} = inlet node temperature of heat recovery, C
 
-\emph{Q\(_{t}\)}~~~~~ = recoverable waste heat generated by its child objects, W
+\emph{Q\(_{WasteHeat}\)}~~~~~ = recoverable waste heat generated by its child objects, W
 
 \emph{C\(_{p}\)}~~~~~~~~~~~~~ = inlet node temperature of heat recovery, C
 
@@ -765,21 +763,21 @@ No\;Heat\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_
 
 where:
 
-\emph{Mass Flow Rate\(_{d}\)} = air mass flow rate through furnace at full-load conditions, kg/s
+\emph{Mass Flow Rate\(_{full\,load}\)} = air mass flow rate through furnace at full-load conditions, kg/s
 
-\emph{h\(_{d}\)} = enthalpy of air exiting the furnace at full-load conditions, J/kg
+\emph{h\(_{out,\,full\,load}\)} = enthalpy of air exiting the furnace at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
+\emph{h\(_{control\, zone}\)} = enthalpy of air in the control zone (where thermostat is located), J/kg
 
-\emph{HR\(_{n}\)~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+\emph{HR\(_{min}\)~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
 of the furnace exiting air or the air in the control zone
 
-\emph{Mass Flow Rate\(_{f}\)} = air mass flow rate through the furnace with the heating coil OFF, kg/s
+\emph{Mass Flow Rate\(_{coil\, off}\)} = air mass flow rate through the furnace with the heating coil OFF, kg/s
 
-\emph{h\(_{f}\)}~ = enthalpy of air exiting the furnace with the heating coil OFF, J/kg
+\emph{h\(_{out,\, coil\, off}\)} = enthalpy of air exiting the furnace with the heating coil OFF, J/kg
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ\(_{sen,}\) \emph{\(_{full\, load}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -792,7 +790,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\)** = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ\(_{sen,coil\, off}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -807,7 +805,7 @@ With the calculated sensible heating energy rates and the total sensible heating
 PartLoadRatio\, = \,MAX\left( {0.0,MIN\left( {1.0,\frac{{ABS\left( {FurnaceHeatingLoad - NoHeatOutput} \right)}}{{ABS(FullHeatOutput - NoHeatOutput)}}} \right)} \right)
 \end{equation}
 
-The part-load ratio calculated above is used to determine the required heating coil capacity as \(Qheating\,coil = Qdesign\,*PartLoadRatio\) ~where \emph{Q\(_{n}\)} is the nominal heating coil capacity as specified in the heating coil object. If the fan cycles on and off with the heating coil (i.e.,~ when the supply air fan operating mode schedule values are equal to 0), then this part-load ratio is also used to determine the operating mass flow rate of the furnace as
+The part-load ratio calculated above is used to determine the required heating coil capacity as \(Qheating\,coil = Qdesign\,*PartLoadRatio\) where \emph{Q\(_{design}\)} is the nominal heating coil capacity as specified in the heating coil object. If the fan cycles on and off with the heating coil (i.e.,~ when the supply air fan operating mode schedule values are equal to 0), then this part-load ratio is also used to determine the operating mass flow rate of the furnace as
 
 \begin{equation}
 {\dot m_{furnace}} = {\dot m_{design}}*PartLoadRatio
@@ -825,15 +823,15 @@ where:
 
 \({\dot m_{furnace}}\) ~~~~~ ~~~ = air mass flow rate through the furnace (kg/s)
 
-\emph{h\(_{l}\)}\(_{ }\) = enthalpy of air exiting the furnace (J/kg)
+\emph{h\(_{out,\, actual}\)} = enthalpy of air exiting the furnace (J/kg)
 
-\emph{h\(_{e}\)} ~ = enthalpy of air in the control zone (J/kg)
+\emph{h\(_{out,\, control\, zone}\)} = enthalpy of air in the control zone (J/kg)
 
-\emph{HR\(_{n}\)~~~~~~}~~~~~~~ = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
 of the furnace exiting air or the air in the control zone
 
-Δ\(_{l}\) = Sensible load difference between the system output node and the zone inlet node at the above calculated part-load ratio.
+\(\Delta_{sen,\, actual}\) = Sensible load difference between the system output node and the zone inlet node at the above calculated part-load ratio.
 
 \begin{equation}
   \begin{array}{rl}
@@ -876,21 +874,21 @@ No\;Cool\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_
 
 where:
 
-\emph{Mass Flow Rate\(_{d}\)} = air mass flow rate through furnace at full-load conditions, kg/s
+\emph{Mass Flow Rate\(_{full\, load}\)} = air mass flow rate through furnace at full-load conditions, kg/s
 
-\emph{h\(_{d}\)} = enthalpy of air exiting the furnace at full-load conditions, J/kg
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the furnace at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}\(_{ }\) = enthalpy of air in the control zone (where thermostat is located), J/kg
+\emph{h\(_{control\, zone}\)} = enthalpy of air in the control zone (where thermostat is located), J/kg
 
-\emph{HR\(_{n}\)~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
 
 of the furnace exiting air or the air in the control zone
 
-\emph{Mass Flow Rate\(_{f}\)} = air mass flow rate through the furnace with the cooling coil OFF, kg/s
+\emph{Mass Flow Rate\(_{coil\, off}\)} = air mass flow rate through the furnace with the cooling coil OFF, kg/s
 
-\emph{h\(_{f}\)}~ = enthalpy of air exiting the furnace with the cooling coil OFF, J/kg
+\emph{h\(_{out,\, coil\, off}\)} = enthalpy of air exiting the furnace with the cooling coil OFF, J/kg
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ\(_{sen,}\) \emph{\(_{full\, load}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -902,7 +900,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\)** = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ\(_{sen,coil\, off}\)** = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -1193,13 +1191,19 @@ At the end of each HVAC simulation time step, this object reports the heating or
 {\dot Q_{latent}} = {\dot Q_{total}} - {\dot Q_{sensible}}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate by the system, W \(_{ }\) = sensible energy transfer rate by the system, W \(_{ }\) = latent energy transfer rate by the system, W
+where:
 
-\emph{h\(_{t}\)}~~~~~~~~~~~~~~~~~~~~~~~ = enthalpy of the air entering the unit at its inlet node, J/kg
+\(\dot{Q}_{total}\) = total energy transfer rate by the system, W
 
-\emph{h\(_{t}\)} ~~~~~~~~ = enthalpy of the air leaving the unit at its outlet node, J/kg
+\(\dot{Q}_{sensible}\) = sensible energy transfer rate by the system, W
 
-\(H{R_{min}}\) ~~~~~~~ = minimum of the inlet air and outlet air humidity ratio, kg/kg
+\(\dot{Q}_{latent}\) = latent energy transfer rate by the system, W
+
+\emph{h\(_{inlet}\)} = enthalpy of the air entering the unit at its inlet node, J/kg
+
+\emph{h\(_{outlet}\)} = enthalpy of the air leaving the unit at its outlet node, J/kg
+
+\(H{R_{min}}\) = minimum of the inlet air and outlet air humidity ratio, kg/kg
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
@@ -1221,7 +1225,11 @@ Else:
   \end{array}
 \end{equation}
 
-where: \(_{ }\) = output variable `Unitary System Total Cooling Rate, W' \(_{ }\) = output variable `Unitary System Total Heating Rate, W'
+where:
+
+\(\dot{Q}_{total,cooling}\) = output variable `Unitary System Total Cooling Rate, W'
+
+\(\dot{Q}_{total,heating}\) = output variable `Unitary System Total Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied by the system are also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -1229,7 +1237,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 {Q_{total,cooling}} = {\dot Q_{total,cooling}}*TimeStepSys*3600
 \end{equation}
 
-where: \(_{ }\) = output variable `Unitary System Total Cooling Energy, J'
+where: \(Q_{total,cooling}\) = output variable `Unitary System Total Cooling Energy, J'
 
 \emph{TimeStepSys}~ = HVAC system simulation time step, hr
 
@@ -1307,19 +1315,19 @@ No\;Cool\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_
 
 where:
 
-\emph{Mass Flow Rate\(_{d}\)}~ = air mass flow rate through heat pump at full-load conditions, kg/s
+\emph{Mass Flow Rate\(_{full \, load}\)} = air mass flow rate through heat pump at full-load conditions, kg/s
 
-\emph{h\(_{d}\)}~~~ = enthalpy of air exiting the heat pump at full-load conditions, J/kg
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the heat pump at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}~~ = enthalpy of air leaving the control zone (where thermostat is located), J/kg
+\emph{h\(_{control \, zone}\)} = enthalpy of air leaving the control zone (where thermostat is located), J/kg
 
-\emph{HR\(_{n}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
+\emph{HR\(_{min}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
 
-\emph{Mass Flow Rate\(_{f}\)}~ = air mass flow rate through the heat pump with the cooling coil OFF, kg/s
+\emph{Mass Flow Rate\(_{coil\, off}\)} = air mass flow rate through the heat pump with the cooling coil OFF, kg/s
 
-\emph{h\(_{f}\)}~~~ = enthalpy of air exiting the heat pump with the cooling coil OFF, J/kg
+\(h_{out,coil \, off}\) = enthalpy of air exiting the heat pump with the cooling coil OFF, J/kg
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+\(\Delta_{sen,full\, load}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -1332,7 +1340,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\)** = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+\(\Delta_{sen,coil\, off}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -1395,19 +1403,19 @@ No\;Heat\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_
 
 where:
 
-\emph{Mass Flow Rate \(_{d}\)}~ = air mass flow rate through heat pump at full-load conditions, kg/s
+\emph{Mass Flow Rate \(_{full\, load}\)} = air mass flow rate through heat pump at full-load conditions, kg/s
 
-\emph{h\(_{d}\)}~ = enthalpy of air exiting the heat pump at full-load conditions, J/kg
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the heat pump at full-load conditions, J/kg
 
-\emph{h\(_{e}\)}~ = enthalpy of air leaving the control zone (where thermostat is located), J/kg
+\emph{h\(_{control \, zone}\)} = enthalpy of air leaving the control zone (where thermostat is located), J/kg
 
-\emph{HR\(_{n}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
 
-\emph{Mass Flow Rate \(_{f}\)}~ = air mass flow rate through the heat pump with the heating coil OFF, kg/s
+\emph{Mass Flow Rate \(_{coil \, off}\)} = air mass flow rate through the heat pump with the heating coil OFF, kg/s
 
-\emph{h\(_{f}\)}~ = enthalpy of air exiting the heat pump with the heating coil OFF, J/kg
+\emph{h\(_{out,\, coil \, off}\)} = enthalpy of air exiting the heat pump with the heating coil OFF, J/kg
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ\(_{sen,}\) \emph{\(_{full\, load}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -1419,7 +1427,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\)** = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+\(\Delta_{sen,coil\, off}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
   \begin{array}{rl}
@@ -1567,7 +1575,8 @@ Heat\;Pump\;Cooling\;Load = \frac{{Control\;Zone\;Cooling\;Load}}{{Control\;Zone
 The model then calculates the heat pump's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multispeed DX cooling coil. The multispeed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the heat pump is calculated as follows:
 
 \begin{equation}
-FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}} \end{equation}
+FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}}
+\end{equation}
 
 \begin{equation}
 NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,coil\;off}}
@@ -1575,19 +1584,19 @@ NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}}
 
 where:
 
-\emph{\({\dot m}_{HighestSpeed}\)}~ = air mass flow rate through heat pump at the highest cooling speed {[}kg/s{]}
+\emph{\({\dot m}_{HighestSpeed}\)} = air mass flow rate through heat pump at the highest cooling speed {[}kg/s{]}
 
-\emph{h\(_{d}\)}~~~ = enthalpy of air exiting the heat pump at full-load conditions {[}J/kg{]}
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the heat pump at full-load conditions {[}J/kg{]}
 
-\emph{h\(_{e}\)}~~ = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
+\emph{h\(_{control \, zone}\)} = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
 
-\emph{HR\(_{n}\) =} the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone {[}kg/kg{]}
+\emph{HR\(_{min}\) =} the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone {[}kg/kg{]}
 
-\({\dot m}_{CoilOff}\) ~ = air mass flow rate through the heat pump with the cooling coil OFF {[}kg/s{]}
+\({\dot m}_{CoilOff}\) = air mass flow rate through the heat pump with the cooling coil OFF {[}kg/s{]}
 
-\emph{h\(_{f}\)}~~~ = enthalpy of air exiting the heat pump with the cooling coil OFF {[}J/kg{]}
+\emph{h\(_{out,coil \, off}\)} = enthalpy of air exiting the heat pump with the cooling coil OFF {[}J/kg{]}
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ\(_{sen,}\) \emph{\(_{full\, load}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
 \begin{split}
@@ -1600,7 +1609,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
+Δ\(_{sen,coil\, off}\) = Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 \begin{equation}
 \begin{split}
@@ -1619,9 +1628,9 @@ FullCoolOutpu{t_{Speed1}} = \left( {{{\dot m}_{Speed1}}} \right){\left( {{h_{out
 
 where
 
-\emph{\({{{\dot m}_{Speed1}}}\)}~ = air mass flow rate through heat pump at Speed 1 {[}kg/s{]}
+\emph{\({{{\dot m}_{Speed1}}}\)} = air mass flow rate through heat pump at Speed 1 {[}kg/s{]}
 
-Δ\(_{,}\) \(_{1}\)** = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+\(\Delta_{sen,\, Speed1}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
 \begin{split}
@@ -1643,7 +1652,7 @@ where
 
 AddedFanHeat~ = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load {[}W{]}.
 
-AddedFanHeat\(_{1}\)~~~~~~~ = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
+AddedFanHeat\(_{Speed1}\) = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
 
 Since the part-load performance of the DX cooling coil is frequently non-linear,and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the heat pump's cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the heat pump's cooling output divided by the load to be met.
 
@@ -1653,7 +1662,7 @@ Since the part-load performance of the DX cooling coil is frequently non-linear,
 
 where:
 
-HeatPumpOutput\(_{g}\) = heat pump delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+HeatPumpOutput\(_{Cycling}\) = heat pump delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
 \begin{equation}
 HeatPumpOutpu{t_{cycling}} = {\dot m_{_{HeatPump}}}{\left( {{h_{out}} - {h_{Control\;Zone}}} \right)_{HR\min }} - {\Delta_{cycling}}
@@ -1661,11 +1670,11 @@ HeatPumpOutpu{t_{cycling}} = {\dot m_{_{HeatPump}}}{\left( {{h_{out}} - {h_{Cont
 
 where
 
-\({\dot m_{HeatPump}}\) ~~~~~~~~~ = average air mass flow rate defined in the next section {[}kg/s{]}
+\({\dot m_{HeatPump}}\) = average air mass flow rate defined in the next section {[}kg/s{]}
 
-h\(_{,}\) ~~~~~ ~ = enthalpy of air exiting the heat pump at part load conditions {[}J/kg{]}
+h\(_{out,}\) = enthalpy of air exiting the heat pump at part load conditions {[}J/kg{]}
 
-Δ\(_{g}\) ~~ = average sensible load difference between the system output node and the zone inlet node
+Δ\(_{cycling}\) = average sensible load difference between the system output node and the zone inlet node
 
 \begin{equation}
   \begin{array}{rl}
@@ -1692,13 +1701,13 @@ Tolerance = 0.001 \ge \frac{{Heat\,Pump\,Cooling\,Load - HeatPumpOutpu{t_{SpeedR
 
 where:
 
-HeatPumpOutput\(_{n}\) = heat pump delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
+HeatPumpOutput\(_{Speed,n}\) = heat pump delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
 
 ~~~~~~ \(\begin{array}{l}HeatPumpOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{Speed\;n}}\\\;\;\;\;\;\;\; = (1 - SpeedRatio)FullCoolOutpu{t_{Speed\;n - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}\)
 
 Where
 
-AddedFanHeat\(_{o}\)~~~~~~~~~ = generated supply air fan heat at a specific speed ratio {[}W{]}
+AddedFanHeat\(_{SpeedRatio}\)~~~~~~~~~ = generated supply air fan heat at a specific speed ratio {[}W{]}
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -1774,17 +1783,17 @@ where:
 
 \emph{\({\dot m}_{HighestSpeed}\)}~ = air mass flow rate through heat pump at the highest heating speed {[}kg/s{]}
 
-\emph{h\(_{d}\)}~~~ = enthalpy of air exiting the heat pump at full-load conditions {[}J/kg{]}
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the heat pump at full-load conditions {[}J/kg{]}
 
-\emph{h\(_{e}\)}~~ = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
+\emph{h\(_{control \, zone}\)} = enthalpy of air leaving the control zone (where thermostat is located) {[}J/kg{]}
 
-\emph{HR\(_{n}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
+\emph{HR\(_{min}\) =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
 
 \({\dot m}_{CoilOff}\) = air mass flow rate through the heat pump with the heating coil OFF {[}kg/s{]}
 
-\emph{h\(_{f}\)}~~~ = enthalpy of air exiting the heat pump with the heating coil OFF {[}J/kg{]}
+\emph{h\(_{out,coil \, off}\)} = enthalpy of air exiting the heat pump with the heating coil OFF {[}J/kg{]}
 
-Δ\(_{,}\) \emph{\(_{d}\)} = Sensible load difference between the system output node and the zone inlet node at full-load conditions
+\(\Delta_{sen,full\, load}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 \begin{equation}
 \begin{split}
@@ -1797,7 +1806,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ\(_{f}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+\(\Delta_{sen,coil\, off}\) = Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 \begin{equation}
 \begin{split}
@@ -1820,7 +1829,7 @@ where:
 
 \emph{\({{{\dot m}_{Speed1}}}\)}~ = air mass flow rate through heat pump at Speed 1 {[}kg/s{]}
 
-Δ\(_{,}\) \(_{1}\)** = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+\(\Delta_{sen,Speed1}\) = Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 \begin{equation}
 \begin{split}
@@ -1842,7 +1851,7 @@ where
 
 AddedFanHeat~~~~~~~ = generated supply air fan heat, which is a function of part load ratio and as internal component heating load {[}W{]}.
 
-AddedFanHeat\(_{1}\)~ = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
+AddedFanHeat\(_{Speed1}\) = generated supply air fan heat at Speed 1 (part load ratio = 1) {[}W{]}.
 
 Since the part-load performance of the DX heating coil is frequently non-linear (Ref: Single-Speed Electric Heat Pump DX Air Heating Coil), and the supply air fan heat varies based on heating coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the heating coil compressor and fan are determined through iterative calculations (successive modeling of the heating coil and fan) until the heat pump's heating output matches the heating load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the heat pump's heating output divided by the load to be met.
 
@@ -1852,7 +1861,7 @@ Since the part-load performance of the DX heating coil is frequently non-linear 
 
 where:
 
-HeatPumpOutput\(_{g}\) = heat pump delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+HeatPumpOutput\(_{Cycling}\) = heat pump delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
 \begin{equation}
 HeatPumpOutpu{t_{cycling}} = {\dot m_{_{HeatPump}}}{\left( {{h_{out}} - {h_{Control\;Zone}}} \right)_{HR\min }} - {\Delta_{cycling}}
@@ -1862,9 +1871,9 @@ where
 
 \({\dot m_{HeatPump}}\) ~~~ = average air mass flow rate defined in the next section {[}kg/s{]}
 
-h\(_{,}\) ~~~~~~~~~~~ ~ = enthalpy of air exiting the heat pump at part load conditions {[}J/kg{]}
+h\(_{out,}\) = enthalpy of air exiting the heat pump at part load conditions {[}J/kg{]}
 
-Δ\(_{g}\) ~~~~~~~~ = average sensible load difference between the system output node and the zone inlet node
+\(\Delta_{cycling}\) = average sensible load difference between the system output node and the zone inlet node
 
 \begin{equation}
   \begin{array}{rl}
@@ -1891,13 +1900,13 @@ Tolerance = 0.001 \ge \frac{{Heat\,Pump\,Heating\,Load - HeatPumpOutpu{t_{SpeedR
 
 where:
 
-HeatPumpOutput\(_{o}\) = heat pump delivered sensible capacity between two consecutive speeds at a specific ratio {[}W{]}
+HeatPumpOutput\(_{SpeedRatio}\) = heat pump delivered sensible capacity between two consecutive speeds at a specific ratio {[}W{]}
 
 ~~~~~~ \(\begin{array}{l}HeatPumpOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{Speed\;n}}\\\;\;\;\;\;\;\; = (1 - SpeedRatio)FullHeatOutpu{t_{Speed\;n - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}\)
 
 Where
 
-AddedFanHeat\(_{o}\)~~~~~~~~~ = generated supply air fan heat at a specific speed ratio {[}W{]}
+AddedFanHeat\(_{SpeedRatio}\) = generated supply air fan heat at a specific speed ratio {[}W{]}
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -1919,15 +1928,15 @@ When the heat recovery is active (the value of the Design Heat Recovery Water Fl
 
 where
 
-T\(_{t}\)~~~~~~~~~~~ = outlet node temperature of heat recovery, C
+T\(_{outlet}\) = outlet node temperature of heat recovery, C
 
-T\(_{t}\) = inlet node temperature of heat recovery, C
+T\(_{inlet}\) = inlet node temperature of heat recovery, C
 
-Q\(_{t}\)~~~~~ = recoverable waste heat generated by its child objects, W
+Q\(_{WasteHeat}\) = recoverable waste heat generated by its child objects, W
 
-C\(_{p}\)~~~~~~~~~~~~~ = inlet node temperature of heat recovery, C
+C\(_{p}\) = inlet node temperature of heat recovery, C
 
-\({{{\dot m}_{hr}}}\) ~~~~~~~~~~~ = mass flow rate of heat recovery, kg/s
+\({{{\dot m}_{hr}}}\) = mass flow rate of heat recovery, kg/s
 
 If the outlet node temperature is above the value of the Maximum Temp for Heat Recovery field, the outlet node temperature is reset to the value of Maximum Temp for Heat Recovery.
 
@@ -1942,7 +1951,7 @@ This system does not need any plant specification and will provide the electric 
 \begin{figure}[hbtp] % fig 231
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5198.png}
-\caption{  Schematic of Packaged DX Cooling Subsystem in Air Loop for a Blow-Thru Application \protect \label{fig:schematic-of-packaged-dx-cooling-subsystem-in}}
+\caption{Schematic of Packaged DX Cooling Subsystem in Air Loop for a Blow-Thru Application \protect \label{fig:schematic-of-packaged-dx-cooling-subsystem-in}}
 \end{figure}
 
 \subsubsection{Controls}\label{controls-1}
@@ -2037,7 +2046,7 @@ where:
 
 \({P_{exhaust,\,max}}\) ~~ = exhaust fan maximum power, user input (W)
 
-\(ExhFanModFac\) = exhaust fan power modifier curve evaluated at PLR\(_{t}\). If modifier~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~ ~~~~~ ~~curve not provided by the user, then this factor is assumed to be 1.0.
+\(ExhFanModFac\) = exhaust fan power modifier curve evaluated at PLR\(_{exhaust}\). If modifier curve not provided by the user, then this factor is assumed to be 1.0.
 
 \(PL{R_{companion\,coil}}\) ~~~~ = part load ratio of the companion cooling coil
 
@@ -2102,7 +2111,7 @@ ASHRAE. 2004. Chapter 22: Desiccant Dehumidification and Pressure-Drying Equipme
 
 Kosar, D. 2006. Dehumidification Enhancements, ASHRAE Journal, Vol. 48, No. 2, February 2006.
 
-Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems Through Component Augmentation of the Cooling Coil. 15\(^{h}\) Symposium on Improving Building Systems in Hot and Humid Climates, July 24-26, 2006.
+Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems Through Component Augmentation of the Cooling Coil. 15\(^{th}\) Symposium on Improving Building Systems in Hot and Humid Climates, July 24-26, 2006.
 
 \subsection{Unitary Water-To-Air Heat Pump}\label{unitary-water-to-air-heat-pump}
 
@@ -2113,14 +2122,14 @@ The input object AirLoopHVAC:UnitaryHeatPump:WaterToAir provides a model for a w
 \begin{figure}[hbtp] % fig 234
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5222.png}
-\caption{  Source Side and Load Side Configuration of a BlowThru WateroToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a}}
+\caption{Source Side and Load Side Configuration of a BlowThru WateroToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a}}
 \end{figure}
 
 There are two different models for water-to-air heat pump cooling and heating coils. Cooling and heating coils are modeled using a Single Speed or Variable Speed Equation Fit model or a Parameter Estimation model. The parameter estimation procedure is quite detailed and the equation fit model is designed to simplify the user inputs. Each model is discussed in short in the following sections. The Variable-Speed Equation Fit model is described in a separate section, as Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit and Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit.
 
 \subsubsection{Single Speed Equation-Fit Model:}\label{single-speed-equation-fit-model}
 
-This section describes the equation-fit model for Water-to-Air heat pump ~(Object names: \textbf{Coil:Cooling:WaterToAirHeatPump:EquationFit} and \\ \textbf{Coil:Heating:WaterToAirHeatPump:EquationFit}). This documentation is derived from the M.S. dissertation of Tang (2005) which is available on the Oklahoma State University web site . The model uses five non-dimensional equations or curves to predict the heat pump performance in cooling and heating mode. The methodology involved using the generalized least square method to generate a set of performance coefficients from the catalog data at indicated reference conditions. Then the respective coefficients and indicated reference conditions are used in the model to simulate the heat pump performance. The variables or inlet conditions that influenced the water-to-air heat pump performance are load side inlet water temperature, source side inlet temperature, source side water flow rate and load side water flow rate. The governing equations for the cooling and heating mode are as following:
+This section describes the equation-fit model for Water-to-Air heat pump (Object names: \textbf{Coil:Cooling:WaterToAirHeatPump:EquationFit} and \\ \textbf{Coil:Heating:WaterToAirHeatPump:EquationFit}). This documentation is derived from the M.S. dissertation of Tang (2005) which is available on the Oklahoma State University web site . The model uses five non-dimensional equations or curves to predict the heat pump performance in cooling and heating mode. The methodology involved using the generalized least square method to generate a set of performance coefficients from the catalog data at indicated reference conditions. Then the respective coefficients and indicated reference conditions are used in the model to simulate the heat pump performance. The variables or inlet conditions that influenced the water-to-air heat pump performance are load side inlet water temperature, source side inlet temperature, source side water flow rate and load side water flow rate. The governing equations for the cooling and heating mode are as following:
 
 Cooling Mode:
 
@@ -2372,7 +2381,7 @@ The generalized least square method is used to generate the coefficients. This m
 \begin{figure}[hbtp] % fig 238
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5290.png}
-\caption{  Information Flow Chart for Water-To-Water Heat Pump Equation Fit (Tang 2005) \protect \label{fig:information-flow-chart-for-water-to-water}}
+\caption{Information Flow Chart for Water-To-Water Heat Pump Equation Fit (Tang 2005) \protect \label{fig:information-flow-chart-for-water-to-water}}
 \end{figure}
 
 \subsection{Parameter Estimation Water-To-Water Heat Pump Model}\label{parameter-estimation-water-to-water-heat-pump-model}
@@ -2404,7 +2413,7 @@ v = Specific volume
 \begin{figure}[hbtp] % fig 239
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5296.png}
-\caption{  Schematic indicator diagram for a reciprocating Compressor(Jin 2002) \protect \label{fig:schematic-indicator-diagram-for-a}}
+\caption{Schematic indicator diagram for a reciprocating Compressor(Jin 2002) \protect \label{fig:schematic-indicator-diagram-for-a}}
 \end{figure}
 
 Since the refrigerant vapor in the clearance volume as shown in the previous figure goes through a re-expansion procedure, the mass flow rate of the compressor refrigerant is a decreasing function of the pressure ratio.
@@ -2452,7 +2461,7 @@ n~Load side heat transfer coefficient, (UA)\(_{L}\)
 \begin{figure}[hbtp] % fig 240
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5306.png}
-\caption{  Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002) \protect \label{fig:information-flowchart-for-water-to-water-heat}}
+\caption{Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002) \protect \label{fig:information-flowchart-for-water-to-water-heat}}
 \end{figure}
 
 Where:
@@ -2488,7 +2497,7 @@ Extrapolation beyond the catalog data grants the parameter estimation model an u
 \begin{figure}[hbtp] % fig 241
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5314.png}
-\caption{  Flow diagram of EnergyPlus Water to Water HeatPump implementation \protect \label{fig:flow-diagram-of-energyplus-water-to-water}}
+\caption{Flow diagram of EnergyPlus Water to Water HeatPump implementation \protect \label{fig:flow-diagram-of-energyplus-water-to-water}}
 \end{figure}
 
 \subsubsection{Control Strategy:}\label{control-strategy}
