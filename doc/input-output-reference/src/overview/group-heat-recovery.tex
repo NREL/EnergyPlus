@@ -193,10 +193,18 @@ Figure 150. Schematic of the Sensible and Latent Air-to-Air Heat Exchanger
 
 % table 30
 \begin{longtable}[c]{@{}lll@{}}
-\caption{Operating Conditions for Defining Heat Exchanger Performance \protect \label{table:operating-conditions-for-defining-heat}}\\
+\caption{Operating Conditions for Defining Heat Exchanger Performance \label{table:operating-conditions-for-defining-heat}} \tabularnewline
 \toprule 
-Parameter & Conditions \tabularnewline \midrule
+Parameter & Conditions \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Operating Conditions for Defining Heat Exchanger Performance} \tabularnewline
+\toprule 
+Parameter & Conditions \tabularnewline
+\midrule
 \endhead
+
 Heating & Cooling \tabularnewline
 Entering supply air temperature: &  &  \tabularnewline
 Dry-bulb: & 1.7°C (35°F) & 35°C (95°F) \tabularnewline
@@ -328,10 +336,18 @@ The appropriate threshold temperature varies with exhaust (inlet) air temperatur
 
 % table 31
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Typical threshold temperatures \protect \label{table:typical-threshold-temperatures}}\\
+\caption{Typical threshold temperatures \label{table:typical-threshold-temperatures}} \tabularnewline
 \toprule 
-Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperature \tabularnewline \midrule
+Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperature \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Typical threshold temperatures} \tabularnewline
+\toprule 
+Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperature \tabularnewline
+\midrule
 \endhead
+
 Exhaust Air Recirculation & Plate & Sensible-only & -1.1°C (30°F) \tabularnewline
 Sensible + latent & -12.2°C (10°F) \tabularnewline
 Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
@@ -368,7 +384,7 @@ This value is used to determine the total defrost time fraction as follows:
 Total defrost time fraction = Initial Defrost Time Fraction +
 
 \begin{lstlisting}
-       Rate of Defrost Time Fraction Increase \* (T$_{d}$     T$_{t}$)
+       Rate of Defrost Time Fraction Increase \* (T$_{threshold}$     T$_{supply\\ air\\ inlet}$)
 \end{lstlisting}
 
 The model does not allow the total defrost time fraction to exceed 1.0 or be less than 0.

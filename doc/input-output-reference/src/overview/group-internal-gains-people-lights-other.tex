@@ -89,10 +89,18 @@ This field accepts either ``Yes'' or ``No'' as values. When ``Yes'' is specified
 
 % table 11
 \begin{longtable}[c]{p{2.0in}p{1.34in}p{1.33in}p{1.33in}}
-\caption{Metabolic Rates for Various Activities \protect \label{table:metabolic-rates-for-various-activities}}\\
+\caption{Metabolic Rates for Various Activities \label{table:metabolic-rates-for-various-activities}} \tabularnewline
 \toprule 
-  Activity & Activity Level w/ Person EnergyPlus Schedule Value & Activity Level W/m\(^2\) & met* \tabularnewline \midrule
+Activity & Activity Level w/ Person EnergyPlus Schedule Value & Activity Level W/m\(^2\) & met* \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Metabolic Rates for Various Activities} \tabularnewline
+\toprule 
+Activity & Activity Level w/Person EnergyPlus Schedule Value & Activity Level W/m2 & met* \tabularnewline
+\midrule
 \endhead
+
 \emph{Resting} \tabularnewline \midrule 
 Sleeping & 72 & 40 & 0.7 \tabularnewline
 Reclining & 81 & 45 & 0.8 \tabularnewline
@@ -524,10 +532,18 @@ The following output variables are all based on whether the humidity ratio and t
 
 % table 12
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Winter Clothes (1.0 Clo) \protect \label{table:winter-clothes-1.0-clo}}\\
+\caption{Winter Clothes (1.0 Clo) \label{table:winter-clothes-1.0-clo}} \tabularnewline
 \toprule 
-Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline \midrule
+Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Winter Clothes (1.0 Clo)} \tabularnewline
+\toprule 
+Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
+\midrule
 \endhead
+
 19.6 & 0.012 \tabularnewline
 23.9 & 0.012 \tabularnewline
 26.3 & 0.000 \tabularnewline
@@ -543,10 +559,18 @@ Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline \m
 
 % table 13
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Summer Clothes (0.5 Clo) \protect \label{table:summer-clothes-0.5-clo}}\\
+\caption{Summer Clothes (0.5 Clo) \label{table:summer-clothes-0.5-clo}} \tabularnewline
 \toprule 
-Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline \midrule
+Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Summer Clothes (0.5 Clo)} \tabularnewline
+\toprule 
+Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
+\midrule
 \endhead
+
 23.6 & 0.012 \tabularnewline
 26.8 & 0.012 \tabularnewline
 28.3 & 0.000 \tabularnewline
@@ -650,7 +674,7 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 ComfortViewFactorAngles,
-  South Zone Angle Facto,                                                                                                    !- name of angle factor list
+  South Zone Angle Factors,                                                                                                    !- name of angle factor list
   Sourth Zone,          !- Zone Name
   Zn001:Flr001,         !- Surface name 1
   0.75,                 !- Angle factor for surface 1
@@ -726,7 +750,7 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The electrical input to lighting ultimately appears as heat that contributes to zone loads or to return air heat gains. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Return Air Fraction, Fraction Radiant and Fraction Visible. A fourth, defined as the fraction of the heat from lights convected to the zone air, is calculated by the program as:
 
-f\(_{d}\) = 1.0 -- (Return Air Fraction + Fraction Radiant + Fraction Visible)
+f\(_{convected}\) = 1.0 -- (Return Air Fraction + Fraction Radiant + Fraction Visible)
 
 You will get an error message if Return Air Fraction + Fraction Radiant + Fraction Visible exceeds 1.0.
 
@@ -748,10 +772,18 @@ Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible
 
 % table 14
 \begin{longtable}[c]{p{0.8in}>{\raggedright}p{1.6in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}}
-\caption{Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. \protect \label{table:approximate-values-of-return-air-fraction}}\\
+\caption{Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. \label{table:approximate-values-of-return-air-fraction}} \tabularnewline
 \toprule 
-  Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & \(f_{\rm{convected}}\) \tabularnewline \midrule
+Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & fconvected \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations.} \tabularnewline
+\toprule 
+Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & \(f_{\rm{convected}}\) \tabularnewline
+\midrule
 \endhead
+
 1 & Recessed, Parabolic Louver, Non-Vented, T8 & 0.31 & 0.22 & 0.20 & 0.27 \tabularnewline
 2 & Recessed, Acrylic Lens, Non-Vented, T8 & 0.56 & 0.12 & 0.20 & 0.12 \tabularnewline
 3 & Recessed, Parabolic Louver, Vented, T8 & 0.28 & 0.19 & 0.20 & 0.33 \tabularnewline
@@ -1016,10 +1048,18 @@ As described in the Lights Outputs, values for lights will show up on the follow
 
 % table 15
 \begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
-\caption{Distribution of Lights to Meters \protect \label{table:distribution-of-lights-to-meters}}\\
+\caption{Distribution of Lights to Meters \label{table:distribution-of-lights-to-meters}} \tabularnewline
 \toprule 
-Meter Name & Scope & Lights Specfics \tabularnewline \midrule
+Meter Name & Scope & Lights Specfics \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Distribution of Lights to Meters} \tabularnewline
+\toprule 
+Meter Name & Scope & Lights Specfics \tabularnewline
+\midrule
 \endhead
+
 Electricity:Facility & Entire Facility & All \tabularnewline
 Electricity:Building & All Zones & All \tabularnewline
 Electricity:Zone: <Zone Name> & Specific Zone & All \tabularnewline
@@ -2785,7 +2825,7 @@ An IDF example is provided below:
 
 \begin{lstlisting}
 ZoneContaminantSourceAndSink:Generic:CutoffModel,
-    NORTH ZONE GC CutoffModel,          !- Name
+  NORTH ZONE GC CutoffModel,            !- Name
   NORTH ZONE,                           !- Zone Name
   1.0E-5,                               !- Design Generation Rate Coefficient {m3/s}
   GC Source Schedule,                   !- Schedule Name
@@ -2852,7 +2892,7 @@ An IDF example is provided below:
 
 \begin{lstlisting}
 ZoneContaminantSourceAndSink:Generic:DecaySource,
-  WEST ZONE GC DecaySour, !- Name
+  WEST ZONE GC DecaySource, !- Name
   WEST ZONE,              !- Zone Name
   1.0E-5,                 !- Initial Emission Rate {m3/s}
   GC Source Schedule,     !- Schedule Name
@@ -3103,10 +3143,18 @@ This object specifies outside temperature-controlled (OTC) baseboard heating. Th
 
 % table 16
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity \protect \label{table:outdoor-temperature-controlled-baseboard-heat}}\\
+\caption{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity \label{table:outdoor-temperature-controlled-baseboard-heat}} \tabularnewline
 \toprule 
-Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline \midrule
+Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity} \tabularnewline
+\toprule 
+Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
+\midrule
 \endhead
+
 > 10 & 0 \tabularnewline
 10 & 100,000 \tabularnewline
 8 & 180,000 \tabularnewline
@@ -3274,10 +3322,18 @@ As described in each of the equipment sections, values for specific equipments w
 
 % table 17
 \begin{longtable}[c]{>{\raggedright}p{2.8in}>{\raggedright}p{1.2in}>{\raggedright}p{2.0in}}
-\caption{Distribution of Equipment to Meters \protect \label{table:distribution-of-equipment-to-meters}}\\
+\caption{Distribution of Equipment to Meters \label{table:distribution-of-equipment-to-meters}} \tabularnewline
 \toprule 
-Meter Name & Scope & Equipment Specfics \tabularnewline \midrule
+Meter Name & Scope & Equipment Specfics \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Distribution of Equipment to Meters} \tabularnewline
+\toprule 
+Meter Name & Scope & Equipment Specfics \tabularnewline
+\midrule
 \endhead
+
 Electricity:\-Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
 Electricity:\-Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
 Electricity:\-Zone: <Zone Name> & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
