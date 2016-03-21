@@ -8,9 +8,9 @@ Thermal comfort modeling is controlled primarily by the People input object. Thi
 
 Throughout the last few decades, researchers have been exploring the thermal, physiological and psychological response of people in their environment in order to develop mathematical models to predict these responses. Researchers have empirically debated building occupants' thermal responses to the combined thermal effect of the personal, environmental and physiological variables that influence the condition of thermal comfort.
 
-There are two personal variables that influence the condition of thermal comfort: the thermal resistance of the clothing (I\(_{l}\)), and the metabolic rate (H/A\(_{u}\)). The thermal resistance of the clothing (I\(_{l}\)) is measured in units of ``clo.'' The 1985 ASHRAE Handbook of Fundamentals (ASHRAE 1985) suggests multiplying the summation of the individual clothing items clo value by a factor of 0.82 for clothing ensembles.
+There are two personal variables that influence the condition of thermal comfort: the thermal resistance of the clothing (I\(_{cl}\)), and the metabolic rate (H/A\(_{Du}\)). The thermal resistance of the clothing (I\(_{cl}\)) is measured in units of ``clo.'' The 1985 ASHRAE Handbook of Fundamentals (ASHRAE 1985) suggests multiplying the summation of the individual clothing items clo value by a factor of 0.82 for clothing ensembles.
 
-The metabolic rate (H/A\(_{u}\)), is a measure of the internal heat production rate of an occupant (H) w/hr. in per unit of ``Dubois'' body surface area (A\(_{u}\)) in units of m\(^{2}\). The DuBois body surface area is given by :
+The metabolic rate (H/A\(_{Du}\)), is a measure of the internal heat production rate of an occupant (H) w/hr. in per unit of ``Dubois'' body surface area (A\(_{Du}\)) in units of m\(^{2}\). The DuBois body surface area is given by :
 
 \begin{equation}
 {A_{Du}} = 0.202{(weight)^{0.425}}{(height)^{0.725}}
@@ -39,9 +39,9 @@ The physiological variables that influence the conditions of thermal comfort inc
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
 \item
-  Skin Temperature (T\(_{k}\)),
+  Skin Temperature (T\(_{sk}\)),
 \item
-  Core or Internal Temperature (T\(_{r}\)),
+  Core or Internal Temperature (T\(_{cr}\)),
 \item
   Sweat Rate,
 \item
@@ -50,16 +50,24 @@ The physiological variables that influence the conditions of thermal comfort inc
   Thermal Conductance (K) between the core and skin.
 \end{enumerate}
 
-Where the Skin Temperature (T\(_{k}\)), the Core Temperature (T\(_{r}\)) and the Sweat Rate are physiological indices. The Skin Wettedness (w) is a rationally derived physiological index defined as the ratio of the actual sweating rate to the maximum rate of sweating that would occur if the skin were completely wet.
+Where the Skin Temperature (T\(_{sk}\)), the Core Temperature (T\(_{cr}\)) and the Sweat Rate are physiological indices. The Skin Wettedness (w) is a rationally derived physiological index defined as the ratio of the actual sweating rate to the maximum rate of sweating that would occur if the skin were completely wet.
 
 One more consideration is important in dealing with thermal comfort - the effect of asymmetrical heating or cooling. This could occur when there is a draft or when there is a radiant flux incident on a person (which is what is of primary interest to us here). Fanger (1967) noted that the human regulatory system is quite tolerant of asymmetrical radiant flux. A reasonable upper limit on the difference in mean radiant temperature (T\(_{r}\)) from one direction to the opposing direction is 15°C. (ASHRAE 1984). This limit is lower if there is a high air velocity in the zone.
 
 % table 78
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
-\caption{  General Nomenclature list for Thermal Comfort Models \protect \label{table:general-nomenclature-list-for-thermal-comfort}}\\
+\caption{General Nomenclature list for Thermal Comfort Models \label{table:general-nomenclature-list-for-thermal-comfort}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{General Nomenclature list for Thermal Comfort Models} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 A\(_{Du}\) & Dubois body surface area & m\(^{2}\) & - & - \tabularnewline
 H & Internal heat production rate of an occupant per unit area = M – W & W/m\(^{2}\) & - & IntHeatProd \tabularnewline
 I\(_{cl}\) & Thermal resistance of the clothing & clo & - & CloUnit \tabularnewline
@@ -81,10 +89,18 @@ Many researchers have been exploring ways to predict the thermal sensation of pe
 
 % table 79
 \begin{longtable}[c]{@{}ll@{}}
-\caption{  Seven point Thermal Sensation Scale \protect \label{table:seven-point-thermal-sensation-scale}}\\
+\caption{Seven point Thermal Sensation Scale \label{table:seven-point-thermal-sensation-scale}} \tabularnewline
 \toprule 
-Sensation & Description \tabularnewline \midrule
+Sensation & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Seven point Thermal Sensation Scale} \tabularnewline
+\toprule 
+Sensation & Description \tabularnewline
+\midrule
 \endhead
+
 3 & Hot \tabularnewline
 2 & Warm \tabularnewline
 1 & slightly warm \tabularnewline
@@ -97,10 +113,18 @@ Sensation & Description \tabularnewline \midrule
 
 % table 80
 \begin{longtable}[c]{@{}ll@{}}
-\caption{  Nine point Thermal Sensation Scale \protect \label{table:nine-point-thermal-sensation-scale}}\\
+\caption{Nine point Thermal Sensation Scale \label{table:nine-point-thermal-sensation-scale}} \tabularnewline
 \toprule 
-Sensation Value & Description \tabularnewline \midrule
+Sensation Value & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nine point Thermal Sensation Scale} \tabularnewline
+\toprule 
+Sensation Value & Description \tabularnewline
+\midrule
 \endhead
+
 4 & very hot \tabularnewline
 3 & hot \tabularnewline
 2 & warm \tabularnewline
@@ -129,10 +153,18 @@ Fanger's Comfort model was the first one developed. It was published first in 19
 
 % table 81
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
-\caption{  Nomenclature list for Fanger model \protect \label{table:nomenclature-list-for-fanger-model}}\\
+\caption{Nomenclature list for Fanger model \label{table:nomenclature-list-for-fanger-model}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & Range & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units & Range & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature list for Fanger model} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units & Range & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 A\(_{Du}\) & Dubois body surface area & m\(^{2}\) & - & BodySurfaceArea \tabularnewline
 C\(_{res}\) & The rate of dry respiratory heat loss & W/m\(^{2}\) & - & DryRespHeatLoss \tabularnewline
 E\(_{dif}\) & The rate of heat loss from the diffusion of water vapor through the skin & W/m\(^{2}\) & - & EvapHeatLossDiff \tabularnewline
@@ -230,10 +262,18 @@ The Pierce Two-Node model was developed at the John B. Pierce Foundation at Yale
 
 % table 82
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
-\caption{  Nomenclature list for Pierce Two-Node model \protect \label{table:nomenclature-list-for-pierce-two-node-model}}\\
+\caption{Nomenclature list for Pierce Two-Node model \label{table:nomenclature-list-for-pierce-two-node-model}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature list for Pierce Two-Node model} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 C\(_{dil}\) & Constant for skin blood flow & ~ & ~ & SkinBloodFlowConst \tabularnewline
 C\(_{res}\) & The rate of dry respiratory heat loss & W/m\(^{2}\) & - & DryRespHeatLoss \tabularnewline
 C\(_{sw}\) & Proportionality constant for sweat control & g/m\(^{2}\)hr & ~ & SweatContConst \tabularnewline
@@ -382,7 +422,7 @@ Also, in the model, the radiant heat transfer coefficient, h\(_{r}\), is defined
 
 Hr = 4.*RadSurfEff*StefanBoltz*((CloSurfTemp + RadTemp)/2. + TAbsConv)**3
 
-In the Pierce model, T\(_{l}\) is estimated by each iteration using following equation:
+In the Pierce model, T\(_{cl}\) is estimated by each iteration using following equation:
 
 \({T_{cl}} = ({T_{sk}}/{I_{cl}} + {f_{cl}}({h_c}{T_a} - {h_r}{T_r}))/(1/{I_{cl}} + {f_{cl}}({h_c} + {h_r}))\) ~~~~~~~~~~~~~ °C
 
@@ -394,7 +434,7 @@ CloSurfTemp = (CloCond*SkinTemp + CloBodyRat*(Hc*AirTemp \&
   Hr*RadTemp))/(CloCond + CloBodyRat*(Hc + Hr))
 \end{itemize}
 
-Total evaporative heat loss from the skin, E\(_{k}\), includes evaporation of water produced by regulatory sweating, E\(_{w}\), and evaporation of water vapor that diffuses through the skin surface, E\(_{f}\).
+Total evaporative heat loss from the skin, E\(_{sk}\), includes evaporation of water produced by regulatory sweating, E\(_{rsw}\), and evaporation of water vapor that diffuses through the skin surface, E\(_{diff}\).
 
 \({E_{sk}} = {E_{rsw}} + {E_{diff}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
 
@@ -442,7 +482,7 @@ Where
 
 1.163 is the thermal capacity of blood in W•h/L•°C
 
-Thus, individual heat balance equations for core and skin compartments are expressed using this term, Q\(_{s}\). New temperatures of core, skin and body are calculated by each iteration from rates of heat storage in the core and skin.
+Thus, individual heat balance equations for core and skin compartments are expressed using this term, Q\(_{c-s}\). New temperatures of core, skin and body are calculated by each iteration from rates of heat storage in the core and skin.
 
 \({S_{sk}} = {Q_{c - s}} - {Q_c} - {Q_r} - {E_{sk}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
 
@@ -518,8 +558,16 @@ The KSU two-node model, developed at Kansas State University, was published in 1
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
 \caption{  Nomenclature list for KSU Two-Node model \protect \label{table:nomenclature-list-for-ksu-two-node-model}}\\
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature list for KSU Two-Node model} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 C\(_{cr}\) & Specific heat of body core & Whr/kg°C & ~ & ~ \tabularnewline
 C\(_{sk}\) & Specific heat of skin & Whr/kg°C & ~ & ~ \tabularnewline
 C\(_{res}\) & The rate of dry respiratory heat loss & W/m\(^{2}\) & - & DryRespHeatLoss \tabularnewline
@@ -622,7 +670,7 @@ EvapHeatLossDiff = 0.408*(SkinVapPress - VapPress)
 
 EvapHeatLossMax = 2.2*Hc*(SkinVapPress - VapPress)*CloPermeatEff
 
-Here, control signals, based on setpoint temperatures in the skin and core, are introduced into passive system equations and these equations are integrated numerically for small time increments or small increments in core and skin temperature. The control signals modulate the thermoregulatory mechanism and regulate the peripheral blood flow, the sweat rate, and the increase of metabolic heat by active muscle shivering. The development of the controlling functions of skin conductance (KS), sweat rate (E\(_{w}\)), and shivering (M\(_{v}\)) is based on their correlation with the deviations in skin and core temperatures from their setpoints.
+Here, control signals, based on setpoint temperatures in the skin and core, are introduced into passive system equations and these equations are integrated numerically for small time increments or small increments in core and skin temperature. The control signals modulate the thermoregulatory mechanism and regulate the peripheral blood flow, the sweat rate, and the increase of metabolic heat by active muscle shivering. The development of the controlling functions of skin conductance (KS), sweat rate (E\(_{sw}\)), and shivering (M\(_{shiv}\)) is based on their correlation with the deviations in skin and core temperatures from their setpoints.
 
 \begin{equation}
   KS = 5.3 + \frac{6.75+42.45\PB{T_{cr}-36.98}+8.15\PB{T_{cr}-35.15}^{0.8}\PB{T_{sk}-33.8}}{1+0.4\PB{32.1-T_{sk}}}
@@ -704,7 +752,7 @@ VasoconstrictFac = (ThermCndctNeut - ThermCndct) \&
 
 /(ThermCndctNeut - ThermCndctMin)
 
-Thus, TSV in the cold is a function of a vasoconstriction factor (ε\(_{c}\)) as:
+Thus, TSV in the cold is a function of a vasoconstriction factor (ε\(_{vc}\)) as:
 
 \begin{equation}
 TSV =  - 1.46 \times {\varepsilon_{vc}} + 3.75 \times {\varepsilon_{vc}}^2 - 6.17 \times {\varepsilon_{vc}}^3
@@ -748,7 +796,7 @@ The central line of the model (shown in red), or comfort temperature, is defined
 
 Where
 
-T\(_{t}\) -- operative temperature (°C), calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces
+T\(_{ot}\) -- operative temperature (°C), calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces
 
 T\(_{o}\) -- monthly mean outdoor air dry-bulb temperature (°C).
 
@@ -766,15 +814,15 @@ If the .stat file is provided for the simulation, T\(_{o}\) is drawn directly fr
 \alpha  = \frac{{29}}{{30}}
 \end{equation}
 
-T\(_{i}\) is defined as the daily average temperature of the i\(^{h}\) previous day.
+T\(_{od-i}\) is defined as the daily average temperature of the i\(^{th}\) previous day.
 
 Note that the weather file must be a standard .epw containing a full year of data.
 
 The comfort regions for 80\% and 90\% acceptability are symmetric about the central line.
 
-90\% Acceptability Limits: T\(_{t}\) = 0.31* T\(_{o}\) + 17.8± 2.5
+90\% Acceptability Limits: T\(_{ot}\) = 0.31* T\(_{o}\) + 17.8± 2.5
 
-80\% Acceptability Limits: T\(_{t}\) = 0.31* T\(_{o}\) + 17.8± 3.5
+80\% Acceptability Limits: T\(_{ot}\) = 0.31* T\(_{o}\) + 17.8± 3.5
 
 If, using either method, T\(_{o}\) is less than 10°(C) or greater than 33.5°(C), the model is not applicable.
 
@@ -782,9 +830,9 @@ For a detailed description of this model, please see \emph{ASHRAE Standard 55-20
 
 \subsection{Adaptive Comfort Model Based on European Standard EN15251-2007}\label{adaptive-comfort-model-based-on-european-standard-en15251-2007}
 
-The EN15251-2007 is similar to ASHRAE 55-2010, but with slightly different curves of the indoor operative temperature and acceptability limits (Fig. 2). The model, intended for use in naturally ventilated buildings, determines the acceptability of indoor conditions given the 7-day weighted mean outdoor air temperature and the indoor operative temperature. The 7-day weighted mean outdoor air temperature (T\(_{m}\)) is defined as the weighted running average of the previous 7 daily average outdoor air temperatures.
+The EN15251-2007 is similar to ASHRAE 55-2010, but with slightly different curves of the indoor operative temperature and acceptability limits (Fig. 2). The model, intended for use in naturally ventilated buildings, determines the acceptability of indoor conditions given the 7-day weighted mean outdoor air temperature and the indoor operative temperature. The 7-day weighted mean outdoor air temperature (T\(_{rm}\)) is defined as the weighted running average of the previous 7 daily average outdoor air temperatures.
 
-This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people's clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90\%) Acceptability, Category II (80\%) Acceptability, and Category III (65\%) Acceptability. If T\(_{m}\) is not within the specified domain of 10.0 to 30.0C, the model is not applicable.
+This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people's clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90\%) Acceptability, Category II (80\%) Acceptability, and Category III (65\%) Acceptability. If T\(_{rm}\) is not within the specified domain of 10.0 to 30.0C, the model is not applicable.
 
 \begin{figure}[hbtp] % fig 303
 \centering
@@ -806,7 +854,7 @@ Category II, 80\% Acceptability Limits: Tot = 0.33*To + 18.8± 3.0
 
 Category III, 65\% Acceptability Limits: Tot = 0.33*To + 18.8± 4.0
 
-For 10°(C) \textless{} T\(_{m}\) \textless{} 15°(C), the comfort temperature of the lower boundaries of the comfort regions is T\(_{f}\) = 23.75°(C). That is, the lower boundaries are constant according to the same ranges above:
+For 10°(C) \textless{} T\(_{rm}\) \textless{} 15°(C), the comfort temperature of the lower boundaries of the comfort regions is T\(_{comf}\) = 23.75°(C). That is, the lower boundaries are constant according to the same ranges above:
 
 Category I, 90\% Acceptability Limits: Tot = 23.75- 2.0
 
@@ -818,11 +866,11 @@ Where
 
 Tot -- operative temperature (°C) , calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces
 
-To -- mean outdoor air dry-bulb temperature (°C), calculated as the weighted mean of the previous 7-day daily mean outdoor air dry-bulb temperature (T\(_{d}\)):
+To -- mean outdoor air dry-bulb temperature (°C), calculated as the weighted mean of the previous 7-day daily mean outdoor air dry-bulb temperature (T\(_{od}\)):
 
-T\(_{o}\) = (1 - α)*\{T\(_{1}\) + α *T\(_{2}\) + α\(^{2}\) *T\(_{3}\) + α\(^{3}\) *T\(_{4}\) + α\(^{4}\) *T\(_{5}\) + α\(^{5}\) *T\(_{6}\) + α\(^{6}\) *T\(_{7}\)\}
+T\(_{o}\) = (1 - α)*\{T\(_{od-1}\) + α *T\(_{od-2}\) + α\(^{2}\) *T\(_{od-3}\) + α\(^{3}\) *T\(_{od-4}\) + α\(^{4}\) *T\(_{od-5}\) + α\(^{5}\) *T\(_{od-6}\) + α\(^{6}\) *T\(_{od-7}\)\}
 
-T\(_{o}\) = (1 - α)*T\(_{1}\) + α *T\(_{1}\)
+T\(_{o}\) = (1 - α)*T\(_{od-1}\) + α *T\(_{o-1}\)
 
 α~ = 0.8
 
@@ -832,15 +880,15 @@ In most building energy simulations, thermal comfort condition is calculated bas
 
 The model proposed to ASHRAE 55 is described below.
 
-For t\(_{ }\) \textless{} -5°C, \({I_{cl}} = 1\) .00
+For t\(_{a(out,6)}\) \textless{} -5°C, \({I_{cl}} = 1\) .00
 
-For -5°C ≤ t\(_{)}\) \textless{} 5°C, \({I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}\)
+For -5°C ≤ t\(_{a(out,6)}\) \textless{} 5°C, \({I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}\)
 
-For 5°C ≤ t\(_{)}\) \textless{} 26°C \({I_{cl}} = {10^{\left( { - 0.1635 - 0.0066{\rm{*}}{t_{a\left( {out,6} \right)}}} \right)}}\)
+For 5°C ≤ t\(_{a(out,6)}\) \textless{} 26°C \({I_{cl}} = {10^{\left( { - 0.1635 - 0.0066{\rm{*}}{t_{a\left( {out,6} \right)}}} \right)}}\)
 
-or t\(_{)}\) ≥ 26°C \({I_{cl}} = 0.46\)
+or t\(_{a(out,6)}\) ≥ 26°C \({I_{cl}} = 0.46\)
 
-Where, \emph{I\(_{l}\)} is the clothing insulation value, \emph{t\(_{)}\)} is the outdoor air temperature measured at 6 o'clock in the morning. The following figure illustrates the proposed clothing insulation model.
+Where, \emph{I\(_{cl}\)} is the clothing insulation value, \emph{t\(_{a(out,\, 6)}\)} is the outdoor air temperature measured at 6 o'clock in the morning. The following figure illustrates the proposed clothing insulation model.
 
 \begin{figure}[hbtp] % fig 305
 \centering
@@ -872,10 +920,18 @@ There are three options to calculate mean radiant temperature in the thermal com
 
 % table 84
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
-\caption{  Nomenclature and variable list for MRT calculation \protect \label{table:nomenclature-and-variable-list-for-mrt}}\\
+\caption{Nomenclature and variable list for MRT calculation \label{table:nomenclature-and-variable-list-for-mrt}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline \midrule
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature and variable list for MRT calculation} \tabularnewline
+\toprule 
+Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+\midrule
 \endhead
+
 T\(_{r}\) & Mean radiant temperature & °C & - & RadTemp \tabularnewline
 T\(_{r-avg}\) & Zone averaged radiant temperature & °C & - & ZoneRadTemp \tabularnewline
 T\(_{surf}\) & Surface temperature & °C & - & SurfaceTemp \tabularnewline

@@ -36,7 +36,7 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 ·~~~~~~~~The control type: \emph{Stay Off}, \emph{Cycle On Any}, \emph{Cycle On Control Zone}, or \emph{Cycle On Any - Zone Fans Only};
 
-·~~~~~~~~Thermostat on/off tolerance \emph{T\(_{l}\)} (degrees C);
+·~~~~~~~~Thermostat on/off tolerance \emph{T\(_{tol}\)} (degrees C);
 
 ·~~~~~~~~Cycling run time in seconds; used to calculate a stop time (in time steps since the start of the current run period) once the status has become \emph{Cycle On}.
 
@@ -50,7 +50,7 @@ Otherwise,
 
 3.~~~~~If the current time is greater than the stop time, the manager can potentially cycle the system on.
 
-a.~~~~For control types \emph{Cycle On Any} and \emph{Cycle On Any -- Zone Fans Only} the manger looks at each zone served by the air loop and detects whether the zone temperature at the thermostat is greater than the cooling setpoint plus ½\emph{T\(_{l}\)} or less than the heating setpoint minus ½\emph{T\(_{l}\)}. If it is, \emph{AvailStatus} is set to \emph{CycleOn} (or \emph{CycleOnZoneFansOnly}). If not, \emph{AvailStatus} is set to \emph{NoAction}.
+a.~~~~For control types \emph{Cycle On Any} and \emph{Cycle On Any -- Zone Fans Only} the manger looks at each zone served by the air loop and detects whether the zone temperature at the thermostat is greater than the cooling setpoint plus ½\emph{T\(_{tol}\)} or less than the heating setpoint minus ½\emph{T\(_{tol}\)}. If it is, \emph{AvailStatus} is set to \emph{CycleOn} (or \emph{CycleOnZoneFansOnly}). If not, \emph{AvailStatus} is set to \emph{NoAction}.
 
 b.~~~For control type \emph{Cycle On Control Zone}, the manager does the same check just for the control zone.
 
@@ -94,19 +94,19 @@ The input object AvailabilityManager:DifferentialThermostat is a manager that ov
 
 ·~~~~~~~~name of the cold node;
 
-·~~~~~~~~temperature difference for turning the system on (\emph{DeltaT\(_{n}\)});
+·~~~~~~~~temperature difference for turning the system on (\emph{DeltaT\(_{on}\)});
 
-·~~~~~~~~temperature difference for turning the system off (\emph{DeltaT\(_{f}\)}).
+·~~~~~~~~temperature difference for turning the system off (\emph{DeltaT\(_{off}\)}).
 
 Note that there is no applicability schedule for this manager. Also, this manager always returns a status of \emph{CycleOn} or \emph{ForceOff}, never \emph{NoAction}.
 
-\emph{DeltaT} = \emph{T\(_{e}\)} -- \emph{T\(_{e}\)}
+\emph{DeltaT} = \emph{T\(_{hot\, node}\)} -- \emph{T\(_{cold\, node}\)}
 
-If \emph{DeltaT} \textgreater{} = \emph{DeltaT\(_{n}\)} ~then
+If \emph{DeltaT} \textgreater{} = \emph{DeltaT\(_{on}\)} ~then
 
 \emph{AvailStatus = CycleOn}
 
-~ ~~~~Else if \emph{DeltaT} \textless{} = \emph{DeltaT\(_{f}\)} ~then
+~ ~~~~Else if \emph{DeltaT} \textless{} = \emph{DeltaT\(_{off}\)} ~then
 
 \emph{AvailStatus = ForceOff}
 
@@ -122,7 +122,7 @@ The input object AvailabilityManager:HighTemperatureTurnOff is used to turn off 
 
 ·~~~~~~~~limit temperature (\emph{T\(_{u}\)}).
 
-If \emph{T\(_{e}\)} \textgreater{} = \emph{T\(_{u}\)} then
+If \emph{T\(_{sensed\, node}\)} \textgreater{} = \emph{T\(_{u}\)} then
 
 \emph{AvailStatus} = \emph{ForceOff}
 
@@ -138,7 +138,7 @@ The input object AvailabilityManager:HighTemperatureTurnOn is used to turn on a 
 
 ·~~~~~~~~limit temperature (\emph{T\(_{u}\)}).
 
-If \emph{T\(_{e}\)} \textgreater{} = \emph{T\(_{u}\)} then
+If \emph{T\(_{sensed\, node}\)} \textgreater{} = \emph{T\(_{u}\)} then
 
 \emph{AvailStatus} = \emph{CycleOn}
 
@@ -160,7 +160,7 @@ If the applicability schedule exists and has a current value of \textless{} = 0,
 
 Otherwise,
 
-If \emph{T\(_{e}\)} \textless{} = \emph{T\(_{l}\)}~ then
+If \emph{T\(_{sensed\, node}\)} \textless{} = \emph{T\(_{l}\)}~ then
 
 \emph{AvailStatus} = \emph{ForceOff}
 
@@ -176,7 +176,7 @@ The input object AvailabilityManager:LowTemperatureTurnOn is used to turn on a c
 
 ·~~~~~~~~limit temperature (\emph{T\(_{l}\)}).
 
-If \emph{T\(_{e}\)} \textless{} = \emph{T\(_{l}\)}~ then
+If \emph{T\(_{sensed\, node}\)} \textless{} = \emph{T\(_{l}\)}~ then
 
 \emph{AvailStatus} = \emph{CycleOn}
 
@@ -314,13 +314,13 @@ Preheating time
 {t_i} = {a_0} + \left( {1 - {w_i}} \right)({a_1}{T_{z,i}} + {a_2}T_{z,i}^2) + {w_i}{a_3}{T_{o,i}}
 \end{equation}
 
-Where, on \emph{i}\(^{h}\) day
+Where, on \emph{i}\(^{th}\) day
 
 \emph{t\(_{i}\)} = start/recovery time,
 
-\emph{T\(_{i}\)} = ~~~~~~~~~ zone temperature
+\emph{T\(_{z,i}\)} = ~~~~~~~~~ zone temperature
 
-\emph{T\(_{i}\)} = ~~~~~~~~~~ outdoor temperature
+\emph{T\(_{o,i}\)} = ~~~~~~~~~~ outdoor temperature
 
 `\emph{w\(_{i}\)}' is a weighting factor which determines weighting given to outside and zone temperature.
 
@@ -328,7 +328,7 @@ Where, on \emph{i}\(^{h}\) day
 {w_i} = {1000^{ - \frac{{\left( {{T_{z,i}} - {T_{unocc}}} \right)}}{{\left( {{T_{occ}} - {T_{unocc}}} \right)}}}}
 \end{equation}
 
-\emph{T\(_{c}\)} and \emph{T\(_{c}\)} are setpoint temperatures during unoccupied (setback) and occupied periods.
+\emph{T\(_{unocc}\)} and \emph{T\(_{occ}\)} are setpoint temperatures during unoccupied (setback) and occupied periods.
 
 Coefficients \emph{a\(_{0}\), a\(_{1}\), a\(_{2}\)} (and \emph{a\(_{3}\)}) are separately calculated for heating and cooling operation and are updated from the optimum times from last three days thus; these coefficients carry history and adapt the trend from previous days.
 
@@ -342,8 +342,8 @@ The optimum time for past days is determined using,
 
 Δ\emph{t} = ~~~~~~~~~~~ time-step
 
-\emph{t\(_{)}\)} = recovery time on (\emph{i}-1)\(^{h}\) day
+\emph{t\(_{opt,(i-1)}\)} = recovery time on (\emph{i}-1)\(^{th}\) day
 
-\emph{q\(_{)}\)} = ~~~~~~~~~ energy extracted or added during last time step
+\emph{q\(_{(i-1)}\)} = ~~~~~~~~~ energy extracted or added during last time step
 
-\emph{q\(_{x}\)} = ~~~~~~~~ maximum capacity of the equipments 
+\emph{q\(_{max}\)} = ~~~~~~~~ maximum capacity of the equipments 
