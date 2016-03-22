@@ -320,7 +320,8 @@ namespace EnergyPlus {
 				DayOfSimChr = "0";
 				NumOfWarmupDays = 0;
 
-				ManageEMS(emsCallFromBeginNewEvironment); // calling point
+				bool anyEMSRan;
+				ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
 				while ( (DayOfSim < NumOfDayInEnvrn) || (WarmupFlag) ) { // Begin day loop ...
 

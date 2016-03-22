@@ -10,17 +10,17 @@ The ZoneHVAC:AirDistributionUnit is a special piece of zone equipment -- it conn
 
 The air distribution function is encapsulated in the module \emph{ZoneAirEquipmentManager}. The object and module function only to invoke the individual air terminal unit simulations.
 
-\subsubsection{Inputs and Data}\label{inputs-and-data-002}
+\subsubsection{Inputs and Data}\label{inputs-and-data-003}
 
 The data for this unit consists of the unit name, the air outlet node name (which should be the same as one of the zone inlet nodes), the type of air terminal unit (air distribution equipment), and the name of the air terminal unit.
 
 All input data for air distribution units is stored in the array \emph{AirDistUnit} in data module \emph{DataDefineEquip}.
 
-\subsubsection{Calculation}\label{calculation-000}
+\subsubsection{Calculation}\label{calculation-001}
 
 There is no calculation associated with ZoneHVAC:AirDistributionUnit.
 
-\subsubsection{Simulation and Control}\label{simulation-and-control-003}
+\subsubsection{Simulation and Control}\label{simulation-and-control-004}
 
 \emph{SimZoneAirLoopEquipment} in module \emph{ZoneAirEquipmentManager} calls the individual air terminal unit simulations.
 
@@ -112,7 +112,7 @@ where \({\dot m_{da}}\) is dry air mass flow rate in kg/s, \emph{h} is specific 
 
 The supply side mixer model is invoked from within the zonal AC model. Basically the supply side mixer becomes a subcomponent of the zonal unit model. This allows the zonal unit to allow for the mixing of central supply air with its outlet stream in calculating how much cooling or heating it needs to do in order to meet the zone load.
 
-\subsubsection{References}\label{references-2-009}
+\subsubsection{References}\label{references-2-010}
 
 See Chapter 1, page 1.17 of the 2013 ASHRAE Handbook of Fundamentals
 
@@ -242,7 +242,7 @@ Here \({\dot Q_z}\) {[}watts{]} is the actual zone load (met by \({\dot m_{s,z}}
 
 Once \({\dot m_{tu}}\) ~is known, all the other flow rates can be calculated. \({\dot m_{s,us}}\) is assigned to the air distribution unit's air inlet node and \({\dot m_{s,z}}\) is assigned to the unit's air outlet node. Thus, air mass flow is not conserved through the unit: the two air leakage flow rates disappear. These two vanished flow rates are stored in the air distribution unit data structure. When the downstream return air plenum mass and energy balances are calculated, the leakage flow rate data is accessed and added back in as inlets to the return air plenum. Thus, the overall air system preserves a mass balance.
 
-\subsubsection{References}\label{references-3-004}
+\subsubsection{References}\label{references-3-005}
 
 Wray, C.P. 2003. ``Duct Thermal Performance Models for Large Commercial Buildings'', Lawrence Berkeley National Laboratory Report to the California Energy Commission. LBNL-53410.
 
@@ -513,76 +513,76 @@ The remainder of this section describes the calculations performed during the la
 If EnergyPlus determines that the air conditioner must supply cooling to the zone in order to meet the zone air temperature setpoint, then the model first calculates the PTAC's sensible cooling rate to the zone under two conditions: when the unit runs at full-load (steady-state) conditions and when the DX cooling coil is OFF. If the supply air fan cycles on/off with the compressor, then the sensible cooling rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling rate involves modeling the supply air fan (and associated fan heat), the outdoor air mixer, and the DX cooling coil. The heating coil is also modeled, but only to pass the air properties and mass flow rate from it's inlet node to it's outlet node. For each of these cases (full load and DX cooling coil OFF), the sensible cooling rate delivered to the zone by the PTAC is calculated as follows:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{cooling,\,max\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,full\,\,load}}} \right){\left( {{h_{out,\,full\,\,load}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{cooling,\,max} = \left( \dot{m}_{SA,full\,load} \right) \left( h_{out,\,full\,load} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{cooling,\,min\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,coil\,\,off}}} \right){\left( {{h_{out,\,coil\,\,off}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{cooling,\,min} = \left( \dot{m}_{SA,coil\,off} \right) \left( h_{out,\,coil\,off} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{cooling,\,max\,}}\) = maximum PTAC sensible cooling rate with cooling coil ON, W
+\(\dot{Q}_{cooling,\,max}\) = maximum PTAC sensible cooling rate with cooling coil ON, W
 
-\({\mathop m\limits^ \bullet_{\,SA,full\,\,load}}\) = supply air mass flow rate at full-load (steady-state) conditions, kg/s
+\(\dot{m}_{SA,full\,load}\) = supply air mass flow rate at full-load (steady-state) conditions, kg/s
 
-\emph{h\(_{d}\)} = enthalpy of air exiting the PTAC at full-load conditions, J/kg
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the PTAC at full-load conditions, J/kg
 
-\emph{h\(_{r}\)}\(_{ }\) = enthalpy of zone (exhaust) air, J/kg
+\emph{h\(_{zone\, air}\)} = enthalpy of zone (exhaust) air, J/kg
 
-\emph{HR\(_{n}\)~~~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTAC exiting air or the zone (exhaust) air
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTAC exiting air or the zone (exhaust) air
 
-\({\mathop Q\limits^ \bullet_{cooling,\,min\,}}\) ~ = minimum PTAC sensible cooling rate with cooling coil OFF, W
+\(\dot{Q}_{cooling,\,min}\) = minimum PTAC sensible cooling rate with cooling coil OFF, W
 
-\({\mathop m\limits^ \bullet_{\,SA,coil\,\,off}}\) ~~ = supply air mass flow rate with the cooling coil OFF, kg/s
+\(\dot{m}_{SA,coil\,\,off}\) = supply air mass flow rate with the cooling coil OFF, kg/s
 
-\emph{h\(_{f}\)}~ = enthalpy of air exiting the PTAC with the cooling coil OFF, J/kg
+\emph{h\(_{out,\, coil\, off}\)} = enthalpy of air exiting the PTAC with the cooling coil OFF, J/kg
 
 With the calculated PTAC sensible cooling rates and the zone sensible cooling load to be met, the compressor part-load ratio for the PTAC is approximately equal to:
 
 \begin{equation}
-PartLoadRatio = MAX\left( {0.0,\frac{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{zone,cooling}} - {{\mathop Q\limits^ \bullet  }_{cooling,\,min\,}}} \right)}}{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{cooling,\,max\,}} - {{\mathop Q\limits^ \bullet  }_{cooling,\,min\,}}} \right)}}} \right)
+  PartLoadRatio = MAX \left( 0.0, \frac{ABS \left( \dot{Q}_{zone,cooling} - \dot{Q}_{cooling,\,min} \right)}{ABS \left( \dot{Q}_{cooling,\,max} - \dot{Q}_{cooling,\,min} \right)} \right)
 \end{equation}
 
 where:
 
 \(PartLoadRatio\) = compressor part-load ratio required to meet the zone load
 
-\({\mathop Q\limits^ \bullet_{zone,cooling}}\) ~ = required zone sensible cooling rate to meet setpoint, W
+\(\dot{Q}_{zone,cooling}\) = required zone sensible cooling rate to meet setpoint, W
 
 Since the part-load performance of the DX cooling coil is frequently non-linear (Ref: DX Cooling Coil Model), and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the actual part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the individual PTAC component models) until the PTAC's cooling output (including on/off cycling effects) matches the zone cooling load requirement.
 
 If the PTAC has been specified with cycling fan/cycling coil (AUTO fan), then the user-defined supply air flow rate during cooling operation (volumetric flow rate converted to mass flow rate) is multiplied by the final PartLoadRatio value to determine the average supply air mass flow rate for the HVAC system simulation time step. For this case, the air conditions (temperature, humidity ratio and enthalpy) at nodes downstream of the cooling coil represent the full-load (steady-state) values when the coil is operating. If the supply air fan is specified to run continuously (fan ON), then the supply air mass flow rate is calculated as the average of the air mass flow rate when the compressor is on and the air mass flow rate when the compressor is off. In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and mixed inlet air conditions when the coil is OFF). Additional discussion regarding the calculation of the average supply air flow and supply air conditions is provided later in this section.
 
-\subsubsection{Heating Operation}\label{heating-operation-000}
+\subsubsection{Heating Operation}\label{heating-operation-001}
 
 Calculations of the PTAC's sensible heating rate delivered to the zone at full load and with the heating coil OFF are identical to the calculations described above for cooling operation.
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{heating,\,max\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,full\,\,load}}} \right){\left( {{h_{out,\,full\,\,load}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{heating,\,max} = \left( \dot{m}_{SA,full\,load} \right) \left( h_{out,\,full\,load} - {h_{zone\,air}} \right)_{HRmin}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{heating,\,min\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,coil\,\,off}}} \right){\left( {{h_{out,\,coil\,\,off}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{heating,\,min} = \left( \dot{m}_{SA,coil\,off} \right) \left( h_{out,\,coil\,off} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{heating,\,max\,}}\) = maximum PTAC sensible heating rate with heating coil ON, W
+\(\dot{Q}_{heating,\,max}\) = maximum PTAC sensible heating rate with heating coil ON, W
 
-\({\mathop Q\limits^ \bullet_{heating,\,min\,}}\) ~ = minimum PTAC sensible heating rate with heating coil OFF, W
+\(\dot{Q}_{heating,\,min}\) = minimum PTAC sensible heating rate with heating coil OFF, W
 
 With the calculated PTAC sensible heating rates and the zone sensible heating load to be met, the heating coil part-load ratio for the PTAC is approximately equal to:
 
 \begin{equation}
-PartLoadRatio = MAX\left( {0.0,\frac{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{zone,heating}} - {{\mathop Q\limits^ \bullet  }_{heating,\,min\,}}} \right)}}{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{heating,\,max\,}} - {{\mathop Q\limits^ \bullet  }_{heating,\,min\,}}} \right)}}} \right)
+  PartLoadRatio = MAX \left( 0.0, \frac{ABS \left( \dot{Q}_{zone,heating} - \dot{Q}_{heating,\,min} \right)}{ABS \left( \dot{Q}_{heating,\,max} - \dot{Q}_{heating,\,min} \right)} \right)
 \end{equation}
 
 where:
 
 \(PartLoadRatio\) = heating coil part-load ratio required to meet the zone load
 
-\({\mathop Q\limits^ \bullet_{zone,heating}}\) ~~~~~~~~~~~~ = required zone sensible heating rate to meet setpoint, W
+\(\dot{Q}_{zone,heating}\) = required zone sensible heating rate to meet setpoint, W
 
 Iterative calculations (successive modeling of the individual PTAC component models) are used to determine the final heating part-load ratio to account for the non-linear performance of the heating coil at part-load conditions and the variation in supply air fan heat for the case of cycling fan/cycling coil (AUTO fan). If heating coil operation at full load is unable to meet the entire zone heating load (e.g., the heating coil capacity is insufficient or the coil is scheduled OFF), the air conditioner's part-load ratio is set to 1 to meet the zone heating load to the extent possible.
 
@@ -593,28 +593,28 @@ The packaged terminal air conditioner operates based on user-specified (or autos
 The average supply air and outdoor air mass flow rates through the air conditioner for the HVAC simulation time step are calculated based on the part-load ratio of the DX cooling coil or heating coil (whichever coil is operating) as follows:
 
 \begin{equation}
-\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\,\, = \,\,\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}\left( {PartLoadRatio} \right) + \mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}\left( {1 - PartLoadRatio} \right)
+  \dot{m}_{SA,\,avg} = \dot{m}_{SA,coil\,on} \left( PartLoadRatio \right) + \dot{m}_{SA,\,coil\,off} \left( 1 - PartLoadRatio \right)
 \end{equation}
 
 \begin{equation}
-\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}} = \,\,\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}\left( {PartLoadRatio} \right) + \mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}\left( {1 - PartLoadRatio} \right)
+  \dot{m}_{OA,\,avg} = \dot{m}_{OA,\,coil\,on} \left( PartLoadRatio \right) + \dot{m}_{OA,\,coil\,off} \left( 1 - PartLoadRatio \right)
 \end{equation}
 
 where:
 
-\(\mathop m\limits^ \bullet {\,_{SA,\,\,avg}}\) ~~~~~ = average supply air mass flow rate during the time step, kg/s
+\(\dot{m}_{SA,\,avg}\) = average supply air mass flow rate during the time step, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{SA,coil\,\,on}}\) ~~ = supply air mass flow rate when the coil is ON, kg/s
+\(\dot{m}_{SA,coil\,on}\) = supply air mass flow rate when the coil is ON, kg/s
 
 \emph{PartLoadRatio} = part-load ratio of the coil (heating or cooling)
 
-\(\mathop m\limits^ \bullet {\,_{SA,\,\,coil\,\,off}}\) ~ = supply air mass flow rate when the coil is OFF, kg/s
+\(\dot{m}_{SA,\,coil\,off}\) = supply air mass flow rate when the coil is OFF, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{OA,\,\,avg\,\,}}\) ~~~ = average outdoor air mass flow rate during the time step, kg/s
+\(\dot{m}_{OA,\,avg\,}\) = average outdoor air mass flow rate during the time step, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{OA,\,\,coil\,\,on}}\) ~ = average outdoor air mass flow rate when the coil is ON, kg/s
+\(\dot{m}_{OA,\,coil\,on}\) = average outdoor air mass flow rate when the coil is ON, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{OA,\,\,coil\,\,off}}\) ~ = average outdoor air mass flow rate when the coil is OFF, kg/s
+\(\dot{m}_{OA,\,coil\,off}\) = average outdoor air mass flow rate when the coil is OFF, kg/s
 
 The supply air and outdoor air flow rates when the DX cooling coil or the heating coil is ON are specified by the user (i.e., supply air volumetric flow rate during cooling operation, supply air volumetric flow rate during heating operation, outdoor air volumetric air flow rate during cooling operation, and outdoor air volumetric air flow rate during heating operation) and are converted from volumetric to mass flow rate. If the user has specified cycling fan operation (i.e.~supply air fan operating mode schedule value is equal to 0), then the supply air and outdoor air mass flow rates when the coil is OFF are zero. If the user has specified constant fan operation (i.e.~supply air fan operating mode schedule value is greater than 0), then the user-defined air flow rates when no cooling or heating is needed are used when the coil is OFF.
 
@@ -633,46 +633,58 @@ For hot water or steam coils, the water or steam mass flow rate is also proporti
 At the end of each HVAC simulation time step, this compound object reports the heating or cooling rate and energy delivered to the zone, as well as the electric power and consumption by the air conditioner. In terms of thermal energy delivered to the zone, the sensible, latent and total energy transfer rate to the zone is calculated as follows:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total}} = \left( {\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\,\,} \right)\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)
+  \dot{Q}_{Total} = \left( \dot{m}_{SA,\,\,avg} \right) \left( h_{out,\,avg} - h_{zone\,air} \right)
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}} = \left( {\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\,\,} \right){\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{Sensible} = \left( \dot{m}_{SA,\,avg} \right) \left( h_{out,\,avg} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Latent}} = {\mathop Q\limits^ \bullet_{Total}} - {\mathop Q\limits^ \bullet_{Sensible}}
+  \dot{Q}_{Latent} = \dot{Q}_{Total} - \dot{Q}_{Sensible}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where:
 
-\(\mathop m\limits^ \bullet {\,_{SA,\,\,avg}}\) ~~~~~ = average mass flow rate of the supply air stream, kg/s
+\(\dot{Q}_{Total}\) = total energy transfer rate to the zone, W
 
-\emph{h\(_{g}\)} ~~~~~ = enthalpy of the air being supplied to the zone, J/kg
+\(\dot{Q}_{Sensible}\) = sensible energy transfer rate to the zone, W
+
+\(\dot{Q}_{Latent}\) = latent energy transfer rate to the zone, W
+
+\(\dot{m}_{SA,\,avg}\) = average mass flow rate of the supply air stream, kg/s
+
+\emph{h\(_{out,avg}\)} = enthalpy of the air being supplied to the zone, J/kg
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-IF (\({\mathop Q\limits^ \bullet_{Total}}\) \emph{~\textless{} 0.0 )}THEN
+IF (\(\dot{Q}_{Total} < 0.0\)) THEN
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalCooling}}\) ~ = ~ ABS (\({\mathop Q\limits^ \bullet_{Total}}\) )
+~~~~~~~~~~~~~~~~~ \(\dot{Q}_{TotalCooling} = ABS(\dot{Q}_{Total})\)
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \(\dot{Q}_{TotalHeating} = 0.0\)
 
 ELSE
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \(\dot{Q}_{TotalCooling} = 0.0\)
 
-~~~~~~~~~~~~~~~~~ \({\mathop Q\limits^ \bullet_{TotalHeating}}\) \(_{ }\)~ = ~ \({\mathop Q\limits^ \bullet_{Total}}\)
+~~~~~~~~~~~~~~~~~ \(\dot{Q}_{TotalHeating} = \dot{Q}_{Total}\)
 
-where: \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Rate, W' \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Heating Rate, W'
+where:
+
+\(\dot{Q}_{TotalCooling}\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Rate, W'
+
+\(\dot{Q}_{TotalHeating}\) = output variable `Packaged Terminal Air Conditioner Total Zone Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
 \begin{equation}
-\,{Q_{TotalCooling}} = \,\,{\mathop Q\limits^ \bullet_{TotalCooling}}\,\, * \,\,TimeStepSys\,\, * \,\,3600.
+  Q_{TotalCooling} = \dot{Q}_{TotalCooling} \cdot TimeStepSys \cdot 3600
 \end{equation}
 
-where: \(_{ }\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Energy, J'
+where:
+
+\(Q_{TotalCooling}\) = output variable `Packaged Terminal Air Conditioner Total Zone Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -685,7 +697,7 @@ The input object ZoneHVAC:PackagedTerminalHeatPump provides a model for a packag
 \begin{figure}[hbtp] % fig 320
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7215.png}
-\caption{  Schematic of a Packaged Terminal Heat Pump (Draw Through Fan Placement) \protect \label{fig:schematic-of-a-packaged-terminal-heat-pump}}
+\caption{Schematic of a Packaged Terminal Heat Pump (Draw Through Fan Placement) \protect \label{fig:schematic-of-a-packaged-terminal-heat-pump}}
 \end{figure}
 
 The PTHP conditions a single zone and is controlled by a thermostat located in that zone. The PTHP operates to meet the zone sensible cooling or sensible heating requirements as dictated by the thermostat schedule. The model calculates the required part-load ratio for the heat pump's coils and the supply air fan to meet the cooling/heating requirements. The heating or cooling energy provided by the PTHP is delivered to the zone via the zone air inlet node.
@@ -705,42 +717,42 @@ The remainder of this section describes the calculations performed during the la
 If EnergyPlus determines that the heat pump must supply cooling to the zone in order to meet the zone air temperature setpoint, then the model first calculates the PTHP's sensible cooling rate to the zone under two conditions: when the unit runs at full-load (steady-state) conditions and when the DX cooling coil is OFF. If the supply air fan cycles on/off with the compressor, then the sensible cooling rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling rate involves modeling the supply air fan (and associated fan heat), the outdoor air mixer, and the DX cooling coil. The DX heating coil and the gas or electric supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load and DX cooling coil OFF), the sensible cooling rate delivered to the zone by the PTHP is calculated as follows:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{cooling,\,max\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,full\,\,load}}} \right){\left( {{h_{out,\,full\,\,load}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{cooling,\,max} = \left( \dot{m}_{SA,full\,load} \right) \left( h_{out,\,full\,load} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{cooling,\,min\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,coil\,\,off}}} \right){\left( {{h_{out,\,coil\,\,off}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{cooling,\,min} = \left( \dot{m}_{SA,coil\,off} \right) \left( h_{out,\,coil\,off} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{cooling,\,max\,}}\) = maximum PTHP sensible cooling rate with cooling coil ON, W
+\(\dot{Q}_{cooling,\,max}\) = maximum PTHP sensible cooling rate with cooling coil ON, W
 
-\({\mathop m\limits^ \bullet_{\,SA,full\,\,load}}\) = supply air mass flow rate at full-load (steady-state) conditions, kg/s
+\(\dot{Q}_{SA,full\,load}\) = supply air mass flow rate at full-load (steady-state) conditions, kg/s
 
-\emph{h\(_{d}\)} ~ = enthalpy of air exiting the PTHP at full-load conditions, J/kg
+\emph{h\(_{out,\, full\, load}\)} = enthalpy of air exiting the PTHP at full-load conditions, J/kg
 
-\emph{h\(_{r}\)}\(_{ }\) = enthalpy of zone (exhaust) air, J/kg
+\emph{h\(_{zone\, air}\)} = enthalpy of zone (exhaust) air, J/kg
 
-\emph{HR\(_{n}\)~~~~~~ ~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTHP exiting air or the zone (exhaust) air
+\emph{HR\(_{min}\)~~~~~~ ~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTHP exiting air or the zone (exhaust) air
 
-\({\mathop Q\limits^ \bullet_{cooling,\,min\,}}\) ~ = minimum PTHP sensible cooling rate with cooling coil OFF, W
+\(\dot{Q}_{cooling,\,min}\) = minimum PTHP sensible cooling rate with cooling coil OFF, W
 
-\({\mathop m\limits^ \bullet_{\,SA,coil\,\,off}}\) ~~ = supply air mass flow rate with the cooling coil OFF, kg/s
+\(\dot{Q}_{SA,coil\,off}\) = supply air mass flow rate with the cooling coil OFF, kg/s
 
-\emph{h\(_{f}\)}~ ~ = enthalpy of air exiting the PTHP with the cooling coil OFF, J/kg
+\emph{h\(_{out,\, coil\, off}\)}~ ~ = enthalpy of air exiting the PTHP with the cooling coil OFF, J/kg
 
 With the calculated PTHP sensible cooling rates and the zone sensible cooling load to be met, the compressor part-load ratio for the PTHP is approximately equal to:
 
 \begin{equation}
-PartLoadRatio = MAX\left( {0.0,\frac{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{zone,cooling}} - {{\mathop Q\limits^ \bullet  }_{cooling,\,min\,}}} \right)}}{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{cooling,\,max\,}} - {{\mathop Q\limits^ \bullet  }_{cooling,\,min\,}}} \right)}}} \right)
+  PartLoadRatio = MAX \left( 0.0, \frac{ABS \left( \dot{Q}_{zone,cooling} - \dot{Q}_{cooling,\,min} \right)}{ABS \left( \dot{Q}_{cooling,\,max} - \dot{Q}_{cooling,\,min} \right)} \right)
 \end{equation}
 
 where:
 
 \(PartLoadRatio\) = compressor part-load ratio required to meet the zone load
 
-\({\mathop Q\limits^ \bullet_{zone,cooling}}\) ~ = required zone sensible cooling rate to meet setpoint, W
+\(\dot{Q}_{zone,cooling}\) = required zone sensible cooling rate to meet setpoint, W
 
 Since the part-load performance of the DX cooling coil is frequently non-linear (Ref: DX Cooling Coil Model), and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the actual part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the individual PTHP component models) until the PTHP's cooling output (including on/off cycling effects) matches the zone cooling load requirement within the cooling convergence tolerance that is specified.
 
@@ -751,30 +763,30 @@ If the PTHP is specified to operate with cycling fan/cycling coil (AUTO fan), th
 Calculations of the PTHP's sensible heating rate delivered to the zone at full load and with the DX heating coil OFF are identical to the calculations described above for cooling operation.
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{heating,\,max\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,full\,\,load}}} \right){\left( {{h_{out,\,full\,\,load}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{heating,\,max} = \left( \dot{m}_{SA,full\,load} \right) \left( h_{out,\,full\,load} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{heating,\,min\,}} = \left( {{{\mathop m\limits^ \bullet  }_{\,SA,coil\,\,off}}} \right){\left( {{h_{out,\,coil\,\,off}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{heating,\,min} = \left( \dot{m}_{SA,coil\,off} \right) \left( h_{out,\,coil\,off} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 where:
 
-\({\mathop Q\limits^ \bullet_{heating,\,max\,}}\) = maximum PTHP sensible heating rate with DX heating coil ON, W
+\(\dot{Q}_{heating,\,max}\) = maximum PTHP sensible heating rate with DX heating coil ON, W
 
-\({\mathop Q\limits^ \bullet_{heating,\,min\,}}\) ~ = minimum PTHP sensible heating rate with DX heating coil OFF, W
+\(\dot{Q}_{heating,\,min}\) = minimum PTHP sensible heating rate with DX heating coil OFF, W
 
 With the calculated PTHP sensible heating rates and the zone sensible heating load to be met, the compressor part-load ratio for the PTHP is approximately equal to:
 
 \begin{equation}
-PartLoadRatio = MAX\left( {0.0,\frac{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{zone,heating}} - {{\mathop Q\limits^ \bullet  }_{heating,\,min\,}}} \right)}}{{ABS\left( {{{\mathop Q\limits^ \bullet  }_{heating,\,max\,}} - {{\mathop Q\limits^ \bullet  }_{heating,\,min\,}}} \right)}}} \right)
+  PartLoadRatio = MAX \left( 0.0, \frac{ABS \left( \dot{Q}_{zone,heating} - \dot{Q}_{heating,\,min} \right)}{ABS \left( \dot{Q}_{heating,\,max} - \dot{Q}_{heating,\,min} \right)} \right)
 \end{equation}
 
 where:
 
 \(PartLoadRatio\) = compressor part-load ratio required to meet the zone load
 
-\({\mathop Q\limits^ \bullet_{zone,heating}}\) ~~~~~~~~~~~~ = required zone sensible heating rate to meet setpoint, W
+\(\dot{Q}_{zone,heating}\) = required zone sensible heating rate to meet setpoint, W
 
 Iterative calculations (successive modeling of the individual PTHP component models) are used to determine the final heating part-load ratio to account for the non-linear performance of the DX heating coil at part-load conditions and the variation in supply air fan heat for the case of cycling fan/cycling coil (AUTO fan). If DX heating coil operating at full load is unable to meet the entire zone heating load (e.g., the DX heating coil capacity is insufficient or the coil is scheduled OFF, or the outdoor temperature is below the PTHP's minimum outdoor dry-bulb temperature for compressor operation), the supplemental heating coil is activated to meet the remaining zone heating load to the extent possible.
 
@@ -825,22 +837,28 @@ Refer to the sections in the document that describe the DX heating and DX coolin
 At the end of each HVAC simulation time step, this compound object reports the heating or cooling rate and energy delivered to the zone, as well as the electric power and consumption by the heat pump. In terms of thermal energy delivered to the zone, the sensible, latent and total energy transfer rate to the zone is calculated as follows:
 
 \begin{equation}
-{\dot Q_{Total}} = \left( {\dot m{\,_{SA,\,\,avg}}\,\,} \right)\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)
+  \dot Q_{Total} = \left( {\dot m{\,_{SA,\,\,avg}}\,\,} \right)\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)
 \end{equation}
 
 \begin{equation}
-{\dot Q_{Sensible}} = \left( {\dot m{\,_{SA,\,\,avg}}\,\,} \right){\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot Q_{Sensible} = \left( {\dot m{\,_{SA,\,\,avg}}\,\,} \right){\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)_{HRmin}}
 \end{equation}
 
 \begin{equation}
-{\dot Q_{Latent}} = {\dot Q_{Total}} - {\dot Q_{Sensible}}
+  \dot Q_{Latent} = \dot Q_{Total} - \dot Q_{Sensible}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where:
 
-\(\dot m{\,_{SA,\,\,avg}}\) ~~~~~ = average mass flow rate of the supply air stream, kg/s
+\(\dot{Q}_{Total}\) = total energy transfer rate to the zone, W
 
-\emph{h\(_{g}\)} ~~~~~~~ = enthalpy of the air being supplied to the zone, J/kg
+\(\dot{Q}_{Sensible}\) = sensible energy transfer rate to the zone, W
+
+\(\dot{Q}_{Latent}\) = latent energy transfer rate to the zone, W
+
+\(\dot{m}_{SA,\,avg}\) = average mass flow rate of the supply air stream, kg/s
+
+\emph{h\(_{out,avg}\)} = enthalpy of the air being supplied to the zone, J/kg
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
@@ -848,23 +866,29 @@ IF (\({\dot Q_{Total}}\) \emph{\textless{} 0.0 )}THEN
 
 ~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ ABS (\({\dot Q_{Total}}\) )
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) ~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ \emph{0.0}
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) ~ = ~ \({\dot Q_{Total}}\)
 
-where: \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Rate, W' \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Heating Rate, W'
+where:
+
+\(\dot{Q}_{TotalCooling}\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Rate, W'
+
+\(\dot{Q}_{TotalHeating}\) = output variable `Packaged Terminal Heat Pump Total Zone Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
 \begin{equation}
-{Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
+  Q_{TotalCooling} = \dot{Q}_{TotalCooling} * TimeStepSys * 3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Energy, J'
+where:
+
+\(Q_{TotalCooling}\) = output variable `Packaged Terminal Heat Pump Total Zone Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -877,7 +901,7 @@ The input object ZoneHVAC:WaterToAirHeatPump provides a zone equipment model for
 \begin{figure}[hbtp] % fig 321
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7258.png}
-\caption{  Source Side and Load Side Configuration of a Zone WaterToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a-001}}
+\caption{Source Side and Load Side Configuration of a Zone WaterToAir Heat Pump \protect \label{fig:source-side-and-load-side-configuration-of-a-001}}
 \end{figure}
 
 There are two models for zone water-to-air heat pump cooling and heating coils, i.e.~Single-Speed and Variable-Speed Equation Fit models. Cooling and heating coils are modeled using the Equation Fit model described here.
@@ -996,9 +1020,9 @@ WaterRemovalModFac = \,a + \,b\left( {{T_{in}}} \right)\,\, + \,\,c{\left( {{T_{
 
 where
 
-\emph{T\(_{n}\)}~ = dry-bulb temperature of the air entering the dehumidifier, °C
+\emph{T\(_{in}\)}~ = dry-bulb temperature of the air entering the dehumidifier, °C
 
-\emph{RH\(_{n}\)} = relative of the air entering the dehumidifier, \% (0-100)
+\emph{RH\(_{in}\)} = relative of the air entering the dehumidifier, \% (0-100)
 
 ·~~~~~~~~The energy factor modifier curve is a biquadratic curve with two independent variables: dry-bulb temperature and relative humidity of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor at the specific entering air conditions at which the dehumidifier is operating (i.e., at temperature/relative humidity different from the rating point conditions). If the output of this curve is negative, then a warning message is issued and it is reset to 0.0.
 
@@ -1100,7 +1124,7 @@ The Zone Dehumidifier Sensible Heating Rate (output variable) is calculated as f
 
 where
 
-\emph{h\(_{g}\)} = enthalpy of vaporization of air, J/kg
+\emph{h\(_{fg}\)} = enthalpy of vaporization of air, J/kg
 
 The Zone Dehumidifier Sensible Heating Rate (W) is calculated during each HVAC simulation time step, and the results are averaged for the timestep being reported. However, this sensible heating is carried over to the zone air heat balance for the next HVAC time step (i.e., it is reported as an output variable for the current simulation time step but actually impacts the zone air heat balance on the following HVAC time step).
 
@@ -1132,17 +1156,17 @@ The dry-bulb temperature and humidity ratio of the air leaving the dehumidifier 
 
 where
 
-\emph{T\(_{t}\)} = ~~~ Zone Dehumidifier Outlet Air Temperature, C (output variable). Represents the
+\emph{T\(_{out}\)} = ~~~ Zone Dehumidifier Outlet Air Temperature, C (output variable). Represents the
 
 outlet air temperature when the dehumidifier is operating.
 
-\emph{T\(_{n}\)} = inlet air dry-bulb temperature, C
+\emph{T\(_{in}\)} = inlet air dry-bulb temperature, C
 
 \({C_p}\) = heat capacity of air, J/kg
 
-\emph{w\(_{n}\)} = inlet air humidity ratio, kg/kg
+\emph{w\(_{in}\)} = inlet air humidity ratio, kg/kg
 
-\emph{w\(_{t}\)} = outlet air humidity ratio, kg/kg
+\emph{w\(_{out}\)} = outlet air humidity ratio, kg/kg
 
 If the dehumidifier does not operate for a given HVAC simulation time step, then the outlet air dry-bulb temperature and humidity ratio are set equal to the corresponding inlet air values.
 
@@ -1180,17 +1204,17 @@ Finally, the following additional output variables are calculated:
 
 where
 
-\emph{Q\(_{ }\)} = output variable `Zone Dehumidifier Sensible Heating Energy {[}J{]}'
+\emph{Q\(_{sensible}\)} = output variable `Zone Dehumidifier Sensible Heating Energy {[}J{]}'
 
-\emph{E\(_{d}\)} ~ = output variable `Zone Dehumidifier Electric Energy {[}J{]}'
+\emph{E\(_{dehumid}\)} ~ = output variable `Zone Dehumidifier Electric Energy {[}J{]}'
 
-\emph{P\(_{g}\)}~ = output variable `Zone Dehumidifier Off Cycle Parasitic Electric Power {[}W{]}'
+\emph{P\(_{off-cycle,avg}\)}~ = output variable `Zone Dehumidifier Off Cycle Parasitic Electric Power {[}W{]}'
 
-\emph{E\(_{e}\)} = output variable `Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}'
+\emph{E\(_{off-cycle}\)} = output variable `Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}'
 
-\emph{m\(_{r}\)} = output variable `Zone Dehumidifier Removed Water Mass {[}kg{]}'
+\emph{m\(_{water}\)} = output variable `Zone Dehumidifier Removed Water Mass {[}kg{]}'
 
-\({\dot V_{_{water,avg}}}\) \emph{\(_{ }\)} = output variable `Zone Dehumidifier Condensate Volume Flow Rate {[}m\(^{3}\)/s{]}'
+\({\dot V_{_{water,avg}}}\) = output variable `Zone Dehumidifier Condensate Volume Flow Rate {[}m\(^{3}\)/s{]}'
 
 \({V_{_{water}}}\) ~ = output variable `Zone Dehumidifier Condensate Volume {[}m\(^{3}\){]}'
 
@@ -1237,49 +1261,49 @@ During each simulation time step, the air mass flow rate at the supply air and e
 
 IF (availability schedule value \textgreater{} 0) THEN
 
-~\({\mathop m\limits^ \bullet_{Supply}} = \rho {\mathop V\limits^ \bullet_{Supply}}\)
+\(\dot{m}_{Supply} = \rho \dot{V}_{Supply}\)
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{Exhaust}} = \rho {\mathop V\limits^ \bullet_{Exhaust}}
+  \dot{m}_{Exhaust} = \rho \dot{V}_{Exhaust}
 \end{equation}
 
 ELSE
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{Supply}} = {\mathop m\limits^ \bullet_{Exhaust}} = 0.0
+  \dot{m}_{Supply} = \dot{m}_{Exhaust} = 0.0
 \end{equation}
 
 \emph{where}:
 
-\({\mathop m\limits^ \bullet_{Supply}}\) ~~~~~~~~~~~~ = mass flow rate of the supply air stream, kg/s
+\(\dot{m}_{Supply}\) = mass flow rate of the supply air stream, kg/s
 
-\({\mathop m\limits^ \bullet_{Exhaust}}\) ~~~~~~~~~~~ = mass flow rate of the exhaust air stream, kg/s
+\(\dot{m}_{Exhaust}\) = mass flow rate of the exhaust air stream, kg/s
 
-\(\rho\) ~~~~~~~~~~~~~~~~~~~ = density of dry air at local barometric pressure (adjusted for altitude)~~~~~~~ and 20 ºC, kg/m\(^{3}\)
+\(\rho\) = density of dry air at local barometric pressure (adjusted for altitude) and 20 ºC, kg/m\(^{3}\)
 
-\({\mathop V\limits^ \bullet_{Supply}}\) ~~~~~~~~~~~~ = volumetric flow rate of the supply air stream, m\(^{3}\)/s
+\(\dot{V}_{Supply}\) = volumetric flow rate of the supply air stream, m\(^{3}\)/s
 
-\({\mathop V\limits^ \bullet_{Exhaust}}\) ~~~~~~~~~~~ = volumetric flow rate of the exhaust air stream, m\(^{3}\)/s
+\({\dot{V}_{Exhaust}}\) = volumetric flow rate of the exhaust air stream, m\(^{3}\)/s
 
 With the supply and exhaust inlet air mass flow rates set, the compound object then calls the generic air-to-air heat exchanger model to determine its supply air and exhaust air exiting conditions based on the inputs specified in the heat exchanger object. The supply air and exhaust air fans are then modeled to determine the final conditions of the air streams exiting the stand alone energy recovery ventilator. The heat exchanger and fan models are described in detail elsewhere in this document (reference: HeatExchanger:AirToAir:SensibleAndLatent and Fan:OnOff).
 
 The sensible heat transfer rate to the zone by the stand alone ventilator is then calculated as follows:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}}\, = \,{\mathop {\,m}\limits^ \bullet_{Supply}}{\left( {{h_{SupplyOutlet}}\, - \,{h_{ExhaustInlet}}} \right)_{HR\min }}
+  \dot{Q}_{Sensible} = \dot{m}_{Supply} \left( h_{SupplyOutlet} - h_{ExhaustInlet} \right)_{HR\min }
 \end{equation}
 
-~where: \(_{ }\) = sensible energy transfer rate to the zone, W
+where:
 
-\({\mathop m\limits^ \bullet_{Supply}}\) ~~~~~~ = mass flow rate of the supply air stream, kg/s
+\(\dot{Q}_{Sensible}\) = sensible energy transfer rate to the zone, W
 
-\emph{h\(_{t}\)} ~ = enthalpy of the air being supplied to the zone, J/kg
+\(\dot{m}_{Supply}\) = mass flow rate of the supply air stream, kg/s
 
-\emph{h\(_{t}\)}\(_{ }\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
+\emph{h\(_{SupplyOutlet}\)} = enthalpy of the air being supplied to the zone, J/kg
 
-\emph{HR\(_{n}\) ~~~~~~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+\emph{h\(_{ExhaustInlet}\)} = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
 
-~~ of the supply air outlet or the exhaust air inlet
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the supply air outlet or the exhaust air inlet
 
 The resulting sensible energy transfer rate is passed to the zone equipment manager and added to the zone load to be met by other heating or cooling equipment. Since the stand alone ERV is intended to reduce the outdoor air load through heat exchange and not meet that load completely, the stand alone heat exchanger must be modeled first in the list of zone equipment. This is accomplished by setting the stand alone ERV priority for cooling and heating higher than that of other zone cooling or heating equipment (reference: ZoneHVAC:EquipmentList).
 
@@ -1288,28 +1312,32 @@ When economizer (free cooling) operation is desired, a controller is coupled to 
 At the end of each HVAC simulation time step, this compound object reports the heating or cooling rate and energy delivered to the zone, as well as the electric power and consumption by the ventilator. In terms of thermal energy delivered to the zone, the sensible, latent and total energy transfer rate to the zone is calculated as follows:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total}}\, = \,\,{\mathop m\limits^ \bullet_{Supply}}{\left( {{h_{SupplyOutlet}}\, - \,{h_{ExhaustInlet}}} \right)_{}}
+  \dot{Q}_{Total} = \dot{m}_{Supply} \left( h_{SupplyOutlet} - h_{ExhaustInlet} \right)
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}}\, = \,\,{\mathop m\limits^ \bullet_{Supply}}{\left( {{h_{SupplyOutlet}}\, - \,{h_{ExhaustInlet}}} \right)_{HR\min }}
+  \dot{Q}_{Sensible} = \dot{m}_{Supply} \left( h_{SupplyOutlet} - h_{ExhaustInlet} \right)_{HR\min }
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Latent}}\, = \,\,{\mathop Q\limits^ \bullet_{Total}}\, - \,{\mathop Q\limits^ \bullet_{Sensible}}
+  \dot{Q}_{Latent} = \dot{Q}_{Total} - \dot{Q}_{Sensible}
 \end{equation}
 
-~where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where:
 
-\({\mathop m\limits^ \bullet_{Supply}}\) ~~~~~~ = mass flow rate of the supply air stream, kg/s
+\(\dot{Q}_{Total}\) = total energy transfer rate to the zone, W
 
-\emph{h\(_{t}\)} ~ = enthalpy of the air being supplied to the zone, J/kg
+\(\dot{Q}_{Sensible}\) = sensible energy transfer rate to the zone, W
 
-\emph{h\(_{t}\)}\(_{ }\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
+\(\dot{Q}_{Latent}\) = latent energy transfer rate to the zone, W
 
-\emph{HR\(_{n}\)~~~~~ ~~ =} enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+\(\dot{m}_{Supply}\) = mass flow rate of the supply air stream, kg/s
 
-~~ of the supply air outlet or the exhaust air inlet
+\emph{h\(_{SupplyOutlet}\)} = enthalpy of the air being supplied to the zone, J/kg
+
+\emph{h\(_{ExhaustInlet}\)}\(_{\\}\) = enthalpy of the air being exhausted from the zone through the ventilator, J/kg
+
+\emph{HR\(_{min}\)} = enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the supply air outlet or the exhaust air inlet
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
@@ -1317,15 +1345,19 @@ IF (\({\dot Q_{Total}}\) \emph{~\textless{} 0.0 )}THEN
 
 ~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ ABS (\({\dot Q_{Total}}\) )
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) ~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ \emph{0.0}
 
-~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
+~~~~~~~~~~~~~~~~~ \({\dot Q_{TotalHeating}}\) ~ = ~ \({\dot Q_{Total}}\)
 
-where: \(_{ }\) = output variable `Zone Ventilator Total Cooling Rate, W' \(_{ }\) = output variable `Zone Ventilator Total Heating Rate, W'
+where:
+
+\(\dot{Q}_{TotalCooling}\) = output variable `Zone Ventilator Total Cooling Rate, W'
+
+\(\dot{Q}_{TotalHeating}\) = output variable `Zone Ventilator Total Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -1333,7 +1365,9 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 {Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Zone Ventilator Total Cooling Energy, J'
+where:
+
+\(\dot{Q}_{TotalCooling}\) = output variable `Zone Ventilator Total Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -1466,28 +1500,28 @@ The variable refrigerant flow (VRF) terminal unit operates based on user-specifi
 The average supply air and outdoor air mass flow rates through the terminal unit for the HVAC simulation time step are calculated based on the cycling ratio of the heat pump condenser as follows:
 
 \begin{equation}
-\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\,\, = \,\,\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}\left( {CyclingRatio} \right) + \mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}\left( {1 - CyclingRatio} \right)
+  \dot{m}_{SA,\,avg} = \dot{m}_{SA,coil\,on} \left( CyclingRatio \right) + \dot{m}_{SA,\,coil\,off} \left( 1 - CyclingRatio \right)
 \end{equation}
 
 \begin{equation}
-\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}} = \,\,\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}\left( {CyclingRatio} \right) + \mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}\left( {1 - CyclingRatio} \right)
+  \dot{m}_{OA,\,avg} = \dot{m}_{OA,\,coil\,on} \left( CyclingRatio \right) + \dot{m}_{OA,\,coil\,off} \left( 1 - CyclingRatio \right)
 \end{equation}
 
 where:
 
-\(\mathop m\limits^ \bullet {\,_{SA,\,\,avg}}\) ~~~~~ = average supply air mass flow rate during the time step, kg/s
+\(\dot{m}_{SA,\,avg}\) = average supply air mass flow rate during the time step, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{SA,coil\,\,on}}\) ~~ = supply air mass flow rate when the coil is ON, kg/s
+\(\dot{m}_{SA,coil\,on}\) = supply air mass flow rate when the coil is ON, kg/s
 
 \emph{CyclingRatio} = cycling ratio of the heat pump condenser (heating or cooling)
 
-\(\mathop m\limits^ \bullet {\,_{SA,\,\,coil\,\,off}}\) ~ = supply air mass flow rate when the coil is OFF, kg/s
+\(\dot{m}_{SA,\,coil\,off}\) = supply air mass flow rate when the coil is OFF, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{OA,\,\,avg\,\,}}\) ~~~ = average outside air mass flow rate during the time step, kg/s
+\(\dot{m}_{OA,\,avg}\) = average outside air mass flow rate during the time step, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{OA,\,\,coil\,\,on}}\) ~ = average outside air mass flow rate when the coil is ON, kg/s
+\(\dot{m}_{OA,\,coil\,on}\) = average outside air mass flow rate when the coil is ON, kg/s
 
-\(\mathop m\limits^ \bullet {\,_{OA,\,\,coil\,\,off}}\) ~ = average outside air mass flow rate when the coil is OFF, kg/s
+\(\dot{m}_{OA,\,coil\,off}\) = average outside air mass flow rate when the coil is OFF, kg/s
 
 The supply air and outside air flow rates when the DX cooling coil or the DX heating coil is ON are specified by the user (i.e., supply air volumetric flow rate during cooling operation, supply air volumetric flow rate during heating operation, outside air volumetric air flow rate during cooling operation, and outside air volumetric air flow rate during heating operation) and are converted from volumetric to mass flow rate. If the user has specified cycling fan/cycling coil operation (i.e.~supply air fan operating mode schedule value is equal to 0), then the supply air and outside air mass flow rates when the coil is OFF are zero. If the user has specified constant fan/cycling coil operation (i.e.~supply air fan operating mode schedule value is greater than 0), then the user-defined air flow rates when no cooling or heating is needed are used when the coil is OFF.
 
@@ -1504,22 +1538,28 @@ When the supply air fan operates continuously while the terminal unit coils cycl
 At the end of each HVAC simulation time step, this compound object reports the heating or cooling rate and energy delivered to the zone. In terms of thermal energy delivered to the zone, the sensible, latent and total energy transfer rate to the zone is calculated as follows:
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Total}} = \left( {\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\,\,} \right)\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)
+  \dot{Q}_{Total} = \left( \dot{m}_{SA,\,avg} \right) \left( h_{out,\,avg} - h_{zone\,air} \right)
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Sensible}} = \left( {\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\,\,} \right){\left( {{h_{out,\,avg}} - {h_{zone\,\,air}}} \right)_{HRmin}}
+  \dot{Q}_{Sensible} = \left( \dot{m}_{SA,\,avg} \right) \left( h_{out,\,avg} - h_{zone\,air} \right)_{HRmin}
 \end{equation}
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{Latent}} = {\mathop Q\limits^ \bullet_{Total}} - {\mathop Q\limits^ \bullet_{Sensible}}
+  \dot{Q}_{Latent} = \dot{Q}_{Total} - \dot{Q}_{Sensible}
 \end{equation}
 
-where: \(_{ }\) = total energy transfer rate to the zone, W \(_{ }\) = sensible energy transfer rate to the zone, W \(_{ }\) = latent energy transfer rate to the zone, W
+where:
 
-\(\mathop m\limits^ \bullet {\,_{SA,\,\,avg}}\) = average mass flow rate of the supply air stream, kg/s
+\(\dot{Q}_{Total}\) = total energy transfer rate to the zone, W
 
-\emph{h\(_{g}\)} ~~~~~~~~ = enthalpy of the air being supplied to the zone, J/kg
+\(\dot{Q}_{Sensible}\) = sensible energy transfer rate to the zone, W
+
+\(\dot{Q}_{Latent}\) = latent energy transfer rate to the zone, W
+
+\(\dot{m}_{SA,\,\,avg}\) = average mass flow rate of the supply air stream, kg/s
+
+\emph{h\(_{out,avg}\)} = enthalpy of the air being supplied to the zone, J/kg
 
 The terminal unit's energy transfer rate is used by the program in the zone air heat balance to determine the final zone air conditions. If the terminal unit is capable of meeting the zone thermostat set point temperature, then these report variables are indicative of the zone loads and may be compared directly to the report variables for predicted zone loads (ref: Output:Variable, e.g., Zone Predicted Sensible Load to Setpoint Heat Transfer Rate).
 
@@ -1529,25 +1569,28 @@ IF (\({\dot Q_{Total}}\) \emph{~\textless{} 0.0 )} THEN
 
 ~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ ABS (\({\dot Q_{Total}}\) )
 
-~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~ \({\dot Q_{TotalHeating}}\) ~ = ~ \emph{0.0}
 
 ELSE
 
-~~~~~ \({\dot Q_{TotalCooling}}\) \(_{ }\)~ = ~ \emph{0.0}
+~~~~~ \({\dot Q_{TotalCooling}}\) ~ = ~ \emph{0.0}
 
-~~~~~ \({\dot Q_{TotalHeating}}\) \(_{ }\)~ = ~ \({\dot Q_{Total}}\)
+~~~~~ \({\dot Q_{TotalHeating}}\) ~ = ~ \({\dot Q_{Total}}\)
 
 ENDIF
 
-where: \(_{ }\) = output variable `Zone VRF Air Terminal Total Cooling Rate, W' \(_{ }\) = output variable `Zone VRF Air Terminal Total Heating Rate, W'
+where:
+\(\dot{Q}_{TotalCooling}\) = output variable `Zone VRF Air Terminal Total Cooling Rate, W'
+
+\(\dot{Q}_{TotalHeating}\) = output variable `Zone VRF Air Terminal Total Heating Rate, W'
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
 \begin{equation}
-{Q_{TotalCooling}} = {\dot Q_{TotalCooling}}*TimeStepSys*3600.
+  Q_{TotalCooling} = \dot{Q}_{TotalCooling} * TimeStepSys * 3600.
 \end{equation}
 
-where: \(_{ }\) = output variable `Zone VRF Air Terminal Total Cooling Energy, J'
+where: \(\dot{Q}_{TotalCooling}\) = output variable `Zone VRF Air Terminal Total Cooling Energy, J'
 
 \emph{TimeStepSys} = HVAC system simulation time step, hr
 
@@ -1595,7 +1638,7 @@ For more information on the impact on the zone and air heat balances by the vent
 
 \subsection{CoolTower}\label{cooltower}
 
-\subsubsection{Overview}\label{overview-11}
+\subsubsection{Overview}\label{overview-11-000}
 
 The Cool Tower (object ZoneCoolTower:Shower) is available for modeling a cooltower (which is sometimes referred to as s wind tower or a shower cooling tower) which is a component that is intended to model a passive downdraught evaporative cooling (PDEC) that is designed to capture the wind at the top of a tower and cool the outdoor air using water evaporation before delivering it to a space. The air flow in these systems is natural as the evaporation process increases the density of the air causing it to fall through the tower and into the space without the aid of a fan. A cooltower typically consists of a water spray or an evaporative pad, a shaft, and a water tank or reservoir. Wind catchers to improve the wind-driven performance at the top of the tower are optional. Water is pumped over an evaporative device by water pump which is the only component consumed power for this system. This water cools and humidifies incoming air and then the cool, dense air naturally falls down through shaft and leaves through large openings at the bottom of cooltowers.
 
@@ -1617,7 +1660,7 @@ The user must input the required information according to the Input Output Refer
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-5-000}
 
-The cooltower model first determines the temperature and volume flow rate of the exit air.~ Both parameters can be directly determined in case of water flow schedule control when the water flow rate is known. With the outdoor temperatures obtained from weather data, the exit air temperature (\emph{T\(_{t}\))} can be directly determined as functions of outdoor dry bulb temperature (DB), outdoor wet bulb temperature (WB), effective tower height (\emph{H}) and water flow rate (WF) in l/min by using following equation.
+The cooltower model first determines the temperature and volume flow rate of the exit air.~ Both parameters can be directly determined in case of water flow schedule control when the water flow rate is known. With the outdoor temperatures obtained from weather data, the exit air temperature (\emph{T\(_{out}\))} can be directly determined as functions of outdoor dry bulb temperature (DB), outdoor wet bulb temperature (WB), effective tower height (\emph{H}) and water flow rate (WF) in l/min by using following equation.
 
 \begin{equation}
 {T_{out}} = DB - (DB - WB)(1 - \exp ( - 0.8H))(1 - \exp ( - 0.15WF)
@@ -1631,7 +1674,7 @@ Q = 0.0125WF \cdot {H^{0.5}}
 
 In case of that the calculated air volume flow rate is greater than maximum air volume flow rate in this control, which leads to overestimation of actual volume flow rate of the exit air, the calculated air volume flow rate is replaced with the maximum.
 
-For the simulation of wind-driven flow control where the water flow rate is unknown, the model determines velocity of the outlet air (\emph{V\(_{t}\)}) as functions of effective tower height and wind speed of outdoor air (WS) as
+For the simulation of wind-driven flow control where the water flow rate is unknown, the model determines velocity of the outlet air (\emph{V\(_{out}\)}) as functions of effective tower height and wind speed of outdoor air (WS) as
 
 \begin{equation}
 {V_{out}} = 0.7{H^{0.5}} + 0.47(WS - 1)
@@ -1651,9 +1694,9 @@ Substituting the air flow rate to the previous equation for \emph{Q,} water flow
 WF = \frac{Q}{{0.0125 \cdot {H^{0.5}}}}
 \end{equation}
 
-Once water flow rate is determined, the model checks the limit of water flow rate that the user inputs, so that the model prevents overestimation of actual volume flow rate of the exit air. If the calculated water flow rate is greater than the maximum water flow rate, the maximum will be chosen. The model also replaces the calculated air volume flow rate with the maximum volume flow rate from the user input when the calculated is greater than the maximum. Then, the model calculates the air volume flow rate and exit temperature using the previous equation for \emph{Q} and \emph{T\(_{t}\)}.
+Once water flow rate is determined, the model checks the limit of water flow rate that the user inputs, so that the model prevents overestimation of actual volume flow rate of the exit air. If the calculated water flow rate is greater than the maximum water flow rate, the maximum will be chosen. The model also replaces the calculated air volume flow rate with the maximum volume flow rate from the user input when the calculated is greater than the maximum. Then, the model calculates the air volume flow rate and exit temperature using the previous equation for \emph{Q} and \emph{T\(_{out}\)}.
 
-This cooltower model allows the user to specify water loss due to drift or blow down and the loss of air flow (example: a cooltower which delivers air to both the interior and exterior of the building). If the user inputs the fraction of water loss or flow schedule that means some amount of the air actually goes to outside, the fractional values will be applied to previously calculated ones so that the model calculates both actual water flow rate (\emph{WF\(_{l}\)}) and air volume flow rate (\emph{Q\(_{l}\)}) as follows:
+This cooltower model allows the user to specify water loss due to drift or blow down and the loss of air flow (example: a cooltower which delivers air to both the interior and exterior of the building). If the user inputs the fraction of water loss or flow schedule that means some amount of the air actually goes to outside, the fractional values will be applied to previously calculated ones so that the model calculates both actual water flow rate (\emph{WF\(_{actual}\)}) and air volume flow rate (\emph{Q\(_{actual}\)}) as follows:
 
 \begin{equation}
 W{F_{actual}} = WF(1.0 + Fraction)
@@ -1669,7 +1712,7 @@ The model then determines the exit humidity ratio (\({\omega_{out}}\) ) from the
 {\omega_{in}}({\dot m_{air}} + {\dot m_{water}}) = {\omega_{out}} \cdot {\dot m_{air}}
 \end{equation}
 
-In this case, actual mass flow rate at the inlet and outlet of cooltower cannot be correctly calculated with limited information. Thus, the model estimates initial conditions of the air based on the outdoor temperatures, the calculated exit air temperature, enthalpy of outdoor air (\emph{H\(_{n}\)}) and outdoor barometric pressure (P). Assuming no enthalpy changes and pressure drops between inlet air and the initialized air, the humidity ratio and mass flow of the initialized air can be obtained by using EnergyPlus psychrometric functions and the following equation.
+In this case, actual mass flow rate at the inlet and outlet of cooltower cannot be correctly calculated with limited information. Thus, the model estimates initial conditions of the air based on the outdoor temperatures, the calculated exit air temperature, enthalpy of outdoor air (\emph{H\(_{in}\)}) and outdoor barometric pressure (P). Assuming no enthalpy changes and pressure drops between inlet air and the initialized air, the humidity ratio and mass flow of the initialized air can be obtained by using EnergyPlus psychrometric functions and the following equation.
 
 \begin{equation}
 {\omega_{in}} = PsyWRnTdbTwbPb({T_{d{b_{in}}}},{T_{w{b_{in}}}},P)
@@ -1776,7 +1819,7 @@ In case of \emph{h\(_{e}\)} and \emph{h\(_{r}\)}, they can be determined by the 
 
 with a = 103 Pa/°C.
 
-Average air temperature (°C), \emph{T\(_{a}\)}, is also calculated from EnergyPlus weather data by averaging individual air temperature values of the whole year.
+Average air temperature (°C), \emph{T\(_{ma}\)}, is also calculated from EnergyPlus weather data by averaging individual air temperature values of the whole year.
 
 The appropriate value of hemispherical emittance of the ground surface, \emph{ε,} is 0.93\textasciitilde{}0.96. Radiation constant (W/m\(^{2}\)), \emph{ΔR,} depends on soil radiative properties, air relative humidity, and effective sky temperature. An appropriate value of \emph{ΔR} according to Krarti (1995) is 63 W/m\(^{2}\).
 
@@ -1790,22 +1833,53 @@ Relative humidity, \emph{r\(_{a}\)}, is also calculated from EnergyPlus weather 
 
 The soil thermal diffusivity (m\(^{2}\)/s), \emph{α\(_{s}\)}, and conductivity (W/m°C), \emph{k\(_{s}\)}, varies with the density and moisture content. From Table 3.3, pg. 26 of ASHRAE's Ground Source Heat Pumpss--Design of Geothermal Systems for Commercial and Institutional Buildings, 1997, the following values are recommended under different conditions.
 
-{\scriptsize
-\begin{longtable}[c]{p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}}
+\begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
 \toprule 
- & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline
-Soil   Type & Dry Density  [kg/m3] & k  [W/m-K] & $\alpha$ [m2/s] & k  [W/m-K] & $\alpha$ [m2/s] & k  [W/m-K] & $\alpha$ [m2/s] & k  [W/m-K] & $\alpha$ [m2/s] \tabularnewline \midrule
-\endhead
-Coarse 100\%  Sand & 1922 & 2.77 & 1.34E-06 & 2.94 & 1.24E-06 & 3.29 & 1.18E-06 &  &  \tabularnewline
- & 1602 & 1.90 & 1.18E-06 & 2.34 & 1.18E-06 & 2.51 & 1.08E-06 & 2.68 & 8.82E-07 \tabularnewline
- & 1281 & 1.38 & 1.18E-06 & 1.56 & 9.14E-07 & 1.56 & 8.06E-07 & 1.47 & 6.99E-07 \tabularnewline
-Fine Grain  100\% Clay & 1922 & 1.21 & 5.91E-07 & 1.21 & 4.84E-07 & 1.64 & 5.70E-07 &  &  \tabularnewline
- & 1602 & 0.95 & 5.70E-07 & 0.95 & 4.73E-07 & 1.12 & 4.73E-07 & 1.21 & 5.16E-07 \tabularnewline
- & 1281 & 0.69 & 4.84E-07 & 0.74 & 4.62E-07 & 0.81 & 4.73E-07 & 0.87 & 4.09E-07 \tabularnewline
-\bottomrule
-\end{longtable}}
+Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
+\midrule
+\endfirsthead
 
-Annual angular frequency, \emph{w}, is equal to 1.992 x 10\(^{7}\)rad/s, and dampening depth (m), D, is calculated from the following equation:
+\toprule 
+Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
+\midrule
+\endhead
+
+Heavy clay & 15\% water & 1922 & 1.558 & 5.914E-07 \tabularnewline
+ & 5\% water & 1922 & 1.212 & 6.452E-07 \tabularnewline
+Light clay & 15\% water & 1281 & 0.865 & 4.624E-07 \tabularnewline
+ & 5\% water & 1281 & 0.692 & 4.839E-07 \tabularnewline
+Heavy sand & 15\% water & 1922 & 3.115 & 1.129E-07 \tabularnewline
+ & 5\% water & 1922 & 2.596 & 1.344E-06 \tabularnewline
+Light sand & 15\% water & 1281 & 1.558 & 8.065E-07 \tabularnewline
+ & 5\% water & 1281 & 1.385 & 9.677E-07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+The following information is also available for reference from Table~\ref{table:atmospheric-variables-at-two-different}, pg. 34.6 of the ASHRAE Applications Handbook, 2015.
+
+\begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
+\toprule 
+Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
+\midrule
+\endhead
+
+Heavy clay & 15\% water & 1922 & 1.558 & 5.914E-07 \tabularnewline
+ & 5\% water & 1922 & 1.212 & 6.452E-07 \tabularnewline
+Light clay & 15\% water & 1281 & 0.865 & 4.624E-07 \tabularnewline
+ & 5\% water & 1281 & 0.692 & 4.839E-07 \tabularnewline
+Heavy sand & 15\% water & 1922 & 3.115 & 1.129E-07 \tabularnewline
+ & 5\% water & 1922 & 2.596 & 1.344E-06 \tabularnewline
+Light sand & 15\% water & 1281 & 1.558 & 8.065E-07 \tabularnewline
+ & 5\% water & 1281 & 1.385 & 9.677E-07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual angular frequency, \emph{w}, is equal to 1.992 x 10\(^{-7}\)rad/s, and dampening depth (m), D, is calculated from the following equation:
 
 \begin{equation}
 D = \sqrt {\frac{{2{\alpha_s}}}{w}}
@@ -1817,13 +1891,13 @@ The value of δ is evaluated as follows.
 \delta  = \frac{{1 + i}}{D}
 \end{equation}
 
-Amplitude of the air temperature (°C), \emph{T\(_{a}\)}, can be evaluated from EnergyPlus weather data by dividing the difference between the maximum and minimum air temperature value of the whole year by two. Similarly, amplitude of the solar radiation (W/m\(^{2}\)), \emph{S\(_{v}\)}, can also be determined from weather data by dividing the difference between the maximum and minimum solar radiation value of the whole year by two.
+Amplitude of the air temperature (°C), \emph{T\(_{va}\)}, can be evaluated from EnergyPlus weather data by dividing the difference between the maximum and minimum air temperature value of the whole year by two. Similarly, amplitude of the solar radiation (W/m\(^{2}\)), \emph{S\(_{v}\)}, can also be determined from weather data by dividing the difference between the maximum and minimum solar radiation value of the whole year by two.
 
 Phase angle between the insolation and the air temperature (rad), \emph{φ\(_{I}\)} , is calculated by subtracting insolation phase angle from air temperature phase angle. Phase angle of insolation and air temperature is the point from the beginning of the year at which the insolation and air temperature respectively reaches the minimum value among the whole year.
 
-Phase constant of the air (sec), \emph{t\(_{a}\)}, is the time elapsed from the beginning of the year at which the air temperature reaches the minimum value in the year.
+Phase constant of the air (sec), \emph{t\(_{0a}\)}, is the time elapsed from the beginning of the year at which the air temperature reaches the minimum value in the year.
 
-By using all the input parameters and variables described above, average soil surface temperature (°C), \emph{T\(_{m}\)}, amplitude of the soil surface temperature variation (°C), \emph{A\(_{s}\)}, phase constant of the soil surface (sec), \emph{t\(_{0}\)}, and phase angle difference between the air and soil surface temperature (rad), \emph{Φ\(_{s}\)}, can be evaluated as follows \(^{)}\):
+By using all the input parameters and variables described above, average soil surface temperature (°C), \emph{T\(_{m}\)}, amplitude of the soil surface temperature variation (°C), \emph{A\(_{s}\)}, phase constant of the soil surface (sec), \emph{t\(_{0}\)}, and phase angle difference between the air and soil surface temperature (rad), \emph{Φ\(_{s}\)}, can be evaluated as follows \(^{1)}\):
 
 \begin{equation}
 {T_m} = \frac{1}{{{h_e}}}\left[ {{h_r}{T_{ma}} - \varepsilon \Delta R + \beta {S_m} - 0.0168{h_s}fb\left( {1 - {r_a}} \right)} \right]
@@ -1853,7 +1927,7 @@ The symbols \textbar{}\textbar{}~ \textbar{}\textbar{} and Arg denote the modulu
   \end{array}
 \end{equation}
 
-Assuming a homogeneous soil of constant thermal diffusivity, the temperature at any depth z and time t can be estimated by the following expression \(^{)}\).
+Assuming a homogeneous soil of constant thermal diffusivity, the temperature at any depth z and time t can be estimated by the following expression \(^{2)}\).
 
 \begin{equation}
 {T_{z,t}} = {T_m} - {A_s}\exp \left[ { - z{{\left( {\frac{\pi }{{{\rm{365}}{\alpha_s}}}} \right)}^{1/2}}} \right]\cos \left\{ {\frac{{2\pi }}{{{\rm{365}}}}\left[ {t - {t_0} - \frac{z}{2}{{\left( {\frac{{{\rm{365}}}}{{\pi {\alpha_s}}}} \right)}^{1/2}}} \right]} \right\}
@@ -1861,7 +1935,7 @@ Assuming a homogeneous soil of constant thermal diffusivity, the temperature at 
 
 In this expression, the unit of time, \emph{t}, and phase constant of the soil surface, \emph{t\(_{0}\)}, should be converted into days. Similarly, the unit of soil thermal diffusivity, \emph{α\(_{s}\)}, should also be converted into m\(^{2}\)/days.
 
-By integrating the expression with respect to depth, the average temperature of a vertical soil profile ranging between depth z\(_{1}\) and z\(_{2}\) (°C ) can be determined as follows \(^{)}\).
+By integrating the expression with respect to depth, the average temperature of a vertical soil profile ranging between depth z\(_{1}\) and z\(_{2}\) (°C ) can be determined as follows \(^{2)}\).
 
 {\scriptsize
 \begin{equation}
@@ -1878,7 +1952,7 @@ where,
 L = \frac{1}{2}{\left( {{\rm{365}}/\pi {\alpha_s}} \right)^{1/2}}
 \end{equation}
 
-As the final step with regard to the heat transfer between soil and earth tube system, thermal conductivity of air (W/m°C), \emph{k\(_{r}\)}, and kinetic viscosity of air (m\(^{2}\)/s), υ, should calculated first \(^{)}\).
+As the final step with regard to the heat transfer between soil and earth tube system, thermal conductivity of air (W/m°C), \emph{k\(_{air}\)}, and kinetic viscosity of air (m\(^{2}\)/s), υ, should calculated first \(^{3)}\).
 
 \begin{equation}
 {k_{air}} = 0.02442 + ({10^{ - 4}}(0.6992{T_a}))
@@ -1888,7 +1962,7 @@ As the final step with regard to the heat transfer between soil and earth tube s
 \upsilon  = {10^{ - 4}}(0.1335 + 0.000925{T_a})
 \end{equation}
 
-By using the values of thermal conductivity of air, \emph{k\(_{r}\)}, and kinetic viscosity of air, υ, the convective heat transfer coefficient at the inner pipe surface (W/m\(^{2}\)°C), \emph{h\(_{,}\)} can be evaluated. It is a function of Reynolds number, Re, and Nusselt number, Nu \(^{)}\), where
+By using the values of thermal conductivity of air, \emph{k\(_{air}\)}, and kinetic viscosity of air, υ, the convective heat transfer coefficient at the inner pipe surface (W/m\(^{2}\)°C), \emph{h\(_{c,}\)} can be evaluated. It is a function of Reynolds number, Re, and Nusselt number, Nu \(^{4)}\), where
 
 \begin{equation}
 {h_c} = \frac{{Nu{k_{air}}}}{{2{r_1}}}
@@ -1903,7 +1977,7 @@ Nu = \frac{{({f_a}/2)({\mathop{\rm Re}\nolimits}  - 1000)\Pr }}{{1 + 12.7{{({f_a
 \end{equation}
 
 \begin{equation}
-{\mathop{\rm Re}\nolimits}  = \frac{{2{r_1}{V_a}}}{\nu }
+  \mathop{\rm Re}\nolimits  = \frac{{2{r_1}{V_a}}}{\nu }
 \end{equation}
 
 \begin{equation}
@@ -1949,11 +2023,19 @@ where \emph{U\(_{t}\)} is overall heat transfer coefficient of the whole earth t
 Initial condition of inlet air temperature is equal to the ambient air temperature. Outlet air temperature is finally evaluated by solving the heat transfer equation above.
 
 % table 87
-\begin{longtable}[c]{p{1.0in}p{3.5in}p{1.5in}}
-\caption{  Nomenclature for Earthtube Model \protect \label{table:nomenclature-for-earthtube-model}}\\
+\begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
+\caption{Nomenclature for Earthtube Model \label{table:nomenclature-for-earthtube-model}} \tabularnewline
 \toprule 
-Variable & Description & Units \tabularnewline \midrule
+Variable & Description & Units \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature for Earthtube Model} \tabularnewline
+\toprule 
+Variable & Description & Units \tabularnewline
+\midrule
 \endhead
+
 A\(_{s}\) & amplitude of the soil surface temperature variation & (°C) \tabularnewline
 C\(_{a}\) & specific heat of air & (J/kg°C) \tabularnewline
 h\(_{c}\) & convective heat transfer coefficient at the inner pipe surface & (W/m\(^{2}\)°C) \tabularnewline
@@ -1999,7 +2081,7 @@ w & annual angular frequency ( = 1.992 x 10\(^{-7}\)rad/s) & ~ \tabularnewline
 \bottomrule
 \end{longtable}
 
-\subsubsection{References}\label{references-6-000}
+\subsubsection{References}\label{references-6-001}
 
 Krarti M., Lopez-Alonzo C., Claridge D. E. and Kreider J. F. 1995. Analytical model to predict annual soil surface temperature variation. Journal of Solar Energy Engineering 117, 91\textasciitilde{}99
 
@@ -2064,7 +2146,7 @@ L = \frac{{{L_1}{r_1}{E_1} + {L_2}{r_2}{E_2} + {L_3}{r_3}{E_3} +  \cdot  \cdot  
 {A_i} = {A_{i1}} + {A_{i2}} + {A_{i3}} +  \cdot  \cdot  \cdot  + {A_{in}}
 \end{equation}
 
-Where, \emph{A\(_{n}\)} is the cross sectional area of nth air channel inlet (m\(^{2}\)), \emph{L\(_{n}\)} is the distance from the top of thermal chimney to nth inlet (m), \emph{E\(_{n}\)} is the room air specific enthalpy corresponding to nth inlet (J/kg), \emph{r\(_{n}\)} is the relative ratio of air flow rate passing through nth inlet and \emph{T\(_{n}\)} is the room air temperature corresponding to nth inlet (K). Among them, room air specific enthalpy, \emph{E\(_{n}\)}, and room air temperature corresponding to each inlet, \emph{T\(_{n}\)}, are directly calculated inside EnergyPlus. In addition, the relative ratios should meet the following expression:
+Where, \emph{A\(_{in}\)} is the cross sectional area of nth air channel inlet (m\(^{2}\)), \emph{L\(_{n}\)} is the distance from the top of thermal chimney to nth inlet (m), \emph{E\(_{n}\)} is the room air specific enthalpy corresponding to nth inlet (J/kg), \emph{r\(_{n}\)} is the relative ratio of air flow rate passing through nth inlet and \emph{T\(_{rn}\)} is the room air temperature corresponding to nth inlet (K). Among them, room air specific enthalpy, \emph{E\(_{n}\)}, and room air temperature corresponding to each inlet, \emph{T\(_{rn}\)}, are directly calculated inside EnergyPlus. In addition, the relative ratios should meet the following expression:
 
 \begin{equation}
 {r_1} + {r_2} + {r_3} +  \cdot  \cdot  \cdot  + {r_n} = 1
@@ -2082,7 +2164,7 @@ Once the glass cover temperature and the absorber wall temperature are computed 
 
 Where, \emph{m} is the total mass flow rate of the air (kg/s), \emph{C\(_{p}\)} is the specific heat of air (J/kg°C), \emph{w} is the width of the absorber wall (m) and \emph{x} is the elemental length of the absorber wall (m).
 
-Since the initial condition of inlet air temperature in this differential equation is equal to the room air temperature (i.e. \emph{x = 0, T\(_{i}\) = T\(_{r}\)}), the outlet air temperature, \emph{T\(_{o}\)}, can be finally evaluated.
+Since the initial condition of inlet air temperature in this differential equation is equal to the room air temperature (i.e. \emph{x = 0, T\(_{f,i}\) = T\(_{r}\)}), the outlet air temperature, \emph{T\(_{fo}\)}, can be finally evaluated.
 
 Finally, the total air flow rate caused by the thermal chimney (m\(^{3}\)/s), \emph{Q}, can be evaluated from the following expression {[}1{]}:
 
@@ -2094,7 +2176,7 @@ Q = {C_d}{A_o}\sqrt {\frac{{2(\frac{{{T_{fo}} - {T_r}}}{{{T_r}}})gL}}{{{{(1 + {A
 {A_r} = {A_o}/{A_i}
 \end{equation}
 
-Where, \emph{C\(_{d}\)} is the discharge coefficient, \emph{A\(_{o}\)} and \emph{A\(_{i}\)} is the cross sectional areas of air channel outlet and inlet (m\(^{2}\)), respectively, \emph{T\(_{o}\)} is the outlet air temperature (K), \emph{T\(_{r}\)} is the room air temperature (K) and \emph{L} is the total length of the thermal chimney (m).
+Where, \emph{C\(_{d}\)} is the discharge coefficient, \emph{A\(_{o}\)} and \emph{A\(_{i}\)} is the cross sectional areas of air channel outlet and inlet (m\(^{2}\)), respectively, \emph{T\(_{fo}\)} is the outlet air temperature (K), \emph{T\(_{r}\)} is the room air temperature (K) and \emph{L} is the total length of the thermal chimney (m).
 
 Since multiple inlets are merged into a single inlet in the beginning, the air flow rate passing through each inlet due to the existence of the thermal chimney can be finally determined as follows:
 
@@ -2106,10 +2188,18 @@ The discharged amount of interior air from each zone caused by the presence of t
 
 % table 88
 \begin{longtable}[l]{p{1.5in}p{4.5in}}
-\caption{Nomenclature of Thermal Chimney Model \protect \label{table:nomenclature-of-thermal-chimney-model}}\\
+\caption{Nomenclature of Thermal Chimney Model \label{table:nomenclature-of-thermal-chimney-model}} \tabularnewline
 \toprule 
-Model Nomenclature \tabularnewline \midrule
+Model Nomenclature \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Nomenclature of Thermal Chimney Model} \tabularnewline
+\toprule 
+Model Nomenclature \tabularnewline
+\midrule
 \endhead
+
 Variable & Description \tabularnewline
 A\(_{i}\) & cross sectional area of air channel inlet (m\(^{2}\)) \tabularnewline
 A\(_{o}\) & cross sectional area of air channel outlet (m\(^{2}\)) \tabularnewline
@@ -2152,7 +2242,7 @@ $\nu$ & kinematic viscosity of air (m\(^{2}\)/s) \tabularnewline
 \bottomrule
 \end{longtable}
 
-\subsubsection{References}\label{references-7}
+\subsubsection{References}\label{references-7-000}
 
 N. K. Bansal, R. Mathur and M. S. Bhandari, Solar Chimney for enhanced Stack Ventilation, Building and Environment, 28, pp.373-377, 1993
 
@@ -2186,9 +2276,9 @@ Three input parameters control the operation of the zone outdoor air unit.~ The 
 
 where:
 
-~~~~~ T\(_{t}\) = the outlet temperature of the zone outdoor air unit
+~~~~~ T\(_{out}\) = the outlet temperature of the zone outdoor air unit
 
-~~~~~ T\(_{T}\) = the mean air temperature of the zone being served by the unit
+~~~~~ T\(_{MAT}\) = the mean air temperature of the zone being served by the unit
 
 It should be noted that to avoid excessive iteration that the zone mean air temperature that is used is the mean air temperature from the previous time step.~ This will result in a slight lagging that may introduce a slight thermal load, but this should be minimal.
 
@@ -2200,13 +2290,13 @@ It should be noted that to avoid excessive iteration that the zone mean air temp
 
 where:
 
-~~~~~ T\(_{t}\) = the outlet temperature of the zone outdoor air unit
+~~~~~ T\(_{out}\) = the outlet temperature of the zone outdoor air unit
 
-~~~~~ T\(_{a}\) = the outside air temperature
+~~~~~ T\(_{oa}\) = the outside air temperature
 
-~~~~~ T\(_{h}\) = the high control air temperature schedule value
+~~~~~ T\(_{high}\) = the high control air temperature schedule value
 
-~~~~~ T\(_{w}\) = the low control air temperature schedule value
+~~~~~ T\(_{low}\) = the low control air temperature schedule value
 
 If the user wishes to provide ``unconditioned'' air all of the time, the high and low control temperature values can be set very high and very low, respectively, to always force the unit to provide unconditioned air.~ The same effect can also be realized by not specifying any conditioning components (such as coils) in the unit.~ The user can also limit the device to cooling only by specifying a low control temperature schedule with extremely low values.~ Conversely, the user can limit the device to heating only by specifying a high control temperature schedule with extremely high values.~ The user can also limit the equipment specified as part of the device to either cooling or heating components to get similar effects.~ In essence, the temperature control provides a variety of options in a single control type through the use of the high and low control temperature schedules.
 
