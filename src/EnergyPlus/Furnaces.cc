@@ -4184,8 +4184,8 @@ namespace Furnaces {
 
 			}
 		}
-
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyRan;
+		ManageEMS( emsCallFromComponentGetInput, anyRan );
 
 	}
 
@@ -5273,7 +5273,8 @@ namespace Furnaces {
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		bool ErrFound; // flag returned from mining functions
 		Real64 BranchFlow; // branch volumetric flow rate [m3/s]
-		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
+		bool anyRan;
+		ManageEMS( emsCallFromUnitarySystemSizing, anyRan ); // calling point
 		ThisCtrlZoneNum = 0;
 		DXCoolCap = 0.0;
 		UnitaryHeatCap = 0.0;

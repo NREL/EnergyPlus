@@ -232,7 +232,7 @@ namespace UserDefinedComponents {
 				CheckUserPlantCompName( CompNum ) = false;
 			}
 		}
-
+		bool anyEMSRan;
 		if ( InitLoopEquip || BeginEnvrnFlag ) {
 			InitPlantUserComponent( CompNum, LoopNum, MyLoad );
 			// find loop connection number from LoopNum and LoopSide
@@ -244,7 +244,7 @@ namespace UserDefinedComponents {
 			}
 			if ( ThisLoop > 0 ) {
 				if ( UserPlantComp( CompNum ).Loop( ThisLoop ).ErlInitProgramMngr > 0 ) {
-					ManageEMS( emsCallFromUserDefinedComponentModel, UserPlantComp( CompNum ).Loop( ThisLoop ).ErlInitProgramMngr );
+					ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp( CompNum ).Loop( ThisLoop ).ErlInitProgramMngr );
 				}
 				// now interface sizing related values with rest of E+
 				MinCap = UserPlantComp( CompNum ).Loop( ThisLoop ).MinLoad;
@@ -273,12 +273,12 @@ namespace UserDefinedComponents {
 
 		if ( ThisLoop > 0 ) {
 			if ( UserPlantComp( CompNum ).Loop( ThisLoop ).ErlSimProgramMngr > 0 ) {
-				ManageEMS( emsCallFromUserDefinedComponentModel, UserPlantComp( CompNum ).Loop( ThisLoop ).ErlSimProgramMngr );
+				ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp( CompNum ).Loop( ThisLoop ).ErlSimProgramMngr );
 			}
 		}
 
 		if ( UserPlantComp( CompNum ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, UserPlantComp( CompNum ).ErlSimProgramMngr );
+			ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp( CompNum ).ErlSimProgramMngr );
 		}
 
 		ReportPlantUserComponent( CompNum, ThisLoop );
@@ -360,10 +360,10 @@ namespace UserDefinedComponents {
 				CheckUserCoilName( CompNum ) = false;
 			}
 		}
-
+		bool anyEMSRan;
 		if ( BeginEnvrnFlag ) {
 			if ( UserCoil( CompNum ).ErlInitProgramMngr > 0 ) {
-				ManageEMS( emsCallFromUserDefinedComponentModel, UserCoil( CompNum ).ErlInitProgramMngr );
+				ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil( CompNum ).ErlInitProgramMngr );
 			}
 
 			if ( UserCoil( CompNum ).PlantIsConnected ) {
@@ -378,7 +378,7 @@ namespace UserDefinedComponents {
 		InitCoilUserDefined( CompNum );
 
 		if ( UserCoil( CompNum ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, UserCoil( CompNum ).ErlSimProgramMngr );
+			ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil( CompNum ).ErlSimProgramMngr );
 		}
 
 		ReportCoilUserDefined( CompNum );
@@ -479,12 +479,12 @@ namespace UserDefinedComponents {
 				CheckUserZoneAirName( CompNum ) = false;
 			}
 		}
-
+		bool anyEMSRan;
 		if ( BeginEnvrnFlag ) {
 			InitZoneAirUserDefined( CompNum, ZoneNum );
 
 			if ( UserZoneAirHVAC( CompNum ).ErlInitProgramMngr > 0 ) {
-				ManageEMS( emsCallFromUserDefinedComponentModel, UserZoneAirHVAC( CompNum ).ErlInitProgramMngr );
+				ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC( CompNum ).ErlInitProgramMngr );
 			}
 			if ( UserZoneAirHVAC( CompNum ).NumPlantConnections > 0 ) {
 				for ( Loop = 1; Loop <= UserZoneAirHVAC( CompNum ).NumPlantConnections; ++Loop ) {
@@ -500,7 +500,7 @@ namespace UserDefinedComponents {
 		InitZoneAirUserDefined( CompNum, ZoneNum );
 
 		if ( UserZoneAirHVAC( CompNum ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, UserZoneAirHVAC( CompNum ).ErlSimProgramMngr );
+			ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC( CompNum ).ErlSimProgramMngr );
 		}
 
 		ReportZoneAirUserDefined( CompNum );
@@ -591,12 +591,12 @@ namespace UserDefinedComponents {
 				CheckUserAirTerminal( CompNum ) = false;
 			}
 		}
-
+		bool anyEMSRan;
 		if ( BeginEnvrnFlag ) {
 			InitAirTerminalUserDefined( CompNum, ZoneNum );
 
 			if ( UserAirTerminal( CompNum ).ErlInitProgramMngr > 0 ) {
-				ManageEMS( emsCallFromUserDefinedComponentModel, UserAirTerminal( CompNum ).ErlInitProgramMngr );
+				ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal( CompNum ).ErlInitProgramMngr );
 			}
 			if ( UserAirTerminal( CompNum ).NumPlantConnections > 0 ) {
 				for ( Loop = 1; Loop <= UserAirTerminal( CompNum ).NumPlantConnections; ++Loop ) {
@@ -613,7 +613,7 @@ namespace UserDefinedComponents {
 		InitAirTerminalUserDefined( CompNum, ZoneNum );
 
 		if ( UserAirTerminal( CompNum ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, UserAirTerminal( CompNum ).ErlSimProgramMngr );
+			ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal( CompNum ).ErlSimProgramMngr );
 		}
 
 		ReportAirTerminalUserDefined( CompNum );
