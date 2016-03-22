@@ -4796,13 +4796,7 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).StandAlone ) {
 				SizeStandAloneWaterHeater( WaterThermalTankNum );
 			}
-
-			CalcStandardRatings( WaterThermalTankNum );
 			SetLoopIndexFlag( WaterThermalTankNum ) = false;
-		}
-
-		if ( WaterThermalTank( WaterThermalTankNum ).StandAlone && ( ! AlreadyRated( WaterThermalTankNum ) ) ) {
-			CalcStandardRatings( WaterThermalTankNum );
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag( WaterThermalTankNum ) && ! SetLoopIndexFlag( WaterThermalTankNum ) ) {
@@ -5134,10 +5128,10 @@ namespace WaterThermalTanks {
 				//     autosize info must be calculated in GetWaterThermalTankInputFlag for use in StandardRating procedure
 				//       (called at end of GetWaterThermalTankInputFlag)
 				//     report autosizing information here (must be done after GetWaterThermalTankInputFlag is complete)
-				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized ) {
+				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized && ( PlantFirstSizesOkayToFinalize || !AnyPlantInModel ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Condenser water flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingWaterFlowRate );
 				}
-				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized ) {
+				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized && ( PlantFirstSizesOkayToFinalize || !AnyPlantInModel ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
 				}
 				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
@@ -5145,7 +5139,7 @@ namespace WaterThermalTanks {
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
 				}
-				MyHPSizeFlag( HPNum ) = false;
+				if ( PlantFirstSizesOkayToFinalize || !AnyPlantInModel ) MyHPSizeFlag( HPNum ) = false;
 			}
 
 			HPAirInletNode = HPWaterHeater( HPNum ).HeatPumpAirInletNode;
@@ -5320,6 +5314,11 @@ namespace WaterThermalTanks {
 			}
 
 		} //  IF(WaterThermalTank(WaterThermalTankNum)%HeatPumpNum .GT. 0)THEN
+
+		// calling CalcStandardRatings early bypasses fan sizing since DataNonZoneNonAirloopValue has not been set yet
+		if ( !AlreadyRated( WaterThermalTankNum ) ) {
+			CalcStandardRatings( WaterThermalTankNum );
+		}
 
 	}
 
