@@ -428,12 +428,16 @@ SurfaceProperty:OtherSideConditionsModel,
 
 \subsubsection{Outputs}\label{outputs-1}
 
-\begin{lstlisting}
-Zone,Average,Surface Other Side Conditions Modeled Convection Air Temperature [C]
-Zone,Average,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient [W/m2-K]
-Zone,Average,Surface Other Side Conditions Modeled Radiation Temperature [C]
-Zone,Average,Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]
-\end{lstlisting}
+\begin{itemize}
+\item
+  Zone,Average,Surface Other Side Conditions Modeled Convection Air Temperature {[}C{]}
+\item
+  Zone,Average,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient {[}W/m2-K{]}
+\item
+  Zone,Average,Surface Other Side Conditions Modeled Radiation Temperature {[}C{]}
+\item
+  Zone,Average,Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient {[}W/m2-K{]}
+\end{itemize}
 
 \paragraph{Surface Other Side Conditions Modeled Convection Air Temperature {[}C{]}}\label{surface-other-side-conditions-modeled-convection-air-temperature-c}
 
@@ -1470,7 +1474,7 @@ Report Code & Related key and model \tabularnewline
 
 Advanced/Research Usage: The internal and external vapor transfer coefficients that are used by the CombinedHeatAndMoistureFiniteElement model are automatically calculated during EnergyPlus execution using information on the convection coefficients. However it is sometimes useful to be able to ``override'' the calculation and set fixed values of vapor transfer coefficient for a single surface. These coefficients are only used by the CombinedHeatAndMoistureFiniteElement model and will be ignored by other solution algorithms.
 
-\subsubsection{Inputs}\label{inputs-11}
+\subsubsection{Inputs}\label{inputs-12}
 
 \paragraph{Field: Surface Name}\label{field-surface-name-3}
 
@@ -1512,7 +1516,7 @@ The area and orientation are obtained from \textbf{BuildingSurface:Detailed} obj
 
 Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and bouancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
 
-\subsubsection{Inputs}\label{inputs-12}
+\subsubsection{Inputs}\label{inputs-13}
 
 \paragraph{Field: Name}\label{field-name-9}
 
@@ -1594,14 +1598,20 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
 
 In addition to related output that can be obtained for all surfaces, these outputs are available for exterior naturally vented cavity configurations:
 
-\begin{lstlisting}
-HVAC,Average, Surface Exterior Cavity Air Drybulb Temperature [C]
-HVAC,Average, Surface Exterior Cavity Baffle Surface Temperature [C]
-HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Air Change Rate [ACH]
-HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate [kg/s]
-HVAC,Average, Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate [kg/s]
-HVAC,Average, Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]
-\end{lstlisting}
+\begin{itemize}
+\item
+  HVAC,Average, Surface Exterior Cavity Air Drybulb Temperature {[}C{]}
+\item
+  HVAC,Average, Surface Exterior Cavity Baffle Surface Temperature {[}C{]}
+\item
+  HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Air Change Rate {[}ACH{]}
+\item
+  HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average, Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average, Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate {[}kg/s{]}
+\end{itemize}
 
 \paragraph{Surface Exterior Cavity Air Drybulb Temperature {[}C{]}}\label{surface-exterior-cavity-air-drybulb-temperature-c}
 
@@ -1631,7 +1641,7 @@ The part of mass flow rate of natural ventilation air exchange between the plenu
 
 This object can be used as an alternative to the standard (automatic) EnergyPlus calculation of the solar radiation incident on interior surfaces of the building. Using this method, the normal EnergyPlus calculation is replaced with a schedule of solar incidence values that are calculated outside the program.
 
-\subsubsection{Inputs}\label{inputs-13}
+\subsubsection{Inputs}\label{inputs-14}
 
 \paragraph{Field: Name}\label{field-name-10}
 
@@ -1674,7 +1684,7 @@ Example for SurfaceProperty:SolarIncidentInside using a compact schedule:
 
 This object can be used as an alternative to the standard (automatic) EnergyPlus calculation of the solar radiation absorbed by fenestration systems in the building. Using this method, the normal EnergyPlus calculation is replaced with a schedule of solar absorptance values that are calculated outside the program.
 
-\subsubsection{Inputs}\label{inputs-14}
+\subsubsection{Inputs}\label{inputs-15}
 
 \paragraph{Field: Name}\label{field-name-11}
 
@@ -1771,7 +1781,7 @@ The object doesn't create any specific output, but the results of using it can b
 \caption{Example of Geometry Transform -- Aspect Ratio \protect \label{fig:example-of-geometry-transform-aspect-ratio}}
 \end{figure}
 
-\subsubsection{Inputs}\label{inputs-15}
+\subsubsection{Inputs}\label{inputs-16}
 
 \paragraph{Field: Plane of Transform}\label{field-plane-of-transform}
 
@@ -1826,7 +1836,7 @@ The second option for specifying view factors requires user input values. These 
 
 The method of entering user view factors is to entere each surface name and its view factor value to other surfaces in the zone
 
-\subsubsection{Inputs}\label{inputs-16}
+\subsubsection{Inputs}\label{inputs-17}
 
 \paragraph{Field: Zone Name}\label{field-zone-name}
 

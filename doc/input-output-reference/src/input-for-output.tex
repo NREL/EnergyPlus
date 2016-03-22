@@ -449,10 +449,18 @@ Current resource types are shown in the table below:
 
 % table 38
 \begin{longtable}[c]{@{}l@{}}
-\caption{Table of Metered Resource  Types \protect \label{table:table-of-metered-resource-types}}\\
+\caption{Table of Metered Resource  Types \label{table:table-of-metered-resource-types}} \tabularnewline
 \toprule 
-Utility/Fuel Types \tabularnewline \midrule
+Utility/Fuel Types \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Table of Metered Resource  Types} \tabularnewline
+\toprule 
+Utility/Fuel Types \tabularnewline
+\midrule
 \endhead
+
 Electricity \tabularnewline
 Gas \tabularnewline
 Gasoline \tabularnewline
@@ -473,11 +481,174 @@ ElectricityNet \tabularnewline
 \bottomrule
 \end{longtable}
 
-\begin{longtable}[c]{@{}l@{}}
+\begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Other Resource Types \tabularnewline \midrule
+Electricity:Facility & Diesel:Facility \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Electricity:Facility & Diesel:Facility \tabularnewline
+\midrule
 \endhead
-EnergyTransfer \tabularnewline
+
+DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
+Gas:Facility & Gasoline:Facility \tabularnewline
+Coal:Facility & FuelOil\#1:Facility \tabularnewline
+FuelOil\#2:Facility & Propane:Facility \tabularnewline
+ElectricityProduced:Facility & Steam:Facility \tabularnewline
+OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
+\bottomrule
+\end{longtable}
+
+The end use types are shown in the following table (note that certain end use types apply only to the EnergyTransfer resource):
+
+% table 39
+\begin{longtable}[c]{@{}l@{}}
+\caption{End Use Category Types \label{table:end-use-category-types}} \tabularnewline
+\toprule 
+Utility/Fuel End Use Types \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{End Use Category Types} \tabularnewline
+\toprule 
+Utility/Fuel End Use Types \tabularnewline
+\midrule
+\endhead
+
+InteriorLights \tabularnewline
+ExteriorLights \tabularnewline
+InteriorEquipment \tabularnewline
+ExteriorEquipment \tabularnewline
+Fans \tabularnewline
+Pumps \tabularnewline
+Heating \tabularnewline
+Cooling \tabularnewline
+HeatRejection \tabularnewline
+Humidifier \tabularnewline
+HeatRecovery \tabularnewline
+DHW \tabularnewline
+Cogeneration \tabularnewline
+Refrigeration \tabularnewline
+WaterSystems \tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Electricity:Facility & Diesel:Facility \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Electricity:Facility & Diesel:Facility \tabularnewline
+\midrule
+\endhead
+
+DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
+Gas:Facility & Gasoline:Facility \tabularnewline
+Coal:Facility & FuelOil\#1:Facility \tabularnewline
+FuelOil\#2:Facility & Propane:Facility \tabularnewline
+ElectricityProduced:Facility & Steam:Facility \tabularnewline
+OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
+\bottomrule
+\end{longtable}
+
+Specific meter types are then used for grouping the fuel type meters:
+
+% table 40
+\begin{longtable}[c]{@{}l@{}}
+\caption{Overall Meter Types \label{table:overall-meter-types}} \tabularnewline
+\toprule 
+Meters \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Overall Meter Types} \tabularnewline
+\toprule 
+Meters \tabularnewline
+\midrule
+\endhead
+
+Facility \tabularnewline
+Building \tabularnewline
+Zone \tabularnewline
+HVAC \tabularnewline
+Plant \tabularnewline
+\bottomrule
+\end{longtable}
+
+Facility meters contain all the energy of a fuel type. Building meters contain the sum of each zone's energy. HVAC meters contain the energy from the air and zone HVAC system components. Plant meters contain the energy from the plant equipment.
+
+Thus, the following relationships should be observed:
+
+\begin{equation}
+Facility = \sum {\left( {Building + HVAC + Plant + Exterior} \right)}
+\end{equation}
+
+\begin{equation}
+Building = \sum\limits_1^{NumberOfZones} {Zone}
+\end{equation}
+
+There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always positive, (2) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always positive, and (3) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative.
+
+\subsubsection{Field: Reporting Frequency}\label{field-reporting-frequency-1}
+
+Similar to the output variables, meters can be reported at different frequencies. Their resolution is the Zone Timestep interval (Number of Timesteps input). For this frequency, the elemental value of the meter will be reported. For more inclusive frequencies, the summed value along with the maximum and minimum values for the time interval will be reported. Default for this field if left blank or omitted is \textbf{Hourly}.
+
+Examples of specifying the object in the IDF follow.
+
+\begin{lstlisting}
+
+Output:Meter,Electricity:*,RunPeriod;
+  Output:Meter,ExteriorEquipment*,RunPeriod;
+  Output:Meter:Cumulative,Electricity:*,Monthly;
+\end{lstlisting}
+
+\subsubsection{Meter Details File (eplusout.mtd)}\label{meter-details-file-eplusout.mtd}
+
+The meter details file illustrates what is on each meter and vice versa.~ It is described in the Output Details and Examples document under the file name.
+
+\subsection{Output:EnvironmentalImpactFactors}\label{outputenvironmentalimpactfactors}
+
+The Output:EnvironmentalImpactFactors object triggers the necessary Facility meters to be reported and the Pollutants resulting from these on and off-site energy consumptions. These values are put into the eplusout.mtr file. Facility meters contain all the energy of a fuel type. Thus, the following relationships should be observed:
+
+\begin{equation}
+Facility = \sum {\left( {Building + System + Plant + Exterior} \right)}
+\end{equation}
+
+Information regarding how the coefficients are derived and applied can be found in the Engineering Document.
+
+To turn on the reporting and the calculations for the environmental factors the user enters 3 objects:
+
+\textbf{Output:EnvironmentalImpactFactors:} (with associated reporting frequency, more than one frequency can be requested)
+
+\textbf{EnvironmentalImpactFactors:} (contains additional information necessary for the calculations not included in the Fuel Factors)
+
+\textbf{FuelFactors:} (required for every fuel that is simulated and converted in this simulation input file)
+
+Users will enter environmental impact factors for each Fuel Type or FuelFactor. This is the same for each Fuel Type: Natural Gas, Residual Oil, Distillate Oil, Coal, Off-Site Electricity, Gasoline, and Propane. For District Heating, District Cooling, and Steam there are additional fields in the EnvironmentalImpactFactors object that help in the conversion of their energy to Natural Gas and Electricity.
+
+The energy is obtained internally from the following facility meters:
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Electricity:Facility & Diesel:Facility \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Electricity:Facility & Diesel:Facility \tabularnewline
+\midrule
+\endhead
+
+DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
+Gas:Facility & Gasoline:Facility \tabularnewline
+Coal:Facility & FuelOil\#1:Facility \tabularnewline
+FuelOil\#2:Facility & Propane:Facility \tabularnewline
+ElectricityProduced:Facility & Steam:Facility \tabularnewline
+OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -485,7 +656,7 @@ For the pollutant calculation only the total off-site or purchased electric ener
 
 \subsubsection{Inputs}\label{inputs-9-017}
 
-\paragraph{Field: Reporting Frequency}\label{field-reporting-frequency-1}
+\paragraph{Field: Reporting Frequency}\label{field-reporting-frequency-2}
 
 Similar to the output variables and meters the environmental impact calculations can be reported at different frequencies. Their resolution is the Zone Timestep interval (Number of Timesteps input). For this frequency, the elemental value of the Environmental Impact Factors Calculation will be reported. For more inclusive frequencies, the summed value along with the maximum and minimum values for the time interval will be reported.
 
@@ -502,7 +673,7 @@ Output:EnvironmentalImpactFactors,
 
 The EnvironmentalImpactFactors object contains additional information that is not individually specified in the FuelFactors object and is the second object needed to complete the calculation.~ Source to Site conversion factors for District Heating, District Cooling and Steam are entered in this object.
 
-\subsubsection{Inputs}\label{inputs-10-016}
+\subsubsection{Inputs}\label{inputs-10-017}
 
 \paragraph{Field: District Heating Efficiency}\label{field-district-heating-efficiency}
 
@@ -630,7 +801,7 @@ Similar to the source energy calculation, this field contains the name of a sche
 
 \paragraph{Field: PM10 Emission Factor}\label{field-pm10-emission-factor}
 
-The environmental impact coefficient for the Fuel for calculating the mass of particulate matter 10 (PM\(_{0}\)) released into the atmosphere. The units are grams per MegaJoule. PM\(_{0}\), includes particles with an aerodynamic diameter of less than 10 microns. These smaller particles are most likely responsible for the adverse health effects on humans because particles so small can reach the thoracic or lower regions of the respiratory tract.
+The environmental impact coefficient for the Fuel for calculating the mass of particulate matter 10 (PM\(_{10}\)) released into the atmosphere. The units are grams per MegaJoule. PM\(_{10}\), includes particles with an aerodynamic diameter of less than 10 microns. These smaller particles are most likely responsible for the adverse health effects on humans because particles so small can reach the thoracic or lower regions of the respiratory tract.
 
 \paragraph{Field: PM10 Emission Factor Schedule Name}\label{field-pm10-emission-factor-schedule-name}
 
@@ -638,7 +809,7 @@ Similar to the source energy calculation, this field contains the name of a sche
 
 \paragraph{Field: PM2.5 Emission Factor}\label{field-pm2.5-emission-factor}
 
-The environmental impact coefficient for the Fuel for calculating the mass of particulate matter 2.5 (PM\(_{5}\)) released into the atmosphere. The units are grams per MegaJoule. EPA's national air quality standards for fine particles, also known as ``PM\(_{5}\) standards,'' are levels allowed in the outdoor air for particulate matter 2.5 microns in diameter or smaller. EPA issued the PM\(_{5}\) standards in 1997 to protect human health and the environment. Studies have linked increased exposure to PM\(_{5}\) to increases in premature death as well as a range of serious respiratory and cardiovascular effects.
+The environmental impact coefficient for the Fuel for calculating the mass of particulate matter 2.5 (PM\(_{2.5}\)) released into the atmosphere. The units are grams per MegaJoule. EPA's national air quality standards for fine particles, also known as ``PM\(_{2.5}\) standards,'' are levels allowed in the outdoor air for particulate matter 2.5 microns in diameter or smaller. EPA issued the PM\(_{2.5}\) standards in 1997 to protect human health and the environment. Studies have linked increased exposure to PM\(_{2.5}\) to increases in premature death as well as a range of serious respiratory and cardiovascular effects.
 
 \paragraph{Field: PM2.5 Emission Factor Schedule Name}\label{field-pm2.5-emission-factor-schedule-name}
 

@@ -228,7 +228,26 @@ Shelter class & Description \tabularnewline
 
 \paragraph{Field: Wind Coefficient}\label{field-wind-coefficient}
 
-This field is the value of the wind coefficient, \({C_w}\) ~in the equation above.~ The coefficient has units of (L/s)\(^{2}\)/(cm\(^{4}\)·(m/s)\(^{2}\)).~ Values for the ``Basic Model Wind Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+This field is the value of the wind coefficient, \({C_w}\) in the equation above. The coefficient has units of (L/s)\(^{2}\)/(cm\(^{4}\)·(m/s)\(^{2}\)). Values for the ``Basic Model Wind Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+
+\begin{longtable}[c]{@{}llll@{}}
+\toprule
+Shelter class & One story house & Two story house & Three story house \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Shelter class & One story house & Two story house & Three story house \tabularnewline
+\midrule
+\endhead
+
+1 & 0.000319 & 0.000420 & 0.000494 \tabularnewline
+2 & 0.000246 & 0.000325 & 0.000382 \tabularnewline
+3 & 0.000174 & 0.000231 & 0.000271 \tabularnewline
+4 & 0.000104 & 0.000137 & 0.000161 \tabularnewline
+5 & 0.000032 & 0.000042 & 0.000049 \tabularnewline
+\bottomrule
+\end{longtable}
 
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
@@ -347,6 +366,25 @@ Shelter class & Description \tabularnewline
 \paragraph{Field: Shelter Factor}\label{field-shelter-factor}
 
 This field is the value of the wind coefficient, \(s\) ~in the equation above.~ The coefficient is dimensionless.~ Values for the ``Enhanced Model Shelter Factor'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+
+\begin{longtable}[c]{@{}lllll@{}}
+\toprule
+Shelter class & No Flue & One story house with flue & Two story house with flue & Three story house with flue \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule
+Shelter class & No Flue & One story house with flue & Two story house with flue & Three story house with flue \tabularnewline
+\midrule
+\endhead
+
+1 & 1.00 & 1.10 & 1.07 & 1.06 \tabularnewline
+2 & 0.90 & 1.02 & 0.98 & 0.97 \tabularnewline
+3 & 0.70 & 0.86 & 0.81 & 0.79 \tabularnewline
+4 & 0.50 & 0.70 & 0.64 & 0.61 \tabularnewline
+5 & 0.30 & 0.54 & 0.47 & 0.43 \tabularnewline
+\bottomrule
+\end{longtable}
 
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
