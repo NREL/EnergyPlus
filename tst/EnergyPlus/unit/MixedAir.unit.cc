@@ -1220,7 +1220,7 @@ namespace EnergyPlus {
 		//compare_err_stream( "" ); // just for debugging
 
 		EXPECT_FALSE( ErrorsFound );
-		EXPECT_EQ ( false, OAController( ControllerNum ).ModifyDuringHighOAMoisture ); // missing input defaults "Control High Indoor Humidity Based on Outdoor Humidity Ratio" to false
+		EXPECT_FALSE( OAController( ControllerNum ).ModifyDuringHighOAMoisture ); // missing input defaults "Control High Indoor Humidity Based on Outdoor Humidity Ratio" to false
 
 		std::string const error_string = delimited_string( {
 			"   ** Warning ** Controller:OutdoorAir \"OA CONTROLLER 1\", missing field value",
