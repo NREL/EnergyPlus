@@ -5317,8 +5317,12 @@ namespace WaterThermalTanks {
 
 		// calling CalcStandardRatings early bypasses fan sizing since DataNonZoneNonAirloopValue has not been set yet
 		if ( !AlreadyRated( WaterThermalTankNum ) ) {
-			if ( !AnyPlantInModel || PlantFirstSizesOkayToReport || WaterThermalTank( WaterThermalTankNum ).MaxCapacity > 0.0 || WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
-				CalcStandardRatings( WaterThermalTankNum );
+			if ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
+				AlreadyRated( WaterThermalTankNum ) = true;
+			} else {
+				if ( !AnyPlantInModel || PlantFirstSizesOkayToReport || WaterThermalTank( WaterThermalTankNum ).MaxCapacity > 0.0 || WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
+					CalcStandardRatings( WaterThermalTankNum );
+				}
 			}
 		}
 
