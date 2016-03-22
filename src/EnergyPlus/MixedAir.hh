@@ -551,6 +551,9 @@ namespace MixedAir {
 	GetOAControllerInputs();
 
 	void
+	AllocateOAControllers();
+
+	void
 	GetOAMixerInputs();
 
 	void

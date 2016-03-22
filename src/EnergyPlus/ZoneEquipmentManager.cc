@@ -2381,7 +2381,8 @@ namespace ZoneEquipmentManager {
 		} else if ( SELECT_CASE_var == EndZoneSizingCalc ) {
 
 			// candidate EMS calling point to customize CalcFinalZoneSizing
-			ManageEMS( emsCallFromZoneSizing );
+			bool anyEMSRan;
+			ManageEMS( emsCallFromZoneSizing, anyEMSRan );
 
 			// now apply EMS overrides (if any)
 
