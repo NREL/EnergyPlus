@@ -26,7 +26,7 @@ where
 
 \emph{t} = time
 
-\emph{q\(_{t}\)} = net heat transfer rate to the tank water
+\emph{q\(_{net}\)} = net heat transfer rate to the tank water
 
 The density and volume can be replaced with the total mass \emph{m} of water in the tank to get:
 
@@ -34,7 +34,7 @@ The density and volume can be replaced with the total mass \emph{m} of water in 
 m{c_p}\frac{{dT}}{{dt}} = {q_{net}}
 \end{equation}
 
-The net heat transfer rate \emph{q\(_{t}\)} is the sum of gains and losses due to multiple heat transfer pathways.
+The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due to multiple heat transfer pathways.
 
 \begin{equation}
 {q_{net}} = {q_{heater}} + {q_{oncycpara}} + {q_{offcycpara}} + {q_{oncycloss}} + {q_{offcycloss}} + {q_{use}} + {q_{source}}
@@ -42,21 +42,21 @@ The net heat transfer rate \emph{q\(_{t}\)} is the sum of gains and losses due t
 
 where
 
-\emph{q\(_{r}\)} = heat added by the heating element or burner
+\emph{q\(_{heater}\)} = heat added by the heating element or burner
 
-\emph{q\(_{a}\)} = heat added due to on-cycle parasitic loads (zero when off)
+\emph{q\(_{oncycpara}\)} = heat added due to on-cycle parasitic loads (zero when off)
 
-\emph{q\(_{a}\)} = heat added due to off-cycle parasitic loads (zero when on)
+\emph{q\(_{offcycpara}\)} = heat added due to off-cycle parasitic loads (zero when on)
 
-\emph{q\(_{s}\)} = heat transfer to/from the ambient environment (zero when off)
+\emph{q\(_{oncycloss}\)} = heat transfer to/from the ambient environment (zero when off)
 
-\emph{q\(_{s}\)} = heat transfer to/from the ambient environment (zero when on)
+\emph{q\(_{offcycloss}\)} = heat transfer to/from the ambient environment (zero when on)
 
-\emph{q\(_{e}\)} = heat transfer to/from the use side plant connections
+\emph{q\(_{use}\)} = heat transfer to/from the use side plant connections
 
-\emph{q\(_{e}\)} = heat transfer to/from the source side plant connections
+\emph{q\(_{source}\)} = heat transfer to/from the source side plant connections
 
-\emph{q\(_{s}\)} and \emph{q\(_{s}\)} are defined as:
+\emph{q\(_{oncycloss}\)} and \emph{q\(_{offcycloss}\)} are defined as:
 
 \begin{equation}
 {q_{oncycloss}} = U{A_{oncyc}}\left( {{T_{amb}} - T} \right)
@@ -68,13 +68,13 @@ where
 
 where
 
-\emph{UA\(_{c}\)} = on-cycle loss coefficient to ambient environment (zero when off)
+\emph{UA\(_{oncyc}\)} = on-cycle loss coefficient to ambient environment (zero when off)
 
-\emph{UA\(_{c}\)} = off-cycle loss coefficient to ambient environment (zero when on)
+\emph{UA\(_{offcyc}\)} = off-cycle loss coefficient to ambient environment (zero when on)
 
-\emph{T\(_{b}\)} = temperature of ambient environment
+\emph{T\(_{amb}\)} = temperature of ambient environment
 
-\emph{q\(_{e}\)}, and \emph{q\(_{e}\)} are defined as:
+\emph{q\(_{use}\)}, and \emph{q\(_{source}\)} are defined as:
 
 \begin{equation}
 {q_{use}} = {\varepsilon_{use}}{\dot m_{use}}{c_p}\left( {{T_{use}} - T} \right)
@@ -86,17 +86,17 @@ where
 
 where
 
-\emph{e\(_{e}\)} = heat exchanger effectiveness for the use side plant connections
+\emph{e\(_{use}\)} = heat exchanger effectiveness for the use side plant connections
 
 \({\dot m_{use}}\) = mass flow rate for the use side plant connections
 
-\emph{T\(_{e}\)} = inlet fluid temperature of the use side plant connections
+\emph{T\(_{use}\)} = inlet fluid temperature of the use side plant connections
 
-\emph{e\(_{e}\)} = heat exchanger effectiveness for the source side plant connections
+\emph{e\(_{source}\)} = heat exchanger effectiveness for the source side plant connections
 
 \({\dot m_{source}}\) = mass flow rate for the source side plant connections
 
-\emph{T\(_{e}\)} = inlet fluid temperature of the use side plant connections
+\emph{T\(_{source}\)} = inlet fluid temperature of the use side plant connections
 
 Incorporating all of these equations into the original differential equation,
 
@@ -193,7 +193,7 @@ Although the instantaneous tank water temperature may vary considerably within a
 
 The input objects ThermalStorage:ChilledWater:Mixed and ThermalStorage:ChilledWater:Stratified provide chilled water tank models that do not include active cooling elements, there is only indirect cooling by remote devices such as a chiller.~ The tank's setpoint controls are used to determine if flow is to be requested through the source side of the tank.~ The setpont and deadband control scheme is similar to the water heater but the logic is flipped around for cooling instead of heating.~ The setpoint temperatue is the ``cut-out'' temperature and the setpoint plus deadband is the ``cut-in'' temperature.~ If the tank temperature ( or tank sensing node for stratified tanks) is above the ``cut-in'' temperature, then flow is requested.~ If temperatures are below the ``cut-out'' temperature, then flow is not requested.~ The chilled water tanks also have separate availability schedules for the use side and source side for additional control options.
 
-\subsubsection{Standard Ratings}\label{standard-ratings}
+\subsubsection{Standard Ratings}\label{standard-ratings-000}
 
 For water heaters, the industry standard ratings of Recovery Efficiency and Energy Factor are calculated according to the 10CFR430 test procedure.~ To emulate the test procedure, a 24-hour simulation of the water heater is performed internally using the specified test conditions:
 
@@ -233,11 +233,11 @@ EF = \frac{{{m_{total}}{c_p}\left( {57.2 - 14.4} \right)}}{{{E_{total}}}}
 
 where
 
-\emph{m\(_{l}\)} = total water mass of all six draws
+\emph{m\(_{total}\)} = total water mass of all six draws
 
 \emph{c\(_{p}\)} = specific heat of water
 
-\emph{E\(_{l}\)} = total fuel energy consumed over 24 hours (including parasitics)
+\emph{E\(_{total}\)} = total fuel energy consumed over 24 hours (including parasitics)
 
 Under certain input parameters, the rating method will not succeed and a warning message will be generated.~ Problems occur when inputs do not allow the tank to recover to the setpoint temperature within the test period.~ This can occur if the maximum heater capacity is undersized, or if the deadband temperature difference is large enough that the first draw of the test does not trigger the heater to come on.~ In either case, the Recovery Efficiency test will not compute properly because recovery to the setpoint was not achieved.
 
@@ -266,11 +266,33 @@ Each type of \lstinline!WaterHeater:HeatPump:*! object is compatible with certai
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-WaterHeater:HeatPump:* & Coil:WaterHeating:AirToWaterHeatPump:* \tabularnewline \midrule
+WaterHeater:HeatPump:* & WaterHeater:* \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+WaterHeater:HeatPump:* & WaterHeater:* \tabularnewline
+\midrule
 \endhead
+
 PumpedCondenser & Pumped \tabularnewline
-VariableSpeed \tabularnewline
+PumpedCondenser & VariableSpeed \tabularnewline
 WrappedCondenser & Wrapped \tabularnewline
+\bottomrule
+\end{longtable}
+
+Additionally the \lstinline!WaterHeater:HeatPump:WrappedCondenser! object is only compatible with stratified tanks. Therefore \lstinline!WaterHeater:HeatPump:*! has the following tank compatibility matrix:
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule
+WaterHeater:HeatPump:* & \multicolumn{2}{c}{WaterHeater:*} \tabularnewline
+\cmidrule{2-3}
+& Mixed & Stratified \tabularnewline
+\midrule
+\endhead
+
+Pumped & X & X \tabularnewline
+Wrapped &  & X \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -500,7 +522,7 @@ where
 
 \emph{t} = time
 
-\emph{q\(_{t}\)} = net heat transfer rate
+\emph{q\(_{net}\)} = net heat transfer rate
 
 The difference for the stratified model is that it must solve the energy balance on \emph{n} number of nodes simultaneously.~ Node 1 is at the top of the water tank and node \emph{n} is at the bottom of the water tank.
 
@@ -518,9 +540,9 @@ where
 
 \emph{t} = time
 
-\emph{q\(_{n}\)} = net heat transfer rate for node \emph{n}
+\emph{q\(_{net,n}\)} = net heat transfer rate for node \emph{n}
 
-The net heat transfer rate \emph{q\(_{t}\)} is the sum of gains and losses due to multiple heat transfer pathways.
+The net heat transfer rate \emph{q\(_{net}\)} is the sum of gains and losses due to multiple heat transfer pathways.
 
 \begin{equation}
   \begin{array}{ll}
@@ -531,27 +553,27 @@ The net heat transfer rate \emph{q\(_{t}\)} is the sum of gains and losses due t
 
 where
 
-\emph{q\(_{n}\)} = heat added by Heater 1 or Heater 2
+\emph{q\(_{heater,n}\)} = heat added by Heater 1 or Heater 2
 
-\emph{q\(_{n}\)} = heat added due to on-cycle parasitic loads (zero when off)
+\emph{q\(_{oncycpara,n}\)} = heat added due to on-cycle parasitic loads (zero when off)
 
-\emph{q\(_{n}\)} = heat added due to off-cycle parasitic loads (zero when on)
+\emph{q\(_{offcycpara,n}\)} = heat added due to off-cycle parasitic loads (zero when on)
 
-\emph{q\(_{n}\)} = heat transfer to/from the ambient environment (zero when off)
+\emph{q\(_{oncycloss,n}\)} = heat transfer to/from the ambient environment (zero when off)
 
-\emph{q\(_{n}\)} = heat transfer to/from the ambient environment (zero when on)
+\emph{q\(_{offcycloss,n}\)} = heat transfer to/from the ambient environment (zero when on)
 
-\emph{q\(_{n}\)} = heat transfer due to conduction between the node above and below
+\emph{q\(_{cond,n}\)} = heat transfer due to conduction between the node above and below
 
-\emph{q\(_{n}\)} = heat transfer to/from the use side plant connections
+\emph{q\(_{use,n}\)} = heat transfer to/from the use side plant connections
 
-\emph{q\(_{n}\)} = heat transfer to/from the source side plant connections
+\emph{q\(_{source,n}\)} = heat transfer to/from the source side plant connections
 
-\emph{q\(_{n}\)} = heat transfer due to fluid flow from the node above and below
+\emph{q\(_{flow,n}\)} = heat transfer due to fluid flow from the node above and below
 
-\emph{q\(_{n}\)} = heat transfer due to inversion mixing from the node above and below
+\emph{q\(_{invmix,n}\)} = heat transfer due to inversion mixing from the node above and below
 
-\emph{q\(_{n}\)} and \emph{q\(_{n}\)} are defined as:
+\emph{q\(_{oncycloss,n}\)} and \emph{q\(_{offcycloss,n}\)} are defined as:
 
 \begin{equation}
 {q_{oncycloss,n}} = ({UA_{tank}} + UA_add,n)({T_{amb}} - {T_n})
@@ -563,15 +585,15 @@ where
 
 where
 
-\emph{UA\(_{k}\)} = loss coefficient to ambient environment for the tank
+\emph{UA\(_{tank}\)} = loss coefficient to ambient environment for the tank
 
-\emph{UA\(_{n}\)} = additional node loss coefficient
+\emph{UA\(_{add,n}\)} = additional node loss coefficient
 
-\emph{UA\(_{e}\)} = additional off-cycle flue loss coefficient to ambient environment (zero when on)
+\emph{UA\(_{flue}\)} = additional off-cycle flue loss coefficient to ambient environment (zero when on)
 
-\emph{T\(_{b}\)} = temperature of ambient environment
+\emph{T\(_{amb}\)} = temperature of ambient environment
 
-\emph{q\(_{n}\)} is defined as:
+\emph{q\(_{cond,n}\)} is defined as:
 
 \begin{equation}
 {q_{cond,n}} = \frac{{k{A_{n + 1}}}}{{{L_{n + 1}}}}({T_{n + 1}} - {T_n}) + \frac{{k{A_{n - 1}}}}{{{L_{n - 1}}}}({T_{n - 1}} - {T_n})
@@ -581,19 +603,19 @@ where
 
 \emph{k} = fluid thermal conductivity of water, 0.6 W/m-K
 
-\emph{A\(_{1}\)} = shared surface area between node \emph{n} and node \emph{n+1}
+\emph{A\(_{n+1}\)} = shared surface area between node \emph{n} and node \emph{n+1}
 
-\emph{L\(_{1}\)} = distance between the center of mass of node \emph{n} and n\emph{+1}
+\emph{L\(_{n+1}\)} = distance between the center of mass of node \emph{n} and n\emph{+1}
 
-\emph{T\(_{1}\)} = temperature of node \emph{n+1}
+\emph{T\(_{n+1}\)} = temperature of node \emph{n+1}
 
-\emph{A\(_{1}\)} = shared surface area between node \emph{n} and node \emph{n-1}
+\emph{A\(_{n-1}\)} = shared surface area between node \emph{n} and node \emph{n-1}
 
-\emph{L\(_{1}\)} = distance between the center of mass of node \emph{n} and n\emph{-1}
+\emph{L\(_{n-1}\)} = distance between the center of mass of node \emph{n} and n\emph{-1}
 
-\emph{T\(_{1}\)} = temperature of node \emph{n-1}
+\emph{T\(_{n-1}\)} = temperature of node \emph{n-1}
 
-\emph{q\(_{n}\)}, and \emph{q\(_{n}\)} are defined as:
+\emph{q\(_{use,n}\)}, and \emph{q\(_{source,n}\)} are defined as:
 
 \begin{equation}
 {q_{use}} = {\varepsilon_{use}}{\dot m_{use}}{c_p}\left( {{T_{use}} - T} \right)
@@ -605,19 +627,19 @@ where
 
 where
 
-\emph{e\(_{e}\)} = heat exchanger effectiveness for the use side plant connections
+\emph{e\(_{use}\)} = heat exchanger effectiveness for the use side plant connections
 
 \({\dot m_{use}}\) = mass flow rate for the use side plant connections
 
-\emph{T\(_{e}\)} = inlet fluid temperature of the use side plant connections
+\emph{T\(_{use}\)} = inlet fluid temperature of the use side plant connections
 
-\emph{e\(_{e}\)} = heat exchanger effectiveness for the source side plant connections
+\emph{e\(_{source}\)} = heat exchanger effectiveness for the source side plant connections
 
 \({\dot m_{source}}\) = mass flow rate for the source side plant connections
 
-\emph{T\(_{e}\)} = inlet fluid temperature of the source side plant connections
+\emph{T\(_{source}\)} = inlet fluid temperature of the source side plant connections
 
-\emph{q\(_{n}\)} is defined as:
+\emph{q\(_{flow,n}\)} is defined as:
 
 \begin{equation}
 {q_{flow,n}} = {\dot m_{n + 1}}{c_p}({T_{n + 1}} - {T_n}) + {\dot m_{n - 1}}{c_p}({T_{n - 1}} - {T_n})
@@ -629,7 +651,7 @@ where
 
 \({\dot m_{n - 1}}\) = mass flow rate from node \emph{n-1}
 
-\emph{q\(_{n}\)} is defined as:
+\emph{q\(_{invmix,n}\)} is defined as:
 
 \begin{equation}
 {q_{invmix,n}} = {\dot m_{invmix,n + 1}}{c_p}({T_{n + 1}} - {T_n}) + {\dot m_{invmix,n - 1}}{c_p}({T_{n - 1}} - {T_n})
@@ -651,7 +673,7 @@ where
 
 \emph{Dt} = the substep time interval.
 
-The use and source fluid steam outlet temperatures calculation procedure depends on the values of the effectiveness.~ If the effectiveness is 1.0, then complete mixing of these fluid steam and the tank water is assumed.~ In this case the outlet temperatures for the use and source streams will be simply the tank water temperatures at point of the outlet nodes. When the effectiveness is less than 1.0, an indirect heat exchange is assumed between the use or source stream and the water in the stratified thermal storage tank.~ When the effectiveness is less than 1.0, the use and source outlet temperatures are calculated using \emph{Q\(_{e}\)} and \emph{Q\(_{e}\)}, and energy balance equations as follows:
+The use and source fluid steam outlet temperatures calculation procedure depends on the values of the effectiveness.~ If the effectiveness is 1.0, then complete mixing of these fluid steam and the tank water is assumed.~ In this case the outlet temperatures for the use and source streams will be simply the tank water temperatures at point of the outlet nodes. When the effectiveness is less than 1.0, an indirect heat exchange is assumed between the use or source stream and the water in the stratified thermal storage tank.~ When the effectiveness is less than 1.0, the use and source outlet temperatures are calculated using \emph{Q\(_{use}\)} and \emph{Q\(_{source}\)}, and energy balance equations as follows:
 
 \begin{equation}
 {T_{use\;out,\,n}} = {T_{use,\,n}} + \frac{{{q_{use,n}}}}{{{{\dot m}_{use}}{c_p}}}
@@ -663,9 +685,9 @@ The use and source fluid steam outlet temperatures calculation procedure depends
 
 ~where,
 
-\emph{T\(_{t}\)}\(_{ }\) = outlet fluid temperature of the use side plant connections
+\emph{T\(_{use\, out}\)} = outlet fluid temperature of the use side plant connections
 
-\emph{T\(_{t}\)}\(_{ }\) = outlet fluid temperature of the source side plant connections
+\emph{T\(_{source\, out}\)} = outlet fluid temperature of the source side plant connections
 
 \subsubsection{Numerical Solution}\label{numerical-solution}
 
@@ -675,7 +697,7 @@ The system of simultaneous differential equations is solved using the Forward-Eu
 {T_n} = {T_{n,old}} + \frac{{{q_{net,n}}\Delta t}}{{{m_n}{c_p}}}
 \end{equation}
 
-All node temperatures for \emph{q\(_{n}\)} are the old temperatures from the previous substep.
+All node temperatures for \emph{q\(_{net,n}\)} are the old temperatures from the previous substep.
 
 Before each system time step is calculated the following evaluations are made:
 
@@ -714,13 +736,22 @@ The volume a water heater can be sized in the following ways depending on the de
 \end{itemize}
 
 % table 85
-\begin{longtable}[c]{p{0.8in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}}
-\caption{Residential HUD-FHA Minimum \protect \label{table:residential-hud-fha-minimum}}\\
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.8in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}p{0.35in}}
+\caption{Residential HUD-FHA Minimum \label{table:residential-hud-fha-minimum}} \tabularnewline
 \toprule 
-\multicolumn{13}{c}{Residential HUD-FHA Minimum DHW Storage and Burner Capacity (ASHRAE 1999)} \tabularnewline \midrule
+\multicolumn{13}{p{5in}}{\raggedright Residential HUD-FHA Minimum DHW Storage and Burner Capacity (ASHRAE 1999)} \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Residential HUD-FHA Minimum} \tabularnewline
+\toprule 
+\multicolumn{13}{p{5in}}{\raggedright Residential HUD-FHA Minimum DHW Storage and Burner Capacity (ASHRAE 1999)} \tabularnewline
+\midrule
 \endhead
-\# Bedrooms & 1 & \multicolumn{3}{c}{2} & \multicolumn{3}{c}{3} & \multicolumn{3}{c}{4} & 5 & 6 \tabularnewline
-\# Bathrooms & All & <=1.5 & 2-2.5 & >=3 & <=1.5 & 2-2.5 & >=3 & <=1.5 & 2-2.5 & >=3 & All & All \tabularnewline
+
+\# Bedrooms & 1 & 2 & 2 & 2 & 3 & 3 & 3 & 4 & 4 & 4 & 5 & 6 \tabularnewline
+\# Bathrooms & All & \(\le 1.5\) & 2-2.5 & \(\ge 3\) & \(\le 1.5\) & 2-2.5 & \(\ge 3\) & \(\le 1.5\) & 2-2.5 & \(\ge 3\) & All & All \tabularnewline
 Gas &  &  &  &  &  &  &  &  &  &  &  &  \tabularnewline
 \;\;Storage (gal) & 20 & 30 & 30 & 40 & 30 & 40 & 40 & 40 & 40 & 50 & 50 & 50 \tabularnewline
 \;\;Burner (kBtu/hr) & 27 & 36 & 36 & 36 & 36 & 36 & 38 & 36 & 38 & 38 & 47 & 50 \tabularnewline
@@ -728,7 +759,7 @@ Electric &  &  &  &  &  &  &  &  &  &  &  &  \tabularnewline
 \;\;Storage (gal) & 20 & 30 & 40 & 50 & 40 & 50 & 50 & 50 & 50 & 66 & 66 & 80 \tabularnewline
 \;\;Burner (kW) & 2.5 & 3.5 & 4.5 & 5.5 & 4.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 & 5.5 \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \begin{itemize}
   \item Per Person. The tank volume is determined by summing the design level of people in the model and multiplying by a user-entered volume per person factor.
@@ -806,7 +837,7 @@ where
 
 \({t_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} er}}\) ~ = User parameter for the time it takes for the tank to recover from assumed starting temperature to an assumed setpoint temperature.~ For water heaters, the starting temperature is 14.4ºC and the final assumed setpoint temperature is 57.2ºC.~ For chilled water tanks, the starting temperature is 14.4 ºC and the final temperature is 9.0ºC.
 
-\(\varepsilon\) ~ = \emph{e\(_{e}\)} ~~or \emph{e\(_{e}\)}
+\(\varepsilon\) ~ = \emph{e\(_{use}\)} ~~or \emph{e\(_{source}\)}
 
 \({T_{PlantDesign}}\) = the exit temperature specified in the Plant Sizing object
 

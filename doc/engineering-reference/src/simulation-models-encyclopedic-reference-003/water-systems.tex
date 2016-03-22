@@ -24,15 +24,15 @@ These values can be easily calculated from annual weather data using a spreadshe
 
 The correlation was developed by Craig Christensen and Jay Burch and is described in Hendron et al. (2004).~ The correlation is:
 
-T\(_{s}\) = (T\(_{g}\) + 6) + ratio * (ΔT\(_{f}\) / 2) * SIN(0.986 * (day - 15 - lag) - 90)
+T\(_{mains}\) = (T\(_{out,avg}\) + 6) + ratio * (ΔT\(_{out,maxdiff}\) / 2) * SIN(0.986 * (day - 15 - lag) - 90)
 
 where
 
-T\(_{s}\) = water mains temperature (°F)
+T\(_{mains}\) = water mains temperature (°F)
 
-T\(_{g}\) = average annual outdoor air temperature (°F)
+T\(_{out,avg}\) = average annual outdoor air temperature (°F)
 
-ΔT\(_{f}\) = maximum difference in monthly average outdoor air temperatures (°F)
+ΔT\(_{out,maxdiff}\) = maximum difference in monthly average outdoor air temperatures (°F)
 
 day = Julian day of the year (1-365)
 
@@ -40,7 +40,7 @@ ratio = 0.4 + 0.01 * (Tamb,avg - 44)
 
 lag = 35 - 1.0 * (Tamb,avg - 44) (°F)
 
-For the Chicago-O'Hare TMY2 weather file, T\(_{g}\) = 9.69 C and ΔT\(_{f}\) = 28.1 C.~ The resulting water mains temperature profile is graphed below.
+For the Chicago-O'Hare TMY2 weather file, T\(_{out,avg}\) = 9.69 C and ΔT\(_{out,maxdiff}\) = 28.1 C.~ The resulting water mains temperature profile is graphed below.
 
 \begin{figure}[htbp]
 \centering
@@ -162,7 +162,7 @@ The approach taken here is to utilize the first set of initial condition variabl
 \begin{figure}[hbtp] % fig 316
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image6962.png}
-\caption{  Zone Heat Gain from Water Use Equipment \protect \label{fig:zone-heat-gain-from-water-use-equipment}}
+\caption{Zone Heat Gain from Water Use Equipment \protect \label{fig:zone-heat-gain-from-water-use-equipment}}
 \end{figure}
 
 The maximum sensible heat gain rate is calculated by assuming that all of the water flow is allowed to cool to the zone dry-bulb temperature.~ The actual sensible zone heat gain rate is found by multiplying the maximum by the user fraction.
