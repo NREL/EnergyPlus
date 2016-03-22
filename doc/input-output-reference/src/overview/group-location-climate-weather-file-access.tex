@@ -94,13 +94,13 @@ The multipliers are taken from the ASHRAE 2009 HOF. More explicitly, EnergyPlus 
 
 where
 
-T\(_{t}\) = Air temperature of current Hour of Day
+T\(_{current}\) = Air temperature of current Hour of Day
 
-T\(_{x}\) = User supplied Max Dry-bulb Temperature
+T\(_{Max}\) = User supplied Max Dry-bulb Temperature
 
-T\(_{e}\) = User supplied Daily Temperature Range
+T\(_{range}\) = User supplied Daily Temperature Range
 
-T\(_{r}\) = Range multiplier as shown on the above graph
+T\(_{Multiplier}\) = Range multiplier as shown on the above graph
 
 The range multiplier values represent typical conditions of diurnal temperatures (i.e. the low temperature for the day occurring about 5:00 AM and the maximum temperature for the day occurring about 3:00 PM. Note that EnergyPlus does not shift the profile based on the time of solar noon as is optionally allowed in ASHRAE procedures.
 
@@ -130,10 +130,18 @@ The Humidity Condition Type fields have interacting uses and units, summarized a
 
 % table 2
 \begin{longtable}[c]{p{2.25in}p{1.75in}p{2.0in}}
-\caption{Humidity Indicating Field Interactions - Design Day \protect \label{table:humidity-indicating-field-interactions-design}}\\
+\caption{Humidity Indicating Field Interactions - Design Day \label{table:humidity-indicating-field-interactions-design}} \tabularnewline
 \toprule 
-Humidity Condition Type & Primary Humidity Indicating Field & Humidity Indicating Day Schedule \tabularnewline \midrule
+Humidity Condition Type & Primary Humidity Indicating Field & Humidity Indicating Day Schedule \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Humidity Indicating Field Interactions - Design Day} \tabularnewline
+\toprule 
+Humidity Condition Type & Primary Humidity Indicating Field & Humidity Indicating Day Schedule \tabularnewline
+\midrule
 \endhead
+
 WetBulb & Wetbulb or DewPoint at Maximum Dry-Bulb & N/A (unused) \tabularnewline
 DewPoint & Wetbulb or DewPoint at Maximum Dry-Bulb & N/A (unused) \tabularnewline
 HumidityRatio & Humidity Ratio at Maximum Dry-Bulb & N/A (unused) \tabularnewline
@@ -685,10 +693,18 @@ This field is the starting date for the special day period. Dates in this field 
 
 % table 3
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Date Field Interpretation \protect \label{table:date-field-interpretation}}\\
+\caption{Date Field Interpretation \label{table:date-field-interpretation}} \tabularnewline
 \toprule 
-Field Contents & Interpretation \tabularnewline \midrule
+Field Contents & Interpretation \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Date Field Interpretation} \tabularnewline
+\toprule 
+Field Contents & Interpretation \tabularnewline
+\midrule
 \endhead
+
 < number >  /  < number > & Month / Day \tabularnewline
 < number >  Month & Day and Month \tabularnewline
 Month  < number > & Day and Month \tabularnewline
@@ -830,10 +846,18 @@ The \textbf{Site:WeatherStation} object is useful when working with a custom wea
 
 % table 4
 \begin{longtable}[c]{@{}lll@{}}
-\caption{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005). \protect \label{table:wind-speed-profile-coefficients-ashrae}}\\
+\caption{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005). \label{table:wind-speed-profile-coefficients-ashrae}} \tabularnewline
 \toprule 
-Terrain Description & Exponent & Bounhary Layer Thickness (m) \tabularnewline \midrule
+Terrain Description & Exponent & Bounhary Layer Thickness (m) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).} \tabularnewline
+\toprule 
+Terrain Description & Exponent & Bounhary Layer Thickness (m) \tabularnewline
+\midrule
 \endhead
+
 Flat, open country & 0.14 & 270 \tabularnewline
 Rough, wooded country & 0.22 & 370 \tabularnewline
 Towns and cities & 0.33 & 460 \tabularnewline
@@ -882,10 +906,18 @@ The Site:HeightVariation object is used to specify the local variation in atmosp
 
 % table 5
 \begin{longtable}[c]{@{}lllll@{}}
-\caption{Atmospheric Variables at Two Different Heights Above Ground Level. \protect \label{table:atmospheric-variables-at-two-different}}\\
+\caption{Atmospheric Variables at Two Different Heights Above Ground Level. \label{table:atmospheric-variables-at-two-different}} \tabularnewline
 \toprule 
-Variable & 1.5 m & 284 m & Absolute Diff & Percent Diff \tabularnewline \midrule
+Variable & 1.5 m & 284 m & Absolute Diff & Percent Diff \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Atmospheric Variables at Two Different Heights Above Ground Level.} \tabularnewline
+\toprule 
+Variable & 1.5 m & 284 m & Absolute Diff & Percent Diff \tabularnewline
+\midrule
 \endhead
+
 Air Temperature & 15°C & 13.15°C & 1.85°C & 12.3\% \tabularnewline
 Barometric Pressure & 101,325 Pa & 97,960 Pa & 3,365 Pa & 3.3\% \tabularnewline
 Wind Speed & 2.46 m/s & 7.75 m/s & 5.29 m/s & 215\% \tabularnewline
@@ -1979,10 +2011,18 @@ The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current ti
 
 % table 6
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Relationship of Angles (degrees) to Time \protect \label{table:relationship-of-angles-degrees-to-time}}\\
+\caption{Relationship of Angles (degrees) to Time \label{table:relationship-of-angles-degrees-to-time}} \tabularnewline
 \toprule 
-Unit of Angle & Equivalent time \tabularnewline \midrule
+Unit of Angle & Equivalent time \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Relationship of Angles (degrees) to Time} \tabularnewline
+\toprule 
+Unit of Angle & Equivalent time \tabularnewline
+\midrule
 \endhead
+
 1 radian & 3.819719 hours \tabularnewline
 1 degree & 4 minutes \tabularnewline
 1 arcmin & 4 seconds \tabularnewline

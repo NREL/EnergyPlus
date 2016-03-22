@@ -38,7 +38,7 @@ The form of the polynomial equation used to represent the tabular data. Choices 
 
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method}
 
-The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{h}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4, 5, and 4 data pairs for linear, quadratic, cubic, quartic, and exponent curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnotics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{th}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4, 5, and 4 data pairs for linear, quadratic, cubic, quartic, and exponent curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnotics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
 
 \paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-000}
 
@@ -94,7 +94,7 @@ The normalization point for the data set. This field provides a method for autom
 
 \paragraph{Data Pairs}\label{data-pairs}
 
-The following inputs describe the data set. Data pairs are entered as X and Output pairs where X is the independent variable (i.e., x in the equation above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. Linear (1\(^{t}\) order), Quadratic (2\(^{d}\) order), Cubic (3\(^{d}\) order), Quartic (4\(^{h}\) order), and Exponent (nth order) polynomials require a minimum of 2, 3, 4, 5, and 4 data pairs, respectively. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
+The following inputs describe the data set. Data pairs are entered as X and Output pairs where X is the independent variable (i.e., x in the equation above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. Linear (1\(^{st}\) order), Quadratic (2\(^{nd}\) order), Cubic (3\(^{rd}\) order), Quartic (4\(^{th}\) order), and Exponent (nth order) polynomials require a minimum of 2, 3, 4, 5, and 4 data pairs, respectively. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
 
 \paragraph{Field: X Value \#n}\label{field-x-value-n}
 
@@ -244,7 +244,7 @@ The normalization point for the data set. This field provides a method for autom
 
 \paragraph{Data Pairs}\label{data-pairs-1}
 
-The following inputs describe the data set. Data pairs are entered as X, Y and Output pairs where X and Y are the independent variables (i.e., x and y in the equations above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. BiQuadratic and QuadraticLinear (2\(^{d}\) order with 2 independent variables) require a minimum of 6 data pairs. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
+The following inputs describe the data set. Data pairs are entered as X, Y and Output pairs where X and Y are the independent variables (i.e., x and y in the equations above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. BiQuadratic and QuadraticLinear (2\(^{nd}\) order with 2 independent variables) require a minimum of 6 data pairs. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
 
 \paragraph{Field: X Value \#n}\label{field-x-value-n-1}
 
@@ -319,7 +319,7 @@ The current value of the first and second independent variable passed to the per
 
 \subsection{Lookup Tables}\label{lookup-tables}
 
-Lookup tables are useful for determining the results of a nth order polynomial without the need to calculate the polynomial coefficients. The Lagrange method for interpolation is currently the only method available for polynomial interpolation. LinearInterpolationOfTable and EvaluateCurveToLimits may also be used. The multi-variable lookup table can represent from 1 to 5 independent variables and can interpolate these independent variables up to a 4\(^{h}\) order polynomial. The polynomial order is assumed to be the number of interpolation points (n) minus 1. Polynomial interpolation of tabular data takes place when the values of the independent variables are within the upper table boundary and at least n data points are available when approaching the lower table boundary for any independent variable. When any independent variable value is outside the table limits, linear extrapolation is used to predict the table result and is based on the two nearest data points in the table for that particular independent variable.
+Lookup tables are useful for determining the results of a nth order polynomial without the need to calculate the polynomial coefficients. The Lagrange method for interpolation is currently the only method available for polynomial interpolation. LinearInterpolationOfTable and EvaluateCurveToLimits may also be used. The multi-variable lookup table can represent from 1 to 5 independent variables and can interpolate these independent variables up to a 4\(^{th}\) order polynomial. The polynomial order is assumed to be the number of interpolation points (n) minus 1. Polynomial interpolation of tabular data takes place when the values of the independent variables are within the upper table boundary and at least n data points are available when approaching the lower table boundary for any independent variable. When any independent variable value is outside the table limits, linear extrapolation is used to predict the table result and is based on the two nearest data points in the table for that particular independent variable.
 
 \subsection{Table:MultiVariableLookup}\label{tablemultivariablelookup}
 
@@ -396,11 +396,11 @@ The name of an external file that represents the tabular data. This file would i
 
 \paragraph{Field: X1 Sort Order}\label{field-x1-sort-order}
 
-The choice field specifies the order of the lookup table data for the 1\(^{t}\) independent variable. Valid choices are \emph{Increasing} or \emph{Decreasing}. If increasing is selected, then the order of the data is from lowest value of the 1\(^{t}\) independent variable to highest. If decreasing is selected, then the order of the data is from highest value of the 1\(^{t}\) independent variable to lowest.
+The choice field specifies the order of the lookup table data for the 1\(^{st}\) independent variable. Valid choices are \emph{Increasing} or \emph{Decreasing}. If increasing is selected, then the order of the data is from lowest value of the 1\(^{st}\) independent variable to highest. If decreasing is selected, then the order of the data is from highest value of the 1\(^{st}\) independent variable to lowest.
 
 \paragraph{Field: X2 Sort Order}\label{field-x2-sort-order}
 
-The choice field specifies the order of the lookup table data for the 2\(^{d}\) independent variable. Valid choices are \emph{Increasing} or \emph{Decreasing}. If increasing is selected, then the order of the data is from lowest value of the 2\(^{d}\) independent variable to highest. If decreasing is selected, then the order of the data is from highest value of the 2\(^{d}\) independent variable to lowest.
+The choice field specifies the order of the lookup table data for the 2\(^{nd}\) independent variable. Valid choices are \emph{Increasing} or \emph{Decreasing}. If increasing is selected, then the order of the data is from lowest value of the 2\(^{nd}\) independent variable to highest. If decreasing is selected, then the order of the data is from highest value of the 2\(^{nd}\) independent variable to lowest.
 
 \paragraph{Field: Minimum Value of X1}\label{field-minimum-value-of-x1}
 
@@ -592,9 +592,9 @@ Line 5: the n values for the fifth independent variable as specified in the head
   \textbf{Tabular Data:}
 \end{itemize}
 
-Line 1: the values of the 3\(^{d}\) through nth independent variables
+Line 1: the values of the 3\(^{rd}\) through nth independent variables
 
-Line 2 m (where m-1 equals the number of variables for the second independent variable): the tabular data corresponding to the 1\(^{t}\) independent variable (the number of inputs on this line equals the number of values for 1\(^{t}\) independent variable), the mth values for the 2\(^{d}\) independent variable and corresponding to the values for the 3\(^{d}\) nth independent variables (see Line 1 above for Tabular Data).
+Line 2 m (where m-1 equals the number of variables for the second independent variable): the tabular data corresponding to the 1\(^{st}\) independent variable (the number of inputs on this line equals the number of values for 1\(^{st}\) independent variable), the mth values for the 2\(^{nd}\) independent variable and corresponding to the values for the 3\(^{rd}\) nth independent variables (see Line 1 above for Tabular Data).
 
 Three examples are provided here as this can be difficult to describe in text. This example assumes that the table data are listed in ascending order from lowest to highest.
 
@@ -630,7 +630,7 @@ Three examples are provided here as this can be difficult to describe in text. T
   \textbf{Header:}
 \end{itemize}
 
-2, 5, 6, (2 independent variables with 5 and 6 values for the 1\(^{t}\) and 2\(^{d}\) independent variables, respectively)
+2, 5, 6, (2 independent variables with 5 and 6 values for the 1\(^{st}\) and 2\(^{nd}\) independent variables, respectively)
 
 \begin{itemize}
 \tightlist
@@ -648,17 +648,17 @@ Three examples are provided here as this can be difficult to describe in text. T
   \textbf{Tabular Data:}
 \end{itemize}
 
-0.1, 0.3, 0.5, 0.7, 0.9, (the first five table values associated with each value of the 1\(^{t}\) independent variable and the first value (32) of the second independent variable listed previously Note: these values may be listed in ascending or descending order based on the input in the X1 Sort Order field above. Each of these rows may also be listed in ascending or descending order based on the input in the X2 Sort Order field above).
+0.1, 0.3, 0.5, 0.7, 0.9, (the first five table values associated with each value of the 1\(^{st}\) independent variable and the first value (32) of the second independent variable listed previously Note: these values may be listed in ascending or descending order based on the input in the X1 Sort Order field above. Each of these rows may also be listed in ascending or descending order based on the input in the X2 Sort Order field above).
 
-0.2, 0.4, 0.6, 0.8, 1.0, (the second five table values associated with each value of the 1\(^{t}\) independent variable and the second value (45) of the second independent variable listed previously).
+0.2, 0.4, 0.6, 0.8, 1.0, (the second five table values associated with each value of the 1\(^{st}\) independent variable and the second value (45) of the second independent variable listed previously).
 
-0.3, 0.5, 0.7, 0.9, 1.1, (the third five table values associated with each value of the 1\(^{t}\) independent variable and the third value (68) of the second independent variable listed previously).
+0.3, 0.5, 0.7, 0.9, 1.1, (the third five table values associated with each value of the 1\(^{st}\) independent variable and the third value (68) of the second independent variable listed previously).
 
-0.4, 0.6, 0.8, 1.0, 1.2, (the fourth five table values associated with each value of the 1\(^{t}\) independent variable and the fourth value (81) of the second independent variable listed previously).
+0.4, 0.6, 0.8, 1.0, 1.2, (the fourth five table values associated with each value of the 1\(^{st}\) independent variable and the fourth value (81) of the second independent variable listed previously).
 
-0.5, 0.7, 0.9, 1.1, 1.3, (the fifth five table values associated with each value of the 1\(^{t}\) independent variable and the fifth value (94) of the second independent variable listed previously).
+0.5, 0.7, 0.9, 1.1, 1.3, (the fifth five table values associated with each value of the 1\(^{st}\) independent variable and the fifth value (94) of the second independent variable listed previously).
 
-0.6, 0.8, 1.0, 1.2, 1.4; (the sixth five table values associated with each value of the 1\(^{t}\) independent variable and the sixth value (107) of the second independent variable listed previously).
+0.6, 0.8, 1.0, 1.2, 1.4; (the sixth five table values associated with each value of the 1\(^{st}\) independent variable and the sixth value (107) of the second independent variable listed previously).
 
 \begin{itemize}
 \item
@@ -667,7 +667,7 @@ Three examples are provided here as this can be difficult to describe in text. T
   \textbf{Header:}
 \end{itemize}
 
-3, 5, 6, 2, (3 independent variables with 5, 6 and 2 values for the 1\(^{t}\) , 2\(^{d}\), and 3\(^{d}\) independent variables)
+3, 5, 6, 2, (3 independent variables with 5, 6 and 2 values for the 1\(^{st}\) , 2\(^{nd}\), and 3\(^{rd}\) independent variables)
 
 \begin{itemize}
 \tightlist
@@ -679,7 +679,7 @@ Three examples are provided here as this can be difficult to describe in text. T
 
 32, 45, 68, 81, 94, 107, (the six values for the 2nd independent variable, these values are always listed in ascending order)
 
-15.5, 45.5, (the two values for the 3\(^{d}\) independent variable, these values are always listed in ascending order)
+15.5, 45.5, (the two values for the 3\(^{rd}\) independent variable, these values are always listed in ascending order)
 
 \begin{itemize}
 \tightlist
@@ -687,33 +687,33 @@ Three examples are provided here as this can be difficult to describe in text. T
   \textbf{Tabular Data:}
 \end{itemize}
 
-15.5, (the first value for the 3\(^{d}\) independent variable values for the 4\(^{h}\) and 5\(^{h}\) independent variable are also listed on this line if they are used)
+15.5, (the first value for the 3\(^{rd}\) independent variable values for the 4\(^{th}\) and 5\(^{th}\) independent variable are also listed on this line if they are used)
 
-0.1, 0.3, 0.5, 0.7, 0.9, (the table values associated with each value of the 1\(^{t}\) independent variable, the first value (32) of the second independent variable, and the first value (15.5) of the 3\(^{d}\) independent variable). Note: these values may be listed in ascending or descending order based on the input in the X1 Sort Order field above).
+0.1, 0.3, 0.5, 0.7, 0.9, (the table values associated with each value of the 1\(^{st}\) independent variable, the first value (32) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable). Note: these values may be listed in ascending or descending order based on the input in the X1 Sort Order field above).
 
-0.2, 0.4, 0.6, 0.8, 1.0, (the table values associated with each value of the 1\(^{t}\) independent variable, the second value (45) of the second independent variable, and the first value (15.5) of the 3\(^{d}\) independent variable).
+0.2, 0.4, 0.6, 0.8, 1.0, (the table values associated with each value of the 1\(^{st}\) independent variable, the second value (45) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
 
-0.3, 0.5, 0.7, 0.9, 1.1, (the table values associated with each value of the 1\(^{t}\) independent variable, the third value (68) of the second independent variable, and the first value (15.5) of the 3\(^{d}\) independent variable).
+0.3, 0.5, 0.7, 0.9, 1.1, (the table values associated with each value of the 1\(^{st}\) independent variable, the third value (68) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
 
-0.4, 0.6, 0.8, 1.0, 1.2, (the table values associated with each value of the 1\(^{t}\) independent variable, the fourth value (81) of the second independent variable, and the first value (15.5) of the 3\(^{d}\) independent variable).
+0.4, 0.6, 0.8, 1.0, 1.2, (the table values associated with each value of the 1\(^{st}\) independent variable, the fourth value (81) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
 
-0.5, 0.7, 0.9, 1.1, 1.3, (the table values associated with each value of the 1\(^{t}\) independent variable, the fifth value (94) of the second independent variable, and the first value (15.5) of the 3\(^{d}\) independent variable).
+0.5, 0.7, 0.9, 1.1, 1.3, (the table values associated with each value of the 1\(^{st}\) independent variable, the fifth value (94) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
 
-0.6, 0.8, 1.0, 1.2, 1.4. (the table values associated with each value of the 1\(^{t}\) independent variable, the sixth value (107) of the second independent variable, and the first value (15.5) of the 3\(^{d}\) independent variable).
+0.6, 0.8, 1.0, 1.2, 1.4. (the table values associated with each value of the 1\(^{st}\) independent variable, the sixth value (107) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
 
-45.5, (the second value for the 3\(^{d}\) independent variable values for the 4\(^{h}\) and 5\(^{h}\) independent variable are also listed on this line if they are used)
+45.5, (the second value for the 3\(^{rd}\) independent variable values for the 4\(^{th}\) and 5\(^{th}\) independent variable are also listed on this line if they are used)
 
-1.1, 1.3, 1.5, 1.7, 1.9, (the table values associated with each value of the 1\(^{t}\) independent variable, the first value (32) of the second independent variable, and the second value (45.5) of the 3\(^{d}\) independent variable).
+1.1, 1.3, 1.5, 1.7, 1.9, (the table values associated with each value of the 1\(^{st}\) independent variable, the first value (32) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
 
-1.2, 1.4, 1.6, 1.8, 2.0, (the table values associated with each value of the 1\(^{t}\) independent variable, the second value (45) of the second independent variable, and the second value (45.5) of the 3\(^{d}\) independent variable).
+1.2, 1.4, 1.6, 1.8, 2.0, (the table values associated with each value of the 1\(^{st}\) independent variable, the second value (45) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
 
-1.3, 1.5, 1.7, 1.9, 2.1, (the table values associated with each value of the 1\(^{t}\) independent variable, the third value (68) of the second independent variable, and the second value (45.5) of the 3\(^{d}\) independent variable).
+1.3, 1.5, 1.7, 1.9, 2.1, (the table values associated with each value of the 1\(^{st}\) independent variable, the third value (68) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
 
-1.4, 1.6, 1.8, 2.0, 2.2, (the table values associated with each value of the 1\(^{t}\) independent variable, the fourth value (81) of the second independent variable, and the second value (45.5) of the 3\(^{d}\) independent variable).
+1.4, 1.6, 1.8, 2.0, 2.2, (the table values associated with each value of the 1\(^{st}\) independent variable, the fourth value (81) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
 
-1.5, 1.7, 1.9, 2.1, 2.3, (the table values associated with each value of the 1\(^{t}\) independent variable, the fifth value (94) of the second independent variable, and the second value (45.5) of the 3\(^{d}\) independent variable).
+1.5, 1.7, 1.9, 2.1, 2.3, (the table values associated with each value of the 1\(^{st}\) independent variable, the fifth value (94) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
 
-1.6, 1.8, 2.0, 2.2, 2.4. (the table values associated with each value of the 1\(^{t}\) independent variable, the sixth value (107) of the second independent variable, and the second value (45.5) of the 3\(^{d}\) independent variable).
+1.6, 1.8, 2.0, 2.2, 2.4. (the table values associated with each value of the 1\(^{st}\) independent variable, the sixth value (107) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
 
 Note: The following fields define the tabular data as described in the previous examples. These field values depend on the number and quantity of independent variables used in the table. The tabular data can be entered in the following fields or entered using an external file. These fields are echoed to the eio file as a check when the output diganostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables). The normalization value is not included in the echoed values.
 

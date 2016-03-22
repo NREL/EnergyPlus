@@ -606,11 +606,11 @@ A maximum of 25 coordinates can be specified.
 
 \paragraph{Field: Relative Humidity Fraction x}\label{field-relative-humidity-fraction-x}
 
-The relative humidity of the x\(^{h}\) coordinate. The relative humidity is entered as fraction, not in percent.
+The relative humidity of the x\(^{th}\) coordinate. The relative humidity is entered as fraction, not in percent.
 
 \paragraph{Field: Moisture Content x}\label{field-moisture-content-x}
 
-The Moisture Content of the x\(^{h}\) coordinate. The units are {[}kg/m3{]}
+The Moisture Content of the x\(^{th}\) coordinate. The units are {[}kg/m3{]}
 
 Below is an example input for a material isotherm
 
@@ -661,11 +661,11 @@ A maximum of 25 points can be specified.
 
 \paragraph{Field: Moisture Content x}\label{field-moisture-content-x-1}
 
-The moisture content of the x\(^{h}\) point. The units are {[}kg/m3{]}.
+The moisture content of the x\(^{th}\) point. The units are {[}kg/m3{]}.
 
 \paragraph{Field: Liquid Transport Coefficient x}\label{field-liquid-transport-coefficient-x}
 
-The Liquid Transport Coefficient of the x\(^{h}\) point. The units are {[}m2/s{]}.
+The Liquid Transport Coefficient of the x\(^{th}\) point. The units are {[}m2/s{]}.
 
 Below is an example input for a material liquid transport coefficient under suction.
 
@@ -706,11 +706,11 @@ A maximum of 25 points can be specified.
 
 \paragraph{Field: Moisture Content x}\label{field-moisture-content-x-2}
 
-The moisture content of the x\(^{h}\) point. The units are {[}kg/m3{]}.
+The moisture content of the x\(^{th}\) point. The units are {[}kg/m3{]}.
 
 \paragraph{Field: Liquid Transport Coefficient x}\label{field-liquid-transport-coefficient-x-1}
 
-The Liquid Transport Coefficient of the x\(^{h}\) point. The units are {[}m2/s{]}.
+The Liquid Transport Coefficient of the x\(^{th}\) point. The units are {[}m2/s{]}.
 
 Below is an example input for the object.
 
@@ -751,11 +751,11 @@ A maximum of 25 pairs can be specified.
 
 \paragraph{Field: Relative Humidity Fraction \#x}\label{field-relative-humidity-fraction-x-1}
 
-The moisture content of the x\(^{h}\) pair. The relative humidity is entered as fraction, not in percent.
+The moisture content of the x\(^{th}\) pair. The relative humidity is entered as fraction, not in percent.
 
 \paragraph{Field: Vapor Diffusion Resistance Factor \#x}\label{field-vapor-diffusion-resistance-factor-x}
 
-The Liquid Transport Coefficient of the x\(^{h}\) pair.
+The Liquid Transport Coefficient of the x\(^{th}\) pair.
 
 Below are some examples of the values for materials.
 
@@ -798,11 +798,11 @@ A maximum of 25 coordinates can be specified.
 
 \paragraph{Field: Moisture Content x}\label{field-moisture-content-x-3}
 
-The moisture content of the x\(^{h}\) coordinate. The units are {[}kg/m3{]}
+The moisture content of the x\(^{th}\) coordinate. The units are {[}kg/m3{]}
 
 \paragraph{Field: Thermal Conductivity x}\label{field-thermal-conductivity-x-1}
 
-The Thermal Conductivity of the x\(^{h}\) coordinate. The units are {[}W/m-K{]}
+The Thermal Conductivity of the x\(^{th}\) coordinate. The units are {[}W/m-K{]}
 
 Below is an example of values for a material.
 
@@ -895,7 +895,7 @@ HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell
 
 It is better to specify the ``key'' or Surface Name in this output.
 
-So for example to output the temperature of the 10\(^{h}\) cell in a surface, eg ``East Wall'' would require the following output variable.
+So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
 
 \begin{lstlisting}
 
@@ -1114,7 +1114,7 @@ Index of refraction averaged over the solar spectrum.
 
 \paragraph{Field: Solar Extinction Coefficient}\label{field-solar-extinction-coefficient}
 
-Extinction coefficient averaged over the solar spectrum (m\(^{1}\)).
+Extinction coefficient averaged over the solar spectrum (m\(^{-1}\)).
 
 \paragraph{Field: Visible Index of Refraction}\label{field-visible-index-of-refraction}
 
@@ -1122,7 +1122,7 @@ Index of refraction averaged over the solar spectrum and weighted by the respons
 
 \paragraph{Field: Visible Extinction Coefficient}\label{field-visible-extinction-coefficient}
 
-Extinction coefficient averaged over the solar spectrum and weighted by the response of the human eye (m\(^{1}\)).
+Extinction coefficient averaged over the solar spectrum and weighted by the response of the human eye (m\(^{-1}\)).
 
 \paragraph{Field: Infrared Transmittance at Normal Incidence}\label{field-infrared-transmittance-at-normal-incidence-1}
 
@@ -1899,7 +1899,7 @@ Reflectance averaged over the solar spectrum and weighted by the response of the
 
 \paragraph{Field: Thermal Hemispherical Emissivity}\label{field-thermal-hemispherical-emissivity}
 
-Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{f}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
+Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
 \begin{equation}
 {\varepsilon_{{\rm{eff}}}} \approx \varepsilon \left( {1 - \eta } \right)
@@ -2260,23 +2260,23 @@ The top opening multiplier value will depend on the location of the shading devi
 
 \textbf{Shading device on the indoor/outdoor side of the window}
 
-In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame (d\(_{p}\)), divided by the gap width (S). There are three possible cases for the position of a shading device the on indoor/outdoor side (see Figure~\ref{fig:three-cases-for-the-dp-calculation-for-an-indoor-outdoor-shade}).
+In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame (d\(_{top}\)), divided by the gap width (S). There are three possible cases for the position of a shading device the on indoor/outdoor side (see Figure~\ref{fig:three-cases-for-the-dp-calculation-for-an-indoor-outdoor-shade}).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/three-cases-for-the-dtop-calculation-for-an-indoor-outdoor-shade-collage.png}
-\caption{Three cases for the D\(_{p}\) calculation for an indoor/outdoor shade: Case a) A shading device between the frame; Case b) A shading device outside the frame, covering the frame; Case c) a shading device outside the frame, not covering the frame. \protect \label{fig:three-cases-for-the-dp-calculation-for-an-indoor-outdoor-shade}}
+\caption{Three cases for the D\(_{top}\) calculation for an indoor/outdoor shade: Case a) A shading device between the frame; Case b) A shading device outside the frame, covering the frame; Case c) a shading device outside the frame, not covering the frame. \protect \label{fig:three-cases-for-the-dp-calculation-for-an-indoor-outdoor-shade}}
 \end{figure}
 
-In the case where the distance between the frame and the shading device is bigger than the gap width, the d\(_{p}\) multiplier is equal to one. Therefore, the calculation of the D\(_{p}\) opening multiplier is:
+In the case where the distance between the frame and the shading device is bigger than the gap width, the d\(_{top}\) multiplier is equal to one. Therefore, the calculation of the D\(_{top}\) opening multiplier is:
 
 \begin{equation*}
-A_p = min(d_p/S, 1)
+A_{top} = min(d_{top}/S, 1)
 \end{equation*}
 
 \textbf{Shading device between glass layers}
 
-In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame or spacer (d\(_{p}\)), divided by the smaller gap width (the minimum of (S\(_{1}\) andS\(_{2}\))).
+In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame or spacer (d\(_{top}\)), divided by the smaller gap width (the minimum of (S\(_{1}\) andS\(_{2}\))).
 
 \begin{figure}[htbp]
 \centering
@@ -2284,29 +2284,29 @@ In this case the opening multiplier is calculated as the smallest distance betwe
 \caption{Calculation of Dtop for a shading device between glass layers \protect \label{fig:calculation-of-dtop-for-a-shading-device-between-glass-layers}}
 \end{figure}
 
-The D\(_{p}\) opening multiplier for a between glass shade is calculated as:
+The D\(_{top}\) opening multiplier for a between glass shade is calculated as:
 
 \begin{equation*}
-A_p = min(d_p/S_n, 1)
+A_{top} = min(d_{top}/S_{min}, 1)
 \end{equation*}
 
 Where
 
 \begin{equation*}
-S_n = min(S_1, S_2)
+S_{min} = min(S_1, S_2)
 \end{equation*}
 
 \paragraph{Field: Bottom Opening Multiplier}\label{field-bottom-opening-multiplier-1}
 
-The bottom opening multiplier (d\(_t\)) is calculated in the same way as the top opening multiplier, with the rules applied to the bottom of the shading device.
+The bottom opening multiplier (d\(_{bot}\)) is calculated in the same way as the top opening multiplier, with the rules applied to the bottom of the shading device.
 
 \paragraph{Field: Left Side Opening Multiplier}\label{field-left-side-opening-multiplier-1}
 
-The left side opening multiplier (d\(_t\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the left side of the shading device.
+The left side opening multiplier (d\(_{left}\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the left side of the shading device.
 
 \paragraph{Field: Right Side Opening Multiplier}\label{field-right-side-opening-multiplier-1}
 
-The right side opening multiplier (d\(_t\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the right side of the shading device.
+The right side opening multiplier (d\(_{right}\)) is calcuated in the same way as the top opening multiplier, with the rules applied to the right side of the shading device.
 
 \paragraph{Field: Front Opening Multiplier}\label{field-front-opening-multiplier}
 
@@ -3465,7 +3465,7 @@ The name of the spectral data set. It is referenced by WindowMaterial:Glazing wh
 
 \paragraph{Fields 1-4 (repeated up to 450 times)}\label{fields-1-4-repeated-up-to-450-times}
 
-Sets of values for wavelengths covering the solar spectrum (from about 0.25 to 2.5 microns {[}10\(^{6}\) m{]}). Each set consists of
+Sets of values for wavelengths covering the solar spectrum (from about 0.25 to 2.5 microns {[}10\(^{-6}\) m{]}). Each set consists of
 
 \textbf{\{wavelength (microns), transmittance, front reflectance, back reflectance\}}
 
@@ -3606,7 +3606,7 @@ HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell
 
 It is better to specify the ``key'' or Surface Name in this output.
 
-So for example to output the temperature of the 10\(^{h}\) cell in a surface, eg ``East Wall'' would require the following output variable.
+So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
 
 \begin{lstlisting}
 
@@ -3882,7 +3882,7 @@ HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell
 
 It is better to specify the ``key'' or Surface Name in this output.
 
-So for example to output the temperature of the 10\(^{h}\) cell in a surface, eg ``East Wall'' would require the following output variable.
+So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
 
 \begin{lstlisting}
 

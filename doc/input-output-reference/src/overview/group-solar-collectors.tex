@@ -300,7 +300,7 @@ This is the average Refractive index for solar spectrum range of the outer trans
 
 \paragraph{Field: Extinction Coefficient Times Thickness of Outer Cover}\label{field-extinction-coefficient-times-thickness-of-outer-cover}
 
-This input field is the product of the extinction coefficient and the thickness of the out cover material. The extinction coefficient for glass types approximately varies from 4m\(^{1}\) to 32 m\(^{1}\). The extinction coefficient for low-iron glass, which is the default outer cover material, is 15 m\(^{1}\). The default value for extinction coefficient times thickness (KL) is 0.045 ( = 15.0 x0.003), which is the product of the default extinction coefficient of 15m\(^{1}\) and 3.0mm thick glass.
+This input field is the product of the extinction coefficient and the thickness of the out cover material. The extinction coefficient for glass types approximately varies from 4m\(^{-1}\) to 32 m\(^{-1}\). The extinction coefficient for low-iron glass, which is the default outer cover material, is 15 m\(^{-1}\). The default value for extinction coefficient times thickness (KL) is 0.045 ( = 15.0 x0.003), which is the product of the default extinction coefficient of 15m\(^{-1}\) and 3.0mm thick glass.
 
 \paragraph{Field: Emissivity of Outer Cover}\label{field-emissivity-of-outer-cover}
 
@@ -312,7 +312,7 @@ This input field is the average Refractive index of the inner transparent cover 
 
 \paragraph{Field: Extinction Coefficient Times Thickness of Inner Cover}\label{field-extinction-coefficient-times-thickness-of-inner-cover}
 
-This input field is the product of the extinction coefficient (K) and the thickness (L) of the inner cover material. The inner cover material is more transparent than the out cover, very thin and hence their thickness can be assumed to be negligible. The default value for extinction coefficient times thickness (KL) is 0.008 ( = 40.0x0.0002), which is the product of extinction coefficient of 40m\(^{1}\) and a thickness of 0.2mm.
+This input field is the product of the extinction coefficient (K) and the thickness (L) of the inner cover material. The inner cover material is more transparent than the out cover, very thin and hence their thickness can be assumed to be negligible. The default value for extinction coefficient times thickness (KL) is 0.008 ( = 40.0x0.0002), which is the product of extinction coefficient of 40m\(^{-1}\) and a thickness of 0.2mm.
 
 \paragraph{Field: Emissivity of Inner Cover}\label{field-emissivity-of-inner-cover}
 
@@ -724,8 +724,15 @@ This field is used to enter the solar absorbtivity of the collector. This surfac
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Color Name of Kynar(R) [[1]](\#\_ftn1) Paint & Solar Absorptivity \tabularnewline \midrule
+Color Name of Kynar(R) [[1]](\#\_ftn1) Paint & Solar Absorptivity \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Color Name of Kynar(R) [[1]](\#\_ftn1) Paint & Solar Absorptivity \tabularnewline
+\midrule
 \endhead
+
 Black & 0.94 \tabularnewline
 Classic Bronze & 0.91 \tabularnewline
 Chocolate Brown & 0.9 \tabularnewline

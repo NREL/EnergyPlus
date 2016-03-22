@@ -1021,13 +1021,13 @@ This numeric field contains the electric chiller's temperature rise coefficient 
 
 where:
 
-TCEnt\(_{d}\) = Required entering condenser air or water temperature to maintain rated capacity.
+TCEnt\(_{required}\) = Required entering condenser air or water temperature to maintain rated capacity.
 
-TCEnt\(_{d}\) = Rated entering condenser air or water temperature at rated capacity.
+TCEnt\(_{rated}\) = Rated entering condenser air or water temperature at rated capacity.
 
-TELv\(_{d}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
+TELv\(_{required}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
 
-TELv\(_{d}\) = Rated leaving evaporator water outlet temperature at rated capacity.
+TELv\(_{rated}\) = Rated leaving evaporator water outlet temperature at rated capacity.
 
 \paragraph{Field: Design Chilled Water Outlet Temperature}\label{field-design-chilled-water-outlet-temperature}
 
@@ -2047,13 +2047,13 @@ This numeric field contains the electric chiller's temperature rise coefficient 
 
 where:
 
-TCEnt\(_{d}\) = Required entering condenser air or water temperature to maintain rated capacity.
+TCEnt\(_{required}\) = Required entering condenser air or water temperature to maintain rated capacity.
 
-TCEnt\(_{d}\) = Rated entering condenser air or water temperature at rated capacity.
+TCEnt\(_{rated}\) = Rated entering condenser air or water temperature at rated capacity.
 
-TELv\(_{d}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
+TELv\(_{required}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
 
-TELv\(_{d}\) = Rated leaving evaporator water outlet temperature at rated capacity.
+TELv\(_{rated}\) = Rated leaving evaporator water outlet temperature at rated capacity.
 
 \paragraph{Field: Design Chilled Water Outlet Temperature}\label{field-design-chilled-water-outlet-temperature-1}
 
@@ -2531,13 +2531,13 @@ This numeric field contains the electric chiller's temperature rise coefficient 
 
 where:
 
-TCEnt\(_{d}\) = Required entering condenser air or water temperature to maintain rated capacity.
+TCEnt\(_{required}\) = Required entering condenser air or water temperature to maintain rated capacity.
 
-TCEnt\(_{d}\) = Rated entering condenser air or water temperature at rated capacity.
+TCEnt\(_{rated}\) = Rated entering condenser air or water temperature at rated capacity.
 
-TELv\(_{d}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
+TELv\(_{required}\) = Required leaving evaporator water outlet temperature to maintain rated capacity.
 
-TELv\(_{d}\) = Rated leaving evaporator water outlet temperature at rated capacity.
+TELv\(_{rated}\) = Rated leaving evaporator water outlet temperature at rated capacity.
 
 \paragraph{Field: Design Chilled Water Outlet Temperature}\label{field-design-chilled-water-outlet-temperature-2}
 
@@ -2641,7 +2641,7 @@ The Fuel Input Curve is a polynomial equation that determines the Ratio of Fuel 
 ExhaustFlowRate = GTCapacity * ({C_1} + {C_2}A{T_{air}} + {C_3}AT_{air}^2)
 \end{equation}
 
-where FIC represents the Fuel Input Curve Coefficients, TBFIC represents the Temperature Based Fuel Input Curve Coefficients, Rload is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the current ambient and design ambient temperatures.
+where FIC represents the Fuel Input Curve Coefficients, TBFIC represents the Temperature Based Fuel Input Curve Coefficients, Rload is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{air}\) is the difference between the current ambient and design ambient temperatures.
 
 The following three fields contain the coefficients for the fuel input curve.
 
@@ -2677,7 +2677,7 @@ The Exhaust Flow Curve is a quadratic equation that determines the Ratio of Exha
 
 \emph{\(ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15\) ~}
 
-where GTCapacity is the Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the current ambient and design ambient temperatures.
+where GTCapacity is the Combustion Turbine Engine Capacity, and AT\(_{air}\) is the difference between the current ambient and design ambient temperatures.
 
 \paragraph{Field: Coefficient 1 of Exhaust Flow Curve}\label{field-coefficient-1-of-exhaust-flow-curve}
 
@@ -2697,7 +2697,7 @@ The Exhaust Gas Temperature Curve is a polynomial equation that determines the E
 
 ~\(RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})\)
 
-where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{r}\) is the difference between the actual ambient and design ambient temperatures.
+where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT\(_{air}\) is the difference between the actual ambient and design ambient temperatures.
 
 \paragraph{Field: Coefficient 1 of Exhaust Gas Temperature Curve}\label{field-coefficient-1-of-exhaust-gas-temperature-curve}
 
@@ -4219,7 +4219,7 @@ Boiler:Steam,
       160000,                     !-Maximum Boiler Pressure Pascal
       0.8,                        !- Theoretical Boiler Efficiency
       115,                        !- Max Design Outlet Steam Temp
-  autosize,                  !- Nominal Capacity W
+      autosize,                  !- Nominal Capacity W
       0.00001,                    !- Minimum Part Load Ratio
       1.0,                        !- Maximum Part Load Ratio
       0.2,                        !- Optimum Part Load Ratio
@@ -4889,8 +4889,8 @@ For the heating mode:
 \begin{lstlisting}
 
 BRANCH, Heating GshpHeating Branch,
-        ,
-        ,
+    ,
+    ,
     HeatPump:WatertoWater:ParameterEstimatinon:Heating,
     GshpHeating,
     GshpHeating LoadSide Inlet Node,
@@ -4903,8 +4903,8 @@ BRANCH, Heating GshpHeating Branch,
 \begin{lstlisting}
 
 BRANCH, GshpHeating SourceSide Branch,
-        ,
-        ,
+    ,
+    ,
     HeatPump:WatertoWater:ParameterEstimatinon:Heating,
     GshpHeating,
     GshpHeating SourceSide Inlet Node,
@@ -5883,8 +5883,15 @@ These objects are typically placed on the supply side of a primary chilled water
 
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \toprule 
-Mode & Chiller Setpoint & Storage Setpoint \tabularnewline \midrule
+Mode & Chiller Setpoint & Storage Setpoint \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Mode & Chiller Setpoint & Storage Setpoint \tabularnewline
+\midrule
 \endhead
+
 Charging ice storage tank & -5C & 7C \tabularnewline
 Cooling with chiller only & 7C & 99C \tabularnewline
 Cooling with chiller and storage (fully load chiller before using storage)) & 7C & 7C \tabularnewline
