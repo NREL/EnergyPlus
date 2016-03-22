@@ -355,7 +355,6 @@ namespace HVACStandAloneERV {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		int OutAirNum; // total number of CONTROLLER:OUTSIDE AIR objects
 		int NumERVCtrlrs; // total number of CONTROLLER:STAND ALONE ERV objects
 		int ERVControllerNum; // index to ERV controller
 		int WhichERV; // used in controller GetInput
@@ -728,7 +727,7 @@ namespace HVACStandAloneERV {
 
 		}
 
-		OutAirNum = GetNumObjectsFound( "Controller:OutdoorAir" );
+		int OutAirNum = 0;
 		CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
 		NumERVCtrlrs = GetNumObjectsFound( CurrentModuleObject );
 
@@ -737,7 +736,7 @@ namespace HVACStandAloneERV {
 
 			IsNotOK = false;
 			IsBlank = false;
-			CheckOAControllerName( Alphas( 1 ), OutAirNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			CheckOAControllerName( Alphas( 1 ), ERVControllerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
