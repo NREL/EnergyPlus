@@ -2025,7 +2025,8 @@ namespace PlantCondLoopOperation {
 					if ( this_op_scheme.OpSchemeType == EMSOpSchemeType ) {
 						if ( BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag ) {
 							if ( this_op_scheme.ErlInitProgramMngr > 0 ) {
-								ManageEMS( emsCallFromUserDefinedComponentModel, this_op_scheme.ErlInitProgramMngr );
+								bool anyEMSRan;
+								ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr );
 							}
 							this_op_scheme.MyEnvrnFlag = false;
 						}
@@ -3016,7 +3017,8 @@ namespace PlantCondLoopOperation {
 
 		// Call EMS program(s)
 		if ( PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ErlSimProgramMngr );
+			bool anyEMSRan;
+			ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ErlSimProgramMngr );
 		}
 
 		// move actuated value to MyLoad

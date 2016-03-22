@@ -276,6 +276,7 @@ namespace EMSManager {
 	void
 	ManageEMS(
 		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
+		bool & anyProgramRan, // true if any Erl programs ran for this call 
 		Optional_int_const ProgramManagerToRun // specific program manager to run
 	)
 	{
@@ -327,11 +328,12 @@ namespace EMSManager {
 		int ErlProgramNum; // local index
 		int ActuatorUsedLoop; // local loop
 		int EMSActuatorVariableNum;
-		bool AnyProgramRan; // local logical
+
 		int tmpInteger;
 		//  INTEGER  :: ProgramNum
 
 		// FLOW:
+		anyProgramRan = false;
 		if ( ! AnyEnergyManagementSystemInModel ) return; // quick return if nothing to do
 
 		if ( iCalledFrom == emsCallFromBeginNewEvironment ) BeginEnvrnInitializeRuntimeLanguage();
@@ -344,14 +346,14 @@ namespace EMSManager {
 		}
 
 		// Run the Erl programs depending on calling point.
-		AnyProgramRan = false;
+
 		if ( iCalledFrom != emsCallFromUserDefinedComponentModel ) {
 			for ( ProgramManagerNum = 1; ProgramManagerNum <= NumProgramCallManagers; ++ProgramManagerNum ) {
 
 				if ( EMSProgramCallManager( ProgramManagerNum ).CallingPoint == iCalledFrom ) {
 					for ( ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager( ProgramManagerNum ).NumErlPrograms; ++ErlProgramNum ) {
 						EvaluateStack( EMSProgramCallManager( ProgramManagerNum ).ErlProgramARR( ErlProgramNum ) );
-						AnyProgramRan = true;
+						anyProgramRan = true;
 					}
 				}
 			}
@@ -359,16 +361,16 @@ namespace EMSManager {
 			if ( present( ProgramManagerToRun ) ) {
 				for ( ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager( ProgramManagerToRun ).NumErlPrograms; ++ErlProgramNum ) {
 					EvaluateStack( EMSProgramCallManager( ProgramManagerToRun ).ErlProgramARR( ErlProgramNum ) );
-					AnyProgramRan = true;
+					anyProgramRan = true;
 				}
 			}
 		}
 
 		if ( iCalledFrom == emsCallFromExternalInterface ) {
-			AnyProgramRan = true;
+			anyProgramRan = true;
 		}
 
-		if ( ! AnyProgramRan ) return;
+		if ( ! anyProgramRan ) return;
 
 		// Set actuated variables with new values
 		for ( ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed; ++ActuatorUsedLoop ) {

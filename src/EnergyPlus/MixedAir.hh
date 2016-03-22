@@ -117,7 +117,6 @@ namespace MixedAir {
 	extern int const UnitarySystem;
 	extern int const Humidifier;
 
-	extern int const ControllerSimple;
 	extern int const ControllerOutsideAir;
 	extern int const ControllerStandAloneERV;
 
@@ -550,6 +549,9 @@ namespace MixedAir {
 
 	void
 	GetOAControllerInputs();
+
+	void
+	AllocateOAControllers();
 
 	void
 	GetOAMixerInputs();
