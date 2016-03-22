@@ -34,7 +34,7 @@ Because in subsequent discussions, it will be distinguished between algebraic an
   If x\(_{1}\) and x\(_{2}\)~are differential variables, then the system is
 \end{itemize}
 
-\(F\left(\dot x_1,x_1,\dot x_2,x_2,u,t\right) = 0\) ~with \emph{F}: ℝ\(^{n}\) x ℝ\(^{n}\) x ℝ\(^{m}\) x ℝ\(^{m}\) x ℝ\(^{q}\) x ℝ → ℝ\(^{m}\).
+\(F\left(\dot x_1,x_1,\dot x_2,x_2,u,t\right) = 0\) ~with \emph{F}: ℝ\(^{n}\) x ℝ\(^{n}\) x ℝ\(^{m}\) x ℝ\(^{m}\) x ℝ\(^{q}\) x ℝ → ℝ\(^{n+m}\).
 
 \begin{itemize}
 \tightlist
@@ -42,7 +42,7 @@ Because in subsequent discussions, it will be distinguished between algebraic an
   If x\(_{1}\) is a differential variable and x\(_{2}\)~is an algebraic variable, then the system is
 \end{itemize}
 
-\(G\left(\dot x_1,x_1,x_2,u,t\right) = 0\) ~with \emph{G}: ℝ\(^{n}\) x ℝ\(^{n}\) x ℝ\(^{m}\) x ℝ\(^{q}\) x ℝ → ℝ\(^{m}\).
+\(G\left(\dot x_1,x_1,x_2,u,t\right) = 0\) ~with \emph{G}: ℝ\(^{n}\) x ℝ\(^{n}\) x ℝ\(^{m}\) x ℝ\(^{q}\) x ℝ → ℝ\(^{n+m}\).
 
 \begin{itemize}
 \tightlist
@@ -50,7 +50,7 @@ Because in subsequent discussions, it will be distinguished between algebraic an
   If x\(_{1}\)~is an algebraic variable and x\(_{2}\)~is a differential variable, then the system is
 \end{itemize}
 
-\(H\left(x_1,\dot x_2,x_2,u,t\right) = 0\) ~with \emph{H:} ℝ\(^{n}\) xℝ\(^{m}\) xℝ\(^{m}\) xℝ\(^{q}\) xℝ →ℝ\(^{m}\).
+\(H\left(x_1,\dot x_2,x_2,u,t\right) = 0\) ~with \emph{H:} ℝ\(^{n}\) xℝ\(^{m}\) xℝ\(^{m}\) xℝ\(^{q}\) xℝ →ℝ\(^{n+m}\).
 
 \begin{itemize}
 \tightlist
@@ -58,7 +58,7 @@ Because in subsequent discussions, it will be distinguished between algebraic an
   If x\(_{1}\)~is an algebraic variable and x\(_{2}\)~is an algebraic variable, then the system is
 \end{itemize}
 
-\(I\left(x_1,x_2,u,t\right) = 0\) with \emph{I}: ℝ\(^{n}\) xℝ\(^{m}\) xℝ\(^{q}\) xℝ →ℝ\(^{m}\).
+\(I\left(x_1,x_2,u,t\right) = 0\) with \emph{I}: ℝ\(^{n}\) xℝ\(^{m}\) xℝ\(^{q}\) xℝ →ℝ\(^{n+m}\).
 
 Figure~\ref{fig:system-with-one-fmu-linked-to-energyplus.}~shows a case where a FMU is linked to an EnergyPlus model for co-simulation. The FMU and EnergyPlus could be linked through differential or algebraic variables.
 
@@ -85,8 +85,15 @@ Table 2:~Use cases with different system configurations
 
 \begin{longtable}[c]{@{}lll@{}}
 \toprule 
-Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline \midrule
+Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline
+\midrule
 \endhead
+
 (1) & Model1 (Differential variable) & Model2 (Differential variable) \tabularnewline
 (2) & Model1 (Differential variable) & Model2 (Algebraic variable) \tabularnewline
 (3) & Model1 (Algebraic variable) & Model2 (Differential variable) \tabularnewline
@@ -98,29 +105,29 @@ Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline \midrule
 
 This case could be for an application where a wall with a phase change material (PCM) is modeled in a FMU and is linked to a room model in EnergyPlus. The room air temperature is the differential variable in EnergyPlus and the temperature of the wall with PCM is the differential variable in the FMU. Each system solves a differential equation that is connected~to the differential equation of the other system. For simplicity, we assume that \emph{y\(_{1}\)(.)} = \emph{x\(_{1}\)(.) and y\(_{2}\)(.)} = \emph{x\(_{2}\)(.).}The systems are described by the ordinary differential equations
 
-dx\(_{1}\)/dt = f\(_{1}\)(x\(_{1}\), x\(_{2}\)), with x\(_{1}\)(0) = x\(_{0}\) ,
+dx\(_{1}\)/dt = f\(_{1}\)(x\(_{1}\), x\(_{2}\)), with x\(_{1}\)(0) = x\(_{1,0}\) ,
 
-dx\(_{2}\)/dt = f\(_{2}\)(x\(_{2}\), x\(_{1}\)), with x\(_{2}\)(0) = x\(_{.}\)
+dx\(_{2}\)/dt = f\(_{2}\)(x\(_{2}\), x\(_{1}\)), with x\(_{2}\)(0) = x\(_{2,0\\ .}\)
 
 Let \(N\in\textbf{N}\) ~denote the number of time steps and let \emph{t\(_{k}\)} with \(k\in\left\{1,...,N\right\}\) denote the time steps. We will use the subscripts \emph{1} and \emph{2} to denote the variables and the functions that compute the next state variable of the simulator \emph{1} and \emph{2}, respectively.
 
 The first system computes, for \(k\in\left\{0,...,N-1\right\}\) and some \(\tilde{F}_1\) : ℝ\(^{n}\) x ℝ\(^{m}\) x ℝ x ℝ → ℝ\(^{n}\), the sequence
 
-x\(_{1}\)(t\(_{1}\)) = \(\tilde{F}_1\) (x\(_{1}\)(t\(_{k}\)), x\(_{2}\)(t\(_{k}\)), t\(_{k}\), t\(_{1}\))
+x\(_{1}\)(t\(_{k+1}\)) = \(\tilde{F}_1\) (x\(_{1}\)(t\(_{k}\)), x\(_{2}\)(t\(_{k}\)), t\(_{k}\), t\(_{k+1}\))
 
 and, similarly, the simulator \emph{2} computes for some \(\tilde{F}_2\) : ℝ\(^{m}\) x ℝ\(^{n}\) x ℝ x ℝ → ℝ\(^{m}\) the sequence
 
-x\(_{2}\)(t\(_{1}\)) = \(\tilde{F}_2\) (x\(_{2}\)(t\(_{k}\)), x\(_{1}\)(t\(_{k}\)), t\(_{k}\), t\(_{1}\))
+x\(_{2}\)(t\(_{k+1}\)) = \(\tilde{F}_2\) (x\(_{2}\)(t\(_{k}\)), x\(_{1}\)(t\(_{k}\)), t\(_{k}\), t\(_{k+1}\))
 
-with initial conditions \emph{x\(_{1}\)(0) = x\(_{0}\)} and \emph{x\(_{2}\)(0) = x\(_{.}\)} \(\tilde{F}_1\) ~and \(\tilde{F}_2\) ~*are the functions that are used to compute the value of the state variables at the new time step
+with initial conditions \emph{x\(_{1}\)(0) = x\(_{1,0}\)} and \emph{x\(_{2}\)(0) = x\(_{2,0.}\)} \(\tilde{F}_1\) ~and \(\tilde{F}_2\) ~*are the functions that are used to compute the value of the state variables at the new time step
 
-To advance from time \emph{t\(_{k}\)} to \emph{t\(_{1}\)}, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new state \emph{x\(_{1}\)(t\(_{1}\))} to the FMU and it receives the state \emph{x\(_{2}\)(t\(_{1}\))} from the FMU. The same procedure is done with the FMU.
+To advance from time \emph{t\(_{k}\)} to \emph{t\(_{k+1}\)}, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new state \emph{x\(_{1}\)(t\(_{k+1}\))} to the FMU and it receives the state \emph{x\(_{2}\)(t\(_{k+1}\))} from the FMU. The same procedure is done with the FMU.
 
 \subsection{Case 2: Linking two systems through algebraic and differential variables}\label{case-2-linking-two-systems-through-algebraic-and-differential-variables}
 
 This case could be for an application where a fan is modeled in a FMU and is linked to a room model in EnergyPlus. The room temperature is the differential variable in EnergyPlus and the pressure difference of the fan is the algebraic variable in the FMU. For simplicity, we assume that \emph{y\(_{1}\)(.)} = \emph{x\(_{1}\)(.) and y\(_{2}\)(.)} = \emph{x\(_{2}\)(.).} In this application, the systems are described by the following equations
 
-dx\(_{1}\)/dt = g\(_{1}\)(x\(_{1}\), x\(_{2}\)), with x\(_{1}\)(0) = x\(_{,}\)
+dx\(_{1}\)/dt = g\(_{1}\)(x\(_{1}\), x\(_{2}\)), with x\(_{1}\)(0) = x\(_{1,0,}\)
 
 0 = g\(_{2}\)(x\(_{2}\), x\(_{1}\)).
 
@@ -128,15 +135,15 @@ Let \(N\in\mathbf{N}\) ~denote the number of time steps and let \emph{t\(_{k}\)}
 
 The first system computes, for \(k\in\left\{0,...,N-1\right\}\) and some \(\tilde{G}_1\) : ℝ\(^{n}\) x ℝ\(^{m}\) x ℝ x ℝ → ℝ\(^{n}\), the sequence
 
-x\(_{1}\)(t\(_{1}\)) = \(\tilde{G}_1\) (x\(_{1}\)(t\(_{k}\)), x\(_{2}\)(t\(_{k}\)), t\(_{k}\), t\(_{1}\))
+x\(_{1}\)(t\(_{k+1}\)) = \(\tilde{G}_1\) (x\(_{1}\)(t\(_{k}\)), x\(_{2}\)(t\(_{k}\)), t\(_{k}\), t\(_{k+1}\))
 
 and, similarly, the simulator \emph{2} computes for some \(\tilde{G}_2\) : ℝ\(^{m}\) x ℝ\(^{n}\) x ℝ → ℝ\(^{m}\) the sequence
 
-x\(_{2}\)(t\(_{1}\)) = \(\tilde{G}_2\) (x\(_{2}\)(t\(_{1}\)), x\(_{1}\)(t\(_{1}\)), t\(_{1}\))
+x\(_{2}\)(t\(_{k+1}\)) = \(\tilde{G}_2\) (x\(_{2}\)(t\(_{k+1}\)), x\(_{1}\)(t\(_{k+1}\)), t\(_{k+1}\))
 
-with initial condition \emph{x\(_{1}\)(0) = x\(_{0}\)}. \(\tilde{G}_1\) and \(\tilde{G}_2\) are the functions that compute the value of the variables at the new time step.
+with initial condition \emph{x\(_{1}\)(0) = x\(_{1,0}\)}. \(\tilde{G}_1\) and \(\tilde{G}_2\) are the functions that compute the value of the variables at the new time step.
 
-To advance from time \emph{t\(_{k}\)} to \emph{t\(_{1}\)}, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new value \emph{x\(_{1}\)(t\(_{1}\))} to the FMU and it receives the value \emph{x\(_{2}\)(t\(_{1}\))} from the FMU. The same procedure is done with the FMU.
+To advance from time \emph{t\(_{k}\)} to \emph{t\(_{k+1}\)}, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new value \emph{x\(_{1}\)(t\(_{k+1}\))} to the FMU and it receives the value \emph{x\(_{2}\)(t\(_{k+1}\))} from the FMU. The same procedure is done with the FMU.
 
 \subsection{Requirements}\label{requirements}
 
