@@ -14,10 +14,18 @@ As shown in the figure above, energy use for the facility is grouped according t
 
 % table 7
 \begin{longtable}[c]{@{}l@{}}
-\caption{Overall Meter Types \protect \label{table:overall-meter-types}}\\
+\caption{Overall Meter Types \label{table:overall-meter-types}} \tabularnewline
 \toprule 
-Meters \tabularnewline \midrule
+Meters \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Overall Meter Types} \tabularnewline
+\toprule 
+Meters \tabularnewline
+\midrule
 \endhead
+
 Facility \tabularnewline
 Building \tabularnewline
 Zone \tabularnewline
@@ -30,10 +38,18 @@ Both the fuel types and enduse types are set within the program by the developer
 
 % table 8
 \begin{longtable}[c]{@{}l@{}}
-\caption{Table of Metered Fuel Types \protect \label{table:table-of-metered-fuel-types}}\\
+\caption{Table of Metered Fuel Types \label{table:table-of-metered-fuel-types}} \tabularnewline
 \toprule 
-Utility/Fuel Types \tabularnewline \midrule
+Utility/Fuel Types \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Table of Metered Fuel Types} \tabularnewline
+\toprule 
+Utility/Fuel Types \tabularnewline
+\midrule
 \endhead
+
 Electricity \tabularnewline
 Gas \tabularnewline
 Gasoline \tabularnewline
@@ -51,8 +67,78 @@ DistrictHeating \tabularnewline
 
 \begin{longtable}[c]{@{}l@{}}
 \toprule 
-Other Resource Types \tabularnewline \midrule
+AdditionalTypes \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+AdditionalTypes \tabularnewline
+\midrule
 \endhead
-EnergyTransfer \tabularnewline
+
+HeatingCoils \tabularnewline
+CoolingCoils \tabularnewline
+Chillers \tabularnewline
+Boilers \tabularnewline
+Baseboard \tabularnewline
+HeatRecoveryForCooling \tabularnewline
+HeatRecoveryForHeating \tabularnewline
+\bottomrule
+\end{longtable}
+
+The end use types are shown in the following table:
+
+% table 9
+\begin{longtable}[c]{@{}l@{}}
+\caption{End Use Category Types \label{table:end-use-category-types}} \tabularnewline
+\toprule 
+End Use Types \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{End Use Category Types} \tabularnewline
+\toprule 
+End Use Types \tabularnewline
+\midrule
+\endhead
+
+InteriorLights \tabularnewline
+ExteriorLights \tabularnewline
+InteriorEquipment \tabularnewline
+ExteriorEquipment \tabularnewline
+Fans \tabularnewline
+Pumps \tabularnewline
+Heating \tabularnewline
+Cooling \tabularnewline
+HeatRejection \tabularnewline
+Humidifier \tabularnewline
+HeatRecovery \tabularnewline
+DHW \tabularnewline
+Cogeneration \tabularnewline
+Refrigeration \tabularnewline
+Miscellaneous \tabularnewline
+\bottomrule
+\end{longtable}
+
+Additional End Use Types Only Used for EnergyTransfer:
+
+\begin{longtable}[c]{@{}l@{}}
+\toprule 
+AdditionalTypes \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+AdditionalTypes \tabularnewline
+\midrule
+\endhead
+
+HeatingCoils \tabularnewline
+CoolingCoils \tabularnewline
+Chillers \tabularnewline
+Boilers \tabularnewline
+Baseboard \tabularnewline
+HeatRecoveryForCooling \tabularnewline
+HeatRecoveryForHeating \tabularnewline
 \bottomrule
 \end{longtable}
