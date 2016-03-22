@@ -45,7 +45,8 @@ BeginSimFlag = .TRUE.
           BeginTimeStepFlag = .TRUE.
           EndTimeStepFlag   = .FALSE.
           ! Set the End_Flag variables to true if necessary. Note that each flag builds on
-          ! the previous level. EndDayFlag cannot be .true. unless EndHourFlag is also .true., etc.
+          ! the previous level. EndDayFlag cannot be .true. unless EndHourFlag is also .true.,
+          ! etc.
           ! Note that the EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
           ! Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
           ! SubTimeStepFlags can/will be set/reset in the HVAC Manager.
