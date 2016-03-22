@@ -5128,10 +5128,10 @@ namespace WaterThermalTanks {
 				//     autosize info must be calculated in GetWaterThermalTankInputFlag for use in StandardRating procedure
 				//       (called at end of GetWaterThermalTankInputFlag)
 				//     report autosizing information here (must be done after GetWaterThermalTankInputFlag is complete)
-				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized && ( PlantFirstSizesOkayToFinalize || !AnyPlantInModel ) ) {
+				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized && ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Condenser water flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingWaterFlowRate );
 				}
-				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized && ( PlantFirstSizesOkayToFinalize || !AnyPlantInModel ) ) {
+				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized && ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
 				}
 				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
@@ -5139,7 +5139,7 @@ namespace WaterThermalTanks {
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
 				}
-				if ( PlantFirstSizesOkayToFinalize || !AnyPlantInModel ) MyHPSizeFlag( HPNum ) = false;
+				if ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) MyHPSizeFlag( HPNum ) = false;
 			}
 
 			HPAirInletNode = HPWaterHeater( HPNum ).HeatPumpAirInletNode;
@@ -5317,7 +5317,9 @@ namespace WaterThermalTanks {
 
 		// calling CalcStandardRatings early bypasses fan sizing since DataNonZoneNonAirloopValue has not been set yet
 		if ( !AlreadyRated( WaterThermalTankNum ) ) {
-			CalcStandardRatings( WaterThermalTankNum );
+			if ( !AnyPlantInModel || PlantFirstSizesOkayToReport || WaterThermalTank( WaterThermalTankNum ).MaxCapacity > 0.0 || WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
+				CalcStandardRatings( WaterThermalTankNum );
+			}
 		}
 
 	}
