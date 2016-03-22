@@ -421,7 +421,7 @@ namespace PlantPipingSystemsManager {
 
 				DoOneTimeInitializations( DomainNum, _ );
 
-				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 					int Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
 					int Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
 					int Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
@@ -446,7 +446,7 @@ namespace PlantPipingSystemsManager {
 			if ( !initOnly ) {
 				// Aggregate the heat flux
 				// Zone-coupled slab
-				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 					PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
 					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
 					PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
@@ -480,7 +480,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 				// Zone-coupled slab
-				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 
 					PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 
@@ -5691,7 +5691,7 @@ namespace PlantPipingSystemsManager {
 					//'apply boundary conditions
 
 					// For zone-coupled ground domain
-					if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+					if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 						if ( CellYIndex == cells.l2() ) { // Farfield cells
 							CellType = CellType_FarfieldBoundary;
 							++TotNumCells;
@@ -6259,7 +6259,7 @@ namespace PlantPipingSystemsManager {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount;
 		} else if ( dir == RegionType_YDirection ) {
 			// Set slab cell count
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {//Slab model
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {//Slab model
 				if ( ( PipingSystemDomains( DomainNum ).VertInsPresentFlag && n == 4 ) || ( !PipingSystemDomains( DomainNum ).VertInsPresentFlag && n == 2 ) ) {//Slab region
 					RetVal = PipingSystemDomains( DomainNum ).NumSlabCells;
 				} else {//Other regions
@@ -6351,7 +6351,7 @@ namespace PlantPipingSystemsManager {
 		GridWidth = g.Max - g.Min;
 
 		if ( ThisMesh.MeshDistribution == MeshDistribution_Uniform ) {
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab && g.RegionType == RegionType_YDirection && g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ) {//Slab region
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab && g.RegionType == RegionType_YDirection && g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ) {//Slab region
 				NumCells = PipingSystemDomains( DomainNum ).NumSlabCells;
 				if ( allocated( RetVal ) ) RetVal.deallocate( );
 				RetVal.allocate( { 0, NumCells - 1 } );
@@ -7906,7 +7906,7 @@ namespace PlantPipingSystemsManager {
 			EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
 
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 				if ( CurDirection == Direction_PositiveX || CurDirection == Direction_PositiveZ ) {
 					AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at Xmax, Ymin, Zmax
 				}
