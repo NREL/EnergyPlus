@@ -10,8 +10,15 @@ The output file contains a list of the unique surfaces and their net and gross a
 
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
-Column & Description \tabularnewline \midrule
+Column & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Column & Description \tabularnewline
+\midrule
 \endhead
+
 1 & Integer counter for surfaces. The surfaces are listed in the order that they are stored internally in EnergyPlus. Note that in this report, the algorithms sort out and exclude duplicate surfaces that are entered for the interior partitions between adjacent thermal zones. Therefore the list is usually not consecutive. \tabularnewline
 2 & The name of the surface entered by the user \tabularnewline
 3 & The name of the construction for the surface entered by the user \tabularnewline

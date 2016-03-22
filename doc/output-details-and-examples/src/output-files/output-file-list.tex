@@ -4,10 +4,18 @@ Following are the native file names that are output from EnergyPlus; native -- d
 
 % table 1
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{EnergyPlus Basic Output  Files \protect \label{table:energyplus-basic-output-files}}\\
+\caption{EnergyPlus Basic Output  Files \label{table:energyplus-basic-output-files}} \tabularnewline
 \toprule 
-Output File Name & Description & EP-Launch File Name \tabularnewline \midrule
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Basic Output  Files} \tabularnewline
+\toprule 
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
 \endhead
+
 eplusout.audit & Echo of input, includes both IDD echo and IDF echo – may have errors shown in context with IDD or IDF statements & < filename > .audit (without echoing IDD unless errors in IDD). \tabularnewline
 eplusout.bnd & This file contains details about the nodes and branches. Useful in determining if all your nodes are connected correctly. May be used to diagram the network/ nodes of the HVAC system. & < filename > .bnd \tabularnewline
 eplusout.dbg & From Debug Output object – may be useful to support to help track down problems & < filename > .dbg \tabularnewline
@@ -45,10 +53,18 @@ In addition to the basic output files from EnergyPlus there are three standard `
 
 % table 2
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
-\caption{"Hybrid" EnergyPlus Output Files \protect \label{table:hybrid-energyplus-output-files}}\\
+\caption{"Hybrid" EnergyPlus Output Files \label{table:hybrid-energyplus-output-files}} \tabularnewline
 \toprule 
-Output File Name & Description & EP-Launch File Name \tabularnewline \midrule
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{"Hybrid" EnergyPlus Output Files} \tabularnewline
+\toprule 
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
 \endhead
+
 eplusout. < ext >  ~ & “spreadsheet” ready file that contains either all the report variables requested (default: up to limit of 255) from the input file or specific ones specified by the user. Different extensions (csv, tab, and txt denote different “separators” in the file. & < filename > .csv or  < filename > .tab or  < filename > .txt \tabularnewline
 eplusmtr. < ext >  ~ & “spreadsheet” ready file that contains either all the report meter requests (default: up to 255) from the input file or specific ones specified by the user. Different extensions (csv, tab, and txt denote different “separators” in the file. & < filename > Meter.csv or  < filename > Meter.tab or  < filename > Meter.txt \tabularnewline
 readvars.rvaudit & Results of any “ReadVarsESO” execution in the current batch run. & < filename > .rvaudit \tabularnewline

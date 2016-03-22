@@ -2,7 +2,31 @@
 
 Every programming language has instructions or commands that tell the processor what to do. Erl supports a few types of program statements. Each line of an Erl program begins with a statement keyword. The syntax for each line depends on the keyword that starts that line. Only those listed in Table 1 are allowed.
 
-DID NOT CONVERT TABLE
+\begin{longtable}{@{}ll>{\raggedright}p{3in}@{}}
+
+\caption{Programming Statements in ERL \label{table:programming-statements-in-erl}} \tabularnewline
+\toprule
+Keyword & Syntax & Statement Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Programming Statements in ERL}
+\toprule
+Keyword & Syntax & Statement Description \tabularnewline
+\midrule
+\endhead
+
+RUN & RUN <program name> & Calls another Erl program or subroutine. Returns to the calling point when completed. Recursive calling is allowed. \tabularnewline
+RETURN & RETURN, & Prematurely exits a subroutine or program and returns control to the caller. \tabularnewline
+SET & SET <variable> = <expression>, & Assigns the right-hand side to the left-hand side. If <variable> has not been used before, it is dynamically declared (with local scope). \textbf{Note: <variables> should NOT start with numerics.} \tabularnewline
+IF & IF <expression>, & Begins an ``IF block.'' Conditional decision. If <expression> evaluates to anything other than zero, the block of statements after the IF is executed. \tabularnewline
+ELSEIF & ELSEIF <expression> & Conditional decision that follows a regular IF block of instructions. If <expression> evaluates to anything other than zero, the block of instructions after the ELSEIF is executed. \tabularnewline
+ELSE & ELSE, & Conditional decision. Associated with an IF statement, the block of statements after the ELSE is executed if <expression> evaluates to zero for preceding IF and ELSEIF statements. \tabularnewline
+ENDIF & ENDIF, & Terminates IF block (required). \tabularnewline
+WHILE & WHILE <expression> & Begins a ``WHILE block.'' Conditional decision. If <expression> evaluates to anything other than zero, the block of statements after the WHILE is repeatedly executed. \tabularnewline
+ENDWHILE & ENDWHILE, & Terminates WHILE block (required). \tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsection{Rules for IF blocks:}\label{rules-for-if-blocks}
 

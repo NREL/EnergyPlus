@@ -387,10 +387,18 @@ NOTE:~ modifying the RH multiplier (-0.144599) tends to ``wag'' the curvature at
 
 % table 43
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
-\caption{Electronic Enthalpy Curve Constants and approximate control point at 50\% RH \protect \label{table:electronic-enthalpy-curve-constants}}\\
+\caption{Electronic Enthalpy Curve Constants and approximate control point at 50\% RH \label{table:electronic-enthalpy-curve-constants}} \tabularnewline
 \toprule 
-Control Curve & Curve Constant K & Approximate Control Point at 50\% RH (ºC) \tabularnewline \midrule
+Control Curve & Curve Constant K & Approximate Control Point at 50\% RH (ºC) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Electronic Enthalpy Curve Constants and approximate control point at 50\% RH} \tabularnewline
+\toprule 
+Control Curve & Curve Constant K & Approximate Control Point at 50\% RH (ºC) \tabularnewline
+\midrule
 \endhead
+
 A & 12 & 22.9 \tabularnewline
 B & 14 & 21.1 \tabularnewline
 C & 16 & 19.4 \tabularnewline
@@ -410,21 +418,88 @@ The method described here was used to create each of the four ``cubic'' curve ob
 
 \textbf{Step 2:} Identify humidity ratio at each point (e.g.~column 3 in the following table). Psychrometric routines are helpful for this step.
 
-\begin{longtable}[c]{p{1.78in}p{1.5in}p{2.71in}}
+\begin{longtable}[c]{@{}l@{}}
 \toprule 
-Relative Humidity (\%) & Temperature (ºC) & Calculated Humidity Ratio (kg/kg) \tabularnewline \midrule
+Glycols \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Glycols \tabularnewline
+\midrule
 \endhead
-0 & 29.128 & 0.00000 \tabularnewline
-10 & 27.877 & 0.00232 \tabularnewline
-20 & 26.627 & 0.00433 \tabularnewline
-30 & 25.376 & 0.00605 \tabularnewline
-40 & 24.125 & 0.00750 \tabularnewline
-50 & 22.874 & 0.00872 \tabularnewline
-60 & 21.623 & 0.00971 \tabularnewline
-70 & 20.372 & 0.01051 \tabularnewline
-80 & 19.121 & 0.01112 \tabularnewline
-90 & 17.871 & 0.01158 \tabularnewline
-100 & 16.620 & 0.01189 \tabularnewline
+
+EthyleneGlycol \tabularnewline
+PropyleneGlycol \tabularnewline
+Water \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{~}
+
+\textbf{Step 3:} Use multiple linear regression to solve one of the following equations:
+
+\emph{Quadratic~ Curve}: Humidity Ratio = A0 + A1*Temperature + A2*Temperature\(^{2}\)
+
+\emph{Cubic~ Curve}: Humidity Ratio = A0 + A1*Temperature + A2*Temperature\(^{2}\) + A3*Temperature\(^{3}\)
+
+\textbf{Step 4:} Use the coefficients calculated in the multiple linear regression to create a cubic (or quadratic) curve object.
+
+\subsection{Exhaust Fired Chiller.idf}\label{exhaust-fired-chiller.idf}
+
+This dataset includes the curves for exhaust fired absorption chiller.
+
+1)~~~Cooling Capacity Function of Temperature Curve
+
+2)~~~Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve
+
+3)~~~Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
+
+\subsection{Fossil Fuel Environmental Impact Factors.idf}\label{fossil-fuel-environmental-impact-factors.idf}
+
+Impact factors for environmental reporting. References for each fuel are given in the dataset.
+
+\subsection{FluidPropertiesRefData.idf}\label{fluidpropertiesrefdata.idf}
+
+This data set includes fluid properties reference data. Fluid properties for R404a, R407a, R410a, R505a, R744, were developed using the NIST Standard Reference Database 23, NIST Reference Thermodynamic and Transport Properties -- REFPROP, April 2007 Version 8.0, National Institute of Standards and Technology, 2007. The other refrigerants were developed using older versions of the NIST Standard Reference Database. The entire data set includes:
+
+\begin{longtable}[c]{@{}l@{}}
+\toprule 
+Glycols \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Glycols \tabularnewline
+\midrule
+\endhead
+
+EthyleneGlycol \tabularnewline
+PropyleneGlycol \tabularnewline
+Water \tabularnewline
+\bottomrule
+\end{longtable}
+
+To use the data, copy the appropriate data for the refrigerant you desire into your input file.
+
+\subsection{GlycolPropertiesRefData.idf}\label{glycolpropertiesrefdata.idf}
+
+This data set includes fluid properties (glycol) reference data. Reference for the data is the ASHRAE Handbook of Fundamentals. Included are:
+
+\begin{longtable}[c]{@{}l@{}}
+\toprule 
+Glycols \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Glycols \tabularnewline
+\midrule
+\endhead
+
+EthyleneGlycol \tabularnewline
+PropyleneGlycol \tabularnewline
+Water \tabularnewline
 \bottomrule
 \end{longtable}
 

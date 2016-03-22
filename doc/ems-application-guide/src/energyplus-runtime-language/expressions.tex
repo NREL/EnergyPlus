@@ -21,26 +21,28 @@ The operators shown in Table~\ref{table:operators-for-erl} are available for use
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Operators for Erl \label{table:operators-for-erl}} \tabularnewline
 \toprule 
-Operator Symbol & Description & Evaluation Order & Example \tabularnewline \midrule
+Operator Symbol & Description & Evaluation Order & Example \tabularnewline
+\midrule
 \endfirsthead
 
 \caption[]{Operators for Erl} \tabularnewline
 \toprule 
-Operator Symbol & Description & Evaluation Order & Example \tabularnewline \midrule
+Operator Symbol & Description & Evaluation Order & Example \tabularnewline
+\midrule
 \endhead
 
 ( ) & Parentheses & left-to-right & SET z = 23/(3 + 2) \tabularnewline
-- & Addition & right-to-left & SET a = 4 + 5 \tabularnewline
++ & Addition & right-to-left & SET a = 4 + 5 \tabularnewline
 - & Subtraction & right-to-left & SET b = a - 3 \tabularnewline
 * & Multiplication & right-to-left & SET c = a * b \tabularnewline
 / & Division & left-to-right & SET d = b/a \tabularnewline
 \^{} & Raise to a power & left-to-right & SET e = c \^{} 0.5 \tabularnewline
-= = & Equality comparison & left-to-right & IF a = = b \tabularnewline
+== & Equality comparison & left-to-right & IF a == b \tabularnewline
 < > ~ & Inequality comparison & left-to-right & IF c  < >  d \tabularnewline
 > ~ & Greater than comparison & left-to-right & IF a  >  e \tabularnewline
->  = & Greater than or equal to comparison & left-to-right & IF a  >  = 6 \tabularnewline
+> = & Greater than or equal to comparison & left-to-right & IF a  > = 6 \tabularnewline
 < ~ & Less than comparison & left-to-right & IF b  <  2 \tabularnewline
-<  = & Less than or equal to comparison & left-to-right & IF b  <  = f \tabularnewline
+< = & Less than or equal to comparison & left-to-right & IF b  < = f \tabularnewline
 \& \& & Logical AND & right-to-left & IF c  \& \&  d \tabularnewline
 || & Logical OR & right-to-left & IF c || d \tabularnewline
 \bottomrule

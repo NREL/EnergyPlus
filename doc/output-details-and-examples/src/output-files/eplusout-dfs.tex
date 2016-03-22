@@ -64,10 +64,36 @@ Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clea
 
 The first line describes the data in the eplusout.dfs file. The second line describes the header of the daily row:
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\begin{longtable}[c]{p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}}
 \toprule 
-Month and Day & Zone Name & Window Name & Window State \tabularnewline \midrule
+Hour & Daylight factor for clear sky at reference point 1 & Daylight factor for clear turbid sky at reference point 1 & Daylight factor for intermediate sky at reference point 1 & Daylight factor for overcast sky at reference point 1 & Daylight factor for clear sky at reference point 2 & Daylight factor for clear turbid sky at reference point 2 & Daylight factor for intermediate sky at reference point 2 & Daylight factor for overcast sky at reference point 2 \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Hour & Daylight factor for clear sky at reference point 1 & Daylight factor for clear turbid sky at reference point 1 & Daylight factor for intermediate sky at reference point 1 & Daylight factor for overcast sky at reference point 1 & Daylight factor for clear sky at reference point 2 & Daylight factor for clear turbid sky at reference point 2 & Daylight factor for intermediate sky at reference point 2 & Daylight factor for overcast sky at reference point 2 \tabularnewline
+\midrule
 \endhead
-01/21 & PERIMETER\_BOT\_ZN\_1 & PERIMETER\_BOT\_ZN\_1\_WALL\_SOUTH\_WINDOW & Base Window \tabularnewline
+
+10 & 0.06239 & 0.07088 & 0.03377 & 0.01427 & 0.0 & 0.0 & 0.0 & 0.0 \tabularnewline
+\bottomrule
+\end{longtable}
+
+The Window State column has three possible outputs -- Base Window indicating windows without shades; a numeric value, from 0.0 to 180.0 for every 10.0 step, indicating the slat angle (in degrees) of the blind shading the window; blink indicating windows in shaded state by shades, screens, and blinds with fixed slat angle.
+
+The third line describes the hourly daylight factors. Note that the last 4 columns are 0.0 because there is only one daylight reference point.:
+
+\begin{longtable}[c]{p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}p{0.66in}}
+\toprule 
+Hour & Daylight factor for clear sky at reference point 1 & Daylight factor for clear turbid sky at reference point 1 & Daylight factor for intermediate sky at reference point 1 & Daylight factor for overcast sky at reference point 1 & Daylight factor for clear sky at reference point 2 & Daylight factor for clear turbid sky at reference point 2 & Daylight factor for intermediate sky at reference point 2 & Daylight factor for overcast sky at reference point 2 \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Hour & Daylight factor for clear sky at reference point 1 & Daylight factor for clear turbid sky at reference point 1 & Daylight factor for intermediate sky at reference point 1 & Daylight factor for overcast sky at reference point 1 & Daylight factor for clear sky at reference point 2 & Daylight factor for clear turbid sky at reference point 2 & Daylight factor for intermediate sky at reference point 2 & Daylight factor for overcast sky at reference point 2 \tabularnewline
+\midrule
+\endhead
+
+10 & 0.06239 & 0.07088 & 0.03377 & 0.01427 & 0.0 & 0.0 & 0.0 & 0.0 \tabularnewline
 \bottomrule
 \end{longtable}
