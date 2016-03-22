@@ -180,7 +180,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	void
-	GetPipingSystemsInput();
+	GetPipingSystemsAndGroundDomainsInput();
 
 	//*********************************************************************************************!
 

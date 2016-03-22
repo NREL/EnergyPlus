@@ -106,20 +106,6 @@ namespace DataSurfaces {
 	// MODULE PARAMETER DEFINITIONS:
 	int const MaxSlatAngs( 19 );
 
-	// Parameters to indicate surface shape for use with the Surface
-	// derived type (see below):
-
-	int const Triangle( 1 );
-	int const Quadrilateral( 2 );
-	int const Rectangle( 3 );
-	int const Polygonal( 9 );
-	int const RectangularDoorWindow( 4 );
-	int const RectangularOverhang( 5 );
-	int const RectangularLeftFin( 6 );
-	int const RectangularRightFin( 7 );
-	int const TriangularWindow( 8 );
-	int const TriangularDoor( 9 );
-
 	// Parameters to indicate exterior boundary conditions for use with
 	// the Surface derived type (see below):
 	// Note:  Positive values correspond to an interzone adjacent surface
@@ -691,21 +677,21 @@ namespace DataSurfaces {
 		SurfaceData::
 		computed_shapeCat() const
 		{
-			if ( Shape == Triangle ) {
+			if ( Shape == SurfaceShape::Triangle ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == TriangularWindow ) {
+			} else if ( Shape == SurfaceShape::TriangularWindow ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == TriangularDoor ) {
+			} else if ( Shape == SurfaceShape::TriangularDoor ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == Rectangle ) {
+			} else if ( Shape == SurfaceShape::Rectangle ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularDoorWindow ) {
+			} else if ( Shape == SurfaceShape::RectangularDoorWindow ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularOverhang ) {
+			} else if ( Shape == SurfaceShape::RectangularOverhang ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularLeftFin ) {
+			} else if ( Shape == SurfaceShape::RectangularLeftFin ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularRightFin ) {
+			} else if ( Shape == SurfaceShape::RectangularRightFin ) {
 				return ShapeCat::Rectangular;
 			} else if ( IsConvex ) {
 				return ShapeCat::Convex;

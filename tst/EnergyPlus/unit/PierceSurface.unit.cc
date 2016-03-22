@@ -83,7 +83,7 @@ TEST( PierceSurfaceTest, Rectangular )
 	DataSurfaces::SurfaceData floor;
 	floor.Vertex.dimension( 4 );
 	floor.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(1,1,0), Vector(0,1,0) };
-	floor.Shape = Rectangle;
+	floor.Shape = SurfaceShape::Rectangle;
 	floor.set_computed_geometry();
 	DataSurfaces::Surface2D const & floor2d( floor.surface2d );
 	EXPECT_EQ( ShapeCat::Rectangular, floor.shapeCat );
@@ -155,7 +155,7 @@ TEST( PierceSurfaceTest, Triangular )
 	DataSurfaces::SurfaceData floor;
 	floor.Vertex.dimension( 3 );
 	floor.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(1,1,0) };
-	floor.Shape = Triangle;
+	floor.Shape = SurfaceShape::Triangle;
 	floor.set_computed_geometry();
 	DataSurfaces::Surface2D const & floor2d( floor.surface2d );
 	EXPECT_EQ( ShapeCat::Triangular, floor.shapeCat );

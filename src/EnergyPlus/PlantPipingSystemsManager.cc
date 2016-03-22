@@ -301,7 +301,7 @@ namespace PlantPipingSystemsManager {
 
 		// Read input if necessary
 		if ( GetInputFlag ) {
-			GetPipingSystemsInput();
+			GetPipingSystemsAndGroundDomainsInput();
 			GetInputFlag = false;
 		}
 
@@ -400,7 +400,7 @@ namespace PlantPipingSystemsManager {
 
 		// Read input if necessary
 		if ( GetInputFlag ) {
-			GetPipingSystemsInput();
+			GetPipingSystemsAndGroundDomainsInput();
 			GetInputFlag = false;
 		}
 
@@ -462,15 +462,22 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 				}
 
-				// Select run interval
-				if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
-					// Keep on going!
-					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZoneSec;
-				} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
-					// Passes by if not time to run
-					if ( TimeStep != 1 ) continue;
-						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
-				}
+			// Aggregate the heat flux
+			// Zone-coupled slab
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
+				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+			} else { // Coupled basement
+				// basement walls
+				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
+				// basement floor
+				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
+
+				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+				PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+			}
 
 				// Zone-coupled slab
 				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
@@ -572,7 +579,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	GetPipingSystemsInput()
+	GetPipingSystemsAndGroundDomainsInput()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -601,7 +608,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetPipingSystemsInput" );
+		static std::string const RoutineName( "GetPipingSystemsAndGroundDomainsInput" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1078,7 +1085,7 @@ namespace PlantPipingSystemsManager {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Edwin Lee
 			//       DATE WRITTEN   Summer 2011
-			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accomodate ground coupled calculations
+			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accommodate ground coupled calculations
 			//       RE-ENGINEERED  na
 
 			// PURPOSE OF THIS SUBROUTINE:
@@ -1168,7 +1175,7 @@ namespace PlantPipingSystemsManager {
 			// initialize these counters properly so they can be incremented within the DO loop
 			DomainCtr = StartingDomainNumForZone - 1;
 
-			// For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zonecoupled domain.
+			// For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zone coupled domain.
 			// This way, the outer get input routines can handle it as though they were generalized routines
 
 			for ( ZoneCoupledDomainCtr = 1; ZoneCoupledDomainCtr <= NumZoneCoupledDomains; ++ZoneCoupledDomainCtr ) {
@@ -1213,8 +1220,9 @@ namespace PlantPipingSystemsManager {
 				} else if ( SameString( cAlphaArgs( 5 ), "ONGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = false;
 				} else {
-					ShowContinueError( "Slab location not determined." );
-					ShowContinueError( "Preceding error causes program termination." );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + "=" + cAlphaArgs( 5 ) );
+					ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+					ErrorsFound = true;
 				}
 
 				// Get slab material properties
@@ -1223,10 +1231,9 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
-						ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
 						ErrorsFound = true;
 					} else {
-						// check this
 						PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
 						PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
 						PipingSystemDomains( DomainCtr ).SlabProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).SpecHeat;
@@ -1235,13 +1242,16 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// set flag for horizontal insulation
-				if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
-					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-				} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
-					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
-				} else {
-					ShowContinueError( "Must enter either yes or no for horizontal insulation." );
-					ShowFatalError( "Preceding error causes program termination." );
+				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
+					if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
+					} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
+						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
+					} else {
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + "=" + cAlphaArgs( 7 ) );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+						ErrorsFound = true;
+					}
 				}
 
 				// Get horizontal insulation material properties
@@ -1250,7 +1260,7 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
-						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).HorizInsMaterial );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
 						ErrorsFound = true;
 					} else {
 						PipingSystemDomains( DomainCtr ).HorizInsThickness = Material( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum ).Thickness;
@@ -1262,15 +1272,25 @@ namespace PlantPipingSystemsManager {
 					// Set flag for horizontal insulation extents
 					if ( SameString( cAlphaArgs( 9 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
+						// Horizontal insulation perimeter width
+						if ( Domain( ZoneCoupledDomainCtr ).HorizInsWidth > 0.0 ) {
+							PipingSystemDomains( DomainCtr ).HorizInsWidth = Domain( ZoneCoupledDomainCtr ).HorizInsWidth;
+						} else {
+							ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) );
+							ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+							ErrorsFound = true;
+						}
 					} else if ( SameString( cAlphaArgs( 9 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
 					} else {
-						ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
-						ShowFatalError( "Preceding error causes program termination." );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+						ErrorsFound = true;
 					}
 
 					// Horizontal insulation perimeter width
 					PipingSystemDomains( DomainCtr ).HorizInsWidth = Domain( ZoneCoupledDomainCtr ).HorizInsWidth;
+
 				}
 
 				// set flag for vertical insulation
@@ -1279,8 +1299,9 @@ namespace PlantPipingSystemsManager {
 				} else if ( SameString( cAlphaArgs( 10 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = true;
 				} else {
-					ShowContinueError( "Must enter either yes or no for vertical insulation." );
-					ShowFatalError( "Preceding error causes program termination." );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
+					ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+					ErrorsFound = true;
 				}
 
 				// Get vertical insulation material properties
@@ -1289,7 +1310,7 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 11 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).VertInsMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
-						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).VertInsMaterial );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
 						ErrorsFound = true;
 					} else {
 						PipingSystemDomains( DomainCtr ).VertInsThickness = Material( PipingSystemDomains( DomainCtr ).VertInsMaterialNum ).Thickness;
@@ -1299,13 +1320,13 @@ namespace PlantPipingSystemsManager {
 					}
 
 					// vertical insulation depth
-					if ( Domain( ZoneCoupledDomainCtr ).VertInsDepth < Domain( ZoneCoupledDomainCtr ).Depth ) {
-						PipingSystemDomains( DomainCtr ).VertInsDepth = Domain( ZoneCoupledDomainCtr ).VertInsDepth;
+					if ( Domain( ZoneCoupledDomainCtr ).VertInsDepth > Domain( ZoneCoupledDomainCtr ).Depth || Domain( ZoneCoupledDomainCtr ).VertInsDepth <= 0.0 ) {
+						ShowSevereError( "Invalid " + cNumericFieldNames( 11 ) );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+						ErrorsFound = true;
 					} else {
-						ShowContinueError( "Vertical insulation depth must be less than the domain depth. Check input." );
-						ShowFatalError( "Preceding error causes program termination." );
+						PipingSystemDomains( DomainCtr ).VertInsDepth = Domain( ZoneCoupledDomainCtr ).VertInsDepth;
 					}
-
 				}
 
 				// Domain perimeter offset
@@ -1317,14 +1338,15 @@ namespace PlantPipingSystemsManager {
 				} else if ( SameString( cAlphaArgs( 12 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
-					ShowContinueError( "Could not determine slab simulation interval. Check input." );
-					ShowFatalError( "Preceding error causes program termination." );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 12 ) + "=" + cAlphaArgs( 12 ) );
+					ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+					ErrorsFound = true;
 				}
 
 				//******* We'll first set up the domain ********
 				PipingSystemDomains( DomainCtr ).IsActuallyPartOfAHorizontalTrench = false;
 				PipingSystemDomains( DomainCtr ).HasAPipeCircuit = false;
-				PipingSystemDomains( DomainCtr ).IsZoneCoupledSlab = true;
+				PipingSystemDomains( DomainCtr ).HasZoneCoupledSlab = true;
 
 				// Domain name
 				PipingSystemDomains( DomainCtr ).Name = Domain( ZoneCoupledDomainCtr ).ObjName;
@@ -1332,11 +1354,13 @@ namespace PlantPipingSystemsManager {
 				// get boundary condition model names and indices -- error check
 				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM );
 				if ( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex <= 0 ) {
-					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
+					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
+					ErrorsFound = true;
 				} else {
 					NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex );
 					if ( NumSurfacesWithThisOSCM <= 0 ) {
-						IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.", ErrorsFound );
+						IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.", ErrorsFound );
+						ErrorsFound = true;
 					} else {
 						PipingSystemDomains( DomainCtr ).ZoneCoupledSurfaces.allocate( NumSurfacesWithThisOSCM );
 						// Create GetSurfaceDataForOSCM function
@@ -1358,9 +1382,15 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).SlabLength = PipingSystemDomains( DomainCtr ).SlabWidth * Domain( ZoneCoupledDomainCtr ).AspectRatio;
 
 				// Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical partition thickness.
-				if ( 2 * PipingSystemDomains( DomainCtr ).HorizInsWidth + PipingSystemDomains( DomainCtr ).VertInsThickness > PipingSystemDomains( DomainCtr ).SlabWidth || 2 * PipingSystemDomains( DomainCtr ).HorizInsWidth + PipingSystemDomains( DomainCtr ).VertInsThickness > PipingSystemDomains( DomainCtr ).SlabLength ) {
-					ShowSevereError( "PipingSystems:" + RoutineName + ": Perimeter Insulation Width is too high" );
-					ShowFatalError( "Preceding error(s) cause program termination." );
+				if ( !PipingSystemDomains( DomainCtr ).FullHorizInsPresent && ThisArea > 0.0 ) {
+					if ( 2 * ( PipingSystemDomains( DomainCtr ).HorizInsWidth + PipingSystemDomains( DomainCtr ).VertInsThickness ) > PipingSystemDomains( DomainCtr ).SlabWidth ||
+						2 * ( PipingSystemDomains( DomainCtr ).HorizInsWidth + PipingSystemDomains( DomainCtr ).VertInsThickness ) > PipingSystemDomains( DomainCtr ).SlabLength ) {
+						ShowContinueError( RoutineName + ": Perimeter insulation width is too large." );
+						ShowContinueError( "This would cause overlapping insulation. Check inputs." );
+						ShowContinueError( "Defaulting to full horizontal insulation." );
+						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
+						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
+					}
 				}
 
 				// Set ground domain dimensions
@@ -1504,7 +1534,7 @@ namespace PlantPipingSystemsManager {
 		// initialize these counters properly so they can be incremented within the DO loop
 		DomainNum = StartingDomainNumForBasement - 1;
 
-		// For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zonecoupled domain.
+		// For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zone coupled domain.
 		// This way, the outer get input routines can handle it as though they were generalized routines
 
 		for ( BasementCtr = 1; BasementCtr <= NumBasements; ++BasementCtr ) {
@@ -1536,6 +1566,9 @@ namespace PlantPipingSystemsManager {
 			Domain( BasementCtr ).HorizInsWidth = rNumericArgs( 10 );
 			Domain( BasementCtr ).VertInsDepth = rNumericArgs( 12 );
 
+			// Other inputs
+			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
+
 			// Soil properties, validated min/max by IP
 			PipingSystemDomains( DomainNum ).GroundProperties.Conductivity = rNumericArgs( 4 );
 			PipingSystemDomains( DomainNum ).GroundProperties.Density = rNumericArgs( 5 );
@@ -1555,8 +1588,10 @@ namespace PlantPipingSystemsManager {
 			// Basement zone depth
 			CurIndex = 11;
 			PipingSystemDomains( DomainNum ).BasementZone.Depth = rNumericArgs( CurIndex );
-			if ( PipingSystemDomains( DomainNum ).BasementZone.Depth <= 0.0 ) {
-				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cNumericFieldNames( CurIndex ), rNumericArgs( CurIndex ), "Basement depth must be a positive nonzero value.", ErrorsFound );
+			if ( PipingSystemDomains( DomainNum ).BasementZone.Depth >= Domain( BasementCtr ).Depth || PipingSystemDomains( DomainNum ).BasementZone.Depth <= 0.0 ) {
+				ShowSevereError( "Invalid " + cNumericFieldNames( CurIndex ) );
+				ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+				ErrorsFound = true;
 			}
 
 			// get boundary condition model names and indices --error check
@@ -1583,10 +1618,12 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
+				ErrorsFound = true;
 			} else {
 				NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex );
 				if ( NumSurfacesWithThisOSCM <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.", ErrorsFound );
+					ErrorsFound = true;
 				} else {
 					PipingSystemDomains( DomainNum ).BasementZone.WallSurfacePointers.allocate( NumSurfacesWithThisOSCM );
 					PipingSystemDomains( DomainNum ).BasementZone.WallSurfacePointers = GetSurfaceIndecesForOSCM( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex, NumSurfacesWithThisOSCM );
@@ -1622,8 +1659,9 @@ namespace PlantPipingSystemsManager {
 			} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = true;
 			} else {
-				ShowContinueError( "Must enter either yes or no for horizontal insulation." );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + "=" + cAlphaArgs( 5 ) );
+				ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+				ErrorsFound = true;
 			}
 
 			// Get horizontal insulation material properties
@@ -1632,7 +1670,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).HorizInsMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
-					ShowContinueError( "Found in " + Domain( BasementCtr ).HorizInsMaterial );
+					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
 					ErrorsFound = true;
 				} else {
 					PipingSystemDomains( DomainNum ).HorizInsThickness = Material( PipingSystemDomains( DomainNum ).HorizInsMaterialNum ).Thickness;
@@ -1644,15 +1682,25 @@ namespace PlantPipingSystemsManager {
 				// Set flag for horizontal insulation extents
 				if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = false;
+					// Horizontal insulation perimeter width
+					if ( Domain( BasementCtr ).HorizInsWidth > 0.0 ) {
+						PipingSystemDomains( DomainNum ).HorizInsWidth = Domain( BasementCtr ).HorizInsWidth;
+					} else {
+						ShowSevereError( "Invalid " + cNumericFieldNames( 10 ) );
+						ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+						ErrorsFound = true;
+					}
 				} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
 				} else {
-					ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
-					ShowFatalError( "Preceding error causes program termination." );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + "=" + cAlphaArgs( 7 ) );
+					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+					ErrorsFound = true;
 				}
 
 				// Horizontal insulation perimeter width
 				PipingSystemDomains( DomainNum ).HorizInsWidth = Domain( BasementCtr ).HorizInsWidth;
+
 			}
 
 			// set flag for vertical insulation
@@ -1661,17 +1709,28 @@ namespace PlantPipingSystemsManager {
 			} else if ( SameString( cAlphaArgs( 9 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = true;
 			} else {
-				ShowContinueError( "Must enter either yes or no for vertical insulation." );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
+				ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+				ErrorsFound = true;
 			}
 
 			// Get vertical insulation material properties
 			if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
+				// Check if vertical insulation is in domain
+				if ( Domain( BasementCtr ).VertInsDepth >= Domain( BasementCtr ).Depth || Domain( BasementCtr ).VertInsDepth <= 0.0 ) {
+					ShowSevereError( "Invalid " + cNumericFieldNames( 12 ) );
+					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+					ErrorsFound = true;
+				} else {
+					// Set insulation depth
+					PipingSystemDomains( DomainNum ).VertInsDepth = Domain( BasementCtr ).VertInsDepth;
+				}
+
 				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 10 );
 				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).VertInsMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
-					ShowContinueError( "Found in " + Domain( BasementCtr ).VertInsMaterial );
+					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
 					ErrorsFound = true;
 				} else {
 					PipingSystemDomains( DomainNum ).VertInsThickness = Material( PipingSystemDomains( DomainNum ).VertInsMaterialNum ).Thickness;
@@ -1679,9 +1738,6 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainNum ).VertInsProperties.SpecificHeat = Material( PipingSystemDomains( DomainNum ).VertInsMaterialNum ).SpecHeat;
 					PipingSystemDomains( DomainNum ).VertInsProperties.Conductivity = Material( PipingSystemDomains( DomainNum ).VertInsMaterialNum ).Conductivity;
 				}
-
-				// vertical insulation depth
-				PipingSystemDomains( DomainNum ).VertInsDepth = Domain( BasementCtr ).VertInsDepth;
 			}
 
 			// Set simulation interval flag
@@ -1690,8 +1746,9 @@ namespace PlantPipingSystemsManager {
 			} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
 			} else {
-				ShowContinueError( "Could not determine basement simulation interval. Check input." );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
+				ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+				ErrorsFound = true;
 			}
 
 			// Farfield ground temperature model
@@ -1715,29 +1772,32 @@ namespace PlantPipingSystemsManager {
 			// get width and length from aspect ratio later
 			PipingSystemDomains( DomainNum ).Extents.Xmax = Domain( BasementCtr ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementZone.Width / 2;
 			PipingSystemDomains( DomainNum ).Extents.Ymax = Domain( BasementCtr ).Depth;
-			PipingSystemDomains( DomainNum ).Extents.Zmax = Domain( BasementCtr ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementZone.Width / 2;
+			PipingSystemDomains( DomainNum ).Extents.Zmax = Domain( BasementCtr ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementZone.Length / 2;
 
 			// Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical partition thickness.
-			if ( PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness > PipingSystemDomains( DomainNum ).BasementZone.Width / 2.0
-				|| PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness > PipingSystemDomains( DomainNum ).BasementZone.Width /2.0 ) {
-				ShowSevereError( "PipingSystems:" + RoutineName + ": Perimeter Horizontal Insulation Width is too high compared to basement floor dimensions" );
-				ShowFatalError( "Preceding error(s) cause program termination." );
+			if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent && ThisArea > 0.0 ) {
+				if ( ( PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness ) > PipingSystemDomains( DomainNum ).BasementZone.Width / 2.0 ||
+					( PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness ) > PipingSystemDomains( DomainNum ).BasementZone.Length / 2.0 ) {
+					ShowContinueError( RoutineName + ": Perimeter insulation width is too large." );
+					ShowContinueError( "This would cause overlapping insulation. Check inputs." );
+					ShowContinueError( "Defaulting to full horizontal insulation." );
+					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
+					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
+				}
 			}
 
 			//******* We'll first set up the domain ********
 			PipingSystemDomains( DomainNum ).IsActuallyPartOfAHorizontalTrench = false;
 			PipingSystemDomains( DomainNum ).HasAPipeCircuit = false;
-			PipingSystemDomains( DomainNum ).IsZoneCoupledSlab = false;
+			PipingSystemDomains( DomainNum ).HasZoneCoupledSlab = false;
 			PipingSystemDomains( DomainNum ).HasBasement = false;
-			PipingSystemDomains( DomainNum ).HasCoupledBasement = true;
+			PipingSystemDomains( DomainNum ).HasZoneCoupledBasement = true;
 
 			// Domain name
 			PipingSystemDomains( DomainNum ).Name = Domain( BasementCtr ).ObjName;
 
 			// setup output variables
 			SetupZoneCoupledOutputVariables( BasementCtr );
-
-			// Add error-handling for vertical insulation depth
 
 		}
 
@@ -2422,11 +2482,11 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
 			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-		} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+		} else if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 			// Zone-coupled basement wall outputs
 			SetupOutputVariable( "GroundDomain Basement Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 			SetupOutputVariable( "GroundDomain Basement Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
@@ -4329,7 +4389,7 @@ namespace PlantPipingSystemsManager {
 
 		//'***** LAYOUT MESH REGIONS *****'
 		// Zone-coupled slab  models
-		if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 			RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, XPartitionsExist );
 			XRegions.allocate( { 0, RegionListCount - 1 } );
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, _, _, PipingSystemDomains( DomainNum ).XIndex, PipingSystemDomains( DomainNum ).XWallIndex, PipingSystemDomains( DomainNum ).InsulationXIndex );
@@ -4341,7 +4401,7 @@ namespace PlantPipingSystemsManager {
 			RegionListCount = CreateRegionListCount( ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, ZPartitionsExist );
 			ZRegions.allocate( { 0, RegionListCount - 1 } );
 			ZRegions = CreateRegionList( DomainNum, ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, RegionType_ZDirection, RegionListCount - 1, ZPartitionsExist, _, _, _, _, _, _, _, _, PipingSystemDomains( DomainNum ).ZIndex, PipingSystemDomains( DomainNum ).ZWallIndex, PipingSystemDomains( DomainNum ).InsulationZIndex );
-		} else if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+		} else if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 			RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, XPartitionsExist );
 			XRegions.allocate( { 0, RegionListCount - 1 } );
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, _, _, PipingSystemDomains( DomainNum ).XIndex, _, PipingSystemDomains( DomainNum ).InsulationXIndex );
@@ -4512,7 +4572,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// Underground Piping Systems Ground domain with basement interaction
-		if ( !PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+		if ( !PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 			if ( PipingSystemDomains( DomainNum ).HasBasement ) { // FHX model
 				//'NOTE: the basement depth is still a depth from the ground surface, need to correct for this here
 				if ( PipingSystemDomains( DomainNum ).BasementZone.Width > 0 ) {
@@ -4746,7 +4806,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// Zone-coupled slab
-		if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 			// NOTE: the slab depth is still a depth from the ground surface, need to correct for this here.
 			// Create partition at slab edges in the X direction
 			if ( PipingSystemDomains( DomainNum ).SlabWidth > 0 ) {
@@ -4998,7 +5058,7 @@ namespace PlantPipingSystemsManager {
 			// Scan all grid regions to make sure this range doesn't fall within an already entered range
 			for ( SubIndex = 0; SubIndex <= Index - 1; ++SubIndex ) {
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ) - SA
-				if ( PipingSystemDomains( DomainNum ).HasCoupledBasement && Index ==1 ) {
+				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement && Index ==1 ) {
 					if ( IsInRange_BasementModel( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRange( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
 
 						ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
@@ -5208,7 +5268,7 @@ namespace PlantPipingSystemsManager {
 					LeftRegionExtent = ThesePartitionRegions( Index - 1 ).Max;
 				}
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a mesh region to the left of ThesePartitionRegions( 1 ).-SA
-				if ( ! PipingSystemDomains( DomainNum ).HasCoupledBasement || ( Index == 0 || Index == 2 ) ) {
+				if ( ! PipingSystemDomains( DomainNum ).HasZoneCoupledBasement || ( Index == 0 || Index == 2 ) ) {
 					//'add a mesh region to the "left" of the partition
 					++PreviousUbound;
 					TempRegions( PreviousUbound ) = TempGridRegionData( LeftRegionExtent, ThisRegion.Min, DirDirection );
@@ -5703,7 +5763,7 @@ namespace PlantPipingSystemsManager {
 							CellType = CellType_FarfieldBoundary;
 							++TotNumCells;
 						}
-					} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) { // basement model, zone-coupled
+					} else if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) { // basement model, zone-coupled
 						// Set the appropriate cell type
 						if ( CellYIndex == cells.l2() ) { // Farfield cells
 							CellType = CellType_FarfieldBoundary;
@@ -6464,12 +6524,12 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Update the basement surface temperatures, if any
-			if ( PipingSystemDomains( DomainNum ).HasBasement || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+			if ( PipingSystemDomains( DomainNum ).HasBasement || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 				UpdateBasementSurfaceTemperatures( DomainNum );
 			}
 
 			// Update the slab surface temperatures, if any
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 				UpdateZoneSurfaceTemperatures( DomainNum );
 			}
 		}
@@ -6522,7 +6582,7 @@ namespace PlantPipingSystemsManager {
 						cell.MyBase.Temperature = EvaluateFarfieldBoundaryTemperature( DomainNum, cell );
 					} else if ( ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementCorner ) || ( SELECT_CASE_var == CellType_BasementFloor ) ) {
 						// basement model, zone-coupled. Call EvaluateZoneInterfaceTemperature routine to handle timestep/hourly simulation.
-						if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+						if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 							cell.MyBase.Temperature = EvaluateZoneInterfaceTemperature( DomainNum, cell );
 						} else { // FHX model
 							cell.MyBase.Temperature = EvaluateBasementCellTemperature( DomainNum, cell );
@@ -6798,7 +6858,7 @@ namespace PlantPipingSystemsManager {
 			Real64 AdiabaticMultiplier = CalcAdiabaticMultiplier( DomainNum, cell, CurDirection );
 
 			// For Zone-coupled slab or basement configuration
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 				//-x-direction will always be a farfield boundary
 				//-z will also be a farfield boundary
 				//+x and +z will be handled above
@@ -9033,7 +9093,7 @@ namespace PlantPipingSystemsManager {
 					} else if ( ( SELECT_CASE_var == CellType_GeneralField ) || ( SELECT_CASE_var == CellType_GroundSurface ) || ( SELECT_CASE_var == CellType_AdiabaticWall ) || ( SELECT_CASE_var == CellType_FarfieldBoundary ) ) {
 						cell.MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 					} else if ( ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementFloor ) || ( SELECT_CASE_var == CellType_BasementCorner ) ) {
-						if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) { // Basement interface layer
+						if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) { // Basement interface layer
 							cell.MyBase.Properties = PipingSystemDomains( DomainNum ).BasementInterfaceProperties;
 						} else { // Basement cells are partially ground, give them some props
 							cell.MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
@@ -9372,10 +9432,22 @@ namespace PlantPipingSystemsManager {
 		//'this routine should be *much* more restrictive than the exceptions, so we should be safe with this location
 		OutOfRange = CheckForOutOfRangeTemps( DomainNum );
 		if ( OutOfRange ) {
-			ShowSevereError( "PipingSystems:" + RoutineName + ": Out of range temperatures detected in piping system simulation." );
-			ShowContinueError( "This could be due to the size of the pipe circuit in relation to the loads being imposed." );
-			ShowContinueError( "Try increasing the size of the pipe circuit and investigate sizing effects." );
-			ShowFatalError( "Preceding error(s) cause program termination" );
+			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
+				ShowSevereError( "Site:GroundDomain:Slab" + RoutineName + ": Out of range temperatures detected in the ground domain." );
+				ShowContinueError( "This could be due to the size of the loads on the domain." );
+				ShowContinueError( "Verify inputs are correct. If problem persists, notify EnergyPlus support." );
+				ShowFatalError( "Preceding error(s) cause program termination" );
+			} else if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
+				ShowSevereError( "Site:GroundDomain:Basement" + RoutineName + ": Out of range temperatures detected in the ground domain." );
+				ShowContinueError( "This could be due to the size of the loads on the domain." );
+				ShowContinueError( "Verify inputs are correct. If problem persists, notify EnergyPlus support." );
+				ShowFatalError( "Preceding error(s) cause program termination" );
+			} else {
+				ShowSevereError( "PipingSystems:" + RoutineName + ": Out of range temperatures detected in piping system simulation." );
+				ShowContinueError( "This could be due to the size of the pipe circuit in relation to the loads being imposed." );
+				ShowContinueError( "Try increasing the size of the pipe circuit and investigate sizing effects." );
+				ShowFatalError( "Preceding error(s) cause program termination" );
+			}
 		}
 
 	}

@@ -459,7 +459,7 @@ private:
 			double const & azimuth;
 			double const & height;
 			double const & reveal;
-			int const & shape;
+			DataSurfaces::SurfaceShape const & shape;
 			int const & sides;
 			double const & tilt;
 			double const & width;

@@ -13828,11 +13828,11 @@ This numeric field defines the cooling coefficient of performance at rated condi
 
 #### Field: Minimum Outdoor Temperature in Cooling Mode
 
-This numeric field defines the minimum outdoor dry-bulb temperature allowed for cooling operation. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+This numeric field defines the minimum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
 
 #### Field: Maximum Outdoor Temperature in Cooling Mode
 
-This numeric field defines the maximum outdoor dry-bulb temperature allowed for cooling operation. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
 
 #### Field: Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
 
@@ -13888,11 +13888,11 @@ This numeric field defines the heating coefficient of performance at rated condi
 
 #### Field: Minimum Outdoor Temperature in Heating Mode
 
-This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum source temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
 
 #### Field: Maximum Outdoor Temperature in Heating Mode
 
-This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum source temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
 
 #### Field: Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
 
