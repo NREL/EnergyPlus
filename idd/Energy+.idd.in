@@ -1998,12 +1998,19 @@ Site:GroundDomain:Slab,
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   A12; \field Simulation Timestep
+   A12, \field Simulation Timestep
         \type choice
         \key Timestep
         \key Hourly
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
+   N12, \field Geometric Mesh Parameter
+        \type real
+        \minimum 1.0
+        \maximum 2.0
+   N13; \field Mesh Density
+        \type integer
+        \minimum 2
 
 Site:GroundDomain:Basement,
         \memo Ground-coupled basement model for simulating basements
@@ -2128,6 +2135,22 @@ Site:GroundDomain:Basement,
         \key Hourly
         \default Hourly
         \note This field specifies the basement domain simulation interval.
+        
+Site:GroundDomain:BESTEST:GroundSurfaceConditions,
+    A1, \field Name
+        \required-field
+    A2, \field Ground Domain Name
+        \required-field
+    A3, \field Ground Surface Conditions
+        \type key
+        \choice WeatherFile
+        \choice ConstConvCoefficient
+    N1, \field Ground Surface Convection Coefficient
+        \type real
+        \minimum 0.0
+    N2; \field Ground Surface Temperature
+        \type real
+        \minimum 0.0
 
 Site:GroundReflectance,
         \memo Specifies the ground reflectance values used to calculate ground reflected solar.

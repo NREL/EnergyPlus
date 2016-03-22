@@ -135,6 +135,7 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_HorizTrench( "GroundHeatExchanger:HorizontalTrench" );
 	std::string const ObjName_ZoneCoupled_Slab( "Site:GroundDomain:Slab" );
 	std::string const ObjName_ZoneCoupled_Basement( "Site:GroundDomain:Basement" );
+	std::string const ObjName_BESTEST_SurfaceConditions( "Site:GroundDomain:BESTEST:GroundSurfaceConditions" );
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -659,6 +660,9 @@ namespace PlantPipingSystemsManager {
 
 		// This is heavily dependent on the order of the domains in the main array.
 		ReadBasementInputs( NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements, ErrorsFound );
+
+		// Check for BESTEST
+		ReadBESTESTInputs( NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements, ErrorsFound );
 
 		// Report errors that are purely input problems
 		if ( ErrorsFound ) ShowFatalError( RoutineName + ": Preceding input errors cause program termination." );
@@ -1371,12 +1375,12 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
 				PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
 
-				Real64 MeshCoefficient = 1.3;
+				Real64 MeshCoefficient = rNumericArgs( 12 );
 				PipingSystemDomains( DomainCtr ).Mesh.X.GeometricSeriesCoefficient = MeshCoefficient;
 				PipingSystemDomains( DomainCtr ).Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
 				PipingSystemDomains( DomainCtr ).Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
 
-				int MeshCount = 5;
+				int MeshCount = rNumericArgs( 13 );
 				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = MeshCount;
 				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = MeshCount;
 				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = MeshCount;
@@ -1741,7 +1745,67 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	//************************
+	//*********************************************************************************************!
+
+	void
+	ReadBESTESTInputs(
+		int const TotalNumDomains,
+		bool & ErrorsFound
+	)
+	{
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::SameString;
+		using namespace DataIPShortCuts;
+
+		int NumAlphas; // Number of Alphas for each GetObjectItem call
+		int NumNumbers; // Number of Numbers for each GetObjectItem call
+		int IOStatus; // Used in GetObjectItem
+
+		int NumBESTESTObjects = GetNumObjectsFound( ObjName_BESTEST_SurfaceConditions );
+
+		if ( !( NumBESTESTObjects > 0 ) ) return;
+
+		for ( int DomainCtr = 1; DomainCtr <= TotalNumDomains; ++DomainCtr ) {
+
+			for ( int BESTESTCtr = 1; BESTESTCtr <= NumBESTESTObjects; ++BESTESTCtr ) {
+				GetObjectItem( ObjName_BESTEST_SurfaceConditions, BESTESTCtr, cAlphaArgs,
+					NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+				if ( PipingSystemDomains( DomainCtr ).Name == cAlphaArgs( 2 ) ) {
+
+					if ( !PipingSystemDomains( DomainCtr ).BESTESTFlag ) {
+						if ( SameString( cAlphaArgs( 3 ), "WEATHERFILE" ) ) {
+							PipingSystemDomains( DomainCtr ).BESTESTFlag = true;
+							PipingSystemDomains( DomainCtr ).BESTESTConstConvCoeff = false;
+						} else if ( SameString( cAlphaArgs( 3 ), "CONSTCONVCOEFFICIENT" ) ) {
+							PipingSystemDomains( DomainCtr ).BESTESTFlag = true;
+							PipingSystemDomains( DomainCtr ).BESTESTConstConvCoeff = true;
+							PipingSystemDomains( DomainCtr ).BESTESTSurfaceConvCoefficient = rNumericArgs( 1 );
+							PipingSystemDomains( DomainCtr ).BESTESTGroundSurfTemp = rNumericArgs( 2 );
+						} else {
+							// Bad input
+							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + "=" + cAlphaArgs( 3 ) );
+ 							ShowContinueError( "Found in: " + cAlphaArgs( 1 ) );
+							ErrorsFound = true;
+						}
+					} else { //
+						// Error--this has already been found
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + "=" + cAlphaArgs( 2 ) );
+ 						ShowContinueError( "Found in: " + cAlphaArgs( 1 ) );
+						ErrorsFound = true;
+					}
+				}
+				break;
+			}
+
+		}
+	}
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -5460,7 +5524,7 @@ namespace PlantPipingSystemsManager {
 		int NumInsulationCells = 0;
 		int NumGroundSurfaceCells = 0;
 
-		std::ofstream static outFile( "Cells.csv", std::ofstream::out );
+		//std::ofstream static outFile( "Cells.csv", std::ofstream::out );
 
 		struct tCellExtents
 		{
@@ -5791,9 +5855,9 @@ namespace PlantPipingSystemsManager {
 						CartesianPipeCellInformation_ctor( cell.PipeCellData, cell.X_max - cell.X_min, PipeSizing, NumRadialCells, Depth( cell ), InsulationThickness, RadialMeshThickness, HasInsulation );
 					}
 
-#ifdef CalcEnergyBalance
-					outFile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << cell.X_max - cell.X_min << "," << cell.Y_max - cell.Y_min << "," << cell.Z_max - cell.Z_min << std::endl;
-#endif
+//#ifdef CalcEnergyBalance
+//					outFile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << cell.X_max - cell.X_min << "," << cell.Y_max - cell.Y_min << "," << cell.Z_max - cell.Z_min << std::endl;
+//#endif
 
 				} //'z
 			} //'y
@@ -6748,14 +6812,24 @@ namespace PlantPipingSystemsManager {
 				} else if ( CurDirection == Direction_PositiveY ) {
 					// convection at the surface
 					if ( WindSpeed > 0.1 ) {
-						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
-						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
+						if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
+							Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
+							Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
+							NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
+						} else {
+							Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
+							Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
+							NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
+						}
 						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-						NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 					} else {
 						// Need to incorporate natural convection effects here
-						Resistance = 100000;
-						NeighborTemp = cell.MyBase.Temperature;
+						if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
+							Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
+							Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
+							Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+							NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
+						}
 					}
 				} else if ( CurDirection == Direction_PositiveZ || CurDirection == Direction_PositiveX ) {
 					AdiabaticMultiplier = 0.0;
@@ -6926,7 +7000,11 @@ namespace PlantPipingSystemsManager {
 		EvapotransHeatLoss_Wm2 = EvapotransHeatLoss_MJhrmin * Convert_MJhrmin_To_Wm2;
 
 		// Calculate overall net heat ?gain? into the cell, [W]
-		IncidentHeatGain = ( NetIncidentRadiation_Wm2 - EvapotransHeatLoss_Wm2 ) * ThisNormalArea;
+		if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
+			IncidentHeatGain = 0.0;
+		} else {
+			IncidentHeatGain = ( NetIncidentRadiation_Wm2 - EvapotransHeatLoss_Wm2 ) * ThisNormalArea;
+		}
 
 		// Add any solar/evapotranspiration heat gain here
 		Numerator += Beta * IncidentHeatGain;

@@ -1001,6 +1001,10 @@ namespace DataPlantPipingSystems {
 		Real64 TotalEnergyUniformHeatFlux = 0.0;
 		Real64 TotalEnergyWeightedHeatFlux = 0.0;
 		Real64 HeatFluxWeightingFactor = 0.0;
+		bool BESTESTFlag = false;
+		bool BESTESTConstConvCoeff = false;
+		Real64 BESTESTSurfaceConvCoefficient = 0.0;
+		Real64 BESTESTGroundSurfTemp = 0.0;
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
