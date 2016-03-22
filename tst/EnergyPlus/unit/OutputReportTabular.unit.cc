@@ -1334,6 +1334,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 	// DATE WRITTEN: Sep 2015
 
 	std::string const idf_objects = delimited_string( {
+
 		" Version,8.3;",
 		" Output:Diagnostics, DisplayExtraWarnings;",
 		" Timestep, 4;",
