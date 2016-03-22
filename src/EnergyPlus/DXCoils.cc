@@ -6121,6 +6121,7 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					PrintFlag = false;
+					Node( DXCoil( DXCoilNum ).WaterInNode ).Temp = DXCoil( DXCoilNum ).RatedInletWaterTemp; // set the rated water inlet node for HPWHs for use in CalcHPWHDXCoil
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
