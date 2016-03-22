@@ -194,6 +194,7 @@ namespace ZoneEquipmentManager {
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool reportDOASZoneSizingHeader( true );
 		bool InitZoneEquipmentOneTimeFlag( true );
 		bool InitZoneEquipmentEnvrnFlag( true );
 		bool FirstPassZoneEquipFlag( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
@@ -223,6 +224,7 @@ namespace ZoneEquipmentManager {
 		GetZoneEquipmentInputFlag = true;
 		PrioritySimOrder.deallocate();
 		FirstPassZoneEquipFlag = true;
+		reportDOASZoneSizingHeader = true;
 	}
 
 	void
@@ -5584,27 +5586,13 @@ namespace ZoneEquipmentManager {
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-
 		// Formats
 		static gio::Fmt Format_990( "('! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature {C}, DOAS Design High Setpoint Temperature {C} ')" );
 		static gio::Fmt Format_991( "(' Zone Sizing DOAS Inputs',4(', ',A))" );
 
-		if ( MyOneTimeFlag ) {
+		if ( reportDOASZoneSizingHeader ) {
 			gio::write( OutputFileInits, Format_990 );
-			MyOneTimeFlag = false;
+			reportDOASZoneSizingHeader = false;
 		}
 
 		gio::write( OutputFileInits, Format_991 ) << ZoneName << DOASCtrlStrategy << RoundSigDigits( DOASLowTemp, 3 ) << RoundSigDigits( DOASHighTemp, 3 );
