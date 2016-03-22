@@ -2238,10 +2238,18 @@ The following table shows what input objects/fields to use to model different wi
 
 % table 8
 \begin{longtable}[c]{p{2.0in}p{2.0in}p{2.0in}}
-\caption{Window Modeling Options \protect \label{table:window-modeling-options}}\\
+\caption{Window Modeling Options \label{table:window-modeling-options}} \tabularnewline
 \toprule 
-Option & Object/Field or Output Variable & Input File (distributed with install) \tabularnewline \midrule
+Option & Object/Field or Output Variable & Input File (distributed with install) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Window Modeling Options} \tabularnewline
+\toprule 
+Option & Object/Field or Output Variable & Input File (distributed with install) \tabularnewline
+\midrule
 \endhead
+
 Build up a window from \textbf{layers} & Window\-Material:\-Glazing, Window\-Material:-Gas, Window\-Material:\-Shade, Window\-Material:\-Screen, Window\-Material:\-Blind, Construction & Window\-Tests.idf \tabularnewline
 Add an \textbf{overhang} & Shading:\-Zone:\-Detailed & 5Zone\-Air\-Cooled.idf \tabularnewline
 Add a \textbf{shading device} & Window\-Material:\-Shade, Window\-Material:\-Screen or Window\-Material:\-Blind; Window\-Property:\-Shading\-Control & Window\-Tests.idf, Purch\-Air\-Window\-Blind.idf \tabularnewline

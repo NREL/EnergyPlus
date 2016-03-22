@@ -1706,16 +1706,16 @@ WaterHeater:HeatPump:WrappedCondenser,
   ,                        !- Inlet Air Temperature Schedule Name
   ,                        !- Inlet Air Humidity Schedule Name
   ,                        !- Inlet Air Zone Name
-      WaterHeater:Stratified,  !- Tank Object Type
+  WaterHeater:Stratified,  !- Tank Object Type
   HPWHPlantTank,           !- Tank Name
   HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
   HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
-      Coil:WaterHeating:AirToWaterHeatPump:Wrapped,  !- DX Coil Object Type
+  Coil:WaterHeating:AirToWaterHeatPump:Wrapped,  !- DX Coil Object Type
   HPWHPlantDXCoil,         !- DX Coil Name
   7.2,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
   Outdoors,                !- Compressor Location
   ,                        !- Compressor Ambient Temperature Schedule Name
-      Fan:OnOff,               !- Fan Object Type
+  Fan:OnOff,               !- Fan Object Type
   HPWHPlantFan,            !- Fan Name
   DrawThrough,             !- Fan Placement
   0,                       !- On Cycle Parasitic Electric Load {W}

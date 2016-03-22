@@ -8,10 +8,18 @@ EnergyPlus may create several output files. Whether some files are produced depe
 
 % table 47
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{EnergyPlus Output Files \protect \label{table:energyplus-output-files}}\\
+\caption{EnergyPlus Output Files \label{table:energyplus-output-files}} \tabularnewline
 \toprule 
-FileName & Description \tabularnewline \midrule
+FileName & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Output Files} \tabularnewline
+\toprule 
+FileName & Description \tabularnewline
+\midrule
 \endhead
+
 Eplusout.audit & Echo of input \tabularnewline
 Eplusout.err & Error file \tabularnewline
 Eplusout.eso & Standard Output File (contains results from both Output:Variable and Output:Meter objects). \tabularnewline
