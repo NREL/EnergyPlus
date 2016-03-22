@@ -222,7 +222,7 @@ namespace ZoneEquipmentManager {
 		std::string const & DOASCtrlStrategy, // DOAS control strategy
 		Real64 const DOASLowTemp, // DOAS design low setpoint temperature [C]
 		Real64 const DOASHighTemp // DOAS design high setpoint temperature [C]
-		);
+	);
 
 } // ZoneEquipmentManager
 

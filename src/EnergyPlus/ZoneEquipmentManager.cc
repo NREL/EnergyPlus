@@ -5461,7 +5461,7 @@ namespace ZoneEquipmentManager {
 	}
 
 	void
-		AutoCalcDOASControlStrategy()
+	AutoCalcDOASControlStrategy()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
@@ -5555,7 +5555,7 @@ namespace ZoneEquipmentManager {
 	}
 
 	void
-		ReportZoneSizingDOASInputs(
+	ReportZoneSizingDOASInputs(
 		std::string const & ZoneName, // the name of the zone
 		std::string const & DOASCtrlStrategy, // DOAS control strategy
 		Real64 const DOASLowTemp, // DOAS design low setpoint temperature [C]
