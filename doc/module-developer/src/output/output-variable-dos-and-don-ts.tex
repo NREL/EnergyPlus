@@ -57,10 +57,18 @@ For Version 8.0, a comprehensive effort was made to rename output variables to f
 
 % table 5
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Output Variable Classifications \protect \label{table:output-variable-classifications}}\\
+\caption{Output Variable Classifications \label{table:output-variable-classifications}} \tabularnewline
 \toprule 
-Model Classification & Spatial Classification & Type of Component & Dimensional Nature \tabularnewline \midrule
+Model Classification & Spatial Classification & Type of Component & Dimensional Nature \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Output Variable Classifications} \tabularnewline
+\toprule 
+Model Classification & Spatial Classification & Type of Component & Dimensional Nature \tabularnewline
+\midrule
 \endhead
+
 AFN & Zone & Inside Face & Rate \tabularnewline
 Refrigeration & Surface & Outside Face & Rate per Area \tabularnewline
 Room Air & Linkage & Air Terminal & Energy \tabularnewline

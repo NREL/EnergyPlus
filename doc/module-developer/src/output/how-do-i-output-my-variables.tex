@@ -38,10 +38,18 @@ CALL SetupOutputVariable(`Humidifier Electric Energy {[}J{]}',
 
 % table 4
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{  SetupOutputVariable Arguments \protect \label{table:setupoutputvariable-arguments}}\\
+\caption{SetupOutputVariable Arguments \label{table:setupoutputvariable-arguments}} \tabularnewline
 \toprule 
-SetupOutput Variable Arguments & Description \tabularnewline \midrule
+SetupOutput Variable Arguments & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{SetupOutputVariable Arguments} \tabularnewline
+\toprule 
+SetupOutput Variable Arguments & Description \tabularnewline
+\midrule
 \endhead
+
 VariableName & String name of variable, units should be included in [].~ If no units, use [] \tabularnewline
 ActualVariable & This should be the actual variable that will store the value.~ The OutputProcessor sets up a pointer to this variable, so it will need to be a SAVEd variable if in a local routine.~ As noted in examples, can be a simple variable or part of an array/derived type. \tabularnewline
 IndexTypeKey & When this variable has its proper value.~ ‘Zone’ is used for variables that will have value on the global timestep (alias “HeatBalance”).~ ‘HVAC’ is used for variables that will have values calculated on the variable system timesteps (alias “System”, “Plant”) \tabularnewline

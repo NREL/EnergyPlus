@@ -731,7 +731,7 @@ An example input for a fan coil unit, including its constituent components, is s
       Zone1FanCoilAirInletNode; !Return Air Stream Node Name
 
   Fan:OnOff,
-     Zone1FanCoilFan,         !- Name
+      Zone1FanCoilFan,         !- Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
       0.5,                     !- Fan Total Efficiency
       75.0,                    !- Pressure Rise {Pa}
@@ -1511,8 +1511,8 @@ ZoneHVAC:EvaporativeCoolerUnit,
      100.0, !- Cooling Load Control Threshold Heat Transfer Rate
      EvaporativeCooler:Direct:CelDekPad, !- First Evaporative Cooler Object Type
      Evaporative Cooler, !- First Evaporative Cooler Object Name
-      , !- Second Evaporative Cooler Object Type
-      ; !- Second Evaporative Cooler Name
+     , !- Second Evaporative Cooler Object Type
+     ; !- Second Evaporative Cooler Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-021}
@@ -3182,7 +3182,7 @@ ZoneHVAC:WaterToAirHeatPump,
     BRANCH,
       Gshp Cooling Condenser Branch,  !- Name
       0,  !- Maximum Flow Rate {m3/s}
-       ,  !- Pressure Drop Curve Name
+      ,  !- Pressure Drop Curve Name
       Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Cooling Mode,  !- Component 1 Name
       Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
@@ -3192,7 +3192,7 @@ ZoneHVAC:WaterToAirHeatPump,
     BRANCH,
       Gshp Heating Condenser Branch,  !- Name
       0,  !- Maximum Flow Rate {m3/s}
-       ,  !- Pressure Drop Curve Name
+      ,  !- Pressure Drop Curve Name
       Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Heating Mode,  !- Component 1 Name
       Water to Air Heat Pump Source Side2 Inlet Node,   !- Component 1 Inlet Node Name
@@ -3643,7 +3643,7 @@ ZoneHVAC:EnergyRecoveryVentilator,
 
   ZoneHVAC:EquipmentList,
       Zone1Equipment,                          !-Name
-  ZoneHVAC:EnergyRecoveryVentilator,  !- KEY--Zone Equipment Type 1
+      ZoneHVAC:EnergyRecoveryVentilator,  !- KEY--Zone Equipment Type 1
       Stand Alone ERV 1,                       !- Type Name 1
       1,                                       !- Cooling Priority
       1;                                       !- Heating Priority

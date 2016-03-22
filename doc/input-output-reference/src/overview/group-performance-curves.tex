@@ -742,7 +742,7 @@ The coefficient C\(_{9}\) in the equation.
 
 \paragraph{Field: Coefficient10 x*y**2}\label{field-coefficient10-xy2}
 
-The coefficient C\(_{0}\) in the equation.
+The coefficient C\(_{10}\) in the equation.
 
 \paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-6}
 
@@ -1348,7 +1348,7 @@ Curve:QuadraticLinear,
 
 \subsection{Curve:Triquadratic}\label{curvetriquadratic}
 
-This curve is a 2\(^{d}\) order polynomial function of three variable polynomial independent variables. Input consists of the curve name, the twenty seven coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the triquadratic curve:
+This curve is a 2\(^{nd}\) order polynomial function of three variable polynomial independent variables. Input consists of the curve name, the twenty seven coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the triquadratic curve:
 
 \begin{equation}
   \begin{array}{l}
@@ -1403,71 +1403,71 @@ The coefficient (A\(_{9}\)) in the equation.
 
 \paragraph{Field: Coefficient11 x**2*y}\label{field-coefficient11-x2y}
 
-The coefficient (A\(_{0}\)) in the equation.
+The coefficient (A\(_{10}\)) in the equation.
 
 \paragraph{Field: Coefficient12 x**2*z**2}\label{field-coefficient12-x2z2}
 
-The coefficient (A\(_{1}\)) in the equation.
+The coefficient (A\(_{11}\)) in the equation.
 
 \paragraph{Field: Coefficient13 x*z}\label{field-coefficient13-xz}
 
-The coefficient (A\(_{2}\)) in the equation.
+The coefficient (A\(_{12}\)) in the equation.
 
 \paragraph{Field: Coefficient14 x*z**2}\label{field-coefficient14-xz2}
 
-The coefficient (A\(_{3}\)) in the equation.
+The coefficient (A\(_{13}\)) in the equation.
 
 \paragraph{Field: Coefficient15 x**2*z}\label{field-coefficient15-x2z}
 
-The coefficient (A\(_{4}\)) in the equation.
+The coefficient (A\(_{14}\)) in the equation.
 
 \paragraph{Field: Coefficient16 y**2*z**2}\label{field-coefficient16-y2z2}
 
-The coefficient (A\(_{5}\)) in the equation.
+The coefficient (A\(_{15}\)) in the equation.
 
 \paragraph{Field: Coefficient17 y*z}\label{field-coefficient17-yz}
 
-The coefficient (A\(_{6}\)) in the equation.
+The coefficient (A\(_{16}\)) in the equation.
 
 \paragraph{Field: Coefficient18 y*z**2}\label{field-coefficient18-yz2}
 
-The coefficient (A\(_{7}\)) in the equation.
+The coefficient (A\(_{17}\)) in the equation.
 
 \paragraph{Field: Coefficient19 y**2*z}\label{field-coefficient19-y2z}
 
-The coefficient (A\(_{8}\)) in the equation.
+The coefficient (A\(_{18}\)) in the equation.
 
 \paragraph{Field: Coefficient20 x**2*y**2*z**2}\label{field-coefficient20-x2y2z2}
 
-The coefficient (A\(_{9}\)) in the equation.
+The coefficient (A\(_{19}\)) in the equation.
 
 \paragraph{Field: Coefficient21 x**2*y**2*z}\label{field-coefficient21-x2y2z}
 
-The coefficient (A\(_{0}\)) in the equation.
+The coefficient (A\(_{20}\)) in the equation.
 
 \paragraph{Field: Coefficient22 x**2*y*z**2}\label{field-coefficient22-x2yz2}
 
-The coefficient (A\(_{1}\)) in the equation.
+The coefficient (A\(_{21}\)) in the equation.
 
 \paragraph{Field: Coefficient23 x*y**2*z**2}\label{field-coefficient23-xy2z2}
 
-The coefficient (A\(_{2}\)) in the equation.
+The coefficient (A\(_{22}\)) in the equation.
 
 \paragraph{Field: Coefficient24 x**2*y*z}\label{field-coefficient24-x2yz}
 
-The coefficient (A\(_{3}\)) in the equation.
+The coefficient (A\(_{23}\)) in the equation.
 
 \paragraph{Field: Coefficient25 x*y**2*z}\label{field-coefficient25-xy2z}
 
-The coefficient (A\(_{4}\)) in the equation.
+The coefficient (A\(_{24}\)) in the equation.
 
 \paragraph{Field: Coefficient26 x*y*z**2}\label{field-coefficient26-xyz2}
 
-The coefficient (A\(_{5}\)) in the equation.
+The coefficient (A\(_{25}\)) in the equation.
 
 \paragraph{Field: Coefficient27 x*y*z}\label{field-coefficient27-xyz}
 
-The coefficient (A\(_{6}\)) in the equation.
+The coefficient (A\(_{26}\)) in the equation.
 
 \paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-11}
 
@@ -1645,7 +1645,7 @@ The first term of the curve looks like the common system curve in which the fan 
 
 The second term accounts for significant flow resistances in the system where the pressure difference is linearly proportional to the flow. Some filters and coils in the return may need this term to be adequately described. This term could be ignored if there are no linear components or if their pressure drops are very small compared to the other terms.
 
-The third term, which depends on the fan flow and square root of the supply duct pressure \emph{P\(_{m}\)}, accounts in part for leakage from the supply system when damper positions are fixed or are changed independently of static pressure or fan flow. In this case, reducing or eliminating supply leakage results in a different system curve. This, however, might be only a minor correction to the simple system curves generally used. The third term is zero when the VAV box dampers are modulated to control flow. Consequently, with variable-position supply dampers, reducing or eliminating supply leakage does not change the system curve.
+The third term, which depends on the fan flow and square root of the supply duct pressure \emph{P\(_{sm}\)}, accounts in part for leakage from the supply system when damper positions are fixed or are changed independently of static pressure or fan flow. In this case, reducing or eliminating supply leakage results in a different system curve. This, however, might be only a minor correction to the simple system curves generally used. The third term is zero when the VAV box dampers are modulated to control flow. Consequently, with variable-position supply dampers, reducing or eliminating supply leakage does not change the system curve.
 
 The last term also accounts in part for leakage from the supply system when damper positions are fixed or are changed independently of static pressure or fan flow. This term indicates that the same fan pressure rise can be achieved by raising the duct pressure and closing dampers. The only change in the system in such a case is that the leakage flow may increase. The coefficient for this term is one when the VAV box dampers are modulated to control flow. In both cases, this term may be the most important correction to the simple system curves generally used, especially at low flows.
 
@@ -1665,7 +1665,7 @@ The required numeric constant coefficient C\emph{\(_{2}\)} (Pa s/m\(^{3}\)) in t
 
 \paragraph{Field: Fan Pressure Rise Coefficient3 C3}\label{field-fan-pressure-rise-coefficient3-c3}
 
-The required numeric constant coefficient \emph{C\(_{3}\)} (Pa\(^{5}\) s/m\(^{3}\)) in the curve\emph{.}
+The required numeric constant coefficient \emph{C\(_{3}\)} (Pa\(^{0.5}\) s/m\(^{3}\)) in the curve\emph{.}
 
 \paragraph{Field: Fan Pressure Rise Coefficient4 C4}\label{field-fan-pressure-rise-coefficient4-c4}
 
@@ -1673,19 +1673,19 @@ The required numeric constant coefficient C\emph{\(_{4}\)} (dimensionless) in th
 
 \paragraph{Field: Minimum Value of Qfan}\label{field-minimum-value-of-qfan}
 
-The required numeric minimum allowable value of \emph{Q\(_{n}\)} (m\(^{3}\)/s). Values of \emph{Q\(_{n}\)} less than the minimum will be replaced within this curve by the minimum.
+The required numeric minimum allowable value of \emph{Q\(_{fan}\)} (m\(^{3}\)/s). Values of \emph{Q\(_{fan}\)} less than the minimum will be replaced within this curve by the minimum.
 
 \paragraph{Field: Maximum Value of Qfan}\label{field-maximum-value-of-qfan}
 
-The required numeric maximum allowable value of \emph{Q\(_{n}\)} (m\(^{3}\)/s). Values of \emph{Q\(_{n}\)} greater than the maximum will be replaced within this curve by the maximum.
+The required numeric maximum allowable value of \emph{Q\(_{fan}\)} (m\(^{3}\)/s). Values of \emph{Q\(_{fan}\)} greater than the maximum will be replaced within this curve by the maximum.
 
 \paragraph{Field: Minimum Value of Psm}\label{field-minimum-value-of-psm}
 
-The required numeric minimum allowable value of \emph{P\(_{m}\)} (Pa). Values of \emph{P\(_{m}\)} less than the minimum will be replaced within this curve by the minimum.
+The required numeric minimum allowable value of \emph{P\(_{sm}\)} (Pa). Values of \emph{P\(_{sm}\)} less than the minimum will be replaced within this curve by the minimum.
 
 \paragraph{Field: Maximum Value of Psm}\label{field-maximum-value-of-psm}
 
-The required numeric maximum allowable value of \emph{P\(_{m}\)} (Pa). Values of \emph{P\(_{m}\)} greater than the maximum will be replaced within this curve by the maximum.
+The required numeric maximum allowable value of \emph{P\(_{sm}\)} (Pa). Values of \emph{P\(_{sm}\)} greater than the maximum will be replaced within this curve by the maximum.
 
 \paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-11}
 
@@ -1721,7 +1721,7 @@ Input for the exponential-modified skew normal curve consists of the curve name,
 y = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}}*erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}}*erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}
 \end{equation}
 
-where \emph{Z\(_{1}\) =} (\emph{x C\(_{1}\)}) \emph{/ C\(_{2}\)}; \emph{Z\(_{2}\) =} {[}(\emph{exp}\(^{*}\)\emph{3\(^{x}\)}\(^{)}\) * \emph{C\(_{4}\)*x}) \emph{- C\(_{1}\)}{]} \emph{/ C\(_{2}\)}; \emph{Z\(_{3}\) = -C\(_{1}\) / C\(_{2}\)}
+where \emph{Z\(_{1}\) =} (\emph{x C\(_{1}\)}) \emph{/ C\(_{2}\)}; \emph{Z\(_{2}\) =} {[}(\emph{exp}\(^{(*C*}\)\emph{3\(^{\*x}\)}\(^{)}\) * \emph{C\(_{4}\)*x}) \emph{- C\(_{1}\)}{]} \emph{/ C\(_{2}\)}; \emph{Z\(_{3}\) = -C\(_{1}\) / C\(_{2}\)}
 
 \subsubsection{Inputs}\label{inputs-13-008}
 
@@ -2044,7 +2044,7 @@ Curve:RectangularHyperbola2,
 
 Input for the exponential decay curve consists of the curve name, the three coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
 
-\emph{y = C\(_{1}\) + C\(_{2}\) * exp}\(^{*}\)\emph{3\(^{x}\)}\(^{)}\)
+\emph{y = C\(_{1}\) + C\(_{2}\) * exp}\(^{*C*}\)\emph{3\(^{*x}\)}\(^{)}\)
 
 \subsubsection{Inputs}\label{inputs-17-005}
 

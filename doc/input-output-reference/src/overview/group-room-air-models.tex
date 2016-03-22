@@ -9,10 +9,18 @@ EnergyPlus offers the different types of air models listed in the table below al
 % table 10
 {\scriptsize
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Summary of Room Air Models \protect \label{table:summary-of-room-air-models}}\\
+\caption{Summary of Room Air Models \label{table:summary-of-room-air-models}} \tabularnewline
 \toprule 
-Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline \midrule
+Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Summary of Room Air Models} \tabularnewline
+\toprule 
+Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline
+\midrule
 \endhead
+
 Mixing & Well-Mixed & All zones & None, default \tabularnewline
 UserDefined & User Defined & All zones & `Room\-Air\-Model\-Type', `Room\-Air:\-Temperature\-Pattern:\-User\-Defined', `Room\-Air:\-Temperature\-Pattern:***' \tabularnewline
 One\-Node\-Displacement\-Ventilation & Mundt & displacement ventilation & `Room\-Air\-Model\-Type', `Room\-Air\-Settings:\-One\-Node\-Displacement\-Ventilation', `Room\-Air:Node' \tabularnewline
@@ -270,7 +278,7 @@ Zeta is the normalized height and should be a fractional value from 0.0 to 1.0. 
 
 \paragraph{Field: Pair \textless{}\#\textgreater{} Delta Adjacent Air Temperature}\label{field-pair-delta-adjacent-air-temperature}
 
-DeltaT\(_{i}\) is the temperature difference between the air temperature at the associated Zeta (T\(_{i}\)) and the mean air temperature and is given in degrees Celsius.
+DeltaT\(_{ai}\) is the temperature difference between the air temperature at the associated Zeta (T\(_{ai}\)) and the mean air temperature and is given in degrees Celsius.
 
 An example of this object corresponding to the figure above is:
 
@@ -335,7 +343,7 @@ The name of a surface defined elsewhere in the input file.
 
 \paragraph{Field: Delta Adjacent Air Temperature Pair \textless{}\#\textgreater{}}\label{field-delta-adjacent-air-temperature-pair}
 
-DeltaT\(_{i}\) is the temperature difference between the air temperature adjacent to the associated surface (T\(_{i}\)) and the mean air temperature and is given in degrees Celsius.
+DeltaT\(_{ai}\) is the temperature difference between the air temperature adjacent to the associated surface (T\(_{ai}\)) and the mean air temperature and is given in degrees Celsius.
 
 An example of this object, which might be used to elevate temperatures near west windows in the afternoon, is:
 

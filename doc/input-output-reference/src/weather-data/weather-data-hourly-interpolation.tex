@@ -28,10 +28,18 @@ To explain further, the weighting for four (4) timesteps in hour is:
 
 % table 45
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Illustration of Data Interpolation for 15 minute timesteps \protect \label{table:illustration-of-data-interpolation-for-15}}\\
+\caption{Illustration of Data Interpolation for 15 minute timesteps \label{table:illustration-of-data-interpolation-for-15}} \tabularnewline
 \toprule 
-TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline \midrule
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Illustration of Data Interpolation for 15 minute timesteps} \tabularnewline
+\toprule 
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
 \endhead
+
 1 & 00:01 to 15:00 & .75 & .25 \tabularnewline
 2 & 15:01 to 30:00 & .5 & .5 \tabularnewline
 3 & 30:01 to 45:00 & .25 & .75 \tabularnewline
@@ -43,10 +51,18 @@ And similarly for six (6) timesteps in hour:
 
 % table 46
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Illustration of Data Interpolation for 10 minute timesteps \protect \label{table:illustration-of-data-interpolation-for-10}}\\
+\caption{Illustration of Data Interpolation for 10 minute timesteps \label{table:illustration-of-data-interpolation-for-10}} \tabularnewline
 \toprule 
-TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline \midrule
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Illustration of Data Interpolation for 10 minute timesteps} \tabularnewline
+\toprule 
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
 \endhead
+
 1 & 00:01 to 10:00 & 0.833333333333333 & 0.166666666666667 \tabularnewline
 2 & 10:01 to 20:00 & 0.666666666666667 & 0.333333333333333 \tabularnewline
 3 & 20:01 to 30:00 & .5 & .5 \tabularnewline

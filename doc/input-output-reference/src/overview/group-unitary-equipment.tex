@@ -1687,7 +1687,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
       -8.0,                    !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
       200.0,                   !- Crankcase Heater Capacity {W}
-  10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
+      10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
                            !- Operation {C}
       HPACDefrostCAPFT,        !- Defrost energy input ratio modifier curve (temperature)
       7.22,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
@@ -1753,8 +1753,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       No,                      !- Apply Part Load Fraction to Speeds greater than 1
       No,                      !- Apply Latent Degradation to Speeds greater than 1
       200.0,                   !- Crankcase Heater Capacity {W}
-  10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
-                           !- Operation {C}
+      10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
       NaturalGas,              !- Fuel type
       4,                       !- Number of speeds
       7500,                    !- Rated Total Cooling Capacity, Speed 1 (gross) {W}
@@ -1767,8 +1766,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       HPACCOOLEIRFF Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (flow fraction)
       HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 1 (part load ratio)
       1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 1 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 1 {dimensionless}
+      1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity, Speed 1 {dimensionless}
       3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 1 {cycles/hr}
       45.0,                    !- Latent Capacity Time Constant, Speed 1 {s}
       0.2,                     !- Rated waste heat fraction of power input, Speed 1 {dimensionless}
@@ -1786,8 +1784,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       HPACCOOLEIRFF Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (flow fraction)
       HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 2 (part load ratio)
       1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 2 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 2 {dimensionless}
+      1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity, Speed 2 {dimensionless}
       3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 2 {cycles/hr}
       45.0,                    !- Latent Capacity Time Constant, Speed 2 {s}
       0.2,                     !- Rated waste heat fraction of power input, Speed 2 {dimensionless}
@@ -1805,8 +1802,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       HPACCOOLEIRFF Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (flow fraction)
       HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 3 (part load ratio)
       1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 3 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 3 {dimensionless}
+      1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity, Speed 3 {dimensionless}
       3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 3 {cycles/hr}
       45.0,                    !- Latent Capacity Time Constant, Speed 3 {s}
       0.2,                     !- Rated waste heat fraction of power input, Speed 3 {dimensionless}
@@ -1824,8 +1820,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       HPACCOOLEIRFF Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (flow fraction)
       HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 4 (part load ratio)
       1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 4 {s}
-  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-                           !- Capacity, Speed 4 {dimensionless}
+      1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity, Speed 4 {dimensionless}
       3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 4 {cycles/hr}
       45.0,                    !- Latent Capacity Time Constant, Speed 4 {s}
       0.2,                     !- Rated waste heat fraction of power input, Speed 4 {dimensionless}
@@ -1854,22 +1849,22 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
   AirTerminal:SingleDuct:Uncontrolled,
-        Zone1DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 1 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+      Zone1DirectAir,                  ! direct air unit name
+      FanAndCoilAvailSched,            ! schedule name for on/off schedule
+      Zone 1 Inlet Node,               ! zone supply air node name
+      0.612;                           ! maximum air flow rate, m3/s
 
   AirTerminal:SingleDuct:Uncontrolled,
-        Zone2DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 2 Inlet Node,               ! zone supply air node name
-       0.476;                           ! maximum air flow rate, m3/s
+      Zone2DirectAir,                  ! direct air unit name
+      FanAndCoilAvailSched,            ! schedule name for on/off schedule
+      Zone 2 Inlet Node,               ! zone supply air node name
+      0.476;                           ! maximum air flow rate, m3/s
 
   AirTerminal:SingleDuct:Uncontrolled,
-        Zone3DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 3 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+      Zone3DirectAir,                  ! direct air unit name
+      FanAndCoilAvailSched,            ! schedule name for on/off schedule
+      Zone 3 Inlet Node,               ! zone supply air node name
+      0.612;                           ! maximum air flow rate, m3/s
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-021}
@@ -2152,21 +2147,21 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
       Zone1DirectAir,       !-Direct Air Name
       FanAndCoilAvailSched, !- Schedule name for on/off schedule
       Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+      0.47;   !- Maximum air flow rate {m3/s}
 
 
     AirTerminal:SingleDuct:Uncontrolled,
       Zone2DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      FanAndCoilAvailSched, !- Schedule name for on/off schedule
       Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-     0.36;   !- Maximum air flow rate {m3/s}
+      0.36;   !- Maximum air flow rate {m3/s}
 
 
     AirTerminal:SingleDuct:Uncontrolled,
       Zone3DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      FanAndCoilAvailSched, !- Schedule name for on/off schedule
       Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+      0.47;   !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat-Only Furnace Specification
@@ -2327,21 +2322,21 @@ AirLoopHVAC:UnitaryHeatOnly,
       Zone1DirectAir,       !-Direct Air Name
       FanAndCoilAvailSched, !- Schedule name for on/off schedule
       Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+      0.47;   !- Maximum air flow rate {m3/s}
 
 
     AirTerminal:SingleDuct:Uncontrolled,
       Zone2DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      FanAndCoilAvailSched, !- Schedule name for on/off schedule
       Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-     0.36;   !- Maximum air flow rate {m3/s}
+      0.36;   !- Maximum air flow rate {m3/s}
 
 
     AirTerminal:SingleDuct:Uncontrolled,
       Zone3DirectAir,       !- Direct Air Name
-     FanAndCoilAvailSched, !- Schedule name for on/off schedule
+      FanAndCoilAvailSched, !- Schedule name for on/off schedule
       Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-     0.47;   !- Maximum air flow rate {m3/s}
+      0.47;   !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat-Only Unitary System Specification
@@ -2668,13 +2663,13 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
       Heating Coil Air Inlet Node,  !- Air Inlet Node Name
       SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
       3.91379E+03,  !-Parameter 1 {W/K}
-     5.94753E-01,  !- Parameter 2 {C}
+      5.94753E-01,  !- Parameter 2 {C}
       2.49945E+03,  !- Parameter 3 {W}
       8.68734E-01,  !- Parameter 4
       7.23595E-03,  !- Parameter 5
       3.69126E+00,  !- Parameter 6
       1.75701E-05,  !- Parameter 7
-     3.65348E+03;  !-Parameter 8
+      3.65348E+03;  !-Parameter 8
 
 
 
@@ -2704,7 +2699,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
     BRANCH,
       Gshp Heating Condenser Branch,  !- Name
       0,  !- Maximum Flow Rate {m3/s}
-       , !- Pressure Drop Curve Name
+      , !- Pressure Drop Curve Name
       Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Heating Mode,  !- Component 1 Name
       Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
@@ -2729,22 +2724,22 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
     AirTerminal:SingleDuct:Uncontrolled,
       Zone1DirectAir,        !- Name
       FanAndCoilAvailSched,  !- Availability Schedule Name
-     Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-     0.7;                   !- Maximum Air Flow Rate {m3/s}
+      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
+      0.7;                   !- Maximum Air Flow Rate {m3/s}
 
 
     AirTerminal:SingleDuct:Uncontrolled,
       Zone2DirectAir,        !- Name
       FanAndCoilAvailSched,  !- Availability Schedule Name
-     Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-     0.6;                   !- Maximum Air Flow Rate {m3/s}
+      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
+      0.6;                   !- Maximum Air Flow Rate {m3/s}
 
 
     AirTerminal:SingleDuct:Uncontrolled,
       Zone3DirectAir,        !- Name
       FanAndCoilAvailSched,  !- Availability Schedule Name
-     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-     0.7;                   !- Maximum Air Flow Rate {m3/s}
+      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
+      0.7;                   !- Maximum Air Flow Rate {m3/s}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-011}

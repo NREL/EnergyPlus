@@ -37,8 +37,15 @@ The choice made for this field has important implications for modeling accuracy 
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Demand Window & Applicable Number of Timesteps per Hour \tabularnewline \midrule
+Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
+\midrule
 \endhead
+
 QuarterHour & 4, 12, 20, or 60 \tabularnewline
 HalfHour & 2, 4, 6, 10, 12, 20, 30, or 60 \tabularnewline
 FullHour, Day, Week & Any \tabularnewline
@@ -125,10 +132,18 @@ The site's terrain affects how the wind hits the building -- as does the buildin
 
 % table 1
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Values for ``Terrain'' \protect \label{table:values-for-terrain}}\\
+\caption{Values for ``Terrain'' \label{table:values-for-terrain}} \tabularnewline
 \toprule 
-Terrain Type Value & Terrain Description \tabularnewline \midrule
+Terrain Type Value & Terrain Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Values for ``Terrain''} \tabularnewline
+\toprule 
+Terrain Type Value & Terrain Description \tabularnewline
+\midrule
 \endhead
+
 Country & Flat, Open Country \tabularnewline
 Suburbs & Rough, Wooded Country, Suburbs \tabularnewline
 City & Towns, city outskirts, center of large cities \tabularnewline
