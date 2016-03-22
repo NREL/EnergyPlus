@@ -369,6 +369,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! So for now I'll just change them on a version by version basis.
               CASE ('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
                 SELECT CASE ( MakeUPPERCase ( InArgs(4) ) )
                 CASE ('OUTDOOR AIR DRYBLUB TEMPERATURE')
 				  nodiff = .true.
