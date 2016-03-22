@@ -36,10 +36,18 @@ A text file containing the error messages issued by EnergyPlus. \textbf{This is 
 
 % table 1
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\caption{Error Message Levels – Required Actions \protect \label{table:error-message-levels-required-actions}}\\
+\caption{Error Message Levels – Required Actions \label{table:error-message-levels-required-actions}} \tabularnewline
 \toprule 
-Error Level & Action \tabularnewline \midrule
+Error Level & Action \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Error Message Levels – Required Actions} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
 \endhead
+
 Information, shown as ********* & Informative, usually a follow-on to one of the others. No action required. \tabularnewline
 **~~ \~{}\textbackslash\~{}\~{}~~** & This is a continuation of a previous message.~ String all the words/sentences together to form the complete message. \tabularnewline
 Warning & Take note. Fix as applicable. \tabularnewline
@@ -62,7 +70,7 @@ OutputControl:Table,
      HTML;                    !- ColumnSeparator
 
   Output:Table:SummaryReports,
-      All Summary;
+     All Summary;
 \end{lstlisting}
 
 Note that you can also get this file in other formats (the OutputControl:Table option).
