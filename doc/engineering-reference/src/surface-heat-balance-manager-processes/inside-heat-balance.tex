@@ -27,7 +27,7 @@ Each of these heat balance components is introduced briefly below.
 \begin{figure}[hbtp] % fig 19
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image301.png}
-\caption{  Inside Heat Balance Control Volume Diagram \protect \label{fig:inside-heat-balance-control-volume-diagram}}
+\caption{Inside Heat Balance Control Volume Diagram \protect \label{fig:inside-heat-balance-control-volume-diagram}}
 \end{figure}
 
 \subsection{Internal Long-Wave Radiation Exchange}\label{internal-long-wave-radiation-exchange}
@@ -155,9 +155,19 @@ The adaptive convection algorithm implemented in EnergyPlus for the inside face 
 
 {\scriptsize
 \begin{longtable}[c]{p{0.25in}p{1.25in}p{0.25in}p{1.5in}p{2.5in}}
-\caption{Table 13. Inside Convection Categories and Assignments \label{table:table-13.-inside-convection-categories}}\\
+
+\caption{Inside Convection Categories and Assignments \label{table:table-13.-inside-convection-categories}} \tabularnewline
 \toprule 
-\# & Zone Air Flow Regime & IB-M's \# & Surface orientation and heat flow direction & Keywords for Applicable Model Equation Sources \tabularnewline \midrule \endhead
+\# & Zone Air Flow Regime & IB-M's \# & Surface orientation and heat flow direction & Keywords for Applicable Model Equation Sources \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Inside Convection Categories and Assignments} \tabularnewline
+\toprule 
+\# & Zone Air Flow Regime & IB-M's \# & Surface orientation and heat flow direction & Keywords for Applicable Model Equation Sources \tabularnewline
+\midrule
+\endhead
+
 1  & & & Vertical Walls & FohannoPolidoriVerticalWall* \tabularnewline
    & & & & AlamdariHammondVerticalWall \tabularnewline
    & & & & ASHRAEVerticalWall \tabularnewline
@@ -787,7 +797,7 @@ The correlation for floors is illustrated in the following figure:
 \begin{figure}[hbtp] % fig 1017
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image378.png}
-\caption{  Ceiling Diffuser Correlation for Floors \protect \label{fig:ceiling-diffuser-correlation-for-floors}}
+\caption{Ceiling Diffuser Correlation for Floors \protect \label{fig:ceiling-diffuser-correlation-for-floors}}
 \end{figure}
 
 For ceilings:
@@ -799,7 +809,7 @@ The correlation for ceilings is illustrated in the following figure:
 \begin{figure}[hbtp] % fig 1018
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image380.png}
-\caption{  Ceiling Diffuser Correlation for Ceilings \protect \label{fig:ceiling-diffuser-correlation-for-ceilings}}
+\caption{Ceiling Diffuser Correlation for Ceilings \protect \label{fig:ceiling-diffuser-correlation-for-ceilings}}
 \end{figure}
 
 For Walls:
@@ -811,7 +821,7 @@ The correlation for walls is illustrated in the following figure:
 \begin{figure}[hbtp] % fig 1019
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image382.png}
-\caption{  Ceiling Diffuser Correlation for Walls \protect \label{fig:ceiling-diffuser-correlation-for-walls}}
+\caption{Ceiling Diffuser Correlation for Walls \protect \label{fig:ceiling-diffuser-correlation-for-walls}}
 \end{figure}
 
 \subsubsection{Trombe Wall Algorithm}\label{trombe-wall-algorithm}

@@ -65,19 +65,19 @@ In this case the values of HA, HS and HG must be found by using an estimated val
 \begin{figure}[hbtp] % fig 29
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image420.png}
-\caption{  Thermal Network for Simple Outside Surface Coefficient \protect \label{fig:thermal-network-for-simple-outside-surface}}
+\caption{Thermal Network for Simple Outside Surface Coefficient \protect \label{fig:thermal-network-for-simple-outside-surface}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 30
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image421.png}
-\caption{  Thermal Network for Detailed Outside Surface Coefficient \protect \label{fig:thermal-network-for-detailed-outside-surface}}
+\caption{Thermal Network for Detailed Outside Surface Coefficient \protect \label{fig:thermal-network-for-detailed-outside-surface}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 31
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image422.png}
-\caption{  Thermal Network for Outside Moveable Insulation \protect \label{fig:thermal-network-for-outside-moveable}}
+\caption{Thermal Network for Outside Moveable Insulation \protect \label{fig:thermal-network-for-outside-moveable}}
 \end{figure}
 
 \subsection{Heat Balance Cases}\label{heat-balance-cases}
@@ -253,9 +253,19 @@ TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                      &
 % table 16
 {\scriptsize
 \begin{longtable}[c]{p{1.8in}p{1.2in}p{0.9in}p{0.9in}p{1.2in}}
-\caption{Fortran Variables and Descriptions \label{table:fortran-variables-and-descriptions}}\\
+
+\caption{Fortran Variables and Descriptions \label{table:fortran-variables-and-descriptions}} \tabularnewline
 \toprule 
-FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline \midrule \endhead
+FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Fortran Variables and Descriptions} \tabularnewline
+\toprule 
+FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline
+\midrule
+\endhead
+
 TH(SurfNum,1,1) & Temperature History(SurfNum,Hist Term,In/Out), where: Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times), In/Out (1 = Outside, 2 = Inside) & TO & C & Temperature of outside of surface I at time t \tabularnewline
 Construct(ConstrNum) \% CTFCross(0) & Cross or Y term of the CTF equation & Y0 & W/m  K & Cross CTF term \tabularnewline
 Construct(ConstrNum) \% CTFInside(0) & Inside or Z terms of the CTF equation & Z0 & W/m  K & Inside CTF term \tabularnewline

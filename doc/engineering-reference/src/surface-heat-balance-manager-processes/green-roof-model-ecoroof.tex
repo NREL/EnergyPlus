@@ -41,7 +41,7 @@ As with a traditional roof, the energy balance of an green roof is dominated by 
 \begin{figure}[hbtp] % fig 35
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image509.png}
-\caption{  The Energy Balance for a Green Roof. \protect \label{fig:the-energy-balance-for-a-green-roof.}}
+\caption{The Energy Balance for a Green Roof. \protect \label{fig:the-energy-balance-for-a-green-roof.}}
 \end{figure}
 
 The energy budget analysis follows the Fast All Season Soil Strength (FASST) model developed by Frankenstein and Koenig for the US Army Corps of Engineers. FASST was developed, in part, to determine the ability of soils to support manned and unmanned vehicles and personnel movement. In order to accomplish this, however, FASST tracks the energy and moisture balance (including ice and snow) within a vegetated soil. It is a one-dimensional model that draws heavily from other plant canopy models including BATS (Dickinson et al.) and SiB (Sellers et al.). We have implemented FASST here with only a few modifications to adapt it for use with a relatively thin soil layer. The sign convention used assumes all heat fluxes are positive when energy is absorbed into the layer.
@@ -62,7 +62,7 @@ Where $\sigma$\(_{f}\) is calculated as a function of Leaf-Area-Index (LAI):
 \sigma_f = 0.9 - 0.7 \exp{-0.75 LAI }
 \end{equation}
 
-In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H\(_{f}\) and L\(_{­}\)) are somewhat complicated and therefore discussed in some detail below.
+In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H\(_{f}\) and L\(_{f­}\)) are somewhat complicated and therefore discussed in some detail below.
 
 \paragraph{Sensible heat flux in the foliage layer}\label{sensible-heat-flux-in-the-foliage-layer}
 
@@ -90,7 +90,7 @@ where r\(_{a}\) is the density of air at the instrument height ~and r\(_{f}\) is
 {W_{af}} = 0.83{\sigma_f}W\sqrt {C_{hn}^f}  + (1 - {\sigma_f})W
 \end{equation}
 
-Here \emph{W} is the larger of 2.0 m/s or the actual wind speed above the canopy (Hughes et al.) and C\(^{f}\)\(_{n}\) is the transfer coefficient at near-neutral atmospheric stability conditions:
+Here \emph{W} is the larger of 2.0 m/s or the actual wind speed above the canopy (Hughes et al.) and C\(^{f}\)\(_{hn}\) is the transfer coefficient at near-neutral atmospheric stability conditions:
 
 \begin{equation}
 C_{hn}^f = {K_v}^2 \cdot {\left( {\ln \left( {\frac{{{Z_a} - {Z_d}}}{{Z_o^f}}} \right)} \right)^{ - 2}}
@@ -120,7 +120,7 @@ The process of water loss through plant respiration is known as transpiration. I
 {r_s} = \frac{{{r_{s,\min }}}}{{LAI}} \cdot {f_1} \cdot {f_2} \cdot {f_3}
 \end{equation}
 
-Here, r\(_{n}\) is the minimum stomatal resistance. The actual stomatal resistance at any time is proportional to this minimum resistance and inversely proportional to LAI. The stomatal resistance is further modified by fractional multiplying factors that relate to incoming solar radiation and atmospheric moisture. As found in Frankenstein and Koenig the inverses of the multiplying factors f\(_{1}\), f\(_{2}\), and f\(_{3}\) are given by:
+Here, r\(_{s,min}\) is the minimum stomatal resistance. The actual stomatal resistance at any time is proportional to this minimum resistance and inversely proportional to LAI. The stomatal resistance is further modified by fractional multiplying factors that relate to incoming solar radiation and atmospheric moisture. As found in Frankenstein and Koenig the inverses of the multiplying factors f\(_{1}\), f\(_{2}\), and f\(_{3}\) are given by:
 
 \begin{equation}
 \begin{array}{l}
@@ -134,7 +134,7 @@ Here, r\(_{n}\) is the minimum stomatal resistance. The actual stomatal resistan
 \end{array}
 \end{equation}
 
-Here, Q\(_{r}\), is the residual moisture content (defined as the amount of moisture in soil when plants begin to wilt), Q\(_{x}\) is the maximum moisture content (defined as the maximum amount of moisture a particular type of soil can hold and above which run off occurs), and \(\overline \Theta\) ~is the average soil moisture in the root zone. The residual moisture content is typically around 0.01 m\(^{3}\)/m\(^{3}\) (Frankenstein and Koenig). The maximum moisture content depends upon the soil, but generally varies from 0.3 to 0.6 m\(^{3}\)/m\(^{3}\) (Guymon et al.). In the expression for f\(_{3}\), g\(_{d}\) is a plant specific characteristic that is only non-zero for trees, e\(_{t}\) is the saturated vapor pressure at the leaf temperature, and e\(_{a}\) is the air vapor pressure.
+Here, Q\(_{r}\), is the residual moisture content (defined as the amount of moisture in soil when plants begin to wilt), Q\(_{max}\) is the maximum moisture content (defined as the maximum amount of moisture a particular type of soil can hold and above which run off occurs), and \(\overline \Theta\) ~is the average soil moisture in the root zone. The residual moisture content is typically around 0.01 m\(^{3}\)/m\(^{3}\) (Frankenstein and Koenig). The maximum moisture content depends upon the soil, but generally varies from 0.3 to 0.6 m\(^{3}\)/m\(^{3}\) (Guymon et al.). In the expression for f\(_{3}\), g\(_{d}\) is a plant specific characteristic that is only non-zero for trees, e\(_{f,sat}\) is the saturated vapor pressure at the leaf temperature, and e\(_{a}\) is the air vapor pressure.
 
 Resistance to moisture exchange offered by the boundary layer formed on the leaf surface is known as aerodynamic resistance. It is measured in units of (s/m) and is influenced by wind speed, surface roughness and stability of the atmosphere (Oke). It is formulated as:
 
@@ -156,7 +156,7 @@ The latent heat flux is then given by:
 {L_f} = {l_f} * LAI{\rho_{af}}{C_f}{W_{af}}{r^``}\left( {{q_{af}} - {q_{f,sat}}} \right)
 \end{equation}
 
-Here \emph{l\(_{f}\)} , is the latent heat of vaporization (J/kg), q\(_{t}\) is the saturation mixing ratio at the leaf surface temperature, and q\(_{f}\) is the mixing ratio of the air within the canopy. As developed in Frankenstein and Koenig the mixing ratio within the canopy can be determined from:
+Here \emph{l\(_{f}\)} , is the latent heat of vaporization (J/kg), q\(_{f,sat}\) is the saturation mixing ratio at the leaf surface temperature, and q\(_{af}\) is the mixing ratio of the air within the canopy. As developed in Frankenstein and Koenig the mixing ratio within the canopy can be determined from:
 
 \begin{equation}
 {q_{af}} = \left[ {\frac{{\left( {1 - {\sigma_f}} \right){q_a} + {\sigma_f}\left( {0.3{q_a} + 0.6{q_{f,sat}}{r^``} + 0.1{q_{f,sat}}{M_g}} \right)}}{{1 - {\sigma_f}\left[ {0.6\left( {1 - {r^``}} \right) + 0.1\left( {1 - {M_g}} \right)} \right]}}} \right]
@@ -186,7 +186,7 @@ Sensible heat flux between the soil surface and air in its vicinity is dependent
 {H_g} = {\rho_{ag}}{C_{p,a}}C_h^g{W_{af}}({T_{af}} - {T_g})
 \end{equation}
 
-where \(C_h^g\) ~is the bulk transfer coefficient and r\(_{g}\) is the density of air near the soil surface (kg/m\(^{3}\)) given by:
+where \(C_h^g\) ~is the bulk transfer coefficient and r\(_{ag}\) is the density of air near the soil surface (kg/m\(^{3}\)) given by:
 
 \begin{equation}
 {p_{ag}} = \frac{{{p_a} + {p_g}}}{2}
@@ -194,7 +194,7 @@ where \(C_h^g\) ~is the bulk transfer coefficient and r\(_{g}\) is the density o
 
 Here r\(_{g}\) is the density of air at the ground surface temperature
 
-The bulk transfer coefficient is given as the linear combination of bulk transfer coefficient near ground (C\(^{f}\)\(_{n}\)) and near foliage-atmosphere interface (C\(^{g}\)\(_{n}\)) multiplied by the stability factor (G\(_{h}\)) and is formulated as:
+The bulk transfer coefficient is given as the linear combination of bulk transfer coefficient near ground (C\(^{f}\)\(_{hn}\)) and near foliage-atmosphere interface (C\(^{g}\)\(_{hn}\)) multiplied by the stability factor (G\(_{h}\)) and is formulated as:
 
 \begin{equation}
 C_h^g = {\Gamma_k}\left[ {\left( {1 - {\sigma_f}} \right)C_{hn}^g + {\sigma_f}C_{hn}^f} \right]
@@ -212,7 +212,7 @@ And
 C_{hn}^f = {\left[ {\frac{{K_v}}{{\ln \left( \frac{{Z_a} - {Z_d}}{Z_o^f} \right)}}} \right]^2}
 \end{equation}
 
-where\(Z_o^g\) ~and \(Z_o^f\) ~are the ground and foliage roughness lengths,~ r\(_{h}\) is turbulent Schmidt number (0.63), and K\(_{v}\) is the von Karman constant (0.4).
+where\(Z_o^g\) ~and \(Z_o^f\) ~are the ground and foliage roughness lengths,~ r\(_{ch}\) is turbulent Schmidt number (0.63), and K\(_{v}\) is the von Karman constant (0.4).
 
 The condition of the atmosphere (G\(_{h}\)) is determined as stable or unstable based on the sign of the bulk Richardson number:
 
@@ -239,7 +239,7 @@ Removal of water vapor from the soil surface depends on the difference between t
 {L_R} = C_e^g{l_g}{W_{af}}{\rho_{ag}}\left( {{q_{af}} - {q_g}} \right)
 \end{equation}
 
-Here\(C_e^g\) is the bulk transfer coefficient, l\(_{g}\) is the latent heat of vaporization at the ground surface temperature, q\(_{f}\) is the mixing ratio at the foliage-atmosphere interface, and q\(_{f}\) is the mixing ratio at the ground surface, given by:
+Here\(C_e^g\) is the bulk transfer coefficient, l\(_{g}\) is the latent heat of vaporization at the ground surface temperature, q\(_{af}\) is the mixing ratio at the foliage-atmosphere interface, and q\(_{f}\) is the mixing ratio at the ground surface, given by:
 
 \begin{equation}
 {q_g} = {M_g}{q_{g,sat}} + \left( {1 - {M_g}} \right){q_{af}}
@@ -255,7 +255,7 @@ where \(C_{en}^g\) is the near ground bulk transfer coefficient for Latent heat 
 
 \subsection{Linearization}\label{linearization}
 
-In order to solve the foliage and soil heat budget equations, the 4\(^{h}\) \(^{ }\)order terms T\(_{f}\)\(^{4}\) and T\(_{g}\)\(^{4}\) ~and mixing ratio terms q\(_{t}\) and q\(_{t}\) \(_{ }\)are linearized as given by Deardorff:
+In order to solve the foliage and soil heat budget equations, the 4\(^{th}\) order terms T\(_{f}\)\(^{4}\) and T\(_{g}\)\(^{4}\) ~and mixing ratio terms q\(_{g,sat}\) and q\(_{f,sat}\) are linearized as given by Deardorff:
 
 \begin{equation}
 {\left[ {T_f^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_f^n} \right]^4} + 4{\left[ {T_f^n} \right]^3}\left[ {T_f^{n + 1} - T_f^n} \right]
@@ -265,7 +265,7 @@ In order to solve the foliage and soil heat budget equations, the 4\(^{h}\) \(^{
 {\left[ {T_g^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_g^n} \right]^4} + 4{\left[ {T_g^n} \right]^3}\left[ {T_g^{n + 1} - T_g^n} \right]
 \end{equation}
 
-Here T\(_{f}\)\(^{1}\) and T\(_{g}\)\(^{1}\) are the current time step leaf and ground surface temperatures in Kelvin. T\(_{f}\)\(^{n}\) and T\(_{g}\)\(^{n}\) are the corresponding temperatures at the previous time step.
+Here T\(_{f}\)\(^{n+1}\) and T\(_{g}\)\(^{n+1}\) are the current time step leaf and ground surface temperatures in Kelvin. T\(_{f}\)\(^{n}\) and T\(_{g}\)\(^{n}\) are the corresponding temperatures at the previous time step.
 
 The saturation mixing ratio at the ground and leaf surface temperatures are given as:
 
@@ -277,7 +277,7 @@ The saturation mixing ratio at the ground and leaf surface temperatures are give
 {q_{f,sat}}\left( {T_f^{n + 1}} \right) = {q_{sat}}\left( {T_f^n} \right) + {\left( {\frac{{\partial {q_{sat}}}}{{\partial T}}} \right)_{T_f^n}} * \left( {T_f^{n + 1} - T_f^n} \right)
 \end{equation}
 
-where q\(_{t}\)(T\(_{g}\)\(^{n}\)) is the saturation mixing ratio at the previous time step and is formulated as given in Garratt:
+where q\(_{sat}\)(T\(_{g}\)\(^{n}\)) is the saturation mixing ratio at the previous time step and is formulated as given in Garratt:
 
 \begin{equation}
 {q_{sat}}\left( {T_g^n} \right) = \frac{{0.622{e^ * }\left( {T_g^n} \right)}}{{P - {e^ * }\left( {T_g^n} \right)}}
@@ -323,7 +323,7 @@ This final set of equations is then solved simultaneously to obtain T\emph{\(_{g
 
 \subsection{Green Roof Nomenclature}\label{green-roof-nomenclature}
 
-C\(_{1}\), C\(_{2}\), C\(_{3}\)~~~~~~ = ~~~~~~~~~ coefficients in linearized temperature equations
+C\(_{1}\), C\(_{2}\), C\(_{3}\)~~~ = ~~~~~~~~~ coefficients in linearized temperature equations
 
 \emph{C\(_{e}\)\(^{g}\)~~~~~~~~~~~~~ = ~~~~~~~~~} latent heat flux bulk transfer coefficient at ground layer
 
@@ -331,11 +331,11 @@ C\(_{1}\), C\(_{2}\), C\(_{3}\)~~~~~~ = ~~~~~~~~~ coefficients in linearized tem
 
 C\(_{h}\)\(^{g}\)~~~~~~~~~~~~~ = ~~~~~~~~~ sensible heat flux bulk transfer coefficient at ground layer
 
-C\(_{n}\)\(^{f}\) ~~~~~~~~~~~ = ~~~~~~~~~ near-neutral transfer coefficient at foliage layer
+C\(_{hn}\)\(^{f}\) ~~~~~~~~~~~ = ~~~~~~~~~ near-neutral transfer coefficient at foliage layer
 
-C\(_{n}\)\(^{g}\)~~~~~~~~~~~ = ~~~~~~~~~ near-neutral transfer coefficient at ground layer
+C\(_{hn}\)\(^{g}\) = ~~~~~~~~~ near-neutral transfer coefficient at ground layer
 
-C\(_{a}\)~~~~~~~~~~~~ = ~~~~~~~~~ specific heat of air at constant pressure (1005.6 J/kg k)
+C\(_{p,a}\)~~~~~~~~~~~~ = ~~~~~~~~~ specific heat of air at constant pressure (1005.6 J/kg k)
 
 e\(^{*}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ saturation vapor pressure (Pa)
 
@@ -375,27 +375,27 @@ M\(_{g}\)~~~~~~~~~~~~~ = ~~~~~~~~~ moisture saturation factor
 
 q\(_{a}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ mixing ratio for air
 
-q\(_{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ mixing ratio for air within foliage canopy
+q\(_{af}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ mixing ratio for air within foliage canopy
 
-q\(_{t}\)~~~~~~~~~~~~ = ~~~~~~~~~ saturation mixing ratio at foliage temperature
+q\(_{f,sat}\)~~~~~~~~~~~~ = ~~~~~~~~~ saturation mixing ratio at foliage temperature
 
-q\(_{t}\)~~~~~~~~~~~ = ~~~~~~~~~ saturation mixing ratio at ground temperature
+q\(_{g,sat}\)~~~~~~~~~~~ = ~~~~~~~~~ saturation mixing ratio at ground temperature
 
 r\(_{a}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ aerodynamic resistance to transpiration (s/m)
 
 r\(_{s}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage leaf stomatal resistance (s/m)
 
-r\(_{n}\)~~~~~~~~~~~ = ~~~~~~~~~ minimal leaf stomatal resistance (s/m)
+r\(_{s,min}\)~~~~~~~~~~~ = ~~~~~~~~~ minimal leaf stomatal resistance (s/m)
 
 r''~~~~~~~~~~~~~~~ = ~~~~~~~~~ surface wetness factor
 
-R\(_{b}\)~~~~~~~~~~~~~ = ~~~~~~~~~ bulk Richardson number
+R\(_{ib}\)~~~~~~~~~~~~~ = ~~~~~~~~~ bulk Richardson number
 
 R\(_{v}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ gas constant for water vapor (461.53 J/kgK)
 
-\emph{T\(_{ }\)}~~~~~~~~~~~ = ~~~~~~~~~ the air temperature at the instrument height (Kelvin)
+\emph{T\(_{a}\)} = ~~~~~~~~~ the air temperature at the instrument height (Kelvin)
 
-T\(_{ }\) ~ ~~~~~~~~~ = ~~~~~~~~~ air temperature with in the canopy (Kelvin)
+T\(_{af}\) ~ ~~~~~~~~~ = ~~~~~~~~~ air temperature with in the canopy (Kelvin)
 
 T\emph{\(_{f}\)}~~ ~~~~~~~~~~~ = ~~~~~~~~~ leaf temperature (Kelvin)
 
@@ -403,7 +403,7 @@ T\(_{g}\) ~~~~~~~~~~~~~~ = ~~~~~~~~~ ground surface temperature (Kelvin)
 
 W~~~~~~~~~~~~~~ = ~~~~~~~~~ wind speed above canopy (m/s)
 
-W\(_{f}\)~ ~~~~~~~~~~~ = ~~~~~~~~~ wind speed with in the canopy (m/s)
+W\(_{af}\)~ ~~~~~~~~~~~ = ~~~~~~~~~ wind speed with in the canopy (m/s)
 
 z~~~~~~~~~~~~~~~~ = ~~~~~~~~~ height or depth (m)
 
@@ -441,7 +441,7 @@ Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
 \subsubsection{Subscripts and superscripts}\label{subscripts-and-superscripts-000}
 
-~~~~~a~~~~~~~~~~~~~~~ = ~~~~~~~~~ air
+a~~~~~~~~~~~~~~~ = ~~~~~~~~~ air
 
 af~~~~~~~~~~~~~~ = ~~~~~~~~~ air within the foliage layer
 

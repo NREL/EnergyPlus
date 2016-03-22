@@ -8,10 +8,18 @@ EnergyPlus offers the different types of air models listed in the table below al
 
 % table 43
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
-\caption{Summary of room air models available in EnergyPlus \protect \label{table:summary-of-room-air-models-available-in}}\\
+\caption{Summary of room air models available in EnergyPlus \label{table:summary-of-room-air-models-available-in}} \tabularnewline
 \toprule 
-Air model name & Applicability & Input Objects Required \tabularnewline \midrule
+Air model name & Applicability & Input Objects Required \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Summary of room air models available in EnergyPlus} \tabularnewline
+\toprule 
+Air model name & Applicability & Input Objects Required \tabularnewline
+\midrule
 \endhead
+
 Well-Mixed & All zones & None, default \tabularnewline
 User Defined & Any zone where the user has prior knowledge of the temperature pattern & ‘RoomAirModelType’, ‘RoomAir:TemperaturePattern:UserDefined’, ‘RoomAir:TemperaturePattern: xx’ \tabularnewline
 One-Node Displacement Ventilation (Mundt) & displacement ventilation in typical office-type zones & ‘RoomAirModelType’, ‘RoomAirSettings:OneNodeDisplacementVentilation’, ‘RoomAir:Node’’ \tabularnewline
@@ -541,7 +549,7 @@ If mixing:
 
 If displacement ventilation:
 
-If \emph{H\(_{t}\)} \textless{} \emph{H\(_{g}\)}
+If \emph{H\(_{stat}\)} \textless{} \emph{H\(_{flavg}\)}
 
 \begin{equation}
 {T_{stat}} = {T_{fl}}
@@ -1491,10 +1499,18 @@ Table~\ref{table:test-cases-used-to-develop-correlations} lists the cases used t
 
 % table 44
 \begin{longtable}[c]{@{}lllll@{}}
-\caption{Test cases used to develop correlations \protect \label{table:test-cases-used-to-develop-correlations}}\\
+\caption{Test cases used to develop correlations \label{table:test-cases-used-to-develop-correlations}} \tabularnewline
 \toprule 
-Case & Opening area & Room width & Room depth & Room height \tabularnewline \midrule
+Case & Opening area & Room width & Room depth & Room height \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Test cases used to develop correlations} \tabularnewline
+\toprule 
+Case & Opening area & Room width & Room depth & Room height \tabularnewline
+\midrule
 \endhead
+
 A in (m 2 ) & W (m) & D (m) & H (m) \tabularnewline
 1 & 0.25 & 6 & 9 & 2.3 \tabularnewline
 2 & 0.25 & 11 & 9 & 2.3 \tabularnewline
@@ -1517,9 +1533,16 @@ RANGE (max:min ratio) \tabularnewline
 
 % table 45
 \begin{longtable}[c]{p{1.25in}p{0.5in}p{0.5in}p{3.0in}}
-\caption{Definitions of output variables \protect \label{table:definitions-of-output-variables}}\\
+\caption{Definitions of output variables \label{table:definitions-of-output-variables}} \tabularnewline
 \toprule 
-Output variable & Symbol & Units & Definition \tabularnewline \midrule
+Output variable & Symbol & Units & Definition \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Definitions of output variables} \tabularnewline
+\toprule 
+Output variable & Symbol & Units & Definition \tabularnewline
+\midrule
 \endhead
 Jet velocity & U\(_J\) & m/s & Volume-averaged jet region velocity. The averaging volume is bounded at each x along the room depth by the line in the y-z plane where the jet velocity drops to 50\% of its maximum centerline value. \tabularnewline
 Recirculation zone velocity & U\(_R\) & m/s & Area-averaged velocity in the y-z plane with maximum flow. The averaging area is the recirculation part of the room cross-section. Typically the plane of maximum flow occurs at x~\textbackslash\~{}~2D/3 (D/3 before the outlet). \tabularnewline
@@ -1533,9 +1556,16 @@ See also Figure~\ref{fig:jet-and-recirculation-regions-in-typical}. Note the \em
 
 % table 46
 \begin{longtable}[c]{p{1.0in}p{0.5in}p{2.0in}p{0.5in}p{0.5in}p{0.5in}}
-\caption{Correlation formulae in the form Y = aX + b \protect \label{table:correlation-formulae-in-the-form-y-ax-+-b}}\\
+\caption{Correlation formulae in the form Y = aX + b \label{table:correlation-formulae-in-the-form-y-ax-+-b}} \tabularnewline
 \toprule 
-~ & Y & X & a & b & R\(^2\) \tabularnewline \midrule
+~ & Y & X & a & b & R\(^2\) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Correlation formulae in the form Y = aX + b} \tabularnewline
+\toprule 
+~ & Y & X & a & b & R\(^2\) \tabularnewline
+\midrule
 \endhead
 Jet velocity & U\(_J\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in}\right)$ & 1.6173 & 0.1466 & 0.8343 \tabularnewline
 Recirculation zone velocity & U\(_R\)/U\(_{in}\) & $\sqrt{A_{in}/A_{RM}} \cdot \left(V_{J,m}/U_{in}\right)$ & 0.8911 & 0.0393 & 0.6464 \tabularnewline
@@ -1547,10 +1577,18 @@ Recirculation zone temperature rise & $\Delta$T\(_R\) & $\frac{q''_{RM}}{\rho {c
 
 % table 47
 \begin{longtable}[c]{p{0.5in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
-\caption{Accuracy of correlation formulae in predicting test case results \protect \label{table:accuracy-of-correlation-formulae-in}}\\
+\caption{Accuracy of correlation formulae in predicting test case results \label{table:accuracy-of-correlation-formulae-in}} \tabularnewline
 \toprule 
-Cases & Errors (\%) \tabularnewline \midrule
+Cases & Errors (\%) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Accuracy of correlation formulae in predicting test case results} \tabularnewline
+\toprule 
+Cases & Errors (\%) \tabularnewline
+\midrule
 \endhead
+
 ID & A (m2) & W (m) & D (m) & H (m) & Jet Velocity & Recirculation Velocity & Recirculation Flow Rate & Jet Temperature Rise & Recirculation Temperature Rise \tabularnewline
 1 & 0.25 & 6 & 9 & 2.3 & 16 & 45 & 60 & 1 & 10 \tabularnewline
 2 & 0.25 & 11 & 9 & 2.3 & 5 & 43 & 32 & 5 & 7 \tabularnewline
@@ -1758,10 +1796,18 @@ For simplicity the heat gains are considered to be evenly distributed along the 
 
 % table 48
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{3.5in}}
-\caption{List of variables for CV model \protect \label{table:list-of-variables-for-cv-model}}\\
+\caption{List of variables for CV model \label{table:list-of-variables-for-cv-model}} \tabularnewline
 \toprule 
-Symbol & Units & Description \tabularnewline \midrule
+Symbol & Units & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{List of variables for CV model} \tabularnewline
+\toprule 
+Symbol & Units & Description \tabularnewline
+\midrule
 \endhead
+
 a & - & Slope of correlation line of best fit \tabularnewline
 A\(_{in}\) & m\(^2\) & Inlet area \tabularnewline
 A\(_{RM}\) & m\(^2\) & Room cross-sectional area \tabularnewline

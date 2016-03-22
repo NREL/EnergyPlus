@@ -38,10 +38,18 @@ The Demand Manager is called after the first pass through the HVAC system simula
 
 % table 42
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Demand Manager Types and Resimulation. \protect \label{table:demand-manager-types-and-resimulation.}}\\
+\caption{Demand Manager Types and Resimulation. \label{table:demand-manager-types-and-resimulation.}} \tabularnewline
 \toprule 
-Demand Manager Type & Resimulate Exterior Energy & Resimulate Zone Heat Balance & Resimulate HVAC System \tabularnewline \midrule
+Demand Manager Type & Resimulate Exterior Energy & Resimulate Zone Heat Balance & Resimulate HVAC System \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Demand Manager Types and Resimulation.} \tabularnewline
+\toprule 
+Demand Manager Type & Resimulate Exterior Energy & Resimulate Zone Heat Balance & Resimulate HVAC System \tabularnewline
+\midrule
 \endhead
+
 DemandManager:ExteriorLights & X & ~ & ~ \tabularnewline
 DemandManager:Lights & ~ & X & X \tabularnewline
 DemandManager:ElectricEquipment & ~ & X & X \tabularnewline

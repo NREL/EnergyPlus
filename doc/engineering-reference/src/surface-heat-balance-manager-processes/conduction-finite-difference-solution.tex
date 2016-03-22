@@ -180,7 +180,7 @@ QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old
 
 Where:
 
-HeatCap1\(_{i}\) = heat capacitance associated with a given outer half-node HeatCap2\(_{i}\) = heat capacitance associated with a given inner half-node QDreport\(_{i}\) = CondFD Surface Heat Flux Node \textless{} i \textgreater{} QSource\(_{i}\) = internal source heat flux at node i Q\(_{e}\) = Surface Inside Face Conduction Heat Transfer Rate per Area {[}W/m\(^{2}\){]}
+HeatCap1\(_{i}\) = heat capacitance associated with a given outer half-node HeatCap2\(_{i}\) = heat capacitance associated with a given inner half-node QDreport\(_{i}\) = CondFD Surface Heat Flux Node \textless{} i \textgreater{} QSource\(_{i}\) = internal source heat flux at node i Q\(_{inside}\) = Surface Inside Face Conduction Heat Transfer Rate per Area {[}W/m\(^{2}\){]}
 
 N = total number of nodes in a surface including the surface inside face node. Note that the variable \emph{TotNodes} used in the source code is actually N-1. The surface inside face node is referenced as \emph{TotNodes+1}.
 

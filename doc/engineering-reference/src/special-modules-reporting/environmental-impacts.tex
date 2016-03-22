@@ -2,7 +2,7 @@
 
 Typically when a new building technology is evaluated the energy performance of a baseline building is compared to the energy and life-cycle costs of alternatives to determine cost-effectiveness. But what if the lowest energy or life-cycle cost alternative is not the cleanest or lowest environmental impact?~ By calculating environmental impact, designers can compare alternatives not only in terms of their energy performance but also their environmental performance---working towards a more sustainable design (Liesen 1997; Stroot, Nemeth, and Fournier 1996).~ Environmental impacts are quantified, in part, by modeling the amount of emissions and in EnergyPlus this is done using the input objects ``EnvironmentalImpactFactors,'' ``FuelFactors,'' and ``Output:EnvironmentalImpactFactors.''
 
-Based on emissions factors entered by the user, EnergyPlus calculates the mass or volume of thirteen different pollutants: CO\(_{2}\) (carbon dioxide), CO (carbon monoxide), CH\(_{4}\) (methane), NO\(_{x}\) (nitrogen oxides), N\(_{2}\)O (nitrous oxide), SO\(_{2}\) (sulphur dioxide), PM (particulate matter), PM\(_{0}\) (particulate matter 10\textgreater{}PM\(_{0}\)\textgreater{}2.5 microns), PM\(_{5}\) (particulate matter\textless{}2.5 microns), NH\(_{3}\) (ammonia), NMVOC (non-methane volatile organic compounds), Hg (mercury), and Pb (lead) as well as water consumed through evaporation in thermo- and hydro-electric generation and high- and low-level nuclear waste from nuclear electricity generation for on- and off-site energy production.~ Note that while these comprise the largest proportion of pollutants, more than one hundred other pollutants are emitted from fossil fuel combustion or electricity generation. Much of the information compiled here for fossil fuel combustion comes from \emph{AP-42 Compilation of Air Pollutant Emission Factors} (EPA 1998a, 1998b, 1996).~ For more information on pollutants, see the U.S. Environmental Protection Agency (EPA) Clearinghouse for Inventories \& Emission Factors (\href{http://www.epa.gov/ttn/chief/efinformation.html}{www.epa.gov/ttn/chief/efinformation.html}).
+Based on emissions factors entered by the user, EnergyPlus calculates the mass or volume of thirteen different pollutants: CO\(_{2}\) (carbon dioxide), CO (carbon monoxide), CH\(_{4}\) (methane), NO\(_{x}\) (nitrogen oxides), N\(_{2}\)O (nitrous oxide), SO\(_{2}\) (sulphur dioxide), PM (particulate matter), PM\(_{10}\) (particulate matter 10\textgreater{}PM\(_{10}\)\textgreater{}2.5 microns), PM\(_{2.5}\) (particulate matter\textless{}2.5 microns), NH\(_{3}\) (ammonia), NMVOC (non-methane volatile organic compounds), Hg (mercury), and Pb (lead) as well as water consumed through evaporation in thermo- and hydro-electric generation and high- and low-level nuclear waste from nuclear electricity generation for on- and off-site energy production.~ Note that while these comprise the largest proportion of pollutants, more than one hundred other pollutants are emitted from fossil fuel combustion or electricity generation. Much of the information compiled here for fossil fuel combustion comes from \emph{AP-42 Compilation of Air Pollutant Emission Factors} (EPA 1998a, 1998b, 1996).~ For more information on pollutants, see the U.S. Environmental Protection Agency (EPA) Clearinghouse for Inventories \& Emission Factors (\href{http://www.epa.gov/ttn/chief/efinformation.html}{www.epa.gov/ttn/chief/efinformation.html}).
 
 EnergyPlus models energy performance of on-site fossil fuels and purchased electricity (generated from a variety of fuels including natural gas, oil, gasoline, diesel, coal, hydroelectric, nuclear, wind, solar power, and biomass).~ The energy performance calculated by EnergyPlus is converted into a mass or volume of pollutants emitted.~ From a baseline building, alternative energy and pollution saving technologies can be explored, and the energy savings and pollution reduction can be calculated.~ Figure~\ref{fig:example-annual-atmospheric-pollutants} and Figure~\ref{fig:example-annual-total-carbon-equivalent-for} illustrate a comparison of two buildings simulated using Chicago weather data in EnergyPlus and the calculated pollutant levels (based on U.S. national average pollutants) (Crawley 2003).
 
@@ -15,25 +15,33 @@ EPA categorizes pollutants as either Criteria Pollutants or Hazardous Pollutants
 \begin{figure}[hbtp] % fig 341
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7910.svg.png}
-\caption{  Example Annual Atmospheric Pollutants and Water Consumption \protect \label{fig:example-annual-atmospheric-pollutants}}
+\caption{Example Annual Atmospheric Pollutants and Water Consumption \protect \label{fig:example-annual-atmospheric-pollutants}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 342
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7911.svg.png}
-\caption{  Example Annual Total Carbon Equivalent for Major Greenhouse Gases \protect \label{fig:example-annual-total-carbon-equivalent-for}}
+\caption{Example Annual Total Carbon Equivalent for Major Greenhouse Gases \protect \label{fig:example-annual-total-carbon-equivalent-for}}
 \end{figure}
 
 \subsection{Carbon Equivalent}\label{carbon-equivalent}
 
-The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases.~ This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gas.~ This equivalent is based on a factor of 1.0 for carbon.~ This group of gases includes carbon dioxide (CO\(_{2}\)), carbon monoxide, nitrous oxide, methane, halocarbon emission, hydrofluorocarbons (HFC), perfluorocarbons (PFC), and chlorofluorocarbons (CFC).~ For building energy use, the main gases of concern are carbon dioxide, carbon monoxide, methane, and nitrous oxide.~ Although carbon monoxide has a relatively short life, CO emissions into the atmosphere may have a significant impact on climate forcing due to chemical impact on CH\(_{4}\) lifetime, and tropospheric O\(_{3}\) and CO\(_{2}\) photochemical production normally reacts to produce carbon dioxide, but it can't be ignored since it is produced in incomplete combustion and the carbon remains to interact as CO\(_{.}\) Yet there is no agreement on its carbon equivalent (IPCC 2001). The carbon equivalent of carbon dioxide, methane, and nitrous oxide are calculated and then multiplied by their GWP on a 100 year time frame.~ The Carbon Equivalents of the following gases have been determined and used in the program are shown in the following table.
+The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases.~ This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gas.~ This equivalent is based on a factor of 1.0 for carbon.~ This group of gases includes carbon dioxide (CO\(_{2}\)), carbon monoxide, nitrous oxide, methane, halocarbon emission, hydrofluorocarbons (HFC), perfluorocarbons (PFC), and chlorofluorocarbons (CFC).~ For building energy use, the main gases of concern are carbon dioxide, carbon monoxide, methane, and nitrous oxide.~ Although carbon monoxide has a relatively short life, CO emissions into the atmosphere may have a significant impact on climate forcing due to chemical impact on CH\(_{4}\) lifetime, and tropospheric O\(_{3}\) and CO\(_{2}\) photochemical production normally reacts to produce carbon dioxide, but it can't be ignored since it is produced in incomplete combustion and the carbon remains to interact as CO\(_{2}\) Yet there is no agreement on its carbon equivalent (IPCC 2001). The carbon equivalent of carbon dioxide, methane, and nitrous oxide are calculated and then multiplied by their GWP on a 100 year time frame.~ The Carbon Equivalents of the following gases have been determined and used in the program are shown in the following table.
 
 % table 93
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Carbon Equivalents (IPCC 2001) \protect \label{table:carbon-equivalents-ipcc-2001}}\\
+\caption{Carbon Equivalents (IPCC 2001) \label{table:carbon-equivalents-ipcc-2001}} \tabularnewline
 \toprule 
-Gas & Carbon Equivalent \tabularnewline \midrule
+Gas & Carbon Equivalent \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Carbon Equivalents (IPCC 2001)} \tabularnewline
+\toprule 
+Gas & Carbon Equivalent \tabularnewline
+\midrule
 \endhead
+
 NO & 80.7272 \tabularnewline
 CH & 6.2727 \tabularnewline
 CO & 0.2727 \tabularnewline
@@ -48,10 +56,18 @@ Emission factors for on-site fossil fuel consumption are based on Section 1.4 Na
 
 % table 94
 \begin{longtable}[c]{p{4.5in}p{1.5in}}
-\caption{  Emission Factors for Natural Gas \protect \label{table:emission-factors-for-natural-gas}}\\
+\caption{Emission Factors for Natural Gas \label{table:emission-factors-for-natural-gas}} \tabularnewline
 \toprule 
-Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline \midrule
+Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for Natural Gas} \tabularnewline
+\toprule 
+Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO  ) & 50.23439 \tabularnewline
 Carbon Monoxide (CO) & 3.51641E-02 \tabularnewline
 Methane (CH  ) & 9.62826E-04 \tabularnewline
@@ -75,10 +91,18 @@ e No data \tabularnewline
 
 % table 95
 \begin{longtable}[c]{p{4.5in}p{1.5in}}
-\caption{  Emission Factors for Residual Fuel Oil (No. 4 and No. 6 Fuel Oil) \protect \label{table:emission-factors-for-residual-fuel-oil-no.-4}}\\
+\caption{Emission Factors for Residual Fuel Oil (No. 4 and No. 6 Fuel Oil) \label{table:emission-factors-for-residual-fuel-oil-no.-4}} \tabularnewline
 \toprule 
-Pollutant & Emission Factor    (g/MJ) \tabularnewline \midrule
+Pollutant & Emission Factor    (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for Residual Fuel Oil (No. 4 and No. 6 Fuel Oil)} \tabularnewline
+\toprule 
+Pollutant & Emission Factor    (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO 2 ) & 50.23439 \tabularnewline
 Carbon Monoxide (CO) & 3.52E-002 \tabularnewline
 Methane (CH 4 ) & 9.63E-004 \tabularnewline
@@ -102,10 +126,18 @@ No data. \tabularnewline
 
 % table 96
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
-\caption{  Emission Factors for Distillates (No. 1 and No. 2 Fuel Oil) \protect \label{table:emission-factors-for-distillates-no.-1}}\\
+\caption{Emission Factors for Distillates (No. 1 and No. 2 Fuel Oil) \label{table:emission-factors-for-distillates-no.-1}} \tabularnewline
 \toprule 
-Pollutant & No. 1 Fuel Oil Emission Factor   (g/MJ) & No. 2 Fuel Oil Emission Factor   (g/MJ) \tabularnewline \midrule
+Pollutant & No. 1 Fuel Oil Emission Factor   (g/MJ) & No. 2 Fuel Oil Emission Factor   (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for Distillates (No. 1 and No. 2 Fuel Oil)} \tabularnewline
+\toprule 
+Pollutant & No. 1 Fuel Oil Emission Factor   (g/MJ) & No. 2 Fuel Oil Emission Factor   (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO  ) & 66.0233 & 68.47998 \tabularnewline
 Carbon Monoxide (CO) & 1.54E-002 & 1.54E-002 \tabularnewline
 Methane (CH  ) & 6.63E-004 & 6.63E-004 \tabularnewline
@@ -128,10 +160,18 @@ d No data. &  &  \tabularnewline
 
 % table 97
 \begin{longtable}[c]{p{4.5in}p{1.5in}}
-\caption{  Emission Factors for Residential Oil Furnace \protect \label{table:emission-factors-for-residential-oil-furnace}}\\
+\caption{Emission Factors for Residential Oil Furnace \label{table:emission-factors-for-residential-oil-furnace}} \tabularnewline
 \toprule 
-Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline \midrule
+Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for Residential Oil Furnace} \tabularnewline
+\toprule 
+Pollutant & Emission Factor  ~~ (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO  ) & 68.48237 \tabularnewline
 Carbon Monoxide (CO) & 1.53543E-02 \tabularnewline
 Methane (CH  ) & 5.46612E-02 \tabularnewline
@@ -154,10 +194,18 @@ d No data. \tabularnewline
 
 % table 98
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
-\caption{  Emission Factors for LPG (butane and propane) \protect \label{table:emission-factors-for-lpg-butane-and-propane}}\\
+\caption{Emission Factors for LPG (butane and propane) \label{table:emission-factors-for-lpg-butane-and-propane}} \tabularnewline
 \toprule 
-Pollutant & LPG (butane) Emission Factor    (g/MJ) & Propane Emission Factor    (g/MJ) \tabularnewline \midrule
+Pollutant & LPG (butane) Emission Factor    (g/MJ) & Propane Emission Factor    (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for LPG (butane and propane)} \tabularnewline
+\toprule 
+Pollutant & LPG (butane) Emission Factor    (g/MJ) & Propane Emission Factor    (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO  ) & 66.0233 & 68.47998 \tabularnewline
 Carbon Monoxide (CO) & 1.54E-002 & 1.54E-002 \tabularnewline
 Methane (CH  ) & 6.63E-004 & 6.63E-004 \tabularnewline
@@ -180,10 +228,18 @@ d No data. \tabularnewline
 
 % table 99
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
-\caption{  Emission Factors for Gasoline and Diesel \protect \label{table:emission-factors-for-gasoline-and-diesel}}\\
+\caption{Emission Factors for Gasoline and Diesel \label{table:emission-factors-for-gasoline-and-diesel}} \tabularnewline
 \toprule 
-Pollutant & Gasoline Emission Factor   (g/MJ) & Diesel Emission Factor   (g/MJ) \tabularnewline \midrule
+Pollutant & Gasoline Emission Factor   (g/MJ) & Diesel Emission Factor   (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for Gasoline and Diesel} \tabularnewline
+\toprule 
+Pollutant & Gasoline Emission Factor   (g/MJ) & Diesel Emission Factor   (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO  ) & 66.20808 & 70.50731 \tabularnewline
 Carbon Monoxide (CO) & 2.70E+001 & 4.08E-001 \tabularnewline
 Methane (CH  ) & 0 & 0 \tabularnewline
@@ -205,10 +261,18 @@ c No data. \tabularnewline
 
 % table 100
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{  Emission Factors for Coal \protect \label{table:emission-factors-for-coal}}\\
+\caption{Emission Factors for Coal \label{table:emission-factors-for-coal}} \tabularnewline
 \toprule 
-Pollutant & Bituminous Emission Factor   (g/MJ) & Anthracite Emission Factor   (g/MJ) & Lignite Emission Factor   (g/MJ) \tabularnewline \midrule
+Pollutant & Bituminous Emission Factor   (g/MJ) & Anthracite Emission Factor   (g/MJ) & Lignite Emission Factor   (g/MJ) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Emission Factors for Coal} \tabularnewline
+\toprule 
+Pollutant & Bituminous Emission Factor   (g/MJ) & Anthracite Emission Factor   (g/MJ) & Lignite Emission Factor   (g/MJ) \tabularnewline
+\midrule
 \endhead
+
 Carbon Dioxide (CO  ) & 91.11052 & 99.26669 & 152.12646 \tabularnewline
 Carbon Monoxide (CO) & 8.27E-003 & 1.05E-002 & 8.27E-003 \tabularnewline
 Methane (CH  ) & 6.61E-004 & 0 & 0 \tabularnewline
@@ -239,10 +303,18 @@ As mentioned in the introduction to this section, EnergyPlus also calculates wat
 
 % table 101
 \begin{longtable}[c]{p{4.5in}p{1.5in}}
-\caption{  United States National Average Emission Factors for Electricity Generation \protect \label{table:united-states-national-average-emission}}\\
+\caption{United States National Average Emission Factors for Electricity Generation \label{table:united-states-national-average-emission}} \tabularnewline
 \toprule 
-~ & Efficiency Ratio (J/J) \tabularnewline \midrule
+~ & Efficiency Ratio (J/J) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{United States National Average Emission Factors for Electricity Generation} \tabularnewline
+\toprule 
+~ & Efficiency Ratio (J/J) \tabularnewline
+\midrule
 \endhead
+
 Ratio of Heat Input to Electricity Output & 2.253 \tabularnewline
 ~ & ~ \tabularnewline \midrule
 Pollutant & Emission Factor~~ (g/MJ) \tabularnewline \midrule
@@ -269,10 +341,18 @@ No data. \tabularnewline
 
 % table 102
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
-\caption{  U. S. State Average Greenhouse Gas Emission Factors for Electricity Generation, in g/MJ \protect \label{table:u.-s.-state-average-greenhouse-gas-emission}}\\
+\caption{U. S. State Average Greenhouse Gas Emission Factors for Electricity Generation, in g/MJ \label{table:u.-s.-state-average-greenhouse-gas-emission}} \tabularnewline
 \toprule 
- & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO 2 ) b & Carbon Monoxide (CO) c & Methane (CH4) b & Nitrogen Oxides (NO X ) a & Nitrous Oxide (N 2 O) b & Sulphur Dioxide (SO 2 ) a \tabularnewline \midrule
+ & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO 2 ) b & Carbon Monoxide (CO) c & Methane (CH4) b & Nitrogen Oxides (NO X ) a & Nitrous Oxide (N 2 O) b & Sulphur Dioxide (SO 2 ) a \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{U. S. State Average Greenhouse Gas Emission Factors for Electricity Generation, in g/MJ} \tabularnewline
+\toprule 
+ & Ratio of Heat Input to Electric Output & Carbon Dioxide (CO 2 ) b & Carbon Monoxide (CO) c & Methane (CH4) b & Nitrogen Oxides (NO X ) a & Nitrous Oxide (N 2 O) b & Sulphur Dioxide (SO 2 ) a \tabularnewline
+\midrule
 \endhead
+
 Alabama & 2.23 & 165.30922 & 1.45E+003 & 1.73E-003 & 4.02E-001 & 2.81E-003 & 1.14E+000 \tabularnewline
 Alaska & 2.734 & 173.87708 & 3.72E+002 & 8.57E-004 & 7.29E-001 & 1.12E-003 & 2.38E-001 \tabularnewline
 Arizona & 1.694 & 132.29777 & 8.27E+002 & 8.57E-004 & 2.74E-001 & 1.94E-003 & 2.28E-001 \tabularnewline
@@ -334,10 +414,18 @@ e No data. \tabularnewline
 
 % table 103
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
-\caption{  U. S. State Average Criteria Pollutant Emission Factors for Electricity Generation, in g/MJ \protect \label{table:u.-s.-state-average-criteria-pollutant}}\\
+\caption{U. S. State Average Criteria Pollutant Emission Factors for Electricity Generation, in g/MJ \label{table:u.-s.-state-average-criteria-pollutant}} \tabularnewline
 \toprule 
-~ & Particulate Matter (PM) & Particulate Matter (PM10) & Particulate Matter (PM2.5) & Ammonia (NH  ) & Volatile Organic Compounds (NMVOC) & Mercury (Hg) & Lead (Pb) \tabularnewline \midrule
+~ & Particulate Matter (PM) & Particulate Matter (PM10) & Particulate Matter (PM2.5) & Ammonia (NH  ) & Volatile Organic Compounds (NMVOC) & Mercury (Hg) & Lead (Pb) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{U. S. State Average Criteria Pollutant Emission Factors for Electricity Generation, in g/MJ} \tabularnewline
+\toprule 
+~ & Particulate Matter (PM) & Particulate Matter (PM10) & Particulate Matter (PM2.5) & Ammonia (NH  ) & Volatile Organic Compounds (NMVOC) & Mercury (Hg) & Lead (Pb) \tabularnewline
+\midrule
 \endhead
+
 Alabama & 7.91048E-03 & 7.86328E-03 & 4.72023E-05 & 3.55049E-05 & 4.66784E-03 & 5.14071E-06 & 0 \tabularnewline
 Alaska & 8.96502E-03 & 8.85977E-03 & 1.05247E-04 & 6.51454E-06 & 2.82297E-03 & 3.27594E-07 & 0 \tabularnewline
 Arizona & 1.70555E-02 & 1.69322E-02 & 1.23202E-04 & 1.80226E-04 & 2.27385E-03 & 1.88997E-06 & 0 \tabularnewline
@@ -394,10 +482,18 @@ Wyoming & 5.08215E-02 & 5.06042E-02 & 2.17349E-04 & 5.19787E-05 & 4.78782E-03 & 
 
 % table 104
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
-\caption{  United States National Average Water Consumption Factorssup{}a \protect \label{table:united-states-national-average-water}}\\
+\caption{United States National Average Water Consumption Factorssup{}a \label{table:united-states-national-average-water}} \tabularnewline
 \toprule 
- & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline \midrule
+ & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{United States National Average Water Consumption Factorssup{}a} \tabularnewline
+\toprule 
+ & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+\midrule
 \endhead
+
  & L/MJ & Percent of Total Generation & L/MJ & Percent of Total Generation & L/MJ \tabularnewline
 United States & 0.4960 & 89.4\% & 19.2095 & 8.6\% & 2.1007 \tabularnewline
 a Based on data from Torcellini, Long, and Judkoff (2004). \tabularnewline
@@ -406,10 +502,18 @@ a Based on data from Torcellini, Long, and Judkoff (2004). \tabularnewline
 
 % table 105
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
-\caption{   U.S. State Average Water Consumption Factors for Electricity Generationsup{}a \protect \label{table:u.s.-state-average-water-consumption-factors}}\\
+\caption{U.S. State Average Water Consumption Factors for Electricity Generationsup{}a \label{table:u.s.-state-average-water-consumption-factors}} \tabularnewline
 \toprule 
- & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline \midrule
+ & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{U.S. State Average Water Consumption Factors for Electricity Generationsup{}a} \tabularnewline
+\toprule 
+ & ThermoElectric Generation & HydroElectric Generation & Weighted Total Water Consumption \tabularnewline
+\midrule
 \endhead
+
 State & L/MJ & Percent of Total Generation & L/MJ & Percent of Total Generation & L/MJ \tabularnewline
 Alabama & 0.1503 & 89.80\% & 38.9053 & 6.4\% & 2.6274 \tabularnewline
 Alaska & 0.3295 & 86.20\% & -- & 13.8\% & 0.2839 \tabularnewline

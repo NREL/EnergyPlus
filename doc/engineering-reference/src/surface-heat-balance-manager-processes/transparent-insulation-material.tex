@@ -13,7 +13,7 @@ A qualitative comparison between the performance of Transparent Insulation and o
 \begin{figure}[hbtp] % fig 26
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image399.png}
-\caption{  Energy Flows of Opaquely and Transparently Insulated Walls (Wood and Jesch 1993). \protect \label{fig:energy-flows-of-opaquely-and-transparently}}
+\caption{Energy Flows of Opaquely and Transparently Insulated Walls (Wood and Jesch 1993). \protect \label{fig:energy-flows-of-opaquely-and-transparently}}
 \end{figure}
 
 While both types of insulation reduce energy losses from the building via conduction through the building surfaces, transparent insulation allows solar radiation to penetrate deeper into the surface construction.~ This increases the construction internal temperature and can result in heat being conducted into the building under the proper weather conditions.~ This can be seen in the lower half of the above figure during a sunny day.~ The temperature plot shows a maximum between the transparent insulation and the rest of the surface construction.~ As a result, the temperature gradient results in heat transfer from this point into the interior space, causing a heating effect on the zone.~ Thus, the advantage of transparent insulation is that, like opaque insulation, it reduces winter heat transfer losses during low or no solar conditions and has the possibility of providing heating during sunny winter days.~ It should be noted that this same effect in summer could be detrimental to the cooling loads of a building since the introduction of solar radiation closer to the space will increase the solar heating within the zone.~ Most systems counteract this with a shading device or with sophisticated transparent insulation systems.
@@ -35,7 +35,7 @@ Cross-sections of each of these types is shown in the figure below.~ The arrows 
 \begin{figure}[hbtp] % fig 27
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image400.png}
-\caption{  Geometrical Categories of Classification for Transparent Insulation Material (Wood and Jesch 1993). \protect \label{fig:geometrical-categories-of-classification-for}}
+\caption{Geometrical Categories of Classification for Transparent Insulation Material (Wood and Jesch 1993). \protect \label{fig:geometrical-categories-of-classification-for}}
 \end{figure}
 
 \subsection{TIM- Basic Mathematical Model}\label{tim--basic-mathematical-model}
@@ -43,7 +43,7 @@ Cross-sections of each of these types is shown in the figure below.~ The arrows 
 \begin{figure}[hbtp] % fig 28
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image401.png}
-\caption{  Cross Section of TIM and wall, showing energy flow \protect \label{fig:cross-section-of-tim-and-wall-showing-energy}}
+\caption{Cross Section of TIM and wall, showing energy flow \protect \label{fig:cross-section-of-tim-and-wall-showing-energy}}
 \end{figure}
 
 Mathematical model to calculate amount of energy absorbed at the surface of moveable insulation (TIM) and at the Outside surface of the Wall.
@@ -152,7 +152,7 @@ IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)                                 
 
 \subsection{Sample Test Run Cases: -- Comparison}\label{sample-test-run-cases-comparison}
 
-A series of test cases were run in EnergyPlus to test the TIM model.~ The building was a very simple box with walls facing north, south, east, and west, all of which are exterior walls.~ Transparent Insulation Material has been applied to the south wall (except as noted in the table below).~ The program was run for this fictional 1 zone building located in Chanute AFB IL, for two design days, (21\(^{t}\) June and 21\(^{t}\) January).~ The main purpose of these runs was to verify that the transparent insulation model was predicting results that were reasonable using a simple test case.~ The winter design day was also modified in some runs to have a clearness of 1.0 so that the effect that solar radiation during winter-time conditions could be studied.
+A series of test cases were run in EnergyPlus to test the TIM model.~ The building was a very simple box with walls facing north, south, east, and west, all of which are exterior walls.~ Transparent Insulation Material has been applied to the south wall (except as noted in the table below).~ The program was run for this fictional 1 zone building located in Chanute AFB IL, for two design days, (21\(^{st}\) June and 21\(^{st}\) January).~ The main purpose of these runs was to verify that the transparent insulation model was predicting results that were reasonable using a simple test case.~ The winter design day was also modified in some runs to have a clearness of 1.0 so that the effect that solar radiation during winter-time conditions could be studied.
 
 The Transparent Insulation material is conceived by applying a SurfaceControl:MoveableInsulation on the exterior.~ In the test cases, the TIM had the following thermal properties:
 
@@ -185,12 +185,20 @@ The following two tables shows data for two series of runs.~ The first ``summer 
 % table 14
 {\scriptsize
 \begin{longtable}[c]{p{2.5in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
-\caption{  TIM with Summer Conditions \label{table:tim-with-summer-conditions}}\\
+\caption{TIM with Summer Conditions \label{table:tim-with-summer-conditions-000}} \tabularnewline
 \toprule 
 EXTWALL80 Construction & Conductivity & Thickness & Sensible Cooling Energy & Energy Saved \tabularnewline
 ~ & [W/m-K] & [m] & [J] & [J] \tabularnewline
 \midrule
+\endfirsthead
+
+\caption[]{TIM with Summer Conditions} \tabularnewline
+\toprule
+EXTWALL80 Construction & Conductivity & Thickness & Sensible Cooling Energy & Energy Saved \tabularnewline
+~ & [W/m-K] & [m] & [J] & [J] \tabularnewline
+\midrule
 \endhead
+
 Normal case Without any Insulation & 0.000 & 0.000 & 3.37E+08 & 0.00E+00 \tabularnewline
 With Dense Insulation Present & 0.040 & 0.025 & 3.17E+08 & 2.05E+07 \tabularnewline
 With Dense Insulation Present & 0.040 & 0.050 & 3.09E+08 & 2.84E+07 \tabularnewline
@@ -208,12 +216,20 @@ With TIM Present (WEST WALL) & 0.040 & 0.050 & 5.64E+08 & -2.27E+08 \tabularnewl
 % table 15
 {\scriptsize
 \begin{longtable}[c]{p{1.0in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
-\caption{TIM with Winter Conditions \label{table:tim-with-winter-conditions}}\\
+\caption{TIM with Winter Conditions \label{table:tim-with-winter-conditions-000}} \tabularnewline
+\toprule 
+EXTWALL80 Construction & Conductivity & Thickness & Sensible Heating Energy & Energy Saved Winter Clearness = 0 & Sensible Heating Energy & Energy Saved Winter Clearness = 1 \tabularnewline
+~ & [W/m-K] & [m] & [J] & [J] & [J] & [J] \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{TIM with Winter Conditions} \tabularnewline
 \toprule 
 EXTWALL80 Construction & Conductivity & Thickness & Sensible Heating Energy & Energy Saved Winter Clearness = 0 & Sensible Heating Energy & Energy Saved Winter Clearness = 1 \tabularnewline
 ~ & [W/m-K] & [m] & [J] & [J] & [J] & [J] \tabularnewline
 \midrule
 \endhead
+
 Normal case Without any Insulation & 0.000 & 0.000 & 1.47E+09 & 0.00E+00 & 1.05E+09 & 0.00E+00 \tabularnewline
 With Dense Insulation Present & 0.040 & 0.025 & 1.30E+09 & 1.70E+08 & 9.76E+08 & 7.40E+07 \tabularnewline
 With Dense Insulation Present & 0.040 & 0.050 & 1.26E+09 & 2.10E+08 & 9.73E+08 & 7.70E+07 \tabularnewline

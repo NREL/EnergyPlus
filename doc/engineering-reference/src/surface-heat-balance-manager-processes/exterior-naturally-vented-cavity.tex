@@ -9,7 +9,7 @@ The baffle is assumed to be sufficiently thin and high-conductivity so that it c
 \begin{figure}[hbtp] % fig 33
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image438.png}
-\caption{  Baffle Surface Heat Balance \protect \label{fig:baffle-surface-heat-balance}}
+\caption{Baffle Surface Heat Balance \protect \label{fig:baffle-surface-heat-balance}}
 \end{figure}
 
 The heat balance on the baffle surface's control volume is:
@@ -38,7 +38,7 @@ All terms are positive for net flux to the baffle.~ Each of these heat balance c
 
 \subsubsection{External Convection}\label{external-convection}
 
-\(q''_{conv,env}\) ~is modeled using the classical formulation: \(q''_{conv}  = h_{co}(T_{air} - T_{o})\) where h\(_{co}\), is the convection coefficient.~ The h\(_{co}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for \({h_{co}}\) .
+\(q''_{conv,env}\) is modeled using the classical formulation: \(q''_{conv} = h_{co}(T_{air} - T_{o})\) where h\(_{co}\), is the convection coefficient.~ The h\(_{co}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for \({h_{co}}\) .
 
 \subsubsection{Cavity LW Radiation}\label{cavity-lw-radiation}
 
@@ -46,7 +46,7 @@ All terms are positive for net flux to the baffle.~ Each of these heat balance c
 
 \subsubsection{Cavity Convection}\label{cavity-convection}
 
-\(q''_{conv,cav}\) ~is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o})\) ~ where h\(_{cp}\), is the convection coefficient.~ The value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+\(q''_{conv,cav}\) is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o})\) where h\(_{cp}\), is the convection coefficient. The value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
 Substituting models into (113) and solving for \({T_{s,baff}}\) ~yields the following equation:
 
@@ -87,7 +87,7 @@ The \emph{cavity} is the volume of air located between the baffle and the underl
 \begin{figure}[hbtp] % fig 34
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image469.png}
-\caption{  Cavity Air Heat Balance \protect \label{fig:cavity-air-heat-balance}}
+\caption{Cavity Air Heat Balance \protect \label{fig:cavity-air-heat-balance}}
 \end{figure}
 
 The heat balance on the cavity air control volume is:
@@ -98,7 +98,7 @@ The heat balance on the cavity air control volume is:
 
 where,
 
-\({\dot Q_{vent}}\) ~is the net rate of energy added from natural ventilation -- where outdoor ambient air exchanges with the cavity air. \(_{ }\)~is the net rate of energy added by surface convection heat transfer with the underlying surface.
+\(\dot{Q}_{vent}\) is the net rate of energy added from natural ventilation -- where outdoor ambient air exchanges with the cavity air. \(\dot{Q}_{co}\) is the net rate of energy added by surface convection heat transfer with the underlying surface.
 
 \({\dot Q_{c,baff}}\) is the net rate of energy added by surface convection heat transfer with the collector.
 
@@ -175,14 +175,22 @@ The wind speed is modified from the measured meteorological wind speed by the eq
 {U_\infty } = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{a_{met}}}}{\left( {\frac{z}{\delta }} \right)^a}
 \end{equation}
 
-where z is the height of the centroid of the system, z\(_{t}\) is the height of the standard meteorological wind speed measurement, and a and d are terrain-dependent coefficients.~ d is the boundary layer thickness for the given terrain type.~ The values of a and d are shown in the following tables:
+where z is the height of the centroid of the system, z\(_{met}\) is the height of the standard meteorological wind speed measurement, and a and d are terrain-dependent coefficients.~ d is the boundary layer thickness for the given terrain type.~ The values of a and d are shown in the following tables:
 
 % table 19
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Terrain-Dependent Coefficients (ASHRAE 2001). \protect \label{table:terrain-dependent-coefficients-ashrae-2001.}}\\
+\caption{Terrain-Dependent Coefficients (ASHRAE 2001). \label{table:terrain-dependent-coefficients-ashrae-2001.}} \tabularnewline
 \toprule 
-Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline \midrule
+Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Terrain-Dependent Coefficients (ASHRAE 2001).} \tabularnewline
+\toprule 
+Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewline
+\midrule
 \endhead
+
 1 & Flat, open country & 0.14 & 270 \tabularnewline
 2 & Rough, wooded country & 0.22 & 370 \tabularnewline
 3 & Towns and cities & 0.33 & 460 \tabularnewline
