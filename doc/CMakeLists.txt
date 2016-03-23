@@ -1,7 +1,13 @@
 # the only thing that really needs to be set outside of here is the XELATEX variable, the path to the xelatex compiler
 
-execute_process( COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/doc ${CMAKE_BINARY_DIR}/doc-build)
+# the root doc build directory will be created at configure time, but lets not copy anything over until build time.
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build)
 
+# add a configure rule to the header file though
+configure_file(${CMAKE_SOURCE_DIR}/doc/header.tex ${CMAKE_BINARY_DIR}/doc-build/header.tex COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/doc/title.tex ${CMAKE_BINARY_DIR}/doc-build/title.tex COPYONLY)
+
+# add each of the documents, they have their own CMakeLists.txt files
 add_subdirectory(acknowledgements)
 add_subdirectory(auxiliary-programs)
 add_subdirectory(ems-application-guide)
@@ -16,6 +22,7 @@ add_subdirectory(plant-application-guide)
 add_subdirectory(tips-and-tricks-using-energyplus)
 add_subdirectory(using-energyplus-for-compliance)
 
+# we still need to find wkhtmltopdf and pandoc for building validation reports
 if (BUILD_VALIDATION_REPORTS)
 
   # wkhtmltopdf
