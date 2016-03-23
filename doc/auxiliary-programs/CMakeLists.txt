@@ -3,6 +3,7 @@
 # grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/acknowledgements/|g' | sed 's/$/.tex/g' 
 SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/../header.tex
+  ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/auxiliary-programs.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/auxiliary-energyplus-programs.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/weather-converter-program.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/weather-converter-program/background.tex
@@ -194,8 +195,10 @@ SET( INCLUDED_IMAGES
 SET( SOURCE_FILENAME "auxiliary-programs" )
 SET( OUTPUT_FILENAME "AuxiliaryPrograms" )
 
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME})
+
 add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
-                    COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
+	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
 		    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME}
 		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
                  ) 
