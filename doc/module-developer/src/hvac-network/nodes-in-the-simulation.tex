@@ -1,0 +1,179 @@
+\section{Nodes in the simulation}\label{nodes-in-the-simulation}
+
+In the EnergyPlus data structure, the nodes are where each component model gets its input and where it places its output. The module \emph{DataLoopNode} contains all the node related data. In particular, the array \emph{Node} contains the state variables and mass flows for all the nodes in the problem being simulated.
+
+~ ! Valid Fluid Types for Nodes
+
+~ INTEGER, PARAMETER :: NodeType\_Unknown = 0~ ! `blank'
+
+~ INTEGER, PARAMETER :: NodeType\_Air~~~~ = 1~ ! `Air'
+
+~ INTEGER, PARAMETER :: NodeType\_Water~~ = 2~ ! `Water'
+
+~ INTEGER, PARAMETER :: NodeType\_Steam~~ = 3~ ! `Steam'
+
+~ INTEGER, PARAMETER :: NodeType\_Electric = 4~ ! `Electric'
+
+~\textbf{TYPE} NodeData
+
+~~ \textbf{INTEGER}~ :: FluidType~~~~~~~~~~~~~~~~ = 0~~ ! must be one of the valid parameters
+
+~~ \textbf{INTEGER}~ :: FluidIndex~~~~~~~~~~~~~~~ = 0~~ ! For Fluid Properties
+
+~~ REAL(r64)~~~~ :: Temp~~~~~~~~~~~~~~~~~~~~~ = 0.d0 ! \{C\}
+
+~~ REAL(r64)~~~~ :: TempMin~~~~~~~~~~~~~~~~~~ = 0.d0 ! \{C\}
+
+~~ REAL(r64)~~~~ :: TempMax~~~~~~~~~~~~~~~~~~ = 0.d0 ! \{C\}
+
+~~ REAL(r64)~~~~ :: TempSetPoint~~~~~~~~~~~~~ = SensedNodeFlagValue ! \{C\}
+
+~~ REAL(r64)~~~~ :: TempLastTimestep~~~~~~~~~ = 0.d0 ! {[}C\}~~ DSU
+
+~~ REAL(r64)~~~~ :: MassFlowRateRequest~~~~~~ = 0.d0 ! \{kg/s\}~ DSU
+
+~~ REAL(r64)~~~~ :: MassFlowRate~~~~~~~~~~~~~ = 0.d0 ! \{kg/s\}
+
+~~ REAL(r64)~~~~ :: MassFlowRateMin~~~~~~~~~~ = 0.d0 ! \{kg/s\}
+
+~~ REAL(r64)~~~~ :: MassFlowRateMax~~~~~~~~~~ = SensedNodeFlagValue ! \{kg/s\}
+
+~~ REAL(r64)~~~~ :: MassFlowRateMinAvail~~~~~ = 0.d0 ! \{kg/s\}
+
+~~ REAL(r64)~~~~ :: MassFlowRateMaxAvail~~~~~ = 0.d0 ! \{kg/s\}
+
+~~ REAL(r64)~~~~ :: MassFlowRateSetPoint~~~~~ = 0.d0 ! \{kg/s\}
+
+~~ REAL(r64)~~~~ :: Quality~~~~~~~~~~~~~~~~~~ = 0.d0 ! \{0.0-1.0 vapor fraction/percent\}
+
+~~ REAL(r64)~~~~ :: Press~~~~~ ~~~~~~~~~~~~~~~ = 0.d0 ! \{Pa\}
+
+~~ REAL(r64)~~~~ :: Enthalpy~~~~~~~~~~~~~~~~~ = 0.d0 ! \{J/kg\}
+
+~~ REAL(r64)~~~~ :: EnthalpyLastTimestep~~~~~ = 0.d0 ! \{J/kg\}~ DSU for steam?
+
+~~ REAL(r64)~~~~ :: HumRat~~~~~~~~~~~~~~~~~~~ = 0.d0 ! \{\}
+
+~~ REAL(r64)~~~~ :: HumRatMin~~~~~~~~~~~~~~~~ = SensedNodeFlagValue ! \{\}
+
+~~ REAL(r64)~~~~ :: HumRatMax~~~~~~~~~~~~~~~~ = SensedNodeFlagValue ! \{\}
+
+~~ REAL(r64)~~~~ :: HumRatSetPoint~~~~~~~~~~~ = SensedNodeFlagValue ! \{\}
+
+~~ REAL(r64)~~~~ :: TempSetPointHi~~~~~~~~~~~ = SensedNodeFlagValue ! \{C\}
+
+~~ REAL(r64)~~~~ :: TempSetPointLo~~~~~~~~~~~ = SensedNodeFlagValue ! \{C\}
+
+~~ REAL(r64)~~~~ :: Height~~~~~~~~~~~~~~~~~~~ = -1.d0 !~ \{m\}
+
+~~ !~ Following are for Outdoor Air Nodes ``read only''
+
+~~ REAL(r64)~~~~ :: OutAirDryBulb~~~~~~~~~~~~ = 0.d0 ! \{C\}
+
+~~ \textbf{LOGICAL}~~~~~~ :: EMSOverrideOutAirDryBulb~ = .FALSE. ! if true, the EMS is calling to override outdoor air node drybulb setting
+
+~~ REAL(r64)~~~~ :: EMSValueForOutAirDryBulb~ = 0.d0 ! value EMS is directing to use for outdoor air node's drybulb \{C\}
+
+~~ REAL(r64)~~~~ :: OutAirWetBulb~~~~~~~~~~~~ = 0.d0 ! \{C\}
+
+~~ \textbf{LOGICAL}~~~~~~ :: EMSOverrideOutAirWetBulb~ = .FALSE. ! if true, the EMS is calling to override outdoor air node wetbulb setting
+
+~~ REAL(r64)~~~~ :: EMSValueForOutAirWetBulb~ = 0.d0 ! value EMS is directing to use for outdoor air node's wetbulb \{C\}
+
+~~ ! Contaminant
+
+~~ REAL(r64)~~~~ :: CO2~~~~~~~~~~~~~~~~~~~~~~ = 0.d0 ! \{ppm\}
+
+~~ REAL(r64)~~~~ :: CO2SetPoint~~~~~~~~~~~~~~ = 0.d0 ! \{ppm\}
+
+~\textbf{END} \textbf{TYPE} NodeData
+
+\textbf{TYPE} MoreNodeData
+
+~~ REAL(r64)~~~~ :: RelHumidity~~~~~~~~~~~~~~ = 0.d0 ! \{\%\}
+
+~~ REAL(r64)~~~~ :: ReportEnthalpy~~~~~~~~~~~ = 0.d0 ! specific enthalpy calculated at the HVAC timestep {[}J/kg{]}
+
+~~ REAL(r64)~~~~ :: VolFlowRateStdRho~~~~~~~~ = 0.d0 ! volume flow rate at standard density {[}m3/s{]}
+
+~~ REAL(r64)~~~~ :: VolFlowRateCrntRho~~~~~~~ = 0.d0 ! volume flow rate at current density, only used for air nodes {[}m3/s{]}
+
+~~ REAL(r64)~~~~ :: WetbulbTemp~~~~~~~~~~~~~~ = 0.d0 ! wetbulb temperature {[}C{]}
+
+~~ REAL(r64)~~~~ :: AirDensity~~~~~~~~~~~~~~~ = 0.d0 ! reported air density at standard density {[}kg/m3{]}
+
+~\textbf{END} \textbf{TYPE} MoreNodeData
+
+\textbf{TYPE} (NodeData), \textbf{ALLOCATABLE}, \textbf{DIMENSION}(:) :: Node !dim to num nodes in SimHVAC
+
+~\textbf{TYPE} (NodeData) :: DefaultNodeValues = ~ \&
+
+~~~~ NodeData(0, ~~~~~~~~~\& ! FluidType
+
+~~~~~~~~~~~~~ 0,~~~~~~~~~ \& ! FluidIndex
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! Temp \{C\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! TempMin \{C\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! TempMax \{C\}
+
+~~~~ SensedNodeFlagValue,~~ \& ! TempSetPoint \{C\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! TempLastTimeStep \{C\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRateRequest \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRate \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRateMin \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRateMax \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRateMinAvail \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRateMaxAvail \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! MassFlowRateSetPoint \{kg/s\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! Quality \{0.0-1.0 vapor fraction/percent\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! Press \{Pa\}~~ REAL(r64)~~~~ ::
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! Enthalpy \{J/kg\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! EnthalpyLastTimeStep \{J/kg\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! HumRat \{\}
+
+~~~~ SensedNodeFlagValue,~~ \& ! HumRatMin \{\}
+
+~~~~ SensedNodeFlagValue,~~ \& ! HumRatMax \{\}
+
+~~~~ SensedNodeFlagValue,~~ \& ! HumRatSetPoint \{\}
+
+~~~~ SensedNodeFlagValue,~~ \& ! TempSetPointHi \{C\}
+
+~~~~ SensedNodeFlagValue,~~ \& ! TempSetPointLo \{C\}
+
+~~~~~~~~~~~~ -1.0D0,~~~~~~~ \& ! Height \{m\}
+
+~~ ~~~~~~~~~~~0.0D0,~~~~~~~ \& ! OutAirDryBulb \{C\}
+
+~~~~~~~~~~~~~ .FALSE.,~~~~~ \& ! EMSOverrideOutAirDryBulb
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! EMSValueForOutAirDryBulb \{C\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~~~ \& ! OutAirWetBulb \{C\}
+
+~~~~~~~~~~~~~ .FALSE.,~~~~~ \& ! EMSOverrideOutAirWetBulb
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! EMSValueForOutAirWetBulb \{C\}
+
+~~~~~~~~~~~~~ 0.0D0,~~~~~~~ \& ! CO2 \{ppm\}
+
+~~~~~~~~~~~~~ 0.0D0)~~~~~~~~~ ! CO2 setpoint \{ppm\}
+
+~TYPE (MoreNodeData), ALLOCATABLE, DIMENSION(:) :: MoreNodeInfo
+
+In our example module \emph{NewHVACComponent,} the subroutine \emph{InitNewHVACComponent} is responsible for obtaining the input data from the inlet node(s) and putting it into the component data structure for use in C\emph{alcNewHVACComponent}. Then \emph{UpdateNewHVACComponent} takes the calculated data and moves it to the outlet nodes for use by other components. EnergyPlus component models are assumed to be direct models: inlets are input to the calculation and outlets are output from the calculations.

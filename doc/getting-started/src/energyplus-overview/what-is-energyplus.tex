@@ -1,0 +1,51 @@
+\section{What is EnergyPlus?}\label{what-is-energyplus}
+
+EnergyPlus has its roots in both the BLAST and DOE--2 programs. BLAST (Building Loads Analysis and System Thermodynamics) and DOE--2 were both developed and released in the late 1970s and early 1980s as energy and load simulation tools. Their intended audience is a design engineer or architect that wishes to size appropriate HVAC equipment, develop retrofit studies for life cycling cost analyses, optimize energy performance, etc. Born out of concerns driven by the energy crisis of the early 1970s and recognition that building energy consumption is a major component of the American energy usage statistics, the two programs attempted to solve the same problem from two slightly different perspectives. Both programs had their merits and shortcomings, their supporters and detractors, and solid user bases both nationally and internationally.
+
+Like its parent programs, EnergyPlus is an energy analysis and thermal load simulation program. Based on a user's description of a building from the perspective of the building's physical make-up, associated mechanical systems, etc., EnergyPlus will calculate the heating and cooling loads necessary to maintain thermal control setpoints, conditions throughout an secondary HVAC system and coil loads, and the energy consumption of primary plant equipment as well as many other simulation details that are necessary to verify that the simulation is performing as the actual building would. Many of the simulation characteristics have been inherited from the legacy programs of BLAST and DOE--2. Below is list of some of the features of the first release of EnergyPlus. While this list is not exhaustive, it is intended to give the reader and idea of the rigor and applicability of EnergyPlus to various simulation situations.
+
+\begin{itemize}
+\item
+  \textbf{Integrated, simultaneous solution} where the building response and the primary and secondary systems are tightly coupled (iteration performed when necessary)
+\item
+  \textbf{Sub-hourly, user-definable time steps} for the interaction between the thermal zones and the environment; variable time steps for interactions between the thermal zones and the HVAC systems (automatically varied to ensure solution stability)
+\item
+  \textbf{ASCII text based weather, input, and output files} that include hourly or sub-hourly environmental conditions, and standard and user definable reports, respectively
+\item
+  \textbf{Heat balance based solution} technique for building thermal loads that allows for simultaneous calculation of radiant and convective effects at both in the interior and exterior surface during each time step
+\item
+  \textbf{Transient heat conduction} through building elements such as walls, roofs, floors, etc. using conduction transfer functions
+\item
+  \textbf{Improved ground heat transfer modeling} through links to three-dimensional finite difference ground models and simplified analytical techniques
+\item
+  \textbf{Combined heat and mass transfer} model that accounts for moisture adsorption/desorption either as a layer-by-layer integration into the conduction transfer functions or as an effective moisture penetration depth model (EMPD)
+\item
+  \textbf{Thermal comfort models} based on activity, inside dry bulb, humidity, etc.
+\item
+  \textbf{Anisotropic sky model} for improved calculation of diffuse solar on tilted surfaces
+\item
+  \textbf{Advanced fenestration calculations} including controllable window blinds, electrochromic glazings, layer-by-layer heat balances that allow proper assignment of solar energy absorbed by window panes, and a performance library for numerous commercially available windows
+\item
+  \textbf{Daylighting controls} including interior illuminance calculations, glare simulation and control, luminaire controls, and the effect of reduced artificial lighting on heating and cooling
+\item
+  \textbf{Loop} \textbf{based configurable HVAC systems} (conventional and radiant) that allow users to model typical systems and slightly modified systems without recompiling the program source code
+\item
+  \textbf{Atmospheric pollution calculations} that predict CO\(_{2}\), SO\(_{x}\), NO\(_{x}\), CO, particulate matter, and hydrocarbon production for both on site and remote energy conversion
+\item
+  \textbf{Links to other popular simulation environments/components} such as WINDOW5, WINDOW6 and DElight to allow more detailed analysis of building components
+\end{itemize}
+
+More details on each of these features can be found in the various parts of the EnergyPlus documentation library.
+
+No program is able to handle every simulation situation. However, it is the intent of EnergyPlus to handle as many building and HVAC design options either directly or indirectly through links to other programs in order to calculate thermal loads and/or energy consumption on for a design day or an extended period of time (up to, including, and beyond a year). While the first version of the program contained mainly features directly linked to the thermal aspects of buildings, later versions of the program also included other issues that are important to the built environment: water, electrical systems, etc.
+
+\emph{Although it is important to note what EnergyPlus is, it is also important to remember what it is not.}
+
+\begin{itemize}
+\item
+  EnergyPlus is not a user interface. It is intended to be the simulation engine around which a third-party interface can be wrapped. Inputs and outputs are simple ASCII text that is decipherable but best left to a GUI (graphical user interface). This approach allows interface designers to do what they do best---produce quality tools specifically targeted toward individual markets and concerns. The availability of EnergyPlus frees up resources previously devoted to algorithm production and allows them to be redirected interface feature development in order to keep pace with the demands and expectations of building professionals.
+\item
+  EnergyPlus is currently not a life cycle cost analysis tool. It produces results that can then be fed into an LCC program. In general, calculations of this nature are better left to smaller ``utility'' programs which can respond more quickly to changes in escalation rates and changes to methodologies as prescribed by state, federal, and defense agencies.
+\item
+  EnergyPlus is not an architect or design engineer replacement. It does not check input, verify the acceptability or range of various parameters (expect for a limited number of very basic checks), or attempt to interpret the results. While many GUI programs assist the user in fine-tuning and correcting input mistakes, EnergyPlus still operates under the ``garbage in, garbage out'' standard. Engineers and architects will always be a vital part of the design and thermal engineering process.
+\end{itemize}
