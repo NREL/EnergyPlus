@@ -1,0 +1,109 @@
+\section{UtilityCost:Ratchet}\label{utilitycostratchet}
+
+The UtilityCost:Ratchet command allows the modeling of tariffs that include some type of seasonal ratcheting. Ratchets are most common when used with electric demand charges. A ratchet is when a utility requires that the demand charge for a month with a low demand may be increased to be more consistent with a month that set a higher demand charge.
+
+While the details of the UtilityCost:Ratchet command are described further in this section, an example is probably the easiest way to learn the basic functions.
+
+Ratchet Example: A utility has a single ratchet that says that the billing demand for each month of the year is the higher value of the actual demand or 60\% of the peak summer demand
+
+\begin{lstlisting}
+
+UtilityCost:Ratchet,
+    BillingDemand1,   ! Ratchet Variable Name
+    ExampleTariff1,   ! Tariff Name
+    TotalDemand,      ! Baseline Source Variable
+    TotalDemand,      ! Adjustment Source Variable
+    Summer,           ! Season From
+    Annual,           ! Season To
+    0.60,             ! Multiplier Value or Variable Name
+    0;                ! Offset Value or Variable Name
+\end{lstlisting}
+
+The Ratchet Variable Name (the first field) should be used wherever the ratchet should be applied and is often the source variable for UtilityCost:Charge:Simple or UtilityCost:Charge:Block.
+
+The detailed steps taken for the ratchet are the following:
+
+\begin{itemize}
+\item
+  AdjSeasonal contains either:
+\item
+  When SeasonFrom is not set to Monthly, the maximum for all months in Season From in the Adjustment Source Variable. This is a single value.
+\item
+  When SeasonFrom is set to Monthly, the monthly values of the Adjustment Source Variable.
+\item
+  AdjPeak = (AdjSeasonal + Offset) * Multiplier
+\item
+  MaxAdjBase = maximum value of either AdjPeak or Baseline Source Variable
+\item
+  The resulting Ratchet Variable contains:
+\item
+  For months not in SeasonTo, the values of Baseline Source Variable
+\item
+  For months in SeasonTo, the values of MaxAdjBase
+\end{itemize}
+
+If multiple ratchets occur in the same tariff, multiple UtilityCost:Ratchet commands should be ``chained'' together with the Baseline Source Variable subsequent ratchets referencing the Ratchet Variable Name of the previous UtilityCost:Ratchet.
+
+Since the ratchet command can add together two variables, mutliply two variables, or take the maximum value between two variables, it may be used for other difficult to model tariffs without needing to use UtilityCost:Computation. Clever use of UtilityCost:Ratchet should be well documented with comments.
+
+\subsection{Inputs}\label{inputs-071}
+
+\paragraph{Field: Ratchet Variable Name}\label{field-ratchet-variable-name}
+
+The name of the ratchet and the name of the result of this single ratchet.
+
+\paragraph{Field: Tariff Name}\label{field-tariff-name-003}
+
+The name of the tariff that this UtilityCost:Ratchet is associated with.
+
+\paragraph{Field: Baseline Source Variable}\label{field-baseline-source-variable}
+
+The name of the variable used as the baseline value. When the ratcheted value exceeds the baseline value for a month the ratcheted value is used but when the baseline value is greater then the ratcheted value the baseline value is used. Usually the electric demand charge is used. The baseline source variable can be the results of another ratchet object. This allows utility tariffs that have multiple ratchets to be modeled.
+
+\paragraph{Field: Adjustment Source Variable}\label{field-adjustment-source-variable}
+
+The variable that the ratchet is calculated from. It is often but not always the same as the baseline source variable. The ratcheting calculations using offset and multiplier are using the values from the adjustment source variable. If left blank, the adjustment source variable is the same as the baseline source variable.
+
+\paragraph{Field: Season From}\label{field-season-from}
+
+The name of the season that is being examined. The maximum value for all of the months in the named season is what is used with the multiplier and offset. This is most commonly Summer or Annual. When Monthly is used, the adjustment source variable is used directly for all months.
+
+\begin{itemize}
+\item
+  Annual
+\item
+  Winter
+\item
+  Spring
+\item
+  Summer
+\item
+  Fall
+\item
+  Monthly
+\end{itemize}
+
+\paragraph{Field: Season To}\label{field-season-to}
+
+The name of the season when the ratchet would be calculated. This is most commonly Winter. The ratchet only is applied to the months in the named season. The resulting variable for months not in the Season To selection will contain the values as appear in the baseline source variable.
+
+\begin{itemize}
+\item
+  Annual
+\item
+  Winter
+\item
+  Spring
+\item
+  Summer
+\item
+  Fall
+\end{itemize}
+
+\paragraph{Field: Multiplier Value or Variable Name}\label{field-multiplier-value-or-variable-name}
+
+Often the ratchet has a clause such as ``the current month demand or 90\% of the summer month demand''. For this case a value of 0.9 would be entered here as the multiplier. This value may be left blank if no multiplier is needed and a value of one will be used as a default.
+
+\paragraph{Field: Offset Value or Variable Name}\label{field-offset-value-or-variable-name}
+
+A less common strategy is to say that the ratchet must be all demand greater than a value, in this case an offset that is added to the demand may be entered here. If entered, it is common for the offset value to be negative representing that the demand be reduced.~ If no value is entered it is assumed to be zero and not affect the ratchet.

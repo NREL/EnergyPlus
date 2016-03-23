@@ -919,8 +919,8 @@ namespace DataPlantPipingSystems {
 		bool DomainNeedsToBeMeshed;
 		bool IsActuallyPartOfAHorizontalTrench;
 		bool HasAPipeCircuit;
-		bool IsZoneCoupledSlab;
-		bool HasCoupledBasement;
+		bool HasZoneCoupledSlab;
+		bool HasZoneCoupledBasement;
 		// "Input" data structure variables
 		MeshExtents Extents;
 		MeshProperties Mesh;
@@ -996,8 +996,8 @@ namespace DataPlantPipingSystems {
 			DomainNeedsToBeMeshed( true ),
 			IsActuallyPartOfAHorizontalTrench( false ),
 			HasAPipeCircuit( true ),
-			IsZoneCoupledSlab( false ),
-			HasCoupledBasement( false ),
+			HasZoneCoupledSlab( false ),
+			HasZoneCoupledBasement( false ),
 			HasBasement( false ),
 			ZoneCoupledOSCMIndex( 0 ),
 			PerimeterOffset( 0.0 ),

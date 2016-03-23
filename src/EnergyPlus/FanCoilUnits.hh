@@ -140,7 +140,9 @@ namespace FanCoilUnits {
 		int CapCtrlMeth_Num;
 		Real64 PLR; // Part Load Ratio, fraction of time step fancoil is on
 		int MaxIterIndexH; // Maximum iterations exceeded for heating
+		int BadMassFlowLimIndexH; // Bad mass flow limit error index for heating
 		int MaxIterIndexC; // Maximum iterations exceeded for cooling
+		int BadMassFlowLimIndexC; // Bad mass flow limit error index for cooling
 		Real64 FanAirVolFlow; // m3/s
 		Real64 MaxAirVolFlow; // m3/s
 		Real64 MaxAirMassFlow; // kg/s
@@ -219,7 +221,13 @@ namespace FanCoilUnits {
 		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
 		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
 		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
-
+		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
+		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
+		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
+		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
+		int LimitErrCountC; // count of SolveRegulaFalsi limit errors
+		int ConvgErrCountH; // count of SolveRegulaFalsi iteration limit errors
+		int ConvgErrCountC; // count of SolveRegulaFalsi iteration limit errors
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J
@@ -245,7 +253,9 @@ namespace FanCoilUnits {
 			CapCtrlMeth_Num( 0 ),
 			PLR( 0.0 ),
 			MaxIterIndexH( 0 ),
+			BadMassFlowLimIndexH( 0 ),
 			MaxIterIndexC( 0 ),
+			BadMassFlowLimIndexC( 0 ),
 			FanAirVolFlow( 0.0 ),
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
@@ -307,6 +317,13 @@ namespace FanCoilUnits {
 			MinSATempCooling( 0.0 ),
 			MaxSATempHeating( 0.0 ),
 			ASHRAETempControl( false ),
+			QUnitOutNoHC( 0.0 ),
+			QUnitOutMaxH( 0.0 ),
+			QUnitOutMaxC( 0.0 ),
+			LimitErrCountH( 0 ),
+			LimitErrCountC( 0 ),
+			ConvgErrCountH( 0 ),
+			ConvgErrCountC( 0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -447,6 +464,16 @@ namespace FanCoilUnits {
 	);
 
 	Real64
+	CalcFanCoilHWLoadResidual(
+		Real64 const HWFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+		CalcFanCoilCWLoadResidual(
+		Real64 const CWFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+		);	Real64
 	CalcFanCoilWaterFlowTempResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
@@ -492,32 +519,7 @@ namespace FanCoilUnits {
 	CalcFanCoilElecHeatTempResidual(
 		Real64 const PLR, // electric heating coil part load ratio
 		Array1< Real64 > const & Par // Function parameters
-	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-} // FanCoilUnits
+	);} // FanCoilUnits
 
 } // EnergyPlus
 

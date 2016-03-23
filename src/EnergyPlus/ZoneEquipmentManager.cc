@@ -84,6 +84,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataRoomAirModel.hh>
 #include <DataSizing.hh>
+#include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
@@ -193,6 +194,7 @@ namespace ZoneEquipmentManager {
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool reportDOASZoneSizingHeader( true );
 		bool InitZoneEquipmentOneTimeFlag( true );
 		bool InitZoneEquipmentEnvrnFlag( true );
 		bool FirstPassZoneEquipFlag( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
@@ -222,6 +224,7 @@ namespace ZoneEquipmentManager {
 		GetZoneEquipmentInputFlag = true;
 		PrioritySimOrder.deallocate();
 		FirstPassZoneEquipFlag = true;
+		reportDOASZoneSizingHeader = true;
 	}
 
 	void
@@ -1034,6 +1037,9 @@ namespace ZoneEquipmentManager {
 		if ( ErrorsFound ) {
 			ShowFatalError( "SetUpZoneSizingArrays: Errors found in Sizing:Zone input" );
 		}
+
+		// Put Auto Sizing of Sizing:Zone inputs here!
+		AutoCalcDOASControlStrategy();
 
 		ZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		FinalZoneSizing.allocate( NumOfZones );
@@ -2381,7 +2387,8 @@ namespace ZoneEquipmentManager {
 		} else if ( SELECT_CASE_var == EndZoneSizingCalc ) {
 
 			// candidate EMS calling point to customize CalcFinalZoneSizing
-			ManageEMS( emsCallFromZoneSizing );
+			bool anyEMSRan;
+			ManageEMS( emsCallFromZoneSizing, anyEMSRan );
 
 			// now apply EMS overrides (if any)
 
@@ -5453,6 +5460,150 @@ namespace ZoneEquipmentManager {
 			}
 		}
 		MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
+	}
+
+	void
+	AutoCalcDOASControlStrategy()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS Function:
+		// This subroutine does the autosizing calculations for the Sizing:Zone
+		// DOAS input.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// See IO Ref for suggested values
+		
+		// Using/Aliasing
+
+		// FUNCTION ARGUMENT DEFINITIONS:
+		// na
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ZoneSizIndex;
+		bool ErrorsFound;
+
+		ErrorsFound = false;
+		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
+			if ( ZoneSizingInput( ZoneSizIndex ).AccountForDOAS ) {
+				if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOANeutralSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 21.1;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 23.9;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint
+							- 2.8;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint
+							+ 2.8;
+					}
+					ReportZoneSizingDOASInputs( ZoneSizingInput( ZoneSizIndex ).ZoneName, "NeutralSupplyAir",
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint, ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint  );
+				} else if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOANeutralDehumSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 14.4;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 22.2;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 14.4;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 22.2;
+					}
+					ReportZoneSizingDOASInputs( ZoneSizingInput( ZoneSizIndex ).ZoneName, "NeutralDehumidifiedSupplyAir",
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint, ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint );
+				} else if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOACoolSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 12.2;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 14.4;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint
+							- 2.2;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint
+							+ 2.2;
+					}
+					ReportZoneSizingDOASInputs( ZoneSizingInput( ZoneSizIndex ).ZoneName, "ColdSupplyAir",
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint, ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint );
+				}
+				if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint ) {
+					ShowSevereError( "For Sizing:Zone = " + ZoneSizingInput( ZoneSizIndex ).ZoneName );
+					ShowContinueError( "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint" );
+					ErrorsFound = true;
+				}
+
+			}
+		}
+		if ( ErrorsFound ) {
+			ShowFatalError( "Errors found in DOAS sizing input. Program terminates." );
+		}
+	}
+
+	void
+	ReportZoneSizingDOASInputs(
+		std::string const & ZoneName, // the name of the zone
+		std::string const & DOASCtrlStrategy, // DOAS control strategy
+		Real64 const DOASLowTemp, // DOAS design low setpoint temperature [C]
+		Real64 const DOASHighTemp // DOAS design high setpoint temperature [C]
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine writes the DOAS Sizing:Zone input for 1 zone to the eio file
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataPrecisionGlobals;
+		using DataGlobals::OutputFileInits;
+		using DataStringGlobals::VerString;
+		using General::RoundSigDigits;
+
+		// Formats
+		static gio::Fmt Format_990( "('! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature {C}, DOAS Design High Setpoint Temperature {C} ')" );
+		static gio::Fmt Format_991( "(' Zone Sizing DOAS Inputs',4(', ',A))" );
+
+		if ( reportDOASZoneSizingHeader ) {
+			gio::write( OutputFileInits, Format_990 );
+			reportDOASZoneSizingHeader = false;
+		}
+
+		gio::write( OutputFileInits, Format_991 ) << ZoneName << DOASCtrlStrategy << RoundSigDigits( DOASLowTemp, 3 ) << RoundSigDigits( DOASHighTemp, 3 );
+
+		// BSLLC Start
+		// if ( sqlite ) {
+		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, 
+		// 		PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
+		// }
+		// BSLLC Finish
+
 	}
 
 } // ZoneEquipmentManager

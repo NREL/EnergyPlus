@@ -21,7 +21,7 @@
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
-! Run Control:             Zone and System sizing with design day simulations (design days run)
+! Run Control:             Design day simulations (design days run)
 !
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
 !           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
@@ -87,7 +87,7 @@
 !
 ! Zonal Equipment:                Water Loop Heat PUmp
 ! Central Air Handling Equipment: Yes
-! System Equipment Autosize:      Yes
+! System Equipment Autosize:      No
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
 ! Coils:                          COIL:WATERTOAIRHP:PARAMETERESTIMATION:COOLING, COIL:WATERTOAIRHP:PARAMETERESTIMATION:HEATING
@@ -204,9 +204,9 @@
     190.00;                  !- Elevation {m}
 
   SimulationControl,
-    Yes,                     !- Do Zone Sizing Calculation
-    Yes,                     !- Do System Sizing Calculation
-    Yes,                     !- Do Plant Sizing Calculation
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 
@@ -1067,7 +1067,7 @@
     1584,                    !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0.2,                     !- Return Air Fraction
+    ,                        !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
@@ -1278,7 +1278,7 @@
     684,                     !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0.2,                     !- Return Air Fraction
+    ,                        !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
@@ -1453,7 +1453,7 @@
     1584,                    !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0.2,                     !- Return Air Fraction
+    ,                        !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
@@ -1644,7 +1644,7 @@
     684,                     !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0.2,                     !- Return Air Fraction
+    ,                        !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
@@ -1819,7 +1819,7 @@
     2964,                    !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0.2,                     !- Return Air Fraction
+    ,                        !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
@@ -1933,23 +1933,6 @@
     3.7,3.7,0.0,  !- X,Y,Z ==> Vertex 3 {m}
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
-  Sizing:Parameters,
-    1.3,                     !- Heating Sizing Factor
-    1.3,                     !- Cooling Sizing Factor
-    ;                        !- Timesteps in Averaging Window
-
-  Sizing:Plant,
-    Hot Water Loop,          !- Plant or Condenser Loop Name
-    heating,                 !- Loop Type
-    82.,                     !- Design Loop Exit Temperature {C}
-    11;                      !- Loop Design Temperature Difference {deltaC}
-
-  Sizing:Plant,
-    Chilled Water Loop,      !- Plant or Condenser Loop Name
-    cooling,                 !- Loop Type
-    7.22,                    !- Design Loop Exit Temperature {C}
-    6.67;                    !- Loop Design Temperature Difference {deltaC}
-
   ZoneControl:Thermostat,
     SPACE1-1 Control,        !- Name
     SPACE1-1,                !- Zone or ZoneList Name
@@ -2029,37 +2012,6 @@
 !*********************************************************************************************************************************************************
 ! HP Air Loop #1
 
-  Sizing:Zone,
-    SPACE1-1,                !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-
-  DesignSpecification:OutdoorAir,
-    SZ DSOA SPACE1-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
-
   ZoneHVAC:EquipmentConnections,
     SPACE1-1,                !- Zone Name
     SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name
@@ -2083,52 +2035,13 @@
     SPACE1-1 Direct Air,     !- Name
     FanAvailSched,           !- Availability Schedule Name
     SPACE1-1 Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
-
-  Sizing:System,
-    AHU 1,                   !- AirLoop Name
-    sensible,                !- Type of Load to Size On
-    0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Central Heating Maximum System Air Flow Ratio
-    7.0,                     !- Preheat Design Temperature {C}
-    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
-    11.0,                    !- Precool Design Temperature {C}
-    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
-    12.,                     !- Central Cooling Design Supply Air Temperature {C}
-    50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Type of Zone Sum to Use
-    no,                      !- 100% Outdoor Air in Cooling
-    no,                      !- 100% Outdoor Air in Heating
-    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- Central Cooling Capacity Control Method
+    2.0;                     !- Maximum Air Flow Rate {m3/s}
 
   AirLoopHVAC,
     AHU 1,                   !- Name
     ,                        !- Controller List Name
     AHU 1 Availability Managers,  !- Availability Manager List Name
-    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    2.0,                     !- Design Supply Air Flow Rate {m3/s}
     AHU 1 Branches,          !- Branch List Name
     ,                        !- Connector List Name
     AHU 1 Air Loop Inlet,    !- Supply Side Inlet Node Name
@@ -2257,7 +2170,7 @@
     R22,                     !- Refrigerant Type
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
     38000,                   !- Gross Rated Heating Capacity {W}
-    4000000,                 !- High Pressure Cutoff
+    4000000,                 !- High Pressure Cutoff {Pa}
     0,                       !- Low Pressure Cutoff {Pa}
     AHU1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
     AHU1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
@@ -2287,37 +2200,6 @@
 
 ! HP Air Loop #2
 
-  Sizing:Zone,
-    SPACE2-1,                !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-
-  DesignSpecification:OutdoorAir,
-    SZ DSOA SPACE2-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
-
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
     SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name
@@ -2341,52 +2223,13 @@
     SPACE2-1 Direct Air,     !- Name
     FanAvailSched,           !- Availability Schedule Name
     SPACE2-1 Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
-
-  Sizing:System,
-    AHU 2,                   !- AirLoop Name
-    sensible,                !- Type of Load to Size On
-    0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Central Heating Maximum System Air Flow Ratio
-    7.0,                     !- Preheat Design Temperature {C}
-    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
-    11.0,                    !- Precool Design Temperature {C}
-    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
-    12.,                     !- Central Cooling Design Supply Air Temperature {C}
-    50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Type of Zone Sum to Use
-    no,                      !- 100% Outdoor Air in Cooling
-    no,                      !- 100% Outdoor Air in Heating
-    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- Central Cooling Capacity Control Method
+    2.0;                     !- Maximum Air Flow Rate {m3/s}
 
   AirLoopHVAC,
     AHU 2,                   !- Name
     ,                        !- Controller List Name
     AHU 2 Availability Managers,  !- Availability Manager List Name
-    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    2.0,                     !- Design Supply Air Flow Rate {m3/s}
     AHU 2 Branches,          !- Branch List Name
     ,                        !- Connector List Name
     AHU 2 Air Loop Inlet,    !- Supply Side Inlet Node Name
@@ -2512,7 +2355,7 @@
     R22,                     !- Refrigerant Type
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
     38000,                   !- Gross Rated Heating Capacity {W}
-    4000000,                 !- High Pressure Cutoff
+    4000000,                 !- High Pressure Cutoff {Pa}
     0,                       !- Low Pressure Cutoff {Pa}
     AHU2 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
     AHU2 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
@@ -2542,37 +2385,6 @@
 
 ! HP Air Loop #3
 
-  Sizing:Zone,
-    SPACE3-1,                !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA SPACE3-1,        !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-
-  DesignSpecification:OutdoorAir,
-    SZ DSOA SPACE3-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
-
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
     SPACE3-1 Equipment,      !- Zone Conditioning Equipment List Name
@@ -2596,52 +2408,13 @@
     SPACE3-1 Direct Air,     !- Name
     FanAvailSched,           !- Availability Schedule Name
     SPACE3-1 Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
-
-  Sizing:System,
-    AHU 3,                   !- AirLoop Name
-    sensible,                !- Type of Load to Size On
-    0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Central Heating Maximum System Air Flow Ratio
-    7.0,                     !- Preheat Design Temperature {C}
-    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
-    11.0,                    !- Precool Design Temperature {C}
-    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
-    12.,                     !- Central Cooling Design Supply Air Temperature {C}
-    50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Type of Zone Sum to Use
-    no,                      !- 100% Outdoor Air in Cooling
-    no,                      !- 100% Outdoor Air in Heating
-    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- Central Cooling Capacity Control Method
+    2.0;                     !- Maximum Air Flow Rate {m3/s}
 
   AirLoopHVAC,
     AHU 3,                   !- Name
     ,                        !- Controller List Name
     AHU 3 Availability Managers,  !- Availability Manager List Name
-    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    2.0,                     !- Design Supply Air Flow Rate {m3/s}
     AHU 3 Branches,          !- Branch List Name
     ,                        !- Connector List Name
     AHU 3 Air Loop Inlet,    !- Supply Side Inlet Node Name
@@ -2767,7 +2540,7 @@
     R22,                     !- Refrigerant Type
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
     38000,                   !- Gross Rated Heating Capacity {W}
-    4000000,                 !- High Pressure Cutoff
+    4000000,                 !- High Pressure Cutoff {Pa}
     0,                       !- Low Pressure Cutoff {Pa}
     AHU3 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
     AHU3 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
@@ -2797,37 +2570,6 @@
 
 ! HP Air Loop #4
 
-  Sizing:Zone,
-    SPACE4-1,                !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA SPACE4-1,        !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-
-  DesignSpecification:OutdoorAir,
-    SZ DSOA SPACE4-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
-
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
     SPACE4-1 Equipment,      !- Zone Conditioning Equipment List Name
@@ -2851,52 +2593,13 @@
     SPACE4-1 Direct Air,     !- Name
     FanAvailSched,           !- Availability Schedule Name
     SPACE4-1 Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
-
-  Sizing:System,
-    AHU 4,                   !- AirLoop Name
-    sensible,                !- Type of Load to Size On
-    0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Central Heating Maximum System Air Flow Ratio
-    7.0,                     !- Preheat Design Temperature {C}
-    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
-    11.0,                    !- Precool Design Temperature {C}
-    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
-    12.,                     !- Central Cooling Design Supply Air Temperature {C}
-    50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Type of Zone Sum to Use
-    no,                      !- 100% Outdoor Air in Cooling
-    no,                      !- 100% Outdoor Air in Heating
-    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- Central Cooling Capacity Control Method
+    2.0;                     !- Maximum Air Flow Rate {m3/s}
 
   AirLoopHVAC,
     AHU 4,                   !- Name
     ,                        !- Controller List Name
     AHU 4 Availability Managers,  !- Availability Manager List Name
-    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    2.0,                     !- Design Supply Air Flow Rate {m3/s}
     AHU 4 Branches,          !- Branch List Name
     ,                        !- Connector List Name
     AHU 4 Air Loop Inlet,    !- Supply Side Inlet Node Name
@@ -3022,7 +2725,7 @@
     R22,                     !- Refrigerant Type
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
     38000,                   !- Gross Rated Heating Capacity {W}
-    4000000,                 !- High Pressure Cutoff
+    4000000,                 !- High Pressure Cutoff {Pa}
     0,                       !- Low Pressure Cutoff {Pa}
     AHU4 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
     AHU4 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
@@ -3052,37 +2755,6 @@
 
 ! HP Air Loop #5
 
-  Sizing:Zone,
-    SPACE5-1,                !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA SPACE5-1,        !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-
-  DesignSpecification:OutdoorAir,
-    SZ DSOA SPACE5-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
-
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
     SPACE5-1 Equipment,      !- Zone Conditioning Equipment List Name
@@ -3106,52 +2778,13 @@
     SPACE5-1 Direct Air,     !- Name
     FanAvailSched,           !- Availability Schedule Name
     SPACE5-1 Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
-
-  Sizing:System,
-    AHU 5,                   !- AirLoop Name
-    sensible,                !- Type of Load to Size On
-    0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Central Heating Maximum System Air Flow Ratio
-    7.0,                     !- Preheat Design Temperature {C}
-    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
-    11.0,                    !- Precool Design Temperature {C}
-    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
-    12.,                     !- Central Cooling Design Supply Air Temperature {C}
-    50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Type of Zone Sum to Use
-    no,                      !- 100% Outdoor Air in Cooling
-    no,                      !- 100% Outdoor Air in Heating
-    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- Central Cooling Capacity Control Method
+    2.0;                     !- Maximum Air Flow Rate {m3/s}
 
   AirLoopHVAC,
     AHU 5,                   !- Name
     ,                        !- Controller List Name
     AHU 5 Availability Managers,  !- Availability Manager List Name
-    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    2.0,                     !- Design Supply Air Flow Rate {m3/s}
     AHU 5 Branches,          !- Branch List Name
     ,                        !- Connector List Name
     AHU 5 Air Loop Inlet,    !- Supply Side Inlet Node Name
@@ -3277,7 +2910,7 @@
     R22,                     !- Refrigerant Type
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
     38000,                   !- Gross Rated Heating Capacity {W}
-    4000000,                 !- High Pressure Cutoff
+    4000000,                 !- High Pressure Cutoff {Pa}
     0,                       !- Low Pressure Cutoff {Pa}
     AHU5 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
     AHU5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
