@@ -1911,8 +1911,8 @@ namespace HVACUnitarySystem {
 		EqSizing.DesCoolingLoad = 0.0;
 		EqSizing.DesHeatingLoad = 0.0;
 
-
-		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
+		bool anyEMSRan;
+		ManageEMS( emsCallFromUnitarySystemSizing, anyEMSRan ); // calling point
 
 		CompName = UnitarySystem( UnitarySysNum ).Name;
 		CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
@@ -6068,8 +6068,8 @@ namespace HVACUnitarySystem {
 
 			}
 		}
-
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyEMSRan;
+		ManageEMS( emsCallFromComponentGetInput,anyEMSRan );
 
 	}
 

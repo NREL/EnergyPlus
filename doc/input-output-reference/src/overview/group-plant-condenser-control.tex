@@ -1,0 +1,485 @@
+\section{Group -- Plant-Condenser Control}\label{group-plant-condenser-control}
+
+\subsection{Operation Schemes (Plant and Condenser)}\label{operation-schemes-plant-and-condenser}
+
+Plants and condenser loops must have some mechanism for controlling the operation of the loop and which equipment is available under what conditions. Since there may be multiple control schemes that are assigned various priorities associated with each loop, an overall operation scheme must be defined. The overall scheme consists of the object name, an identifying name that is referenced in the main plant or condenser loop statement, and a list of operation schemes. Each operation scheme must have the type of operation scheme, its identifying name, and the schedule that defines its availability. Note that the order in which the individual operation schemes appear in this list defines its priority versus the others with the same scheduled availability. The first scheme appearing in the list is given the highest priority, the second scheme has second highest priority, etc. In other words, if according to its schedule, the first operation scheme is available, then it is used by the simulation to define how the plant or condenser loop operates. If it is not available, the second operation scheme in the list is checked to see if it is available until the highest priority scheme that is also available is found.~ To allow for simultaneous heating and cooling, there is one configuration where multiple operation schemes are available at a given timestep.~ This is allowed if a user inputs both a heating range based operation and a cooling range based operation with overlapping schedules.~ The simulation will look at the current loop demand to determine if the cooling scheme should be used or the heating scheme.~ In other cases, if two schemes overlap (are available at the same time), a fatal error will be encountered.
+
+\subsection{PlantEquipmentOperationSchemes}\label{plantequipmentoperationschemes}
+
+\subsubsection{Inputs}\label{inputs-033}
+
+\paragraph{Field: Name}\label{field-name-032}
+
+This alpha field contains the identifying name given to the Plant Operation Scheme. This name is placed in the Plant Loop object to select this scheme.
+
+\paragraph{Field Set: (Component Object Type, Name, Schedule) up to 8}\label{field-set-component-object-type-name-schedule-up-to-8}
+
+Operation schemes are listed in ``priority'' order.~ Note that each scheme must address the entire load and/or condition ranges for the simulation. The actual one selected for use will be the first that is ``Scheduled'' on.~ That is, if control scheme 1 is not ``on'' and control scheme 2 is -- then control scheme 2 is selected. Only plant equipment should be listed on a Control Scheme for this item.
+
+\paragraph{Field: Control Scheme \textless{}\#\textgreater{} Object Type}\label{field-control-scheme-object-type}
+
+This alpha field contains the keyword for the type of control scheme used. The options for plant control schemes are:
+
+\begin{itemize}
+\item
+  PlantEquipmentOperation:Uncontrolled
+\item
+  PlantEquipmentOperation:CoolingLoad
+\item
+  PlantEquipmentOperation:HeatingLoad
+\item
+  PlantEquipmentOperation:ComponentSetpoint
+\item
+  PlantEquipmentOperation:ThermalEnergyStorage
+\item
+  PlantEquipmentOperation:UserDefined
+\end{itemize}
+
+\paragraph{Field: Control Scheme \textless{}\#\textgreater{} Name}\label{field-control-scheme-name}
+
+This alpha field contains the identifying name given to the control scheme. These must be the named versions of the referenced Control Scheme (e.g.. a Uncontrolled Loop Operation with this name or a Cooling or Heating Load Range Based Operation with this name).
+
+\paragraph{Field: Control Scheme \textless{}\#\textgreater{} Schedule}\label{field-control-scheme-schedule}
+
+This alpha field contains the schedule name for the control scheme. This schedule consists of weeks and days, with the days containing ``0 or 1'' for each hour of the day. This binary schedule (0 for off, 1 for on) determines if the control scheme is operating for that hour of day or not.
+
+Examples of this statement in two different IDFs:
+
+\begin{lstlisting}
+
+PlantEquipmentOperationSchemes,
+      CW Loop Operation,       !- Name
+      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 1 Object Type
+      Peak Operation,          !- Control Scheme 1 Name
+      On Peak,                 !- Control Scheme 1 Schedule
+      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 2 Object Type
+      Off Peak Operation,      !- Control Scheme 2 Name
+      Off Peak;                !- Control Scheme 2 Schedule
+
+  PlantEquipmentOperationSchemes,
+      CW Loop Operation,       !- Name
+      PlantEquipmentOperation:CoolingLoad,  ! Control Scheme 1 Object Type
+      Central Chiller Only,    !- Control Scheme 1 Name
+      PlantOnSched;            !- Control Scheme 1 Schedule
+\end{lstlisting}
+
+In the first IDF example, ``PlantEquipmentOperation:CoolingLoad'' is the type of control scheme. ``Peak Operation'' and ``Off Peak Operation'' are the names of two different load range based controls defined separately (see below -- ). ``On Peak'' and ``Off Peak'' are schedules defined elsewhere in the input file.
+
+The load range based operation scheme has two statements associated with it: a main statement that defines the ranges that individual priority settings are valid and the lists of equipment that may be used for each range.
+
+\subsection{CondenserEquipmentOperationSchemes}\label{condenserequipmentoperationschemes}
+
+\subsubsection{Inputs}\label{inputs-1-030}
+
+\paragraph{Field: Name}\label{field-name-1-029}
+
+This alpha field contains the identifying name given to the Condenser Operation Scheme.
+
+\paragraph{Field Set: (Component Object Type, Name, Schedule) up to 8}\label{field-set-component-object-type-name-schedule-up-to-8-1}
+
+Operation schemes are listed in ``priority'' order.~ Note that each scheme must address the entire load and/or condition ranges for the simulation. The actual one selected for use will be the first that is ``Scheduled'' on.~ That is, if control scheme 1 is not ``on'' and control scheme 2 is -- then control scheme 2 is selected. Only condenser equipment should be listed on a Control Scheme for this item.
+
+\paragraph{Field: Control Scheme \textless{}\#\textgreater{} Object Type}\label{field-control-scheme-object-type-1}
+
+This alpha field contains the keyword for the type of control scheme used. The options for plant control schemes are:
+
+This alpha field contains the keyword for the type of control scheme used. Currently, the available options are:
+
+\begin{itemize}
+\item
+  PlantEquipmentOperation:Uncontrolled
+\item
+  PlantEquipmentOperation:CoolingLoad
+\item
+  PlantEquipmentOperation:HeatingLoad
+\item
+  PlantEquipmentOperation:OutdoorDryBulb
+\item
+  PlantEquipmentOperation:OutdoorWetBulb
+\item
+  PlantEquipmentOperation:OutdoorDewpoint
+\item
+  PlantEquipmentOperation:OutdoorRelativeHumidity
+\item
+  PlantEquipmentOperation:OutdoorDryBulbDifference
+\item
+  PlantEquipmentOperation:OutdoorWetBulbDifference
+\item
+  PlantEquipmentOperation:OutdoorDewpointDifference
+\item
+  PlantEquipmentOperation:UserDefined
+\end{itemize}
+
+The condenser operation schemes apply to the equipment on the `supply side' of the condenser loop---pumps, cooling towers, ground coupled heat exchangers, etc. The keywords select the algorithm that will be used to determine which equipment is available for each timestep. The Load Schemes schemes select a user specified set of equipment for each user specified range of a particular simulation variable. Load schemes compare the demand on the condenser supply side with specified load ranges and associated equipment lists. Outdoor schemes compare the current value of an environmental parameter with user specified ranges of that parameter.
+
+\paragraph{Field: Control Scheme \textless{}\#\textgreater{} Name}\label{field-control-scheme-name-1}
+
+This alpha field contains the identifying name given to the control scheme.
+
+\paragraph{Field: Control Scheme \textless{}\#\textgreater{} Schedule}\label{field-control-scheme-schedule-1}
+
+This alpha field contains the schedule name for the control scheme. This schedule consists of weeks and days, with the days containing ``0 or 1'' for each hour of the day. This binary schedule (0 for off, 1 for on) determines which control scheme is operating for a particular hour. The schedule facilitates daily or seasonal changes in control schemes to meet demand side management or energy conservation goals.
+
+Scheduling conflicts are handled by selecting the first available scheme in order of appearance in the list.
+
+Examples of this statement in two IDFs:
+
+\begin{lstlisting}
+
+CondenserEquipmentOperationSchemes,
+      Tower Loop Operation,    !- CondenserOperationSchemeName
+      PlantEquipmentOperation:CoolingLoad,  Control Scheme 1 Object Type
+      Year Round Tower Operation,  !- Control Scheme 1 Name
+      PlantOnSched;            !- Control Scheme 1 Schedule
+
+  CondenserEquipmentOperationSchemes,Tower Loop Operation,
+      PlantEquipmentOperation:CoolingLoad, Peak Load Operation, AFTERNOONSCHEDULE,
+      PlantEquipmentOperation:CoolingLoad, OffPeak Load Operation, MORNINGSCHEDULE,
+      PlantEquipmentOperation:OutdoorWetBulb, NightOperation, NIGHTSCHEDULE;
+\end{lstlisting}
+
+Each schedule (AFTERNOONSCHEDULE, MORNINGSCHEDULE, NIGHTSCHEDULE) invokes its associated operation scheme (Peak Load Operation, OffPeak Load Operation, NightOperation). The type of operation scheme and its name references the input syntax associated with the range specification and the associated equipment.
+
+\subsection{PlantEquipmentOperation:Uncontrolled}\label{plantequipmentoperationuncontrolled}
+
+Uncontrolled loop operation simply specifies a group of equipment that runs `uncontrolled'. If the loop runs, this equipment will run also, unless turned off by the loop flow resolver to maintain continuity in the fluid loop.
+
+\subsubsection{Inputs}\label{inputs-2-028}
+
+\paragraph{Field: Name}\label{field-name-2-027}
+
+This alpha field contains the identifying name for the control scheme.
+
+\paragraph{Field: Equipment List Name}\label{field-equipment-list-name}
+
+This alpha field contains the identifying name for the Equipment List. This field ties to the Load Range Equipment List input structure, which must also be defined.
+
+\paragraph{Field: Equipment List Name}\label{field-equipment-list-name-1}
+
+This alpha field contains the identifying name for the Equipment List. This field ties to the PlantEquipmentList or CondenserEquipmentList input structure, which must also be defined.
+
+\subsection{PlantEquipmentOperation:CoolingLoad}\label{plantequipmentoperationcoolingload}
+
+\subsubsection{Inputs}\label{inputs-3-025}
+
+\subsection{PlantEquipmentOperation:HeatingLoad}\label{plantequipmentoperationheatingload}
+
+The PlantEquipmentOperation:CoolingLoad ~and PlantEquipmentOperation:HeatingLoad objects define the different ranges and which equipment list is valid for each range. After the keyword and the identifying name, a series of data trios is expected. In each trio, there is a lower limit for the load range, an upper limit for the load range, and a name that links to an equipment availability list (the PlantEquipmentList or CondenserEquipmentList objects).
+
+\subsubsection{Inputs}\label{inputs-4-022}
+
+\paragraph{Field: Name}\label{field-name-3-022}
+
+This alpha field contains the identifying name for the control scheme.
+
+\paragraph{Field Set: (Lower limit, Upper Limit, Equip List name) up to 10}\label{field-set-lower-limit-upper-limit-equip-list-name-up-to-10}
+
+\paragraph{Field: Load Range \textless{}\#\textgreater{} Lower Limit}\label{field-load-range-lower-limit}
+
+This numeric field contains the lower demand range (W) for the equipment list. If demand is below this value, then this equipment list will not turn on to meet the demand.
+
+\paragraph{Field: Load Range \textless{}\#\textgreater{} Upper Limit}\label{field-load-range-upper-limit}
+
+This numeric field contains the upper demand range (W) for the equipment list. If demand is above this value, then this equipment list will not turn on to meet the demand.
+
+\paragraph{Field: Range \textless{}\#\textgreater{} Equipment List Name}\label{field-range-equipment-list-name}
+
+This alpha field contains the identifying name for the Equipment List (i.e., the name of a PlantEquipmentList or CondenserEquipmentList object).
+
+An example of these statements in an IDF is:
+
+\begin{lstlisting}
+
+PlantEquipmentOperation:CoolingLoad, Peak Operation,
+          0,7000,   Chiller Plant,
+          7000,24500,   Chiller Plant and Purchased,
+          24500,500000, Purchased Only;
+\end{lstlisting}
+
+This particular load based operation scheme (above) has three different ranges. ``Chiller Plant'', ``Chiller Plant and Purchased'', and ``Purchased Only'' are names which link to various PlantEquipmentList or CondenserEquipmentList objects as described below. Gaps may be left in the load ranges specified, but to operate equipment over the entire range the upper limit of a given range must equal the lower limit of the next range as shown in the example. If gaps are left in the load ranges specified, a warning message will be issued when the load to be met falls within a load range ``gap''. If the user wishes to leave a load range ``gap'' for a specific reason (no equipment to operate on this plant {[}or condenser{]} loop within this load range) and does not want the warning messages to be generated, then specify a lower limit, upper limit and equipment list name for the gap and do not specify any equipment in the associated equipment list, as shown below.
+
+\begin{lstlisting}
+
+PlantEquipmentOperation:CoolingLoad, Peak Operation,
+      0,7000,   Chiller Plant,
+      7000,7100, NoEquipmentOperationOnThisPlantLoop,
+      7100,24500,   Chiller Plant and Purchased,
+      24500,500000, Purchased Only;
+
+  PlantEquipmentList,
+      Chiller Plant,           !- Name
+      Chiller:Electric,        !- Equipment 1 Object Type
+      Big Chiller;             !- Equipment 1 Name
+
+  PlantEquipmentList,
+      NoEquipmentOperationOnThisPlantLoop;    !- Name
+
+  PlantEquipmentList,
+      Chiller Plant and Purchased,  !- Name
+      Chiller:Electric,        !- Equipment 1 Object Type
+      Big Chiller,             !- Equipment 1 Name
+      DistrictCooling,         !- Equipment 2 Object Type
+      Purchased Cooling;       !- Equipment 2 Name
+
+  PlantEquipmentList,
+      Purchased Only,          !- Name
+      DistrictCooling,         !- Equipment 1 Object Type
+      Purchased Cooling;       !- Equipment 1 Name
+\end{lstlisting}
+
+\subsection{PlantEquipmentOperation:OutdoorDryBulb}\label{plantequipmentoperationoutdoordrybulb}
+
+\subsubsection{Inputs}\label{inputs-5-020}
+
+\subsection{PlantEquipmentOperation:OutdoorWetBulb}\label{plantequipmentoperationoutdoorwetbulb}
+
+\subsubsection{Inputs}\label{inputs-6-017}
+
+\subsection{PlantEquipmentOperation:OutdoorRelativeHumidity}\label{plantequipmentoperationoutdoorrelativehumidity}
+
+\subsubsection{Inputs}\label{inputs-7-017}
+
+\subsection{PlantEquipmentOperation:OutdoorDewpoint}\label{plantequipmentoperationoutdoordewpoint}
+
+The outdoor operation objects define the different ranges of the various environmental parameters and which equipment list is valid for each range. After the keyword and the identifying name, a series of data trios is expected. In each trio, there is a lower limit for the load range, an upper limit for the load range, and a name that links to an equipment availability list (the CondenserEquipmentList).
+
+The fields for each of these are:
+
+\subsubsection{Inputs}\label{inputs-8-015}
+
+\paragraph{Field: Name}\label{field-name-4-019}
+
+This alpha field contains the identifying name for the control scheme.
+
+\paragraph{Field Set: (Lower limit, Upper Limit, Equip List name) up to 10}\label{field-set-lower-limit-upper-limit-equip-list-name-up-to-10-1}
+
+\paragraph{Field: \textless{}specfic type\textgreater{} Range \textless{}\#\textgreater{} Lower Limit}\label{field-specfic-type-range-lower-limit}
+
+This numeric field contains the lower limit (C for temperature operations, Percent for relative humidity operations) for the equipment list. If specific value is below this value, then this equipment list will not turn on to meet the demand.
+
+\paragraph{Field: \textless{}specific type\textgreater{} Range \textless{}\#\textgreater{} Upper Limit}\label{field-specific-type-range-upper-limit}
+
+This numeric field contains the lower limit (C for temperature operations, Percent for relative humidity operations) for the equipment list. If specific value is above this value, then this equipment list will not turn on to meet the demand.
+
+\paragraph{Field: Range \textless{}\#\textgreater{} Equipment List Name}\label{field-range-equipment-list-name-1}
+
+This alpha field contains the identifying name for the Equipment List (i.e., the name of a CondenserEquipmentList object).
+
+\subsection{PlantEquipmentOperation:OutdoorDryBulbDifference}\label{plantequipmentoperationoutdoordrybulbdifference}
+
+\subsubsection{Inputs}\label{inputs-9-013}
+
+\subsection{PlantEquipmentOperation:OutdoorWetBulbDifference}\label{plantequipmentoperationoutdoorwetbulbdifference}
+
+\subsubsection{Inputs}\label{inputs-10-012}
+
+\subsection{PlantEquipmentOperation:OutdoorDewpointDifference}\label{plantequipmentoperationoutdoordewpointdifference}
+
+The Delta Temperature based control strategies help to control any condenser equipment based on the difference between a reference node temperature and any environmental temperature. For example a cooling tower can be controlled by a strategy, which looks at the difference between the tower inlet temperature and wet-bulb temperature. A difference range is specified for each equipment list. IDD excerpts are shown below:
+
+\subsubsection{Inputs}\label{inputs-11-011}
+
+\paragraph{Field: Name}\label{field-name-5-016}
+
+This alpha value contains the identifying name of the control strategy. This name appears as `control scheme name' in Condenser Operation Scheme object.
+
+\paragraph{Field: Reference Temperature Node Name}\label{field-reference-temperature-node-name}
+
+This alpha value specifies the reference node for the operation scheme identified in the first field.
+
+\paragraph{Field Set: (Lower limit, Upper limit, Equipment List)}\label{field-set-lower-limit-upper-limit-equipment-list}
+
+\paragraph{Field: \textless{}specfic type\textgreater{} Range \textless{}\#\textgreater{} Lower Limit}\label{field-specfic-type-range-lower-limit-1}
+
+This numeric field specifies the minimum temperature difference required for the equipment specified in the equipment list to operate.
+
+\paragraph{Field: \textless{}specfic type\textgreater{} Range \textless{}\#\textgreater{} Upper Limit}\label{field-specfic-type-range-upper-limit}
+
+This numeric field specifies the maximum temperature difference below which the equipment specified in the equipment list is available.
+
+\paragraph{Field: Range \textless{}\#\textgreater{} Equipment List Name}\label{field-range-equipment-list-name-2}
+
+This alpha field contains the identifying name for the Equipment List (i.e., the name of a CondenserEquipmentList object).
+
+\subsection{PlantEquipmentOperation:ComponentSetpoint}\label{plantequipmentoperationcomponentsetpoint}
+
+In addition to load range based control on the plant loop, sequencing the plant components based on the outlet temperature of individual equipment is allowed. This scheme is common to many present-day Energy Management Systems sequencing. In this scheme, the sequencing is done based on the order specified in the control object described below.
+
+\subsubsection{Inputs}\label{inputs-12-011}
+
+\paragraph{Field: Name}\label{field-name-6-014}
+
+This field specifies the name of the operation scheme.
+
+\paragraph{Field Set: Equipment Object Type, Name, Demand Calculation Node, Setpoint Node, Flow Rate, Operation Type)}\label{field-set-equipment-object-type-name-demand-calculation-node-setpoint-node-flow-rate-operation-type}
+
+\paragraph{Field: Equipment \textless{}\#\textgreater{} Object Type}\label{field-equipment-object-type}
+
+This field specifies the type of equipment controlled by scheme.
+
+\paragraph{Field: Equipment \textless{}\#\textgreater{} Name}\label{field-equipment-name}
+
+This field specifies the name of the controlled equipment.
+
+\paragraph{Field: Demand Calculation \textless{}\#\textgreater{} Node Name}\label{field-demand-calculation-node-name}
+
+The component demand will be calculated using the difference between the temperature at the demand node and the component set point temperature.
+
+\paragraph{Field: Setpoint \textless{}\#\textgreater{} Node Name}\label{field-setpoint-node-name}
+
+Each component controlled under temperature based control will have its own set point different from the loop set point. This field specifies component set point node (Generally its outlet temperatures). This node is acted upon by a SetpointManager in order to obtain the setpoint at any simulation timestep.
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Flow Rate}\label{field-component-flow-rate}
+
+This numeric field specifies the design flow rate for the component specified in earlier fields. This flow rate is used to calculate the component demand. The field can be set to autosize, if the user wants the program to calculate the design flow. This would generally be set to autosize when the user does not know the component flow rate and does a sizing calculation for the corresponding component.
+
+\paragraph{Field: Operation\textless{}\#\textgreater{} Type}\label{field-operation-type}
+
+This alpha field specifies the operation mode for the equipment. The equipment can be in any of the three modes viz. Cooling, Heating and Dual. Dual is used when the components both as heating and cooling equipment (for example heat pumps).
+
+And, as an example in an IDF:
+
+\begin{lstlisting}
+
+PlantEquipmentOperationSchemes,
+      CW Loop Operation,       !- PlantOperationSchemeName
+      PlantEquipmentOperation:ComponentSetpoint, ! Control Scheme 1 Object Type
+      Test Scheme,                         !- Control Scheme 1 Name
+      On;                                  !- Control Scheme 1 Schedule
+
+  PlantEquipmentOperation:ComponentSetpoint,
+      Test Scheme,
+      CHILLER:ELECTRIC,        !- Equipment 1 Object Type
+      Little Chiller,          !- Equipment 1 Name
+      Little Chiller Inlet Node, !- Demand Calculation 1 Node Name
+      Little Chiller Outlet Node, !- Setpoint 1 Node Name
+      0.0011,                     !- Component 1 Flow Rate
+      COOLING,                    !- Operation 1 Type
+      CHILLER:ELECTRIC,        !- Equipment 2 Object Type
+      Big Chiller,             !- Equipment 2 Name
+      Big Chiller Inlet Node,  !- Demand Calculation 2 Node Name
+      Big Chiller Outlet Node, !- Setpoint 2 Node Name
+      0.0011,                  !- Component 2 Flow Rate
+      COOLING;                 !- Operation 2 Type
+\end{lstlisting}
+
+\subsection{PlantEquipmentOperation:ThermalEnergyStorage}\label{plantequipmentoperationthermalenergystorage}
+
+Users of thermal energy storage, particularly ice storage systems, are often faced with a challenge of specifying input for these systems. Essentially, they have to define various setpoint managers, temperature schedules, etc. in order to make the system functional. This plant/condenser control type simplifies the input somewhat by eliminating both a setpoint manager and a schedule for each piece of equipment that makes up the ice storage system. In fact, this operation scheme internally creates the setpoint managers required by the equipment listed as operated by the scheme defined by this syntax. While the more complex definition is possible and provides more flexibility like hourly variation of setpoint temperatures at the outlet of each piece of equipment, this input provides the most convenient method for making the system to work and assumes a single charging setpoint temperature and a single discharging setpoint temperature. For most systems, this is all that is needed.
+
+\subsubsection{Inputs}\label{inputs-13-009}
+
+\paragraph{Field: Name}\label{field-name-7-013}
+
+This field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the PlantEquipmentOperationSchemes list in the plant input.
+
+\paragraph{Field: On-Peak Schedule}\label{field-on-peak-schedule}
+
+This field defines the name of an integer schedule that determines when on-peak electric pricing is in effect. This value is used to determine whether or not the ice storage system should be charging the ice storage unit. In the schedule, a value of 1 (or greater) corresponds to being in the on-peak period while any value of 0 or less corresponds to being in the off-peak period.
+
+\paragraph{Field: Charging Availability Schedule}\label{field-charging-availability-schedule}
+
+This field defines the name of an integer schedule that determines whether or not the system may enter charging mode off-peak. If the current value of the on-peak schedule is ``off'', then charging can take place if the charging availability schedule is ``on''. If the on-peak schedule is ``off'' and charging availability is ``off'', then charging is not allowed and the chiller and ice storage units controlled by this statement are operating to meet the non-charging chilled water temperature defined by the next input parameter. In this schedule, a value of 1 (or greater) corresponds to ``on'' when charging is available during an off-peak period while any value of 0 or less corresponds to chillers not being allowed to charge even during off-peak.
+
+\paragraph{Field: Non-Charging Chilled Water Temperature}\label{field-non-charging-chilled-water-temperature}
+
+This field defines the chilled water temperature when the ice storage system is NOT in charging mode. During these times, the storage system could be discharging or dormant depending on HVAC load conditions and ice storage controls. This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during non-cooling season and during cooling season during the on-peak period. The cooling season and on-peak periods are defined by schedules reference to input above.
+
+\paragraph{Field: Charging Chilled Water Temperature}\label{field-charging-chilled-water-temperature}
+
+This field defines the chilled water temperature when the ice storage system is in charging mode. During these times, the chiller is producing a temperature low enough to generate ice in the ice storage unit. This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during the cooling season during the off-peak period. The cooling season and on-peak periods are defined by schedules reference to input above.
+
+\paragraph{Field Set: (Component Object Type, Name, Demand Calculation Node, Setpoint Node, Flow Rate, Operation Type)}\label{field-set-component-object-type-name-demand-calculation-node-setpoint-node-flow-rate-operation-type}
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type-001}
+
+This field specifies the type of equipment controlled by scheme. This must be a thermal energy storage device (simple or detailed ice storage) or a chiller.
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Name}\label{field-component-name-002}
+
+This field specifies the name of the controlled equipment. This name must be defined in the input as a valid ice storage device or chiller.
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Demand Calculation Node Name}\label{field-component-demand-calculation-node-name}
+
+The component demand will be calculated using the difference between the temperature at the demand node and the component set point temperature.
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Setpoint Node Name}\label{field-component-setpoint-node-name}
+
+Each component controlled under temperature based control will have its own set point different from the loop set point. This field specifies component set point node (Generally its outlet temperatures). This node is acted upon by a SetpointManager in order to obtain the setpoint at any simulation timestep.
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Flow Rate}\label{field-component-flow-rate-1}
+
+This numeric field specifies the design flow rate for the component specified in earlier fields. This flow rate is used to calculate the component demand. The field can be set to autosize, if the user wants the program to calculate the design flow. This would generally be set to autosize when the user does not know the component flow rate and does a sizing calculation for the corresponding component.
+
+\paragraph{Field: Component \textless{}\#\textgreater{} Operation Type}\label{field-component-operation-type}
+
+This alpha field specifies the operation mode for the equipment. The equipment can be in any of the three modes viz. Cooling, Heating and Dual. Dual is used when the components both as heating and cooling equipment (for example heat pumps). Ice storage units can potentially either heat or cool the circulating fluid and thus should be defined as Dual mode.
+
+An example IDF is shown below:
+
+\begin{lstlisting}
+
+PlantEquipmentOperationSchemes,
+  CW Loop Operation,       !- Name
+  PlantEquipmentOperation:ThermalEnergyStorage,  !- Control Scheme 1 Object Type
+  Chiller and Partial Ice Storage,  !- Control Scheme 1 Name
+  PlantOnSched;            !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:ThermalEnergyStorage,
+  Chiller and Partial Ice Storage,  !- Name
+  OnPeakEnergy,            !- On-Peak Schedule Name
+  ChargingAvail,           !- Charging Availability Schedule Name
+  7.22,                    !- Non-charging Chilled Water Temperature
+  -5.0,                    !- Charging Chilled Water Temperature
+  Chiller:Electric,        !- Component 1 Object Type
+  Central Chiller,         !- Component 1 Name
+  Central Chiller Inlet Node,  !- Component 1 Demand Calculation Node Name
+  Central Chiller Outlet Node,  !- Component 1 Setpoint Node Name
+  autosize,                !- Component 1 Flow Rate {m3/s}
+  COOLING,                 !- Component 1 Operation Type
+  ThermalStorage:Ice:Detailed,  !- Component 2 Object Type
+  Ice Tank,                !- Component 2 Name
+  Ice Tank Inlet Node,     !- Component 2 Demand Calculation Node Name
+  Ice Tank Outlet Node,    !- Component 2 Setpoint Node Name
+  0.13506E-02,             !- Component 2 Flow Rate {m3/s}
+  DUAL;                    !- Component 2 Operation Type
+\end{lstlisting}
+
+\subsection{PlantEquipmentList}\label{plantequipmentlist}
+
+\subsubsection{Inputs}\label{inputs-14-009}
+
+\subsection{CondenserEquipmentList}\label{condenserequipmentlist}
+
+The PlantEquipmentList ~and CondenserEquipmentList ~specify available plant and condenser loop equipment respectively for any loop operation scheme. Each statement contains the object name, an identifying name (which links the definition back to one of the operation scheme statements) and a variable length of data pairs. These pairs refer to a plant equipment type and an identifying name. The type in this list of pairs must correspond to a valid plant object as described in the next subsection.
+
+Note: If a PlantEquipmentList or CondenserEquipmentList object is specified with no equipment object types or equipment names, then the corresponding PlantEquipmentOperation:* object will assume all available equipment on this plant (or condenser) loop should be OFF (not operate) within the specified lower/upper limit.
+
+\subsubsection{Inputs}\label{inputs-15-009}
+
+\paragraph{Field: Name}\label{field-name-8-013}
+
+This alpha field contains the identifying name for the Equipment List.
+
+\paragraph{Field Set: (Object Type, Name) up to 10}\label{field-set-object-type-name-up-to-10}
+
+Remember the order of equipment on this list determines operation priority. Equipment on the list first will try to meet demand first. These fields tie to the Equipment Definition input structure, which must also be defined.
+
+\paragraph{Field: Equipment \textless{}\#\textgreater{} Object Type}\label{field-equipment-object-type-1}
+
+This alpha field contains the keyword for the type of equipment in operation. Example: (Chiller:Electric, DistrictCooling). The full list of allowable plant equipment is valid plant objects as described in the next subsection.
+
+\paragraph{Field: Equipment \textless{}\#\textgreater{} Name}\label{field-equipment-name-1}
+
+This alpha field contains the identifying name for the equipment in operation. This distinguishes between two different pieces of equipment of the same type.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+PlantEquipmentList, Chiller Plant and Purchased,
+          Chiller:Electric, Big Chiller,
+          DistrictCooling, Purchased Cooling;
+\end{lstlisting}
+
+Note that this list is the middle range defined in the PlantEquipmentOperation:CoolingLoad statement named ``Peak Operation'' above. This defines the equipment available when the load encountered by the plant (chiller water demand, for example) is between 7000 W and 24500 W. EnergyPlus will run the ``Big Chiller'' first up to its capacity and then attempt to meet the remaining load (while in that range) with the next piece of equipment (in this case, ``Purchased:Cooling'') in the list.

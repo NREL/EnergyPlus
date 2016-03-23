@@ -1,0 +1,19 @@
+\section{Tabular Output Utilities}\label{tabular-output-utilities}
+
+Several utility routines are available to help generate tabular reports. To create tabular reports, the developer needs to create a routine called something like WriteTabularX.~ The WriteTabularX routine should appear in SimulationManger between the OpenOutputTabularFile and CloseOutputTabularFile calls.~ The WriteTabularX routine should make use of several utilities described below.~ The ``USE'' statement reference OutputReportTabular module.~ Good example of how to use this facility are in the OutputReportTabular file and the EconomicTariff file.
+
+\subsection{WriteReportHeaders(reportName,objectName,averageOrSum)}\label{writereportheadersreportnameobjectnameaverageorsum}
+
+Where reportName is the name that you want the report to be called and the objectName is the name of the object that appears after the ``For: `` for each instance of the report. The averageOrSum flag when set to SUM adds the phrase ``per second'' after the reportName.
+
+\subsection{WriteSubtitle(subtitle)}\label{writesubtitlesubtitle}
+
+Where the subtitle is a string that usually appears before a specific table. This is useful if the report includes multiple tables.
+
+\subsection{WriteTable(body,rowLabels,columnLabels,widthColumn)}\label{writetablebodyrowlabelscolumnlabelswidthcolumn}
+
+The WriteTable routine actually generates the tables that appear in the tabular output file (CSV, HTML, or TXT).~ The rowLabels and columnLables are both one dimensional string arrays that contain the appropriate labels. If the column labels strings include the vertical bar symbol ``\textbar{}'' then when creating a text report, the labels will be split between lines at the vertical bar.~ For HTML and CSV output, the vertical bar symbols are removed prior to display.
+
+The body array is a two dimensional array (row,column order) containing the cells in the body of the table.~ It must be strings so conversion utilities such as RealToStr should be used to convert from numeric values.
+
+WidthColumn is a one dimensional integer array containing the column widths for use only with the fixed width text output option.
