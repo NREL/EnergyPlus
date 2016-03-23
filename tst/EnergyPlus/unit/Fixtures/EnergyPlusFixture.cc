@@ -76,6 +76,7 @@
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -266,6 +267,7 @@ namespace EnergyPlus {
 		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CoolTower::clear_state();
+		CrossVentMgr::clear_state();
 		CurveManager::clear_state();
 		DataAirflowNetwork::clear_state();
 		DataAirLoop::clear_state();
