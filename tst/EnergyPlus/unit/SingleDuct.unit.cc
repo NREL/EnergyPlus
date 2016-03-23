@@ -1262,14 +1262,29 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 	//compare_err_stream( "" ); // just for debugging
 
 	//zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
-	// EXPECT == 0
-	EXPECT_EQ( SingleDuct::Sys( 1 ).ZoneFloorArea, 0.0 );
-	EXPECT_EQ( SingleDuct::Sys( 1 ).MaxAirVolFlowRateDuringReheat, 0.0 );
-	EXPECT_EQ( SingleDuct::Sys( 1 ).MaxAirVolFractionDuringReheat, 0.0 );
+	Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
+	// apply limit based on min stop
+	MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( SingleDuct::Sys( 1 ).MaxAirVolFlowRate * SingleDuct::Sys( 1 ).ZoneMinAirFrac ) );
 
-	// EXPECT > 0
+	Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
+	// apply limit based on min stop
+	MaxAirVolFractionDuringReheatDes = max( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 1 ).ZoneMinAirFrac );
+	// apply model math
+	MaxAirVolFlowRateDuringReheatDes = min( max( MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * SingleDuct::Sys( 1 ).MaxAirVolFlowRate ), SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
+	// EXPECT zone floor area == 0, others as calculated above
+	EXPECT_EQ( SingleDuct::Sys( 1 ).ZoneFloorArea, 0.0 );
+	EXPECT_NEAR( SingleDuct::Sys( 1 ).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001 );
+	EXPECT_NEAR( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 1 ).MaxAirVolFractionDuringReheat, 0.0000000000001 );
+
+	MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 2 ).ZoneFloorArea, SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
+	MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( SingleDuct::Sys( 2 ).MaxAirVolFlowRate * SingleDuct::Sys( 2 ).ZoneMinAirFrac ) );
+	MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 2 ).ZoneFloorArea / SingleDuct::Sys( 2 ).MaxAirVolFlowRate ) );
+	MaxAirVolFractionDuringReheatDes = max( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 2 ).ZoneMinAirFrac );
+	MaxAirVolFlowRateDuringReheatDes = min( max( MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * SingleDuct::Sys( 2 ).MaxAirVolFlowRate ), SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
+
+	// EXPECT zone floor area > 0, others as calculated above
 	EXPECT_GT( SingleDuct::Sys( 2 ).ZoneFloorArea, 0.0 );
-	EXPECT_GT( SingleDuct::Sys( 2 ).MaxAirVolFlowRateDuringReheat, 0.0 );
-	EXPECT_GT( SingleDuct::Sys( 2 ).MaxAirVolFractionDuringReheat, 0.0 );
+	EXPECT_NEAR( SingleDuct::Sys( 2 ).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001 );
+	EXPECT_NEAR( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 2 ).MaxAirVolFractionDuringReheat, 0.0000000000001 );
 
 }

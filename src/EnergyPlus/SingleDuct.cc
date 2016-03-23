@@ -2005,7 +2005,6 @@ namespace SingleDuct {
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
 			} else {
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = 0.0;
-				Sys( SysNum ).MaxAirVolFractionDuringReheat = 0.0;
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", 0.0 );
 			}
 		} else { // Hard size with sizing data
