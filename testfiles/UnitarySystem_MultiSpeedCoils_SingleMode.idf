@@ -1656,7 +1656,7 @@
     0.058333,                !- Defrost Time Period Fraction
     2000.0,                  !- Resistive Defrost Heater Capacity {W}
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
-    NaturalGas,              !- Fuel Type
+    Electricity,             !- Fuel Type
     4,                       !- Region number for Calculating HSPF
     4,                       !- Number of Speeds
     7500,                    !- Speed 1 Gross Rated Heating Capacity {W}
@@ -2032,7 +2032,7 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    NaturalGas,              !- Fuel Type
+    Electricity,             !- Fuel Type
     4,                       !- Number of Speeds
     7500,                    !- Speed 1 Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Gross Rated Sensible Heat Ratio

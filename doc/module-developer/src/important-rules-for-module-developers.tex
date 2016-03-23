@@ -1,0 +1,19 @@
+\chapter{Important Rules for Module Developers}\label{important-rules-for-module-developers}
+
+1.~~~INITIALIZE!!!!!~ INITIALIZE either fully or ``invalidly'' when you ALLOCATE the array/derived type.~ Two items have been set up to help you: BigNumber and DBigNumber are in DataGlobals.~ They get initialized before anything happens in the main routine (EnergyPlus). An invalid initialization can use one of these, appropriately (i.e.~set and test for ``BigNumber'').~ Another example of ``invalid'' initialization is a value that shouldn't be legal for the item (-999).
+
+2.~~~Warning errors during ``get input'' should only be used when program termination is not required (this is rare). Each GetInput routine should be structured so that errors detected (such as an invalid schedule name which currently is just a warning) cause a fatal error after all the input for that item/module/etc is gotten.~ (See HBManager, BaseboardRadiator, others)~ In addition, don't make GetInputFlag a module variable.~ Make it as ``local'' as possible.~ Look at BaseboardRadiator for an example.
+
+3.~~~Error messages during simulation should be semi-intelligent.~ No one wants to see 5,000 messages saying ``this flow invalid''.~ If the error condition might happen a lot (especially during debugging), count each occurrence and only put out a message every 50 or so.~~ It is better to use the ``Recurring Error Handling'' routines. (See examples of both above in the Error Messages section).~ Also, if you are putting the same message in two modules, identify the error message with some designation.~ For Example,
+
+~CALL ShowWarningError (\textbf{'SimRoutinename}: this condition happened again')
+
+will help everyone track it down.~~ Use the ShowContinueErrorTimeStamp so the time/date/environment of occurrence is known, as appropriate for the condition.
+
+4.~~~Use the templates for documentation!~ Modules, subroutines, functions templates all have been checked into StarTeam.~ Use them.~ Put INTENTs on your Subroutine Arguments.~ Document variables.
+
+\textbf{5.~~~Add ``meter'' variables as appropriate!~ If your module uses fuel or electricity and that energy is not accounted for by other components (i.e.~pumps, coils, chillers, etc), then you need to report it onto a ``meter''.}
+
+\textbf{6.~~~Avoid the use of string comparisons in subroutines other than GetInput.~ Check string comparisons in the GetInput subroutines and assign an integer parameter for comparisons elsewhere in the module. Character strings in structures are not allowed (except for name of object) -- any exceptions must be approved. Schedule names, curve object names, and child object types MUST all be referenced by an integer. Existing code must be changed as you change any of the code within a module.~}
+
+\textbf{7.~~~If you are submitting code for insertion in the public version of EnergyPlus, make sure that the proper ``Grant-Back'' procedure has been followed so that the correct attributions of code authorship are given as well as permission to use this code in publicly available software is assured. (see Appendix G, Code/Module Contribution Questionnaire -- also available separately)}

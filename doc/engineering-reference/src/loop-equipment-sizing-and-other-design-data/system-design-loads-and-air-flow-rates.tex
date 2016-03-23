@@ -1,0 +1,562 @@
+\section{System Design Loads and Air Flow Rates}\label{system-design-loads-and-air-flow-rates}
+
+\subsection{Overview}\label{overview-026}
+
+The purpose of the system design calculation is to estimate design heating and cooling loads and air flow rates for each air loop in the simulation problem. The calculation sequence for system level design loads and air flow rates resembles the calculation sequence for zone loads and air flow rates. There is an update subroutine \emph{UpdateSysSizing} called at the beginning, during, and end of a loop in the Sizing Manager over all the design days. The major difference is that this calculation is done at the zone time-step only. There is no idealized component calculation triggered at the system time-step as in the zone calculation. The system design calculation operates at the zone time step using the design environment weather data and the data stored in the zone sizing arrays. The results of the system design calculation are stored in the system sizing arrays described below.
+
+\subsection{System Design Data Arrays}\label{system-design-data-arrays}
+
+The system design data arrays are:
+
+\emph{SysSizInput(i)} stores the input data from the Sizing:System objects.
+
+\emph{SysSizing(i,j)} stores the results of the system design calculations for all systems and all design days. The index i is for air loops, j for design days.
+
+\emph{CalcSysSizing(i}) stores the results of the system design calculations for the peak heating and cooling cases for each air loop. The index i is for the air loops.
+
+\emph{FinalSysSizing(i}) corresponds to \emph{CalcSysSizing} but includes the effect of the user specified sizing factor or user specified system design flow rate.
+
+The data stored in \emph{SysSizing}, \emph{CalcSysSizing} and \emph{FinalSysSizing} includes the following data items.
+
+% table 41
+\begin{longtable}[c]{p{2.0in}p{4.0in}}
+\caption{System Sizing Data \label{table:system-sizing-data}} \tabularnewline
+\toprule 
+Name & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{System Sizing Data} \tabularnewline
+\toprule
+Name & Description \tabularnewline
+\midrule
+\endhead
+
+All the data from SysSizInput &  \tabularnewline
+CoinCoolMassFlow & coincident peak cooling mass flow rate [kg/s] \tabularnewline
+CoinHeatMassFlow & coincident peak heating mass flow rate [kg/s] \tabularnewline
+NonCoinCoolMassFlow & noncoincident peak cooling mass flow rate [kg/s] \tabularnewline
+NonCoinHeatMassFlow & noncoincident peak heating mass flow rate [kg/s] \tabularnewline
+DesMainVolFlow & design main supply duct volume flow [m  /s] \tabularnewline
+DesHeatVolFlow & design heat supply duct volume flow [m  /s] \tabularnewline
+DesCoolVolFlow & design cool supply duct volume flow [m  /s] \tabularnewline
+SensCoolCap & design sensible cooling capacity [W] \tabularnewline
+TotCoolCap & design total cooling capacity [W] \tabularnewline
+HeatCap & design heating capacity [W] \tabularnewline
+PreheatCap & design preheat capacity [W] \tabularnewline
+MixTempAtCoolPeak & mixed air temperature at the time of the cooling peak [C] \tabularnewline
+MixHumRatAtCoolPeak & mixed air humidity ratio at the time of the cooling peak [kg water/kg dry air] \tabularnewline
+RetTempAtCoolPeak & return air temperature at the time of the cooling peak [C] \tabularnewline
+RetHumRatAtCoolPeak & return air humidity ratio at the time of the cooling peak [kg water/kg dry air] \tabularnewline
+OutTempAtCoolPeak & outside air temperature at the time of the cooling peak [C] \tabularnewline
+OutHumRatAtCoolPeak & outside air humidity ratio at the time of the cooling peak [kg water/kg dry air] \tabularnewline
+HeatMixTemp & design mixed air temperature for heating [C] \tabularnewline
+HeatMixHumRat & design mixed air humidity ratio for heating [kg water/kg dry air] \tabularnewline
+HeatRetTemp & design return air temperature for heating [C] \tabularnewline
+HeatRetHumRat & design return air humidity ratio for heating [kg water/kg dry air] \tabularnewline
+HeatOutTemp & design outside air temperature for heating [C] \tabularnewline
+HeatOutHumRat & design outside air humidity ratio for heating [kg water/kg dry air] \tabularnewline
+HeatFlowSeq(i) & daily sequence of system heating air mass flow rate (zone time step) [kg/s] \tabularnewline
+CoolFlowSeq(i) & daily sequence of system cooling air mass flow rate (zone time step) [kg/s] \tabularnewline
+SumZoneCoolLoadSeq(I) & daily sequence of zones' summed cooling load (zone time step) [W] \tabularnewline
+CoolZoneAvgTempSeq(I) & daily sequence of zones flow weighted average temperature (zone time step) [W] \tabularnewline
+SensCoolCapSeq(I) & daily sequence of system sensible cooling capacity (zone time step) [W] \tabularnewline
+TotCoolCapSeq(I) & daily sequence of system total cooling capacity (zone time step) [W] \tabularnewline
+HeatCapSeq(i) & daily sequence of system heating capacity (zone time step) [W] \tabularnewline
+PreHeatCapSeq(i) & daily sequence of system preheat capacity (zone time step) [W] \tabularnewline
+SysCoolRetTempSeq(i) & daily sequence of system cooling return temperatures (zone time step) [C] \tabularnewline
+SysCoolRetHumRatSeq(I) & daily sequence of system cooling return humidity ratios (zone time step) [kg water/kg dry air] \tabularnewline
+SysHeatRetTempSeq(i) & daily sequence of system heating return temperatures (zone time step) [C] \tabularnewline
+SysHeatRetHumRatSeq(I) & daily sequence of system heating return humidity ratios (zone time step) [kg water/kg dry air] \tabularnewline
+SysCoolOutTempSeq & daily sequence of system cooling outside temperatures (zone time step) [C] \tabularnewline
+SysCoolOutHumRatSeq & daily sequence of system cooling outside humidity ratios (zone time step) [kg water/kg dry air] \tabularnewline
+SysHeatOutTempSeq & daily sequence of system heating outside temperatures (zone time step) [C] \tabularnewline
+SysHeatOutHumRatSeq & daily sequence of system heating outside humidity ratios (zone time step) [kg water/kg dry air] \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{System Design Flow Rate and Load Summation and Adjustment}\label{system-design-flow-rate-and-load-summation-and-adjustment}
+
+There is no system level subroutine corresponding to \emph{SizeZoneEquipment.} Instead the system design loads and flow rates are calculated using the zone level results. The zone design flow rates for the zones served by an air loop are summed to obtain the system level design flow rates. These air flows are mixed with the system level design minimum outside air flow rate to obtain system design coil loads. These activities are all performed within the \emph{UpdateSysSizing} subroutine in the \emph{SimAirServingZones} module. It is called at the start of each design day (\emph{CallIndicator = BeginDay}), at the zone time-step (\emph{CallIndicator = DuringDay}), at the end of the design day (\emph{CallIndicator = EndDay}) and at the end of the zone design calculation (\emph{CallIndicator = EndSysSizingCalc}).
+
+There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCalc}. It is used to allow the component routines to distinguish a normal simulation call from a being called during a system sizing calculation.
+
+\subsubsection{BeginDay}\label{beginday}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+  The environment (in this case, a design day) name is stored in the system sizing data structures.
+\item
+  Loop over the zones cooled by this air loop: 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  \emph{NonCoinCoolMassFlow\(_{sys}\)} = \emph{DesCoolMassFlow\(_{zone}\)} 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Loop over the zones heated by this air loop: 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  \emph{NonCoinHeatMassFlow\(_{sys}\)} = \emph{DesHeatMassFlow\(_{zone}\)}
+\end{enumerate}
+
+\subsubsection{DuringDay}\label{duringday}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Loop over the zones cooled by this air loop:
+\end{enumerate}
+
+\emph{CoolFlowSeq\(_{sys}\)(i)} = \emph{CoolFlowSeq \(_{zone}\)}(i)
+
+\emph{SysCoolRetTemp(i)} = (\emph{CoolZoneRetTempSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
+
+\emph{SysCoolRetHumRat(i)} = (\emph{CoolZoneHumRatSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
+
+\emph{T\(_{mix}\)} = \emph{T\(_{outside}\)} * \emph{FracOA} + \emph{SysCoolRetTemp(i)}(1 - \emph{FracOA})
+
+\emph{W\(_{mix}\)} = \emph{W\(_{outside}\)} * \emph{FracOA} + \emph{SysCoolRetHumRat (i)}(1 - \emph{FracOA})
+
+\emph{SysCoolOutTempSeq(i)} = \emph{T\(_{outside}\)}
+
+\emph{SysCoolOutHumRatSeq(i)} = \emph{W\(_{outside}\)}
+
+Get the current (zone time-step) system cooling capacity:
+
+\emph{SysSensCoolCap\(_{cur}\)} = \emph{C\(_{p,air}\)} * \emph{CoolFlowSeq\(_{sys}\)(i)} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
+
+\emph{SensCoolCapSeq(I)} = \emph{SysSensCoolCap\(_{cur}\)}
+
+If \emph{SysSensCoolCap\(_{cur}\)} is the maximum for the day so far then save \emph{SysSensCoolCap\(_{cur}\)} as the design value:
+
+\emph{SensCoolCap(i )\(_{sys}\)} = \emph{SysSensCoolCap\(_{cur}\)}
+
+And save the corresponding mixed, return and outside conditions:
+
+\emph{CoolMixTemp\(_{sys}\)} = \emph{T\(_{mix}\)}
+
+\emph{CoolMixHumRat\(_{sys}\)} = \emph{W\(_{mix}\)}
+
+\emph{CoolRetTemp\(_{sys}\)} = \emph{SysCoolRetTemp(i)}
+
+\emph{CoolRetHumRat\(_{sys}\)} = \emph{SysCoolRetHumRat(I)}
+
+\emph{CoolOutTemp\(_{sys}\)} = \emph{T\(_{outside}\)}
+
+\emph{CoolOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
+
+Here \emph{r\(_{air}\)} is the density of dry air at 20C and standard elevation corrected pressure, {[}kg/m\(^{3}\){]};
+
+\begin{lstlisting}
+        *FracOA* is the outside air fraction;
+\end{lstlisting}
+
+\begin{itemize}
+\item
+  C\(_{p,air}\)* is the specific heat of dry air at 20C, {[}J/kg-K{]};
+\item
+  T\(_{sup}\)* is the user specified design cooling supply temperature {[}C{]};
+\item
+  T\(_{mix}\)* is the current mixed air temperature {[}C{]};
+\item
+  W\(_{mix}\)* is the current mixed air humidity ratio {[}kg water / kg dry air{]};
+\item
+  \(T_{outside}\) is the current outside air temperature {[}C{]};
+\item
+  \(W_{outside}\) is the current outside air humidity ratio {[}kg water / kg dry air{]}.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Loop over the zones heated by this air loop.
+\end{enumerate}
+
+\emph{HeatFlowSeq\(_{sys}\)(i)} = \emph{HeatFlowSeq \(_{zone}\)}(i)
+
+\emph{SysHeatRetTemp(i)} = (\emph{HeatZoneRetTempSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
+
+\emph{HeatFlowSeq\(_{sys}\)(i)}
+
+\emph{SysHeatRetHumRat(i)} = (\emph{HeatZoneHumRatSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
+
+\begin{itemize}
+\tightlist
+\item
+  HeatFlowSeq\(_{sys}\)(i)*
+\end{itemize}
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{HeatFlowSeq\(_{sys}\)(i)}
+
+\emph{T\(_{mix}\)} = \emph{T\(_{outside}\)} * \emph{FracOA} + \emph{SysHeatRetTemp(i)}(1 - \emph{FracOA})
+
+\emph{W\(_{mix}\)} = \emph{W\(_{outside}\)} * \emph{FracOA} + \emph{SysHeatRetHumRat (i)}(1 - \emph{FracOA})
+
+\emph{SysHeatOutTempSeq(i)} = \emph{T\(_{outside}\)}
+
+\emph{SysHeatOutHumRatSeq(i)} = \emph{W\(_{outside}\)}
+
+Get the current (zone time-step) system heating capacity:
+
+\emph{SysHeatCap\(_{cur}\)} = \emph{C\(_{p,air}\)} * \emph{MinFlowRat\(_{sys}\)} *\emph{HeatFlowSeq\(_{sys}\)(i)} *( \emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
+
+\emph{HeatCapSeq(I)} = \emph{SysHeatCap\(_{cur}\)}
+
+If \emph{SysHeatCap\(_{cur}\)} is the maximum for the day so far then save \emph{SysHeatCap\(_{cur}\)} as the design value:
+
+\emph{HeatCap(i )\(_{sys}\)} = \emph{SysHeatCap\(_{cur}\)}
+
+And save the corresponding mixed, return and outside conditions:
+
+\emph{HeatMixTemp\(_{sys}\)} = \emph{T\(_{mix}\)}
+
+\emph{HeatMixHumRat\(_{sys}\)} = \emph{W\(_{mix}\)}
+
+\emph{HeatRetTemp\(_{sys}\)} = \emph{SysHeatRetTemp(i)}
+
+\emph{HeatRetHumRat\(_{sys}\)} = \emph{SysHeatRetHumRat(I)}
+
+\emph{HeatOutTemp\(_{sys}\)} = \emph{T\(_{outside}\)}
+
+\emph{HeatOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
+
+Here \emph{MinFlowRat\(_{sys}\)} is the user specified minimum supply flow ratio.
+
+\subsubsection{EndDay}\label{endday}
+
+If the user has specified \emph{coincident} system sizing then:
+
+\emph{DesCoolVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{CoinCoolMassFlow\(_{sys}\)}
+
+\emph{DesHeatVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{CoinHeatMassFlow\(_{sys}\)}
+
+\emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
+
+If the user has specified \emph{noncoincident}system sizing then:
+
+\emph{DesCoolVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{NonCoinCoolMassFlow\(_{sys}\)}
+
+\emph{DesHeatVolFlow\(_{sys}\)} = \emph{r\(_{air}\)} *\emph{NonCoinHeatMassFlow\(_{sys}\)}
+
+\emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
+
+Based on the outdoor air method selected, the \emph{DesCoolVolFlow\(_{sys}\)} and \emph{DesHeatVolFlow\(_{sys}\)} are modified based on the system ventilation effciency calculated based on the maximum outdoor air fraction.
+
+\subsubsection{EndSysSizingCalc}\label{endsyssizingcalc}
+
+At this point all the calculations have been done in \emph{SysSizing(i,j)}: we have results for each design day. Now these results need to be processed to find the heating and cooling design quantities for each system over all the design days.
+
+For coincident sizing the task is quite easy.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Loop over all of the air loops. 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\item
+  Loop over all of the design days.
+\item
+  If the value of \emph{DesCoolVolFlow} in \emph{SysSizing} for the current design day is greater than the value stored in \emph{CalcSysSizing}, then move \emph{DesCoolVolFlow} from \emph{SysSizing} into \emph{CalcSysSizing} along with \emph{CoolDesDay}, \emph{CoinCoolMassFlow}, \emph{SensCoolCap}, \emph{CoolFlowSeq(i)}, \emph{SensCoolCapSeq(i),} \emph{CoolMixTemp}, \emph{CoolRetTemp}, \emph{CoolMixHumRat}, \emph{CoolRetHumRat}, \emph{CoolOutTemp}, \emph{CoolOutHumRat}, \emph{SysCoolRetTempSeq(i)}, \emph{SysCoolRetHumRatSeq(i)}, \emph{SysCoolOutTempSeq(i)} and \emph{SysCoolOutHumRatSeq(i)}. 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  If the value of \emph{DesHeatVolFlow} in \emph{SysSizing} for the current design day is greater than the value stored in \emph{CalcSysSizing}, then move \emph{DesHeatVolFlow} from \emph{SysSizing} into \emph{CalcSysSizing} along with \emph{HeatDesDay}, \emph{CoinHeatMassFlow}, \emph{HeatCap}, \emph{PreHeatCap}, \emph{HeatFlowSeq(i)}, \emph{HeatCapSeq(i),} \emph{PreHeatCapSeq(i), HeatMixTemp}, \emph{HeatRetTemp}, \emph{HeatMixHumRat}, \emph{HeatRetHumRat}, \emph{HeatOutTemp}, \emph{HeatOutHumRat}, \emph{SysHeatRetTempSeq(i)}, \emph{SysHeatRetHumRatSeq(i)}, \emph{SysHeatOutTempSeq(i)} and \emph{SysHeatOutHumRatSeq(i)}.
+\end{enumerate}
+
+At the end of each design day loop the peak cooling and the peak heating data will be stored in \emph{CalcSysSizing}. At this point we set \emph{DesMainVolFlow} in \emph{CalcSysSizing} equal to the maximum of \emph{DesCoolVolFlow} and \emph{DesHeatVolFlow.}
+
+For noncoincident sizing the task is harder since we don't have a single time-step during which all the zone peaks occur. So there is no obvious value for outside air temperature at the peak, return air temperature at the peak and so forth. We must return to the zone sizing data and calculate average values for return and outside conditions.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\item
+  Loop over all of the zones cooled by this air loop
+\item
+  In \emph{FinalZoneSizing} replace the value in \emph{DesCoolCoilInTemp} with the user specified \emph{CoolSupTemp\(_{sys}\)}. Do the same for \emph{DesCoolCoilInHumRat} and \emph{CoolSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions. 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \emph{NonCoinCoolMassFlow\(_{sys}\)} = \emph{DesCoolMassFlow\(_{zone}\)}
+\end{enumerate}
+
+\emph{SysCoolRetTemp} = (\emph{ZoneRetTempAtCoolPeak *DesCoolMassFlow\(_{zone}\)})
+
+/\emph{NonCoinCoolMassFlow\(_{sys}\)}
+
+\emph{SysCoolRetHumRat} = (\emph{ZoneHumRatAtCoolPeak *}
+
+\emph{DesCoolMassFlow\(_{zone}\)})/\emph{NonCoinCoolMassFlow\(_{sys}\)}
+
+\emph{SysCoolOutTemp} = (\emph{T\(_{OA,zone\, peak}\) *DesCoolMassFlow\(_{zone}\)})/
+
+\begin{itemize}
+\tightlist
+\item
+  NonCoinCoolMassFlow\(_{sys}\)*
+\end{itemize}
+
+\emph{SysCoolOutHumRat} = (\emph{W\(_{OA,zone\\ peak}\) *DesCoolMassFlow\(_{zone}\)})/
+
+\begin{itemize}
+\tightlist
+\item
+  NonCoinCoolMassFlow\(_{sys}\)*
+\end{itemize}
+
+At the end of the zone loop calculate mixed air conditions and the system sensible cooling capacity.
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinCoolMassFlow\(_{sys}\)}
+
+\emph{T\(_{mix}\)} = \emph{SysCoolOutTemp} * \emph{FracOA} + \emph{SysCoolRetTemp} * (1 - \emph{FracOA})
+
+\emph{W\(_{mix}\)} = \emph{SysCoolOutHumRat} * \emph{FracOA} + \emph{SysCoolRetHumRat} *
+
+(1 - \emph{FracOA})
+
+\emph{SysSensCoolCap} = \emph{C\(_{p,air}\)} * \emph{NonCoinCoolMassFlow} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
+
+Then (for noncoincident sizing) the variables calculated in section (ii) are moved into the \emph{CalcSysSizing} Array.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{2}
+\item
+  Loop over all of the zones heated by this air loop.
+\item
+  In \emph{FinalZoneSizing} replace the value in \emph{DesHeatCoilInTemp} with the user specified \emph{HeatSupTemp\(_{sys}\)}. Do the same for \emph{DesHeatCoilInHumRat} and \emph{HeatSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions. 
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \emph{NonCoinHeatMassFlow\(_{sys}\)} = \emph{DesHeatMassFlow\(_{zone}\)}
+\end{enumerate}
+
+\emph{SysHeatRetTemp} = (\emph{ZoneRetTempAtHeatPeak *DesHeatMassFlow\(_{zone}\)})
+
+/\emph{NonCoinHeatMassFlow\(_{sys}\)}
+
+\emph{SysHeatRetHumRat} = (\emph{ZoneHumRatAtHeatPeak *}
+
+\emph{DesHeatMassFlow\(_{zone}\)})/\emph{NonCoinHeatMassFlow\(_{sys}\)}
+
+\emph{SysHeatOutTemp} = (\emph{T\(_{OA,zone\\ peak}\) *DesHeatMassFlow\(_{zone}\)})/
+
+\begin{itemize}
+\tightlist
+\item
+  NonCoinHeatMassFlow\(_{sys}\)*
+\end{itemize}
+
+\emph{SysHeatOutHumRat} = (\emph{W\(_{OA,zone\\ peak}\) *DesHeatMassFlow\(_{zone}\)})/
+
+\begin{itemize}
+\tightlist
+\item
+  NonCoinHeatMassFlow\(_{sys}\)*
+\end{itemize}
+
+At the end of the zone loop calculate mixed air conditions and the system sensible cooling capacity.
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinHeatMassFlow\(_{sys}\)}
+
+\emph{T\(_{mix}\)} = \emph{SysHeatOutTemp} * \emph{FracOA} + \emph{SysHeatRetTemp} * (1 - \emph{FracOA})
+
+\emph{W\(_{mix}\)} = \emph{SysHeatOutHumRat} * \emph{FracOA} + \emph{SysHeatRetHumRat} *
+
+(1 - \emph{FracOA})
+
+\emph{SysHeatlCap} = \emph{C\(_{p,air}\)} * \emph{NonCoinHeatlMassFlow} *( \emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
+
+Then (for noncoincident sizing) the variables calculated in section (ii) are moved into the \emph{CalcSysSizing} Array.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  We now have the calculated system sizing data. This data needs to be altered to take into account the user input system design flow rates (if any), or the fact that the user may have requested that the system flow rate be sized on the ventilation requirement. Note that user specified sizing ratios have already been applied to the zone sizing data which have been used in out preceding system sizing calculation. Thus the user specified sizing ratios do not have to be explicitly taken into account at the system level.
+\end{enumerate}
+
+First we move the calculated system sizing data from \emph{CalcSysSizing} array into the \emph{FinalSysSizing} array. \emph{FinalSysSizing} will contain the user modified system design data when we are all done.
+
+Loop over the air loops.
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\tightlist
+\item
+  As in the zone case, the user specified system design flow rates are turned into sizing ratios by dividing the user input value by the calculated value. The same strategy is employed for sizing on the ventilation requirement: the design ventilation flow rate is divided by the calculated design flow rate value. For each air loop this gives us a \emph{SizRat\(_{cool}\)} and \emph{SizRat\(_{heat}\)}.
+\end{enumerate}
+
+\emph{CoinCoolMassFlow} = \emph{SizRat\(_{cool}\)} * \emph{CoinCoolMassFlow\(_{calc}\)}
+
+\emph{NonCoinCoolMassFlow} = \emph{SizRat\(_{cool}\)} * \emph{NonCoinCoolMassFlow\(_{calc}\)}
+
+\emph{DesCoolVolFlow} = \emph{SizRat\(_{cool}\)} * \emph{DesCoolVolFlow\(_{calc}\)}
+
+Since the flow rates have been altered the outside air fraction will change. This will alter the design mixed air conditions and lead to an altered value for the cooling capacity. This must be done for the time-step sequence and for the peak value.
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Loop over the zone timesteps (index = \emph{i}).
+\end{enumerate}
+
+\emph{CoolFlowSeq\(_{sys}\)(i)} = \emph{SizRat\(_{cool}\)} * \emph{CoolFlowSeq\(_{sys,calc}\)(i)}
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
+
+\emph{T\(_{mix}\)} = \emph{SysCoolOutTempSeq(i) *FracOA +}
+
+\emph{SysCoolRetTempSeq(i) *(}1-FracOA)
+
+\emph{SensCoolCapSeq(i)} = \emph{C\(_{p,air}\)} * \emph{CoolFlowSeq\(_{sys}\)(i)} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Do the same calculation for peak cooling.
+\end{enumerate}
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesCoolVolFlow}
+
+\emph{T\(_{mix}\)} = \emph{CoolOutTemp\(_{sys}\) *FracOA + CoolRetTemp\(_{sys}\) *(}1-FracOA)
+
+\emph{W\(_{mix}\)} = \emph{CoolOutHumRat\(_{sys}\) *FracOA + CoolRetHumRat\(_{sys}\) *}
+
+\emph{(}1-FracOA)
+
+\emph{SensCoolCap\(_{sys}\)} = \emph{C\(_{p,air}\)} * \emph{DesCoolVolFlow\(_{sys}\)} *( \emph{T\(_{mix}\)}-\emph{T\(_{sup}\)})
+
+\emph{T\(_{mix}\)} and \emph{W\(_{mix}\)} are saved in \emph{FinalSysSizing} \emph{.}
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Do the same calculation for the heating case.
+\end{enumerate}
+
+\emph{CoinHeatMassFlow} = \emph{SizRat\(_{heat}\)} * \emph{CoinHeatMassFlow\(_{calc}\)}
+
+\emph{NonCoinHeatMassFlow} = \emph{SizRat\(_{heat}\)} * \emph{NonCoinHeatMassFlow\(_{calc}\)}
+
+\emph{DesHeatVolFlow} = \emph{SizRat\(_{heat}\)} * \emph{DesHeatVolFlow\(_{calc}\)}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{21}
+\tightlist
+\item
+  Loop over the zone timesteps (index = \emph{i}).
+\end{enumerate}
+
+\emph{HeatFlowSeq\(_{sys}\)(i)} = \emph{SizRat\(_{Heat}\)} * \emph{HeatFlowSeq\(_{sys,calc}\)(i)}
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{HeatFlowSeq\(_{sys}\)(i)}
+
+\emph{T\(_{mix}\)} = \emph{SysHeatOutTempSeq(i) * FracOA +}
+
+\begin{itemize}
+\tightlist
+\item
+  SysHeatRetTempSeq(i) ** \emph{(}1-FracOA)
+\end{itemize}
+
+\emph{HeatCapSeq(i)} = \emph{C\(_{p,air}\)} * \emph{HeatFlowSeq\(_{sys}\)(i)} *(\emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  Do the same calculation for peak heating.
+\end{enumerate}
+
+\emph{FracOA = r\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesHeatVolFlow}
+
+\emph{T\(_{mix}\)} = \emph{HeatOutTemp\(_{sys}\) *FracOA + HeatRetTemp\(_{sys}\) *} \emph{(}1-FracOA)
+
+\emph{W\(_{mix}\)} = \emph{HeatOutHumRat\(_{sys}\) *FracOA + HeatRetHumRat\(_{sys}\) *}
+
+\emph{(}1-FracOA)
+
+\emph{HeatCap\(_{sys}\)} = \emph{C\(_{p,air}\)} * \emph{DesHeatVolFlow\(_{sys}\)} *( \emph{T\(_{sup}\)}-\emph{T\(_{mix}\)})
+
+\emph{T\(_{mix}\)} and \emph{W\(_{mix}\)} are saved in \emph{FinalSysSizing} \emph{.}
+
+(vii)\emph{DesMainVolFlow\(_{sys}\)} = \textbf{MAX}(\emph{DesCoolVolFlow\(_{sys}\)},\emph{DesHeatVolFlow\(_{sys}\)})
+
+\textbf{This concludes the system design calculation.}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\textbf{Scalable System HVAC Sizing}
+
+The scalable system sizing applies to system supply air flow rates and sysyem capacity in coolin and heating modes.
+
+\textbf{Scalable System Air Flow Sizing}
+
+The scalable sizing methods for supply air flow rate allowed are either, \emph{FlowPerFloorArea}, \emph{FractionOfAutosizedCoolingAirflow}, or \emph{FlowPerCoolingCapacity}. The scalable system air flow sizing methods are defined as follows:
+
+\emph{FlowPerFloorArea} means the program calculates the cooling supply air volume flow rate from zone floor area served by the airloop and user specified \emph{Flow Per Floor Area} value.
+
+\emph{FractionOfAutosizedCoolingAirflow} means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation.
+
+\emph{FractionOfAutosizedHeatingAirflow} means the program calculates the heating supply air volume flow rate from user specified fraction and the autosized design heating supply air volume flow rate value determined by the simulation.
+
+\emph{FlowPerCoolingCapacity} means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation.
+
+\emph{FlowPerHeatingCapacity} means the supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation.
+
+\textbf{Scalable System Capacity Sizing}
+
+The scalable sizing methods for system capacity available are: \emph{CapacityPerFloorArea}, \emph{FractionOfAutosizedCoolingCapacity} and \emph{FractionOfAutosizedHeatingCapacity}. The scalable system capacity sizing methods are defined as follows:
+
+\emph{CapacityPerFloorArea} means the program calculates the design capacity from user specified capacity per floor area and floor area of the zones served by the airloop.
+
+\emph{FractionOfAutosizedCoolingCapacity} means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\emph{FractionOfAutosizedHeatingCapacity} means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity.

@@ -2664,14 +2664,24 @@ namespace MixedAir {
 				}
 			}
 
-			if ( SameString( AlphArray( 18 ), "Yes" ) ) {
-				OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
-			} else if ( SameString( AlphArray( 18 ), "No" ) ) {
-				OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
+			if ( NumAlphas >= 18 ) {
+				if ( SameString( AlphArray( 18 ), "Yes" ) ) {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
+				} else if ( SameString( AlphArray( 18 ), "No" ) ) {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
+				} else {
+					ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
+					ShowContinueError( "..." + cAlphaFields( 18 ) + "=\"" + AlphArray( 18 ) + "\" - valid values are \"Yes\" or \"No\"." );
+					ErrorsFound = true;
+				}
 			} else {
-				ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
-				ShowContinueError( "..." + cAlphaFields( 18 ) + "=\"" + AlphArray( 18 ) + "\" - valid values are \"Yes\" or \"No\"." );
-				ErrorsFound = true;
+				if( OAController( OutAirNum ).Econo == NoEconomizer ) {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
+				} else {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
+					ShowWarningError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", missing field value" );
+					ShowContinueError( "..." + cAlphaFields( 18 ) + " will default to Yes when " + cAlphaFields( 16 ) + "= \"Yes\"" );
+				}
 			}
 
 		} else if ( SameString( AlphArray( 16 ), "No" ) || lAlphaBlanks( 16 ) ) {
