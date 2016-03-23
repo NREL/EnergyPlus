@@ -7194,6 +7194,10 @@ namespace SolarShading {
 			} else {
 				SUN3( DayOfYear, AvgSinSolarDeclin, AvgEqOfTime );
 				AvgCosSolarDeclin = std::sqrt( 1.0 - pow_2( AvgSinSolarDeclin ) );
+				// trigger display of progress in the simulation every two weeks
+				if ( !WarmupFlag && BeginDayFlag && ( DayOfSim % 14 == 0 ) ) {
+					DisplayPerfSimulationFlag = true;
+				}
 			}
 
 			CalcPerSolarBeam( AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );

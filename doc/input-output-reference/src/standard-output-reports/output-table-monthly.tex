@@ -1,0 +1,72 @@
+\section{Output:Table:Monthly}\label{outputtablemonthly}
+
+The Output:Table:Monthly object provides a generic method of setting up tables of monthly results. These tables are good for creating reports that broadly summarize the building performance. At the bottom of the tables, three rows are added for the sum or average depending on the type of variable, the maximum and the minimum of each column. The report produced has multiple columns that are each defined using a repeated group of fields. The fields for the variable name and the aggregation type can be repeated for any number of columns. A single Output:Table:Monthly object often produces multiple tables in the output. A table is produced for every ``key'' for a particular output variable. A single table of results shows values only for a specific ``key''. The exception to this are environment variables, such as outdoor air temperature, that are included in each table, no matter what the key.
+
+\subsection{Inputs}\label{inputs-063}
+
+\paragraph{Field: Name}\label{field-name-061}
+
+The Name field allows the user to give the output table a label that is shown in the output file.
+
+\paragraph{Field: Digits After Decimal}\label{field-digits-after-decimal}
+
+The Digits After Decimal field is a numeric value that indicates how many digits after the decimal point should be shown on the table of values.
+
+\paragraph{Field Set: Variable or Meter and Aggregation Type}\label{field-set-variable-or-meter-and-aggregation-type}
+
+The VariableOrMeterName field and the AggregationType field may be repeated for each column desired in the monthly report. These two fields define each column of the report. The IDD object has been set up to allow up to 25 columns. This object is extensible, so the number of columns may be increased by editing the IDD file and adding the desired number of fields at the end of the object.
+
+\paragraph{Field: Variable or Meter \textless{}\#\textgreater{} Name}\label{field-variable-or-meter-name-000}
+
+The remainder of this input object consists of pairs of fields that can be repeatedVariable Or Meter Name fields contain the name of a variable (see Output:Variable and eplusout.rdd), meter (see Output:Meter and eplusout.mdd), or schedule. This value is shown on a monthly basis using the aggregation method specified. If the selected name is used for both a variable or a meter and a schedule name, the variable or meter will be used.
+
+\paragraph{Field: Aggregation Type for Variable or Meter \textless{}\#\textgreater{}}\label{field-aggregation-type-for-variable-or-meter-000}
+
+The aggregation type determines how the variable is aggregated in the table. The choices for aggregation type are described below:
+
+Simple Aggregation Types
+
+\textbf{SumOrAverage} -- For ``sum'' type variables adds up the values for each timestep and reports the sum of the value monthly. For ``average'' type variables, the value shown will be the average for the month. SumOrAverage is probably the most common choice for aggregation type.
+
+\textbf{Maximum} -- Reports the maximum value and the time that the maximum value occurred. When the maximum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the maximum for a variable in Joules is reported in Watts.
+
+\textbf{Minimum} -- Reports the minimum value and the time that the minimum value occurred. When the minimum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the minimum for a variable in Joules is reported in Watts.
+
+\textbf{HoursNonZero} -- The HoursNonZero option adds up the elapsed time during the month that this variable is non-zero and would be appropriate to determine the number of hour that a fan operates.
+
+\textbf{HoursZero} -- The HoursZero option adds up the elapsed time during the month that this variable has a zero value and would be appropriate to determine the number of hour that a fan does not operate.
+
+\textbf{HoursPositive} -- The HoursPositive option adds up the elapsed time during the month that this variable has a positive value. Hours with a zero value are not included.
+
+\textbf{HoursNonPositive} -- The HoursNonPositive option adds up the elapsed time during the month that this variable has non-positive value. Hours with a negative value and hours with a zero value are all included.
+
+\textbf{HoursNegative} -- The HoursNegative option adds up the elapsed time during the month that this variable has a negative value. Hours with a zero value are not included.
+
+\textbf{HoursNonNegative} -- The HoursNonNegative option adds up the elapsed time during the month that this variable has non-negative value. Hours with a positive value and hours with a zero value are all included.
+
+\emph{Advanced Aggregation Types}
+
+The advanced aggregation types are described below. These aggregation types rely on doing an operation on the current variable but only during the time or times defined by a previously defined field. The ValueWhenMaxOrMin displays the value of one variable at the same time as the maximum or minimum is set on a previous field that is defined as either a maximum or minimum. The ``Hours---`` aggregation types display then number of hours that a variable meets a condition. The ``---DuringHoursShown'' aggregation types perform those aggretations but instead of for all the hours in the month, only for the hours that the previous ``Hours---`` entry applies. Multiple ``---DuringHoursShown'' after an ``Hours---`` will all be based on that single ``Hours---`` entry, in fact the ``---DuringHoursShown'' is based on the next column to the left that contains an ``Hours---`` entry even if other types of aggregations are used in intermediate columns. Order of the variables in the report is important when using the advanced aggregation types since they often depend on a previous entry.
+
+\textbf{ValueWhenMaximumOrMinimum} -- The ValueWhenMaximumOrMinimum option looks at the previous variable in the report that sets a maximum or minimum and displays the value of the current variable at that same timestep. Order of the variables in the report is important when using ValueWhenMaxMin. This can be used, for example, when an outdoor temperature should be reported for the time of the maximum cooling load.
+
+\textbf{SumOrAverageDuringHoursShown} -- Provides the sum or average of the named variable when during the hours that the previous variable displayed with any of the aggregation types starting with ``Hours''. For ``sum'' type variables adds up the values for each timestep and reports the sum of the value monthly during the hours reported on the previous variable. For ``average'' type variables, the value shown will be the average for the month during the hours reported on the previous variable. Order of the variables in the report is important when using this aggregation type.
+
+\textbf{MaximumDuringHoursShown} -- Reports the maximum value and the time that the maximum value occurred but only during the hours reported with the previous ``hours-`` aggregation type. When the maximum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the maximum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.
+
+\textbf{MinimumDuringHoursShown} - Reports the minimum value and the time that the minimum value occurred but only during the hours reported with the previous ``hours-`` aggregation type. When the minimum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the minimum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.
+
+An example of this object follows.
+
+\begin{lstlisting}
+
+Output:Table:Monthly,
+    Building Monthly Cooling Load Report,               ! Name
+    3,                                                  ! Digits After Decimal
+    Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 1 Name
+    SumOrAverage,                                       ! Aggregation Type for Variable or Meter 1
+    Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 2 Name
+    Maximum,                                            ! Aggregation Type for Variable or Meter 2
+    Site Outdoor Air Drybulb Temperature,                                   ! Variable or Meter 3 Name
+    ValueWhenMaxMin;                                    ! Aggregation Type for Variable or Meter 3
+\end{lstlisting}

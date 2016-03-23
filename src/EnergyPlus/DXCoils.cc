@@ -5404,7 +5404,8 @@ namespace DXCoils {
 		Numbers2.deallocate();
 		lAlphaBlanks2.deallocate();
 		lNumericBlanks2.deallocate();
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyEMSRan;
+		ManageEMS( emsCallFromComponentGetInput, anyEMSRan );
 
 	}
 
