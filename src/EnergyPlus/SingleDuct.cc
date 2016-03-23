@@ -2000,8 +2000,14 @@ namespace SingleDuct {
 		// apply limit based on min stop
 		MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac ) );
 		if ( IsAutoSize ) {
-			Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
-			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
+			if( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
+			} else {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = 0.0;
+				Sys( SysNum ).MaxAirVolFractionDuringReheat = 0.0;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", 0.0 );
+			}
 		} else { // Hard size with sizing data
 			if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 0.0 && MaxAirVolFlowRateDuringReheatDes > 0.0 ) {
 				MaxAirVolFlowRateDuringReheatUser = Sys( SysNum ).MaxAirVolFlowRateDuringReheat;
