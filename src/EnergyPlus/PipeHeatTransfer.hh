@@ -71,6 +71,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -99,30 +100,36 @@ namespace PipeHeatTransfer {
 	// the model data structures
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern int NumOfPipeHT; // Number of Pipe Heat Transfer objects
-	extern int InletNodeNum; // module variable for inlet node number
-	extern int OutletNodeNum; // module variable for outlet node number
-	extern int PipeHTNum; // object index
-	extern Real64 MassFlowRate; // pipe mass flow rate
-	extern Real64 VolumeFlowRate; // pipe volumetric flow rate
-	extern Real64 DeltaTime; // time change from last update
-	extern Real64 InletTemp; // pipe inlet temperature
-	extern Real64 OutletTemp; // pipe outlet temperature
-	extern Real64 EnvironmentTemp; // environmental temperature (surrounding pipe)
-	extern Real64 EnvHeatLossRate; // heat loss rate from pipe to the environment
-	extern Real64 FluidHeatLossRate; // overall heat loss from fluid to pipe
+	extern int nsvNumOfPipeHT; // Number of Pipe Heat Transfer objects
+	extern int nsvInletNodeNum; // module variable for inlet node number
+	extern int nsvOutletNodeNum; // module variable for outlet node number
+	extern int nsvPipeHTNum; // object index
+	extern Real64 nsvMassFlowRate; // pipe mass flow rate
+	extern Real64 nsvVolumeFlowRate; // pipe volumetric flow rate
+	extern Real64 nsvDeltaTime; // time change from last update
+	extern Real64 nsvInletTemp; // pipe inlet temperature
+	extern Real64 nsvOutletTemp; // pipe outlet temperature
+	extern Real64 nsvEnvironmentTemp; // environmental temperature (surrounding pipe)
+	extern Real64 nsvEnvHeatLossRate; // heat loss rate from pipe to the environment
+	extern Real64 nsvFluidHeatLossRate; // overall heat loss from fluid to pipe
+	extern int nsvNumInnerTimeSteps; // the number of "inner" time steps for our model
+
 	extern bool GetPipeInputFlag; // First time, input is "gotten"
-	extern int NumInnerTimeSteps; // the number of "inner" time steps for our model
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Types
 
-	struct PipeHTData
+	struct PipeHTData : public PlantComponent
 	{
+
+		virtual
+		~PipeHTData()
+		{}
+
 		// Members
 		// Input data
-		std::string Name; // name of the component
+		std::string Name;
 		std::string Construction; // construction object name
 		std::string Environment; // keyword:  'Schedule', 'OutdoorAir', 'Zone'
 		std::string EnvrSchedule; // temperature schedule for environmental temp
@@ -209,6 +216,19 @@ namespace PipeHeatTransfer {
 		int CompNum; // ..Branch%Comp index where this pipe lies
 		bool CheckEquipName;
 		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
+		bool OneTimeInit;
+
+		// Report data
+		Real64 FluidInletTemp; // inlet temperature [C]
+		Real64 FluidOutletTemp; // outlet temperature [C]
+		Real64 MassFlowRate; // mass flow rate [kg/s]
+		Real64 FluidHeatLossRate; // overall heat transfer rate from fluid to pipe [W]
+		Real64 FluidHeatLossEnergy; // energy transferred from fluid to pipe [J]
+		Real64 PipeInletTemp; // pipe temperature at inlet [C]
+		Real64 PipeOutletTemp; // pipe temperature at Oulet [C]
+		Real64 EnvironmentHeatLossRate; // overall heat transfer rate from pipe to environment [W]
+		Real64 EnvHeatLossEnergy; // energy transferred from pipe to environment [J]
+		Real64 VolumeFlowRate;
 
 		// Default Constructor
 		PipeHTData() :
@@ -279,28 +299,8 @@ namespace PipeHeatTransfer {
 			LoopSideNum( 0 ),
 			BranchNum( 0 ),
 			CompNum( 0 ),
-			CheckEquipName( true )
-		{}
-
-	};
-
-	struct PipeHeatTransferReport
-	{
-		// Members
-		// Report data
-		Real64 FluidInletTemp; // inlet temperature [C]
-		Real64 FluidOutletTemp; // outlet temperature [C]
-		Real64 MassFlowRate; // mass flow rate [kg/s]
-		Real64 FluidHeatLossRate; // overall heat transfer rate from fluid to pipe [W]
-		Real64 FluidHeatLossEnergy; // energy transferred from fluid to pipe [J]
-		Real64 PipeInletTemp; // pipe temperature at inlet [C]
-		Real64 PipeOutletTemp; // pipe temperature at Oulet [C]
-		Real64 EnvironmentHeatLossRate; // overall heat transfer rate from pipe to environment [W]
-		Real64 EnvHeatLossEnergy; // energy transferred from pipe to environment [J]
-		Real64 VolumeFlowRate;
-
-		// Default Constructor
-		PipeHeatTransferReport() :
+			CheckEquipName( true ),
+			OneTimeInit( true ),
 			FluidInletTemp( 0.0 ),
 			FluidOutletTemp( 0.0 ),
 			MassFlowRate( 0.0 ),
@@ -311,116 +311,75 @@ namespace PipeHeatTransfer {
 			EnvironmentHeatLossRate( 0.0 ),
 			EnvHeatLossEnergy( 0.0 ),
 			VolumeFlowRate( 0.0 )
+
 		{}
+
+		static
+		PlantComponent * factory( int objectType, std::string objectName );
+
+		void
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
+
+		void
+		PushInnerTimeStepArrays();
+
+		void
+		InitPipesHeatTransfer(
+			bool const FirstHVACIteration // component number
+		);
+
+		Real64
+		TBND(
+			Real64 const z, // Current Depth
+			Real64 const DayOfSim // Current Simulation Day
+		);
+
+		void
+		CalcBuriedPipeSoil();
+
+		void
+		CalcPipesHeatTransfer(
+			Optional_int_const LengthIndex = _
+		);
+
+		Real64
+		OutsidePipeHeatTransCoef();
+
+		Real64
+		CalcPipeHeatTransCoef(
+			Real64 const Temperature, // Temperature of water entering the surface, in C
+			Real64 const MassFlowRate, // Mass flow rate, in kg/s
+			Real64 const Diameter // Pipe diameter, m
+		);
+
+		void
+		ReportPipesHeatTransfer(); // Index for the surface under consideration
+
+		void
+		UpdatePipesHeatTransfer();
+
+		void
+		ValidatePipeConstruction(
+			std::string const & PipeType, // module object of pipe (error messages)
+			std::string const & ConstructionName, // construction name of pipe (error messages)
+			std::string const & FieldName, // fieldname of pipe (error messages)
+			int const ConstructionNum, // pointer into construction data
+			bool & ErrorsFound // set to true if errors found here
+		);
+
+		static
+		void
+		CalcZonePipesHeatGain();
+
 
 	};
 
 	// Object Data
 	extern Array1D< PipeHTData > PipeHT;
-	extern Array1D< PipeHeatTransferReport > PipeHTReport;
-
-	// Functions
-
-	void
-	SimPipesHeatTransfer(
-		int const EquipType,
-		std::string const & EquipName, // name of the Pipe Heat Transfer.
-		int & EqNum, // index in local derived types for external calling
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration // component number
-	);
-
-	//==============================================================================
-
-	void
-	PushInnerTimeStepArrays( int const PipeHTNum );
 
 	void
 	GetPipesHeatTransfer();
 
-	void
-	ValidatePipeConstruction(
-		std::string const & PipeType, // module object of pipe (error messages)
-		std::string const & ConstructionName, // construction name of pipe (error messages)
-		std::string const & FieldName, // fieldname of pipe (error messages)
-		int const ConstructionNum, // pointer into construction data
-		int const PipeNum, // pointer into pipe data
-		bool & ErrorsFound // set to true if errors found here
-	);
-
-	//==============================================================================
-
-	void
-	InitPipesHeatTransfer(
-		int const PipeType,
-		int const PipeHTNum, // component number
-		bool const FirstHVACIteration // component number
-	);
-
-	//==============================================================================
-
-	void
-	InitializeHeatTransferPipes(
-		int const PipeType, // Type of Pipe
-		std::string const & PipeName, // Name of Pipe
-		int & PipeNum // Index into pipe structure for name
-	);
-
-	//==============================================================================
-
-	void
-	CalcPipesHeatTransfer(
-		int const PipeHTNum, // component number
-		Optional_int_const LengthIndex = _
-	);
-
-	//==============================================================================
-
-	void
-	CalcBuriedPipeSoil( int const PipeHTNum ); // Current Simulation Pipe Number
-
-	//==============================================================================
-
-	void
-	UpdatePipesHeatTransfer();
-
-	//==============================================================================
-
-	void
-	ReportPipesHeatTransfer( int const PipeHTNum ); // Index for the surface under consideration
-
-	//==============================================================================
-
-	void
-	CalcZonePipesHeatGain();
-
-	//==============================================================================
-
-	Real64
-	CalcPipeHeatTransCoef(
-		int const PipeHTNum,
-		Real64 const Temperature, // Temperature of water entering the surface, in C
-		Real64 const MassFlowRate, // Mass flow rate, in kg/s
-		Real64 const Diameter // Pipe diameter, m
-	);
-
-	//==============================================================================
-
-	Real64
-	OutsidePipeHeatTransCoef( int const PipeHTNum ); // Index number of surface under consideration
-
-	//==============================================================================
-
-	Real64
-	TBND(
-		Real64 const z, // Current Depth
-		Real64 const DayOfSim, // Current Simulation Day
-		int const PipeHTNum // Current Pipe Number
-	);
-
-	//===============================================================================
-
-	//===============================================================================
 
 } // PipeHeatTransfer
 

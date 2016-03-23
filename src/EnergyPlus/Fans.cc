@@ -956,7 +956,8 @@ namespace Fans {
 			SetupOutputVariable( "Fan Runtime Fraction []", Fan( FanNum ).FanRuntimeFraction, "System", "Average", Fan( FanNum ).FanName );
 		}
 
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyRan;
+		ManageEMS( emsCallFromComponentGetInput, anyRan );
 		MySizeFlag.dimension( NumFans, true );
 
 	}

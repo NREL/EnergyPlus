@@ -213,7 +213,6 @@ namespace MixedAir {
 	int const UnitarySystem( 21 );
 	int const Humidifier( 22 );
 
-	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
 	int const ControllerStandAloneERV( 3 );
 
@@ -276,8 +275,9 @@ namespace MixedAir {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool InitOAControllerOneTimeFlag( true );
-		bool InitOAControllerSetPointCheckFlag( true );
+		Array1D_bool InitOAControllerSetPointCheckFlag( true );
 		bool InitOAControllerSetUpAirLoopHVACVariables( true );
+		bool AllocateOAControllersFlag( true );
 		Array1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
 		Array1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
 		Array1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
@@ -384,8 +384,9 @@ namespace MixedAir {
 		GetOAMixerInputFlag = true;
 		GetOAControllerInputFlag = true;
 		InitOAControllerOneTimeFlag = true;
-		InitOAControllerSetPointCheckFlag = true;
+		InitOAControllerSetPointCheckFlag.deallocate();
 		InitOAControllerSetUpAirLoopHVACVariables = true;
+		AllocateOAControllersFlag = true;
 		ControllerLists.deallocate();
 		OAController.deallocate();
 		OAMixer.deallocate();
@@ -910,7 +911,7 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OAControllerNum;
 
-		if ( GetOAControllerInputFlag ) { // Gets input for object  first time Sim routine is called
+		if ( ( GetOAControllerInputFlag ) && ( AirLoopNum > 0 ) ) { // Gets input for object  first time Sim routine is called from an airloop
 			GetOAControllerInputs();
 			GetOAControllerInputFlag = false;
 		}
@@ -1426,22 +1427,18 @@ namespace MixedAir {
 		cAlphaFields.allocate( MaxAlphas );
 		cNumericFields.allocate( MaxNums );
 
-		NumOAControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
-		NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
-		NumOAControllers += NumERVControllers;
 
-		//     Mangesh code to fix CR 8225 - 09/14/2010
-		//NumControllerList = GetNumObjectsFound("AirLoopHVAC:ControllerList")
-		//NumOASys = GetNumObjectsFound("AirLoopHVAC:OutdoorAirSystem")
+		// Count OAcontrollers and ERVcontrollers and allocate arrays
+		AllocateOAControllers();
 
-		if ( NumOAControllers > 0 ) {
 
-			OAController.allocate( NumOAControllers );
-			OAControllerInfo.allocate( NumOAControllers );
+		// If there are ERV controllers, they have been filled before now NumOAControllers includes the count of NumERVControllers
+		if ( NumOAControllers > NumERVControllers ) {
 			CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
-			for ( OutAirNum = 1; OutAirNum <= NumOAControllers - NumERVControllers; ++OutAirNum ) {
-				GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			int currentOAControllerNum = 0;
+			for ( OutAirNum = NumERVControllers+1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
+				++currentOAControllerNum;
+				GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
 				VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -1684,14 +1681,6 @@ namespace MixedAir {
 				//   May include duplicate zones. Will check for duplicate zones further down in this subroutine.
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
 					VentMechZoneName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 5 );
-
-					for ( OutAirNum = 1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
-						if ( OAController( OutAirNum ).VentilationMechanicalName == VentilationMechanical( VentMechNum ).Name && VentilationMechanical( VentMechNum ).DCVFlag ) {
-							AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = true;
-						} else {
-							AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = false;
-						}
-					}
 
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
@@ -2217,6 +2206,26 @@ namespace MixedAir {
 	}
 
 	void
+	AllocateOAControllers()
+	{
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
+
+		using namespace InputProcessor;
+
+		if ( AllocateOAControllersFlag ) {
+			NumOAControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
+			NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
+			NumOAControllers += NumERVControllers;
+			OAController.allocate( NumOAControllers );
+			OAControllerInfo.allocate( NumOAControllers );
+			AllocateOAControllersFlag = false;
+		}
+
+	}
+
+	void
 	GetOAMixerInputs()
 	{
 
@@ -2655,14 +2664,24 @@ namespace MixedAir {
 				}
 			}
 
-			if ( SameString( AlphArray( 18 ), "Yes" ) ) {
-				OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
-			} else if ( SameString( AlphArray( 18 ), "No" ) ) {
-				OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
+			if ( NumAlphas >= 18 ) {
+				if ( SameString( AlphArray( 18 ), "Yes" ) ) {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
+				} else if ( SameString( AlphArray( 18 ), "No" ) ) {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
+				} else {
+					ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
+					ShowContinueError( "..." + cAlphaFields( 18 ) + "=\"" + AlphArray( 18 ) + "\" - valid values are \"Yes\" or \"No\"." );
+					ErrorsFound = true;
+				}
 			} else {
-				ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
-				ShowContinueError( "..." + cAlphaFields( 18 ) + "=\"" + AlphArray( 18 ) + "\" - valid values are \"Yes\" or \"No\"." );
-				ErrorsFound = true;
+				if( OAController( OutAirNum ).Econo == NoEconomizer ) {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
+				} else {
+					OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
+					ShowWarningError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", missing field value" );
+					ShowContinueError( "..." + cAlphaFields( 18 ) + " will default to Yes when " + cAlphaFields( 16 ) + "= \"Yes\"" );
+				}
 			}
 
 		} else if ( SameString( AlphArray( 16 ), "No" ) || lAlphaBlanks( 16 ) ) {
@@ -2823,8 +2842,9 @@ namespace MixedAir {
 		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
 		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
 		//////////////////////////////////
-		static Array1D_bool MyEnvrnFlag; // One-time initialization flag
-		static Array1D_bool MySizeFlag; // One-time initialization flag
+		static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
+		static Array1D_bool OAControllerMyEnvrnFlag; // One-time initialization flag
+		static Array1D_bool OAControllerMySizeFlag; // One-time initialization flag
 		static Array1D_bool MechVentCheckFlag; // One-time initialization flag
 		bool FoundZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
 		bool FoundAreaZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
@@ -2835,7 +2855,6 @@ namespace MixedAir {
 		Real64 RhoAirStdInit; // Standard air density
 		Real64 TotalPeopleOAFlow; // Total outside air required for PEOPLE objects served by this OA controller
 		int MixedAirNode; // Controller:OutdoorAir mixed air node
-		int OAControllerIndex; // Index to Controller:OutdoorAir
 		int ZoneNum; // DO loop index (zone number)
 		int ZoneIndex; // Index to zone in mechanical ventilation zone list
 		int AirLoopZoneInfoZoneNum; // Index to AirLoopZoneInfo structure
@@ -2847,7 +2866,6 @@ namespace MixedAir {
 		int thisNumForMixer; // Temporary array counter
 		int thisMixerIndex; // Temporary array counter
 		int OASysNum; // Temporary array counter
-		int thisOAController; // Temporary array counter
 		int found; // Temporary index to equipment
 		int OANode; // OA node index
 		int VentMechObjectNum; // Temporary variable
@@ -2869,104 +2887,100 @@ namespace MixedAir {
 		ErrorsFound = false;
 		OANode = 0;
 
-		if ( InitOAControllerOneTimeFlag ) {
-
-			MyEnvrnFlag.dimension( NumOAControllers, true );
-			MySizeFlag.dimension( NumOAControllers, true );
+		if (InitOAControllerOneTimeFlag) {
+			OAControllerMyOneTimeFlag.dimension(NumOAControllers, true);
+			OAControllerMyEnvrnFlag.dimension( NumOAControllers, true );
+			OAControllerMySizeFlag.dimension( NumOAControllers, true );
 			MechVentCheckFlag.dimension( NumOAControllers, true );
-
-			// Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
-			// This input setup needs to happen for all controllers, not just the one first passed into this init routine
-			for ( thisOAController = 1; thisOAController <= NumOAControllers; ++thisOAController ) {
-
-				{ auto const SELECT_CASE_var( OAController( thisOAController ).ControllerType_Num );
-
-				if ( SELECT_CASE_var == ControllerOutsideAir ) {
-					thisOASys = 0;
-					for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
-						// find which OAsys has this controller
-						found = FindItemInList( OAController( thisOAController ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
-						if ( found != 0 ) {
-							thisOASys = OASysNum;
-							break; // we found it
-						}
-					}
-					if ( thisOASys == 0 ) {
-						ShowSevereError( "InitOAController: Did not find OAController=\"" + OAController( thisOAController ).Name + "\"." );
-						ShowContinueError( "in list of valid OA Controllers." );
-						ErrorsFound = true;
-						continue;
-					}
-					thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
-					if ( thisNumForMixer != 0 ) {
-						equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
-						thisMixerIndex = FindItemInList( equipName, OAMixer );
-						if ( thisMixerIndex != 0 ) {
-							OAController( thisOAController ).InletNode = OAMixer( thisMixerIndex ).InletNode;
-						} else {
-							ShowSevereError( "InitOAController: Did not find OAMixer=\"" + equipName + "\"." );
-							ShowContinueError( "in list of valid OA Mixers." );
-							ErrorsFound = true;
-						}
-					} else {
-						ShowSevereError( "InitOAController: Did not find OutdoorAir:Mixer Component=\"OutdoorAir:Mixer\"." );
-						ShowContinueError( "in list of valid OA Components." );
-						ErrorsFound = true;
-					}
-
-					if ( OAController( thisOAController ).InletNode == 0 ) { //throw an error
-						ShowSevereError( "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + OAController( thisOAController ).Name );
-						ErrorsFound = true;
-					}
-
-				} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
-					// set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
-					// with the assumption that equipment is bypassed....
-
-					OAController( thisOAController ).InletNode = OAController( thisOAController ).OANode;
-
-				} else {
-					ShowSevereError( "InitOAController: Failed to find ControllerType: " + OAController( thisOAController ).ControllerType );
-					ErrorsFound = true;
-
-				}}
-
-			}
+			InitOAControllerSetPointCheckFlag.dimension ( NumOAControllers, true );
 			InitOAControllerOneTimeFlag = false;
+		}
+		if ( OAControllerMyOneTimeFlag( OAControllerNum ) ) {
+			// Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
+			{ auto const SELECT_CASE_var( OAController( OAControllerNum ).ControllerType_Num );
+
+			if ( SELECT_CASE_var == ControllerOutsideAir ) {
+				thisOASys = 0;
+				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
+					// find which OAsys has this controller
+					found = FindItemInList( OAController( OAControllerNum ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
+					if ( found != 0 ) {
+						thisOASys = OASysNum;
+						break; // we found it
+					}
+				}
+				if ( thisOASys == 0 ) {
+					ShowSevereError( "InitOAController: Did not find OAController=\"" + OAController( OAControllerNum ).Name + "\"." );
+					ShowContinueError( "in list of valid OA Controllers." );
+					ErrorsFound = true;
+				}
+				thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
+				if ( thisNumForMixer != 0 ) {
+					equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
+					thisMixerIndex = FindItemInList( equipName, OAMixer );
+					if ( thisMixerIndex != 0 ) {
+						OAController( OAControllerNum ).InletNode = OAMixer( thisMixerIndex ).InletNode;
+					} else {
+						ShowSevereError( "InitOAController: Did not find OAMixer=\"" + equipName + "\"." );
+						ShowContinueError( "in list of valid OA Mixers." );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( "InitOAController: Did not find OutdoorAir:Mixer Component=\"OutdoorAir:Mixer\"." );
+					ShowContinueError( "in list of valid OA Components." );
+					ErrorsFound = true;
+				}
+
+				if ( OAController( OAControllerNum ).InletNode == 0 ) { //throw an error
+					ShowSevereError( "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + OAController( OAControllerNum ).Name );
+					ErrorsFound = true;
+				}
+
+			} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
+				// set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
+				// with the assumption that equipment is bypassed....
+
+				OAController( OAControllerNum ).InletNode = OAController( OAControllerNum ).OANode;
+
+			} else {
+				ShowSevereError( "InitOAController: Failed to find ControllerType: " + OAController( OAControllerNum ).ControllerType );
+				ErrorsFound = true;
+
+			}}
+
+			OAControllerMyOneTimeFlag( OAControllerNum ) = false;
 
 		}
 
-		if ( ! SysSizingCalc && InitOAControllerSetPointCheckFlag && DoSetPointTest && ! FirstHVACIteration ) {
-			for ( OAControllerIndex = 1; OAControllerIndex <= NumOAControllers; ++OAControllerIndex ) {
-				MixedAirNode = OAController( OAControllerIndex ).MixNode;
-				if ( MixedAirNode > 0 ) {
-					//      IF (OAController(OAControllerIndex)%Econo == 1 .AND. .NOT. AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
-					if ( OAController( OAControllerIndex ).Econo > NoEconomizer && AirLoopControlInfo( AirLoopNum ).AnyContFan ) {
-						if ( Node( MixedAirNode ).TempSetPoint == SensedNodeFlagValue ) {
-							if ( ! AnyEnergyManagementSystemInModel ) {
-								ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerIndex ).Name );
+		if ( ! SysSizingCalc && InitOAControllerSetPointCheckFlag( OAControllerNum ) && DoSetPointTest && ! FirstHVACIteration ) {
+			MixedAirNode = OAController( OAControllerNum ).MixNode;
+			if ( MixedAirNode > 0 ) {
+				//      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
+				if ( OAController( OAControllerNum ).Econo > NoEconomizer && AirLoopControlInfo( AirLoopNum ).AnyContFan ) {
+					if ( Node( MixedAirNode ).TempSetPoint == SensedNodeFlagValue ) {
+						if ( ! AnyEnergyManagementSystemInModel ) {
+							ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerNum ).Name );
+							ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
+							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
+							SetPointErrorFlag = true;
+						} else {
+							// add call to check node in EMS
+							CheckIfNodeSetPointManagedByEMS( MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag );
+							if ( SetPointErrorFlag ) {
+								ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerNum ).Name );
 								ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
 								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
-								SetPointErrorFlag = true;
-							} else {
-								// add call to check node in EMS
-								CheckIfNodeSetPointManagedByEMS( MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag );
-								if ( SetPointErrorFlag ) {
-									ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerIndex ).Name );
-									ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
-									ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
-									ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
-								}
+								ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 							}
 						}
 					}
 				}
 			}
 
-			InitOAControllerSetPointCheckFlag = false;
+			InitOAControllerSetPointCheckFlag( OAControllerNum ) = false;
 		}
 
-		if ( ! SysSizingCalc && MySizeFlag( OAControllerNum ) ) {
+		if ( ! SysSizingCalc && OAControllerMySizeFlag( OAControllerNum ) ) {
 			SizeOAController( OAControllerNum );
 			if ( AirLoopNum > 0 ) {
 				AirLoopControlInfo( AirLoopNum ).OACtrlNum = OAControllerNum;
@@ -2991,15 +3005,15 @@ namespace MixedAir {
 				ShowContinueError( "  To set the minimum outside air flow rate use the \"Design (minimum) outdoor air flow rate\" field in the Sizing:System object" );
 				ErrorsFound = true;
 			}
-			MySizeFlag( OAControllerNum ) = false;
+			OAControllerMySizeFlag( OAControllerNum ) = false;
 		}
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( OAControllerNum ) ) {
+		if ( BeginEnvrnFlag && OAControllerMyEnvrnFlag( OAControllerNum ) ) {
 			OANode = OAController( OAControllerNum ).OANode;
 			RhoAirStdInit = StdRhoAir;
 			OAController( OAControllerNum ).MinOAMassFlowRate = OAController( OAControllerNum ).MinOA * RhoAirStdInit;
 			OAController( OAControllerNum ).MaxOAMassFlowRate = OAController( OAControllerNum ).MaxOA * RhoAirStdInit;
-			MyEnvrnFlag( OAControllerNum ) = false;
+			OAControllerMyEnvrnFlag( OAControllerNum ) = false;
 			Node( OANode ).MassFlowRateMax = OAController( OAControllerNum ).MaxOAMassFlowRate;
 
 			//predefined reporting
@@ -3047,7 +3061,7 @@ namespace MixedAir {
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( OAControllerNum ) = true;
+			OAControllerMyEnvrnFlag( OAControllerNum ) = true;
 		}
 
 		VentMechObjectNum = OAController( OAControllerNum ).VentMechObjectNum;
@@ -3203,7 +3217,7 @@ namespace MixedAir {
 		// two IF statements are checked each time through Init (e.g., if StandAloneERV controllers are used
 		// without AirloopHVAC objects).
 		if ( InitOAControllerSetUpAirLoopHVACVariables ) {
-			if ( NumPrimaryAirSys > 0 ) {
+			if ( AirLoopNum > 0 ) {
 				// Added code to report (TH, 10/20/2008):
 				//   air economizer status (1 = on, 0 = off or does not exist), and
 				//   actual and minimum outside air fraction (0 to 1)
@@ -3279,6 +3293,12 @@ namespace MixedAir {
 						SetupEMSActuator( "Outdoor Air Controller", OAController( OAControllerLoop ).Name, "Air Mass Flow Rate", "[kg/s]", OAController( OAControllerLoop ).EMSOverrideOARate, OAController( OAControllerLoop ).EMSOARateValue );
 					}
 
+					VentMechObjectNum = OAController( OAControllerLoop ).VentMechObjectNum;
+					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
+						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
+							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
+						}
+					}
 				}
 
 				InitOAControllerSetUpAirLoopHVACVariables = false;
@@ -3657,7 +3677,7 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
-		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
@@ -3677,6 +3697,9 @@ namespace MixedAir {
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
 
+		// Assign references
+		auto & thisController( OAController( OAControllerNum ) );
+		auto & thisControllerInfo( OAControllerInfo( OAControllerNum ) );
 		if ( AirLoopNum > 0 ) {
 			AirLoopEconoLockout = AirLoopControlInfo( AirLoopNum ).EconoLockout;
 			AirLoopNightVent = AirLoopControlInfo( AirLoopNum ).NightVent;
@@ -3688,22 +3711,22 @@ namespace MixedAir {
 		}
 
 		// Check for no flow
-		if ( OAController( OAControllerNum ).MixMassFlow <= SmallMassFlow ) {
+		if ( thisController.MixMassFlow <= SmallMassFlow ) {
 
-			OAController( OAControllerNum ).OAMassFlow = 0.0; // outside air mass flow rate
-			OAController( OAControllerNum ).RelMassFlow = 0.0; // relief air mass flow rate
-			OAController( OAControllerNum ).MixMassFlow = 0.0; // mixed air mass flow rate
-			OAController( OAControllerNum ).MinOAFracLimit = 0.0; // minimum OA fraction limit
+			thisController.OAMassFlow = 0.0; // outside air mass flow rate
+			thisController.RelMassFlow = 0.0; // relief air mass flow rate
+			thisController.MixMassFlow = 0.0; // mixed air mass flow rate
+			thisController.MinOAFracLimit = 0.0; // minimum OA fraction limit
 
-			OAController( OAControllerNum ).EconomizerStatus = 0; // economizer status for reporting
-			OAController( OAControllerNum ).HeatRecoveryBypassStatus = 0; // HR bypass status for reporting
-			OAController( OAControllerNum ).HRHeatingCoilActive = 0; // resets report variable
-			OAController( OAControllerNum ).MixedAirTempAtMinOAFlow = Node( OAController( OAControllerNum ).RetNode ).Temp; // track return T
-			OAController( OAControllerNum ).HighHumCtrlStatus = 0; // high humdity control status for reporting
-			OAController( OAControllerNum ).OAFractionRpt = 0.0; // actual OA fraction for reporting
+			thisController.EconomizerStatus = 0; // economizer status for reporting
+			thisController.HeatRecoveryBypassStatus = 0; // HR bypass status for reporting
+			thisController.HRHeatingCoilActive = 0; // resets report variable
+			thisController.MixedAirTempAtMinOAFlow = Node( thisController.RetNode ).Temp; // track return T
+			thisController.HighHumCtrlStatus = 0; // high humdity control status for reporting
+			thisController.OAFractionRpt = 0.0; // actual OA fraction for reporting
 
-			OAControllerInfo( OAControllerNum ).EconoActive = false; // DataAirLoop variable (OA Controllers)
-			OAControllerInfo( OAControllerNum ).HighHumCtrlActive = false; // DataAirLoop variable (OA Controllers)
+			thisControllerInfo.EconoActive = false; // DataAirLoop variable (OA Controllers)
+			thisControllerInfo.HighHumCtrlActive = false; // DataAirLoop variable (OA Controllers)
 
 			// also reset air loop data for use by other routines
 			if ( AirLoopNum > 0 ) {
@@ -3722,25 +3745,25 @@ namespace MixedAir {
 		// set OutAirMinFrac
 		if ( AirLoopNum > 0 ) {
 			if ( AirLoopFlow( AirLoopNum ).DesSupply >= SmallAirVolFlow ) {
-				OutAirMinFrac = OAController( OAControllerNum ).MinOAMassFlowRate / AirLoopFlow( AirLoopNum ).DesSupply;
+				OutAirMinFrac = thisController.MinOAMassFlowRate / AirLoopFlow( AirLoopNum ).DesSupply;
 			} else {
 				OutAirMinFrac = 0.0;
 			}
 		} else {
-			if ( OAController( OAControllerNum ).MaxOA >= SmallAirVolFlow ) {
-				OutAirMinFrac = OAController( OAControllerNum ).MinOA / OAController( OAControllerNum ).MaxOA;
+			if ( thisController.MaxOA >= SmallAirVolFlow ) {
+				OutAirMinFrac = thisController.MinOA / thisController.MaxOA;
 			} else {
 				OutAirMinFrac = 0.0;
 			}
 		}
-		if ( OAController( OAControllerNum ).MinOASchPtr > 0 ) {
-			MinOASchedVal = GetCurrentScheduleValue( OAController( OAControllerNum ).MinOASchPtr );
+		if ( thisController.MinOASchPtr > 0 ) {
+			MinOASchedVal = GetCurrentScheduleValue( thisController.MinOASchPtr );
 			MinOASchedVal = min( max( MinOASchedVal, 0.0 ), 1.0 );
 			OutAirMinFrac *= MinOASchedVal;
 		}
 
 		// Get mechanical ventilation
-		VentMechObjectNum = OAController( OAControllerNum ).VentMechObjectNum;
+		VentMechObjectNum = thisController.VentMechObjectNum;
 		if ( AirLoopNum > 0 && VentMechObjectNum != 0 ) {
 			// Apply mechanical ventilation only when it is available/allowed
 			if ( GetCurrentScheduleValue( VentilationMechanical( VentMechObjectNum ).SchPtr ) > 0 ) {
@@ -4171,26 +4194,26 @@ namespace MixedAir {
 		}
 
 		// Define an outside air signal
-		if ( OAController( OAControllerNum ).MixedAirSPMNum > 0 ) {
-			OAController( OAControllerNum ).CoolCoilFreezeCheck = GetCoilFreezingCheckFlag( OAController( OAControllerNum ).MixedAirSPMNum );
+		if ( thisController.MixedAirSPMNum > 0 ) {
+			thisController.CoolCoilFreezeCheck = GetCoilFreezingCheckFlag( thisController.MixedAirSPMNum );
 		} else {
-			OAController( OAControllerNum ).CoolCoilFreezeCheck = false;
+			thisController.CoolCoilFreezeCheck = false;
 		}
-		if ( std::abs( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp ) > SmallTempDiff ) {
-			OutAirSignal = ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp ) / ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp );
-			if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
-				OAController( OAControllerNum ).MaxOAFracBySetPoint = 0.0;
+		if ( std::abs( thisController.RetTemp - thisController.InletTemp ) > SmallTempDiff ) {
+			OutAirSignal = ( thisController.RetTemp - thisController.MixSetTemp ) / ( thisController.RetTemp - thisController.InletTemp );
+			if ( thisController.CoolCoilFreezeCheck ) {
+				thisController.MaxOAFracBySetPoint = 0.0;
 				MaximumOAFracBySetPoint = OutAirSignal;
 			}
 		} else {
-			if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp < 0.0 ) {
-				if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp >= 0.0 ) {
+			if ( thisController.RetTemp - thisController.MixSetTemp < 0.0 ) {
+				if ( thisController.RetTemp - thisController.InletTemp >= 0.0 ) {
 					OutAirSignal = -1.0;
 				} else {
 					OutAirSignal = 1.0;
 				}
 			} else {
-				if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp >= 0.0 ) {
+				if ( thisController.RetTemp - thisController.InletTemp >= 0.0 ) {
 					OutAirSignal = 1.0;
 				} else {
 					OutAirSignal = -1.0;
@@ -4200,12 +4223,12 @@ namespace MixedAir {
 		OutAirSignal = min( max( OutAirSignal, OutAirMinFrac ), 1.0 );
 
 		// If no economizer, set to minimum and disable economizer and high humidity control
-		if ( OAController( OAControllerNum ).Econo == NoEconomizer ) {
+		if ( thisController.Econo == NoEconomizer ) {
 			OutAirSignal = OutAirMinFrac;
 			EconomizerOperationFlag = false;
 			EconomizerAirFlowScheduleValue = 0.0;
 			HighHumidityOperationFlag = false;
-		} else if ( OAController( OAControllerNum ).MaxOA < SmallAirVolFlow ) {
+		} else if ( thisController.MaxOA < SmallAirVolFlow ) {
 			OutAirSignal = OutAirMinFrac;
 			EconomizerOperationFlag = false;
 			EconomizerAirFlowScheduleValue = 0.0;
@@ -4220,66 +4243,66 @@ namespace MixedAir {
 			// Otherwise do the limit checks
 			EconomizerOperationFlag = true;
 			// Outside air temp greater than mix air setpoint
-			if ( OAController( OAControllerNum ).InletTemp > OAController( OAControllerNum ).MixSetTemp ) {
+			if ( thisController.InletTemp > thisController.MixSetTemp ) {
 				OutAirSignal = 1.0;
 			}
 			// Return air temp limit
-			if ( OAController( OAControllerNum ).Econo == DifferentialDryBulb ) {
-				if ( OAController( OAControllerNum ).InletTemp > OAController( OAControllerNum ).RetTemp ) {
+			if ( thisController.Econo == DifferentialDryBulb ) {
+				if ( thisController.InletTemp > thisController.RetTemp ) {
 					OutAirSignal = OutAirMinFrac;
 					EconomizerOperationFlag = false;
 				}
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 			// Return air enthalpy limit
-			if ( OAController( OAControllerNum ).Econo == DifferentialEnthalpy ) {
-				if ( OAController( OAControllerNum ).InletEnth > OAController( OAControllerNum ).RetEnth ) {
+			if ( thisController.Econo == DifferentialEnthalpy ) {
+				if ( thisController.InletEnth > thisController.RetEnth ) {
 					OutAirSignal = OutAirMinFrac;
 					EconomizerOperationFlag = false;
 				}
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 			// Outside air temperature limit
-			if ( OAController( OAControllerNum ).Econo == FixedDryBulb ) {
+			if ( thisController.Econo == FixedDryBulb ) {
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 			//Fixed Enthalpy limit
-			if ( OAController( OAControllerNum ).Econo == FixedEnthalpy ) {
+			if ( thisController.Econo == FixedEnthalpy ) {
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 			//FIXED DEW POINT AND DRY BULB TEMPERATURE STRATEGY
-			if ( OAController( OAControllerNum ).Econo == FixedDewPointAndDryBulb ) {
+			if ( thisController.Econo == FixedDewPointAndDryBulb ) {
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 			// ELECRONIC ENTHALPY, HUMIDITY RATIO CURVE
-			if ( OAController( OAControllerNum ).Econo == ElectronicEnthalpy ) {
+			if ( thisController.Econo == ElectronicEnthalpy ) {
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 			// Differential dry bulb and enthalpy strategy
-			if ( OAController( OAControllerNum ).Econo == DifferentialDryBulbAndEnthalpy ) {
-				if ( OAController( OAControllerNum ).InletTemp > OAController( OAControllerNum ).RetTemp ) {
+			if ( thisController.Econo == DifferentialDryBulbAndEnthalpy ) {
+				if ( thisController.InletTemp > thisController.RetTemp ) {
 					OutAirSignal = OutAirMinFrac;
 					EconomizerOperationFlag = false;
 				}
-				if ( OAController( OAControllerNum ).InletEnth > OAController( OAControllerNum ).RetEnth ) {
+				if ( thisController.InletEnth > thisController.RetEnth ) {
 					OutAirSignal = OutAirMinFrac;
 					EconomizerOperationFlag = false;
 				}
 				Checksetpoints( OAControllerNum, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag );
 			}
 
-			if ( OAController( OAControllerNum ).TempLowLim != BlankNumeric && OAController( OAControllerNum ).OATemp < OAController( OAControllerNum ).TempLowLim ) {
+			if ( thisController.TempLowLim != BlankNumeric && thisController.OATemp < thisController.TempLowLim ) {
 				OutAirSignal = OutAirMinFrac;
 				EconomizerOperationFlag = false;
 			}
 			// Increase air flow for humidity control
 			// (HumidistatZoneNum is greater than 0 IF High Humidity Control Flag = YES, checked in GetInput)
-			if ( OAController( OAControllerNum ).HumidistatZoneNum > 0 ) {
+			if ( thisController.HumidistatZoneNum > 0 ) {
 				//   IF humidistat senses a moisture load check to see if modifying air flow is appropriate, otherwise disable modified air flow
-				if ( ZoneSysMoistureDemand( OAController( OAControllerNum ).HumidistatZoneNum ).TotalOutputRequired < 0.0 ) {
+				if ( ZoneSysMoistureDemand( thisController.HumidistatZoneNum ).TotalOutputRequired < 0.0 ) {
 					//     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
 					//     if indoor humrat is less than or equal to outdoor humrat
-					if ( ! OAController( OAControllerNum ).ModifyDuringHighOAMoisture && Node( OAController( OAControllerNum ).NodeNumofHumidistatZone ).HumRat <= OAController( OAControllerNum ).OAHumRat ) {
+					if ( ! thisController.ModifyDuringHighOAMoisture && Node( thisController.NodeNumofHumidistatZone ).HumRat <= thisController.OAHumRat ) {
 						HighHumidityOperationFlag = false;
 					} else {
 						HighHumidityOperationFlag = true;
@@ -4293,8 +4316,8 @@ namespace MixedAir {
 
 			// Check time of day economizer schedule, enable economizer if schedule value > 0
 			EconomizerAirFlowScheduleValue = 0.0;
-			if ( OAController( OAControllerNum ).EconomizerOASchedPtr > 0 ) {
-				EconomizerAirFlowScheduleValue = GetCurrentScheduleValue( OAController( OAControllerNum ).EconomizerOASchedPtr );
+			if ( thisController.EconomizerOASchedPtr > 0 ) {
+				EconomizerAirFlowScheduleValue = GetCurrentScheduleValue( thisController.EconomizerOASchedPtr );
 				if ( EconomizerAirFlowScheduleValue > 0.0 ) {
 					EconomizerOperationFlag = true;
 					OutAirSignal = 1.0;
@@ -4306,11 +4329,11 @@ namespace MixedAir {
 		// OutAirSignal will not give exactly the correct mixed air temperature (equal to the setpoint) since
 		// it was calculated using the approximate method of sensible energy balance. Now we have to get the
 		// accurate result using a full mass, enthalpy and moisture balance and iteration.
-		if ( OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && OAController( OAControllerNum ).MixMassFlow > VerySmallMassFlow && OAController( OAControllerNum ).ControllerType_Num == ControllerOutsideAir && ! AirLoopNightVent ) {
-			Par( 1 ) = OAController( OAControllerNum ).MixNode;
-			Par( 2 ) = OAController( OAControllerNum ).RetNode;
-			Par( 3 ) = OAController( OAControllerNum ).InletNode;
-			Par( 4 ) = OAController( OAControllerNum ).MixMassFlow;
+		if ( OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && thisController.MixMassFlow > VerySmallMassFlow && thisController.ControllerType_Num == ControllerOutsideAir && ! AirLoopNightVent ) {
+			Par( 1 ) = thisController.MixNode;
+			Par( 2 ) = thisController.RetNode;
+			Par( 3 ) = thisController.InletNode;
+			Par( 4 ) = thisController.MixMassFlow;
 			SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
 			if ( SolFla < 0 ) {
 				OASignal = OutAirSignal;
@@ -4320,15 +4343,15 @@ namespace MixedAir {
 		}
 
 		// Economizer choice "Bypass" forces minimum OA except when high humidity air flow is active based on indoor RH
-		if ( OAController( OAControllerNum ).EconBypass && EconomizerAirFlowScheduleValue == 0.0 ) {
+		if ( thisController.EconBypass && EconomizerAirFlowScheduleValue == 0.0 ) {
 			OASignal = OutAirMinFrac;
 		}
 
 		// Set outdoor air signal based on OA flow ratio if high humidity air flow is enabled
 		if ( HighHumidityOperationFlag ) {
-			if ( OAController( OAControllerNum ).MixMassFlow > 0.0 ) {
+			if ( thisController.MixMassFlow > 0.0 ) {
 				//   calculate the actual ratio of outside air to mixed air so the magnitude of OA during high humidity control is correct
-				OASignal = max( OutAirMinFrac, ( OAController( OAControllerNum ).HighRHOAFlowRatio * OAController( OAControllerNum ).MaxOAMassFlowRate / OAController( OAControllerNum ).MixMassFlow ) );
+				OASignal = max( OutAirMinFrac, ( thisController.HighRHOAFlowRatio * thisController.MaxOAMassFlowRate / thisController.MixMassFlow ) );
 			}
 		}
 
@@ -4336,8 +4359,8 @@ namespace MixedAir {
 		if ( AirLoopNightVent ) OASignal = 1.0;
 
 		// Changed by Amit for new feature
-		if ( OAController( OAControllerNum ).MinOAflowSchPtr > 0 ) {
-			MinOAflowfracVal = GetCurrentScheduleValue( OAController( OAControllerNum ).MinOAflowSchPtr );
+		if ( thisController.MinOAflowSchPtr > 0 ) {
+			MinOAflowfracVal = GetCurrentScheduleValue( thisController.MinOAflowSchPtr );
 			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
 			if ( MinOAflowfracVal > OutAirMinFrac ) {
 				OutAirMinFrac = MinOAflowfracVal;
@@ -4345,114 +4368,114 @@ namespace MixedAir {
 			OASignal = max( MinOAflowfracVal, OASignal );
 		}
 
-		if ( OAController( OAControllerNum ).MaxOAflowSchPtr > 0 ) {
-			MaxOAflowfracVal = GetCurrentScheduleValue( OAController( OAControllerNum ).MaxOAflowSchPtr );
+		if ( thisController.MaxOAflowSchPtr > 0 ) {
+			MaxOAflowfracVal = GetCurrentScheduleValue( thisController.MaxOAflowSchPtr );
 			MaxOAflowfracVal = min( max( MaxOAflowfracVal, 0.0 ), 1.0 );
 			if ( MaxOAflowfracVal < OutAirMinFrac ) {
 				OutAirMinFrac = MaxOAflowfracVal;
 			}
 			OASignal = min( MaxOAflowfracVal, OASignal );
 
-			if ( OAController( OAControllerNum ).MinOAflowSchPtr > 0 ) {
+			if ( thisController.MinOAflowSchPtr > 0 ) {
 				if ( MaxOAflowfracVal < MinOAflowfracVal ) {
-					ShowWarningError( "Min OA flow frac Greater than Max OA flow frac - check the Schedules in \"Controller:OutdoorAir \" " + OAController( OAControllerNum ).MinOAflowSch + OAController( OAControllerNum ).MaxOAflowSch );
+					ShowWarningError( "Min OA flow frac Greater than Max OA flow frac - check the Schedules in \"Controller:OutdoorAir \" " + thisController.MinOAflowSch + thisController.MaxOAflowSch );
 				}
 			}
 
 		}
 
-		if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
+		if ( thisController.CoolCoilFreezeCheck ) {
 			MaximumOAFracBySetPoint = min( max( MaximumOAFracBySetPoint, 0.0 ), 1.0 );
-			OAController( OAControllerNum ).MaxOAFracBySetPoint = MaximumOAFracBySetPoint;
+			thisController.MaxOAFracBySetPoint = MaximumOAFracBySetPoint;
 			if ( MaximumOAFracBySetPoint < OutAirMinFrac ) {
 				OutAirMinFrac = MaximumOAFracBySetPoint;
-				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
+				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * thisController.MixMassFlow;
 			}
 			OASignal = min( MaximumOAFracBySetPoint, OASignal );
 		}
 
-		OAController( OAControllerNum ).OAMassFlow = OASignal * OAController( OAControllerNum ).MixMassFlow;
+		thisController.OAMassFlow = OASignal * thisController.MixMassFlow;
 
 		// Do not allow OA to be below Ventilation:Mechanical flow rate or above mixed mass flow rate
 		if ( AirLoopNum > 0 && VentMechObjectNum != 0 ) {
-			if ( MechVentOutsideAirFlow > OAController( OAControllerNum ).OAMassFlow ) {
-				OAController( OAControllerNum ).OAMassFlow = min( MechVentOutsideAirFlow, OAController( OAControllerNum ).MixMassFlow );
+			if ( MechVentOutsideAirFlow > thisController.OAMassFlow ) {
+				thisController.OAMassFlow = min( MechVentOutsideAirFlow, thisController.MixMassFlow );
 			}
 		}
 
 		// Do not allow OA to be below Exh for controller:outside air
-		if ( OAController( OAControllerNum ).ControllerType_Num == ControllerOutsideAir ) {
-			OAController( OAControllerNum ).OAMassFlow = max( OAController( OAControllerNum ).ExhMassFlow, OAController( OAControllerNum ).OAMassFlow );
+		if ( thisController.ControllerType_Num == ControllerOutsideAir ) {
+			thisController.OAMassFlow = max( thisController.ExhMassFlow, thisController.OAMassFlow );
 		}
 
 		// if fixed minimum, don't let go below min OA
-		if ( OAController( OAControllerNum ).FixedMin ) {
+		if ( thisController.FixedMin ) {
 			// cycling fans allow "average" min OA to be below minimum
 			if ( ! AirLoopCyclingFan ) {
-				OAController( OAControllerNum ).OAMassFlow = max( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MinOAMassFlowRate * MinOASchedVal );
+				thisController.OAMassFlow = max( thisController.OAMassFlow, thisController.MinOAMassFlowRate * MinOASchedVal );
 			}
 		}
 
 		// Don't let OA flow be > mixed air flow.
 		// Seems if RAB (return air bypass) that this should be don't let OA flow be > design supply flow but that causes other issues
-		OAController( OAControllerNum ).OAMassFlow = min( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MixMassFlow );
+		thisController.OAMassFlow = min( thisController.OAMassFlow, thisController.MixMassFlow );
 
 		// Don't let the OA flow be > than the max OA limit. OA for high humidity control is allowed to be greater than max OA.
 		// Night Ventilation has priority and may override an OASignal > 1 high humidity condition with OASignal = 1
 		if ( HighHumidityOperationFlag ) {
-			OAController( OAControllerNum ).OAMassFlow = min( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MaxOAMassFlowRate * max( 1.0, OASignal ) );
+			thisController.OAMassFlow = min( thisController.OAMassFlow, thisController.MaxOAMassFlowRate * max( 1.0, OASignal ) );
 		} else {
-			OAController( OAControllerNum ).OAMassFlow = min( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MaxOAMassFlowRate );
+			thisController.OAMassFlow = min( thisController.OAMassFlow, thisController.MaxOAMassFlowRate );
 		}
 
-		if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
-			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).DemandLimitFlowRate;
-		if ( OAController( OAControllerNum ).EMSOverrideOARate ) {
-			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).EMSOARateValue;
+		if ( !WarmupFlag && !DoingSizing && ( thisController.ManageDemand ) && ( thisController.OAMassFlow > thisController.DemandLimitFlowRate ) )
+			thisController.OAMassFlow = thisController.DemandLimitFlowRate;
+		if ( thisController.EMSOverrideOARate ) {
+			thisController.OAMassFlow = thisController.EMSOARateValue;
 		}
 
 		// save the min outside air flow fraction and max outside air mass flow rate
 		if ( AirLoopNum > 0 ) {
 			AirLoopFlow( AirLoopNum ).OAMinFrac = OutAirMinFrac;
-			AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
-			if ( OAController( OAControllerNum ).MixMassFlow > 0.0 ) {
-				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
+			AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * thisController.MixMassFlow;
+			if ( thisController.MixMassFlow > 0.0 ) {
+				AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
 			} else {
 				AirLoopFlow( AirLoopNum ).OAFrac = 0.0;
 			}
-			OAController( OAControllerNum ).MinOAFracLimit = OutAirMinFrac;
+			thisController.MinOAFracLimit = OutAirMinFrac;
 			if ( HighHumidityOperationFlag && OASignal > 1.0 ) {
-				AirLoopFlow( AirLoopNum ).MaxOutAir = OAController( OAControllerNum ).MaxOAMassFlowRate * OASignal;
+				AirLoopFlow( AirLoopNum ).MaxOutAir = thisController.MaxOAMassFlowRate * OASignal;
 			} else {
-				AirLoopFlow( AirLoopNum ).MaxOutAir = OAController( OAControllerNum ).MaxOAMassFlowRate;
+				AirLoopFlow( AirLoopNum ).MaxOutAir = thisController.MaxOAMassFlowRate;
 			}
 
 			// calculate mixed air temp at min OA flow rate
-			ReliefMassFlowAtMinOA = max( AirLoopFlow( AirLoopNum ).MinOutAir - OAController( OAControllerNum ).ExhMassFlow, 0.0 );
-			RecircMassFlowRateAtMinOAFlow = max( Node( OAController( OAControllerNum ).RetNode ).MassFlowRate - ReliefMassFlowAtMinOA, 0.0 );
+			ReliefMassFlowAtMinOA = max( AirLoopFlow( AirLoopNum ).MinOutAir - thisController.ExhMassFlow, 0.0 );
+			RecircMassFlowRateAtMinOAFlow = max( Node( thisController.RetNode ).MassFlowRate - ReliefMassFlowAtMinOA, 0.0 );
 			if ( ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir ) > 0.0 ) {
-				RecircTemp = Node( OAController( OAControllerNum ).RetNode ).Temp;
-				MixedAirTempAtMinOAFlow = ( RecircMassFlowRateAtMinOAFlow * RecircTemp + AirLoopFlow( AirLoopNum ).MinOutAir * Node( OAController( OAControllerNum ).OANode ).Temp ) / ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir );
+				RecircTemp = Node( thisController.RetNode ).Temp;
+				MixedAirTempAtMinOAFlow = ( RecircMassFlowRateAtMinOAFlow * RecircTemp + AirLoopFlow( AirLoopNum ).MinOutAir * Node( thisController.OANode ).Temp ) / ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir );
 			} else {
-				MixedAirTempAtMinOAFlow = Node( OAController( OAControllerNum ).RetNode ).Temp;
+				MixedAirTempAtMinOAFlow = Node( thisController.RetNode ).Temp;
 			}
-			OAController( OAControllerNum ).MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
+			thisController.MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
 
 			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
 			if ( EconomizerOperationFlag ) {
-				if ( OAController( OAControllerNum ).Lockout == LockoutWithHeatingPossible ) {
+				if ( thisController.Lockout == LockoutWithHeatingPossible ) {
 					// For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
 					if ( AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus && AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated ) {
 
-						if ( MixedAirTempAtMinOAFlow <= Node( OAController( OAControllerNum ).MixNode ).TempSetPoint ) {
+						if ( MixedAirTempAtMinOAFlow <= Node( thisController.MixNode ).TempSetPoint ) {
 							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = true;
-							OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
-							AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
+							thisController.OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+							AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
 							AirLoopControlInfo( AirLoopNum ).EconoLockout = true;
 							EconomizerOperationFlag = false ;
 						} else { // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
 							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
-							OAController( OAControllerNum ).HRHeatingCoilActive = 0;
+							thisController.HRHeatingCoilActive = 0;
 						} // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
 						AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = false;
 					}
@@ -4461,15 +4484,15 @@ namespace MixedAir {
 
 			// Check heat exchanger bypass control
 			AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
-			OAController( OAControllerNum ).HeatRecoveryBypassStatus = 0;
+			thisController.HeatRecoveryBypassStatus = 0;
 			if ( EconomizerOperationFlag ) {
-				if ( OAController( OAControllerNum ).HeatRecoveryBypassControlType == BypassWhenWithinEconomizerLimits ) {
+				if ( thisController.HeatRecoveryBypassControlType == BypassWhenWithinEconomizerLimits ) {
 					AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-					OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
-				} else if ( OAController( OAControllerNum ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
-					if ( OAController( OAControllerNum ).OAMassFlow > AirLoopFlow( AirLoopNum ).MinOutAir ) {
+					thisController.HeatRecoveryBypassStatus = 1;
+				} else if ( thisController.HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
+					if ( thisController.OAMassFlow > AirLoopFlow( AirLoopNum ).MinOutAir ) {
 						AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-						OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
+						thisController.HeatRecoveryBypassStatus = 1;
 					}
 				}
 			}
@@ -4478,8 +4501,8 @@ namespace MixedAir {
 			AirLoopControlInfo( AirLoopNum ).EconoActive = EconomizerOperationFlag;
 			AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive = HighHumidityOperationFlag;
 			if ( AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
-				OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
-				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
+				thisController.OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+				AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
 			}
 
 
@@ -4495,9 +4518,9 @@ namespace MixedAir {
 					// reset heating coil active status and HX since logic tests may turn off heating coil
 					// the ResimAirLoopFlag will force another iteration and things should line up on subsequent iterations
 					AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = false;
-					OAController( OAControllerNum ).HRHeatingCoilActive = 0;
+					thisController.HRHeatingCoilActive = 0;
 					AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-					OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
+					thisController.HeatRecoveryBypassStatus = 1;
 				} else if ( AirLoopControlInfo( AirLoopNum ).HeatRecoveryResimFlag2 ) {
 					AirLoopControlInfo( AirLoopNum ).ResimAirLoopFlag = true;
 					AirLoopControlInfo( AirLoopNum ).HeatRecoveryResimFlag2 = false;
@@ -4505,49 +4528,49 @@ namespace MixedAir {
 					AirLoopControlInfo( AirLoopNum ).ResimAirLoopFlag = false;
 				}
 			} else {
-				OAController( OAControllerNum ).HRHeatingCoilActive = 0;
+				thisController.HRHeatingCoilActive = 0;
 			}
 
 		} // if (AirLoopNum > 0)
 
 		// Set the relief air flow rate (must be done last to account for changes in OAMassFlow
-		OAController( OAControllerNum ).RelMassFlow = max( OAController( OAControllerNum ).OAMassFlow - OAController( OAControllerNum ).ExhMassFlow, 0.0 );
+		thisController.RelMassFlow = max( thisController.OAMassFlow - thisController.ExhMassFlow, 0.0 );
 
 		// Set economizer report variable and status flag
-		if ( OAController( OAControllerNum ).Econo == NoEconomizer ) {
+		if ( thisController.Econo == NoEconomizer ) {
 			// No economizer
-			OAController( OAControllerNum ).EconomizerStatus = 0;
-			OAControllerInfo( OAControllerNum ).EconoActive = false;
+			thisController.EconomizerStatus = 0;
+			thisControllerInfo.EconoActive = false;
 		} else {
 			// With economizer.
 			if ( EconomizerOperationFlag ) {
 				// Economizer is enabled
-				OAController( OAControllerNum ).EconomizerStatus = 1;
-				OAControllerInfo( OAControllerNum ).EconoActive = true;
+				thisController.EconomizerStatus = 1;
+				thisControllerInfo.EconoActive = true;
 			} else {
 				// Economizer is disabled
-				OAController( OAControllerNum ).EconomizerStatus = 0;
-				OAControllerInfo( OAControllerNum ).EconoActive = false;
+				thisController.EconomizerStatus = 0;
+				thisControllerInfo.EconoActive = false;
 			}
 		}
 
 		// Set high humidity control report variable and status flag
 		if ( HighHumidityOperationFlag ) {
-			OAController( OAControllerNum ).HighHumCtrlStatus = 1;
-			OAControllerInfo( OAControllerNum ).HighHumCtrlActive = true;
+			thisController.HighHumCtrlStatus = 1;
+			thisControllerInfo.HighHumCtrlActive = true;
 		} else {
-			OAController( OAControllerNum ).HighHumCtrlStatus = 0;
-			OAControllerInfo( OAControllerNum ).HighHumCtrlActive = false;
+			thisController.HighHumCtrlStatus = 0;
+			thisControllerInfo.HighHumCtrlActive = false;
 		}
 
 		// Save OA fraction for reporting
-		if ( OAController( OAControllerNum ).MixMassFlow > 0 ) {
-			OAController( OAControllerNum ).OAFractionRpt = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
+		if ( thisController.MixMassFlow > 0 ) {
+			thisController.OAFractionRpt = thisController.OAMassFlow / thisController.MixMassFlow;
 		} else {
-			if ( OAController( OAControllerNum ).OAMassFlow > 0 ) {
-				OAController( OAControllerNum ).OAFractionRpt = OASignal;
+			if ( thisController.OAMassFlow > 0 ) {
+				thisController.OAFractionRpt = OASignal;
 			} else {
-				OAController( OAControllerNum ).OAFractionRpt = 0.0;
+				thisController.OAFractionRpt = 0.0;
 			}
 		}
 
@@ -4710,8 +4733,6 @@ namespace MixedAir {
 						OAController( OAControllerNum ).MaxOA = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					}}
 
-				} else if ( SELECT_CASE_var == ControllerSimple ) {
-
 				} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
 
 				} else {
@@ -4726,8 +4747,6 @@ namespace MixedAir {
 
 					CheckZoneSizing( CurrentModuleObject, OAController( OAControllerNum ).Name );
 					OAController( OAControllerNum ).MaxOA = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-
-				} else if ( SELECT_CASE_var == ControllerSimple ) {
 
 				} else if ( SELECT_CASE_var == ControllerStandAloneERV ) {
 
@@ -4860,8 +4879,8 @@ namespace MixedAir {
 			}
 			else
 			{
-			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-			Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
 				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 			}
 			Node( RelAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).RelMassFlow;
@@ -4877,29 +4896,11 @@ namespace MixedAir {
 			}
 			else
 			{
-			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 			}
 			Node( RetAirNodeNum ).MassFlowRate = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
 			Node( RetAirNodeNum ).MassFlowRateMaxAvail = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
-		}
-
-		if ( Contaminant.CO2Simulation && OAController( OAControllerNum ).ControllerType_Num == ControllerSimple ) {
-			Node( RelAirNodeNum ).CO2 = Node( InletAirNodeNum ).CO2;
-			if ( Node( RetAirNodeNum ).MassFlowRate > 0.0 ) {
-				Node( RetAirNodeNum ).CO2 = ( ( Node( InletAirNodeNum ).MassFlowRate - Node( RelAirNodeNum ).MassFlowRate ) * Node( InletAirNodeNum ).CO2 + Node( OutAirNodeNum ).MassFlowRate * OutdoorCO2 ) / Node( RetAirNodeNum ).MassFlowRate;
-			} else {
-				Node( RetAirNodeNum ).CO2 = Node( InletAirNodeNum ).CO2;
-			}
-		}
-
-		if ( Contaminant.GenericContamSimulation && OAController( OAControllerNum ).ControllerType_Num == ControllerSimple ) {
-			Node( RelAirNodeNum ).GenContam = Node( InletAirNodeNum ).GenContam;
-			if ( Node( RetAirNodeNum ).MassFlowRate > 0.0 ) {
-				Node( RetAirNodeNum ).GenContam = ( ( Node( InletAirNodeNum ).MassFlowRate - Node( RelAirNodeNum ).MassFlowRate ) * Node( InletAirNodeNum ).GenContam + Node( OutAirNodeNum ).MassFlowRate * OutdoorGC ) / Node( RetAirNodeNum ).MassFlowRate;
-			} else {
-				Node( RetAirNodeNum ).GenContam = Node( InletAirNodeNum ).GenContam;
-			}
 		}
 
 	}
@@ -5235,10 +5236,9 @@ namespace MixedAir {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( GetOAControllerInputFlag ) {
-			// Make sure OAControllers are "gotten"
-			GetOAControllerInputs();
-			GetOAControllerInputFlag = false;
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
 		}
 
 		NumberOfOAControllers = NumOAControllers;
@@ -5473,7 +5473,7 @@ namespace MixedAir {
 	}
 
 	int
-	GetOASysNumHXs( int const OASysNumber ) 
+	GetOASysNumHXs( int const OASysNumber )
 	{
 
 		// FUNCTION INFORMATION:
@@ -6168,10 +6168,9 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( GetOAControllerInputFlag ) {
-			// Make sure OAControllers are "gotten"
-			GetOAControllerInputs();
-			GetOAControllerInputFlag = false;
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
 		}
 
 		if ( OACtrlNum <= 0 || OACtrlNum > NumOAControllers ) {
@@ -6326,6 +6325,7 @@ namespace MixedAir {
 		// PURPOSE OF THIS SUBROUTINE:
 		// When OA Controller data is gotten from other routines, must check to make sure
 		// new name doesn't duplicate.  (Essentially a pass through to call Verify Name)
+		// Currently, this is only called from HVACStandAlongERV::GetStandaloneERV()
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -6351,10 +6351,9 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( GetOAControllerInputFlag ) {
-			// Make sure OAControllers are "gotten"
-			GetOAControllerInputs();
-			GetOAControllerInputFlag = false;
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
 		}
 
 		VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );

@@ -26,6 +26,7 @@ set( test_src
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   ElectricPowerServiceManager.unit.cc
@@ -63,6 +64,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
@@ -79,6 +81,7 @@ set( test_src
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
+  SingleDuct.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
   SiteFCFactorMethodGroundTemperatures.unit.cc
@@ -93,6 +96,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
+  UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
