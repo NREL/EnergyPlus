@@ -5923,20 +5923,23 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
+			if ( ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ||
+				( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
 				Index = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
-				if ( DesignSpecMSHP( Index ).SingleModeFlag ) {
-					UnitarySystem( UnitarySysNum ).SingleMode = 1;
+				if ( Index > 0 ) {
+					if ( DesignSpecMSHP( Index ).SingleModeFlag ) {
+						UnitarySystem( UnitarySysNum ).SingleMode = 1;
+					}
 				}
-			}
-			// Check fan operation mode to ensure cycling fan mode
-			if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
-				if ( !CheckScheduleValueMinMax( UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0 ) ) {
-					ShowSevereError( CurrentModuleObject + ": " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "The schedule values in " + cAlphaFields( iFanSchedAlphaNum ) + " must be 0 when Single Mode Operation is applied." );
-					ShowContinueError( "A value of 0 represents cycling fan mode, any other value up to 1 represents constant fan mode." );
-					ErrorsFound = true;
+			} else {
+				if ( UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex > 0 ) {
+					if ( DesignSpecMSHP( UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex ).SingleModeFlag ) {
+						ShowSevereError( CurrentModuleObject + ": " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Gas." );
+						ShowContinueError( "The input cooliing coil type = " + Alphas( iCoolingCoilTypeAlphaNum ) + " and the input heating coil type = " + Alphas( iHeatingCoilTypeAlphaNum ) );
+					}
 				}
+
 			}
 
 			// set global logicals that denote coil type
@@ -10756,11 +10759,15 @@ namespace HVACUnitarySystem {
 			FanSpeedRatio = CompOnFlowRatio;
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
-			AverageUnitMassFlow = PartLoadRatio * CompOnMassFlow;
-			FanSpeedRatio = PartLoadRatio * CompOnFlowRatio;
-			if ( !HeatingLoad && !CoolingLoad ) {
-				AverageUnitMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow;
+		if ( !( HeatingLoad && UnitarySystem( UnitarySysNum ).NumOfSpeedHeating == 0 ) ) {
+			if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
+				if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+					AverageUnitMassFlow = CompOnMassFlow;
+					FanSpeedRatio = CompOnFlowRatio;
+				} else {
+					AverageUnitMassFlow = PartLoadRatio * CompOnMassFlow;
+					FanSpeedRatio = PartLoadRatio * CompOnFlowRatio;
+				}
 			}
 		}
 
