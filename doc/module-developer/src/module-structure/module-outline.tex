@@ -1,0 +1,71 @@
+\section{Module Outline}\label{module-outline}
+
+The developer will create a new file NewHVACComponent.f90.~ The file shall contain the following elements:
+
+Note -- even if your component does not need some of the suggested modules, you should include ``stub'' routines for these.
+
+\textbf{MODULE}NewHVACComponent
+
+\emph{Documentation:} Fortran comments describing and documenting the module. Included are sections showing module author, module creation date, date modified and modification author.~ Each routine and/or function should also follow the documentation guidelines as shown in the templates.
+
+\emph{USE Statements:} Fortran statements naming other modules that this module can access, either for data or for routines.
+
+\emph{Module Parameters:} If you will be implementing more than one ``type'' of component in the module, it is a good idea to assign numeric parameters to each type so as to retain readability yet reduce alpha comparisons which are notoriously slow for most systems.~ Assign numeric parameters to alphanumeric fields within a class type (.e.g.~object UnitarySystem:HeatPump, field Fan Placement: ``blow through'' or ``draw through'') when this information is required in init, calc, update or report subroutines to further reduce alpha comparisons.~ Use string comparison only in GetInput subroutines.
+
+\emph{Module Data structure Definitions:} Using the Fortran TYPE statement define the data structures needed in the module that will not be available from other modules. Define all module level variables that will be needed.
+
+Typically, you define your module's data structure within the module.~ If this data must be used by multiple modules, you should define a separate Data module for the data.
+
+Character strings in structures are not allowed (except for name of object) -- any exceptions must be approved. Schedule names, curve object names, and child object types MUST all be referenced by an integer.
+
+For existing code, convert all character string structure variables to integer parameters and delete the character variable from the structure. Also delete unused strings rather than converting to integer. Do not use structure variable to store information used only during GetInput even if you think it could be used in the future, use local variables instead. Usually won't hurt anything until some user puts a large number of objects in their input (memory use impact).
+
+Currently, the furnace structure includes many that should not be there. SuppHeatCoilType is an example of a character string structure variable that is only used in GetInput and is not needed in the structure. Should have been a local instead. And CoolingPLFFPLR and HeatingPLFFPLR structure variables are not even used.
+
+\textbf{\emph{CONTAINS}}
+
+\textbf{\emph{SUBROUTINE}} \emph{SimNewHVACComponent}
+
+This routine selects the individual component being simulated and calls the other module subroutines that do the real work. This routine is the only routine in the module that is accessible outside the module (\emph{PUBLIC}). All other routines in the module are \emph{PRIVATE} and are only callable within the module. This routine is sometimes called the ``driver'' routine for the module.
+
+\textbf{\emph{END SUBROUTINE}} \emph{SimNewHVACComponent}
+
+\textbf{\emph{SUBROUTINE}} \emph{GetNewHVACComponentInput}
+
+This routine uses the ``get'' routines from the InputProcessor module to obtain input for NewHVACComponent. The module data arrays are allocated and the data is moved into the arrays.
+
+\textbf{\emph{END SUBROUTINE}} \emph{GetNewHVACComponentInput}
+
+\textbf{\emph{SUBROUTINE}} \emph{InitNewHVACComponent}
+
+This routine performs whatever initialization calculations that may be needed at various points in the simulation. For instance, some calculations may only need to be done once; some may need to be done at the start of each simulation weather period; some at the start of each HVAC simulation time step; and some at the start of each loop solution. This routine also transfers data from the component inlet nodes to the component data arrays every time the component is simulated, in preparation for the actual component simulation.
+
+\textbf{\emph{END SUBROUTINE}} \emph{InitNewHVACComponent}
+
+\textbf{\emph{SUBROUTINE}} \emph{SizeNewHVACComponent}
+
+This routine can create the sizing options (if applicable) for the component or be left as a placeholder for later manipulation for sizing purposes.
+
+\textbf{\emph{END SUBROUTINE}} \emph{SizeNewHVACComponent}
+
+\textbf{\emph{SUBROUTINE}} \emph{CalcNewHVACComponent}
+
+This routine does the actual calculations to simulate the performance of the component. Only calculation is done -- there is no moving of data from or to input or output areas. There may be more than one ``\emph{CALC}'' subroutine if more than one component is being modeled within this module.
+
+\textbf{\emph{END SUBROUTINE}} \emph{CalcNewHVACComponent}
+
+\textbf{\emph{SUBROUTINE}} \emph{UpdateNewHVACComponent}
+
+This routine moves the results of the ``\emph{Calc}'' routine(s) to the component outlet nodes.
+
+\textbf{\emph{END SUBROUTINE}} \emph{UpdateNewHVACComponent}
+
+\textbf{\emph{SUBROUTINE}} \emph{ReportNewHVACComponent}
+
+This routine performs any special calculations that are needed purely for reporting purposes.
+
+\textbf{\emph{END SUBROUTINE}} \emph{ReportNewHVACComponent}
+
+\textbf{\emph{Utility Routines (as appropriate) -- in the Fan module we allow outside modules to access internal fan inlets, outlets, and design volume flow rate.}}
+
+\textbf{\emph{END MODULE}} \emph{NewHVACComponent}
