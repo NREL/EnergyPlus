@@ -18,6 +18,7 @@
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
 #include <DataSurfaces.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceSurfaceManager.hh>
@@ -136,6 +137,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 	DataHeatBalance::ZoneIntGain.allocate(1);
 
+	createFacilityElectricPowerServiceObject();
 	HeatBalanceManager::SetPreConstructionInputParameters();
 	HeatBalanceManager::GetProjectControlData( ErrorsFound );
 	HeatBalanceManager::GetFrameAndDividerData( ErrorsFound );
@@ -248,6 +250,6 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 	}
 
-	EXPECT_NEAR(DataSurfaces::WinGainFrameDividerToZoneRep( winNum ), -331.4, 0.1);
+	EXPECT_GT(DataSurfaces::WinHeatLossRep( winNum ), DataSurfaces::WinHeatTransfer( winNum ));
 
 }
