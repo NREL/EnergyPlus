@@ -902,13 +902,24 @@ This numeric field describes the ancillary power consumed by the converter when 
 
 This field is the name of thermal zone where the converter is located. If this field is omitted then the converter is considered outdoors. The power lost during the conversion process is treated as heat gains and added the thermal zone named in this field. The split between radiation and convection can be controlled in the next input field.
 
-\#\#\#\# Field: Radiative Fraction
+\subsubsection{Field: Radiative Fraction}\label{field-zone-rad-fract}
 
 This numeric field is the fraction of zone heat gains that are handled as infrared thermal radiation. This field is only used if a zone is named in the previous field. The portion of zone gains that are not radiative are added to the zone as convection. If a zone is named and this field left blank or omitted then all the zone heat gains will be convective.
 
 An example IDF showing how this object is used is provided below:
 
-ElectricLoadCenter:Storage:Converter, Grid Charge Converter , !- Name ALWAYS\_ON , !- Availability Schedule Name SimpleFixed , !- Power Conversion Efficiency Method 0.95 , !- Simple Fixed Efficiency , !- Design Maximum Continuous Input Power , !- Efficiency Function of Power Curve Name 20 , !- Ancillary Power Consumed In Standby , !- Zone Name 0.25; !- Radiative Fraction
+\begin{lstlisting}
+
+ElectricLoadCenter:Storage:Converter, 
+  Grid Charge Converter , !- Name 
+  ALWAYS\_ON , !- Availability Schedule Name
+  SimpleFixed , !- Power Conversion Efficiency Method 
+  0.95 , !- Simple Fixed Efficiency
+  , !- Design Maximum Continuous Input Power 
+  , !- Efficiency Function of Power Curve Name 20 
+  , !- Ancillary Power Consumed In Standby 
+  , !- Zone Name 0.25; !- Radiative Fraction
+\end{lstlisting}
 
 \subsection{Electric Load Center Converter Outputs}\label{electric-load-center-converter-outputs}
 
