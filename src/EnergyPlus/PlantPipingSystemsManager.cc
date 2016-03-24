@@ -414,6 +414,7 @@ namespace PlantPipingSystemsManager {
 			// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
 			// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
 			// which would be carried over from the previous environment
+			PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
 			PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
 			// There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
@@ -462,22 +463,22 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 				}
 
-			// Aggregate the heat flux
-			// Zone-coupled slab
-			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
-				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
-				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-			} else { // Coupled basement
-				// basement walls
-				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
-				// basement floor
-				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
+				// Aggregate the heat flux
+				// Zone-coupled slab
+				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
+					PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+					PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+				} else if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) { // Coupled basement
+					// basement walls
+					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
+					// basement floor
+					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
 
-				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-				PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-				PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-			}
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+					PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+					PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+				}
 
 				// Zone-coupled slab
 				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
