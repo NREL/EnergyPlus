@@ -9466,7 +9466,7 @@
     ,                        !- Track Schedule Name Scheme Schedule Name
     ,                        !- Track Meter Scheme Meter Name
     DirectCurrentWithInverterDCStorage,  !- Electrical Buss Type
-    PV Inverter,             !- Inverter Object Name
+    Storage Inverter,             !- Inverter Object Name
     Battery,                 !- Electrical Storage Object Name
     ,                        !- Transformer Object Name
     TrackChargeDischargeSchedules,  !- Storage Operation Scheme
@@ -9536,7 +9536,7 @@
     5.0E12;                  !- Initial State of Charge {J}
 
   ElectricLoadCenter:Inverter:LookUpTable,
-    PV Inverter,             !- Name
+    Storage Inverter,             !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Zone Name
     0.25,                    !- Radiative Fraction
@@ -9550,115 +9550,53 @@
     0.934,                   !- Efficiency at 75% Power and Nominal Voltage
     0.930;                   !- Efficiency at 100% Power and Nominal Voltage
 
-
-
-Output:Variable,*,Inverter DC to AC Efficiency,detailed; !- HVAC Average []
-Output:Variable,*,Inverter DC Input Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Inverter DC Input Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Inverter AC Output Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Inverter AC Output Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Inverter Conversion Loss Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Inverter Conversion Loss Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Inverter Conversion Loss Decrement Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Inverter Thermal Loss Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Inverter Thermal Loss Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Inverter Ancillary AC Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Inverter Ancillary AC Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Storage Simple Charge State,detailed; !- HVAC Average [J]
-Output:Variable,*,Electric Storage Charge Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Storage Charge Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Storage Production Decrement Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Storage Discharge Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Storage Discharge Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Storage Thermal Loss Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Storage Thermal Loss Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Converter AC to DC Efficiency,detailed; !- HVAC Average []
-Output:Variable,*,Converter AC Input Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Converter AC Input Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Converter DC Output Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Converter DC Output Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Converter Electric Loss Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Converter Electric Loss Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Converter Electric Loss Decrement Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Converter Thermal Loss Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Converter Thermal Loss Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Converter Ancillary AC Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Converter Ancillary AC Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Load Center Produced Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Load Center Produced Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Load Center Supplied Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Load Center Drawn Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Load Center Produced Thermal Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Electric Load Center Produced Thermal Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Electric Load Center Requested Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total Purchased Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total Purchased Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Facility Total Surplus Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total Surplus Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Facility Net Purchased Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Net Purchased Electric Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Facility Total Building Electric Demand Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total HVAC Electric Demand Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total Electric Demand Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total Produced Electric Power,detailed; !- HVAC Average [W]
-Output:Variable,*,Facility Total Produced Electric Energy,detailed; !- HVAC Sum [J]
-
-! Begin EMS demo of controlling a big battery to smooth out building demand load factor
-
-  Output:EnergyManagementSystem,
-    Verbose,                 !- Actuator Availability Dictionary Reporting
-    Verbose,                 !- Internal Variable Availability Dictionary Reporting
-    ErrorsOnly;              !- EMS Runtime Language Debug Output Level
-
-  EnergyManagementSystem:Sensor,
-    CurntFacilityElectDemand,!- Name
-    Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
- 
-  EnergyManagementSystem:Sensor,
-    CurntStorageSOC,
-    Battery,
-    Electric Storage Simple Charge State;
-    
-  EnergyManagementSystem:InternalVariable, 
-    MaxSOC,
-    BATTERY,
-    Electrical Storage Simple Maximum Capacity; ![J] 
-  
-  EnergyManagementSystem:TrendVariable,
-    FacilityElectTrend,      !- Name
-    CurntFacilityElectDemand,!- EMS Variable Name
-    288;                     !- Number of Timesteps to be Logged 
-  
-  EnergyManagementSystem:Actuator, 
-    dischargeRate,
-    GRID BATTERY LOAD CENTER,
-    Electrical Storage,
-    Power Draw Rate;
-    
-  EnergyManagementSystem:Actuator,
-    chargeRate,
-    GRID BATTERY LOAD CENTER,
-    Electrical Storage,
-    Power Charge Rate;
-  
-  EnergyManagementSystem:ProgramCallingManager,
-    Demand Manager Demonstration,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-    BatteryControlDemandDemo;  !- Program Name 1
-
-  EnergyManagementSystem:Program,
-    BatteryControlDemandDemo,
-    Set fracSOC = CurntStorageSOC / MaxSOC,
-    Set avgFacilDemand = @trendAverage FacilityElectTrend 288,
-    set dischargeRate = 0.0,
-    set chargeRate = 0.0,
-    set dampenFactor = 0.8,
-    If ( CurntFacilityElectDemand > (avgFacilDemand * 1.05 ) ),
-      set dischargeRate = ( CurntFacilityElectDemand - avgFacilDemand ) * dampenFactor ,
-    ELSEIF ( CurntFacilityElectDemand < (avgFacilDemand * 0.95 ) ),
-      set chargeRate = ( avgFacilDemand - CurntFacilityElectDemand ) * dampenFactor,
-    ENDIF;
-    
-    
-  
+Output:Variable,*,Inverter DC to AC Efficiency,hourly; !- HVAC Average []
+Output:Variable,*,Inverter DC Input Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Inverter DC Input Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Inverter AC Output Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Inverter AC Output Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Inverter Conversion Loss Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Inverter Conversion Loss Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Inverter Conversion Loss Decrement Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Inverter Thermal Loss Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Inverter Thermal Loss Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Inverter Ancillary AC Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Inverter Ancillary AC Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Storage Simple Charge State,hourly; !- HVAC Average [J]
+Output:Variable,*,Electric Storage Charge Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Storage Charge Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Storage Production Decrement Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Storage Discharge Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Storage Discharge Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Storage Thermal Loss Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Storage Thermal Loss Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Converter AC to DC Efficiency,hourly; !- HVAC Average []
+Output:Variable,*,Converter AC Input Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Converter AC Input Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Converter DC Output Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Converter DC Output Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Converter Electric Loss Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Converter Electric Loss Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Converter Electric Loss Decrement Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Converter Thermal Loss Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Converter Thermal Loss Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Converter Ancillary AC Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Converter Ancillary AC Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Load Center Produced Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Load Center Produced Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Load Center Supplied Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Load Center Drawn Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Load Center Produced Thermal Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Electric Load Center Produced Thermal Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Electric Load Center Requested Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total Purchased Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total Purchased Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Facility Total Surplus Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total Surplus Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Facility Net Purchased Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Net Purchased Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Facility Total Building Electric Demand Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total HVAC Electric Demand Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total Electric Demand Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total Produced Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Facility Total Produced Electric Energy,hourly; !- HVAC Sum [J]

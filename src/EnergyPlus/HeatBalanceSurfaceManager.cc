@@ -1912,7 +1912,7 @@ namespace HeatBalanceSurfaceManager {
 			window.ConvHeatFlowNatural = 0.0;
 			window.ConvHeatGainToZoneAir = 0.0;
 			window.RetHeatGainToZoneAir = 0.0;
-			window.DividerConduction = 0.0;
+			window.DividerHeatGain = 0.0;
 			window.BlTsolBmBm = 0.0;
 			window.BlTsolBmDif = 0.0;
 			window.BlTsolDifDif = 0.0;
@@ -1951,6 +1951,7 @@ namespace HeatBalanceSurfaceManager {
 		}
 
 		WinHeatGain = 0.0;
+		WinHeatTransfer = 0.0;
 		WinHeatGainRep = 0.0;
 		WinHeatLossRep = 0.0;
 		WinGainConvGlazToZoneRep = 0.0;
@@ -1994,6 +1995,7 @@ namespace HeatBalanceSurfaceManager {
 		WinHeatGainRepEnergy = 0.0;
 		WinHeatLossRepEnergy = 0.0;
 		WinGapConvHtFlowRepEnergy = 0.0;
+		WinHeatTransferRepEnergy = 0.0;
 		ZoneWinHeatGainRepEnergy = 0.0;
 		ZoneWinHeatLossRepEnergy = 0.0;
 		ZnOpqSurfInsFaceCondGnRepEnrg = 0.0;
@@ -5140,6 +5142,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 		if ( PartialResimulate ) {
 			WinHeatGain( SurfNum ) = 0.0;
+			WinHeatTransfer( SurfNum ) = 0.0;
 			WinHeatGainRep( SurfNum ) = 0.0;
 			WinHeatLossRep( SurfNum ) = 0.0;
 			WinGainConvGlazToZoneRep( SurfNum ) = 0.0;
@@ -5202,6 +5205,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	// CalcWindowHeatBalance.
 	if ( ! PartialResimulate ) {
 		WinHeatGain = 0.0;
+		WinHeatTransfer = 0.0;
 		WinHeatGainRep = 0.0;
 		WinHeatLossRep = 0.0;
 		WinGainConvGlazToZoneRep = 0.0;
@@ -5448,6 +5452,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						// Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
 						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( surface.Zone ) * surface.Area * Construct( surface.Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
 						// Zone diffuse interior shortwave reflected back into the TDD
+						WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 
 						// fill out report vars for components of Window Heat Gain
 						WinGainConvGlazToZoneRep( SurfNum ) = HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) );
@@ -5460,6 +5465,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
 							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 						}
+						WinHeatTransferRepEnergy( SurfNum ) = WinHeatGain( SurfNum ) * TimeStepZoneSec;
 
 						TDDPipe( PipeNum ).HeatGain = WinHeatGainRep( SurfNum );
 						TDDPipe( PipeNum ).HeatLoss = WinHeatLossRep( SurfNum );
@@ -5527,6 +5533,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
 								WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 							}
+
+							WinHeatTransferRepEnergy( SurfNum ) = WinHeatGain( SurfNum ) * TimeStepZoneSec;
 
 							TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
 						}

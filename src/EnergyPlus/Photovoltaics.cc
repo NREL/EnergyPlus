@@ -2145,8 +2145,8 @@ namespace Photovoltaics {
 			Real64 const AM( 1.0 / ( std::cos( SolZen * DegToRadians ) + 0.5057 * std::pow( 96.08 - SolZen, -1.634 ) ) );
 			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		} else {
-			AbsoluteAirMass = 999.0;
-			// should maybe add a show warning msg.
+			Real64 const AM( 36.32 ); // evaluated above at SolZen = 89.9 issue #5528
+			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		}
 
 		return AbsoluteAirMass;
