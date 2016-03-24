@@ -5655,8 +5655,19 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 
 }
 
-
-
-
-
+TEST( OutputReportTabularTest, GetUnitSubstring_Test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitSubstring_Test" );
+	EXPECT_EQ( "", GetUnitSubString( "" ) );
+	EXPECT_EQ( "", GetUnitSubString( " " ) );
+	EXPECT_EQ( "", GetUnitSubString( "String with no units" ) );
+	EXPECT_EQ( "feet", GetUnitSubString( "[feet]" ) );
+	EXPECT_EQ( "meters", GetUnitSubString( "String with  unit string at end [meters]" ) );
+	EXPECT_EQ( "newtons", GetUnitSubString( "[newtons] String with unit string at beginning" ) );
+	EXPECT_EQ( "m", GetUnitSubString( "String with unit string at end [m]" ) );
+	EXPECT_EQ( "N", GetUnitSubString( "[N] String with unit string at beginning" ) );
+	EXPECT_EQ( "", GetUnitSubString( "[]" ) );
+	EXPECT_EQ( "", GetUnitSubString( "String with empty unit string at end []" ) );
+	EXPECT_EQ( "", GetUnitSubString( "[] String with empty unit string at beginning" ) );
+}
 
