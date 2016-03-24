@@ -9466,7 +9466,7 @@
     ,                        !- Track Schedule Name Scheme Schedule Name
     ,                        !- Track Meter Scheme Meter Name
     DirectCurrentWithInverterDCStorage,  !- Electrical Buss Type
-    PV Inverter,             !- Inverter Object Name
+    Storage Inverter,             !- Inverter Object Name
     Battery,                 !- Electrical Storage Object Name
     ,                        !- Transformer Object Name
     FacilityDemandLeveling,  !- Storage Operation Scheme
@@ -9505,7 +9505,7 @@
     5.0E12;                  !- Initial State of Charge {J}
 
   ElectricLoadCenter:Inverter:LookUpTable,
-    PV Inverter,             !- Name
+    Storage Inverter,             !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Zone Name
     0.25,                    !- Radiative Fraction
