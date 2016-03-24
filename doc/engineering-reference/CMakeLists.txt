@@ -127,6 +127,7 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/zone-controls.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/zone-equipment-and-zone-forced-air-units.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation/whole-facility-electric-service.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation/electric-load-center-distribution-manager.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation/photovoltaic-arrays.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation/generators.tex
@@ -488,11 +489,12 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7400.svg.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7454.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7466.png
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7480.png
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7481.png
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7482.png
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7483.png
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7484.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ACBussDiagram.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ACStorageBussDiagram.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/DCInverterWithACStorageBussDiagram.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/DCInverterWithDCStorageBussDiagram.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/StorageOperationControlVolume.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/DCInverterBussDiagram.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7528.svg.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7592.svg.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image7837.png
