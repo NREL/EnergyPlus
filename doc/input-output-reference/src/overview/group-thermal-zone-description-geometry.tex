@@ -2239,13 +2239,13 @@ The following table shows what input objects/fields to use to model different wi
 % table 8
 \begin{longtable}[c]{p{2.0in}p{2.0in}p{2.0in}}
 \caption{Window Modeling Options \label{table:window-modeling-options}} \tabularnewline
-\toprule 
+\toprule
 Option & Object/Field or Output Variable & Input File (distributed with install) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Window Modeling Options} \tabularnewline
-\toprule 
+\toprule
 Option & Object/Field or Output Variable & Input File (distributed with install) \tabularnewline
 \midrule
 \endhead
@@ -2409,7 +2409,7 @@ Zone,Average,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Ra
 Zone,Average,Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
 Zone,Average,Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area[W/m2]
 Zone,Average,Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
-Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value[] 
+Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value[]
 Zone,Average,Surface Anisotropic Sky Multiplier []
 Zone,Average,Surface Window BSDF Beam Direction Number []
 Zone,Average,Surface Window BSDF Beam Theta Angle [rad]
@@ -2499,6 +2499,8 @@ Zone,Average,Surface Window Heat Gain Rate [W]
 Zone,Sum,Surface Window Heat Gain Energy [J]
 Zone,Average,Surface Window Heat Loss Rate [W]
 Zone,Sum,Surface Window Heat Loss Energy [J]
+Zone,Average,Surface Window Net Heat Transfer Rate [W]
+Zone,Sum,Surface Window Net Heat Transfer Energy [J]
 Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance[]
 Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance []
 Zone,Average,Surface Window Glazing Diffuse to Diffuse Solar Transmittance[]
@@ -3043,34 +3045,31 @@ For an airflow window, the forced convective heat flow from the gap through whic
 
 \subsubsection{Surface Window Heat Gain Energy {[}J{]}}\label{surface-window-heat-gain-energy-j}
 
-The total heat flow to the zone from the glazing, frame and divider of an exterior window when the total heat flow is positive.
+The total heat flow \emph{to the zone} from the glazing, frame and divider of an exterior window when the total heat flow is positive.
 
 For a window \emph{without an interior shading device}, this heat flow is equal to:
 
-{[}Surface Window Transmitted Solar Radiation Rate (see definition, above){]}
-
 \begin{itemize}
+\item
+  {[}Surface Window Transmitted Solar Radiation Rate (see definition, above){]}
 \item
   {[}Convective heat flow to the zone from the zone side of the glazing{]}
 \item
   {[}Net IR heat flow to the zone from zone side of the glazing{]}
-\end{itemize}
-
--- {[}Short-wave radiation from zone transmitted back out the window{]}
-
-\begin{itemize}
-\tightlist
 \item
-  {[}Conduction to zone from window frame and divider, if present{]}
+  {[}Short-wave radiation from zone transmitted back out the window{]}
+\item
+  {[}Convection to zone from window frame and divider, if present{]}
 \end{itemize}
 
 Here, short-wave radiation is that from lights and diffuse interior solar radiation.
 
 For a window \emph{with an interior shading device}, this heat flow is equal to:
 
-{[}Surface Window Transmitted Solar Radiation Rate{]}
 
 \begin{itemize}
+\item
+  {[}Surface Window Transmitted Solar Radiation Rate{]}
 \item
   {[}Convective heat flow to the zone from the air flowing through the gap between glazing and shading device{]}
 \item
@@ -3079,23 +3078,64 @@ For a window \emph{with an interior shading device}, this heat flow is equal to:
   {[}Net IR heat flow to the zone from the zone side of the glazing{]}
 \item
   {[}Net IR heat flow to the zone from the zone side of the shading device{]}
-\end{itemize}
-
--- {[}Short-wave radiation from zone transmitted back out the window{]}
-
-\begin{itemize}
-\tightlist
 \item
-  {[}Conduction to zone from window frame and divider, if present{]}
+  {[}Short-wave radiation from zone transmitted back out the window{]}
+\item
+  {[}Convection to zone from window frame and divider, if present{]}
 \end{itemize}
 
-The total window heat flow can also be thought of as the sum of the solar and conductive gain from the window glazing.
+The total window heat flow can also be thought of as the sum of the solar and conductive gain \emph{to the zone} from the window.
 
 \subsubsection{Surface Window Heat Loss Rate {[}W{]}}\label{surface-window-heat-loss-rate-w}
 
 \subsubsection{Surface Window Heat Loss Energy {[}J{]}}\label{surface-window-heat-loss-energy-j}
 
 The absolute value of the total heat flow through an exterior window when the total heat flow is negative. (See definition of ``total heat flow'' under ``Surface Window Heat Gain Rate,'' above.)
+
+\subsubsection{Surface Window Net Heat Transfer Rate {[}W{]}}\label{surface-window-net-heat-transfer-rate-w}
+
+\subsubsection{Surface Window Net Heat Transfer Energy {[}J{]}}\label{surface-window-net-heat-transfer-rate-j}
+
+The total heat flow through the glazing, frame and divider of an exterior window. Negative values imply heat flow to the exterior.
+
+The important distinction between this output variable and those for ``Surface Window Heat Gain/Loss'' is that this represents the net heat flow through the window and not the heat flow \emph{to the zone}. The only difference is the heat flow \emph{to the zone} does not account for radiation from the opaque frame and divider components. This is because these components, as a simplification, do not participate in the overall radiative exchange with other surfaces in the zone.
+
+For a window \emph{without an interior shading device}, this heat flow is equal to:
+
+\begin{itemize}
+\item
+  {[}Surface Window Transmitted Solar Radiation Rate (see definition, above){]}
+\item
+  {[}Convective heat flow from the zone side of the glazing{]}
+\item
+  {[}Net IR heat flow from the zone side of the glazing{]}
+\item
+  {[}Short-wave radiation from zone transmitted back out the window{]}
+\item
+  {[}Conduction through window frame and divider, if present{]}
+\end{itemize}
+
+Here, short-wave radiation is that from lights and diffuse interior solar radiation.
+
+For a window \emph{with an interior shading device}, this heat flow is equal to:
+
+
+\begin{itemize}
+\item
+  {[}Surface Window Transmitted Solar Radiation Rate{]}
+\item
+  {[}Convective heat flow from the air flowing through the gap between glazing and shading device{]}
+\item
+  {[}Convective heat flow from the zone side of the shading device{]}
+\item
+  {[}Net IR heat flow from the zone side of the glazing{]}
+\item
+  {[}Net IR heat flow from the zone side of the shading device{]}
+\item
+  {[}Short-wave radiation from zone transmitted back out the window{]}
+\item
+  {[}Conduction through the window frame and divider, if present{]}
+\end{itemize}
 
 \subsubsection{\texorpdfstring{Surface Window Glazing Beam to Beam Solar Transmittance {[]}}{Surface Window Glazing Beam to Beam Solar Transmittance }}\label{surface-window-glazing-beam-to-beam-solar-transmittance}
 
