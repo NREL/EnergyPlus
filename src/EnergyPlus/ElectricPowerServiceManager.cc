@@ -1925,8 +1925,7 @@ namespace EnergyPlus {
 		electProdRate( 0.0 ),
 		thermalProd( 0.0 ),
 		thermProdRate( 0.0 ),
-		errCountNegElectProd_( 0 ),
-		errCountNegThermProd_( 0 )
+		errCountNegElectProd_( 0 )
 	{
 
 		std::string const routineName = "GeneratorController constructor ";

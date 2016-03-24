@@ -599,8 +599,6 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 private:
 
 	int errCountNegElectProd_; // error count for reccuring error when generators produce negative electric power
-	int errCountNegThermProd_; // error count for reccuring error when generators produce negative thermal power
-
 
 }; //class GeneratorController
 
