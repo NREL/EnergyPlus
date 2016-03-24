@@ -61839,9 +61839,7 @@ ChillerHeater:Absorption:DirectFired,
             \note Not currently used.
             \units kJ/kg
             \default 0.0
-  A17  ,  \field Chiller Flow Mode
-       \deprecated
-  A18  ,  \field Fuel Type
+  A17  ,  \field Fuel Type
             \required-field
             \type choice
             \key NaturalGas

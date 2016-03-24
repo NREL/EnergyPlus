@@ -3139,10 +3139,6 @@ The chilled water supply temperature in degrees C below which the chiller will s
 
 The fuel higher heating value in kJ/kg. \emph{This field is not currently used}.
 
-\paragraph{Field: Chiller Flow Mode}\label{field-chiller-flow-mode-7}
-
-This field is deprecated and is not used.
-
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2-000}
 
 This alpha field determines the type of fuel that the chiller uses. The default is \textbf{NaturalGas}. Valid values are \textbf{NaturalGas}, \textbf{PropaneGas}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2, OtherFuel1, OtherFuel2}.
@@ -3181,14 +3177,13 @@ ChillerHeater:Absorption:DirectFired,
       GasAbsFlatBiQuad,        !- Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
       GasAbsLinearQuad,        !- Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
       GasAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-      GasAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      GasAbsFlatQuad,          !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
       GasAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
       GasAbsLinearQuad,        !- Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
       EnteringCondenser,       !- Temperature Curve Input Variable
       WaterCooled,             !- Condenser Type
       2,                       !- Chilled Water Temperature Lower Limit {C}
       0,                       !- Fuel Higher Heating Value {kJ/kg}
-      VariableFlow,            !- Chiller Flow Mode
       NaturalGas,              !- Fuel Type
       1.0;                     !- Sizing Factor
 \end{lstlisting}
