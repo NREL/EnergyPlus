@@ -67,7 +67,7 @@
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/DataAirFlowNetwork.hh>
+#include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
