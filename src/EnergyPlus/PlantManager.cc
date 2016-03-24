@@ -81,6 +81,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
+#include <HeatPumpWaterToWaterHEATING.hh>
 #include <HVACInterfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -91,6 +92,7 @@
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
+#include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -98,6 +100,7 @@
 #include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <WaterUse.hh>
 
 namespace EnergyPlus {
 
@@ -983,6 +986,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = WaterUse::WaterConnections_T::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Coil:Cooling:Water" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
 							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
@@ -1162,6 +1166,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
+							this_comp.compPtr = HeatPumpWaterToWaterParameterEstimationHeating::factory( TypeOf_HPWaterPEHeating, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Cooling" ) ) {
 							this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
 							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
@@ -1193,6 +1198,7 @@ namespace PlantManager {
 						} else if ( SameString( this_comp_type, "TemperingValve" ) ) {
 							this_comp.TypeOf_Num = TypeOf_ValveTempering;
 							this_comp.GeneralEquipType = GenEquipTypes_Valve;
+							this_comp.compPtr = PlantValves::TemperValveData::factory( TypeOf_ValveTempering, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "HeatExchanger:FluidToFluid" ) ) {
 							this_comp.TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
 							this_comp.GeneralEquipType = GenEquipTypes_HeatExchanger;

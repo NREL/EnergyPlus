@@ -65,6 +65,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -80,17 +82,19 @@ namespace PlantValves {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumTemperingValves;
+	extern bool GetValveInputFlag;
 	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Types
 
-	struct TemperValveData
+	struct TemperValveData : public PlantComponent
 	{
 		// Members
 		// user input data
 		std::string Name; // User identifier
+		int plantTypeOf_Num;
 		int PltInletNodeNum; // Node number on the inlet side of the plant
 		int PltOutletNodeNum; // Node number on the outlet side of the plant
 		int PltStream2NodeNum; // Node number on the outlet side of the second stream
@@ -104,14 +108,14 @@ namespace PlantValves {
 		Real64 SetPointTemp; // setpoint Temperatures [C] at control node.
 		Real64 MixedMassFlowRate; // Flow rate downstream of mixer [kg/s]
 		Real64 DivertedFlowRate; // flow rate through tempering valve's diversion path [kg/s]
-		//loop topology variables
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
+		PlantLocation location;
+		bool oneTimeFlag;
+		bool twoTimeFlag;
+
 
 		// Default Constructor
 		TemperValveData() :
+			plantTypeOf_Num( 0 ),
 			PltInletNodeNum( 0 ),
 			PltOutletNodeNum( 0 ),
 			PltStream2NodeNum( 0 ),
@@ -124,56 +128,41 @@ namespace PlantValves {
 			SetPointTemp( 0.0 ),
 			MixedMassFlowRate( 0.0 ),
 			DivertedFlowRate( 0.0 ),
-			LoopNum( 0 ),
-			LoopSideNum( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 )
+			location( PlantLocation( 0, 0, 0, 0 ) ),
+			oneTimeFlag( true ),
+			twoTimeFlag( true )
+
 		{}
+
+		virtual
+		~TemperValveData()
+		{}
+
+		public:
+			static PlantComponent * factory( int objectType, std::string objectName );
+
+			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
+
+		private:
+			void init();
+
+			void calc();
+
+			void update();
+
+			void report();
 
 	};
 
 	// Object Data
 	extern Array1D< TemperValveData > TemperValve; // dimension to No. of TemperingValve objects
 
-	// Functions
-
-	void
-	SimPlantValves(
-		int const CompTypeNum,
-		std::string const & CompName,
-		int & CompNum,
-		bool const RunFlag, // unused1208
-		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	);
+	// namespace functions
 
 	void
 	GetPlantValvesInput();
 
-	void
-	InitPlantValves(
-		int const CompTypeNum,
-		int const CompNum
-	);
 
-	void
-	CalcPlantValves(
-		int const CompTypeNum,
-		int const CompNum
-	);
-
-	void
-	UpdatePlantValves(
-		int const CompTypeNum,
-		int const CompNum
-	);
-
-	void
-	ReportPlantValves();
 
 } // PlantValves
 

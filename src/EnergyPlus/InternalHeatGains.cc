@@ -3273,7 +3273,6 @@ namespace InternalHeatGains {
 		using DataRoomAirModel::TCMF;
 		using DataRoomAirModel::IsZoneUI;
 		using WaterThermalTanks::CalcWaterThermalTankZoneGains;
-		using WaterUse::CalcWaterUseZoneGains;
 		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
 		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
 		using DaylightingDevices::FigureTDDZoneGains;
@@ -3631,7 +3630,7 @@ namespace InternalHeatGains {
 
 		CalcWaterThermalTankZoneGains();
 		PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
-		CalcWaterUseZoneGains();
+		WaterUse::WaterConnections_T::CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
 		initializeElectricPowerServiceZoneGains();
