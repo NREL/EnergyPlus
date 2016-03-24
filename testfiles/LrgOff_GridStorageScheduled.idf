@@ -2,7 +2,7 @@
 !!
 ! This example file is based RefBldgLargeOfficeNew2004_Chicago.idf
 !
-! Demonstrate on-site storage of grid electricity, controlled to follow a prescribed utility demand target. 
+! Demonstrate on-site storage of grid electricity, controlled to follow prescribed charge and discharge schedules. 
 !
 ! Description:  12 story plus basement, office building.
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
@@ -9466,7 +9466,7 @@
     ,                        !- Track Schedule Name Scheme Schedule Name
     ,                        !- Track Meter Scheme Meter Name
     DirectCurrentWithInverterDCStorage,  !- Electrical Buss Type
-    PV Inverter,             !- Inverter Object Name
+    Storage Inverter,             !- Inverter Object Name
     Battery,                 !- Electrical Storage Object Name
     ,                        !- Transformer Object Name
     TrackChargeDischargeSchedules,  !- Storage Operation Scheme
@@ -9536,7 +9536,7 @@
     5.0E11;                  !- Initial State of Charge {J}
 
   ElectricLoadCenter:Inverter:LookUpTable,
-    PV Inverter,             !- Name
+    Storage Inverter,             !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Zone Name
     0.25,                    !- Radiative Fraction
@@ -9591,6 +9591,7 @@ Output:Variable,*,Electric Load Center Produced Thermal Energy,hourly; !- HVAC S
 Output:Variable,*,Electric Load Center Requested Electric Power,hourly; !- HVAC Average [W]
 Output:Variable,*,Facility Total Purchased Electric Power,hourly; !- HVAC Average [W]
 Output:Variable,*,Facility Total Purchased Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Facility Total Surplus Electric Power,hourly; !- HVAC Average [W]
 Output:Variable,*,Facility Total Surplus Electric Energy,hourly; !- HVAC Sum [J]
 Output:Variable,*,Facility Net Purchased Electric Power,hourly; !- HVAC Average [W]
 Output:Variable,*,Facility Net Purchased Electric Energy,hourly; !- HVAC Sum [J]

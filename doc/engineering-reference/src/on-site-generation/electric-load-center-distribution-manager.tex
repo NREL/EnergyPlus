@@ -2,23 +2,25 @@
 
 \subsection{Overview}\label{overview-016}
 
-The electric load center distribution manager (object name: ElectricLoadCenter:Distribution) operates on-site generators specified in the simulation and reports the amount of generated and purchased electricity. Electric load centers really serve as a ``load'' to the generators and ``supply'' power to the rest of the building. The internal meters used by EnergyPlus for reporting do all of the demand tracking. For more details on the individual inputs required see the Input Output Reference document.
+The electric load center distribution manager (object name: ElectricLoadCenter:Distribution) is used organize power conversion devices and provides supervisory control over generators and storage.   Electric load centers can be thought of as subpanels connected to the facility's main electric panel.  Except for two applications for transformers that are located between the main panel and the utility grid connection, all other devices are associated with a specific load center.  The load center connects the “load” to the generators and “supply” power to the main panel serving the rest of the building.  A load center can have any number of generators but only one storage, (DC to AC) inverter, (AC to DC) converter or (isolation) transformer.  There are two separate operation schemes, one for generators and one for storage.  The generator operation scheme controls the on-site generators connected to a particular load center.  The storage operation scheme controls charging and discharging of electrical storage.  The generator operation is managed before the storage operation.  The internal meters used by EnergyPlus for reporting do all of the tracking. For more details on the individual inputs required see the Input Output Reference document.
 
-The electric load center manager sums all of the building and system electric loads and provides operating schemes for the generators. The electric load center objects are operated in the order they are defined in the input data file (IDF), and generators are dispatched sequentially in the order they are specified within each load center object. The electricity produced from photovoltaic arrays is handled somewhat separately and is always ``used'' to reduced the demand that the generators will try to meet for that time step. What is not provided by the on-site generation equipment, and electric storage units if specified, is met by (purchasing) off-site electricity.
+The electric load center manager sums all of the building and system electric loads and provides operating schemes for the generators. The electric load center objects are operated in the order they are defined in the input data file (IDF), and generators are dispatched sequentially in the order they are specified within the list referenced by each load center object. The electricity produced from photovoltaic arrays and wind turbines is handled somewhat separately and is always run rather than being dispatched by supervisory control.  What is not provided by the on-site generation equipment, and electric storage units, is met by (purchasing) off-site electricity. It is possible to prescribe a set of ElectricLoadCenter:Distribution objects with inconsistent or conflicting operating schemes, so users need to be careful.
 
-The available operating schemes are ``Baseload'', ``DemandLimit'', ``TrackElectrical,'' ``TrackSchedule,'' ``TrackMeter,'' ``FollowThermal'' and ``FollowThermalLimitElectrical.''~ These operating schemes affect how loads are dispatched to the generators, in effect telling the generators whether or not to run and requesting power levels.
+\subsection{Generator Operation Schemes}
 
-The BASELOAD scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators in the Input Output Reference). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand.
+The available generator operating schemes are “Baseload”, “DemandLimit”, “TrackElectrical,” “TrackSchedule,” “TrackMeter,” “FollowThermal” and “FollowThermalLimitElectrical.”  These operating schemes affect how loads are dispatched to the generators, in effect telling the generators whether or not to run and requesting power levels.
 
-The DEMAND LIMIT scheme limits the amount of purchased electricity from the utility to the amount specified in the input. The Demand Limit scheme tries to have the generators meet all of the demand above the purchased electric limit defined by the user.
+The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators in the Input Output Reference). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand.
 
-The TRACK ELECTRICAL scheme tries to have the generators meet all of the electrical demand for the building.
+The DemandLimit scheme limits the amount of purchased electricity from the utility to the amount specified in the input. The Demand Limit scheme tries to have the generators meet all of the demand above the purchased electric limit defined by the user.
 
-The TRACK METER scheme tries to have the generators meet all the electrical demand from a meter chosen by the user rather than the usual meter for the entire facility. The meter can be a custom meter so that generators are tied to only certain loads in the building.
+The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building.
 
-The TRACK SCHEDULE scheme tries to have the generators meet all of the electrical demand determined by a user-defined schedule.
+The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter chosen by the user rather than the usual meter for the entire facility. The meter can be a custom meter so that generators are tied to only certain loads in the building.
 
-The FOLLOW THERMAL and FOLLOW THERMAL LIMIT ELECTRICAL schemes run the generators to meet thermal demand. The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature setpoint. The electric load center distribution manager converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator. For these schemes, the generator needs to be connected to the supply side of a plant loop and serve components that use hot water on the demand side of the plant loop. The thermal load request is obtained from the plant data structure (structure location in code is PlantLoop\%LoopSide\%Branch\%Comp\%MyLoad).The distribution manager converts the thermal load, \({q_{thermal}}\) , to an electrical load using:
+The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined by a user-defined schedule.
+
+The FollowThermal and FollowThermalLimitElectrical schemes run the generators to meet thermal demand. The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature setpoint. The electric load center distribution manager converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator. For these schemes, the generator needs to be connected to the supply side of a plant loop and serve components that use hot water on the demand side of the plant loop. The thermal load request is obtained from the plant data structure (structure location in code is PlantLoop\%LoopSide\%Branch\%Comp\%MyLoad).The distribution manager converts the thermal load, $q_{thermal}$, to an electrical load using:
 
 \begin{equation}
 {q_{Elect}} = \frac{{{q_{thermal}}}}{{ThermElectRatio}}
@@ -26,69 +28,71 @@ The FOLLOW THERMAL and FOLLOW THERMAL LIMIT ELECTRICAL schemes run the generator
 
 where,
 
-\(ThermElectRatio\) ~is a nominal, constant, user-defined value for the ratio of thermal production to electrical production for a cogenerator. This ratio is used for supervisory control and dispatch of the electric power request to the generator; however, the cogenerator model may determine that actual performance varies from this nominal value at different times in the simulation when operating conditions differ from those used for the nominal ratio.
+$ThermElectRatio$\ is a nominal, constant, user-defined value for the ratio of thermal production to electrical production for a cogenerator. This ratio is used for supervisory control and dispatch of the electric power request to the generator; however, the cogenerator model may determine that actual performance varies from this nominal value at different times in the simulation when operating conditions differ from those used for the nominal ratio.
 
-For all operating schemes except BASELOAD, a total electric load reduction target (or thermal load converted to electrical equivalent) is established for the load center based on the specific operating scheme. The load center then requests that its generators operate, one-by-one in the order specified, until the target is met or exceeded. Generators that are not scheduled as `available' for the simulation time step are not called to operate. The requested power demand to be met by each generator is the \textbf{smaller of} the nominal `rated' electric power output (as specified in the ElectricLoadCenter:Generators object) or the remaining total electric load reduction target for the load center. After each electric generator is requested to operate, the actual electric power delivered by the generator, which may be greater than or less than the requested amount due to inputs specified in the generator performance model (e.g., Generator:CombustionTurbine, Generator:MicroTurbine, etc.), is used to update the remaining total electric power target for the other generators associated with this load center.
+For all generator operating schemes except Baseload, a total electric load reduction target (or thermal load converted to electrical equivalent) is established for the load center based on the specific operating scheme. The load center then requests that its generators operate, one-by-one in the order specified in the generator list, until the target is met or exceeded. Generators that are not scheduled as ‘available’ for the simulation time step are not called to operate. The requested power demand to be met by each generator is the **smaller of** the nominal ‘rated’ electric power output (as specified in the ElectricLoadCenter:Generators object) or the remaining total electric load reduction target for the load center. After each electric generator is requested to operate, the actual electric power delivered by the generator, which may be greater than or less than the requested amount due to inputs specified in the generator performance model (e.g., Generator:CombustionTurbine, Generator:MicroTurbine, etc.), is used to update the remaining total electric power target for the other generators associated with this load center.
 
-Most of the operating schemes will sequentially load the available electric load centers and generators. EnergyPlus can accept multiple ``ElectricLoadCenter:Distribution'' objects with different operating schemes. Because of this, there are two levels of reporting, one for the whole building and a second for each load center. The whole-building results are managed with the internal meters for the entire model. The individual load-center results are summed for those generators connected to a particular load center. The total electricity purchased is reported both in power and energy units. This value is positive when the amount of energy is purchased from the utility. This value can be negative when the total electricity produced is greater than the facility electrical needs. The excess will either be available for storage or to sell back to the electric utility company.
+Most of the operating schemes will sequentially load the available electric load centers and generators. EnergyPlus can accept multiple “ElectricLoadCenter:Distribution” objects with different operating schemes. Because of this, there are two levels of reporting, one for the whole building and a second for each load center. The whole-building results are managed with the internal meters for the entire model. The individual load-center results are summed for those generators connected to a particular load center. The total electricity purchased is reported both in power and energy units. This value is positive when the amount of energy is purchased from the utility. This value can be negative when the total electricity produced is greater than the facility electrical needs. The excess will either be available for storage or to sell back to the electric utility company.
 
 The order of input objects (ElectricLoadCenter:Distribution) in the input file is significant and used to structure how generators are dispatched with the first load centers and generators managed before the later ones. Therefore, load centers listed earlier in the file effectively have a higher priority.
 
-Electric load centers can have one of five different configurations. Load centers can get fairly complicated and include power conditioning and storage. Separate inverter models are used to condition DC power from photovoltaics into AC power for the building and utility. Load centers serving PV need to be specified with a direct current buss. The other generators may have inverters inside the devices but these are already embedded in the generator models. The load center can also manage electrical storage (ref. Electrical Storage below).
+\subsection{Load Center Buss Types}
 
-The most basic configuration is selected with the keyword ``Alternating Current'' for the Electrical Buss Type, shown in the following diagram.
+Electric load centers can have one of five different configurations. Load centers can get fairly complicated and include power conditioning and storage. Separate inverter models are used to condition DC power from photovoltaics into AC power for the building and utility. The other generators may have inverters inside the devices but these are already embedded in the generator models. The load center can also supervise electrical storage controls and depend on the buss configuration. The transformer is optional for all buss types but if included in the load center it can be used to model an isolation or voltage matching transformer acting on the load center.
+
+The most basic configuration is selected with the keyword “AlternatingCurrent” for the Electrical Buss Type, shown in the following diagram.
 
 \begin{figure}[hbtp] % fig 333
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7480.png}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ACBussDiagram.png}
 \caption{Basic Alternating Current Schematic \protect \label{fig:basic-alternating-current-schematic}}
 \end{figure}
 
-The \emph{AlternatingCurrent} load centers have AC generators with no storage and behave in the following way. All electric demand not met by the sum of the electrical power produced by the available generators will be met by purchased electricity. If a generator is needed in the simulation for a small load and the load is less than the generator's minimum part load ratio, the generator will operate at the minimum part load ratio and the excess will either reduce demand or the excess energy will be exported back to the electric utility company. The purchased electrical demand limit is the user input for the demand limit above which the generators will try and meet the entire electrical load on the building. It is possible to prescribe a set of ElectricLoadCenter:Distribution objects with inconsistent or conflicting operating schemes, so users need to be careful.
+The *AlternatingCurrent* load centers have AC generators with no storage and behave in the following way. All electric demand not met by the sum of the electrical power produced by the available generators will be met by purchased electricity.  If a generator is needed in the simulation for a small load and the load is less than the generator’s minimum part load ratio, the generator will operate at the minimum part load ratio and the excess will either reduce demand or the excess energy will be exported back to the electric utility company. 
 
-A configuration with AC generators with on-site electrical storage is selected with the keyword ``AlternatingCurrentWithStorage'' and is shown in the following diagram.
+A configuration with AC generators with on-site electrical storage is selected with the keyword “AlternatingCurrentWithStorage” and is shown in the following diagram. 
 
 \begin{figure}[hbtp] % fig 334
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7481.png}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ACStorageBussDiagram.png}
 \caption{AC Generators with On-site Electrical Storage Schematic \protect \label{fig:ac-generators-with-on-site-electrical-storage}}
 \end{figure}
 
-The \emph{AlternatingCurrentWithStorage} load centers attempt to augment the generator electricity production so that the power requests are met. Storage control logic is discussed below under Electrical Storage.
+The *AlternatingCurrentWithStorage* load centers attempt to augment the generator electricity production so that the power requests are met. Storage control logic is discussed below under Storage Operation Scheme.
 
-The basic configuration for photovoltaic generators is selected using the ``DirectCurrentWithInverter'' keyword and is shown in the following diagram.
+The basic configuration for photovoltaic generators is selected using the “DirectCurrentWithInverter” keyword and is shown in the following diagram.
 
 \begin{figure}[hbtp] % fig 335
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7482.png}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/DCInverterBussDiagram.png}
 \caption{Direct Current With Inverter Photovoltaic Generators Schematic \protect \label{fig:direct-current-with-inverter-photovoltaic}}
 \end{figure}
 
-The \emph{DirectCurrentWithInverter} load centers collect DC power from various PV arrays, run the DC power through an inverter and produce AC power. The PV arrays produce DC power based on the availability of sunshine and do not respond to load requests made by the electric load center. The AC output from the inverter is what is recorded as electricity production.
+The *DirectCurrentWithInverter* load centers collect DC power from various generators, usually PV arrays, run the DC power through an inverter and produce AC power. The PV arrays produce DC power based on the availability of sunshine and do not respond to load requests made by the electric load center. 
 
-If the PV-based load center is equipped with DC electrical storage that is connected before the inverter, then the buss type should be ``DirectCurrentWithInverterDCStorage'' and is shown in the following diagram.
+If the PV-based load center is equipped with DC electrical storage that is connected before the inverter, then the buss type should be “DirectCurrentWithInverterDCStorage” and is shown in the following diagram.
 
 \begin{figure}[hbtp] % fig 336
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7483.png}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/DCInverterWithDCStorageBussDiagram.png}
 \caption{PV based Load Center with DC Electrical Storage Schematic \protect \label{fig:pv-based-load-center-with-dc-electrical}}
 \end{figure}
 
-The \emph{DirectCurrentWithInverterDCStorage} load centers charge or draw DC power to meet the requested electrical load.
+The *DirectCurrentWithInverterDCStorage* load centers charge or draw DC power to meet the requested electrical load depending on the storage operation scheme.
 
-If the PV-based load center is equipped with AC electrical storage that is connected after the inverter, then the buss type should be ``DirectCurrentWithInverterACStorage'' and is shown in the following diagram.
+If the PV-based load center is equipped with AC electrical storage that is connected after the inverter, then the buss type should be “DirectCurrentWithInverterACStorage” and is shown in the following diagram.
 
 \begin{figure}[hbtp] % fig 337
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7484.png}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/DCInverterWithACStorageBussDiagram.png}
 \caption{PV Based Load Center with AC Electrical Storage Schematic \protect \label{fig:pv-based-load-center-with-ac-electrical}}
 \end{figure}
 
-The \emph{DirectCurrentWithInverterACStorage} load centers charge or draw AC power to meet the requested electrical load.
+The *DirectCurrentWithInverterACStorage* load centers charge or draw AC power to meet the requested electrical load.  They can also draw power from the main panel into the load center to charge storage from grid-supplied electric power.
 
 \subsection{Electric Load Center Generators}\label{electric-load-center-generators}
 
-The electric load center generators (object name: ElectricLoadCenter:Generators) provide a set of scheduled electric generators for electric power generation. Here is where the user lists what generators and PVs are available at any given time. For more details on the individual inputs required see the EnergyPlus Input Output Reference.
+The electric load center generators (object name: ElectricLoadCenter:Generators) provide a set of scheduled electric generators for supervisory control over electric power generation. Here is where the user lists what generators and PVs are available at any given time. For more details on the individual inputs required see the EnergyPlus Input Output Reference.
 
 \subsection{Inverters}\label{inverters}
 
@@ -100,25 +104,153 @@ EnergyPlus includes three models for converting Direct Current (DC) electrical p
 
 The inverter efficiency is determined using one of the three models. For the``Simple'' inveter model, efficiency is constant and input by the user. For the ``Look Up Table'' model, the efficiency is calculated using linear interpolation. For the ``Function of Power'' model, the efficiency is calculating using a single-variable curve object. For both the Look Up Table and Function of Power models, the power production is normalized by \({P_{DC - in}}\) .
 
-The thermal losses are calculated from the difference between \({P_{DC - in}}\) ~and \({P_{AC - out}}\) .
+The conversion power losses are calculated from the difference between $ {P_{DC,in}} $ and $ {P_{AC,out}} $ and are metered as negative values on PowerConversion:ElectricityProduced.  The thermal losses include the conversion power losses plus any ancillary power consumed during standby.  The ancillary electric power consumption occurs when the inverter is scheduled to be available but it is not conditioning any power flows at the time. 
 
-\subsection{Electrical Storage}\label{electrical-storage}
+\subsection{Converter}
 
-EnergyPlus includes two models for storing electrical energy: a simple model that is not intended to represent any specific type of storage technology and a battery model that represents the kinetic battery model originally developed by Manwell and McGowan.
-
-The simple model might be called ``constrained bucket with energy losses.''~ The ``bucket'' holds a quantity of Joules of electrical energy, refered to as the state of charge. There are losses and limits to storing and drawing power but otherwise the bucket just holds electricity. The user sets constraints on the rates of charging,\({P_{stor - {\rm{charge - max}}}}\) , and drawing, \({P_{stor - {\rm{d}}raw{\rm{ - max}}}}\) . The user defines efficiencies for charging,\({\varepsilon_{{\rm{charge}}}}\) , and drawing, \({\varepsilon_{draw}}\) . The user defines an initial state of charge and a maximum state of charge.
-
-The storage control algorithms determine a value for the charging power, \({P_{stor - ch\arg e}}\) , or the drawing power, \({P_{stor - draw}}\) . The basic storage control algorithm is to compare the requested generator electricity loads to the current available supply and make up the difference with storage. If extra power is generated, then store it. If there is a shortage, then attempt to draw from storage to meet the remaining electricity request. The load center dispatchs a requested electric load for each generator, runs each generator, and then stores the actual power. This power dispatch can be a function of many different things depending on the operating scheme. The sum of the generator load requests,\({P_{load - request}}\) , is then compared to the sum of the generator production, \({P_{{\rm{gen}} - {\rm{supply}}}}\)
+EnergyPlus includes a model for converting Alternating Current (AC) electric power into Direct Current (DC) electric power.  This device is used to charge DC electric storage devices with AC drawn from the main panel.  Although the physical device may be a two-way inverter, the modeling is separated so that the converter appears on its own in the modeling. The AC power into the converter, $ {P_{AC,in}} $, is converted to DC power out, $ {P_{DC,out}} $, of the converter using: 
 
 \begin{equation}
-IF\quad ({P_{load - request}} < {P_{gen - \sup ply}})\quad {P_{stor - ch\arg e}} = {P_{gen - \sup ply}} - {P_{load - request}}
+  {P_{DC,out}} = {P_{AC,in}} \cdot {\varepsilon_{converter}}
 \end{equation}
+
+The converter efficiency is determined using one of two method.  For the "SimpleFixed" method the efficiency is constant and input by the user.  For the "FunctionOfPower" method the user defined performance curve or lookup table is evaluated using the normalized power into the converter.
+
+The conversion power losses are calculated from the difference between $ {P_{AC,in}} $ and $ {P_{DC,out}} $ and are metered as negative values on PowerConversion:ElectricityProduced.  The thermal losses include the conversion power losses plus any ancillary power consumed during standby.  The ancillary electric power consumption occurs when the converter is scheduled to be available but it is not conditioning any power flows at the time. 
+
+\subsection{Storage Operation Schemes}
+
+The available storage operation schemes are "TrackFacilityElectricDemandStoreExcessOnSite", "TrackMeterDemandStoreExcessOnSite", "TrackChargeDischargeSchedules", and "FacilityDemandLeveling".  
+
+The following diagram shows the control volume and electrical power flows that are used to model all of the storage operation schemes.  Conservation of energy is used to formulate the calculations based on this control volume and the five terms shown in the diagram.  This control volume is inside a given load center. 
+
+\begin{figure}[hbtp] % fig 337
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/StorageOperationControlVolume.png}
+\caption{Storage operation control volume \protect \label{fig:storage-operation-control-volume}}
+\end{figure}
+
+  $ {P_{gen}}  $  This is the sum of electric power produced by the generators on the load center entering the control volume.  The generator operation is run before the storage operation so that this value is current at the time the storage operation control is evaluated 
+
+  $ {P_{feed}}  $  This is the flow of electric power out of the control volume feeding toward the main panel.  This is power being supplied by the generators and storage and serving the building loads or perhaps being exported.  This power level might be reduced by power conversion losses before it reaches the main panel.  The method used to determine $ {P_{feed}}  $ depends on the operation scheme.
+  
+  $ {P_{draw}}  $  This is the flow of electric power into the control volume drawing from the main panel.  This is power being drawn in order to charge storage as desired by the storage operation scheme.  This power level might be increased by power conversion losses once it is drawn from the main panel.  
+
+  $ {P_{charge}}  $  This is the flow of electric power into the storage device from the control volume.  This is power being supplied by the generators and/or drawn from the main panel and then directed into storage to charge the device.
+
+  $ {P_{discharge}}  $  This is the flow of electric power out of the storage device into the control volume.  This power is being pulled from storage and added to the power from generators to feed toward the main panel. 
+
+The **TrackFacilityElectricDemandStoreExcessOnSite** method tries to run the storage to follow the facility electric demand while storing any excess on-site power production that is above what is needed to run the facility.  This is mainly appropriate for island operation.  This is the intended legacy behavior before version 8.5.  This scheme does not draw from the main panel to charge, so we have  $ {P_{draw}} = 0.0  $.  The value for $ {P_{feed}}  $ is determined from the whole-facility total electric power demand.  (When there is more than one load center in the model, it is actually the portion of the total that remains after previous load centers have been simulated.)  This requested feed in rate is adjusted to be increased by any power conversion losses that may occur in an inverter or a transformer.  This adjusted feed in request is used for $ {P_{feed}}  $. 
+
+If $ {P_{gen}} > {P_{feed}} $ ,  then we have charging, 
 
 \begin{equation}
-IF\quad ({P_{load - request}} > {P_{gen - \sup ply}})\quad {P_{stor - draw}} = {P_{load - request}} - {P_{gen - \sup ply}}
+  \begin{array}{rl}
+    {P_{charge}} &= {P_{gen}} - {P_{feed}} \\
+    {P_{discharge}} &= 0.0
+  \end{array}
 \end{equation}
 
-The limits \({P_{stor - {\rm{charge - max}}}}\) ~and \({P_{stor - {\rm{d}}raw{\rm{ - max}}}}\) ~are applied.
+If $ {P_{gen}} < {P_{feed}} $ , then we have discharging
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{discharge}} &=  {P_{feed}} - {P_{gen}} \\
+    {P_{charge}} &= 0.0
+  \end{array}
+\end{equation}
+
+The **TrackMeterDemandStoreExcessOnSite** method is very similar to the TrackFacilityElectricDemandStoreExcessOnSite method except that instead of using the whole-facility total electric demand, the value for $ {P_{feed}}  $ is determined from a user-specified meter.  The same charge and discharge logic is used. 
+
+The **TrackChargeDischargeSchedules** method tries to run the storage to follow user-defined schedules and design power levels for charging and discharging.  The user inputs a design charge rate $ {P_{charge,design}} $, a charge modification schedule $ {f_{sched,charge}} $, a design discharge rate $ {P_{discharge,design}} $, and a discharge modification schedule $ {f_{sched,discharge}} $.  The scheduled power flows will be used to determine charging and discharging as long as other limits on rates or state of charge are not triggered.  The schedules should be arranged to only charge or only discharge at a given time.  
+
+If charging, we have  
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{charge}} &= {P_{charge,design}} * {f_{sched,charge}} \\
+    {P_{discharge}} &= 0.0
+  \end{array}
+\end{equation}
+
+If $ {P_{gen}} > {P_{charge}} $,  then we have excess to feed toward main panel,
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{feed}} &= {P_{gen}} - {P_{charge}} \\
+    {P_{draw}} &= 0.0
+  \end{array}
+\end{equation}
+
+If $ {P_{gen}} < {P_{charge}} $, the we have a shortfall and we draw from main panel,
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{draw}} &= {P_{charge}} - {P_{gen}} \\
+    {P_{feed}} &= 0.0
+  \end{array}
+\end{equation}
+
+If discharging, we have 
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{discharge}} &= {P_{discharge,design}} * {f_{sched,discharge}} \\
+    {P_{charge}} &= 0.0 \\
+    {P_{feed}} &= {P_{discharge}} + {P_{gen}} \\
+    {P_{draw}} &= 0.0
+  \end{array}
+\end{equation}
+
+The **FacilityDemandLeveling** method tries to run the storage to follow a user-defined schedule for the net purchased power, $ {P_{net,purch}}  $.  This is similar to demand limit operation but instead of just attempting to cap the facility demand, it will also manipulate storage to increase utility grid supply electric to meet the target for net purchased power.  The user inputs a design demand target for net purchase power rate, $ {P_{net,purch,design}}  $, and a demand level modification schedule $ {f_{sched,dmd,target}} $.  
+
+\begin{equation}
+  {P_{net,purch,target}} = {P_{net,purch,design}} *{f_{sched,dmd,target}}
+\end{equation}
+
+This target is compared to an adjusted feed in request, $ {P_{feed, request}}  $, from the (remaining, adjusted) whole-facility total electric power demand. 
+
+\begin{equation}
+  {P_{feed}} = {P_{feed,request}} - {P_{net,purch,target}}
+\end{equation}
+
+If $ {P_{feed}} > 0.0 $, then we have a situation where the facility needs more power that the target demand.  We therefore feed that power toward the main panel, but it is not necessarily the full power request that could be served.  If $ {P_{gen}} < {P_{feed}} $, then we still have some power supply to make up by discharging,
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{discharge}} &=  {P_{feed}} - {P_{gen}} \\
+    {P_{charge}} &= 0.0
+  \end{array}
+\end{equation}
+
+Or if $ {P_{gen}} > {P_{feed}} $,  then we have excess power we can use for charging.
+
+\begin{equation}
+  \begin{array}{rl}
+    {P_{charge}} &= {P_{gen}} - {P_{feed}} \\
+    {P_{discharge}} &= 0.0
+  \end{array}
+\end{equation}
+
+However, if $ {P_{feed}} < 0.0 $, then the facility needs less power than the target demand.  We therefore draw power from the main panel to increase power purchased to meet target demand level. 
+
+\begin{equation}
+  \begin{array}{rl}
+   {P_{draw}} &= { abs( {P_{feed}} )} \\
+    {P_{feed}} &= 0.0 \\
+    {P_{charge}} &= {P_{draw}} + {P_{gen}}
+  \end{array}
+\end{equation}
+
+\subsection{Electrical Storage - Simple Energy Balance Model}
+
+EnergyPlus includes two models for storing electrical energy: a simple model that is not intended to represent any specific type of storage technology and a battery model that represents the kinetic battery model originally developed by Manwell and McGowan which discussed in the next section.
+
+The simple model treats the battery as a black box, counting energy added and removed, with losses due to charge/discharge inefficiencies. The model is a reasonable starting point for simulation of Li-ion and other battery technologies without significant rate limitations. The simple model might be called constrained bucket with energy losses.  The bucket holds a quantity of Joules of electrical energy, referred to as the state of charge. There are losses and limits to storing and drawing power but otherwise the bucket just holds electricity. The user sets constraints on the rates of charging, ${P_{stor - {\rm{charge - max}}}}$, and drawing, ${P_{stor - {\rm{d}}raw{\rm{ - max}}}}$. The user defines efficiency values for charging, ${\varepsilon_{{\rm{charge}}}}$, and drawing, ${\varepsilon_{draw}}$. 
+
+The user defines an initial state of charge and a maximum state of charge. The storage operation scheme makes supervisory control decisions and determines a value for the charging power, ${P_{stor - ch\arg e}}$, or the discharging power, ${P_{stor - draw}}$ and passes in control limits for the minimum and maximum state of charge fraction.  The maximum state of charge is the physical capacity of the storage device, however the storage control applies a separate layer of minimum and maximum state of charge used to model controller behavior designed to protect the battery from abuse. 
+
+The control requests are constrained by the device's physical limits for how fast it can be charged or discharged, ${P_{stor - {\rm{charge - max}}}}$ and ${P_{stor - {\rm{d}}raw{\rm{ - max}}}}$ are applied.
 
 If charging, the new state of charge, \(Q_{stor}^{t + \Delta t}\) , is determined using:
 
@@ -134,13 +266,13 @@ Q_{stor}^{t + \Delta t} = Q_{stor}^t - \frac{{{P_{stor - draw}} \cdot \Delta t}}
 
 Where \(\Delta t\) ~is the length of the system time step in seconds.
 
-The storage device has an availability schedule. If it is not available then no power can be drawn or stored.
+The storage device has an availability schedule. If it is not available then no power can be drawn or stored.  The state of charge minimum and maximum that are passed into the storage model are used to decide if the device can be further charged or discharged.  The separate control limits allow modeling battery preservation strategies where the full capacity of the storage device is not really used. 
 
 The gross electric power drawn and stored includes losses in the form of heat. These thermal losses are calculated from the user-specified efficiencies for charging and drawing and gross electric power stored and drawn. The thermal (heat) losses are included in a zone heat balance if the user specifies a thermal zone. A user-defined radiative split is used to divide thermal losses into radiation and convection portions. If no zone is specified, then the thermal losses are simply disregarded (e.g., rejected to outdoors and do not impact the zone air heat balance).
 
-\subsection{Electrical Storage -- Kinetic Battery Model}\label{electrical-storage-kinetic-battery-model}
+\subsection{Electrical Storage -- Kinetic Battery Model with Cycle Life Estimation}\label{electrical-storage-kinetic-battery-model}
 
-The Kinetic Battery Model (KiBaM) (object: ElectricLoadCenter:Storage:Battery) was originally developed by Manwell and McGowan (1993) for use in time series performance models of hybrid energy systems. The model is called kinetic because it is based on a chemical kinetics process to simulate the battery charging and discharging behavior. The model, with different improvements and modifications, has been incorporated into the software Hybrid2 and HOMER as the electrical storage module of hybrid and distributed power systems. In 2005, KiBaM was implemented as a stand-alone application in support of the European Union Benchmarking research project (Bindner et al. 2005).
+The Kinetic Battery Model (KiBaM) (object: ElectricLoadCenter:Storage:Battery) was originally developed by Manwell and McGowan (1993) for use in time series performance models of hybrid energy systems. The model is called kinetic because it is based on a chemical kinetics process to simulate the battery charging and discharging behavior. The model, with different improvements and modifications, has been incorporated into the software Hybrid2 and HOMER as the electrical storage module of hybrid and distributed power systems. In 2005, KiBaM was implemented as a stand-alone application in support of the European Union Benchmarking research project (Bindner et al. 2005). The model is intended to represent technologies such as Pb-acid that encounter significant rate or kinetic limitations.
 
 The Kinetic Battery Model assumes that the battery charge is distributed over two tanks: an available-charge tank and a bound-charge tank. The tank for available charges can supply electrons directly to the load, whereas the tank for chemically bound charges can only supply electrons to the available-charge tank. At any time, the total charge \(q\) ~in the battery is the sum of the available charge (\({q_1}\) ) and bound charge (\({q_2}\) ). That is:
 

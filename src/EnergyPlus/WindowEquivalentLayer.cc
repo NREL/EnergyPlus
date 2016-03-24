@@ -1001,6 +1001,7 @@ namespace WindowEquivalentLayer {
 		ConvHeatGainWindow = Surface( SurfNum ).Area * HcIn * ( SurfInsideTemp - TaIn );
 		// Window heat gain (or loss) is calculated here
 		WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+		WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 		SurfaceWindow( SurfNum ).ConvHeatFlowNatural = ConvHeatFlowNatural;
 		// store for component reporting
 		WinGainConvGlazShadGapToZoneRep( SurfNum ) = ConvHeatFlowNatural;
