@@ -100,12 +100,11 @@ namespace DataPlant {
 	enum OpSchemeType { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11 enum "class")
 		UnknownStatusOpSchemeType = -2,
 		NoControlOpSchemeType = -1, // Scheme Type placeholder for items such as pipes
-		LoadRBOpSchemeType = 0, // Scheme Type for Load Range Based Operation (Deprecated)
 		HeatingRBOpSchemeType = 1, // Scheme Type for Heating Load Range Based Operation
 		CoolingRBOpSchemeType = 2, // Scheme Type for Cooling  Load Range Based Operation
 		WetBulbRBOpSchemeType = 3, // Scheme Type for Wet bulb range based Operation
 		DryBulbRBOpSchemeType = 4, // Scheme Type for Dry bulb range based Operation
-		DewPointRBOpSchemeType = 5, // Scheme Type for Dewpoint range based Operation
+		DewPointRBOpSchemeType = 5, // Scheme Type for Dew point range based Operation
 		RelHumRBOpSchemeType = 6, // Scheme Type for relative humidity range based Operation
 		DryBulbTDBOpSchemeType = 7, // Scheme Type for relative humidity range based Operation
 		WetBulbTDBOpSchemeType = 8, // Scheme Type for Wet bulb range based Operation
@@ -114,7 +113,7 @@ namespace DataPlant {
 		UncontrolledOpSchemeType = 11, // Scheme Type for Uncontrolled Operation
 		EMSOpSchemeType = 12, // Scheme Type for EMS based operation user Define scheme
 		PumpOpSchemeType = 13, // Not really an OpScheme, just a placeholder
-		DemandOpSchemeType = 14, // Plcaeholder for demand side equipment such as coils
+		DemandOpSchemeType = 14, // Placeholder for demand side equipment such as coils
 		FreeRejectionOpSchemeType = 15, // Scheme Type for waterside economizers and the like
 		WSEconOpSchemeType = 16, // Scheme Type for waterside economizers and the like
 		ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
@@ -356,8 +355,6 @@ namespace DataPlant {
 	extern int const GenEquipTypes_Refrigeration;
 	extern int const GenEquipTypes_PlantComponent;
 	extern int const GenEquipTypes_CentralHeatPumpSystem;
-
-	extern Array1D_string const OpSchemeTypes; // long since Deprecated, remove?
 
 	// DERIVED TYPE DEFINITIONS:
 

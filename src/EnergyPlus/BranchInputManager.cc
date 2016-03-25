@@ -1804,8 +1804,6 @@ namespace BranchInputManager {
 
 						if ( ! lAlphaBlanks( Loop ) && ! lAlphaBlanks( Loop + 1 ) && ! lAlphaBlanks( Loop + 2 ) && ! lAlphaBlanks( Loop + 3 ) ) SetUpCompSets( CurrentModuleObject, Branch( BCount ).Name, Alphas( Loop ), Alphas( Loop + 1 ), Alphas( Loop + 2 ), Alphas( Loop + 3 ) ); //no blanks in required field set
 
-						//            deprecated control type, was using (Alphas(Loop+4))
-
 						++Comp;
 					}
 					Branch( BCount ).NumOfComponents = NumInComps;

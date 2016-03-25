@@ -27532,10 +27532,6 @@ HVACTemplate:System:Unitary,
       \key CoolReheatHeatingCoil
       \key CoolReheatDesuperheater
       \default None
- A19, \field Dehumidification Control Zone Name
-      \note This field is not currently used - the thermostat control zone is also the dehumidification control zone
-      \type object-list
-      \object-list ZoneNames
  N22, \field Dehumidification Setpoint
       \note Zone relative humidity setpoint in percent (0 to 100)
       \type real
@@ -27543,12 +27539,12 @@ HVACTemplate:System:Unitary,
       \maximum 100.0
       \default 60.0
       \units percent
- A20, \field Humidifier Type
+ A19, \field Humidifier Type
       \type choice
       \key None
       \key ElectricSteam
       \default None
- A21, \field Humidifier Availability Schedule Name
+ A20, \field Humidifier Availability Schedule Name
       \note If blank, always available
       \type object-list
       \object-list ScheduleNames
@@ -27570,7 +27566,7 @@ HVACTemplate:System:Unitary,
       \autosizable
       \default autosize
       \ip-units W
- A22, \field Humidifier Control Zone Name
+ A21, \field Humidifier Control Zone Name
       \note Zone name where humidistat is located
       \type object-list
       \object-list ZoneNames
@@ -27581,7 +27577,7 @@ HVACTemplate:System:Unitary,
       \maximum 100.0
       \default 30.0
       \units percent
- A23, \field Return Fan
+ A22, \field Return Fan
       \note Specifies if the system has a return fan.
       \type choice
       \key Yes

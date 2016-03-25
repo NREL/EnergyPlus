@@ -528,11 +528,7 @@ namespace ExteriorEnergyUse {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
 		}
-		if ( SameString( FuelTypeAlpha, "Gas" ) || SameString( FuelTypeAlpha, "NaturalGas" ) ) {
-			if ( SameString( FuelTypeAlpha, "Gas" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"NaturalGas\"." );
-			}
+		if ( SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
 		}
@@ -544,11 +540,7 @@ namespace ExteriorEnergyUse {
 			FuelTypeNumber = FuelOil1Use;
 			FuelTypeString = "FuelOil#1";
 		}
-		if ( SameString( FuelTypeAlpha, "PropaneGas" ) || SameString( FuelTypeAlpha, "LPG" ) ) {
-			if ( SameString( FuelTypeAlpha, "LPG" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"PropaneGas\"." );
-			}
+		if ( SameString( FuelTypeAlpha, "PropaneGas" ) ) {
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";
 		}
