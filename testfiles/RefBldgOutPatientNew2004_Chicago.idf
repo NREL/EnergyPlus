@@ -32138,15 +32138,11 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     AHU-1 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU-1 Supply Equipment Outlet Node,  !- Setpoint Node or NodeList Name
     FLOOR 1 OPERATING ROOM 1 Air Node;  !- Control Zone Air Node Name
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU-1_CoolC HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- Setpoint Node or NodeList Name
     FLOOR 1 OPERATING ROOM 1 Air Node;  !- Control Zone Air Node Name
 

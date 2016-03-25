@@ -57578,8 +57578,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU2_CoolC 1 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU2_CoolC 1-AHU2_CoolC 2Node,  !- Setpoint Node or NodeList Name
     FLOOR 2 TRIAGE Air Node; !- Control Zone Air Node Name
 
@@ -57593,8 +57591,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU2_CoolC 2 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU2_CoolC 2-AHU2_FanNode,  !- Setpoint Node or NodeList Name
     FLOOR 2 TRIAGE Air Node; !- Control Zone Air Node Name
 
@@ -57608,8 +57604,6 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     AHU2 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU2 Supply Equipment Outlet Node,  !- Setpoint Node or NodeList Name
     FLOOR 2 TRIAGE Air Node; !- Control Zone Air Node Name
 
@@ -58152,8 +58146,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU1_CoolC 1 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU1_CoolC 1-AHU1_CoolC 2Node,  !- Setpoint Node or NodeList Name
     FLOOR 2 LAB 1 Air Node;  !- Control Zone Air Node Name
 
@@ -58167,8 +58159,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU1_CoolC 2 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU1_CoolC 2-AHU1_FanNode,  !- Setpoint Node or NodeList Name
     FLOOR 2 LAB 1 Air Node;  !- Control Zone Air Node Name
 
@@ -58182,8 +58172,6 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     AHU1 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU1 Supply Equipment Outlet Node,  !- Setpoint Node or NodeList Name
     FLOOR 2 LAB 1 Air Node;  !- Control Zone Air Node Name
 
@@ -58728,8 +58716,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU3_CoolC 1 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU3_CoolC 1-AHU3_CoolC 2Node,  !- Setpoint Node or NodeList Name
     FLOOR 2 OPERATING Air Node;  !- Control Zone Air Node Name
 
@@ -58743,8 +58729,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU3_CoolC 2 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU3_CoolC 2-AHU3_FanNode,  !- Setpoint Node or NodeList Name
     FLOOR 2 OPERATING Air Node;  !- Control Zone Air Node Name
 
@@ -58758,8 +58742,6 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     AHU3 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU3 Supply Equipment Outlet Node,  !- Setpoint Node or NodeList Name
     FLOOR 2 OPERATING Air Node;  !- Control Zone Air Node Name
 
@@ -59236,8 +59218,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU5_CoolC 1 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU5_CoolC 1-AHU5_CoolC 2Node,  !- Setpoint Node or NodeList Name
     FLOOR 3 TRIAGE Air Node; !- Control Zone Air Node Name
 
@@ -59251,8 +59231,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU5_CoolC 2 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU5_CoolC 2-AHU5_FanNode,  !- Setpoint Node or NodeList Name
     FLOOR 3 TRIAGE Air Node; !- Control Zone Air Node Name
 
@@ -59266,8 +59244,6 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     AHU5 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU5 Supply Equipment Outlet Node,  !- Setpoint Node or NodeList Name
     FLOOR 3 TRIAGE Air Node; !- Control Zone Air Node Name
 
@@ -59776,8 +59752,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU4_CoolC 1 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU4_CoolC 1-AHU4_CoolC 2Node,  !- Setpoint Node or NodeList Name
     FLOOR 3 ICU Air Node;    !- Control Zone Air Node Name
 
@@ -59791,8 +59765,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     AHU4_CoolC 2 HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU4_CoolC 2-AHU4_FanNode,  !- Setpoint Node or NodeList Name
     FLOOR 3 ICU Air Node;    !- Control Zone Air Node Name
 
@@ -59806,8 +59778,6 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     AHU4 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     AHU4 Supply Equipment Outlet Node,  !- Setpoint Node or NodeList Name
     FLOOR 3 ICU Air Node;    !- Control Zone Air Node Name
 

@@ -2241,8 +2241,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     Rooftop DX Humidity Set Point Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     DX Coil Air Outlet Node, !- Setpoint Node or NodeList Name
     SalesFloor Node;         !- Control Zone Air Node Name
 

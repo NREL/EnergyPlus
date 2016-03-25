@@ -71586,15 +71586,11 @@ SetpointManager:SingleZone:Humidity:Minimum,
      \memo object ZoneControl:Humidistat to detect humidity levels.
   A1 , \field Name
        \required-field
-  A2 , \field Control Variable
-       \deprecated
-  A3 , \field Schedule Name
-       \deprecated
-  A4 , \field Setpoint Node or NodeList Name
+  A2 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which humidity ratio setpoint will be set
-  A5 ; \field Control Zone Air Node Name
+  A3 ; \field Control Zone Air Node Name
        \required-field
        \type node
        \note Name of the zone air node for the humidity control zone
@@ -71607,15 +71603,11 @@ SetpointManager:SingleZone:Humidity:Maximum,
        \min-fields 5
   A1 , \field Name
        \required-field
-  A2 , \field Control Variable
-       \deprecated
-  A3 , \field Schedule Name
-       \deprecated
-  A4 , \field Setpoint Node or NodeList Name
+  A2 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which humidity ratio setpoint will be set
-  A5 ; \field Control Zone Air Node Name
+  A3 ; \field Control Zone Air Node Name
        \required-field
        \type node
        \note Name of the zone air node for the humidity control zone

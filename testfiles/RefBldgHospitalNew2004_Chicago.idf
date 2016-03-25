@@ -19790,29 +19790,21 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     CAV_1 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     CAV_1 Humidifier-CAV_1_CoolCNode,  !- Setpoint Node or NodeList Name
     ER_EXAM3_MULT4_FLR_1 Air Node;  !- Control Zone Air Node Name
 
   SetpointManager:SingleZone:Humidity:Minimum,
     CAV_2 Humidifier HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     CAV_2 Humidifier-CAV_2_CoolCNode,  !- Setpoint Node or NodeList Name
     OR2_MULT5_FLR_2 Air Node;!- Control Zone Air Node Name
 
   SetpointManager:SingleZone:Humidity:Maximum,
     CAV_1_CoolC HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     CAV_1_CoolC-CAV_1_HeatCNode,  !- Setpoint Node or NodeList Name
     ER_EXAM3_MULT4_FLR_1 Air Node;  !- Control Zone Air Node Name
 
   SetpointManager:SingleZone:Humidity:Maximum,
     CAV_2_CoolC HUMRAT setpoint,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     CAV_2_CoolC-CAV_2_HeatCNode,  !- Setpoint Node or NodeList Name
     OR2_MULT5_FLR_2 Air Node;!- Control Zone Air Node Name
 

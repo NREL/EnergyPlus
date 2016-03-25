@@ -2766,8 +2766,6 @@
 
   SetpointManager:SingleZone:Humidity:Minimum,
     Zone Min Set Point Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     Humidifier Outlet Node,  !- Setpoint Node or NodeList Name
     SPACE5-1 Node;           !- Control Zone Air Node Name
 

@@ -1970,15 +1970,11 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     EAST ZONE Dehumidifying Humidistat Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     Mixed Air Node,          !- Setpoint Node or NodeList Name
     Zone 2 Node;             !- Control Zone Air Node Name
 
   SetpointManager:SingleZone:Humidity:Minimum,
     EAST ZONE Humidifying Humidistat Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     Air Loop Outlet Node,    !- Setpoint Node or NodeList Name
     Zone 2 Node;             !- Control Zone Air Node Name
 

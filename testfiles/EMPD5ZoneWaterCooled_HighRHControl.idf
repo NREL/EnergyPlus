@@ -2681,8 +2681,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     Space2-1 Humidistat Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     Main Cooling Coil 1 Outlet Node,  !- Setpoint Node or NodeList Name
     SPACE2-1 Node;           !- Control Zone Air Node Name
 

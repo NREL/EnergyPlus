@@ -2748,8 +2748,6 @@ namespace EnergyPlus {
 
 			"  SetpointManager:SingleZone:Humidity:Maximum,",
 			"    SPACE1-1 Humidistat Manager,  !- Name",
-			"    ,                        !- Control Variable",
-			"    ,                        !- Schedule Name",
 			"    Mixed Air Node 1,        !- Setpoint Node or NodeList Name",
 			"    SPACE1-1 Node;           !- Control Zone Air Node Name",
 
@@ -3727,8 +3725,6 @@ namespace EnergyPlus {
 
 			"  SetpointManager:SingleZone:Humidity:Maximum,",
 			"    Zone Max Humidity Manager,  !- Name",
-			"    ,                        !- Control Variable",
-			"    ,                        !- Schedule Name",
 			"    HX Process Outlet Node,  !- Setpoint Node or NodeList Name",
 			"    Main Zone Node;           !- Control Zone Air Node Name",
 
@@ -4902,8 +4898,6 @@ namespace EnergyPlus {
 
 			"  SetpointManager:SingleZone:Humidity:Maximum,",
 			"    Zone Max Humidity Manager,  !- Name",
-			"    ,                        !- Control Variable",
-			"    ,                        !- Schedule Name",
 			"    HX Process Outlet Node,  !- Setpoint Node or NodeList Name",
 			"    Main Zone Node;           !- Control Zone Air Node Name",
 

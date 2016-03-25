@@ -2468,8 +2468,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     Air Loop 2 Humidity Set Point Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     DX Cooling Coil 2 Outlet Node,  !- Setpoint Node or NodeList Name
     ZNF1 Node;               !- Control Zone Air Node Name
 
