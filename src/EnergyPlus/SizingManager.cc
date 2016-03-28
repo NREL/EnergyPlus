@@ -1324,6 +1324,9 @@ namespace SizingManager {
 		int NumZoneLists;
 		int OAIndex; // Index of design specification object
 		int ObjIndex; // Index of zone air distribution effectiveness object name
+		bool DesHeatMaxAirFlowPerAreaUsrInp;
+		bool DesHeatMaxAirFlowUsrInp;
+		bool DesHeatMaxAirFlowFracUsrInp;
 
 		struct GlobalMiscObject
 		{
@@ -1709,6 +1712,7 @@ namespace SizingManager {
 					//      \default .002032
 					//      \note default is .40 cfm/ft2
 					//      \note This input is not currently used for autosizing any of the components.
+					DesHeatMaxAirFlowPerAreaUsrInp = false;
 					if ( lNumericFieldBlanks( 14 ) ) {
 						if ( rNumericArgs( 14 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = 0.002032;
@@ -1721,6 +1725,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = rNumericArgs( 14 );
+						DesHeatMaxAirFlowPerAreaUsrInp = true;
 					}
 					//  N15,\field Heating Maximum Air Flow
 					//      \type real
@@ -1729,6 +1734,7 @@ namespace SizingManager {
 					//      \default .1415762
 					//      \note default is 300 cfm
 					//      \note This input is not currently used for autosizing any of the components.
+					DesHeatMaxAirFlowUsrInp = false;
 					if ( lNumericFieldBlanks( 15 ) ) {
 						if ( rNumericArgs( 15 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = 0.1415762;
@@ -1741,6 +1747,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = rNumericArgs( 15 );
+						DesHeatMaxAirFlowUsrInp = true;
 					}
 					//  N16;\field Heating Maximum Air Flow Fraction
 					//      \note fraction of the Heating Design Air Flow Rate
@@ -1748,6 +1755,7 @@ namespace SizingManager {
 					//      \type real
 					//      \minimum 0
 					//      \default 0.3
+					DesHeatMaxAirFlowFracUsrInp = false;
 					if ( lNumericFieldBlanks( 16 ) ) {
 						if ( rNumericArgs( 16 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = 0.3;
@@ -1760,6 +1768,19 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
+						DesHeatMaxAirFlowFracUsrInp = false;
+					}
+					// make sure the user specified inputs of the previous 3 inputs override the defaults
+					if ( DesHeatMaxAirFlowPerAreaUsrInp || DesHeatMaxAirFlowUsrInp || DesHeatMaxAirFlowFracUsrInp ) {
+						if ( !DesHeatMaxAirFlowPerAreaUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = 0.0;
+						}
+						if ( !DesHeatMaxAirFlowUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = 0.0;
+						}
+						if ( !DesHeatMaxAirFlowFracUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = 0.0;
+						}
 					}
 
 					//  A7, \field Zone Air Distribution Object Name and add its inputs
