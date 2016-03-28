@@ -56904,88 +56904,66 @@ Branch,
    A6, \field Component 1 Outlet Node Name
         \required-field
         \type node
-   A7, \field Component 1 Branch Control Type
-       \note field is no longer used
-   A8, \field Component 2 Object Type
-   A9, \field Component 2 Name
-   A10,\field Component 2 Inlet Node Name
+   A7, \field Component 2 Object Type
+   A8, \field Component 2 Name
+   A9,\field Component 2 Inlet Node Name
         \type node
-   A11, \field Component 2 Outlet Node Name
+   A10, \field Component 2 Outlet Node Name
         \type node
-   A12, \field Component 2 Branch Control Type
-       \note field is no longer used
-   A13, \field Component 3 Object Type
-   A14, \field Component 3 Name
-   A15, \field Component 3 Inlet Node Name
+   A11, \field Component 3 Object Type
+   A12, \field Component 3 Name
+   A13, \field Component 3 Inlet Node Name
         \type node
-   A16, \field Component 3 Outlet Node Name
+   A14, \field Component 3 Outlet Node Name
         \type node
-   A17, \field Component 3 Branch Control Type
-       \note field is no longer used
-   A18, \field Component 4 Object Type
-   A19, \field Component 4 Name
-   A20, \field Component 4 Inlet Node Name
+   A15, \field Component 4 Object Type
+   A16, \field Component 4 Name
+   A17, \field Component 4 Inlet Node Name
         \type node
-   A21, \field Component 4 Outlet Node Name
+   A18, \field Component 4 Outlet Node Name
         \type node
-   A22, \field Component 4 Branch Control Type
-       \note field is no longer used
-   A23, \field Component 5 Object Type
-   A24, \field Component 5 Name
-   A25, \field Component 5 Inlet Node Name
+   A19, \field Component 5 Object Type
+   A20, \field Component 5 Name
+   A21, \field Component 5 Inlet Node Name
         \type node
-   A26, \field Component 5 Outlet Node Name
+   A22, \field Component 5 Outlet Node Name
         \type node
-   A27, \field Component 5 Branch Control Type
-       \note field is no longer used
-   A28, \field Component 6 Object Type
-   A29, \field Component 6 Name
-   A30, \field Component 6 Inlet Node Name
+   A23, \field Component 6 Object Type
+   A24, \field Component 6 Name
+   A25, \field Component 6 Inlet Node Name
         \type node
-   A31, \field Component 6 Outlet Node Name
+   A26, \field Component 6 Outlet Node Name
         \type node
-   A32, \field Component 6 Branch Control Type
-       \note field is no longer used
-   A33, \field Component 7 Object Type
-   A34, \field Component 7 Name
-   A35, \field Component 7 Inlet Node Name
+   A27, \field Component 7 Object Type
+   A28, \field Component 7 Name
+   A29, \field Component 7 Inlet Node Name
         \type node
-   A36, \field Component 7 Outlet Node Name
+   A30, \field Component 7 Outlet Node Name
         \type node
-   A37, \field Component 7 Branch Control Type
-       \note field is no longer used
-   A38, \field Component 8 Object Type
-   A39, \field Component 8 Name
-   A40, \field Component 8 Inlet Node Name
+   A31, \field Component 8 Object Type
+   A32, \field Component 8 Name
+   A33, \field Component 8 Inlet Node Name
         \type node
-   A41, \field Component 8 Outlet Node Name
+   A34, \field Component 8 Outlet Node Name
         \type node
-   A42, \field Component 8 Branch Control Type
-       \note field is no longer used
-   A43, \field Component 9 Object Type
-   A44, \field Component 9 Name
-   A45, \field Component 9 Inlet Node Name
+   A35, \field Component 9 Object Type
+   A36, \field Component 9 Name
+   A37, \field Component 9 Inlet Node Name
         \type node
-   A46, \field Component 9 Outlet Node Name
+   A38, \field Component 9 Outlet Node Name
         \type node
-   A47, \field Component 9 Branch Control Type
-       \note field is no longer used
-   A48, \field Component 10 Object Type
-   A49, \field Component 10 Name
-   A50, \field Component 10 Inlet Node Name
+   A39, \field Component 10 Object Type
+   A40, \field Component 10 Name
+   A41, \field Component 10 Inlet Node Name
         \type node
-   A51, \field Component 10 Outlet Node Name
+   A42, \field Component 10 Outlet Node Name
         \type node
-   A52, \field Component 10 Branch Control Type
-       \note field is no longer used
-   A53, \field Component 11 Object Type
-   A54, \field Component 11 Name
-   A55, \field Component 11 Inlet Node Name
+   A43, \field Component 11 Object Type
+   A44, \field Component 11 Name
+   A45, \field Component 11 Inlet Node Name
         \type node
-   A56, \field Component 11 Outlet Node Name
+   A46; \field Component 11 Outlet Node Name
         \type node
-   A57; \field Component 11 Branch Control Type
-       \note field is no longer used
 
 BranchList,
  \extensible:1 Just duplicate last field and comments (changing numbering, please)
@@ -71596,7 +71574,6 @@ SetpointManager:SingleZone:Humidity:Maximum,
      \memo control of a single zone maximum humidity level.
      \memo This setpoint manager can be used in conjunction with
      \memo object ZoneControl:Humidistat to detect humidity levels.
-       \min-fields 5
   A1 , \field Name
        \required-field
   A2 , \field Setpoint Node or NodeList Name
