@@ -10210,8 +10210,8 @@ namespace OutputReportTabular {
 			curObjectName = tableEntry( lTableEntry ).objectName;
 			found = 0;
 			for ( mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames ) {
-				if ( SameString( curObjectName, uniqueObjectName( mUnqObjNames ) ) ) {
-					found = mUnqObjNames;
+				if ( curObjectName == uniqueObjectName( mUnqObjNames ) ) {
+						found = mUnqObjNames;
 				}
 			}
 			// if found then point to the unique object
