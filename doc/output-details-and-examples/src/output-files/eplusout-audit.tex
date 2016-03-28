@@ -1,0 +1,53 @@
+\section{eplusout.audit}\label{eplusout.audit}
+
+This file is simply the echo of the inputs to the EnergyPlus program -- the Energy+.idd (data dictionary) and in.idf (\textless{}filename\textgreater{}.idf -- the input data file). Every attempt has been made to not require this file to be saved -- errors are interpreted as much as possible and encapsulated onto the eplusout.err file. Any errors in the data dictionary processing should be accomplished during development -- users should never see errors there. Thus, this file is not ``saved'' after processing by the standard script file. Occasionally, you may wish to view this file because of something obscure.
+
+An excerpt of the file follows. Lines in green are notes produced from EnergyPlus (some of these are more useful to developers than users). Lines in red are lines with error messages shown to illustrate context. The other lines are echoes from inputs (with line numbers).
+
+In all the examples, the actual version of the EnergyPlus exe would appear. In the examples these will be shown as: \textless{}version\textgreater{}.
+
+\begin{lstlisting}
+  Processing Data Dictionary (Energy+.idd) File -- Start
+     1 !IDD_Version <version>
+     2 ! **************************************************************************
+     3 !
+<reduced for brevity>
+ 13000 \key DETAILS
+ 13001 \key Vertices
+ 13002 \key DetailsWithVertices
+  Processing Data Dictionary (Energy+.idd) File -- Complete
+  Maximum number of Alpha Args= 4500
+  Maximum number of Numeric Args= 1800
+  Number of Object Definitions= 473
+  Number of Section Definitions= 2
+  Processing Input Data File (in.idf) -- Start
+    1 ! Basic file description: Basic illustration of using Purchased Air as a system
+    2 ! Run: 2 design days.
+    3 ! 2 annual run periods, 2 summer days and 3 winter days.
+<reduced for brevity>
+   63 RunPeriod, ! 3 day winter simuluation
+   64 1, 1, ! Start Month ,Day
+   65 1, 3; ! End Month ,Day
+  ** Warning ** Object=RUNPERIOD, entered with less than minimum number of fields.
+  ** ~~~ ** Attempting fill to minimum.
+   66 MATERIAL:Regular,A1 - 1 IN STUCCO, !- Material Name
+<reduced for brevity>
+  784 End Simulation Data;
+  Processing Input Data File (in.idf) -- Complete
+  Number of IDF "Lines"= 359
+  Maximum number of Alpha IDF Args= 29
+  Maximum number of Numeric IDF Args= 20
+ Getting object=VERSION
+ Getting object=TIMESTEP
+ Getting object=SIMULATIONCONTROL
+ Getting object=SIZING:PARAMETERS
+ Getting object=SIZING:ZONE
+ Getting object=SIZING:SYSTEM
+ Getting object=SIZING:PLANT
+<etc>
+MaxRVariable= 5000
+MaxIVariable= 100
+NumEnergyMeters= 108
+NumVarMeterArrays= 106
+\end{lstlisting}
+

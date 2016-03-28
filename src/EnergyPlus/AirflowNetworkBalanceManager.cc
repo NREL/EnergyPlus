@@ -1,4 +1,63 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -91,7 +150,6 @@ namespace AirflowNetworkBalanceManager {
 	using DataEnvironment::CurMnDy;
 	using DataEnvironment::EnvironmentName;
 	using DataEnvironment::OutAirDensity;
-	using DataEnvironment::WindSpeed;
 	using DataEnvironment::WindDir;
 	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::StdRhoAir;
@@ -244,6 +302,62 @@ namespace AirflowNetworkBalanceManager {
 
 	Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
 	// Functions
+
+	void
+	clear_state()
+	{
+		PZ.deallocate();
+		MA.deallocate();
+		MV.deallocate();
+		IVEC.deallocate();
+		SplitterNodeNumbers.deallocate();
+		AirflowNetworkGetInputFlag = true;
+		VentilationCtrl = 0;
+		NumOfExhaustFans = 0;
+		NumAirflowNetwork = 0;
+		AirflowNetworkNumOfDetOpenings = 0;
+		AirflowNetworkNumOfSimOpenings = 0;
+		AirflowNetworkNumOfHorOpenings = 0;
+		AirflowNetworkNumOfStdCndns = 0;
+		AirflowNetworkNumOfSurCracks = 0;
+		AirflowNetworkNumOfSurELA = 0;
+		AirflowNetworkNumOfExtNode = 0;
+		AirflowNetworkNumOfCPArray = 0;
+		AirflowNetworkNumOfCPValue = 0;
+		AirflowNetworkNumOfSingleSideZones = 0; // added default value
+		AirflowNetworkNumofWindDir = 0; // added default value
+		DisSysNumOfNodes = 0;
+		DisSysNumOfLeaks = 0;
+		DisSysNumOfELRs = 0;
+		DisSysNumOfDucts = 0;
+		DisSysNumOfDampers = 0;
+		DisSysNumOfCVFs = 0;
+		DisSysNumOfDetFans = 0;
+		DisSysNumOfCoils = 0;
+		DisSysNumOfHXs = 0;
+		DisSysNumOfCPDs = 0;
+		DisSysNumOfTermUnits = 0;
+		DisSysNumOfLinks = 0;
+		NumOfExtNodes = 0;
+		AirflowNetworkNumOfExtSurfaces = 0;
+		IncAng = 0.0;
+		FacadeAng = Array1D< Real64 >( 5 );
+		WindDirNum = 0; // added default value
+		WindAng = 0; // added default value
+		SupplyFanInletNode = 0;
+		SupplyFanOutletNode = 0;
+		SupplyFanType = 0;
+		OnOffFanRunTimeFraction = 0.0;
+		CurrentEndTime = 0.0;
+		CurrentEndTimeLast = 0.0;
+		TimeStepSysLast = 0.0;
+		AirflowNetworkNumOfOccuVentCtrls = 0;
+		IntraZoneNumOfNodes = 0;
+		IntraZoneNumOfLinks = 0;
+		IntraZoneNumOfZones = 0;
+		AirflowNetworkZnRpt.deallocate();
+		OccupantVentilationControl.deallocate();
+	}
 
 	void
 	ManageAirflowNetworkBalance(
@@ -1675,7 +1789,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( j > 0 ) {
 				if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Sides == 3 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\"." );
-					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface should be used." );
+					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface will be used with effective width and height." );
 				}
 				if ( ! MultizoneSurfaceData( i ).VentingSchName.empty() ) {
 					MultizoneSurfaceData( i ).VentingSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentingSchName );
@@ -3306,7 +3420,7 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) { // Distribution
 
-			AirflowNetworkLinkageData.ZoneNum() = 0;
+			for ( auto & e : AirflowNetworkLinkageData ) e.ZoneNum = 0;
 
 			for ( count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count ) {
 
@@ -3445,8 +3559,9 @@ namespace AirflowNetworkBalanceManager {
 			if ( !NodeFound ) {
 				if ( count <= AirflowNetworkNumOfSurfaces ) {
 					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:MULTIZONE:SURFACE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
-				} else if ( count <= AirflowNetworkNumOfSurfaces ) {
-					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:INTRAZONE:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
+				// MBA: Always false due to same boolean check but I don't know what the correct logic should be. 01/10/2016
+				// } else if ( count <= AirflowNetworkNumOfSurfaces ) {
+				// 	ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:INTRAZONE:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
 				} else {
 					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE objects." );
 				}
@@ -3750,16 +3865,18 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		AirflowNetworkExchangeData.TotalSen() = 0.0;
-		AirflowNetworkExchangeData.TotalLat() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneSen() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneLat() = 0.0;
-		AirflowNetworkExchangeData.LeakSen() = 0.0;
-		AirflowNetworkExchangeData.LeakLat() = 0.0;
-		AirflowNetworkExchangeData.CondSen() = 0.0;
-		AirflowNetworkExchangeData.DiffLat() = 0.0;
-		if ( Contaminant.CO2Simulation ) AirflowNetworkExchangeData.TotalCO2() = 0.0;
-		if ( Contaminant.GenericContamSimulation ) AirflowNetworkExchangeData.TotalGC() = 0.0;
+		for ( auto & e : AirflowNetworkExchangeData ) {
+			e.TotalSen = 0.0;
+			e.TotalLat = 0.0;
+			e.MultiZoneSen = 0.0;
+			e.MultiZoneLat = 0.0;
+			e.LeakSen = 0.0;
+			e.LeakLat = 0.0;
+			e.CondSen = 0.0;
+			e.DiffLat = 0.0;
+		}
+		if ( Contaminant.CO2Simulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalCO2 = 0.0;
+		if ( Contaminant.GenericContamSimulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalGC = 0.0;
 
 		// Occupant ventilation control
 		CurrentEndTime = CurrentTime + SysTimeElapsed;
@@ -5590,47 +5707,48 @@ namespace AirflowNetworkBalanceManager {
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
-		AirflowNetworkReportData.MultiZoneInfiSenGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiSenGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiSenLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiSenLossJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatLossJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenLossJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatLossJ() = 0.0;
-
-		AirflowNetworkReportData.LeakSenGainW() = 0.0;
-		AirflowNetworkReportData.LeakSenGainJ() = 0.0;
-		AirflowNetworkReportData.LeakSenLossW() = 0.0;
-		AirflowNetworkReportData.LeakSenLossJ() = 0.0;
-		AirflowNetworkReportData.LeakLatGainW() = 0.0;
-		AirflowNetworkReportData.LeakLatGainJ() = 0.0;
-		AirflowNetworkReportData.LeakLatLossW() = 0.0;
-		AirflowNetworkReportData.LeakLatLossJ() = 0.0;
-		AirflowNetworkReportData.CondSenGainW() = 0.0;
-		AirflowNetworkReportData.CondSenGainJ() = 0.0;
-		AirflowNetworkReportData.CondSenLossW() = 0.0;
-		AirflowNetworkReportData.CondSenLossJ() = 0.0;
-		AirflowNetworkReportData.DiffLatGainW() = 0.0;
-		AirflowNetworkReportData.DiffLatGainJ() = 0.0;
-		AirflowNetworkReportData.DiffLatLossW() = 0.0;
-		AirflowNetworkReportData.DiffLatLossJ() = 0.0;
-		AirflowNetworkReportData.TotalSenGainW() = 0.0;
-		AirflowNetworkReportData.TotalSenGainJ() = 0.0;
-		AirflowNetworkReportData.TotalSenLossW() = 0.0;
-		AirflowNetworkReportData.TotalSenLossJ() = 0.0;
-		AirflowNetworkReportData.TotalLatGainW() = 0.0;
-		AirflowNetworkReportData.TotalLatGainJ() = 0.0;
-		AirflowNetworkReportData.TotalLatLossW() = 0.0;
-		AirflowNetworkReportData.TotalLatLossJ() = 0.0;
+		for ( auto & e : AirflowNetworkReportData ) {
+			e.MultiZoneInfiSenGainW = 0.0;
+			e.MultiZoneInfiSenGainJ = 0.0;
+			e.MultiZoneInfiSenLossW = 0.0;
+			e.MultiZoneInfiSenLossJ = 0.0;
+			e.MultiZoneInfiLatGainW = 0.0;
+			e.MultiZoneInfiLatGainJ = 0.0;
+			e.MultiZoneInfiLatLossW = 0.0;
+			e.MultiZoneInfiLatLossJ = 0.0;
+			e.MultiZoneMixSenGainW = 0.0;
+			e.MultiZoneMixSenGainJ = 0.0;
+			e.MultiZoneMixSenLossW = 0.0;
+			e.MultiZoneMixSenLossJ = 0.0;
+			e.MultiZoneMixLatGainW = 0.0;
+			e.MultiZoneMixLatGainJ = 0.0;
+			e.MultiZoneMixLatLossW = 0.0;
+			e.MultiZoneMixLatLossJ = 0.0;
+			e.LeakSenGainW = 0.0;
+			e.LeakSenGainJ = 0.0;
+			e.LeakSenLossW = 0.0;
+			e.LeakSenLossJ = 0.0;
+			e.LeakLatGainW = 0.0;
+			e.LeakLatGainJ = 0.0;
+			e.LeakLatLossW = 0.0;
+			e.LeakLatLossJ = 0.0;
+			e.CondSenGainW = 0.0;
+			e.CondSenGainJ = 0.0;
+			e.CondSenLossW = 0.0;
+			e.CondSenLossJ = 0.0;
+			e.DiffLatGainW = 0.0;
+			e.DiffLatGainJ = 0.0;
+			e.DiffLatLossW = 0.0;
+			e.DiffLatLossJ = 0.0;
+			e.TotalSenGainW = 0.0;
+			e.TotalSenGainJ = 0.0;
+			e.TotalSenLossW = 0.0;
+			e.TotalSenLossJ = 0.0;
+			e.TotalLatGainW = 0.0;
+			e.TotalLatGainJ = 0.0;
+			e.TotalLatLossW = 0.0;
+			e.TotalLatLossJ = 0.0;
+		}
 
 		// Calculate sensible and latent loads in each zone from multizone airflows
 		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
@@ -5763,15 +5881,17 @@ namespace AirflowNetworkBalanceManager {
 
 		// Zone report
 
-		AirflowNetworkZnRpt.MeanAirTemp() = 0.0;
-		AirflowNetworkZnRpt.OperativeTemp() = 0.0;
-		AirflowNetworkZnRpt.InfilHeatGain() = 0.0;
-		AirflowNetworkZnRpt.InfilHeatLoss() = 0.0;
-		AirflowNetworkZnRpt.InfilVolume() = 0.0;
-		AirflowNetworkZnRpt.InfilMass() = 0.0;
-		AirflowNetworkZnRpt.InfilAirChangeRate() = 0.0;
-		AirflowNetworkZnRpt.MixVolume() = 0.0;
-		AirflowNetworkZnRpt.MixMass() = 0.0;
+		for ( auto & e : AirflowNetworkZnRpt ) {
+			e.MeanAirTemp = 0.0;
+			e.OperativeTemp = 0.0;
+			e.InfilHeatGain = 0.0;
+			e.InfilHeatLoss = 0.0;
+			e.InfilVolume = 0.0;
+			e.InfilMass = 0.0;
+			e.InfilAirChangeRate = 0.0;
+			e.MixVolume = 0.0;
+			e.MixMass = 0.0;
+		}
 
 		if ( SupplyFanType == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0 && OnOffFanRunTimeFraction > 0.0 ) {
 			// ON Cycle calculation
@@ -6001,21 +6121,27 @@ namespace AirflowNetworkBalanceManager {
 		static bool MyOneTimeFlag( true );
 		static bool MyOneTimeFlag1( true );
 
-		AirflowNetworkExchangeData.SumMCp() = 0.0;
-		AirflowNetworkExchangeData.SumMCpT() = 0.0;
-		AirflowNetworkExchangeData.SumMHr() = 0.0;
-		AirflowNetworkExchangeData.SumMHrW() = 0.0;
-		AirflowNetworkExchangeData.SumMMCp() = 0.0;
-		AirflowNetworkExchangeData.SumMMCpT() = 0.0;
-		AirflowNetworkExchangeData.SumMMHr() = 0.0;
-		AirflowNetworkExchangeData.SumMMHrW() = 0.0;
+		for ( auto & e : AirflowNetworkExchangeData ) {
+			e.SumMCp = 0.0;
+			e.SumMCpT = 0.0;
+			e.SumMHr = 0.0;
+			e.SumMHrW = 0.0;
+			e.SumMMCp = 0.0;
+			e.SumMMCpT = 0.0;
+			e.SumMMHr = 0.0;
+			e.SumMMHrW = 0.0;
+		}
 		if ( Contaminant.CO2Simulation ) {
-			AirflowNetworkExchangeData.SumMHrCO() = 0.0;
-			AirflowNetworkExchangeData.SumMMHrCO() = 0.0;
+			for ( auto & e : AirflowNetworkExchangeData ) {
+				e.SumMHrCO = 0.0;
+				e.SumMMHrCO = 0.0;
+			}
 		}
 		if ( Contaminant.GenericContamSimulation ) {
-			AirflowNetworkExchangeData.SumMHrGC() = 0.0;
-			AirflowNetworkExchangeData.SumMMHrGC() = 0.0;
+			for ( auto & e : AirflowNetworkExchangeData ) {
+				e.SumMHrGC = 0.0;
+				e.SumMMHrGC = 0.0;
+			}
 		}
 
 		// Calculate sensible and latent loads in each zone from multizone airflows
@@ -6085,12 +6211,14 @@ namespace AirflowNetworkBalanceManager {
 		// End of update of multizone airflow calculations
 
 		// Initialize these values
-		AirflowNetworkExchangeData.LeakSen() = 0.0;
-		AirflowNetworkExchangeData.CondSen() = 0.0;
-		AirflowNetworkExchangeData.LeakLat() = 0.0;
-		AirflowNetworkExchangeData.DiffLat() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneSen() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneLat() = 0.0;
+		for ( auto & e : AirflowNetworkExchangeData ) {
+			e.LeakSen = 0.0;
+			e.CondSen = 0.0;
+			e.LeakLat = 0.0;
+			e.DiffLat = 0.0;
+			e.MultiZoneSen = 0.0;
+			e.MultiZoneLat = 0.0;
+		}
 
 		// Rewrite AirflowNetwork airflow rate
 		for ( i = 1; i <= NumOfLinksMultiZone; ++i ) {
@@ -6100,10 +6228,14 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkLinkSimu( i ).VolFLOW2 = AirflowNetworkLinkSimu( i ).FLOW2 / AirDensity;
 		}
 
-		AirflowNetworkLinkReport.FLOW() = AirflowNetworkLinkSimu.FLOW();
-		AirflowNetworkLinkReport.FLOW2() = AirflowNetworkLinkSimu.FLOW2();
-		AirflowNetworkLinkReport.VolFLOW() = AirflowNetworkLinkSimu.VolFLOW();
-		AirflowNetworkLinkReport.VolFLOW2() = AirflowNetworkLinkSimu.VolFLOW2();
+		for ( std::size_t i = 0; i < AirflowNetworkLinkReport.size(); ++i ) {
+			auto & r( AirflowNetworkLinkReport[ i ] );
+			auto & s( AirflowNetworkLinkSimu[ i ] );
+			r.FLOW = s.FLOW;
+			r.FLOW2 = s.FLOW2;
+			r.VolFLOW = s.VolFLOW;
+			r.VolFLOW2 = s.VolFLOW2;
+		}
 
 		// Save zone loads from multizone calculation for later summation
 		if ( present( FirstHVACIteration ) ) {
@@ -6189,10 +6321,14 @@ namespace AirflowNetworkBalanceManager {
 		LoopHeatingCoilMaxRTF = 0.0;
 
 		if ( SupplyFanType == FanType_SimpleOnOff && PartLoadRatio < 1.0 ) {
-			AirflowNetworkLinkReport.FLOW() = AirflowNetworkLinkSimu.FLOW() * PartLoadRatio;
-			AirflowNetworkLinkReport.FLOW2() = AirflowNetworkLinkSimu.FLOW2() * PartLoadRatio;
-			AirflowNetworkLinkReport.VolFLOW() = AirflowNetworkLinkSimu.VolFLOW() * PartLoadRatio;
-			AirflowNetworkLinkReport.VolFLOW2() = AirflowNetworkLinkSimu.VolFLOW2() * PartLoadRatio;
+			for ( std::size_t i = 0; i < AirflowNetworkLinkReport.size(); ++i ) {
+				auto & r( AirflowNetworkLinkReport[ i ] );
+				auto & s( AirflowNetworkLinkSimu[ i ] );
+				r.FLOW = s.FLOW * PartLoadRatio;
+				r.FLOW2 = s.FLOW2 * PartLoadRatio;
+				r.VolFLOW = s.VolFLOW * PartLoadRatio;
+				r.VolFLOW2 = s.VolFLOW2 * PartLoadRatio;
+			}
 		}
 
 		// One time warning
@@ -7204,7 +7340,7 @@ namespace AirflowNetworkBalanceManager {
 		// Validate supply and return connections
 		if ( OneTimeFlag ) {
 			CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
-			if ( any( ZoneEquipConfig.IsControlled() ) ) {
+			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( DataZoneEquipment::EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
 				AirflowNetworkZoneExhaustFan.dimension( NumOfZones, false );
 			}
 			// Ensure the number of exhaust fan defined in the AirflowNetwork model matches the number of Zone Exhaust Fan objects
@@ -7345,10 +7481,12 @@ namespace AirflowNetworkBalanceManager {
 		static int HybridGlobalErrIndex( 0 );
 		static int HybridGlobalErrCount( 0 );
 
-		MultizoneSurfaceData.HybridVentClose() = false;
-		MultizoneSurfaceData.HybridCtrlGlobal() = false;
-		MultizoneSurfaceData.HybridCtrlMaster() = false;
-		MultizoneSurfaceData.WindModifier() = 1.0;
+		for ( auto & e : MultizoneSurfaceData ) {
+			e.HybridVentClose = false;
+			e.HybridCtrlGlobal = false;
+			e.HybridCtrlMaster = false;
+			e.WindModifier = 1.0;
+		}
 		ControlType = IndividualCtrlType;
 
 		for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
@@ -7511,39 +7649,6 @@ namespace AirflowNetworkBalanceManager {
 				Height( 0.0 ),
 				Width( 0.0 ),
 				DischCoeff( 0.0 )
-			{}
-
-			// Member Constructor
-			AFNExtSurfacesProp(
-				int const SurfNum, // row index of the external opening in the Surface array
-				std::string const & SurfName, // Surface name
-				int const MSDNum, // row index of the external opening in the MultizoneSurfaceData array
-				int const ZoneNum, // EnergyPlus zone number
-				int const MZDZoneNum, // row index of the zone in the MultizoneZoneData array
-				int const ExtNodeNum, // External node number; = row index in MultizoneExternalNodeData array + AirflowNetworkNumOfZones
-				std::string const & ZoneName, // EnergyPlus zone name
-				int const CPVNum, // row index in MultizoneCPValueData
-				int const CompTypeNum, // Opening type (detailed, simple, etc.)
-				Real64 const NodeHeight, // Elevation of the opening node
-				Real64 const OpeningArea, // Opening area (=Height*Width)
-				Real64 const Height, // Opening height = MultizoneSurfaceData()%Height
-				Real64 const Width, // Opening width  = MultizoneSurfaceData()%Width
-				Real64 const DischCoeff // Opening discharge coefficient
-			) :
-				SurfNum( SurfNum ),
-				SurfName( SurfName ),
-				MSDNum( MSDNum ),
-				ZoneNum( ZoneNum ),
-				MZDZoneNum( MZDZoneNum ),
-				ExtNodeNum( ExtNodeNum ),
-				ZoneName( ZoneName ),
-				CPVNum( CPVNum ),
-				CompTypeNum( CompTypeNum ),
-				NodeHeight( NodeHeight ),
-				OpeningArea( OpeningArea ),
-				Height( Height ),
-				Width( Width ),
-				DischCoeff( DischCoeff )
 			{}
 
 		};
@@ -8019,29 +8124,6 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // AirflowNetworkBalanceManager
 

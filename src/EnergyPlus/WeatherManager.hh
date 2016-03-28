@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef WeatherManager_hh_INCLUDED
 #define WeatherManager_hh_INCLUDED
 
@@ -287,75 +345,6 @@ namespace WeatherManager {
 			RawSimDays( 0 )
 		{}
 
-		// Member Constructor
-		EnvironmentData(
-			std::string const & Title, // Environment name
-			std::string const & cKindOfEnvrn, // kind of environment
-			int const KindOfEnvrn, // Type of environment (see Parameters for KindOfSim in DataGlobals)
-			int const TotalDays, // Number of days in environment
-			int const StartJDay, // Day of year of first day of environment
-			int const StartMonth,
-			int const StartDay,
-			int const StartYear,
-			int const StartDate,
-			int const EndMonth,
-			int const EndDay,
-			int const EndJDay,
-			int const EndYear,
-			int const EndDate,
-			int const DayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
-			bool const UseDST, // True if DaylightSavingTime is used for this RunPeriod
-			bool const UseHolidays, // True if Holidays are used for this RunPeriod (from WeatherFile)
-			bool const ApplyWeekendRule, // True if "Weekend Rule" is to be applied to RunPeriod
-			bool const UseRain, // True if Rain from weather file should be used (set rain to true)
-			bool const UseSnow, // True if Snow from weather file should be used (set Snow to true)
-			Array1_int const & MonWeekDay,
-			bool const SetWeekDays, // true when weekdays will be reset (after first year or on repeat)
-			int const NumSimYears, // Total Number of times this period to be performed
-			int const CurrentCycle, // Current cycle through weather file in NumSimYears repeats
-			int const WP_Type1, // WeatherProperties SkyTemperature Pointer
-			int const CurrentYear, // Current year
-			bool const IsLeapYear, // True if current year is leap year.
-			bool const RollDayTypeOnRepeat, // If repeating run period, increment day type on repeat.
-			bool const TreatYearsAsConsecutive, // When year rolls over, increment year and recalculate Leap Year
-			bool const MatchYear, // for actual weather will be true
-			bool const ActualWeather, // true when using actual weather data
-			int const RawSimDays // number of basic sim days.
-		) :
-			Title( Title ),
-			cKindOfEnvrn( cKindOfEnvrn ),
-			KindOfEnvrn( KindOfEnvrn ),
-			TotalDays( TotalDays ),
-			StartJDay( StartJDay ),
-			StartMonth( StartMonth ),
-			StartDay( StartDay ),
-			StartYear( StartYear ),
-			StartDate( StartDate ),
-			EndMonth( EndMonth ),
-			EndDay( EndDay ),
-			EndJDay( EndJDay ),
-			EndYear( EndYear ),
-			EndDate( EndDate ),
-			DayOfWeek( DayOfWeek ),
-			UseDST( UseDST ),
-			UseHolidays( UseHolidays ),
-			ApplyWeekendRule( ApplyWeekendRule ),
-			UseRain( UseRain ),
-			UseSnow( UseSnow ),
-			MonWeekDay( 12, MonWeekDay ),
-			SetWeekDays( SetWeekDays ),
-			NumSimYears( NumSimYears ),
-			CurrentCycle( CurrentCycle ),
-			WP_Type1( WP_Type1 ),
-			CurrentYear( CurrentYear ),
-			IsLeapYear( IsLeapYear ),
-			RollDayTypeOnRepeat( RollDayTypeOnRepeat ),
-			TreatYearsAsConsecutive( TreatYearsAsConsecutive ),
-			MatchYear( MatchYear ),
-			ActualWeather( ActualWeather ),
-			RawSimDays( RawSimDays )
-		{}
-
 	};
 
 	struct DesignDayData
@@ -418,63 +407,6 @@ namespace WeatherManager {
 			DewPointNeedsSet( false )
 		{}
 
-		// Member Constructor
-		DesignDayData(
-			std::string const & Title, // Environment name
-			Real64 const MaxDryBulb, // Maximum Dry-Bulb Temperature (C)
-			Real64 const DailyDBRange, // Daily Temperature Range (deltaC)
-			Real64 const HumIndValue, // Humidity Indicating Value at Max Dry-bulb Temperature
-			int const HumIndType, // Humidity Indicating type  (see Parameters)
-			Real64 const PressBarom, // Atmospheric/Barometric Pressure (Pascals)
-			Real64 const WindSpeed, // Wind Speed (m/s)
-			Real64 const WindDir, // Wind Direction (degrees clockwise from North, N=0, E=90, S=180, W=270)
-			Real64 const SkyClear, // Sky Clearness (0 to 1)
-			int const RainInd, // Rain Indicator (1 = raining and surfaces are wet, else 0)
-			int const SnowInd, // Snow Indicator (1 = snow on ground, else  0)
-			int const DayOfMonth, // Day of Month ( 1 - 31 )
-			int const Month, // Month of Year ( 1 - 12 )
-			int const DayType, // Day Type Sunday = 1 - Saturday = 7
-			int const DSTIndicator, // Daylight Saving Time Period Indicator (1=yes, 0=no) for this DesignDay
-			int const SolarModel, // Solar Model for creating solar values for design day.
-			int const DBTempRangeType, // Drybulb Range Type (see Parameters)
-			int const TempRangeSchPtr, // Schedule pointer to a day schedule for dry-bulb temperature range multipliers
-			int const HumIndSchPtr, // Schedule pointer to a day schedule that specifies
-			int const BeamSolarSchPtr, // Schedule pointer to a day schedule for beam solar
-			int const DiffuseSolarSchPtr, // Schedule pointer to a day schedule for diffuse solar
-			Real64 const TauB, // beam pseudo optical depth for ASHRAE tau model
-			Real64 const TauD, // diffuse pseudo optical depth for ASHRAE tau model
-			Real64 const DailyWBRange, // daily range of wetbulb (deltaC)
-			bool const PressureEntered, // true if a pressure was entered in design day data
-			bool const DewPointNeedsSet // true if the Dewpoint humidicating value needs to be set (after location determined)
-		) :
-			Title( Title ),
-			MaxDryBulb( MaxDryBulb ),
-			DailyDBRange( DailyDBRange ),
-			HumIndValue( HumIndValue ),
-			HumIndType( HumIndType ),
-			PressBarom( PressBarom ),
-			WindSpeed( WindSpeed ),
-			WindDir( WindDir ),
-			SkyClear( SkyClear ),
-			RainInd( RainInd ),
-			SnowInd( SnowInd ),
-			DayOfMonth( DayOfMonth ),
-			Month( Month ),
-			DayType( DayType ),
-			DSTIndicator( DSTIndicator ),
-			SolarModel( SolarModel ),
-			DBTempRangeType( DBTempRangeType ),
-			TempRangeSchPtr( TempRangeSchPtr ),
-			HumIndSchPtr( HumIndSchPtr ),
-			BeamSolarSchPtr( BeamSolarSchPtr ),
-			DiffuseSolarSchPtr( DiffuseSolarSchPtr ),
-			TauB( TauB ),
-			TauD( TauD ),
-			DailyWBRange( DailyWBRange ),
-			PressureEntered( PressureEntered ),
-			DewPointNeedsSet( DewPointNeedsSet )
-		{}
-
 	};
 
 	struct RunPeriodData
@@ -529,59 +461,6 @@ namespace WeatherManager {
 			RollDayTypeOnRepeat( true ),
 			TreatYearsAsConsecutive( true ),
 			ActualWeather( false )
-		{}
-
-		// Member Constructor
-		RunPeriodData(
-			std::string const & Title,
-			std::string const & PeriodType,
-			int const TotalDays, // total number of days in requested period
-			int const StartMonth,
-			int const StartDay,
-			int const StartDate, // Calculated start date (Julian) for a weather file run period
-			int const StartYear, // entered in "consecutive"/real runperiod object
-			int const EndMonth,
-			int const EndDay,
-			int const EndDate, // Calculated end date (Julian) for a weather file run period
-			int const EndYear, // entered in "consecutive"/real runperiod object
-			int const DayOfWeek, // Day of Week that the RunPeriod will start on (User Input)
-			bool const UseDST, // True if DaylightSavingTime is used for this RunPeriod
-			bool const UseHolidays, // True if Holidays are used for this RunPeriod (from WeatherFile)
-			bool const ApplyWeekendRule, // True if "Weekend Rule" is to be applied to RunPeriod
-			bool const UseRain, // True if Rain from weather file should be used (set rain to true)
-			bool const UseSnow, // True if Snow from weather file should be used (set Snow to true)
-			Array1_int const & MonWeekDay,
-			int const NumSimYears, // Total Number of years of simulation to be performed
-			int const BeginYear, // Start year entered in regular RunPeriod object
-			bool const IsLeapYear, // True if Begin Year is leap year.
-			bool const RollDayTypeOnRepeat, // If repeating run period, increment day type on repeat.
-			bool const TreatYearsAsConsecutive, // When year rolls over, increment year and recalculate Leap Year
-			bool const ActualWeather // true when using actual weather data
-		) :
-			Title( Title ),
-			PeriodType( PeriodType ),
-			TotalDays( TotalDays ),
-			StartMonth( StartMonth ),
-			StartDay( StartDay ),
-			StartDate( StartDate ),
-			StartYear( StartYear ),
-			EndMonth( EndMonth ),
-			EndDay( EndDay ),
-			EndDate( EndDate ),
-			EndYear( EndYear ),
-			DayOfWeek( DayOfWeek ),
-			UseDST( UseDST ),
-			UseHolidays( UseHolidays ),
-			ApplyWeekendRule( ApplyWeekendRule ),
-			UseRain( UseRain ),
-			UseSnow( UseSnow ),
-			MonWeekDay( 12, MonWeekDay ),
-			NumSimYears( NumSimYears ),
-			BeginYear( BeginYear ),
-			IsLeapYear( IsLeapYear ),
-			RollDayTypeOnRepeat( RollDayTypeOnRepeat ),
-			TreatYearsAsConsecutive( TreatYearsAsConsecutive ),
-			ActualWeather( ActualWeather )
 		{}
 
 	};
@@ -648,35 +527,6 @@ namespace WeatherManager {
 			Used( false )
 		{}
 
-		// Member Constructor
-		SpecialDayData(
-			std::string const & Name, // Name
-			int const DateType, // Date type as read in from IDF
-			int const Month, // Start Month
-			int const Day, // Start Day of month or Count for DateTypes=NthDayOfMonth
-			int const WeekDay, // For Date types=NthDayOfMonth and LastDayOfMonth
-			int const CompDate, // Start Date in "compressed date" format, only if Month/Day
-			bool const WthrFile, // True if this Special Day came from weather file (EPW)
-			int const Duration, // Number of days this special Day is used for
-			int const DayType, // Day Type desigation for this Special Day period
-			int const ActStMon,
-			int const ActStDay,
-			bool const Used // Set to true in a run period after use (NthDayOfMonth and LastDayOfMonth only)
-		) :
-			Name( Name ),
-			DateType( DateType ),
-			Month( Month ),
-			Day( Day ),
-			WeekDay( WeekDay ),
-			CompDate( CompDate ),
-			WthrFile( WthrFile ),
-			Duration( Duration ),
-			DayType( DayType ),
-			ActStMon( ActStMon ),
-			ActStDay( ActStDay ),
-			Used( Used )
-		{}
-
 	};
 
 	struct DataPeriodData
@@ -715,41 +565,6 @@ namespace WeatherManager {
 			HasYearData( false )
 		{}
 
-		// Member Constructor
-		DataPeriodData(
-			std::string const & Name, // DataPeriod Title
-			std::string const & DayOfWeek, // Start Day of Week for DataPeriod
-			int const NumYearsData, // Number of years for which data is present in EPW.
-			int const WeekDay,
-			int const StMon,
-			int const StDay,
-			int const StYear,
-			int const EnMon,
-			int const EnDay,
-			int const EnYear,
-			int const NumDays,
-			Array1_int const & MonWeekDay,
-			int const DataStJDay,
-			int const DataEnJDay,
-			bool const HasYearData
-		) :
-			Name( Name ),
-			DayOfWeek( DayOfWeek ),
-			NumYearsData( NumYearsData ),
-			WeekDay( WeekDay ),
-			StMon( StMon ),
-			StDay( StDay ),
-			StYear( StYear ),
-			EnMon( EnMon ),
-			EnDay( EnDay ),
-			EnYear( EnYear ),
-			NumDays( NumDays ),
-			MonWeekDay( 12, MonWeekDay ),
-			DataStJDay( DataStJDay ),
-			DataEnJDay( DataEnJDay ),
-			HasYearData( HasYearData )
-		{}
-
 	};
 
 	struct DaylightSavingPeriodData
@@ -774,27 +589,6 @@ namespace WeatherManager {
 			EnMon( 0 ),
 			EnDay( 0 ),
 			EnWeekDay( 0 )
-		{}
-
-		// Member Constructor
-		DaylightSavingPeriodData(
-			int const StDateType, // Start Date type as from EPW or IDF
-			int const StWeekDay, // For DateTypes=NthDayOfMonth or LastDayOfMonth
-			int const StMon, // DaylightSavingTime (DST) Start Month
-			int const StDay, // DaylightSavingTime (DST) Start Day
-			int const EnDateType, // End Date type as from EPW or IDF
-			int const EnMon, // DaylightSavingTime (DST) End Month
-			int const EnDay, // DaylightSavingTime (DST) End Day
-			int const EnWeekDay // For DateTypes=NthDayOfMonth or LastDayOfMonth
-		) :
-			StDateType( StDateType ),
-			StWeekDay( StWeekDay ),
-			StMon( StMon ),
-			StDay( StDay ),
-			EnDateType( EnDateType ),
-			EnMon( EnMon ),
-			EnDay( EnDay ),
-			EnWeekDay( EnWeekDay )
 		{}
 
 	};
@@ -839,43 +633,6 @@ namespace WeatherManager {
 			DaysLastSnow( 0 ),
 			Albedo( 0.0 ),
 			LiquidPrecip( 0.0 )
-		{}
-
-		// Member Constructor
-		MissingData(
-			Real64 const DryBulb, // Dry Bulb Temperature (C)
-			Real64 const DewPoint, // Dew Point Temperature (C)
-			int const RelHumid, // Relative Humidity (%)
-			Real64 const StnPres, // Atmospheric Pressure (Pa)
-			int const WindDir, // Wind Direction (deg)
-			Real64 const WindSpd, // Wind Speed/Velocity (m/s)
-			int const TotSkyCvr, // Total Sky Cover (tenths)
-			int const OpaqSkyCvr, // Opaque Sky Cover (tenths)
-			Real64 const Visibility, // Visibility (km)
-			int const Ceiling, // Ceiling Height (m)
-			int const PrecipWater, // Precipitable Water (mm)
-			Real64 const AerOptDepth, // Aerosol Optical Depth
-			int const SnowDepth, // Snow Depth (cm)
-			int const DaysLastSnow, // Number of Days since last snow
-			Real64 const Albedo, // Albedo
-			Real64 const LiquidPrecip // Rain/Liquid Precipitation (mm)
-		) :
-			DryBulb( DryBulb ),
-			DewPoint( DewPoint ),
-			RelHumid( RelHumid ),
-			StnPres( StnPres ),
-			WindDir( WindDir ),
-			WindSpd( WindSpd ),
-			TotSkyCvr( TotSkyCvr ),
-			OpaqSkyCvr( OpaqSkyCvr ),
-			Visibility( Visibility ),
-			Ceiling( Ceiling ),
-			PrecipWater( PrecipWater ),
-			AerOptDepth( AerOptDepth ),
-			SnowDepth( SnowDepth ),
-			DaysLastSnow( DaysLastSnow ),
-			Albedo( Albedo ),
-			LiquidPrecip( LiquidPrecip )
 		{}
 
 	};
@@ -930,49 +687,6 @@ namespace WeatherManager {
 			LiquidPrecip( 0 )
 		{}
 
-		// Member Constructor
-		MissingDataCounts(
-			int const DryBulb, // Dry Bulb Temperature (C)
-			int const DewPoint, // Dew Point Temperature (C)
-			int const RelHumid, // Relative Humidity (%)
-			int const StnPres, // Atmospheric Pressure (Pa)
-			int const WindDir, // Wind Direction (deg)
-			int const WindSpd, // Wind Speed/Velocity (m/s)
-			int const DirectRad, // Direct Radiation (wh/m2)
-			int const DiffuseRad, // Diffuse Radiation (wh/m2)
-			int const TotSkyCvr, // Total Sky Cover (tenths)
-			int const OpaqSkyCvr, // Opaque Sky Cover (tenths)
-			int const Visibility, // Visibility (km)
-			int const Ceiling, // Ceiling Height (m)
-			int const PrecipWater, // Precipitable Water (mm)
-			int const AerOptDepth, // Aerosol Optical Depth
-			int const SnowDepth, // Snow Depth (cm)
-			int const DaysLastSnow, // Number of Days since last snow
-			int const WeathCodes, // Weather codes invalid
-			int const Albedo, // Albedo
-			int const LiquidPrecip // Liquid Precip Depth
-		) :
-			DryBulb( DryBulb ),
-			DewPoint( DewPoint ),
-			RelHumid( RelHumid ),
-			StnPres( StnPres ),
-			WindDir( WindDir ),
-			WindSpd( WindSpd ),
-			DirectRad( DirectRad ),
-			DiffuseRad( DiffuseRad ),
-			TotSkyCvr( TotSkyCvr ),
-			OpaqSkyCvr( OpaqSkyCvr ),
-			Visibility( Visibility ),
-			Ceiling( Ceiling ),
-			PrecipWater( PrecipWater ),
-			AerOptDepth( AerOptDepth ),
-			SnowDepth( SnowDepth ),
-			DaysLastSnow( DaysLastSnow ),
-			WeathCodes( WeathCodes ),
-			Albedo( Albedo ),
-			LiquidPrecip( LiquidPrecip )
-		{}
-
 	};
 
 	struct RangeDataCounts // This Derived type carries the counts of out of range
@@ -1001,27 +715,6 @@ namespace WeatherManager {
 			WindSpd( 0 ),
 			DirectRad( 0 ),
 			DiffuseRad( 0 )
-		{}
-
-		// Member Constructor
-		RangeDataCounts(
-			int const DryBulb, // Dry Bulb Temperature (C)
-			int const DewPoint, // Dew Point Temperature (C)
-			int const RelHumid, // Relative Humidity (%)
-			int const StnPres, // Atmospheric Pressure (Pa)
-			int const WindDir, // Wind Direction (deg)
-			int const WindSpd, // Wind Speed/Velocity (m/s)
-			int const DirectRad, // Direct Radiation (wh/m2)
-			int const DiffuseRad // Diffuse Radiation (wh/m2)
-		) :
-			DryBulb( DryBulb ),
-			DewPoint( DewPoint ),
-			RelHumid( RelHumid ),
-			StnPres( StnPres ),
-			WindDir( WindDir ),
-			WindSpd( WindSpd ),
-			DirectRad( DirectRad ),
-			DiffuseRad( DiffuseRad )
 		{}
 
 	};
@@ -1054,37 +747,6 @@ namespace WeatherManager {
 			EndJDay( 0 )
 		{}
 
-		// Member Constructor
-		TypicalExtremeData(
-			std::string const & Title, // Environment name
-			std::string const & ShortTitle, // Environment name
-			std::string const & MatchValue, // String to be matched for input/running these periods for design.
-			std::string const & MatchValue1, // String to be also matched (synonym)
-			std::string const & MatchValue2, // String to be also matched (synonym)
-			std::string const & TEType, // Typical or Extreme
-			int const TotalDays, // Number of days in environment
-			int const StartJDay, // Day of year of first day of environment
-			int const StartMonth,
-			int const StartDay,
-			int const EndMonth,
-			int const EndDay,
-			int const EndJDay
-		) :
-			Title( Title ),
-			ShortTitle( ShortTitle ),
-			MatchValue( MatchValue ),
-			MatchValue1( MatchValue1 ),
-			MatchValue2( MatchValue2 ),
-			TEType( TEType ),
-			TotalDays( TotalDays ),
-			StartJDay( StartJDay ),
-			StartMonth( StartMonth ),
-			StartDay( StartDay ),
-			EndMonth( EndMonth ),
-			EndDay( EndDay ),
-			EndJDay( EndJDay )
-		{}
-
 	};
 
 	struct WeatherProperties
@@ -1103,23 +765,6 @@ namespace WeatherManager {
 			CalculationType( 0 ),
 			SchedulePtr( 0 ),
 			UsedForEnvrn( false )
-		{}
-
-		// Member Constructor
-		WeatherProperties(
-			std::string const & Name, // Reference Name
-			std::string const & ScheduleName, // Schedule Name or Algorithm Name
-			bool const IsSchedule, // Default is using Schedule
-			int const CalculationType,
-			int const SchedulePtr, // pointer to schedule when used
-			bool const UsedForEnvrn
-		) :
-			Name( Name ),
-			ScheduleName( ScheduleName ),
-			IsSchedule( IsSchedule ),
-			CalculationType( CalculationType ),
-			SchedulePtr( SchedulePtr ),
-			UsedForEnvrn( UsedForEnvrn )
 		{}
 
 	};
@@ -1437,29 +1082,6 @@ namespace WeatherManager {
 
 	int
 	CalculateDayOfWeek( int const JulianDate ); // from JGDate calculation
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WeatherManager
 

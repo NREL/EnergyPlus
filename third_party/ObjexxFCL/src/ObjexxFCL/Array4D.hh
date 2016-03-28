@@ -5,18 +5,20 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array4D.fwd.hh>
 #include <ObjexxFCL/Array4.hh>
-#include <ObjexxFCL/ArrayInitializer.hh>
+
+// C++ Headers
+#include <functional>
 
 namespace ObjexxFCL {
 
@@ -39,7 +41,9 @@ public: // Types
 
 	typedef  typename Super::Base  Base;
 	typedef  typename Super::Tail  Tail;
+	typedef  typename Super::Traits  Traits;
 	typedef  typename Super::IR  IR;
+	typedef  typename Super::Initializer  Initializer;
 
 	// STL Style
 	typedef  typename Super::value_type  value_type;
@@ -67,9 +71,9 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	typedef  ArrayInitializer< T, ObjexxFCL::Array4D >  Initializer;
-	typedef  typename Initializer::Function  InitializerFunction;
+	typedef  std::function< void( Array4D< T > & ) >  InitializerFunction;
 
+	using Super::assign;
 	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
@@ -88,6 +92,7 @@ public: // Types
 	using Super::operator [];
 	using Super::resize;
 	using Super::shift_set;
+	using Super::shift_only_set;
 	using Super::size1;
 	using Super::size2;
 	using Super::size3;
@@ -114,19 +119,16 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Array4D()
 	{}
 
 	// Copy Constructor
-	inline
 	Array4D( Array4D const & a ) :
 	 Super( a ),
 	 initializer_( a.initializer_ )
 	{}
 
 	// Move Constructor
-	inline
 	Array4D( Array4D && a ) NOEXCEPT :
 	 Super( std::move( a ) ),
 	 initializer_( a.initializer_ )
@@ -136,7 +138,6 @@ public: // Creation
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Array4D( Array4D< U > const & a ) :
 	 Super( a ),
@@ -145,7 +146,6 @@ public: // Creation
 
 	// Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Array4D( Array4< U > const & a ) :
 	 Super( a )
@@ -153,13 +153,12 @@ public: // Creation
 
 	// Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Array4D( Array4S< U > const & a ) :
 	 Super( a )
 	{
 		setup_real();
-		size_type l( 0 );
+		size_type l( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -173,13 +172,12 @@ public: // Creation
 
 	// MArray Constructor Template
 	template< class A, typename M >
-	inline
 	explicit
 	Array4D( MArray4< A, M > const & a ) :
 	 Super( a )
 	{
 		setup_real();
-		size_type l( 0 );
+		size_type l( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -192,14 +190,13 @@ public: // Creation
 	}
 
 	// Sticky Initializer Value Constructor
-	inline
+	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
 	explicit
-	Array4D( Sticky< T > const & t ) :
-	 initializer_( t )
+	Array4D( Sticky< S > const & s ) :
+	 initializer_( s )
 	{}
 
 	// IndexRange Constructor
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4 ) :
 	 Super( I1, I2, I3, I4 )
 	{
@@ -207,105 +204,102 @@ public: // Creation
 	}
 
 	// IndexRange + Initializer Value Constructor
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, T const & t ) :
-	 Super( I1, I2, I3, I4, InitializerSentinel() ),
-	 initializer_( t )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
 		setup_real();
-		initialize();
+		initialize( t );
 	}
 
 	// IndexRange + Sticky Initializer Value Constructor
-	inline
-	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< T > const & t ) :
+	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< S > const & s ) :
 	 Super( I1, I2, I3, I4, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
 		setup_real();
-		initialize();
+		initialize( s );
 	}
 
 	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	inline
-	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< T > const & t, T const & u ) :
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< S > const & s, U const & u ) :
 	 Super( I1, I2, I3, I4, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
 		setup_real();
-		initialize();
-		operator =( u );
+		initialize( s );
+		assign( u );
 	}
 
 	// IndexRange + Initializer Function Constructor
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, InitializerFunction const & fxn ) :
-	 Super( I1, I2, I3, I4, InitializerSentinel() ),
-	 initializer_( fxn )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
 		setup_real();
-		initialize();
+		initialize( fxn );
+	}
+
+	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
+	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< S > const & s, InitializerFunction const & fxn ) :
+	 Super( I1, I2, I3, I4, InitializerSentinel() ),
+	 initializer_( s )
+	{
+		setup_real();
+		initialize( fxn );
 	}
 
 	// IndexRange + Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, std::initializer_list< U > const l ) :
 	 Super( I1, I2, I3, I4, l )
 	{
 		setup_real();
 	}
 
-	// IndexRange + Sticky Initializer + Initializer List Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
-	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< T > const & t, std::initializer_list< U > const l ) :
+	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< S > const & s, std::initializer_list< U > const l ) :
 	 Super( I1, I2, I3, I4, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
 		assert( size_ == l.size() );
 		setup_real();
-		initialize();
+		initialize( s );
 		std::copy( l.begin(), l.end(), data_ );
 	}
 
 	// IndexRange + Super Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Array4< U > const & a ) :
-	 Super( I1, I2, I3, I4 )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		for ( size_type i = 0, e = size_; i < e; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
-	// IndexRange + Sticky Initializer + Super Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
-	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< T > const & t, Array4< U > const & a ) :
+	// IndexRange + Sticky Initializer Value + Super Constructor Template
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Sticky< S > const & s, Array4< U > const & a ) :
 	 Super( I1, I2, I3, I4, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
-		setup_real();
-		initialize();
 		assert( conformable( a ) );
-		for ( size_type i = 0, e = size_; i < e; ++i ) {
-			data_[ i ] = a[ i ];
-		}
+		setup_real();
+		initialize( s );
+		assign( a );
 	}
 
 	// IndexRange + Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Array4S< U > const & a ) :
-	 Super( I1, I2, I3, I4 )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		size_type l( 0 );
+		setup_real();
+		size_type l( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -319,13 +313,12 @@ public: // Creation
 
 	// IndexRange + MArray Constructor Template
 	template< class A, typename M >
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, MArray4< A, M > const & a ) :
-	 Super( I1, I2, I3, I4 )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		size_type l( 0 );
+		setup_real();
+		size_type l( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -339,46 +332,36 @@ public: // Creation
 
 	// Super + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array4D( Array4< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4 ) :
-	 Super( I1, I2, I3, I4 )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		for ( size_type i = 0, e = size_; i < e; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
 	// IndexRange + Base Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Array< U > const & a ) :
-	 Super( I1, I2, I3, I4 )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
-		setup_real();
 		assert( size_ == a.size() );
-		for ( size_type i = 0, e = size_; i < e; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
 	// Base + IndexRange Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array4D( Array< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4 ) :
-	 Super( I1, I2, I3, I4 )
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
 	{
-		setup_real();
 		assert( size_ == a.size() );
-		for ( size_type i = 0, e = size_; i < e; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
-	// Range Named Constructor Template
+	// Array Range Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	range( Array4< U > const & a )
@@ -386,9 +369,8 @@ public: // Creation
 		return Array4D( a.I1_, a.I2_, a.I3_, a.I4_ );
 	}
 
-	// Range + Initializer Value Named Constructor Template
+	// Array Range + Initializer Value Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	range( Array4< U > const & a, T const & t )
@@ -398,7 +380,6 @@ public: // Creation
 
 	// Array Shape Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	shape( Array4< U > const & a )
@@ -408,7 +389,6 @@ public: // Creation
 
 	// Array Shape + Initializer Value Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	shape( Array4< U > const & a, T const & t )
@@ -418,7 +398,6 @@ public: // Creation
 
 	// Slice Shape Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	shape( Array4S< U > const & a )
@@ -428,7 +407,6 @@ public: // Creation
 
 	// Slice Shape + Initializer Value Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	shape( Array4S< U > const & a, T const & t )
@@ -438,7 +416,6 @@ public: // Creation
 
 	// MArray Shape Named Constructor Template
 	template< class A, typename M >
-	inline
 	static
 	Array4D
 	shape( MArray4< A, M > const & a )
@@ -448,7 +425,6 @@ public: // Creation
 
 	// MArray Shape + Initializer Value Named Constructor Template
 	template< class A, typename M >
-	inline
 	static
 	Array4D
 	shape( MArray4< A, M > const & a, T const & t )
@@ -458,7 +434,6 @@ public: // Creation
 
 	// One-Based Copy Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	one_based( Array4< U > const & a )
@@ -468,7 +443,6 @@ public: // Creation
 
 	// One-Based Slice Named Constructor Template
 	template< typename U >
-	inline
 	static
 	Array4D
 	one_based( Array4S< U > const & a )
@@ -478,7 +452,6 @@ public: // Creation
 
 	// One-Based MArray Named Constructor Template
 	template< class A, typename M >
-	inline
 	static
 	Array4D
 	one_based( MArray4< A, M > const & a )
@@ -487,27 +460,46 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~Array4D()
 	{}
 
+private: // Creation
+
+	// IndexRange Raw Constructor
+	explicit
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, InitializerSentinel const & initialized ) :
+	 Super( I1, I2, I3, I4, initialized )
+	{
+		setup_real();
+	}
+
+	// IndexRange Raw Initializer Constructor
+	explicit
+	Array4D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, Initializer const & initializer ) :
+	 Super( I1, I2, I3, I4, InitializerSentinel() )
+	{
+		setup_real();
+		initialize( initializer );
+	}
+
 public: // Assignment: Array
 
 	// Copy Assignment
-	inline
 	Array4D &
 	operator =( Array4D const & a )
 	{
 		if ( this != &a ) {
-			if ( ! conformable( a ) ) size_real( a.I1_, a.I2_, a.I3_, a.I4_ );
-			Base::operator =( a );
+			if ( ( conformable( a ) ) || ( ! size_real( a.I1_, a.I2_, a.I3_, a.I4_ ) ) ) {
+				Base::operator =( a );
+			} else {
+				Base::initialize( a );
+			}
 		}
 		return *this;
 	}
 
 	// Move Assignment
-	inline
 	Array4D &
 	operator =( Array4D && a ) NOEXCEPT
 	{
@@ -529,31 +521,34 @@ public: // Assignment: Array
 	}
 
 	// Super Assignment
-	inline
 	Array4D &
 	operator =( Super const & a )
 	{
 		if ( this != &a ) {
-			if ( ! conformable( a ) ) size_real( a.I1_, a.I2_, a.I3_, a.I4_ );
-			Base::operator =( a );
+			if ( ( conformable( a ) ) || ( ! size_real( a.I1_, a.I2_, a.I3_, a.I4_ ) ) ) {
+				Base::operator =( a );
+			} else {
+				Base::initialize( a );
+			}
 		}
 		return *this;
 	}
 
 	// Super Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator =( Array4< U > const & a )
 	{
-		if ( ! conformable( a ) ) size_real( a.I1_, a.I2_, a.I3_, a.I4_ );
-		Base::operator =( a );
+		if ( ( conformable( a ) ) || ( ! size_real( a.I1_, a.I2_, a.I3_, a.I4_ ) ) ) {
+			Base::operator =( a );
+		} else {
+			Base::initialize( a );
+		}
 		return *this;
 	}
 
 	// Slice Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator =( Array4S< U > const & a )
 	{
@@ -563,7 +558,6 @@ public: // Assignment: Array
 
 	// MArray Assignment Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	operator =( MArray4< A, M > const & a )
 	{
@@ -573,7 +567,6 @@ public: // Assignment: Array
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator =( std::initializer_list< U > const l )
 	{
@@ -583,7 +576,6 @@ public: // Assignment: Array
 
 	// += Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator +=( Array4< U > const & a )
 	{
@@ -593,7 +585,6 @@ public: // Assignment: Array
 
 	// -= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator -=( Array4< U > const & a )
 	{
@@ -603,7 +594,6 @@ public: // Assignment: Array
 
 	// *= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator *=( Array4< U > const & a )
 	{
@@ -613,7 +603,6 @@ public: // Assignment: Array
 
 	// /= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator /=( Array4< U > const & a )
 	{
@@ -623,7 +612,6 @@ public: // Assignment: Array
 
 	// += Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator +=( Array4S< U > const & a )
 	{
@@ -633,7 +621,6 @@ public: // Assignment: Array
 
 	// -= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator -=( Array4S< U > const & a )
 	{
@@ -643,7 +630,6 @@ public: // Assignment: Array
 
 	// *= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator *=( Array4S< U > const & a )
 	{
@@ -653,7 +639,6 @@ public: // Assignment: Array
 
 	// /= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	operator /=( Array4S< U > const & a )
 	{
@@ -663,7 +648,6 @@ public: // Assignment: Array
 
 	// += MArray Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	operator +=( MArray4< A, M > const & a )
 	{
@@ -673,7 +657,6 @@ public: // Assignment: Array
 
 	// -= MArray Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	operator -=( MArray4< A, M > const & a )
 	{
@@ -683,7 +666,6 @@ public: // Assignment: Array
 
 	// *= MArray Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	operator *=( MArray4< A, M > const & a )
 	{
@@ -693,7 +675,6 @@ public: // Assignment: Array
 
 	// /= MArray Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	operator /=( MArray4< A, M > const & a )
 	{
@@ -705,7 +686,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	and_equals( Array4< U > const & a )
 	{
@@ -715,7 +695,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	or_equals( Array4< U > const & a )
 	{
@@ -725,7 +704,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	and_equals( Array4S< U > const & a )
 	{
@@ -735,7 +713,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array4D &
 	or_equals( Array4S< U > const & a )
 	{
@@ -745,7 +722,6 @@ public: // Assignment: Array: Logical
 
 	// &&= MArray Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	and_equals( MArray4< A, M > const & a )
 	{
@@ -755,7 +731,6 @@ public: // Assignment: Array: Logical
 
 	// ||= MArray Template
 	template< class A, typename M >
-	inline
 	Array4D &
 	or_equals( MArray4< A, M > const & a )
 	{
@@ -766,7 +741,6 @@ public: // Assignment: Array: Logical
 public: // Assignment: Value
 
 	// = Value
-	inline
 	Array4D &
 	operator =( T const & t )
 	{
@@ -775,7 +749,6 @@ public: // Assignment: Value
 	}
 
 	// += Value
-	inline
 	Array4D &
 	operator +=( T const & t )
 	{
@@ -784,7 +757,6 @@ public: // Assignment: Value
 	}
 
 	// -= Value
-	inline
 	Array4D &
 	operator -=( T const & t )
 	{
@@ -793,7 +765,6 @@ public: // Assignment: Value
 	}
 
 	// *= Value
-	inline
 	Array4D &
 	operator *=( T const & t )
 	{
@@ -802,7 +773,6 @@ public: // Assignment: Value
 	}
 
 	// /= Value
-	inline
 	Array4D &
 	operator /=( T const & t )
 	{
@@ -813,7 +783,6 @@ public: // Assignment: Value
 public: // Subscript
 
 	// Const Tail Starting at array( i1, i2, i3, i4 )
-	inline
 	Tail const
 	a( int const i1, int const i2, int const i3, int const i4 ) const
 	{
@@ -823,7 +792,6 @@ public: // Subscript
 	}
 
 	// Tail Starting at array( i1, i2, i3, i4 )
-	inline
 	Tail
 	a( int const i1, int const i2, int const i3, int const i4 )
 	{
@@ -835,17 +803,15 @@ public: // Subscript
 public: // Predicate
 
 	// Initializer Active?
-	inline
 	bool
 	initializer_active() const
 	{
-		return initializer_.is_active();
+		return initializer_.active();
 	}
 
 public: // Modifier
 
 	// Clear
-	inline
 	Array4D &
 	clear()
 	{
@@ -855,7 +821,6 @@ public: // Modifier
 	}
 
 	// Dimension by IndexRange
-	inline
 	Array4D &
 	allocate( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
@@ -865,7 +830,6 @@ public: // Modifier
 
 	// Dimension by Array Template
 	template< typename U >
-	inline
 	Array4D &
 	allocate( Array4< U > const & a )
 	{
@@ -874,17 +838,14 @@ public: // Modifier
 	}
 
 	// Deallocate
-	inline
 	Array4D &
 	deallocate()
 	{
 		Super::clear();
-		initializer_.clear_nonsticky();
 		return *this;
 	}
 
 	// Dimension by IndexRange
-	inline
 	Array4D &
 	dimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
@@ -893,7 +854,6 @@ public: // Modifier
 	}
 
 	// Dimension by IndexRange + Initializer Value
-	inline
 	Array4D &
 	dimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4, T const & t )
 	{
@@ -902,7 +862,6 @@ public: // Modifier
 	}
 
 	// Dimension by IndexRange + Initializer Function
-	inline
 	Array4D &
 	dimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4, InitializerFunction const & fxn )
 	{
@@ -912,7 +871,6 @@ public: // Modifier
 
 	// Dimension by Array Template
 	template< typename U >
-	inline
 	Array4D &
 	dimension( Array4< U > const & a )
 	{
@@ -922,7 +880,6 @@ public: // Modifier
 
 	// Dimension by Array + Initializer Value Template
 	template< typename U >
-	inline
 	Array4D &
 	dimension( Array4< U > const & a, T const & t )
 	{
@@ -932,7 +889,6 @@ public: // Modifier
 
 	// Dimension by Array + Initializer Function Template
 	template< typename U >
-	inline
 	Array4D &
 	dimension( Array4< U > const & a, InitializerFunction const & fxn )
 	{
@@ -941,105 +897,78 @@ public: // Modifier
 	}
 
 	// Data-Preserving Redimension by IndexRange
-	inline
 	Array4D &
 	redimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
-		Array4D o( I1, I2, I3, I4 );
-		int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
-		int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
-		int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
-		int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					size_type l( index( i1, i2, i3, b4 ) );
-					size_type m( o.index( i1, i2, i3, b4 ) );
-					for ( int i4 = b4; i4 <= e4; ++i4, ++l, ++m ) {
-						o[ m ] = move_if( operator []( l ) );
+		if ( size_ == 0u ) { // No data
+			return dimension( I1, I2, I3, I4 );
+		} else { // Allocate new space
+			Array4D o( I1, I2, I3, I4, initializer_ );
+			int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
+			int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
+			int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
+			int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
+			for ( int i1 = b1; i1 <= e1; ++i1 ) {
+				for ( int i2 = b2; i2 <= e2; ++i2 ) {
+					for ( int i3 = b3; i3 <= e3; ++i3 ) {
+						size_type l( index( i1, i2, i3, b4 ) );
+						size_type m( o.index( i1, i2, i3, b4 ) );
+						for ( int i4 = b4; i4 <= e4; ++i4, ++l, ++m ) {
+							o[ m ] = move_if( operator []( l ) );
+						}
 					}
 				}
 			}
+			swap4( o );
+			return *this;
 		}
-		return swap( o );
 	}
 
 	// Data-Preserving Redimension by IndexRange + Fill Value
-	inline
 	Array4D &
 	redimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4, T const & t )
 	{
-		Array4D o( I1, I2, I3, I4, t );
-		int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
-		int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
-		int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
-		int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					size_type l( index( i1, i2, i3, b4 ) );
-					size_type m( o.index( i1, i2, i3, b4 ) );
-					for ( int i4 = b4; i4 <= e4; ++i4, ++l, ++m ) {
-						o[ m ] = move_if( operator []( l ) );
+		if ( size_ == 0u ) { // No data
+			return dimension( I1, I2, I3, I4, t );
+		} else { // Allocate new space
+			Array4D o( I1, I2, I3, I4, t );
+			int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
+			int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
+			int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
+			int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
+			for ( int i1 = b1; i1 <= e1; ++i1 ) {
+				for ( int i2 = b2; i2 <= e2; ++i2 ) {
+					for ( int i3 = b3; i3 <= e3; ++i3 ) {
+						size_type l( index( i1, i2, i3, b4 ) );
+						size_type m( o.index( i1, i2, i3, b4 ) );
+						for ( int i4 = b4; i4 <= e4; ++i4, ++l, ++m ) {
+							o[ m ] = move_if( operator []( l ) );
+						}
 					}
 				}
 			}
+			swap4( o );
+			return *this;
 		}
-		return swap( o );
 	}
 
 	// Data-Preserving Redimension by Array Template
 	template< typename U >
-	inline
 	Array4D &
 	redimension( Array4< U > const & a )
 	{
-		Array4D o( a.I1_, a.I2_, a.I3_, a.I4_ );
-		int const b1( std::max( a.l1(), l1() ) ), e1( std::min( a.u1(), u1() ) );
-		int const b2( std::max( a.l2(), l2() ) ), e2( std::min( a.u2(), u2() ) );
-		int const b3( std::max( a.l3(), l3() ) ), e3( std::min( a.u3(), u3() ) );
-		int const b4( std::max( a.l4(), l4() ) ), e4( std::min( a.u4(), u4() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					size_type l( index( i1, i2, i3, b4 ) );
-					size_type m( o.index( i1, i2, i3, b4 ) );
-					for ( int i4 = b4; i4 <= e4; ++i4, ++l, ++m ) {
-						o[ m ] = move_if( operator []( l ) );
-					}
-				}
-			}
-		}
-		return swap( o );
+		return redimension( a.I1_, a.I2_, a.I3_, a.I4_ );
 	}
 
 	// Data-Preserving Redimension by Array + Fill Value Template
 	template< typename U >
-	inline
 	Array4D &
 	redimension( Array4< U > const & a, T const & t )
 	{
-		Array4D o( a.I1_, a.I2_, a.I3_, a.I4_, t );
-		int const b1( std::max( a.l1(), l1() ) ), e1( std::min( a.u1(), u1() ) );
-		int const b2( std::max( a.l2(), l2() ) ), e2( std::min( a.u2(), u2() ) );
-		int const b3( std::max( a.l3(), l3() ) ), e3( std::min( a.u3(), u3() ) );
-		int const b4( std::max( a.l4(), l4() ) ), e4( std::min( a.u4(), u4() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					size_type l( index( i1, i2, i3, b4 ) );
-					size_type m( o.index( i1, i2, i3, b4 ) );
-					for ( int i4 = b4; i4 <= e4; ++i4, ++l, ++m ) {
-						o[ m ] = move_if( operator []( l ) );
-					}
-				}
-			}
-		}
-		return swap( o );
+		return redimension( a.I1_, a.I2_, a.I3_, a.I4_, t );
 	}
 
 	// Set Initializer Value
-	inline
 	Array4D &
 	initializer( T const & t )
 	{
@@ -1047,17 +976,16 @@ public: // Modifier
 		return *this;
 	}
 
-	// Set Initializer Function
-	inline
+	// Set Initializer Sticky Value
+	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
 	Array4D &
-	initializer( InitializerFunction const & fxn )
+	initializer( Sticky< S > const & s )
 	{
-		initializer_ = fxn;
+		initializer_ = s;
 		return *this;
 	}
 
 	// Clear Initializer
-	inline
 	Array4D &
 	initializer_clear()
 	{
@@ -1065,23 +993,7 @@ public: // Modifier
 		return *this;
 	}
 
-	// Initialize
-	inline
-	Array4D &
-	initialize()
-	{
-		if ( initializer_.is_active() ) {
-			if ( initializer_.is_value() ) {
-				initialize( initializer_.value() );
-			} else if ( initializer_.is_function() ) {
-				initializer_.function()( *this );
-			}
-		}
-		return *this;
-	}
-
 	// Swap
-	inline
 	Array4D &
 	swap( Array4D & v )
 	{
@@ -1094,17 +1006,59 @@ public: // Modifier
 protected: // Functions
 
 	// Dimension by IndexRange
-	inline
-	void
+	bool
 	dimension_assign( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
-		size_real( I1, I2, I3, I4 );
+		return size_real( I1, I2, I3, I4 );
+	}
+
+	// Initialize to Default State
+	void
+	initialize()
+	{
+		if ( initializer_.active() ) { // Sticky initialize
+			T const fill( initializer_() );
+			for ( size_type i = 0; i < size_; ++i ) {
+				new ( data_ + i ) T( fill );
+			}
+		} else { // Default initialize
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
+#else
+			for ( size_type i = 0; i < size_; ++i ) {
+				new ( data_ + i ) T;
+			}
+#endif
+		}
+	}
+
+	// Initialize by Function
+	void
+	initialize( InitializerFunction const & fxn )
+	{
+		initialize();
+		fxn( *this );
+	}
+
+	// Assignment to Default State
+	void
+	assign()
+	{
+		if ( initializer_.active() ) { // Sticky initialize
+			T const fill( initializer_() );
+			for ( size_type i = 0; i < size_; ++i ) {
+				data_[ i ] = fill;
+			}
+		} else { // Default initialize
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			std::fill_n( data_, size_, Traits::initial_array_value() );
+#endif
+		}
 	}
 
 private: // Functions
 
 	// Set Up for IndexRange Constructor
-	inline
 	void
 	setup_real()
 	{
@@ -1112,8 +1066,7 @@ private: // Functions
 	}
 
 	// Size by IndexRange
-	inline
-	void
+	bool
 	size_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
 		I1_.assign( I1 );
@@ -1124,38 +1077,40 @@ private: // Functions
 		z2_ = I2_.size();
 		z3_ = I3_.size();
 		z4_ = I4_.size();
-		resize( size_of( z1_, z2_, z3_, z4_ ) );
-		setup_real();
+		shift_only_set( ( ( ( ( ( I1_.l() * z2_ ) + I2_.l() ) * z3_ ) + I3_.l() ) * z4_ ) + I4_.l() );
+		return resize( size_of( z1_, z2_, z3_, z4_ ) );
 	}
 
 	// Dimension by IndexRange
-	inline
 	void
 	dimension_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
-		size_real( I1, I2, I3, I4 );
-		initializer_.clear_nonsticky();
-		initialize();
+		if ( size_real( I1, I2, I3, I4 ) ) {
+			initialize();
+		} else {
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			assign();
+#endif
+		}
 	}
 
 	// Dimension by IndexRange + Initializer Value
-	inline
 	void
 	dimension_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4, T const & t )
 	{
-		size_real( I1, I2, I3, I4 );
-		initializer_ = t;
-		initialize();
+		if ( size_real( I1, I2, I3, I4 ) ) {
+			initialize( t );
+		} else {
+			assign( t );
+		}
 	}
 
 	// Dimension by IndexRange + Initializer Function
-	inline
 	void
 	dimension_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4, InitializerFunction const & fxn )
 	{
-		size_real( I1, I2, I3, I4 );
-		initializer_ = fxn;
-		initialize();
+		if ( size_real( I1, I2, I3, I4 ) ) initialize();
+		fxn( *this );
 	}
 
 private: // Data
@@ -1377,7 +1332,7 @@ operator ==( Array4S< T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1398,7 +1353,7 @@ operator !=( Array4S< T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1419,7 +1374,7 @@ operator <( Array4S< T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1440,7 +1395,7 @@ operator <=( Array4S< T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1461,7 +1416,7 @@ operator >( Array4S< T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1482,7 +1437,7 @@ operator >=( Array4S< T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1503,7 +1458,7 @@ operator ==( Array4S< T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1524,7 +1479,7 @@ operator !=( Array4S< T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1545,7 +1500,7 @@ operator <( Array4S< T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1566,7 +1521,7 @@ operator <=( Array4S< T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1587,7 +1542,7 @@ operator >( Array4S< T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1608,7 +1563,7 @@ operator >=( Array4S< T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1682,7 +1637,7 @@ Array4D< bool >
 operator ==( Array4S< T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1702,7 +1657,7 @@ Array4D< bool >
 operator !=( Array4S< T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1722,7 +1677,7 @@ Array4D< bool >
 operator <( Array4S< T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1742,7 +1697,7 @@ Array4D< bool >
 operator <=( Array4S< T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1762,7 +1717,7 @@ Array4D< bool >
 operator >( Array4S< T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1782,7 +1737,7 @@ Array4D< bool >
 operator >=( Array4S< T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1859,7 +1814,7 @@ operator ==( MArray4< A, T > const & a, MArray4< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1880,7 +1835,7 @@ operator !=( MArray4< A, T > const & a, MArray4< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1901,7 +1856,7 @@ operator <( MArray4< A, T > const & a, MArray4< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1922,7 +1877,7 @@ operator <=( MArray4< A, T > const & a, MArray4< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1943,7 +1898,7 @@ operator >( MArray4< A, T > const & a, MArray4< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1964,7 +1919,7 @@ operator >=( MArray4< A, T > const & a, MArray4< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1985,7 +1940,7 @@ operator ==( MArray4< A, T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2006,7 +1961,7 @@ operator !=( MArray4< A, T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2027,7 +1982,7 @@ operator <( MArray4< A, T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2048,7 +2003,7 @@ operator <=( MArray4< A, T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2069,7 +2024,7 @@ operator >( MArray4< A, T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2090,7 +2045,7 @@ operator >=( MArray4< A, T > const & a, Array4< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2165,7 +2120,7 @@ operator ==( MArray4< A, T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2186,7 +2141,7 @@ operator !=( MArray4< A, T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2207,7 +2162,7 @@ operator <( MArray4< A, T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2228,7 +2183,7 @@ operator <=( MArray4< A, T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2249,7 +2204,7 @@ operator >( MArray4< A, T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2270,7 +2225,7 @@ operator >=( MArray4< A, T > const & a, Array4S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2344,7 +2299,7 @@ Array4D< bool >
 operator ==( MArray4< A, T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2364,7 +2319,7 @@ Array4D< bool >
 operator !=( MArray4< A, T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2384,7 +2339,7 @@ Array4D< bool >
 operator <( MArray4< A, T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2404,7 +2359,7 @@ Array4D< bool >
 operator <=( MArray4< A, T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2424,7 +2379,7 @@ Array4D< bool >
 operator >( MArray4< A, T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2444,7 +2399,7 @@ Array4D< bool >
 operator >=( MArray4< A, T > const & a, T const & t )
 {
 	Array4D< bool > r( Array4D< bool >::shape( a ) );
-	Array4D< bool >::size_type l( 0 );
+	Array4D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {

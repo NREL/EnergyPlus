@@ -1,0 +1,3640 @@
+\section{eplustbl.\textless{}ext\textgreater{}}\label{eplustbl.ext}
+
+The eplustbl file contains the tabular output results that are created when using the following objects:
+
+\begin{itemize}
+\item
+  Output:Table:SummaryReports
+\item
+  Output:Table:TimeBins
+\item
+  Output:Table:Monthly
+\item
+  UtilityCost:Tariff
+\item
+  ComponentCost:Line Item
+\end{itemize}
+
+The format and the extension for the file depends on the setting of the ColumnSeparator field of the Output:Table:Style object. The choices of HTML, tab, fixed, comma, and XML result in eplustbl.htm, eplustbl.tab, eplustbl.txt, eplustbl.csv, eplustbl.xml respectively. The HTML version of the report also includes a table of contents that allows easier navigation through the file.
+
+By default the energy units reported in all of the eplustbl files are in Joules (J) but the UnitConversion field of the Output:Table:Style object allows for the values to be reported in MJ, GJ or in kWh. In addition, the Output:Table:Style object can specify for the tables to be in IP units for all fields.
+
+\subsection{Output:Table:SummaryReports}\label{outputtablesummaryreports}
+
+Several predefined reports are available from the Output:Table:SummaryReports object including the following. (spaces are inserted in names for readability; keys are included in the Input Data Dictionary or by just removing the spaces):
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary
+\end{itemize}
+
+Lists all following applicable tables with ``Summary'' in the name.
+
+\begin{itemize}
+\tightlist
+\item
+  All Monthly
+\end{itemize}
+
+Lists all following applicable tables with ``Monthly'' in the name.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary And Monthly
+\end{itemize}
+
+Lists all following applicable tables with both ``Summary'' and ``Monthly'' in the name. This does not include the Zone Component Load Summary report.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary and Sizing Period
+\end{itemize}
+
+Lists the All Summary tables as well as the Zone Component Load report (currently the only Sizing Period report). Please note that the Zone Component Load report does increase the run time because it repeats sizing periods.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary Monthly and Sizing Period
+\end{itemize}
+
+Lists the All Summary tables, the Monthly tables as well as the Zone Component Load report (currently the only Sizing Period report). Please note that the Zone Component Load report does increase the run time because it repeats sizing periods.
+
+\begin{itemize}
+\item
+  Annual Building Utility Performance Summary
+\item
+  Input Verification and Results Summary
+\item
+  Demand End Use Components Summary
+\item
+  Source Energy End Use Components Summary
+\item
+  Climatic Data Summary
+\item
+  Equipment Summary
+\item
+  Envelope Summary
+\item
+  Surface Shadowing Summary
+\item
+  Shading Summary
+\item
+  Lighting Summary
+\item
+  HVAC Sizing Summary
+\item
+  System Summary
+\item
+  Component Sizing Summary
+\item
+  Outdoor Air Summary
+\item
+  Object Count Summary
+\item
+  Component Cost Economics Summary
+\item
+  Energy Meters
+\item
+  Sensible Heat Gain Summary
+\item
+  Standard 62.1 Summary
+\item
+  Zone Component Load Summary
+\item
+  Zone Cooling Summary Monthly
+\item
+  Zone Heating Summary Monthly
+\item
+  Zone Electric Summary Monthly
+\item
+  Space Gains Monthly
+\item
+  Peak Space Gains Monthly
+\item
+  Space Gain Components At Cooling Peak Monthly
+\item
+  Energy Consumption Electricity Natural Gas Monthly
+\item
+  Energy Consumption Electricity Generated Propane Monthly
+\item
+  Energy Consumption Diesel FuelOil Monthly
+\item
+  Energy Consumption District Heating Cooling Monthly
+\item
+  Energy Consumption Coal Gasoline Monthly
+\item
+  End Use Energy Consumption Electricity Monthly
+\item
+  End Use Energy Consumption NaturalGas Monthly
+\item
+  End Use Energy Consumption Diesel Monthly
+\item
+  End Use Energy Consumption FuelOil Monthly
+\item
+  End Use Energy Consumption Coal Monthly
+\item
+  End Use Energy Consumption Propane Monthly
+\item
+  End Use Energy Consumption Gasoline Monthly
+\item
+  Peak Energy End Use Electricity Part1 Monthly
+\item
+  Peak Energy End Use Electricity Part2 Monthly
+\item
+  Electric Components Of Peak Demand Monthly
+\item
+  Peak Energy End Use NaturalGas Monthly
+\item
+  Peak Energy End Use Diesel Monthly
+\item
+  Peak Energy End Use FuelOil Monthly
+\item
+  Peak Energy End Use Coal Monthly
+\item
+  Peak Energy End Use Propane Monthly
+\item
+  Peak Energy End Use Gasoline Monthly
+\item
+  Setpoints Not Met With Temperatures Monthly
+\item
+  Comfort Report Simple55 Monthly
+\item
+  Unglazed Transpired Solar Collector Summary Monthly
+\item
+  Occupant Comfort Data Summary Monthly
+\item
+  Chiller Report Monthly
+\item
+  Tower Report Monthly
+\item
+  Boiler Report Monthly
+\item
+  DX Report Monthly
+\item
+  Window Report Monthly
+\item
+  Window Energy Report Monthly
+\item
+  Window Zone Summary Monthly
+\item
+  Window Energy Zone Summary Monthly
+\item
+  Average Outdoor Conditions Monthly
+\item
+  Outdoor Conditions Maximum DryBulb Monthly
+\item
+  Outdoor Conditions Minimum DryBulb Monthly
+\item
+  Outdoor Conditions Maximum WetBulb Monthly
+\item
+  Outdoor Conditions Maximum DewPoint Monthly
+\item
+  Outdoor Ground Conditions Monthly
+\item
+  WindowAC Report Monthly
+\item
+  Water Heater Report Monthly
+\item
+  Generator Report Monthly
+\item
+  Daylighting Report Monthly
+\item
+  Coil Report Monthly
+\item
+  PlantLoop Demand Report Monthly
+\item
+  Fan Report Monthly
+\item
+  Pump Report Monthly
+\item
+  CondLoop Demand Report Monthly
+\item
+  Zone Temperature Oscillation Report Monthly
+\item
+  AirLoop System Energy And Water Use Monthly
+\item
+  AirLoop System Component Loads Monthly
+\item
+  AirLoop System Component Energy Use Monthly
+\item
+  Mechanical Ventilation Loads Monthly
+\end{itemize}
+
+Each of these reports is made up of several sub-tables of information. Examples of some of the tables are shown below. To enable all of the reports the single All Summary may be specified.
+
+\subsection{Annual Building Utility Performance Summary}\label{annual-building-utility-performance-summary}
+
+The Annual Building Utility Performance Summary report provides an overview of energy consumption in the building for different end uses. The following is an example this report (some columns may be truncated due to page size). The key used to obtain this report is AnnualBuildingUtilityPerformanceSummary.
+
+In the \emph{Comfort and Setpoint Not Met Summary} sub-table, facility hours represents the total number of hours that any single zone did not meet the comfort or setpoint criteria. It is not weighted by number of zones or number of occupants.
+
+The values in the \emph{End Uses} sub-table are from report meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd).
+
+Report: Annual Building Utility Performance Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Values gathered over 8760.00 hours
+
+Site and Source Energy
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Source to Site Energy Converstion Factors
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Building Area
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+End Uses
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{Note: Natural gas appears to be the principal heating source based on energy usage.}
+
+End Uses By Subcategory
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Normalized Metrics
+
+Utility Use Per Conditioned Floor Area
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Utility Use Per Total Floor Area
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Electric Loads Satisfied
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+On-Site Thermal Sources
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Water Source Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Comfort and Setpoint Not Met Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Note 1: An asterisk (*) indicates that the feature is not yet implemented.
+
+\subsection{Input Verification and Results Summary}\label{input-verification-and-results-summary}
+
+The Input Verification and Results Summary report provides a summary of some of the most common input assumptions that are not included in any of the other predefined reports. Directly following is an example of the report. The key used to obtain this report is InputVerificationandResultsSummary.
+
+Report: Input Verification and Results Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+General
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+ENVELOPE
+
+Window-Wall Ratio
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Skylight-Roof Ratio
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PERFORMANCE
+
+Zone Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Demand End Use Components Summary}\label{demand-end-use-components-summary}
+
+The Demand End Use Components Summary report shows the demand breakdown by component end use at the time that the peak demand for each source of energy is set. The time of the peak demand is shown in the first row. The contributions of each end use at the time of the peak demand of the energy source is shown in this report. The key used to obtain this report is DemandEndUseComponentsSummary.
+
+Report: Demand End Use Components Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+End Uses
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+End Uses By Subcategory
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Source Energy End Use Components Summary}\label{source-energy-end-use-components-summary}
+
+The Source Energy End Use Components Summary report produces a report that includes three tables. These tables display source energy by fuel type that is calculated based on site to source energy factors specified by the user in the EnvironmentalImpactFactors and FuelFactors objects. The last two tables display the source energy in terms of area normalized metrics. Directly following is an example of the three tables. The key used to obtain this report is SourceEnergyEndUseComponentsSummary.
+
+Report: \textbf{Source Energy End Use Components Summary}
+
+For: \textbf{Entire Facility}
+
+Timestamp: \textbf{2011-10-07 20:53:43}
+
+\textbf{Values gathered over 8760.00 hours}
+
+\textbf{Source Energy End Use Components Summary}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Normalized Metrics}
+
+\textbf{Source Energy End Use Components Per Conditioned Floor Area}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Source Energy End Use Components Per Total Floor Area}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Equipment Summary}\label{equipment-summary}
+
+The Equipment Summary report provides a summary of the HVAC related equipment in the building. The central chiller example shows the most common type of chillers, boilers and towers used in EnergyPlus. The remaining subtables cover DX coils, fans and water heating equipment. Not every type of HVAC equipment is represented in this report. Directly following is an example of the report. The key used to obtain this report is EquipmentSummary.
+
+Report: Equipment Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Central Plant
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cooling Coils
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Heating Coils
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Fans
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Pumps
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Service Water Heating
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Envelope Summary}\label{envelope-summary}
+
+The Envelope Summary report provides a summary of the elements of the envelope of the building. The first table describes the exterior opaque elements and the second table describes the fenestration elements. Reflectance is defined as one minus the thermal absorptance. Directly following is an example of the report. The key used to obtain this report is EnvelopeSummary.
+
+Report: Envelope Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Opaque Exterior
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Fenestration
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Surface Shadowing Summary}\label{surface-shadowing-summary}
+
+The Surface Shadowing Summary report summarizes how the surfaces may cast shadows on other surfaces. Directly following is an example of the report. The key used to obtain this report is SurfaceShadowingSummary.
+
+Report: Surface Shadowing Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Shading Summary}\label{shading-summary-000}
+
+The Shading Summary report shows how much of each window is sunlit at different times of the year and also includes a summary of the window controls. Directly following is an example of the report. The key used to obtain this report is ShadingSummary.
+
+Report: Shading Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Sunlit Fraction
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Window Control
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Lighting Summary}\label{lighting-summary}
+
+The Lighting Summary report provides a description of the interior and exterior lighting systems being simulated. It also provides a summary of daylighting controls. The Interior Lighting table has three columns that are explained below:
+
+Scheduled Hours/Week {[}hr{]} - In the schedule shown, this represents the average weekly sum of hourly values. It is based on a full year even if the simulation is only performed for part of the year. It is not affected by daylighting.
+
+Hours/Week \textgreater{} 1\% {[}hr{]} -- This represents the average hours per week that are above 1\% of the design value.
+
+Full Load Hours/Week {[}hr{]} -- This is based on consumption and hours that the consumption occurred. It is dependent on the run period used. When simulating only a portion of the year, the value depends on which days of the year (the number of weekdays versus weekend days, for example) are simulated. It also indicates the impact of daylighting control. Directly following is an example of the report. The key used to obtain this report is LightingSummary.
+
+Report: Lighting Summary
+
+For: Entire Facility
+
+Timestamp: 2012-09-05 12:10:52
+
+Interior Lighting
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Daylighting
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Exterior Lighting
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{HVAC Sizing Summary}\label{hvac-sizing-summary}
+
+The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. The Design Load is the zone sensible load only and it does not include any system effects or ventilation loads. The user specified design load and airflow and the values calculated by the program are shown in the report along with the time of the peak load and the temperature and humidity ratio at the time of the peak during the sizing periods. This information is generated for both the Zone Sensible Cooling and Zone Sensible Heating tables.
+
+Also included is the System Design Air Flow Rates which includes the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, and the user specified air flow rate for heating.
+
+\emph{Note:} values listed as ``calculated'' are the unaltered result of the zone or system sizing calculations, using the design sizing period weather and schedules specified in the input. Values listed as ``user specified'' are either the calculated values modified by global or zone sizing factors or values specified with the \emph{flow/zone} or \emph{flow/system} design air flow method.
+
+Directly following is an example of the report.
+
+The key used to obtain this report is HVACSizingSummary.
+
+Report: \textbf{HVAC Sizing Summary}
+
+For: \textbf{Entire Facility}
+
+** Timestamp: **2011-09-23 15:09:34
+
+\textbf{Zone Sensible Cooling}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Zone Sensible Heating}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{System Design Air Flow Rates}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Plant Loop Coincident Design Fluid Flow Rate Adjustments}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{System Summary}\label{system-summary}
+
+The System Summary report provides information about some of the primary components in the system including the economizer and demand controlled ventilation. In addition, this report describes when the zone conditions are not comfortable or when set points are not met.
+
+In the \emph{Time Not Comfortable Based on Simple ASHRAE 55-2004} and Time Setpoint Not Met sub-tables, The reported time represents the total number of hours that a given zone did not meet the comfort or setpoint criteria. For the Facility row, this is the total numbers of hours that one or more zones were out of range. The values are not weighted by number of zones or number of occupants.
+
+Directly following is an example of the report. The key used to obtain this report is SystemSummary.
+
+Report: System Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Economizer
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Demand Controlled Ventilation using VENTILATION:MECHANICAL
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Time Not Comfortable Based on Simple ASHRAE 55-2004
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Time Setpoint Not Met
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Component Sizing Summary}\label{component-sizing-summary}
+
+The Component Sizing Summary report includes details on many of the HVAC components in the simulation. For each of the components, one or more parameters are shown. Directly following is an example of the report. The key used to obtain this report is ComponentSizingSummary.
+
+Report: Component Sizing Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+SINGLE DUCT:VAV:REHEAT
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+COIL:Water:SimpleHeating
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+BRANCH
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+AIR PRIMARY LOOP
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+CONTROLLER:OUTSIDE AIR
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+COIL:Water:Cooling
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+FAN:SIMPLE:VARIABLEVOLUME
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+CONTROLLER:SIMPLE
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PLANT LOOP
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+BOILER:SIMPLE
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+CHILLER:ELECTRIC
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PUMP:VARIABLE SPEED
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Outdoor Air Summary}\label{outdoor-air-summary}
+
+The Outdoor Air Summary provides information for each zone on the average and minimum ventilation provided.
+
+The reports described so far in this section are displayed when specified in the Output:Table:Predefined object. They are either on or off and are not customizable. The next few types of tabular reports are customizable. You can specify the report variables being used in each one.
+
+Directly following is an example of the report. The key used to obtain this report is OutdoorAirSummary.
+
+Report: Outdoor Air Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Average Outside Air During Occupied Hours
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Minimum Outside Air During Occupied Hours
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Climatic Data Summary}\label{climatic-data-summary}
+
+The Climatic Data Summary provides some statistics from the .STAT file concerning the selected weather. The Stat file must be available (it is included with all the weather files on the EnergyPlus website) for the report to be fully produced. Directly following is an example of the report. The key used to obtain this report is ClimaticDataSummary.
+
+Report: Climatic Data Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 13:27:45
+
+SizingPeriod:DesignDay
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Weather Statistics File
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Object Count Summary}\label{object-count-summary}
+
+The object count summary report provides the count on the number of specific objects in the file. Directly following is an example of the report. The key used to obtain this report is ObjectCountSummary.
+
+Report: Object Count Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Surfaces by Class
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+HVAC
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Component Cost Economics Summary}\label{component-cost-economics-summary}
+
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. Directly following is an example of this report.
+
+Report: Component Cost Economics Summary
+
+For: Entire Facility
+
+Timestamp: 2016-01-12 15:47:39
+
+Construction Cost Estimate Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cost Line Item Details
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{LEED Summary}\label{leed-summary}
+
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+
+Report: LEED Summary
+
+For: Entire Facility
+
+Timestamp: 2013-03-01 15:24:37
+
+Sec1.1A-General Information
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-1. Space Usage Type
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-2. Advisory Messages
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-3. Energy Type Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-4/5. Performance Rating Method Compliance
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-6. Energy Use Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-7. Energy Cost Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Process energy cost based on ratio of process to total energy.
+
+L-1. Renewable Energy Source Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-17a. Energy Use Intensity - Electricity
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-17b. Energy Use Intensity - Natural Gas
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-17c. Energy Use Intensity - Other
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-18. End Use Percentage
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Energy Meters}\label{energy-meters}
+
+This report provides the details on all the energy meters generated by the simulation. Directly following is an example of the report. The key used to obtain this report is EnergyMeters.
+
+Report: Energy Meters
+
+For: Entire Facility
+
+Timestamp: 2012-05-01 17:07:24
+
+Annual and Peak Values - Electricity
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Gas
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Cooling
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Water
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other by Weight/Mass
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other Volumetric
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other Liquid/Gas
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Sensible Heat Gain Summary}\label{sensible-heat-gain-summary}
+
+This report is more fully described in the Input Output Reference but represents the major heat gain components for each zone as well as the HVAC loads satisfied. Directly following is an example of the report. The key used to obtain this report is SensibleHeatGainSummary.
+
+Report: Sensible Heat Gain Summary
+
+For: Entire Facility
+
+Timestamp: 2011-09-09 08:02:03
+
+Annual Building Sensible Heat Gain Components
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Peak Cooling Sensible Heat Gain Components
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Peak Heating Sensible Heat Gain Components
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Standard 62.1 Summary}\label{standard-62.1-summary}
+
+This report is more fully described in the Input Output Reference. The Standard 62.1 Summary produces a report that is consistent with many of the outputs needed when doing calculations consistent with ASHRAE Standard 62.1-2010. The report is generated when sizing calculations are specified. The abbreviations used in the report are consistent with the abbreviations used in Appendix A4 of the Standard. Directly following is an example of the report. The key used to obtain this report is Standard62.1Summary.
+
+Report: Standard 62.1 Summary
+
+For: Entire Facility
+
+Timestamp: 2012-04-20 12:00:57
+
+System Ventilation Requirements for Cooling
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+System Ventilation Requirements for Heating
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Zone Ventilation Parameters
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+System Ventilation Parameters
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Zone Ventilation Calculations for Cooling Design
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+System Ventilation Calculations for Cooling Design
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Zone Ventilation Calculations for Heating Design
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+System Ventilation Calculations for Heating Design
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Zone Component Loads Summary}\label{zone-component-loads-summary}
+
+The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The Sensible-Delayed column of the summary is only an estimate based on a procedure described in the Engineering Reference documentation. An intermediate calculation in this procedure is the decay curves that are shown in the the EIO file when Output:Surfaces:List is set to show DecayCurvesFromZoneComponentLoads. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The key used to obtain this report is ZoneComponentLoadSummary.
+
+Report: ZoneComponentLoadSummary
+
+For: SPACE1-1
+
+Timestamp: 2012-09-21 15:48:46
+
+Estimated Cooling Peak Load Components
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cooling Peak Conditions
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Estimated Heating Peak Load Components
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Heating Peak Conditions
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Output:Table:TimeBins}\label{outputtabletimebins}
+
+A TimeBins report shows a grid of the number of hours that specific report variable spend in a range of values. The first table is broken into two parts. The first part is monthly and the second part is for each hour of the day. The columns show the range of values. A second table is provided to show some statistics on the report variable for the entire year including the maximum and minimum. These statistics are helpful in setting the field values for the interval in the Output Table:TimeBins object. Due to this, it is often necessary to run two simulations to fully utilize the TimeBins report with the first run used to find the minimum and maximum of the variable, these values are then used in the TimeBins object and the second run a better table of binned results are displayed.
+
+Report: PURCHASEDCOOLING:FACILITY J per second
+
+For: Meter
+
+Timestamp: 2006-08-30 07:48:55
+
+Values in table are in hours.
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Statistics
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Output:Table:Monthly}\label{outputtablemonthly}
+
+Monthly reports are not predefined. Instead each column is defined when using the Output:Table:Monthly object. In that object each column is defined by a variable and how it should be aggregated. The StandardReports.idf file is located in DataSets directory where EnergyPlus is installed and contains a large number of examples of how to use Output:Table:Monthly to get summaries of the performance of different components in the building model. These examples include:
+
+\begin{itemize}
+\item
+  Zone Cooling Summary
+\item
+  Zone Heating Summary
+\item
+  Zone Electric Summary
+\item
+  Space Gains
+\item
+  Peak Space Gains
+\item
+  Space Gain Components at Cooling Peak
+\item
+  Energy Consumption - Electricity \& Natural Gas
+\item
+  Energy Consumption - Electricity Generated \& Propane
+\item
+  Energy Consumption - Diesel \& Fuel Oil
+\item
+  Energy Consumption~ - Purchased Heating \& Cooling
+\item
+  Energy Consumption - Coal \& Gasoline
+\item
+  End-Use Energy Consumption - Electricity
+\item
+  End-Use Energy Consumption - Natural Gas
+\item
+  End-Use Energy Consumption - Diesel
+\item
+  End-Use Energy Consumption - Fuel Oil
+\item
+  End-Use Energy Consumption - Coal
+\item
+  End-Use Energy Consumption - Propane
+\item
+  End-Use Energy Consumption - Gasoline
+\item
+  Peak Energy End-Use - Electricity Part 1
+\item
+  Peak Energy End-Use - Electricity Part 2
+\item
+  Electric Components of Peak Demand
+\item
+  Peak Energy End-Use - Natural Gas
+\item
+  Peak Energy End-Use - Diesel
+\item
+  Peak Energy End-Use - Fuel Oil
+\item
+  Peak Energy End-Use - Coal
+\item
+  Peak Energy End-Use - Propane
+\item
+  Peak Energy End-Use - Gasoline
+\item
+  Setpoints Not Met With Temperatures
+\item
+  Comfort Report - Simple 55
+\item
+  Unglazed Transpired Solar Collector Summary
+\item
+  Occupant Comfort Data Summary
+\item
+  Chiller Report
+\item
+  Tower Report
+\item
+  Boiler Report
+\item
+  DX Report
+\item
+  Window Report
+\item
+  Window Energy Report
+\item
+  Window Zone Summary
+\item
+  Average Outdoor Conditions
+\item
+  Outdoor Conditions Maximum Drybulb
+\item
+  Outdoor Conditions Minimum Drybulb
+\item
+  Outdoor Conditions Maximum Wetbulb
+\item
+  Outdoor Conditions Maximum Dewpoint
+\item
+  Outdoor Ground Conditions
+\item
+  Window AC Report
+\item
+  Water Heater Report
+\item
+  Generator Report
+\item
+  Daylighting Report
+\item
+  Coil Report
+\item
+  Plant Loop Demand Report
+\item
+  Fan Report
+\item
+  Pump Report
+\item
+  Cond Loop Demand Report
+\item
+  Zone Temperature Oscillation Report
+\item
+  Air Loop System Energy and Water Use
+\item
+  Air Loop System Component Loads
+\item
+  Air Loop System Component Energy Use
+\item
+  Mechanical Ventilation Loads
+\end{itemize}
+
+An example of the Zone Cooling Summary monthly report is shown below.
+
+Report: ZONE COOLING SUMMARY
+
+For: SPACE2-1
+
+Timestamp: 2006-08-29 07:21:57
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{UtilityCost:Tariff}\label{utilitycosttariff}
+
+The use of UtilityCost:Tariff objects automatically generates two reports related to the calculation of annual utility costs. The first report is a summary across multiple tariffs and is called the Economics Results Summary report and is shown directly below. After that example is an example of the Tariff report which is created for each of the UtilityCost:Tariff Objects defined in the IDF file~ (some columns may be truncated due to page size).
+
+Report: Economics Results Summary Report
+
+For: Entire Facility
+
+Timestamp: 2006-08-29 07:21:57
+
+Annual Cost
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Tariff Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+The following is an example of the Tariff report which is created for each of the UtilityCost:Tariff objects defined in the file.
+
+Report: Tariff Report
+
+For: EXAMPLEA
+
+Timestamp: 2006-08-29 07:21:57
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Categories
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Charges
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Ratchets
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Qualifies
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Native Variables
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Other Variables
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Computation - Automatic FLATENERGYCHARGE FROM TotalEnergy EnergyCharges SUM FLATENERGYCHARGE Basis SUM EnergyCharges DemandCharges ServiceCharges Subtotal SUM Basis Adjustment Surcharge Total SUM Subtotal Taxes
+
+\subsection{Construction Cost Estimate Summary}\label{construction-cost-estimate-summary}
+
+The Construction Cost Estimate Summary report shows the details of a simplified cost estimate of the building along with a comparison with reference building costs entered by the user. An example of the Construction Cost Estimate Summary report is shown below.
+
+Construction Cost Estimate Summary
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cost Line Item Details
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \textbackslash\$ per Qty. & SubTotal \textbackslash\$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{XML Tabular Output}\label{xml-tabular-output}
+
+The tables discussed in this section can also be output in an XML format that may be easier for some other programs to extract specific results. An excerpt of the XML file format is shown below. This report presents the same output results as the other tabular report formats but using XML tags.
+
+\textless{}?xml version = ``1.0''?\textgreater{}
+
+\textless{}EnergyPlusTabularReports\textgreater{}
+
+~ \textless{}BuildingName\textgreater{}NONE\textless{}/BuildingName\textgreater{}
+
+~ \textless{}EnvironmentName\textgreater{}Chicago Ohare Intl Ap IL USA TMY3 WMO\# = 725300\textless{}/EnvironmentName\textgreater{}
+
+~ \textless{}WeatherFileLocationTitle\textgreater{}Chicago Ohare Intl Ap IL USA TMY3 WMO\# = 725300\textless{}/WeatherFileLocationTitle\textgreater{}
+
+~ \textless{}ProgramVersion\textgreater{}EnergyPlus, Version 8.0, YMD = 2013.02.18 15:50\textless{}/ProgramVersion\textgreater{}
+
+~ \textless{}SimulationTimestamp\textgreater{}
+
+~~~ \textless{}Date\textgreater{}
+
+~~~~~ 2013-02-18
+
+~~~ \textless{}/Date\textgreater{}
+
+~~~ \textless{}Time\textgreater{}
+
+~~~~~ 15:50:33
+
+~~~ \textless{}/Time\textgreater{}
+
+~ \textless{}/SimulationTimestamp\textgreater{}
+
+\textless{}AnnualBuildingUtilityPerformanceSummary\textgreater{}
+
+~ \textless{}for\textgreater{}Entire Facility\textless{}/for\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}TotalSiteEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}200671.97\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}NetSiteEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}200671.97\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}TotalSourceEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}442504.19\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}316.04\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}316.04\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}NetSourceEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}397810.98\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}284.12\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}284.12\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+\emph{An actual file will be much longer than this example but follows this format.}

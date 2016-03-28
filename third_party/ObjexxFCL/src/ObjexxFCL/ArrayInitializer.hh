@@ -5,32 +5,31 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Sticky.hh>
-#include <ObjexxFCL/TypeTraits.hh>
+#include <ObjexxFCL/ArrayInitializer.fwd.hh>
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <cassert>
-#include <functional>
+#include <type_traits>
+#include <utility>
 
 namespace ObjexxFCL {
 
 // ArrayInitializer: Array Initializer Class Template
-template< typename T, template< typename > class A >
+template< typename T >
 class ArrayInitializer
 {
 
 public: // Types
-
-	typedef  TypeTraits< T >  Traits;
 
 	// STL style
 	typedef  T  value_type;
@@ -38,252 +37,195 @@ public: // Types
 	// C++ style
 	typedef  T  Value;
 
-	typedef  std::function< void( A< T > & ) >  Function;
-
 private: // Types
 
-	template< typename, template< typename > class > friend class ArrayInitializer;
-	enum State { INACTIVE, VALUE, FUNCTION };
+	template< typename > friend class ArrayInitializer;
 
 public: // Creation
 
 	// Default Constructor
-	inline
 	ArrayInitializer() :
-	 state_( INACTIVE ),
-	 sticky_( false ),
-	 value_( Traits::initial_value() )
+	 value_p_( nullptr )
 	{}
 
 	// Copy Constructor
-	inline
 	ArrayInitializer( ArrayInitializer const & a ) :
-	 state_( a.state_ ),
-	 sticky_( a.sticky_ ),
-	 value_( a.value_ ),
-	 function_( a.function_ )
+	 value_p_( a.value_p_ != nullptr ? new T( *a.value_p_ ) : nullptr )
 	{}
 
 	// Copy Constructor Template
-	template< typename U, template< typename > class C >
-	inline
-	ArrayInitializer( ArrayInitializer< U, C > const & a ) :
-	 state_( a.state_ == ArrayInitializer< U, C >::FUNCTION ? INACTIVE : ( a.state_ == ArrayInitializer< U, C >::VALUE ? VALUE : INACTIVE ) ),
-	 sticky_( a.sticky_ ),
-	 value_( a.value_ )
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	ArrayInitializer( ArrayInitializer< U > const & a ) :
+	 value_p_( a.value_p_ != nullptr ? new T( *a.value_p_ ) : nullptr )
 	{}
 
-	// Value Constructor
-	inline
+	// Move Constructor
+	ArrayInitializer( ArrayInitializer && a ) NOEXCEPT :
+	 value_p_( a.value_p_ )
+	{
+		a.value_p_ = nullptr;
+	}
+
+	// Value Copy Constructor
 	explicit
 	ArrayInitializer( T const & value ) :
-	 state_( VALUE ),
-	 sticky_( false ),
-	 value_( value )
+	 value_p_( new T( value ) )
 	{}
 
-	// Sticky Value Constructor
-	inline
-	explicit
-	ArrayInitializer( Sticky< T > const & value ) :
-	 state_( VALUE ),
-	 sticky_( true ),
-	 value_( value() )
-	{}
-
-	// Value Constructor Template
-	template< typename U >
-	inline
+	// Value Copy Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
 	ArrayInitializer( U const & value ) :
-	 state_( VALUE ),
-	 sticky_( false ),
-	 value_( value )
+	 value_p_( new T( value ) )
 	{}
 
-	// Sticky Value Constructor Template
-	template< typename U >
-	inline
+	// Value Move Constructor
 	explicit
-	ArrayInitializer( Sticky< U > const & value ) :
-	 state_( VALUE ),
-	 sticky_( true ),
-	 value_( value() )
+	ArrayInitializer( T && value ) :
+	 value_p_( new T( std::move( value ) ) )
 	{}
 
-	// Function Constructor
-	inline
-	explicit
-	ArrayInitializer( Function const & fxn ) :
-	 state_( fxn ? FUNCTION : INACTIVE ),
-	 sticky_( false ),
-	 value_( Traits::initial_value() ),
-	 function_( fxn ? fxn : Function() )
-	{}
+	// Destructor
+	~ArrayInitializer()
+	{
+		if ( value_p_ != nullptr ) delete value_p_;
+	}
+
+public: // Operators
+
+	// Value
+	T const &
+	operator ()() const
+	{
+		assert( value_p_ != nullptr );
+		return *value_p_;
+	}
+
+	// Value
+	T &
+	operator ()()
+	{
+		assert( value_p_ != nullptr );
+		return *value_p_;
+	}
 
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	ArrayInitializer &
 	operator =( ArrayInitializer const & a )
 	{
 		if ( this != &a ) {
-			state_ = a.state_;
-			sticky_ = a.sticky_;
-			value_ = a.value_;
-			function_ = a.function_;
+			if ( value_p_ != nullptr ) delete value_p_;
+			value_p_ = ( a.value_p_ != nullptr ? new T( *a.value_p_ ) : nullptr );
 		}
 		return *this;
 	}
 
-	// Value Assignment
-	inline
+	// Copy Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	ArrayInitializer &
+	operator =( ArrayInitializer< U > const & a )
+	{
+		if ( value_p_ != nullptr ) delete value_p_;
+		value_p_ = ( a.value_p_ != nullptr ? new T( *a.value_p_ ) : nullptr );
+		return *this;
+	}
+
+	// Move Assignment
+	ArrayInitializer &
+	operator =( ArrayInitializer && a ) NOEXCEPT
+	{
+		if ( value_p_ != nullptr ) delete value_p_;
+		value_p_ = a.value_p_;
+		a.value_p_ = nullptr;
+		return *this;
+	}
+
+	// Value Copy Assignment
 	ArrayInitializer &
 	operator =( T const & value )
 	{
-		state_ = VALUE;
-		// Don't alter stickyness
-		value_ = value;
-		function_ = Function();
+		if ( value_p_ != nullptr ) delete value_p_;
+		value_p_ = new T( value );
 		return *this;
 	}
 
-	// Sticky Value Assignment
-	inline
+	// Value Copy Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	ArrayInitializer &
-	operator =( Sticky< T > const & value )
+	operator =( U const & value )
 	{
-		state_ = VALUE;
-		sticky_ = true;
-		value_ = value();
-		function_ = Function();
+		if ( value_p_ != nullptr ) delete value_p_;
+		value_p_ = new T( value );
 		return *this;
 	}
 
-	// Function Assignment
-	inline
+	// Value Move Assignment
 	ArrayInitializer &
-	operator =( Function const & fxn )
+	operator =( T && value )
 	{
-		state_ = ( fxn ? FUNCTION : INACTIVE );
-		sticky_ = false;
-		value_ = Traits::initial_value();
-		function_ = ( fxn ? fxn : Function() );
+		if ( value_p_ != nullptr ) delete value_p_;
+		value_p_ = new T( std::move( value ) );
 		return *this;
 	}
 
-public: // Inspector
+public: // Predicate
 
 	// Active?
-	inline
 	bool
-	is_active() const
+	active() const
 	{
-		return ( state_ != INACTIVE );
+		return value_p_ != nullptr;
 	}
 
-	// Value?
-	inline
-	bool
-	is_value() const
-	{
-		return ( state_ == VALUE );
-	}
-
-	// Sticky?
-	inline
-	bool
-	is_sticky() const
-	{
-		return sticky_;
-	}
-
-	// Sticky?
-	inline
-	bool
-	sticky() const
-	{
-		return sticky_;
-	}
-
-	// Function?
-	inline
-	bool
-	is_function() const
-	{
-		return ( state_ == FUNCTION );
-	}
+public: // Property
 
 	// Value
-	inline
 	T const &
 	value() const
 	{
-		assert( state_ == VALUE );
-		return value_;
+		assert( value_p_ != nullptr );
+		return *value_p_;
 	}
 
-	// Function
-	inline
-	Function const &
-	function() const
+	// Value
+	T &
+	value()
 	{
-		assert( state_ == FUNCTION );
-		return function_;
+		assert( value_p_ != nullptr );
+		return *value_p_;
 	}
 
 public: // Modifier
 
 	// Clear
-	inline
 	void
 	clear()
 	{
-		state_ = INACTIVE;
-		sticky_ = false;
-		value_ = Traits::initial_value();
-		function_ = Function();
-	}
-
-	// Clear Non-Sticky
-	inline
-	void
-	clear_nonsticky()
-	{
-		if ( ! sticky_ ) {
-			state_ = INACTIVE;
-			value_ = Traits::initial_value();
-			function_ = Function();
-		}
+		if ( value_p_ != nullptr ) delete value_p_;
+		value_p_ = nullptr;
 	}
 
 	// Swap
-	inline
 	void
 	swap( ArrayInitializer & o )
 	{
 		using std::swap;
-		swap( state_, o.state_ );
-		swap( sticky_, o.sticky_ );
-		swap( value_, o.value_ );
-		swap( function_, o.function_ );
+		swap( value_p_, o.value_p_ );
 	}
 
 private: // Data
 
-	State state_; // State
-	bool sticky_; // Sticky?
-	T value_; // Value
-	Function function_; // Function
+	T * value_p_; // Value pointer
 
 }; // ArrayInitializer
 
 // Swap
-template< typename T, template< typename > class A >
+template< typename T >
 inline
 void
-swap( ArrayInitializer< T, A > & a, ArrayInitializer< T, A > & b )
+swap( ArrayInitializer< T > & a, ArrayInitializer< T > & b )
 {
 	a.swap( b );
 }

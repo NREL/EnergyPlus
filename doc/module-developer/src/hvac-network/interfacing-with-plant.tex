@@ -1,0 +1,132 @@
+\section{Interfacing with Plant}\label{interfacing-with-plant}
+
+Beginning with Version 7.0, EnergyPlus's plant routines were reengineered and this section discusses protocols for how component models should interact with plant loop modeling.~ Component models that reject or obtain heat from a liquid fluid stream, such as hot or chilled water, condenser water, and steam (but not refrigeration), are ``plant components'' that will need to interface with the central plant solver routines.~ This section describes a number of utility routines and concepts for developers of plant component models.
+
+The node structure discussed above is reused for plant.~ Each component model related to plant has inlet and outlet nodes that describe how it is connected to the loop.~ Many of the routines pass in node indexes as arguments as well as other indexes into the main plant data structure.
+
+\subsection{Plant Loop Data Structure}\label{plant-loop-data-structure}
+
+For plant components, in addition to inlet nodes, outlet nodes, and the component's internal data structure, there is a fourth aspect to data flow that includes central data structures defined in DataPlant.f90.~~ The main data structure is called PlantLoop.~ Both condenser loops and plant loops are treated the same and share the PlantLoop structure.~ The PlantLoop structure stores information on the loop topology as well as various control and dispatch input and operational data.~~ The data structure is nested and component information is stored at this level:
+
+PlantLoop()\%LoopSide()\%Branch()\%Comp()\%xxx
+
+Where,
+
+PlantLoop is the top level and will be sized to the total number of plant and condenser loops.
+
+LoopSide is the second level and will be sized to two, one loop side is for the demand side and one loop side is for the supply side.
+
+Branch is the third level and will be sized to the total number of branches on that loop side
+
+Comp is the fourth level and will be sized to the total number of components on the branch.
+
+There are four indices that indentify each component's location for each of the plant loops it is connected with: : loop number, loop side number, branch number, and component number.~ A water cooled chiller will be connected to two loops and so the component itself will appear twice in the data structure and one set of indices will identify its location on the chilled water loop while a second set of indices will locate it on the condenser loop.~~
+
+\subsection{Initialization}\label{initialization}
+
+Component models should store indexes that describe their location in the plant data structure.~ To obtain these indices, call the routine ScanPlantLoopsForObjectonce for each instance of the component.~ The component model's data structure should store a set of indices for: loop number, loop side number, branch number, and component number.~~ If the component is connected to more than one plant loop, then there should be set of indices and a call to ScanPlantLoopsForObject for each plant loop it is connected to.~ If a component model only has a single node name, the required indices can be similarly obtained using the a call to ScanPlantLoopsForNodeNum.
+
+Component models generally need to do a thorough re-initialization at the start of each new environment.~ Component models can call InitComponentNodesto coordinate initializing inlet and outlet nodes. This routine has arguments for the minimum and maximum flow and these should be mass flow rates, in kg/s, that correspond to the ``hardware'' limits of the device.
+
+Some components are connected to more than one plant loop creating dependencies between loops. For example a water-cooled chiller is connected to both a chilled water loop and a condenser water loop.~ The chilled water loop places demands on the condenser water loop so it is beneficial to model the chilled water loop's supply side before the condenser water loop's demand side is modeled.~ An initialization routine called InterConnectTwoPlantLoopSides~is used by the component models to inform the central plant routines of these situations.~ One call to this routine describes a connection between two half-loops. The component model developer needs to decide which of the half loops places demands on the other and set the logical argument Loop1DemandsOnLoop2appropriately.~ The central plant routines use this information to determine an appropriate calling order for simulating individual half-loops.
+
+\subsection{Sizing}\label{sizing}
+
+Component models need to interact with centralized routines that relate to sizes. ~This section provides an overview of how EnergyPlus performs automatic sizing of plant systems and components so that the broader context can be understood when implementing plant components. As of EnergyPlus version 8.3, the plant sizing methods were changed significantly.~ We first describe some of the variables involved, then describe the overall process steps, and finally discuss implications for component models.
+
+The following variables are used to help control plant sizing:
+
+\begin{itemize}
+\item
+  PlantFirstSizesOkayToFinalizePlantSizeNotComplete This public logical boolean flag is declared in DataPlant. It starts out FALSE TRUEfalse and is set to TRUE FALSEtrue only after all some intial plant sizing actions iterations have been completed and the first set of sizes can be finalized. Component models should delay first filling autosized values until this flag is true. The -9999 values that indicate an autosized variable are not filled until this is TRUE.
+\item
+  PlantFirstSizesOkayToReportPlantSizesOkayToFinalize This public logical boolean flag is declared in DataPlant. It starts out false FALSE and is set to TRUE true after the main iterative phase of sizing is completed but before the final finishing passes are made. This flag is only used for advanced sizing methods based on HVAC Sizing Simulations, where the program should report both the ``Initial'' sizes and the final sizes. Component models should delay final reporting first sizes and filling of autosized values until this is set to TRUEtrue. The -9999 values that indicate an autosized variable are not filled until this is TRUE. The first, or intial, cCalls to report the outcome of sizing are not made until this is TRUEtrue.
+\item
+  PlantFinalSizesOkayToReport This public boolean flag is declared in DataPlant. It starts out false and is set to true when all the sizing is done and it is okay to report the final size values. Component models should delay reporting final sizes until this is set to true.
+\item
+  InitLoopEquip This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models. This argument is set to TRUE when the plant sizing is being conducted. The component model needs to handle this argument such that when TRUE the get input, initialization and sizing routines are run, but the calculation routine does not. When TRUE most supply side component models need to return values for the minimum, maximum, and optimal capacities (in terms of loop loads that the device can meet). For plant components with more than one connection to a plant loop, a leading loop connection must be determined and the component sizing routine called with InitLoopEquip is called for only that plant loop. For a example, a chiller only calls its sizing routine when called from a the chilled water loop and does not call it sizing routine when called from the condenser loop.
+\item
+  GetSizingFactor This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models. This is arguementargument set TRUE during some portions of the plant sizing calls and signals the intent to obtain the value of a component-level sizing factor. When this argument is TRUE, InitLoopEquip will also be TRUE. It can be ignored if the component model has no component-level sizing factor as part of its input. If the component does offer a sizing factor, then the implementation needs to handle this argument such that when TRUE the model returns the value of the SizingFactor as an argument to the simulation routine that is called from SimPlantEquip.
+\item
+  CurLoopNum This public integer variable is declared in DataSizing. It is used to communicate to the component models which of the plant loops is actively being sized at the moment.
+\item
+  LoopNum and LoopSide These arguments are optional to the main simulation routine
+\end{itemize}
+
+Plant sizing routines use the approach outlined in the following steps.~ These steps occur at a point during the program's procedural flow when:~ zone and system sizing is completed, much of the plant loop input has been read in and processed but the main plant manager is being called for the first time, none of the pure plant component's simulation routines have yet been called (but components on the air side may have been), and an initial attempt at determining loop calling order has been made in SetupInitialPlantCallingOrder.
+
+1.~~~~Initialize the indices that map between the central plant sizing data structures and the PlantLoop data structure.~ This uses the subroutine called InitOneTimePlantSizingInfo.~This ensures that the PlantLoop\%PlantSizNumvariable is filled before any component models are called.
+
+(steps 2 thru 4 are sequentially repeated for four iterations)
+
+2.~~~~Call each component model in calling order.~~ InitLoopEquipis TRUE.~ The components on each half loop are called in flow order.~ Each half loop in the model is called in the order set up for simulation.~ These calls are typically the first time certain component models have been called and should trigger input processing and plant loop topology processing including loop interconnections.
+
+3.~~~~Revise the calling order for the sequence with which the various plant loop sides are called for sizing and normal simulation.~ Components that connect two loops will have been processed in Step 2 and that information is now available to refine loop side calling order
+
+4.~~~~Call loop sizing routines in calling order.~ Component will have registered their design flow rates in step 2 and now the overall loop sizes are determined from the sum of the components on the loop.
+
+5.~~~~A final pass thru each loop side is made in calling order with the flag PlantFirstSizesOkayToFinalize set to true. At this point the findings are not expected to change (unless doing HVAC Sizing Simulations). Component models now finalize their findings and store the results for use during the simulation. Overall plant loops are finished. If doing coincident plant sizing using HVAC Sizing Simulations, set the flag PlantFirstSizesOkayToReport and report the ``Initial'' sizes. If not doing coincident plant sizing using HVAC Sizing Simulations, the sizes won't change again and set the flag PlantFinalSizesOkayToReport and report the final sizes.
+
+6.~~~~Sizing finished and PlantSizeNotCompleteset FALSE
+
+In earlier versions, component sizing routines were only called once and one had to take care not call them repeatedly (or else their flow request would get doubled each time). However, now plant component models should be designed for multiple executions of their component-level sizing routine. This allows for an iterative approach to plant sizing that is used to solve complex problems raised by inter-connected loops and the interdependence of sizing information. As of version 8.3, the addition of HVAC Sizing Simulation method makes it very explicit that not only do sizing routines need to be able to rerun, the autosized values need to be set to useable values and then changed. It is therefore now necessary to store whether or not the original input was set to autosize and so autosizable input now needs to add a boolean ``*WasAutoSized'' version of the variable to keep track of the user input.
+
+After the component model has determined a design value for the flow rate, this flow rate needs to be registered with the larger plant routines by calling RegisterPlantCompDesignFlow.~This is a volume flow rate in m\(^{3}\)/s.~ The flow rate is associated with the inlet node.~ This call can be repeated and the design flow will be updated with the latest request.
+
+Calls to InitComponentNodesshould be done after sizing is complete so that valid sizes are passed for initialing nodes.
+
+\subsection{Component Flow Rates}\label{component-flow-rates}
+
+Plant components models need knowledge of the rate of plant fluid flows through the device for each of loops involved. Some components will need to request the flow they desire while others just need to know the mass flow rate.~ However, components do not necessarily have complete control over the resulting flow rates because they depend on the state of the entire plant and not just on the individual component model.~ Component models need to be implemented to handle situations where they do not get the exact flow rate they requested or expected to get.~ For example there could be a shortage of flow and components are starved and get less than they desire. Or a component could be in series with another that is making a larger flow request and therefore a component receives more flow than expected.~ Even if a component is usually passive and takes what flow it gets, the user might have placed a component on a branch that is in parallel with other branches making it necessary for even a passive component to make a flow ``request'' in order for its parallel branch to receive flow when a splitter distributes flow across a set of branches.
+
+SetComponentFlowRate collects code for how to properly deal with plant flow rates.~ The idea is to use a central routine that actually changes the various mass flow rate variables on the node and checks against all the constraints.~ As of Version 7, component models should no longer assign flows to the Node data structure. (Component models can get data from Node data structure but should not set flow rate data on the Node directly.)~ The SetComponentFlowRate subroutine's argument for fluid mass flow is INOUT; the component model makes a request and if it cannot be satisfied, the mass flow rate variable will be returned with the corrected flow that the plant can actually provide at the moment.
+
+Some models, such as a water coil controller, may only have information about one control node.~ If a model does not really represent a single device with inlet and outlet nodes, then there is another useful routine called SetActuatedBranchFlowRate which serves a role similar to SetComponentFlowRate.~ This routine handles mass flow issues for all the components on the branch that contains the actuated node but is otherwise similar in concept.
+
+\subsection{Controls}\label{controls}
+
+Plant component models have different types of control interactions depending on the type of component.~~ Plant components that are led by the air side of HVAC models will generally be controlled by circumstances on the air side.~ A water-based cooling coil will be targeting the achievement of certain air conditions and while the state of the chilled water plant serving the coil will matter in the model calculations, the component itself is not controlled by plant but things outside of plant.
+
+Components that need to be operated to meet the loads placed on plant loops will often be controlled based on some combination of node setpoints and dispatched loads.~ The main entry routine (called from PlantLoopEquipment.f90)~ for most such primary components should include and use arguments for ``MyLoad'' and ``RunFlag.''~ Central routines for operation schemes and availability managers will determine if a component is available (e.g.~RunFlag) and what power level the device is being asked to provide (e.g.~MyLoad).~~ MyLoad is now signed as of version 7; a negative value of MyLoad is a cooling load; a positive value of MyLoad is a heating load.
+
+\subsection{Updating}\label{updating}
+
+Plant component update routines should no longer be setting mass flow rates in the update routine.~ The flow setting routines should be called during initialization or calculation routines and should not need to be called again during update.~ The state of the outlet node should be updated, such as outlet temperature, but mass flow rate should not be.~ Prior to version 7 it was common in EnergyPlus to write
+
+~~ Node(OutletNode)~ = Node(InletNode)
+
+However this is no longer acceptable practice and is not allowed for plant nodes.~ Instead this can be replaced with a call to SafeCopyPlantNode.~ This avoids problems when two components are in series and the outlet of one is the inlet of another. We cannot allow unsafe node copying because it will wipe out information stored on the inlet node of the second component.
+
+\subsection{Reporting}\label{reporting}
+
+A component model connected to plant via nodes will inherit a great deal of reporting that already occurs for each node.~ The output variables that start out ``System Node'' will already be available to the user.~~ In general, the focus of reporting should be on data that are internal to the component model.
+
+\subsection{Central Routine Modifications}\label{central-routine-modifications}
+
+When adding a new plant component, there are several places where the central routines' code needs to be modified so that the new model can properly interact with them.~ The following sections of the code should be expanded when adding a new plant component:
+
+1.~~~~DataPlant.f90.~ A new component will need to modify DataPlant.f90 in these places:
+
+a.~~~~Parameter NumSimPlantEquipTypes. Increment up to include new component.
+
+b.~~~Array SimPlantEquipTypes.~ Add array element with new object's class name in upper case.
+
+c.~~~~Array ccSimPlantEquipTypes.Add array element with new object's class name in camel case.
+
+d.~~~Array ValidLoopEquipTypes.~ Add array element with classification for what type of loop this component is intended for, primarily with respect to the type of loop it is intended to meet loads.
+
+e.~~~~Parameter TypeOf\_xxxx .~ Add an integer parameter to identify ``TypeOf'' number for subsequent use to identify component type without having to do string comparisions.
+
+2.~~~~PlantManager.f90
+
+a.~~~~GetPlantInput.~ There is a large IF-ELSEIF block in this routine that will need to be extended to process the new component.~ This is where the ``TypeOf'' number gets set for subsequent use.~ Choose a general equipment type for the component.~ Initialize the value for Comp\%CurOpSchemeType depending on which loop side is involved and/or the nature of the component
+
+b.~~~SetupBranchControlTypes.~ There is a large Case block in this routine that will need to be extended to process the new component.~ Prior to Version 7, the user had to input a branch control type in the IDF.~ Now this information is set in code in this routine.~ There are three different control classifications that need to be set in this routine:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~i.~~~Comp\%FlowCtrl.~ This is the branch control type input for versions prior to version 7.~ Plant components that have some influence over the mass flows should be set to ControlType\_Active.~ There are also ControlType\_Passive~ and ControlType\_ByPass options that may apply.~ The branches are further processed by routines that automatically detect series active situations.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ii.~~~Comp\%FlowPriority.~ New for version 7 is a plant modeling concept that treats flow requests differently depending on the nature of the component's priority.~ The idea is that when determining the overall flow rate in a loop, some mass flow requests need to be handled differently than others.~ The three flow priority options for components are LoopFlowStatus\_NeedyAndTurnsLoopOn, LoopFlowStatus\_NeedyIfLoopOn, and LoopFlowStatus\_TakesWhatGets.~ The first is typically a demand side component that when it requests flow will dictate that the loop operate and try to meet its request.~ The second is typically a supply side component with a minimum flow requirement that should necessarily turn on the loop, but if it is running already then the overall flow rate needs to satisfy the minimum on the component.~ The third is typically a passive device like a water tank.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~iii.~~~Comp\%HowLoadServed.~ This variable informs the load dispatch routines about the component. Some components are intended to serve loads in slightly different ways and this information is stored in the plant data structure as different parameters for HowLoadsServed.~ HowMet\_NoneDemandis used for demand components or others than never meet a load.~ HowMet\_PassiveCap is used for components that can meet a load but are not generally explicitly controllable to meet a certain level of load, such as a ground heat exchanger.~ HowMet\_ByNominalCap is used for components that can be controlled to meet a desired load and do not have any additional layers of constraints.~ HowMet\_ByNominalCapLowOutLimit~is used for components that can be controlled to meet a desired load but have low temperature limit on their outlet node.~ HowMet\_ByNominalCapHiOutLimit is used for components that can be controlled to meet a desired load but have a hi temperature limit on their outlet node.
+
+3.~~~~PlantLoopEquipment.f90.~ The routine SimPlantEquip includes a large Case statement that will need to expanded to include the new component.~ Some demand components, such as a water coil, may not need to actually call a routine from here but a placeholder must be added to the Case statement.~ Most plant components will call the main simulation entry point for the component model from SimPlantEquip and new components need to add that call here.~ Note that the Case statement are broken up into General equipment and the specific equipment.~~~ Code should support use of InitLoopEquip and GetCompSizFac as appropriate.

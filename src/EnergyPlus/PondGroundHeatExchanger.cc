@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -92,138 +150,58 @@ namespace PondGroundHeatExchanger {
 	// utility variables initialized once
 	int NumOfPondGHEs( 0 ); // Number of pond ground heat exchangers
 	// Utility variables - initialized for each instance of a pond
-	Real64 InletTemp( 0.0 ); // water inlet temperature
-	Real64 OutletTemp( 0.0 ); // water outlet temperature
-	Real64 FlowRate( 0.0 ); // water mass flow rate
-	Real64 HeatTransRate( 0.0 ); // total heat transfer rate, Watts
-	Real64 PondTemp( 0.0 ); // pond temperature
-	Real64 PastPondTemp( 0.0 ); // past pond temperature
-	Real64 PondArea( 0.0 ); // pond surface area
-	Real64 PondDepth( 0.0 ); // pond depth
-	Real64 TubeInDiameter( 0.0 ); // hydronic tube inside diameter
-	Real64 TubeOutDiameter( 0.0 ); // hydronic tube outside diameter
-	Real64 TubeConductivity( 0.0 ); // hydronic tube thermal conductivity
-	Real64 GrndConductivity( 0.0 ); // ground thermal conductivity
-	Real64 Concentration( 0.0 ); // fluid/glycol concentration 0.0-1.0 proportion.
-	Real64 CircLength( 0.0 ); // length of each circuit
-	int NumCircuits( 0 ); // number of circuits in total
-	int InletNodeNum( 0 ); // inlet node number
-	int OutletNodeNum( 0 ); // oulet node number
-	int WaterIndex( 0 ); // Fluid index for pond water
-	bool NoDeepGroundTempObjWarning( true ); // This will cause a warning to be issued if no "deep" ground
+	//Real64 nsvOutletTemp( 0.0 ); // water outlet temperature
+	//Real64 PondTemp( 0.0 ); // pond temperature
+	//Real64 PastPondTemp( 0.0 ); // past pond temperature
+	//Real64 TubeInDiameter( 0.0 ); // hydronic tube inside diameter
+	//Real64 TubeOutDiameter( 0.0 ); // hydronic tube outside diameter
+	//Real64 TubeConductivity( 0.0 ); // hydronic tube thermal conductivity
+	//Real64 GrndConductivity( 0.0 ); // ground thermal conductivity
+	//Real64 Concentration( 0.0 ); // fluid/glycol concentration 0.0-1.0 proportion.
+	//int NumCircuits( 0 ); // number of circuits in total
+	//int InletNodeNum( 0 ); // inlet node number
+	//int OutletNodeNum( 0 ); // oulet node number
 	// temperature object was input.
-	Array1D_bool CheckEquipName;
+	bool GetInputFlag( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
 
 	// Object Data
 	Array1D< PondGroundHeatExchangerData > PondGHE;
-	Array1D< PondGroundHeatExchangerReport > PondGHEReport;
 
-	//==============================================================================
 
-	// Functions
+	void PondGroundHeatExchangerData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag )  ) {
+		this->InitPondGroundHeatExchanger( FirstHVACIteration );
+		this->CalcPondGroundHeatExchanger();
+		this->UpdatePondGroundHeatExchanger();
+		this->ReportPondGroundHeatExchanger();
 
-	void
-	SimPondGroundHeatExchanger(
-		std::string const & CompName, // name of the pond GHE
-		int & CompIndex, // index in local derived types
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		bool const RunFlag, // TRUE if equipment turned on by loop operation scheme
-		bool & InitLoopEquip,
-		Real64 & MaxLoad,
-		Real64 & MinLoad,
-		Real64 & OptLoad
-	)
-	{
+	}
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Rees
-		//       DATE WRITTEN   August 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is the public routine that is used to simulate
-		// the operation of pond ground heat exchangers at each system
-		// time step.
-
-		// METHODOLOGY EMPLOYED:
-		// Several private routines are called to get data, make the calculations
-		// and update stuff. This is called for each instance of pond components.
-
-		// REFERENCES:
-		// Chiasson, A. Advances in Modeling of Ground-Source Heat Pump Systems.
-		//   M.S. Thesis, Oklahoma State University, December 1999.
-		// Chiasson, A.D., J.D. Spitler, S.J. Rees, M.D. Smith.  2000.  A Model For
-		//   Simulating The Performance Of A Shallow Pond As A Supplemental Heat
-		//   Rejecter With Closed-Loop Ground-Source Heat Pump Systems.
-		//   ASHRAE Transactions.  106(2):107-121.
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Flag first time, input is fetched
-		int PondGHENum; // index in local derived types
-
-		// check for input
+	PlantComponent * PondGroundHeatExchangerData::factory( int const EP_UNUSED( objectType ), std::string objectName ) {
 		if ( GetInputFlag ) {
 			GetPondGroundHeatExchanger();
 			GetInputFlag = false;
 		}
-
-		if ( CompIndex == 0 ) {
-			PondGHENum = FindItemInList( CompName, PondGHE );
-			if ( PondGHENum == 0 ) {
-				ShowFatalError( "SimPondGroundHeatExchanger: Unit not found=" + CompName );
-			}
-			CompIndex = PondGHENum;
-		} else {
-			PondGHENum = CompIndex;
-			if ( PondGHENum > NumOfPondGHEs || PondGHENum < 1 ) {
-				ShowFatalError( "SimPondGroundHeatExchanger:  Invalid CompIndex passed=" + TrimSigDigits( PondGHENum ) + ", Number of Units=" + TrimSigDigits( NumOfPondGHEs ) + ", Entered Unit name=" + CompName );
-			}
-			if ( CheckEquipName( PondGHENum ) ) {
-				if ( CompName != PondGHE( PondGHENum ).Name ) {
-					ShowFatalError( "SimPondGroundHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( PondGHENum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + PondGHE( PondGHENum ).Name );
-				}
-				CheckEquipName( PondGHENum ) = false;
+		for ( auto & ghx : PondGHE ) {
+			if ( ghx.Name == objectName ) {
+				return &ghx;
 			}
 		}
+		// If we didn't find it, fatal
+		ShowFatalError( "Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
+	}
 
-		if ( InitLoopEquip ) {
-			InitPondGroundHeatExchanger( PondGHENum, FirstHVACIteration, RunFlag );
-			MaxLoad = PondGHE( PondGHENum ).DesignCapacity;
-			MinLoad = 0.0;
-			OptLoad = PondGHE( PondGHENum ).DesignCapacity;
-			return;
-		}
-
-		// initialize
-		InitPondGroundHeatExchanger( PondGHENum, FirstHVACIteration, RunFlag );
-		// make the calculations
-		CalcPondGroundHeatExchanger( PondGHENum );
-		// update vaiables
-		UpdatePondGroundHeatExchanger( PondGHENum );
-		// update report variables
-		ReportPondGroundHeatExchanger( PondGHENum );
+	void PondGroundHeatExchangerData::getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) {
+		this->InitPondGroundHeatExchanger( true );
+		MaxLoad = this->DesignCapacity;
+		MinLoad = 0.0;
+		OptLoad = this->DesignCapacity;
 
 	}
 
-	//==============================================================================
 
 	void
 	GetPondGroundHeatExchanger()
@@ -288,20 +266,16 @@ namespace PondGroundHeatExchanger {
 		NumOfPondGHEs = GetNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( PondGHE ) ) PondGHE.deallocate();
-		if ( allocated( PondGHEReport ) ) PondGHEReport.deallocate();
 
 		PondGHE.allocate( NumOfPondGHEs );
-		PondGHEReport.allocate( NumOfPondGHEs );
-		CheckEquipName.dimension( NumOfPondGHEs, true );
-
-		// record fluid prop index for water
-		WaterIndex = FindGlycol( fluidNameWater );
 
 		// Obtain all of the user data related to the ponds...
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
 
 			// get the input data
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+
+			PondGHE( Item ).WaterIndex = FindGlycol( fluidNameWater );
 
 			// General user input data
 			PondGHE( Item ).Name = cAlphaArgs( 1 );
@@ -407,31 +381,24 @@ namespace PondGroundHeatExchanger {
 
 		// Set up the output variables
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
-			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Rate [W]", PondGHEReport( Item ).HeatTransferRate, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Energy [J]", PondGHEReport( Item ).Energy, "Plant", "Sum", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Mass Flow Rate [kg/s]", PondGHEReport( Item ).MassFlowRate, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Inlet Temperature [C]", PondGHEReport( Item ).InletTemp, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Outlet Temperature [C]", PondGHEReport( Item ).OutletTemp, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Bulk Temperature [C]", PondGHEReport( Item ).PondTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Rate [W]", PondGHE( Item ).HeatTransferRate, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Energy [J]", PondGHE( Item ).Energy, "Plant", "Sum", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Mass Flow Rate [kg/s]", PondGHE( Item ).MassFlowRate, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Inlet Temperature [C]", PondGHE( Item ).InletTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Outlet Temperature [C]", PondGHE( Item ).OutletTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Bulk Temperature [C]", PondGHE( Item ).PondTemp, "Plant", "Average", PondGHE( Item ).Name );
 		}
 
-		if ( NoDeepGroundTempObjWarning ) {
-			if ( ! GroundTemp_DeepObjInput ) {
-				ShowWarningError( "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input." );
-				ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp_Deep, 1 ) + ") will be used." );
-			}
-			NoDeepGroundTempObjWarning = false;
+		if ( ! GroundTemp_DeepObjInput ) {
+			ShowWarningError( "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input." );
+			ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp_Deep, 1 ) + ") will be used." );
 		}
 
 	}
 
-	//==============================================================================
-
 	void
-	InitPondGroundHeatExchanger(
-		int const PondGHENum, // component number
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		bool const EP_UNUSED( RunFlag ) // TRUE if equipment scheduled to operate
+	PondGroundHeatExchangerData::InitPondGroundHeatExchanger(
+		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
 	)
 	{
 
@@ -492,10 +459,7 @@ namespace PondGroundHeatExchanger {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Real64 DesignFlow; // Hypothetical design flow rate
-		static bool OneTimeFlag( true ); // flag for one time intializations
-		int PondNum; // loop counter
-		static Array1D_bool MyFlag;
-		static bool MyOneTimeFlag( true );
+		//int PondNum; // loop counter
 		int LoopNum;
 		int LoopSideNum;
 		Real64 rho;
@@ -504,77 +468,65 @@ namespace PondGroundHeatExchanger {
 		//repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
 		//For each environment start the pond midway between drybulb and ground temp.
 
-		if ( OneTimeFlag || WarmupFlag ) {
-			for ( PondNum = 1; PondNum <= NumOfPondGHEs; ++PondNum ) {
-				// initialize pond temps to mean of drybulb and ground temps.
-				PondGHE.BulkTemperature() = 0.5 * ( OutDryBulbTempAt( PondHeight ) + GroundTemp_Deep );
-				PondGHE.PastBulkTemperature() = 0.5 * ( OutDryBulbTempAt( PondHeight ) + GroundTemp_Deep );
-				OneTimeFlag = false;
-			}
+		if ( this->OneTimeFlag || WarmupFlag ) {
+			// initialize pond temps to mean of drybulb and ground temps.
+			this->BulkTemperature = this->PastBulkTemperature = 0.5 * ( OutDryBulbTempAt( PondHeight ) + GroundTemp_Deep );
+			this->OneTimeFlag = false;
 		}
 
-		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumOfPondGHEs );
-			MyOneTimeFlag = false;
-			MyFlag = true;
-		}
 
 		// Init more variables
-		if ( MyFlag( PondGHENum ) ) {
+		if ( this->MyFlag ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( PondGHE( PondGHENum ).Name, TypeOf_GrndHtExchgPond, PondGHE( PondGHENum ).LoopNum, PondGHE( PondGHENum ).LoopSideNum, PondGHE( PondGHENum ).BranchNum, PondGHE( PondGHENum ).CompNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "InitPondGroundHeatExchanger: Program terminated due to previous condition(s)." );
 			}
-			rho = GetDensityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
-			Cp = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
-			PondGHE( PondGHENum ).DesignMassFlowRate = Pi / 4.0 * pow_2( PondGHE( PondGHENum ).TubeInDiameter ) * DesignVelocity * rho * PondGHE( PondGHENum ).NumCircuits;
-			PondGHE( PondGHENum ).DesignCapacity = PondGHE( PondGHENum ).DesignMassFlowRate * Cp * 10.0; //assume 10C delta T?
-			InitComponentNodes( 0.0, PondGHE( PondGHENum ).DesignMassFlowRate, PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).OutletNodeNum, PondGHE( PondGHENum ).LoopNum, PondGHE( PondGHENum ).LoopSideNum, PondGHE( PondGHENum ).BranchNum, PondGHE( PondGHENum ).CompNum );
-			RegisterPlantCompDesignFlow( PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).DesignMassFlowRate / rho );
+			rho = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, constant_zero, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, constant_zero, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+			this->DesignMassFlowRate = Pi / 4.0 * pow_2( this->TubeInDiameter ) * DesignVelocity * rho * this->NumCircuits;
+			this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; //assume 10C delta T?
+			InitComponentNodes( 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
+			RegisterPlantCompDesignFlow( this->InletNodeNum, this->DesignMassFlowRate / rho );
 
-			MyFlag( PondGHENum ) = false;
+			this->MyFlag = false;
 		}
 
 		// check if we are in very first call for this zone time step
-		LoopNum = PondGHE( PondGHENum ).LoopNum;
-		LoopSideNum = PondGHE( PondGHENum ).LoopSideNum;
+		LoopNum = this->LoopNum;
+		LoopSideNum = this->LoopSideNum;
 		if ( BeginTimeStepFlag && FirstHVACIteration && PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 1 ) { //DSU
 			// update past temperature
-			PondGHE( PondGHENum ).PastBulkTemperature = PondGHE( PondGHENum ).BulkTemperature;
+			this->PastBulkTemperature = this->BulkTemperature;
 		}
 
 		// initialize - module variables
-		InletNodeNum = PondGHE( PondGHENum ).InletNodeNum;
-		OutletNodeNum = PondGHE( PondGHENum ).OutletNodeNum;
-		PondArea = PondGHE( PondGHENum ).Area;
-		PondDepth = PondGHE( PondGHENum ).Depth;
-		InletTemp = Node( InletNodeNum ).Temp;
+		//InletNodeNum = this->InletNodeNum;
+		//OutletNodeNum = this->OutletNodeNum;
+		this->InletTemp = Node( InletNodeNum ).Temp;
 		OutletTemp = Node( OutletNodeNum ).Temp;
-		TubeInDiameter = PondGHE( PondGHENum ).TubeInDiameter;
-		TubeOutDiameter = PondGHE( PondGHENum ).TubeOutDiameter;
-		TubeConductivity = PondGHE( PondGHENum ).TubeConductivity;
-		GrndConductivity = PondGHE( PondGHENum ).GrndConductivity;
-		NumCircuits = PondGHE( PondGHENum ).NumCircuits;
-		CircLength = PondGHE( PondGHENum ).CircuitLength;
+		//TubeInDiameter = this->TubeInDiameter;
+		//TubeOutDiameter = this->TubeOutDiameter;
+		//TubeConductivity = this->TubeConductivity;
+		//GrndConductivity = this->GrndConductivity;
+		//NumCircuits = this->NumCircuits;
 		// temperatures
-		PondTemp = PondGHE( PondGHENum ).BulkTemperature;
-		PastPondTemp = PondGHE( PondGHENum ).PastBulkTemperature;
+		PondTemp = this->BulkTemperature;
 
-		DesignFlow = RegulateCondenserCompFlowReqOp( PondGHE( PondGHENum ).LoopNum, PondGHE( PondGHENum ).LoopSideNum, PondGHE( PondGHENum ).BranchNum, PondGHE( PondGHENum ).CompNum, PondGHE( PondGHENum ).DesignMassFlowRate );
+		DesignFlow = RegulateCondenserCompFlowReqOp( this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate );
 
-		SetComponentFlowRate( DesignFlow, PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).OutletNodeNum, PondGHE( PondGHENum ).LoopNum, PondGHE( PondGHENum ).LoopSideNum, PondGHE( PondGHENum ).BranchNum, PondGHE( PondGHENum ).CompNum );
+		SetComponentFlowRate( DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
 		// get the current flow rate - module variable
-		FlowRate = Node( InletNodeNum ).MassFlowRate;
+		this->MassFlowRate = Node( InletNodeNum ).MassFlowRate;
 
 	}
 
 	//==============================================================================
 
 	void
-	CalcPondGroundHeatExchanger( int const PondGHENum ) // Number of the Pond GHE
+	PondGroundHeatExchangerData::CalcPondGroundHeatExchanger()
 	{
 
 		//       AUTHOR         Simon Rees
@@ -632,20 +584,20 @@ namespace PondGroundHeatExchanger {
 		Real64 SpecificHeat;
 		Real64 PondMass;
 
-		PondMass = PondDepth * PondArea * GetDensityGlycol( fluidNameWater, max( PondTemp, constant_zero ), WaterIndex, RoutineName );
+		PondMass = this->Depth * this->Area * GetDensityGlycol( fluidNameWater, max( PondTemp, constant_zero ), this->WaterIndex, RoutineName );
 
-		SpecificHeat = GetSpecificHeatGlycol( fluidNameWater, max( PondTemp, constant_zero ), WaterIndex, RoutineName ); //DSU bug fix here, was using working fluid index
+		SpecificHeat = GetSpecificHeatGlycol( fluidNameWater, max( PondTemp, constant_zero ), this->WaterIndex, RoutineName ); //DSU bug fix here, was using working fluid index
 
-		Flux = CalcTotalFLux( PondTemp, PondGHENum );
-		PondTempStar = PastPondTemp + 0.5 * SecInHour * TimeStepSys * Flux / ( SpecificHeat * PondMass );
+		Flux = this->CalcTotalFLux( PondTemp );
+		PondTempStar = this->PastBulkTemperature + 0.5 * SecInHour * TimeStepSys * Flux / ( SpecificHeat * PondMass );
 
-		FluxStar = CalcTotalFLux( PondTempStar, PondGHENum );
-		PondTempStarStar = PastPondTemp + 0.5 * SecInHour * TimeStepSys * FluxStar / ( SpecificHeat * PondMass );
+		FluxStar = this->CalcTotalFLux( PondTempStar );
+		PondTempStarStar = this->PastBulkTemperature + 0.5 * SecInHour * TimeStepSys * FluxStar / ( SpecificHeat * PondMass );
 
-		FluxStarStar = CalcTotalFLux( PondTempStarStar, PondGHENum );
-		PondTempStarStarStar = PastPondTemp + SecInHour * TimeStepSys * FluxStarStar / ( SpecificHeat * PondMass );
+		FluxStarStar = this->CalcTotalFLux( PondTempStarStar );
+		PondTempStarStarStar = this->PastBulkTemperature + SecInHour * TimeStepSys * FluxStarStar / ( SpecificHeat * PondMass );
 
-		NewPondTemp = PastPondTemp + SecInHour * TimeStepSys * ( Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + CalcTotalFLux( PondTempStarStarStar, PondGHENum ) ) / ( 6.0 * SpecificHeat * PondMass );
+		NewPondTemp = this->PastBulkTemperature + SecInHour * TimeStepSys * ( Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux( PondTempStarStarStar ) ) / ( 6.0 * SpecificHeat * PondMass );
 
 		PondTemp = NewPondTemp;
 
@@ -654,9 +606,8 @@ namespace PondGroundHeatExchanger {
 	//==============================================================================
 
 	Real64
-	CalcTotalFLux(
-		Real64 const PondBulkTemp, // pond temp for this flux calculation
-		int const PondGHENum // Number of the Pond GHE
+	PondGroundHeatExchangerData::CalcTotalFLux(
+		Real64 const PondBulkTemp // pond temp for this flux calculation
 	)
 	{
 
@@ -783,11 +734,11 @@ namespace PondGroundHeatExchanger {
 		FluxSolAbsorbed = CalcSolarFlux();
 
 		// specific heat from fluid prop routines
-		SpecHeat = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, max( InletTemp, 0.0 ), PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
+		SpecHeat = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, max( this->InletTemp, 0.0 ), PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 		// heat transfer with fluid - heat exchanger analogy.
-		Qfluid = FlowRate * SpecHeat * CalcEffectiveness( InletTemp, PondBulkTemp, FlowRate, PondGHENum ) * ( InletTemp - PondBulkTemp );
+		Qfluid = this->MassFlowRate * SpecHeat * this->CalcEffectiveness( this->InletTemp, PondBulkTemp, this->MassFlowRate ) * ( this->InletTemp - PondBulkTemp );
 
-		HeatTransRate = Qfluid;
+		this->HeatTransferRate = Qfluid;
 
 		// evaporation flux
 		// get air properties
@@ -799,11 +750,11 @@ namespace PondGroundHeatExchanger {
 		FluxEvap = pow_2( PrantlAir / SchmidtAir ) / 3.0 * ConvCoef / SpecHeatAir * ( HumRatioFilm - HumRatioAir ) * LatentHeatAir;
 
 		// ground heat transfer flux
-		Perimeter = 4.0 * std::sqrt( PondArea ); // square assumption
-		UvalueGround = 0.999 * ( GrndConductivity / PondDepth ) + 1.37 * ( GrndConductivity * Perimeter / PondArea );
+		Perimeter = 4.0 * std::sqrt( this->Area ); // square assumption
+		UvalueGround = 0.999 * ( GrndConductivity / this->Depth ) + 1.37 * ( GrndConductivity * Perimeter / this->Area );
 		FluxGround = UvalueGround * ( PondBulkTemp - GroundTemp_Deep );
 
-		CalcTotalFLux = Qfluid + PondArea * ( FluxSolAbsorbed - FluxConvect - FluxLongwave - FluxEvap - FluxGround );
+		CalcTotalFLux = Qfluid + this->Area * ( FluxSolAbsorbed - FluxConvect - FluxLongwave - FluxEvap - FluxGround );
 		if ( BeginTimeStepFlag ) {
 
 		}
@@ -814,7 +765,7 @@ namespace PondGroundHeatExchanger {
 	//==============================================================================
 
 	Real64
-	CalcSolarFlux()
+	PondGroundHeatExchangerData::CalcSolarFlux()
 	{
 
 		// FUNCTION INFORMATION:
@@ -889,7 +840,7 @@ namespace PondGroundHeatExchanger {
 		RefractAngle = std::asin( std::sin( IncidAngle ) * AirRefIndex / WaterRefIndex );
 
 		// absorbed component: Tau_a
-		Absorbtance = std::exp( -PondExtCoef * PondDepth / std::cos( RefractAngle ) );
+		Absorbtance = std::exp( -PondExtCoef * this->Depth / std::cos( RefractAngle ) );
 
 		// parallel and perpendicular components
 		ParallelRad = pow_2( std::tan( RefractAngle - IncidAngle ) ) / pow_2( std::tan( RefractAngle + IncidAngle ) );
@@ -911,11 +862,10 @@ namespace PondGroundHeatExchanger {
 	//==============================================================================
 
 	Real64
-	CalcEffectiveness(
+	PondGroundHeatExchangerData::CalcEffectiveness(
 		Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
 		Real64 const PondTemperature, // Temperature of pond water (i.e. outside the pipe), in C
-		Real64 const MassFlowRate, // Mass flow rate, in kg/s
-		int const PondGHENum // Number of the Pond GHE
+		Real64 const MassFlowRate // Mass flow rate, in kg/s
 	)
 	{
 
@@ -995,10 +945,10 @@ namespace PondGroundHeatExchanger {
 
 		// evaluate properties at pipe fluid temperature for given pipe fluid
 
-		SpecificHeat = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InsideTemperature, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, CalledFrom );
-		Conductivity = GetConductivityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InsideTemperature, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, CalledFrom );
-		Viscosity = GetViscosityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InsideTemperature, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, CalledFrom );
-		Density = GetDensityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InsideTemperature, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, CalledFrom );
+		SpecificHeat = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, InsideTemperature, PlantLoop( this->LoopNum ).FluidIndex, CalledFrom );
+		Conductivity = GetConductivityGlycol( PlantLoop( this->LoopNum ).FluidName, InsideTemperature, PlantLoop( this->LoopNum ).FluidIndex, CalledFrom );
+		Viscosity = GetViscosityGlycol( PlantLoop( this->LoopNum ).FluidName, InsideTemperature, PlantLoop( this->LoopNum ).FluidIndex, CalledFrom );
+		Density = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, InsideTemperature, PlantLoop( this->LoopNum ).FluidIndex, CalledFrom );
 
 		// Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
 		ReynoldsNum = 4.0 * MassFlowRate / ( Pi * Viscosity * TubeInDiameter * NumCircuits );
@@ -1016,17 +966,17 @@ namespace PondGroundHeatExchanger {
 		ConvCoefIn = Conductivity * NuseltNum / TubeInDiameter;
 
 		// now find properties of pond water - always assume pond fluid is water
-		WaterSpecHeat = GetSpecificHeatGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
-		Conductivity = GetConductivityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
-		Viscosity = GetViscosityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
-		Density = GetDensityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
+		WaterSpecHeat = GetSpecificHeatGlycol( fluidNameWater, max( PondTemperature, 0.0 ), this->WaterIndex, CalledFrom );
+		Conductivity = GetConductivityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), this->WaterIndex, CalledFrom );
+		Viscosity = GetViscosityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), this->WaterIndex, CalledFrom );
+		Density = GetDensityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), this->WaterIndex, CalledFrom );
 
 		// derived properties for natural convection coefficient
 		// expansion coef (Beta) = -1/Rho. dRho/dT
 		// The following code includes some slight modifications from Simon's original code.
 		// It guarantees that the delta T is 10C and also avoids the problems associated with
 		// water hitting a maximum density at around 4C. (RKS)
-		ExpansionCoef = -( GetDensityGlycol( fluidNameWater, max( PondTemperature, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( fluidNameWater, max( PondTemperature, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * Density );
+		ExpansionCoef = -( GetDensityGlycol( fluidNameWater, max( PondTemperature, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( fluidNameWater, max( PondTemperature, 10.0 ) - 5.0, this->WaterIndex, CalledFrom ) ) / ( 10.0 * Density );
 
 		ThermDiff = Conductivity / ( Density * WaterSpecHeat );
 		PrantlNum = Viscosity * WaterSpecHeat / Conductivity;
@@ -1052,24 +1002,24 @@ namespace PondGroundHeatExchanger {
 		if ( MassFlowRate == 0.0 ) {
 			CalcEffectiveness = 1.0;
 		} else {
-			NTU = Pi * TubeInDiameter * CircLength * NumCircuits / ( TotalResistance * MassFlowRate * SpecificHeat );
+			NTU = Pi * TubeInDiameter * this->CircuitLength * NumCircuits / ( TotalResistance * MassFlowRate * SpecificHeat );
 			// Calculate effectiveness - formula for static fluid
 			CalcEffectiveness = ( 1.0 - std::exp( -NTU ) );
 		}
 
 		// Check for frozen pond
 		if ( PondTemperature < 0.0 ) {
-			++PondGHE( PondGHENum ).ConsecutiveFrozen;
-			if ( PondGHE( PondGHENum ).FrozenErrIndex == 0 ) {
-				ShowWarningMessage( "GroundHeatExchanger:Pond=\"" + PondGHE( PondGHENum ).Name + "\", is frozen; Pond model not valid. Calculated Pond Temperature=[" + RoundSigDigits( PondTemperature, 2 ) + "] C" );
+			++this->ConsecutiveFrozen;
+			if ( this->FrozenErrIndex == 0 ) {
+				ShowWarningMessage( "GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen; Pond model not valid. Calculated Pond Temperature=[" + RoundSigDigits( PondTemperature, 2 ) + "] C" );
 				ShowContinueErrorTimeStamp( "" );
 			}
-			ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Pond=\"" + PondGHE( PondGHENum ).Name + "\", is frozen", PondGHE( PondGHENum ).FrozenErrIndex, PondTemperature, PondTemperature, _, "[C]", "[C]" );
-			if ( PondGHE( PondGHENum ).ConsecutiveFrozen >= NumOfTimeStepInHour * 30 ) {
-				ShowFatalError( "GroundHeatExchanger:Pond=\"" + PondGHE( PondGHENum ).Name + "\" has been frozen for 30 consecutive hours.  Program terminates." );
+			ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen", this->FrozenErrIndex, PondTemperature, PondTemperature, _, "[C]", "[C]" );
+			if ( this->ConsecutiveFrozen >= NumOfTimeStepInHour * 30 ) {
+				ShowFatalError( "GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates." );
 			}
 		} else {
-			PondGHE( PondGHENum ).ConsecutiveFrozen = 0;
+			this->ConsecutiveFrozen = 0;
 		}
 
 		return CalcEffectiveness;
@@ -1079,7 +1029,7 @@ namespace PondGroundHeatExchanger {
 	//==============================================================================
 
 	void
-	UpdatePondGroundHeatExchanger( int const PondGHENum ) // Index for the pond
+	PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1120,26 +1070,26 @@ namespace PondGroundHeatExchanger {
 
 		// Calculate the water side outlet conditions and set the
 		// appropriate conditions on the correct HVAC node.
-		CpFluid = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InletTemp, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
+		CpFluid = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, this->InletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 		// check for flow
 
 		SafeCopyPlantNode( InletNodeNum, OutletNodeNum );
 
-		if ( ( CpFluid > 0.0 ) && ( FlowRate > 0.0 ) ) {
+		if ( ( CpFluid > 0.0 ) && ( this->MassFlowRate > 0.0 ) ) {
 
-			Node( OutletNodeNum ).Temp = InletTemp - HeatTransRate / ( FlowRate * CpFluid );
+			Node( OutletNodeNum ).Temp = this->InletTemp - this->HeatTransferRate / ( this->MassFlowRate * CpFluid );
 			Node( OutletNodeNum ).Enthalpy = Node( OutletNodeNum ).Temp * CpFluid;
 		}
 
 		// keep track of the bulk temperature
-		PondGHE( PondGHENum ).BulkTemperature = PondTemp;
+		this->BulkTemperature = PondTemp;
 
 	}
 
 	//==============================================================================
 
 	void
-	ReportPondGroundHeatExchanger( int const PondGHENum ) // Index for the pond under consideration
+	PondGroundHeatExchangerData::ReportPondGroundHeatExchanger() // Index for the pond under consideration
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1179,39 +1129,15 @@ namespace PondGroundHeatExchanger {
 		// FLOW:
 
 		// update flows and temps from node data
-		PondGHEReport( PondGHENum ).InletTemp = Node( PondGHE( PondGHENum ).InletNodeNum ).Temp;
-		PondGHEReport( PondGHENum ).OutletTemp = Node( PondGHE( PondGHENum ).OutletNodeNum ).Temp;
-		PondGHEReport( PondGHENum ).MassFlowRate = Node( PondGHE( PondGHENum ).InletNodeNum ).MassFlowRate;
+		this->InletTemp = Node( this->InletNodeNum ).Temp;
+		this->OutletTemp = Node( this->OutletNodeNum ).Temp;
+		this->MassFlowRate = Node( this->InletNodeNum ).MassFlowRate;
 
 		// update other variables from module variables
-		PondGHEReport( PondGHENum ).HeatTransferRate = HeatTransRate;
-		PondGHEReport( PondGHENum ).Energy = HeatTransRate * TimeStepSys * SecInHour;
-		PondGHEReport( PondGHENum ).PondTemp = PondTemp;
+		this->Energy = this->HeatTransferRate * TimeStepSys * SecInHour;
+		//this->PondTemp = PondTemp;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PondGroundHeatExchanger
 

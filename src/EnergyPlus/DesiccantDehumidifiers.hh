@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DesiccantDehumidifiers_hh_INCLUDED
 #define DesiccantDehumidifiers_hh_INCLUDED
 
@@ -265,229 +323,6 @@ namespace DesiccantDehumidifiers {
 			RegenCoilCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		DesiccantDehumidifierData(
-			std::string const & Name, // unique name of component
-			std::string const & Sched, // name of availability schedule
-			std::string const & RegenCoilType, // type of regen coil
-			std::string const & RegenCoilName, // name of regen coil
-			std::string const & RegenFanType, // type of regen fan
-			std::string const & RegenFanName, // name of regen fan
-			int const PerformanceModel_Num, // type of performance model, default or user curves
-			int const ProcAirInNode, // process air inlet node of dehumidifier
-			int const ProcAirOutNode, // process air outlet node of dehumidifier
-			int const RegenAirInNode, // regen air inlet node of dehumidifier
-			int const RegenAirOutNode, // regen air outlet node of dehumidifier
-			int const RegenFanInNode, // regen fan inlet node
-			int const ControlType, // type of controls
-			Real64 const HumRatSet, // humidity ratio setpoint [kg water / kg air]
-			Real64 const NomProcAirVolFlow, // nominal process air flow rate [m3/s]
-			Real64 const NomProcAirVel, // nominal process air velocity [m/s]
-			Real64 const NomRotorPower, // rotor power consumption at full output [W]
-			int const RegenCoilIndex, // Index for regen coil
-			int const RegenFanIndex, // Index for regen fan
-			int const ProcDryBulbCurvefTW, // number of process leaving dry bulb f(edb,ew) curve
-			int const ProcDryBulbCurvefV, // number of process leaving dry bulb f(v) curve
-			int const ProcHumRatCurvefTW, // number of process leaving humidity ratio f(edb,ew) curve
-			int const ProcHumRatCurvefV, // number of process leaving humidity ratio f(v) curve
-			int const RegenEnergyCurvefTW, // number of regen energy f(edb,ew) curve
-			int const RegenEnergyCurvefV, // number of regen energy f(v) curve
-			int const RegenVelCurvefTW, // number of regen velocity f(edb,ew) curve
-			int const RegenVelCurvefV, // number of regen velocity f(v) curve
-			Real64 const NomRegenTemp, // nominal regen temperature for regen energy curve [C]
-			Real64 const MinProcAirInTemp, // min allowable process inlet air temperature [C]
-			Real64 const MaxProcAirInTemp, // max allowable process inlet air temperature [C]
-			Real64 const MinProcAirInHumRat, // min allowable process inlet air humidity ratio [kg water / kg air]
-			Real64 const MaxProcAirInHumRat, // max allowable process inlet air humidity ratio [kg water / kg air]
-			int const SchedPtr, // index of availability schedule
-			Real64 const NomProcAirMassFlow, // nominal process air mass flow rate [kg/s]
-			Real64 const NomRegenAirMassFlow, // nominal regeneration air mass flow rate [kg/s]
-			Real64 const ProcAirInTemp, // process inlet air temperature [C]
-			Real64 const ProcAirInHumRat, // process inlet air humidity ratio [kg water / kg air]
-			Real64 const ProcAirInEnthalpy, // process inlet air specific enthalpy [J/kg]
-			Real64 const ProcAirInMassFlowRate, // process inlet air mass flow rate [kg/s]
-			Real64 const ProcAirOutTemp, // process outlet air temperature [C]
-			Real64 const ProcAirOutHumRat, // process outlet air humidity ratio [kg water / kg air]
-			Real64 const ProcAirOutEnthalpy, // process outlet air specific enthalpy [J/kg]
-			Real64 const ProcAirOutMassFlowRate, // process outlet air mass flow rate [kg/s]
-			Real64 const RegenAirInTemp, // regen inlet air temperature [C]
-			Real64 const RegenAirInHumRat, // regen inlet air humidity ratio [kg water / kg air]
-			Real64 const RegenAirInEnthalpy, // regen inlet air specific enthalpy [J/kg]
-			Real64 const RegenAirInMassFlowRate, // regen inlet air mass flow rate [kg/s]
-			Real64 const RegenAirVel, // regen air velocity [m/s]
-			std::string const & DehumType, // Type of desiccant dehumidifier
-			int const DehumTypeCode, // Type of desiccant dehumidifier, integer code
-			Real64 const WaterRemove, // water removed [kg]
-			Real64 const WaterRemoveRate, // water removal rate [kg/s]
-			Real64 const SpecRegenEnergy, // specific regen energy [J/kg of water removed]
-			Real64 const QRegen, // regen energy rate requested from regen coil [W]
-			Real64 const RegenEnergy, // regen energy requested from regen coil [J]
-			Real64 const ElecUseEnergy, // electricity consumption [J]
-			Real64 const ElecUseRate, // electricity consumption rate [W]
-			Real64 const PartLoad, // fraction of dehumidification capacity required to meet setpoint
-			int const RegenCapErrorIndex1, // recurring error message index for insufficient regen coil capacity
-			int const RegenCapErrorIndex2, // recurring error message index for insufficient regen coil capacity
-			int const RegenCapErrorIndex3, // recurring error message index for insufficient regen coil capacity
-			int const RegenCapErrorIndex4, // recurring error message index for insufficient regen coil capacity
-			int const RegenFanErrorIndex1, // recurring error message index for incorrect regen fan flow
-			int const RegenFanErrorIndex2, // recurring error message index for incorrect regen fan flow
-			int const RegenFanErrorIndex3, // recurring error message index for incorrect regen fan flow
-			int const RegenFanErrorIndex4, // recurring error message index for incorrect regen fan flow
-			std::string const & HXType, // type of desiccant heat exchanger
-			std::string const & HXName, // name of desiccant heat exchanger
-			int const HXTypeNum, // parameter number of desiccant heat exchanger
-			std::string const & ExhaustFanCurveObject, // exhaust fan curve object
-			std::string const & CoolingCoilType, // type of cooling coil used with desiccant heat exchanger
-			std::string const & CoolingCoilName, // name of cooling coil used with desiccant heat exchanger
-			int const Preheat, // determine condenser waste heat usage for pre heating regen air
-			Real64 const RegenSetPointTemp, // heating set-point for regeneration air [C]
-			Real64 const ExhaustFanMaxVolFlowRate, // exhaust fan maximum allowable air flow rate [m3/s]
-			Real64 const ExhaustFanMaxMassFlowRate, // exhaust fan maximum allowable air mass flow rate [kg/s]
-			Real64 const ExhaustFanMaxPower, // exhaust fan maximum allowable power [W]
-			Real64 const ExhaustFanPower, // exhaust fan power for reporting [W]
-			Real64 const ExhaustFanElecConsumption, // exhaust fan electric consumption for reporting [J]
-			Real64 const CompanionCoilCapacity, // DX coil capacity for dehumidifier companion cooling coil [W]
-			int const RegenFanPlacement, // placement of the fan used for regeneration air flow
-			int const ControlNodeNum, // node number of control node
-			int const ExhaustFanCurveIndex, // exhaust fan curve object index
-			int const CompIndex, // index of HX component to call simheatrecovery
-			int const CoolingCoilOutletNode, // node number of cooling coil outlet node
-			int const RegenFanOutNode, // fan outlet node number mined from regen fan object
-			int const RegenCoilInletNode, // regen heating coil inlet node number mined from regen heater object
-			int const RegenCoilOutletNode, // regen heating coil outlet node number mined from regen heater object
-			int const HXProcInNode, // process inlet node num mined from desiccant heat exchanger object
-			int const HXProcOutNode, // process outlet node num mined from desiccant heat exchanger object
-			int const HXRegenInNode, // regen inlet node number mined from desiccant heat exchanger object
-			int const HXRegenOutNode, // regen outlet node number mined from desiccant heat exchanger object
-			int const CondenserInletNode, // regen outlet node number mined from desiccant heat exchanger object
-			int const DXCoilIndex, // DX Coil index mined from coil object
-			int const ErrCount, // error count
-			int const ErrIndex1, // error index
-			int const CoilUpstreamOfProcessSide, // used to determine if process inlet is pre-cooled
-			bool const RegenInletIsOutsideAirNode, // regen inlet is connected to an outside air node
-			int const RegenCoilType_Num, // type number of regen coil
-			int const CoilControlNode, // heating coil hot water or steam inlet node
-			int const CoilOutletNode, // outlet node for water coil
-			int const LoopNum, // plant loop index for water heating coil
-			int const LoopSide, // plant loop side  index for water heating coil
-			int const BranchNum, // plant loop branch index for water heating coil
-			int const CompNum, // plant loop component index for water heating coil
-			int const HotWaterCoilMaxIterIndex, // Index to recurring warning message
-			int const HotWaterCoilMaxIterIndex2, // Index to recurring warning message
-			Real64 const MaxCoilFluidFlow, // hot water or steam mass flow rate regen. heating coil [kg/s]
-			Real64 const RegenCoilCapacity // hot water or steam coil operating capacity [W]
-		) :
-			Name( Name ),
-			Sched( Sched ),
-			RegenCoilType( RegenCoilType ),
-			RegenCoilName( RegenCoilName ),
-			RegenFanType( RegenFanType ),
-			RegenFanName( RegenFanName ),
-			PerformanceModel_Num( PerformanceModel_Num ),
-			ProcAirInNode( ProcAirInNode ),
-			ProcAirOutNode( ProcAirOutNode ),
-			RegenAirInNode( RegenAirInNode ),
-			RegenAirOutNode( RegenAirOutNode ),
-			RegenFanInNode( RegenFanInNode ),
-			ControlType( ControlType ),
-			HumRatSet( HumRatSet ),
-			NomProcAirVolFlow( NomProcAirVolFlow ),
-			NomProcAirVel( NomProcAirVel ),
-			NomRotorPower( NomRotorPower ),
-			RegenCoilIndex( RegenCoilIndex ),
-			RegenFanIndex( RegenFanIndex ),
-			ProcDryBulbCurvefTW( ProcDryBulbCurvefTW ),
-			ProcDryBulbCurvefV( ProcDryBulbCurvefV ),
-			ProcHumRatCurvefTW( ProcHumRatCurvefTW ),
-			ProcHumRatCurvefV( ProcHumRatCurvefV ),
-			RegenEnergyCurvefTW( RegenEnergyCurvefTW ),
-			RegenEnergyCurvefV( RegenEnergyCurvefV ),
-			RegenVelCurvefTW( RegenVelCurvefTW ),
-			RegenVelCurvefV( RegenVelCurvefV ),
-			NomRegenTemp( NomRegenTemp ),
-			MinProcAirInTemp( MinProcAirInTemp ),
-			MaxProcAirInTemp( MaxProcAirInTemp ),
-			MinProcAirInHumRat( MinProcAirInHumRat ),
-			MaxProcAirInHumRat( MaxProcAirInHumRat ),
-			SchedPtr( SchedPtr ),
-			NomProcAirMassFlow( NomProcAirMassFlow ),
-			NomRegenAirMassFlow( NomRegenAirMassFlow ),
-			ProcAirInTemp( ProcAirInTemp ),
-			ProcAirInHumRat( ProcAirInHumRat ),
-			ProcAirInEnthalpy( ProcAirInEnthalpy ),
-			ProcAirInMassFlowRate( ProcAirInMassFlowRate ),
-			ProcAirOutTemp( ProcAirOutTemp ),
-			ProcAirOutHumRat( ProcAirOutHumRat ),
-			ProcAirOutEnthalpy( ProcAirOutEnthalpy ),
-			ProcAirOutMassFlowRate( ProcAirOutMassFlowRate ),
-			RegenAirInTemp( RegenAirInTemp ),
-			RegenAirInHumRat( RegenAirInHumRat ),
-			RegenAirInEnthalpy( RegenAirInEnthalpy ),
-			RegenAirInMassFlowRate( RegenAirInMassFlowRate ),
-			RegenAirVel( RegenAirVel ),
-			DehumType( DehumType ),
-			DehumTypeCode( DehumTypeCode ),
-			WaterRemove( WaterRemove ),
-			WaterRemoveRate( WaterRemoveRate ),
-			SpecRegenEnergy( SpecRegenEnergy ),
-			QRegen( QRegen ),
-			RegenEnergy( RegenEnergy ),
-			ElecUseEnergy( ElecUseEnergy ),
-			ElecUseRate( ElecUseRate ),
-			PartLoad( PartLoad ),
-			RegenCapErrorIndex1( RegenCapErrorIndex1 ),
-			RegenCapErrorIndex2( RegenCapErrorIndex2 ),
-			RegenCapErrorIndex3( RegenCapErrorIndex3 ),
-			RegenCapErrorIndex4( RegenCapErrorIndex4 ),
-			RegenFanErrorIndex1( RegenFanErrorIndex1 ),
-			RegenFanErrorIndex2( RegenFanErrorIndex2 ),
-			RegenFanErrorIndex3( RegenFanErrorIndex3 ),
-			RegenFanErrorIndex4( RegenFanErrorIndex4 ),
-			HXType( HXType ),
-			HXName( HXName ),
-			HXTypeNum( HXTypeNum ),
-			ExhaustFanCurveObject( ExhaustFanCurveObject ),
-			CoolingCoilType( CoolingCoilType ),
-			CoolingCoilName( CoolingCoilName ),
-			Preheat( Preheat ),
-			RegenSetPointTemp( RegenSetPointTemp ),
-			ExhaustFanMaxVolFlowRate( ExhaustFanMaxVolFlowRate ),
-			ExhaustFanMaxMassFlowRate( ExhaustFanMaxMassFlowRate ),
-			ExhaustFanMaxPower( ExhaustFanMaxPower ),
-			ExhaustFanPower( ExhaustFanPower ),
-			ExhaustFanElecConsumption( ExhaustFanElecConsumption ),
-			CompanionCoilCapacity( CompanionCoilCapacity ),
-			RegenFanPlacement( RegenFanPlacement ),
-			ControlNodeNum( ControlNodeNum ),
-			ExhaustFanCurveIndex( ExhaustFanCurveIndex ),
-			CompIndex( CompIndex ),
-			CoolingCoilOutletNode( CoolingCoilOutletNode ),
-			RegenFanOutNode( RegenFanOutNode ),
-			RegenCoilInletNode( RegenCoilInletNode ),
-			RegenCoilOutletNode( RegenCoilOutletNode ),
-			HXProcInNode( HXProcInNode ),
-			HXProcOutNode( HXProcOutNode ),
-			HXRegenInNode( HXRegenInNode ),
-			HXRegenOutNode( HXRegenOutNode ),
-			CondenserInletNode( CondenserInletNode ),
-			DXCoilIndex( DXCoilIndex ),
-			ErrCount( ErrCount ),
-			ErrIndex1( ErrIndex1 ),
-			CoilUpstreamOfProcessSide( CoilUpstreamOfProcessSide ),
-			RegenInletIsOutsideAirNode( RegenInletIsOutsideAirNode ),
-			RegenCoilType_Num( RegenCoilType_Num ),
-			CoilControlNode( CoilControlNode ),
-			CoilOutletNode( CoilOutletNode ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			HotWaterCoilMaxIterIndex( HotWaterCoilMaxIterIndex ),
-			HotWaterCoilMaxIterIndex2( HotWaterCoilMaxIterIndex2 ),
-			MaxCoilFluidFlow( MaxCoilFluidFlow ),
-			RegenCoilCapacity( RegenCoilCapacity )
-		{}
-
 	};
 
 	// Object Data
@@ -552,12 +387,17 @@ namespace DesiccantDehumidifiers {
 		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
+	// Clears the global data in HeatingCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	//        End of Reporting subroutines for the SimAir Module
 	// *****************************************************************************
 
 	//                                 COPYRIGHT NOTICE
 
-	//     Portions Copyright © Gas Research Institute 2001.  All rights reserved.
+	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
 
 	//     GRI LEGAL NOTICE
 	//     Neither GRI, members of GRI nor any person or organization acting on behalf
@@ -573,29 +413,6 @@ namespace DesiccantDehumidifiers {
 	//     B.  Assumes any liability with respoct to the use of, or for any and all
 	//         damages resulting from the use of the program or any portion thereof or
 	//         any information disclosed therein.
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DesiccantDehumidifiers
 

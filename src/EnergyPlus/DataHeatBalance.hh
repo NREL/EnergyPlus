@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataHeatBalance_hh_INCLUDED
 #define DataHeatBalance_hh_INCLUDED
 
@@ -211,6 +269,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_ElectricLoadCenterInverterLookUpTable;
 	extern int const IntGainTypeOf_ElectricLoadCenterStorageBattery;
 	extern int const IntGainTypeOf_ElectricLoadCenterStorageSimple;
+	extern int const IntGainTypeOf_ElectricLoadCenterConverter;
 	extern int const IntGainTypeOf_PipeIndoor;
 	extern int const IntGainTypeOf_RefrigerationCase;
 	extern int const IntGainTypeOf_RefrigerationCompressorRack;
@@ -899,323 +958,6 @@ namespace DataHeatBalance {
 			SlatOrientation( 0 )
 		{}
 
-		// Member Constructor
-		MaterialProperties(
-			std::string const & Name, // Name of material layer
-			int const Group, // Material group type (see Material Parameters above.  Currently
-			int const Roughness, // Surface roughness index (See Surface Roughness parameters
-			Real64 const Conductivity, // Thermal conductivity of layer (W/m2K)
-			Real64 const Density, // Layer density (kg/m3)
-			Real64 const IsoMoistCap, // Isothermal moisture capacity on water vapor density (m3/kg)
-			Real64 const Porosity, // Layer porosity
-			Real64 const Resistance, // Layer thermal resistance (alternative to Density,
-			bool const ROnly, // Material defined with "R" only
-			Real64 const SpecHeat, // Layer specific heat (J/kgK)
-			Real64 const ThermGradCoef, // Thermal-gradient coefficient for moisture capacity
-			Real64 const Thickness, // Layer thickness (m)
-			Real64 const VaporDiffus, // Layer vapor diffusivity
-			Array1_int const & GasType, // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
-			int const GlassSpectralDataPtr, // Number of a spectral data set associated with a window glass material
-			int const NumberOfGasesInMixture, // Number of gases in a window gas mixture
-			Array2< Real64 > const & GasCon, // Gas conductance coefficients for up to 5 gases in a mixture
-			Array2< Real64 > const & GasVis, // Gas viscosity coefficients for up to 5 gases in a mixture
-			Array2< Real64 > const & GasCp, // Gas specific-heat coefficients for up to 5 gases in a mixture
-			Array1< Real64 > const & GasWght, // Gas molecular weight for up to 5 gases in a mixture
-			Array1< Real64 > const & GasSpecHeatRatio, // Gas specific heat ratio (used for low pressure calculations)
-			Array1< Real64 > const & GasFract, // Gas fractions for up to 5 gases in a mixture
-			Real64 const AbsorpSolar, // Layer solar absorptance
-			Real64 const AbsorpSolarInput, // Layer solar absorptance input by user
-			bool const AbsorpSolarEMSOverrideOn, // if true, then EMS calling to override value for solar absorptance
-			Real64 const AbsorpSolarEMSOverride, // value to use when EMS calling to override value for solar absorptance
-			Real64 const AbsorpThermal, // Layer thermal absorptance
-			Real64 const AbsorpThermalInput, // Layer thermal absorptance input by user
-			bool const AbsorpThermalEMSOverrideOn, // if true, then EMS calling to override value for thermal absorptance
-			Real64 const AbsorpThermalEMSOverride, // value to use when EMS calling to override value for thermal absorptance
-			Real64 const AbsorpVisible, // Layer Visible Absorptance
-			Real64 const AbsorpVisibleInput, // Layer Visible Absorptance input by user
-			bool const AbsorpVisibleEMSOverrideOn, // if true, then EMS calling to override value for visible absorptance
-			Real64 const AbsorpVisibleEMSOverride, // value to use when EMS calling to override value for visible absorptance
-			Real64 const Trans, // Transmittance of layer (glass, shade)
-			Real64 const TransVis, // Visible transmittance (at normal incidence)
-			Real64 const GlassTransDirtFactor, // Multiplier on glass transmittance due to dirt
-			bool const SolarDiffusing, // True if glass diffuses beam solar radiation
-			Real64 const ReflectShade, // Shade or screen reflectance (interior shade only)
-			Real64 const ReflectShadeVis, // Shade reflectance for visible radiation
-			Real64 const AbsorpThermalBack, // Infrared radiation back absorption
-			Real64 const AbsorpThermalFront, // Infrared radiation front absorption
-			Real64 const ReflectSolBeamBack, // Solar back reflectance (beam to everything)
-			Real64 const ReflectSolBeamFront, // Solar front reflectance (beam to everything)
-			Real64 const ReflectSolDiffBack, // Solar back diffuse reflectance
-			Real64 const ReflectSolDiffFront, // Solar front diffuse reflectance
-			Real64 const ReflectVisBeamBack, // Visible back reflectance (beam to everything)
-			Real64 const ReflectVisBeamFront, // Visible front reflectance (beam to everything)
-			Real64 const ReflectVisDiffBack, // Visible back diffuse reflectance
-			Real64 const ReflectVisDiffFront, // Visible front diffuse reflectance
-			std::string const & ReflectanceModeling, // method used to account for screen scattering
-			Real64 const TransSolBeam, // Solar transmittance (beam to everything)
-			Real64 const TransThermal, // Infrared radiation transmittance
-			Real64 const TransVisBeam, // Visible transmittance (beam to everything)
-			int const BlindDataPtr, // Pointer to window blind data
-			int const ScreenDataPtr, // Pointer to window screen data
-			int const ScreenMapResolution, // Resolution of azimuth and altitude angles to print in transmittance map
-			Real64 const YoungModulus, // Young's modulus (Pa) - used in window deflection calculations
-			Real64 const PoissonsRatio, // Poisson's ratio - used in window deflection calculations
-			Real64 const DeflectedThickness, // Minimum gap thickness in deflected state (m).  Used with measured deflection
-			Real64 const Pressure, // Window Gap pressure (Pa)
-			int const SupportPillarPtr, // Pointer to support pillar data
-			int const DeflectionStatePtr, // Pointer to deflection state
-			int const ComplexShadePtr, // Pointer to complex shade data
-			int const GasPointer, // Pointer to gas or gas mixture used in the gap
-			Real64 const WinShadeToGlassDist, // Distance between window shade and adjacent glass (m)
-			Real64 const WinShadeTopOpeningMult, // Area of air-flow opening at top of shade, expressed as a fraction
-			Real64 const WinShadeBottomOpeningMult, // Area of air-flow opening at bottom of shade, expressed as a fraction
-			Real64 const WinShadeLeftOpeningMult, // Area of air-flow opening at left side of shade, expressed as a fraction
-			Real64 const WinShadeRightOpeningMult, // Area of air-flow opening at right side of shade, expressed as a fraction
-			Real64 const WinShadeAirFlowPermeability, // The effective area of openings in the shade itself, expressed as a
-			bool const EMPDMaterialProps, // True if EMPD properties have been assigned
-			Real64 const EMPDVALUE,
-			Real64 const MoistACoeff,
-			Real64 const MoistBCoeff,
-			Real64 const MoistCCoeff,
-			Real64 const MoistDCoeff,
-			Real64 const EMPDaCoeff,
-			Real64 const EMPDbCoeff,
-			Real64 const EMPDcCoeff,
-			Real64 const EMPDdCoeff,
-			int const EcoRoofCalculationMethod, // 1-Simple, 2-SchaapGenuchten
-			Real64 const HeightOfPlants, // plants' height
-			Real64 const LAI, // LeafAreaIndex (Dimensionless???)
-			Real64 const Lreflectivity, // LeafReflectivity
-			Real64 const LEmissitivity, // LeafEmissivity
-			Real64 const InitMoisture, // Initial soil moisture DJS
-			Real64 const MinMoisture, // Minimum moisture allowed DJS
-			Real64 const RStomata, // Minimum stomatal resistance DJS
-			int const niso, // Number of data points
-			Array1< Real64 > const & isodata, // isotherm values
-			Array1< Real64 > const & isorh, // isotherm RH values
-			int const nsuc, // Number of data points
-			Array1< Real64 > const & sucdata, // suction values
-			Array1< Real64 > const & sucwater, // suction water values
-			int const nred, // Number of data points
-			Array1< Real64 > const & reddata, // redistribution values
-			Array1< Real64 > const & redwater, // redistribution water values
-			int const nmu, // Number of data points
-			Array1< Real64 > const & mudata, // mu values
-			Array1< Real64 > const & murh, // mu rh values
-			int const ntc, // Number of data points
-			Array1< Real64 > const & tcdata, // thermal conductivity values
-			Array1< Real64 > const & tcwater, // thermal conductivity water values
-			Real64 const itemp, // initial Temperature
-			Real64 const irh, // Initial RH
-			Real64 const iwater, // Initial water content kg/kg
-			int const divs, // Number of divisions
-			Real64 const divsize, // Average Cell Size
-			int const divmin, // Minimum number of cells
-			int const divmax, // Maximum number of cells
-			Real64 const SpecTemp, // Temperature corresponding to the specified material properties
-			int const TCParent, // Reference to the parent object WindowMaterial:Glazing:Thermochromic
-			Real64 const SimpleWindowUfactor, // user input for simple window U-factor with film coefs (W/m2-k)
-			Real64 const SimpleWindowSHGC, // user input for simple window Solar Heat Gain Coefficient (non-dimensional)
-			Real64 const SimpleWindowVisTran, // (optional) user input for simple window Visual Transmittance (non-dimensional)
-			bool const SimpleWindowVTinputByUser, // false means not input, true means user provide VT input
-			bool const WarnedForHighDiffusivity, // used to limit error messaging to just the first instance
-			Real64 const ReflFrontBeamBeam, // Beam-Beam solar reflectance front at zero incident
-			Real64 const ReflBackBeamBeam, // Beam-Beam solar reflectance back at zero incident
-			Real64 const TausFrontBeamBeam, // Beam-Beam solar transmittance front at zero incident
-			Real64 const TausBackBeamBeam, // Beam-Beam solar transmittance back at zero incident
-			Real64 const ReflFrontBeamBeamVis, // Beam-Beam visible reflectance front at zero incident
-			Real64 const ReflBackBeamBeamVis, // Beam-Beam visible reflectance back at zero incident
-			Real64 const TausFrontBeamBeamVis, // Beam-Beam visible transmittance front at zero incident
-			Real64 const TausBackBeamBeamVis, // Beam-Beam visible transmittance back at zero incident
-			Real64 const ReflFrontBeamDiff, // Beam-Diffuse solar reflectance front at zero incident
-			Real64 const ReflBackBeamDiff, // Beam-Diffuse solar reflectance back at zero incident
-			Real64 const TausFrontBeamDiff, // Beam-Diffuse solar transmittance front at zero incident
-			Real64 const TausBackBeamDiff, // Beam-Diffuse solar transmittance back at zero incident
-			Real64 const ReflFrontBeamDiffVis, // Beam-Diffuse visible reflectance front at zero incident
-			Real64 const ReflBackBeamDiffVis, // Beam-Diffuse visible reflectance back at zero incident
-			Real64 const TausFrontBeamDiffVis, // Beam-Diffuse visible transmittance front at zero incident
-			Real64 const TausBackBeamDiffVis, // Beam-Diffuse visible transmittance back at zero incident
-			Real64 const ReflFrontDiffDiff, // Diffuse-Diffuse solar reflectance front
-			Real64 const ReflBackDiffDiff, // Diffuse-Diffuse solar reflectance back
-			Real64 const TausDiffDiff, // Diffuse-Diffuse solar transmittance (front and back)
-			Real64 const ReflFrontDiffDiffVis, // Diffuse-Diffuse visible reflectance front
-			Real64 const ReflBackDiffDiffVis, // Diffuse-Diffuse visible reflectance back
-			Real64 const TausDiffDiffVis, // Diffuse-Diffuse visible transmittance (front and back)
-			Real64 const EmissThermalFront, // Front side thermal or infrared Emissivity
-			Real64 const EmissThermalBack, // Back side thermal or infrared Emissivity
-			Real64 const TausThermal, // Thermal transmittance (front and back)
-			int const GapVentType, // Gap Ven type for equivalent Layer window model
-			bool const ISPleatedDrape, // if pleated drape= true, if nonpleated drape = false
-			Real64 const PleatedDrapeWidth, // width of the pleated drape fabric section
-			Real64 const PleatedDrapeLength, // length of the pleated drape fabric section
-			Real64 const ScreenWireSpacing, // insect screen wire spacing
-			Real64 const ScreenWireDiameter, // insect screen wire diameter
-			Real64 const SlatWidth, // slat width
-			Real64 const SlatSeparation, // slat seperation
-			Real64 const SlatCrown, // slat crown
-			Real64 const SlatAngle, // slat angle
-			int const SlatAngleType, // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
-			int const SlatOrientation, // horizontal or veritical
-			std::string const & GasName // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
-		) :
-			Name( Name ),
-			Group( Group ),
-			Roughness( Roughness ),
-			Conductivity( Conductivity ),
-			Density( Density ),
-			IsoMoistCap( IsoMoistCap ),
-			Porosity( Porosity ),
-			Resistance( Resistance ),
-			ROnly( ROnly ),
-			SpecHeat( SpecHeat ),
-			ThermGradCoef( ThermGradCoef ),
-			Thickness( Thickness ),
-			VaporDiffus( VaporDiffus ),
-			GasType( 5, GasType ),
-			GlassSpectralDataPtr( GlassSpectralDataPtr ),
-			NumberOfGasesInMixture( NumberOfGasesInMixture ),
-			GasCon( 3, 5, GasCon ),
-			GasVis( 3, 5, GasVis ),
-			GasCp( 3, 5, GasCp ),
-			GasWght( 5, GasWght ),
-			GasSpecHeatRatio( 5, GasSpecHeatRatio ),
-			GasFract( 5, GasFract ),
-			AbsorpSolar( AbsorpSolar ),
-			AbsorpSolarInput( AbsorpSolarInput ),
-			AbsorpSolarEMSOverrideOn( AbsorpSolarEMSOverrideOn ),
-			AbsorpSolarEMSOverride( AbsorpSolarEMSOverride ),
-			AbsorpThermal( AbsorpThermal ),
-			AbsorpThermalInput( AbsorpThermalInput ),
-			AbsorpThermalEMSOverrideOn( AbsorpThermalEMSOverrideOn ),
-			AbsorpThermalEMSOverride( AbsorpThermalEMSOverride ),
-			AbsorpVisible( AbsorpVisible ),
-			AbsorpVisibleInput( AbsorpVisibleInput ),
-			AbsorpVisibleEMSOverrideOn( AbsorpVisibleEMSOverrideOn ),
-			AbsorpVisibleEMSOverride( AbsorpVisibleEMSOverride ),
-			Trans( Trans ),
-			TransVis( TransVis ),
-			GlassTransDirtFactor( GlassTransDirtFactor ),
-			SolarDiffusing( SolarDiffusing ),
-			ReflectShade( ReflectShade ),
-			ReflectShadeVis( ReflectShadeVis ),
-			AbsorpThermalBack( AbsorpThermalBack ),
-			AbsorpThermalFront( AbsorpThermalFront ),
-			ReflectSolBeamBack( ReflectSolBeamBack ),
-			ReflectSolBeamFront( ReflectSolBeamFront ),
-			ReflectSolDiffBack( ReflectSolDiffBack ),
-			ReflectSolDiffFront( ReflectSolDiffFront ),
-			ReflectVisBeamBack( ReflectVisBeamBack ),
-			ReflectVisBeamFront( ReflectVisBeamFront ),
-			ReflectVisDiffBack( ReflectVisDiffBack ),
-			ReflectVisDiffFront( ReflectVisDiffFront ),
-			ReflectanceModeling( ReflectanceModeling ),
-			TransSolBeam( TransSolBeam ),
-			TransThermal( TransThermal ),
-			TransVisBeam( TransVisBeam ),
-			BlindDataPtr( BlindDataPtr ),
-			ScreenDataPtr( ScreenDataPtr ),
-			ScreenMapResolution( ScreenMapResolution ),
-			YoungModulus( YoungModulus ),
-			PoissonsRatio( PoissonsRatio ),
-			DeflectedThickness( DeflectedThickness ),
-			Pressure( Pressure ),
-			SupportPillarPtr( SupportPillarPtr ),
-			DeflectionStatePtr( DeflectionStatePtr ),
-			ComplexShadePtr( ComplexShadePtr ),
-			GasPointer( GasPointer ),
-			WinShadeToGlassDist( WinShadeToGlassDist ),
-			WinShadeTopOpeningMult( WinShadeTopOpeningMult ),
-			WinShadeBottomOpeningMult( WinShadeBottomOpeningMult ),
-			WinShadeLeftOpeningMult( WinShadeLeftOpeningMult ),
-			WinShadeRightOpeningMult( WinShadeRightOpeningMult ),
-			WinShadeAirFlowPermeability( WinShadeAirFlowPermeability ),
-			EMPDMaterialProps( EMPDMaterialProps ),
-			EMPDVALUE( EMPDVALUE ),
-			MoistACoeff( MoistACoeff ),
-			MoistBCoeff( MoistBCoeff ),
-			MoistCCoeff( MoistCCoeff ),
-			MoistDCoeff( MoistDCoeff ),
-			EMPDaCoeff( EMPDaCoeff ),
-			EMPDbCoeff( EMPDbCoeff ),
-			EMPDcCoeff( EMPDcCoeff ),
-			EMPDdCoeff( EMPDdCoeff ),
-			EcoRoofCalculationMethod( EcoRoofCalculationMethod ),
-			HeightOfPlants( HeightOfPlants ),
-			LAI( LAI ),
-			Lreflectivity( Lreflectivity ),
-			LEmissitivity( LEmissitivity ),
-			InitMoisture( InitMoisture ),
-			MinMoisture( MinMoisture ),
-			RStomata( RStomata ),
-			niso( niso ),
-			isodata( 27, isodata ),
-			isorh( 27, isorh ),
-			nsuc( nsuc ),
-			sucdata( 27, sucdata ),
-			sucwater( 27, sucwater ),
-			nred( nred ),
-			reddata( 27, reddata ),
-			redwater( 27, redwater ),
-			nmu( nmu ),
-			mudata( 27, mudata ),
-			murh( 27, murh ),
-			ntc( ntc ),
-			tcdata( 27, tcdata ),
-			tcwater( 27, tcwater ),
-			itemp( itemp ),
-			irh( irh ),
-			iwater( iwater ),
-			divs( divs ),
-			divsize( divsize ),
-			divmin( divmin ),
-			divmax( divmax ),
-			SpecTemp( SpecTemp ),
-			TCParent( TCParent ),
-			SimpleWindowUfactor( SimpleWindowUfactor ),
-			SimpleWindowSHGC( SimpleWindowSHGC ),
-			SimpleWindowVisTran( SimpleWindowVisTran ),
-			SimpleWindowVTinputByUser( SimpleWindowVTinputByUser ),
-			WarnedForHighDiffusivity( WarnedForHighDiffusivity ),
-			ReflFrontBeamBeam( ReflFrontBeamBeam ),
-			ReflBackBeamBeam( ReflBackBeamBeam ),
-			TausFrontBeamBeam( TausFrontBeamBeam ),
-			TausBackBeamBeam( TausBackBeamBeam ),
-			ReflFrontBeamBeamVis( ReflFrontBeamBeamVis ),
-			ReflBackBeamBeamVis( ReflBackBeamBeamVis ),
-			TausFrontBeamBeamVis( TausFrontBeamBeamVis ),
-			TausBackBeamBeamVis( TausBackBeamBeamVis ),
-			ReflFrontBeamDiff( ReflFrontBeamDiff ),
-			ReflBackBeamDiff( ReflBackBeamDiff ),
-			TausFrontBeamDiff( TausFrontBeamDiff ),
-			TausBackBeamDiff( TausBackBeamDiff ),
-			ReflFrontBeamDiffVis( ReflFrontBeamDiffVis ),
-			ReflBackBeamDiffVis( ReflBackBeamDiffVis ),
-			TausFrontBeamDiffVis( TausFrontBeamDiffVis ),
-			TausBackBeamDiffVis( TausBackBeamDiffVis ),
-			ReflFrontDiffDiff( ReflFrontDiffDiff ),
-			ReflBackDiffDiff( ReflBackDiffDiff ),
-			TausDiffDiff( TausDiffDiff ),
-			ReflFrontDiffDiffVis( ReflFrontDiffDiffVis ),
-			ReflBackDiffDiffVis( ReflBackDiffDiffVis ),
-			TausDiffDiffVis( TausDiffDiffVis ),
-			EmissThermalFront( EmissThermalFront ),
-			EmissThermalBack( EmissThermalBack ),
-			TausThermal( TausThermal ),
-			GapVentType( GapVentType ),
-			ISPleatedDrape( ISPleatedDrape ),
-			PleatedDrapeWidth( PleatedDrapeWidth ),
-			PleatedDrapeLength( PleatedDrapeLength ),
-			ScreenWireSpacing( ScreenWireSpacing ),
-			ScreenWireDiameter( ScreenWireDiameter ),
-			SlatWidth( SlatWidth ),
-			SlatSeparation( SlatSeparation ),
-			SlatCrown( SlatCrown ),
-			SlatAngle( SlatAngle ),
-			SlatAngleType( SlatAngleType ),
-			SlatOrientation( SlatOrientation ),
-			GasName( GasName )
-		{}
-
 	};
 
 	struct TCGlazingsType
@@ -1230,21 +972,6 @@ namespace DataHeatBalance {
 		// Default Constructor
 		TCGlazingsType() :
 			NumGlzMat( 0 )
-		{}
-
-		// Member Constructor
-		TCGlazingsType(
-			std::string const & Name, // Name
-			int const NumGlzMat, // Number of TC glazing materials
-			Array1_int const & LayerPoint, // Layer pointer
-			Array1< Real64 > const & SpecTemp, // Temperature corresponding to the specified TC glaing optical data
-			Array1_string const & LayerName // Name of the referenced WindowMaterial:Glazing object
-		) :
-			Name( Name ),
-			NumGlzMat( NumGlzMat ),
-			LayerPoint( LayerPoint ),
-			SpecTemp( SpecTemp ),
-			LayerName( LayerName )
 		{}
 
 	};
@@ -1538,253 +1265,6 @@ namespace DataHeatBalance {
 			TransDiffBackEQL( 0.0 )
 		{}
 
-		// Member Constructor
-		ConstructionData(
-			std::string const & Name, // Name of construction
-			int const TotLayers, // Total number of layers for the construction; for windows
-			int const TotSolidLayers, // Total number of solid (glass or shade) layers (windows only)
-			int const TotGlassLayers, // Total number of glass layers (windows only)
-			Array1_int const & LayerPoint, // Pointer array which refers back to
-			bool const IsUsed, // Marked true when the construction is used
-			Real64 const InsideAbsorpVis, // Inside Layer visible absorptance of an opaque surface; not used for windows.
-			Real64 const OutsideAbsorpVis, // Outside Layer visible absorptance of an opaque surface; not used for windows.
-			Real64 const InsideAbsorpSolar, // Inside Layer solar absorptance of an opaque surface; not used for windows.
-			Real64 const OutsideAbsorpSolar, // Outside Layer solar absorptance of an opaque surface; not used for windows.
-			Real64 const InsideAbsorpThermal, // Inside Layer Thermal absorptance for opaque surfaces or windows;
-			Real64 const OutsideAbsorpThermal, // Outside Layer Thermal absorptance
-			int const OutsideRoughness, // Outside Surface roughness index (6=very smooth, 5=smooth,
-			int const DayltPropPtr, // Pointer to Daylight Construction Properties
-			int const W5FrameDivider, // FrameDivider number for window construction from Window5 data file;
-			Array1< Real64 > const & CTFCross, // Cross or Y terms of the CTF equation
-			Array1< Real64 > const & CTFFlux, // Flux history terms of the CTF equation
-			Array1< Real64 > const & CTFInside, // Inside or Z terms of the CTF equation
-			Array1< Real64 > const & CTFOutside, // Outside or X terms of the CTF equation
-			Array1< Real64 > const & CTFSourceIn, // Heat source/sink inside terms of CTF equation
-			Array1< Real64 > const & CTFSourceOut, // Heat source/sink outside terms of CTF equation
-			Real64 const CTFTimeStep, // Time increment for stable simulation of construct (could be greater than TimeStep)
-			Array1< Real64 > const & CTFTSourceOut, // Outside terms of the CTF equation for interior temp
-			Array1< Real64 > const & CTFTSourceIn, // Inside terms of the CTF equation for interior temp
-			Array1< Real64 > const & CTFTSourceQ, // Source/sink terms of the CTF equation for interior temp
-			Array1< Real64 > const & CTFTUserOut, // Outside terms of the CTF equation for interior temp
-			Array1< Real64 > const & CTFTUserIn, // Inside terms of the CTF equation for interior temp
-			Array1< Real64 > const & CTFTUserSource, // Source/sink terms of the CTF equation for interior temp
-			int const NumHistories, // CTFTimeStep/TimeStepZone or the number of temp/flux history series
-			int const NumCTFTerms, // Number of CTF terms for this construction (not including terms at current time)
-			Real64 const UValue, // Overall heat transfer coefficient for the construction
-			int const SolutionDimensions, // Number of dimensions in the solution (1 for normal constructions,
-			int const SourceAfterLayer, // Source/sink is present after this layer in the construction
-			int const TempAfterLayer, // User is requesting a temperature calculation after this layer in the construction
-			Real64 const ThicknessPerpend, // Thickness between planes of symmetry in the direction
-			Real64 const AbsDiffIn, // Inner absorptance coefficient for diffuse radiation
-			Real64 const AbsDiffOut, // Outer absorptance coefficient for diffuse radiation
-			Array1< Real64 > const & AbsDiff, // Diffuse solar absorptance for each glass layer,
-			Array2< Real64 > const & BlAbsDiff, // Diffuse solar absorptance for each glass layer vs.
-			Array2< Real64 > const & BlAbsDiffGnd, // Diffuse ground solar absorptance for each glass layer
-			Array2< Real64 > const & BlAbsDiffSky, // Diffuse sky solar absorptance for each glass layer
-			Array1< Real64 > const & AbsDiffBack, // Diffuse back solar absorptance for each glass layer
-			Array2< Real64 > const & BlAbsDiffBack, // Diffuse back solar absorptance for each glass layer,
-			Real64 const AbsDiffShade, // Diffuse solar absorptance for shade
-			Array1< Real64 > const & AbsDiffBlind, // Diffuse solar absorptance for blind, vs. slat angle
-			Array1< Real64 > const & AbsDiffBlindGnd, // Diffuse ground solar absorptance for blind, vs. slat angle
-			Array1< Real64 > const & AbsDiffBlindSky, // Diffuse sky solar absorptance for blind, vs. slat angle
-			Real64 const AbsDiffBackShade, // Diffuse back solar absorptance for shade
-			Array1< Real64 > const & AbsDiffBackBlind, // Diffuse back solar absorptance for blind, vs. slat angle
-			Real64 const ShadeAbsorpThermal, // Diffuse back thermal absorptance of shade
-			Array2< Real64 > const & AbsBeamCoef, // Coefficients of incidence-angle polynomial for solar
-			Array2< Real64 > const & AbsBeamBackCoef, // As for AbsBeamCoef but for back-incident solar
-			Array1< Real64 > const & AbsBeamShadeCoef, // Coefficients of incidence-angle polynomial for solar
-			Real64 const TransDiff, // Diffuse solar transmittance, bare glass or shade on
-			Array1< Real64 > const & BlTransDiff, // Diffuse solar transmittance, blind present, vs. slat angle
-			Array1< Real64 > const & BlTransDiffGnd, // Ground diffuse solar transmittance, blind present, vs. slat angle
-			Array1< Real64 > const & BlTransDiffSky, // Sky diffuse solar transmittance, blind present, vs. slat angle
-			Real64 const TransDiffVis, // Diffuse visible transmittance, bare glass or shade on
-			Array1< Real64 > const & BlTransDiffVis, // Diffuse visible transmittance, blind present, vs. slat angle
-			Real64 const ReflectSolDiffBack, // Diffuse back solar reflectance, bare glass or shade on
-			Array1< Real64 > const & BlReflectSolDiffBack, // Diffuse back solar reflectance, blind present, vs. slat angle
-			Real64 const ReflectSolDiffFront, // Diffuse front solar reflectance, bare glass or shade on
-			Array1< Real64 > const & BlReflectSolDiffFront, // Diffuse front solar reflectance, blind present, vs. slat angle
-			Real64 const ReflectVisDiffBack, // Diffuse back visible reflectance, bare glass or shade on
-			Array1< Real64 > const & BlReflectVisDiffBack, // Diffuse back visible reflectance, blind present, vs. slat angle
-			Real64 const ReflectVisDiffFront, // Diffuse front visible reflectance, bare glass or shade on
-			Array1< Real64 > const & BlReflectVisDiffFront, // Diffuse front visible reflectance, blind present, vs. slat angle
-			Array1< Real64 > const & TransSolBeamCoef, // Coeffs of incidence-angle polynomial for beam sol trans,
-			Array1< Real64 > const & TransVisBeamCoef, // Coeffs of incidence-angle polynomial for beam vis trans,
-			Array1< Real64 > const & ReflSolBeamFrontCoef, // Coeffs of incidence-angle polynomial for beam sol front refl,
-			Array1< Real64 > const & ReflSolBeamBackCoef, // Like ReflSolBeamFrontCoef, but for back-incident beam solar
-			Array2< Real64 > const & tBareSolCoef, // Isolated glass solar transmittance coeffs of inc. angle polynomial
-			Array2< Real64 > const & tBareVisCoef, // Isolated glass visible transmittance coeffs of inc. angle polynomial
-			Array2< Real64 > const & rfBareSolCoef, // Isolated glass front solar reflectance coeffs of inc. angle polynomial
-			Array2< Real64 > const & rfBareVisCoef, // Isolated glass front visible reflectance coeffs of inc. angle polynomial
-			Array2< Real64 > const & rbBareSolCoef, // Isolated glass back solar reflectance coeffs of inc. angle polynomial
-			Array2< Real64 > const & rbBareVisCoef, // Isolated glass back visible reflectance coeffs of inc. angle polynomial
-			Array2< Real64 > const & afBareSolCoef, // Isolated glass front solar absorptance coeffs of inc. angle polynomial
-			Array2< Real64 > const & abBareSolCoef, // Isolated glass back solar absorptance coeffs of inc. angle polynomial
-			Array1< Real64 > const & tBareSolDiff, // Isolated glass diffuse solar transmittance
-			Array1< Real64 > const & tBareVisDiff, // Isolated glass diffuse visible transmittance
-			Array1< Real64 > const & rfBareSolDiff, // Isolated glass diffuse solar front reflectance
-			Array1< Real64 > const & rfBareVisDiff, // Isolated glass diffuse visible front reflectance
-			Array1< Real64 > const & rbBareSolDiff, // Isolated glass diffuse solar back reflectance
-			Array1< Real64 > const & rbBareVisDiff, // Isolated glass diffuse visible back reflectance
-			Array1< Real64 > const & afBareSolDiff, // Isolated glass diffuse solar front absorptance
-			Array1< Real64 > const & abBareSolDiff, // Isolated glass diffuse solar back absorptance
-			bool const FromWindow5DataFile, // True if this is a window construction extracted from the Window5 data file
-			Real64 const W5FileMullionWidth, // Width of mullion for construction from Window5 data file (m)
-			int const W5FileMullionOrientation, // Orientation of mullion, if present, for Window5 data file construction,
-			Real64 const W5FileGlazingSysWidth, // Glass width for construction from Window5 data file (m)
-			Real64 const W5FileGlazingSysHeight, // Glass height for construction form Window5 data file (m)
-			Real64 const SummerSHGC, // Calculated ASHRAE SHGC for summer conditions
-			Real64 const VisTransNorm, // The normal visible transmittance
-			Real64 const SolTransNorm, // the normal solar transmittance
-			bool const SourceSinkPresent, // .TRUE. if there is a source/sink within this construction
-			bool const TypeIsWindow, // True if a window construction, false otherwise
-			bool const WindowTypeBSDF, // True for complex window, false otherwise
-			bool const TypeIsEcoRoof, // -- true for construction with ecoRoof outside, the flag
-			bool const TypeIsIRT, // -- true for construction with IRT material
-			bool const TypeIsCfactorWall, // -- true for construction with Construction:CfactorUndergroundWall
-			bool const TypeIsFfactorFloor, // -- true for construction with Construction:FfactorGroundFloor
-			int const TCFlag, // 0: this construction is not a thermochromic window construction
-			int const TCLayer, // Reference to the TC glazing material layer in the Material array
-			int const TCMasterConst, // The master TC construction referenced by its slave constructions
-			int const TCLayerID, // Which material layer is the TC glazing, counting all material layers.
-			int const TCGlassID, // Which glass layer is the TC glazing, counting from glass layers only.
-			Real64 const CFactor,
-			Real64 const Height,
-			Real64 const FFactor,
-			Real64 const Area,
-			Real64 const PerimeterExposed,
-			bool const ReverseConstructionNumLayersWarning,
-			bool const ReverseConstructionLayersOrderWarning,
-			BSDFWindowInputStruct const & BSDFInput, // nest structure with user input for complex fenestration
-			bool const WindowTypeEQL, // True for equivalent layer window, false otherwise
-			int const EQLConsPtr, // Pointer to equivalent Layer window construction
-			Array1< Real64 > const & AbsDiffFrontEQL, // Diffuse layer system front absorptance for EQL window
-			Array1< Real64 > const & AbsDiffBackEQL, // Diffuse layer system back absorptance for EQL window
-			Real64 const TransDiffFrontEQL, // Diffuse system front transmittance for EQL window
-			Real64 const TransDiffBackEQL // Diffuse system back transmittance for EQL window
-		) :
-			Name( Name ),
-			TotLayers( TotLayers ),
-			TotSolidLayers( TotSolidLayers ),
-			TotGlassLayers( TotGlassLayers ),
-			LayerPoint( MaxLayersInConstruct, LayerPoint ),
-			IsUsed( IsUsed ),
-			InsideAbsorpVis( InsideAbsorpVis ),
-			OutsideAbsorpVis( OutsideAbsorpVis ),
-			InsideAbsorpSolar( InsideAbsorpSolar ),
-			OutsideAbsorpSolar( OutsideAbsorpSolar ),
-			InsideAbsorpThermal( InsideAbsorpThermal ),
-			OutsideAbsorpThermal( OutsideAbsorpThermal ),
-			OutsideRoughness( OutsideRoughness ),
-			DayltPropPtr( DayltPropPtr ),
-			W5FrameDivider( W5FrameDivider ),
-			CTFCross( {0,MaxCTFTerms-1}, CTFCross ),
-			CTFFlux( MaxCTFTerms-1, CTFFlux ),
-			CTFInside( {0,MaxCTFTerms-1}, CTFInside ),
-			CTFOutside( {0,MaxCTFTerms-1}, CTFOutside ),
-			CTFSourceIn( {0,MaxCTFTerms-1}, CTFSourceIn ),
-			CTFSourceOut( {0,MaxCTFTerms-1}, CTFSourceOut ),
-			CTFTimeStep( CTFTimeStep ),
-			CTFTSourceOut( {0,MaxCTFTerms-1}, CTFTSourceOut ),
-			CTFTSourceIn( {0,MaxCTFTerms-1}, CTFTSourceIn ),
-			CTFTSourceQ( {0,MaxCTFTerms-1}, CTFTSourceQ ),
-			CTFTUserOut( {0,MaxCTFTerms-1}, CTFTUserOut ),
-			CTFTUserIn( {0,MaxCTFTerms-1}, CTFTUserIn ),
-			CTFTUserSource( {0,MaxCTFTerms-1}, CTFTUserSource ),
-			NumHistories( NumHistories ),
-			NumCTFTerms( NumCTFTerms ),
-			UValue( UValue ),
-			SolutionDimensions( SolutionDimensions ),
-			SourceAfterLayer( SourceAfterLayer ),
-			TempAfterLayer( TempAfterLayer ),
-			ThicknessPerpend( ThicknessPerpend ),
-			AbsDiffIn( AbsDiffIn ),
-			AbsDiffOut( AbsDiffOut ),
-			AbsDiff( MaxSolidWinLayers, AbsDiff ),
-			BlAbsDiff( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiff ),
-			BlAbsDiffGnd( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiffGnd ),
-			BlAbsDiffSky( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiffSky ),
-			AbsDiffBack( MaxSolidWinLayers, AbsDiffBack ),
-			BlAbsDiffBack( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiffBack ),
-			AbsDiffShade( AbsDiffShade ),
-			AbsDiffBlind( MaxSlatAngs, AbsDiffBlind ),
-			AbsDiffBlindGnd( MaxSlatAngs, AbsDiffBlindGnd ),
-			AbsDiffBlindSky( MaxSlatAngs, AbsDiffBlindSky ),
-			AbsDiffBackShade( AbsDiffBackShade ),
-			AbsDiffBackBlind( MaxSlatAngs, AbsDiffBackBlind ),
-			ShadeAbsorpThermal( ShadeAbsorpThermal ),
-			AbsBeamCoef( 6, MaxSolidWinLayers, AbsBeamCoef ),
-			AbsBeamBackCoef( 6, MaxSolidWinLayers, AbsBeamBackCoef ),
-			AbsBeamShadeCoef( 6, AbsBeamShadeCoef ),
-			TransDiff( TransDiff ),
-			BlTransDiff( MaxSlatAngs, BlTransDiff ),
-			BlTransDiffGnd( MaxSlatAngs, BlTransDiffGnd ),
-			BlTransDiffSky( MaxSlatAngs, BlTransDiffSky ),
-			TransDiffVis( TransDiffVis ),
-			BlTransDiffVis( MaxSlatAngs, BlTransDiffVis ),
-			ReflectSolDiffBack( ReflectSolDiffBack ),
-			BlReflectSolDiffBack( MaxSlatAngs, BlReflectSolDiffBack ),
-			ReflectSolDiffFront( ReflectSolDiffFront ),
-			BlReflectSolDiffFront( MaxSlatAngs, BlReflectSolDiffFront ),
-			ReflectVisDiffBack( ReflectVisDiffBack ),
-			BlReflectVisDiffBack( MaxSlatAngs, BlReflectVisDiffBack ),
-			ReflectVisDiffFront( ReflectVisDiffFront ),
-			BlReflectVisDiffFront( MaxSlatAngs, BlReflectVisDiffFront ),
-			TransSolBeamCoef( 6, TransSolBeamCoef ),
-			TransVisBeamCoef( 6, TransVisBeamCoef ),
-			ReflSolBeamFrontCoef( 6, ReflSolBeamFrontCoef ),
-			ReflSolBeamBackCoef( 6, ReflSolBeamBackCoef ),
-			tBareSolCoef( 6, 5, tBareSolCoef ),
-			tBareVisCoef( 6, 5, tBareVisCoef ),
-			rfBareSolCoef( 6, 5, rfBareSolCoef ),
-			rfBareVisCoef( 6, 5, rfBareVisCoef ),
-			rbBareSolCoef( 6, 5, rbBareSolCoef ),
-			rbBareVisCoef( 6, 5, rbBareVisCoef ),
-			afBareSolCoef( 6, 5, afBareSolCoef ),
-			abBareSolCoef( 6, 5, abBareSolCoef ),
-			tBareSolDiff( 5, tBareSolDiff ),
-			tBareVisDiff( 5, tBareVisDiff ),
-			rfBareSolDiff( 5, rfBareSolDiff ),
-			rfBareVisDiff( 5, rfBareVisDiff ),
-			rbBareSolDiff( 5, rbBareSolDiff ),
-			rbBareVisDiff( 5, rbBareVisDiff ),
-			afBareSolDiff( 5, afBareSolDiff ),
-			abBareSolDiff( 5, abBareSolDiff ),
-			FromWindow5DataFile( FromWindow5DataFile ),
-			W5FileMullionWidth( W5FileMullionWidth ),
-			W5FileMullionOrientation( W5FileMullionOrientation ),
-			W5FileGlazingSysWidth( W5FileGlazingSysWidth ),
-			W5FileGlazingSysHeight( W5FileGlazingSysHeight ),
-			SummerSHGC( SummerSHGC ),
-			VisTransNorm( VisTransNorm ),
-			SolTransNorm( SolTransNorm ),
-			SourceSinkPresent( SourceSinkPresent ),
-			TypeIsWindow( TypeIsWindow ),
-			WindowTypeBSDF( WindowTypeBSDF ),
-			TypeIsEcoRoof( TypeIsEcoRoof ),
-			TypeIsIRT( TypeIsIRT ),
-			TypeIsCfactorWall( TypeIsCfactorWall ),
-			TypeIsFfactorFloor( TypeIsFfactorFloor ),
-			TCFlag( TCFlag ),
-			TCLayer( TCLayer ),
-			TCMasterConst( TCMasterConst ),
-			TCLayerID( TCLayerID ),
-			TCGlassID( TCGlassID ),
-			CFactor( CFactor ),
-			Height( Height ),
-			FFactor( FFactor ),
-			Area( Area ),
-			PerimeterExposed( PerimeterExposed ),
-			ReverseConstructionNumLayersWarning( ReverseConstructionNumLayersWarning ),
-			ReverseConstructionLayersOrderWarning( ReverseConstructionLayersOrderWarning ),
-			BSDFInput( BSDFInput ),
-			WindowTypeEQL( WindowTypeEQL ),
-			EQLConsPtr( EQLConsPtr ),
-			AbsDiffFrontEQL( CFSMAXNL, AbsDiffFrontEQL ),
-			AbsDiffBackEQL( CFSMAXNL, AbsDiffBackEQL ),
-			TransDiffFrontEQL( TransDiffFrontEQL ),
-			TransDiffBackEQL( TransDiffBackEQL )
-		{}
-
 	};
 
 	struct SpectralDataProperties
@@ -1800,23 +1280,6 @@ namespace DataHeatBalance {
 		// Default Constructor
 		SpectralDataProperties() :
 			NumOfWavelengths( 0 )
-		{}
-
-		// Member Constructor
-		SpectralDataProperties(
-			std::string const & Name, // Name of spectral data set
-			int const NumOfWavelengths, // Number of wavelengths in the data set
-			Array1< Real64 > const & WaveLength, // Wavelength (microns)
-			Array1< Real64 > const & Trans, // Transmittance at normal incidence
-			Array1< Real64 > const & ReflFront, // Front reflectance at normal incidence
-			Array1< Real64 > const & ReflBack // Back reflectance at normal incidence
-		) :
-			Name( Name ),
-			NumOfWavelengths( NumOfWavelengths ),
-			WaveLength( WaveLength ),
-			Trans( Trans ),
-			ReflFront( ReflFront ),
-			ReflBack( ReflBack )
 		{}
 
 	};
@@ -1961,136 +1424,11 @@ namespace DataHeatBalance {
 			ZoneContamControllerSchedIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneData(
-			std::string const & Name,
-			int const Multiplier, // Used in reporting and for systems calculations
-			int const ListMultiplier, // For Zone Group object:  used in reporting and systems calculations
-			int const ListGroup, // used only in Zone Group verification.  and for error message.
-			Real64 const RelNorth, // Relative North (to building north) [Degrees]
-			Real64 const OriginX, // X origin  [m]
-			Real64 const OriginY, // Y origin  [m]
-			Real64 const OriginZ, // Z origin  [m]
-			Real64 const CeilingHeight, // Ceiling Height entered by user [m] or calculated
-			Real64 const Volume, // Volume entered by user [m3] or calculated
-			int const OfType, // 1=Standard Zone, Not yet used:
-			Real64 const UserEnteredFloorArea, // User input floor area for this zone
-			Real64 const FloorArea, // Floor area used for this zone
-			Real64 const CalcFloorArea, // Calculated floor area used for this zone
-			bool const HasFloor, // Has "Floor" surface
-			bool const HasRoof, // Has "Roof" or "Ceiling" Surface
-			bool const HasInterZoneWindow, // Interzone Window(s) present in this zone
-			bool const HasWindow, // Window(s) present in this zone
-			Real64 const AirCapacity,
-			Real64 const ExtWindowArea, // Exterior Window Area for Zone
-			Real64 const ExtGrossWallArea, // Exterior Wall Area for Zone (Gross)
-			Real64 const ExtWindowArea_Multiplied, // Exterior Window Area for Zone with multipliers
-			Real64 const ExtGrossWallArea_Multiplied, // Exterior Wall Area for Zone (Gross) with multipliers
-			Real64 const ExtNetWallArea, // Exterior Wall Area for Zone (Net)
-			Real64 const TotalSurfArea, // Total surface area for Zone
-			Real64 const ExteriorTotalSurfArea, // Total surface area of all exterior surfaces for Zone
-			Real64 const ExteriorTotalGroundSurfArea, // Total surface area of all surfaces for Zone with ground contact
-			Real64 const ExtGrossGroundWallArea, // Ground contact Wall Area for Zone (Gross)
-			Real64 const ExtGrossGroundWallArea_Multiplied, // Ground contact Wall Area for Zone (Gross) with multipliers
-			int const SystemZoneNodeNumber, // This is the zone node number for the system for a controlled zone
-			bool const IsControlled, // True when this is a controlled zone.
-			int const TempControlledZoneIndex, // this is the index number for TempControlledZone structure for lookup
-			int const SurfaceFirst, // First Surface in Zone
-			int const SurfaceLast, // Last Surface in Zone
-			int const InsideConvectionAlgo, // Ref: appropriate values for Inside Convection solution
-			int const NumSurfaces, // Number of surfaces for this zone
-			int const NumSubSurfaces, // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
-			int const NumShadingSurfaces, // Number of shading surfaces for this zone
-			int const OutsideConvectionAlgo, // Ref: appropriate values for Outside Convection solution
-			Vector const & Centroid, // Center of the zone found by averaging wall, floor, and roof centroids
-			Real64 const MinimumX, // Minimum X value for entire zone
-			Real64 const MaximumX, // Maximum X value for entire zone
-			Real64 const MinimumY, // Minimum Y value for entire zone
-			Real64 const MaximumY, // Maximum Y value for entire zone
-			Real64 const MinimumZ, // Minimum Z value for entire zone
-			Real64 const MaximumZ, // Maximum Z value for entire zone
-			Real64 const OutDryBulbTemp, // Zone outside dry bulb air temperature (C)
-			Real64 const OutWetBulbTemp, // Zone outside wet bulb air temperature (C)
-			Real64 const WindSpeed, // Zone outside wind speed (m/s)
-			bool const isPartOfTotalArea, // Count the zone area when determining the building total floor area
-			bool const isNominalOccupied, // has occupancy nominally specified
-			bool const isNominalControlled, // has Controlled Zone Equip Configuration reference
-			Real64 const TotOccupants, // total design occupancy
-			int const AirHBimBalanceErrIndex, // error management counter
-			bool const NoHeatToReturnAir, // TRUE means that heat to return air should be added to the zone load
-			bool const RefrigCaseRA, // TRUE means there is potentially heat removal from return air
-			Real64 const InternalHeatGains, // internal loads (W)
-			Real64 const NominalInfilVent, // internal infiltration/ventilaton
-			Real64 const NominalMixing, // internal mixing/cross mixing
-			bool const TempOutOfBoundsReported, // if any temp out of bounds errors, first will show zone details.
-			bool const EnforcedReciprocity, // if zone required forced reciprocity --
-			int const ZoneMinCO2SchedIndex, // Index for the schedule the schedule which determines minimum CO2 concentration
-			int const ZoneContamControllerSchedIndex // Index for this schedule
-		) :
-			Name( Name ),
-			Multiplier( Multiplier ),
-			ListMultiplier( ListMultiplier ),
-			ListGroup( ListGroup ),
-			RelNorth( RelNorth ),
-			OriginX( OriginX ),
-			OriginY( OriginY ),
-			OriginZ( OriginZ ),
-			CeilingHeight( CeilingHeight ),
-			Volume( Volume ),
-			OfType( OfType ),
-			UserEnteredFloorArea( UserEnteredFloorArea ),
-			FloorArea( FloorArea ),
-			CalcFloorArea( CalcFloorArea ),
-			HasFloor( HasFloor ),
-			HasRoof( HasRoof ),
-			HasInterZoneWindow( HasInterZoneWindow ),
-			HasWindow( HasWindow ),
-			AirCapacity( AirCapacity ),
-			ExtWindowArea( ExtWindowArea ),
-			ExtGrossWallArea( ExtGrossWallArea ),
-			ExtWindowArea_Multiplied( ExtWindowArea_Multiplied ),
-			ExtGrossWallArea_Multiplied( ExtGrossWallArea_Multiplied ),
-			ExtNetWallArea( ExtNetWallArea ),
-			TotalSurfArea( TotalSurfArea ),
-			ExteriorTotalSurfArea( ExteriorTotalSurfArea ),
-			ExteriorTotalGroundSurfArea( ExteriorTotalGroundSurfArea ),
-			ExtGrossGroundWallArea( ExtGrossGroundWallArea ),
-			ExtGrossGroundWallArea_Multiplied( ExtGrossGroundWallArea_Multiplied ),
-			SystemZoneNodeNumber( SystemZoneNodeNumber ),
-			IsControlled( IsControlled ),
-			TempControlledZoneIndex( TempControlledZoneIndex ),
-			SurfaceFirst( SurfaceFirst ),
-			SurfaceLast( SurfaceLast ),
-			InsideConvectionAlgo( InsideConvectionAlgo ),
-			NumSurfaces( NumSurfaces ),
-			NumSubSurfaces( NumSubSurfaces ),
-			NumShadingSurfaces( NumShadingSurfaces ),
-			OutsideConvectionAlgo( OutsideConvectionAlgo ),
-			Centroid( Centroid ),
-			MinimumX( MinimumX ),
-			MaximumX( MaximumX ),
-			MinimumY( MinimumY ),
-			MaximumY( MaximumY ),
-			MinimumZ( MinimumZ ),
-			MaximumZ( MaximumZ ),
-			OutDryBulbTemp( OutDryBulbTemp ),
-			OutWetBulbTemp( OutWetBulbTemp ),
-			WindSpeed( WindSpeed ),
-			isPartOfTotalArea( isPartOfTotalArea ),
-			isNominalOccupied( isNominalOccupied ),
-			isNominalControlled( isNominalControlled ),
-			TotOccupants( TotOccupants ),
-			AirHBimBalanceErrIndex( AirHBimBalanceErrIndex ),
-			NoHeatToReturnAir( NoHeatToReturnAir ),
-			RefrigCaseRA( RefrigCaseRA ),
-			InternalHeatGains( InternalHeatGains ),
-			NominalInfilVent( NominalInfilVent ),
-			NominalMixing( NominalMixing ),
-			TempOutOfBoundsReported( TempOutOfBoundsReported ),
-			EnforcedReciprocity( EnforcedReciprocity ),
-			ZoneMinCO2SchedIndex( ZoneMinCO2SchedIndex ),
-			ZoneContamControllerSchedIndex( ZoneContamControllerSchedIndex )
-		{}
+		void
+		SetOutBulbTempAt();
+
+		void
+		SetWindSpeedAt( Real64 const fac );
 
 	};
 
@@ -2108,19 +1446,6 @@ namespace DataHeatBalance {
 			MaxZoneNameLength( 0u )
 		{}
 
-		// Member Constructor
-		ZoneListData(
-			std::string const & Name, // Zone List name
-			int const NumOfZones, // Number of zones in the list
-			std::string::size_type const MaxZoneNameLength, // Max Name length of zones in the list
-			Array1_int const & Zone // Pointers to zones in the list
-		) :
-			Name( Name ),
-			NumOfZones( NumOfZones ),
-			MaxZoneNameLength( MaxZoneNameLength ),
-			Zone( Zone )
-		{}
-
 	};
 
 	struct ZoneGroupData
@@ -2134,17 +1459,6 @@ namespace DataHeatBalance {
 		ZoneGroupData() :
 			ZoneList( 0 ),
 			Multiplier( 1 )
-		{}
-
-		// Member Constructor
-		ZoneGroupData(
-			std::string const & Name, // Zone Group name
-			int const ZoneList, // Pointer to the zone list
-			int const Multiplier // Zone List multiplier
-		) :
-			Name( Name ),
-			ZoneList( ZoneList ),
-			Multiplier( Multiplier )
 		{}
 
 	};
@@ -2164,21 +1478,6 @@ namespace DataHeatBalance {
 			NumOfZones( 0 ),
 			StartPtr( 0 ),
 			ZoneListActive( false )
-		{}
-
-		// Member Constructor
-		GlobalInternalGainMiscObject(
-			std::string const & Name,
-			int const ZoneOrZoneListPtr,
-			int const NumOfZones,
-			int const StartPtr,
-			bool const ZoneListActive
-		) :
-			Name( Name ),
-			ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
-			NumOfZones( NumOfZones ),
-			StartPtr( StartPtr ),
-			ZoneListActive( ZoneListActive )
 		{}
 
 	};
@@ -2294,107 +1593,6 @@ namespace DataHeatBalance {
 			TimeNotMetCEN15251CatIII( 0.0 )
 		{}
 
-		// Member Constructor
-		PeopleData(
-			std::string const & Name, // PEOPLE object name
-			int const ZonePtr, // Pointer to the zone number for this people statement
-			Real64 const NumberOfPeople, // Maximum number of people for this statement
-			int const NumberOfPeoplePtr, // Pointer to schedule for number of people
-			bool const EMSPeopleOn, // EMS actuating number of people if .TRUE.
-			Real64 const EMSNumberOfPeople, // Value EMS is directing to use for override
-			int const ActivityLevelPtr, // Pointer to schedule for activity level
-			Real64 const FractionRadiant, // Percentage (fraction 0.0-1.0) of sensible heat gain from people
-			Real64 const FractionConvected, // Percentage (fraction 0.0-1.0) of sensible heat gain from people
-			Real64 const NomMinNumberPeople, // Nominal Minimum Number of People (min sch X number of people)
-			Real64 const NomMaxNumberPeople, // Nominal Maximum Number of People (min sch X number of people)
-			int const WorkEffPtr, // Pointer to schedule for work efficiency
-			int const ClothingPtr, // Pointer to schedule for clothing insulation
-			int const ClothingMethodPtr,
-			int const ClothingType, // Name of clothing type
-			int const AirVelocityPtr, // Pointer to schedule for air velocity in zone
-			bool const Fanger, // True when Fanger calculation to be performed
-			bool const Pierce, // True when Pierce 2-node calculation to be performed
-			bool const KSU, // True when KSU 2-node calculation to be performed
-			bool const AdaptiveASH55, // True when ASHRAE Standard 55 adaptive comfort calculation
-			bool const AdaptiveCEN15251, // True when CEN Standard 15251 adaptive comfort calculation
-			int const MRTCalcType, // MRT calculation type (See MRT Calculation type parameters)
-			int const SurfacePtr, // Pointer to the name of surface
-			std::string const & AngleFactorListName, // Name of angle factor list
-			int const AngleFactorListPtr, // Pointer to the name of angle factor list
-			Real64 const UserSpecSensFrac, // User specified sensible fraction
-			bool const Show55Warning, // show the warning messages about ASHRAE 55-2004
-			Real64 const CO2RateFactor, // Carbon Dioxide Generation Rate [m3/s-W]
-			Real64 const NumOcc, // Number of occupants []
-			Real64 const TemperatureInZone, // Temperature in zone (C)
-			Real64 const RelativeHumidityInZone, // Relative humidity in zone
-			Real64 const RadGainRate, // Radiant heat gain [W]
-			Real64 const ConGainRate, // Convective heat gain [W]
-			Real64 const SenGainRate, // Sensible heat gain [W]
-			Real64 const LatGainRate, // Latent heat gain [W]
-			Real64 const TotGainRate, // Total heat gain [W]
-			Real64 const CO2GainRate, // Carbon Dioxide Gain Rate [m3/s]
-			Real64 const RadGainEnergy, // Radiant heat gain [J]
-			Real64 const ConGainEnergy, // Convective heat gain [J]
-			Real64 const SenGainEnergy, // Sensible heat gain [J]
-			Real64 const LatGainEnergy, // Latent heat gain [J]
-			Real64 const TotGainEnergy, // Total heat gain [J]
-			int const AirVelErrIndex, // Air velocity error index
-			Real64 const TimeNotMetASH5580,
-			Real64 const TimeNotMetASH5590,
-			Real64 const TimeNotMetCEN15251CatI,
-			Real64 const TimeNotMetCEN15251CatII,
-			Real64 const TimeNotMetCEN15251CatIII
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			NumberOfPeople( NumberOfPeople ),
-			NumberOfPeoplePtr( NumberOfPeoplePtr ),
-			EMSPeopleOn( EMSPeopleOn ),
-			EMSNumberOfPeople( EMSNumberOfPeople ),
-			ActivityLevelPtr( ActivityLevelPtr ),
-			FractionRadiant( FractionRadiant ),
-			FractionConvected( FractionConvected ),
-			NomMinNumberPeople( NomMinNumberPeople ),
-			NomMaxNumberPeople( NomMaxNumberPeople ),
-			WorkEffPtr( WorkEffPtr ),
-			ClothingPtr( ClothingPtr ),
-			ClothingMethodPtr( ClothingMethodPtr ),
-			ClothingType( ClothingType ),
-			AirVelocityPtr( AirVelocityPtr ),
-			Fanger( Fanger ),
-			Pierce( Pierce ),
-			KSU( KSU ),
-			AdaptiveASH55( AdaptiveASH55 ),
-			AdaptiveCEN15251( AdaptiveCEN15251 ),
-			MRTCalcType( MRTCalcType ),
-			SurfacePtr( SurfacePtr ),
-			AngleFactorListName( AngleFactorListName ),
-			AngleFactorListPtr( AngleFactorListPtr ),
-			UserSpecSensFrac( UserSpecSensFrac ),
-			Show55Warning( Show55Warning ),
-			CO2RateFactor( CO2RateFactor ),
-			NumOcc( NumOcc ),
-			TemperatureInZone( TemperatureInZone ),
-			RelativeHumidityInZone( RelativeHumidityInZone ),
-			RadGainRate( RadGainRate ),
-			ConGainRate( ConGainRate ),
-			SenGainRate( SenGainRate ),
-			LatGainRate( LatGainRate ),
-			TotGainRate( TotGainRate ),
-			CO2GainRate( CO2GainRate ),
-			RadGainEnergy( RadGainEnergy ),
-			ConGainEnergy( ConGainEnergy ),
-			SenGainEnergy( SenGainEnergy ),
-			LatGainEnergy( LatGainEnergy ),
-			TotGainEnergy( TotGainEnergy ),
-			AirVelErrIndex( AirVelErrIndex ),
-			TimeNotMetASH5580( TimeNotMetASH5580 ),
-			TimeNotMetASH5590( TimeNotMetASH5590 ),
-			TimeNotMetCEN15251CatI( TimeNotMetCEN15251CatI ),
-			TimeNotMetCEN15251CatII( TimeNotMetCEN15251CatII ),
-			TimeNotMetCEN15251CatIII( TimeNotMetCEN15251CatIII )
-		{}
-
 	};
 
 	struct LightsData
@@ -2470,77 +1668,6 @@ namespace DataHeatBalance {
 			SumTimeNotZeroCons( 0.0 )
 		{}
 
-		// Member Constructor
-		LightsData(
-			std::string const & Name, // LIGHTS object name
-			int const ZonePtr, // Which zone lights are in
-			int const SchedPtr, // Schedule for lights
-			Real64 const DesignLevel, // design level for lights [W]
-			bool const EMSLightsOn, // EMS actuating Lighting power if .TRUE.
-			Real64 const EMSLightingPower, // Value EMS is directing to use for override
-			Real64 const FractionReturnAir, // Percentage (fraction 0.0-1.0) of sensible heat gain that is return air
-			Real64 const FractionRadiant, // Percentage (fraction 0.0-1.0) of sensible heat gain that is radiant
-			Real64 const FractionShortWave, // Percentage (fraction 0.0-1.0) of sensible heat gain that is short wave
-			Real64 const FractionReplaceable, // Percentage (fraction 0.0-1.0) of sensible heat gain that is replaceable
-			Real64 const FractionConvected, // Percentage (fraction 0.0-1.0) of sensible heat gain that is convective
-			bool const FractionReturnAirIsCalculated,
-			Real64 const FractionReturnAirPlenTempCoeff1,
-			Real64 const FractionReturnAirPlenTempCoeff2,
-			Real64 const NomMinDesignLevel, // Nominal Minimum Design Level (min sch X design level)
-			Real64 const NomMaxDesignLevel, // Nominal Maximum Design Level (max sch X design level)
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const DemandLimit, // Demand limit set by demand manager [W]
-			Real64 const Power, // Electric power [W]
-			Real64 const RadGainRate, // Radiant heat gain [W]
-			Real64 const VisGainRate, // Visible heat gain [W]
-			Real64 const ConGainRate, // Convective heat gain [W]
-			Real64 const RetAirGainRate, // Return air heat gain [W]
-			Real64 const TotGainRate, // Total heat gain [W]
-			Real64 const Consumption, // Electric consumption [J]
-			Real64 const RadGainEnergy, // Radiant heat gain [J]
-			Real64 const VisGainEnergy, // Visible heat gain [J]
-			Real64 const ConGainEnergy, // Convective heat gain [J]
-			Real64 const RetAirGainEnergy, // Return air heat gain [J]
-			Real64 const TotGainEnergy, // Total heat gain [J]
-			std::string const & EndUseSubcategory, // user defined name for the end use category
-			Real64 const SumConsumption, // sum of electric consumption [J] for reporting
-			Real64 const SumTimeNotZeroCons // sum of time of positive electric consumption [hr]
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			DesignLevel( DesignLevel ),
-			EMSLightsOn( EMSLightsOn ),
-			EMSLightingPower( EMSLightingPower ),
-			FractionReturnAir( FractionReturnAir ),
-			FractionRadiant( FractionRadiant ),
-			FractionShortWave( FractionShortWave ),
-			FractionReplaceable( FractionReplaceable ),
-			FractionConvected( FractionConvected ),
-			FractionReturnAirIsCalculated( FractionReturnAirIsCalculated ),
-			FractionReturnAirPlenTempCoeff1( FractionReturnAirPlenTempCoeff1 ),
-			FractionReturnAirPlenTempCoeff2( FractionReturnAirPlenTempCoeff2 ),
-			NomMinDesignLevel( NomMinDesignLevel ),
-			NomMaxDesignLevel( NomMaxDesignLevel ),
-			ManageDemand( ManageDemand ),
-			DemandLimit( DemandLimit ),
-			Power( Power ),
-			RadGainRate( RadGainRate ),
-			VisGainRate( VisGainRate ),
-			ConGainRate( ConGainRate ),
-			RetAirGainRate( RetAirGainRate ),
-			TotGainRate( TotGainRate ),
-			Consumption( Consumption ),
-			RadGainEnergy( RadGainEnergy ),
-			VisGainEnergy( VisGainEnergy ),
-			ConGainEnergy( ConGainEnergy ),
-			RetAirGainEnergy( RetAirGainEnergy ),
-			TotGainEnergy( TotGainEnergy ),
-			EndUseSubcategory( EndUseSubcategory ),
-			SumConsumption( SumConsumption ),
-			SumTimeNotZeroCons( SumTimeNotZeroCons )
-		{}
-
 	};
 
 	struct ZoneEquipData // Electric, Gas, Other Equipment, CO2
@@ -2608,71 +1735,6 @@ namespace DataHeatBalance {
 			LatGainEnergy( 0.0 ),
 			LostEnergy( 0.0 ),
 			TotGainEnergy( 0.0 )
-		{}
-
-		// Member Constructor
-		ZoneEquipData(
-			std::string const & Name, // EQUIPMENT object name
-			int const ZonePtr, // Which zone internal gain is in
-			int const SchedPtr, // Schedule for internal gain
-			Real64 const DesignLevel, // design level for internal gain [W]
-			bool const EMSZoneEquipOverrideOn, // EMS actuating equipment power if .TRUE.
-			Real64 const EMSEquipPower, // Value EMS is directing to use for override
-			Real64 const FractionLatent, // Percentage (fraction 0.0-1.0) of sensible heat gain that is latent
-			Real64 const FractionRadiant, // Percentage (fraction 0.0-1.0) of sensible heat gain that is radiant
-			Real64 const FractionLost, // Percentage (fraction 0.0-1.0) of sensible heat gain that is lost
-			Real64 const FractionConvected, // Percentage (fraction 0.0-1.0) of sensible heat gain that is convective
-			Real64 const CO2DesignRate, // CO2 design Rate [m3/s]
-			Real64 const CO2RateFactor, // CO2 rate factor [m3/s/W]
-			Real64 const NomMinDesignLevel, // Nominal Minimum Design Level (min sch X design level)
-			Real64 const NomMaxDesignLevel, // Nominal Maximum Design Level (max sch X design level)
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const DemandLimit, // Demand limit set by demand manager [W]
-			Real64 const Power, // Electric/Gas/Fuel power [W]
-			Real64 const RadGainRate, // Radiant heat gain [W]
-			Real64 const ConGainRate, // Convective heat gain [W]
-			Real64 const LatGainRate, // Latent heat gain [W]
-			Real64 const LostRate, // Lost energy (converted to work) [W]
-			Real64 const TotGainRate, // Total heat gain [W]
-			Real64 const CO2GainRate, // CO2 gain rate [m3/s]
-			Real64 const Consumption, // Electric/Gas/Fuel consumption [J]
-			Real64 const RadGainEnergy, // Radiant heat gain [J]
-			Real64 const ConGainEnergy, // Convective heat gain [J]
-			Real64 const LatGainEnergy, // Latent heat gain [J]
-			Real64 const LostEnergy, // Lost energy (converted to work) [J]
-			Real64 const TotGainEnergy, // Total heat gain [J]
-			std::string const & EndUseSubcategory // user defined name for the end use category
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			DesignLevel( DesignLevel ),
-			EMSZoneEquipOverrideOn( EMSZoneEquipOverrideOn ),
-			EMSEquipPower( EMSEquipPower ),
-			FractionLatent( FractionLatent ),
-			FractionRadiant( FractionRadiant ),
-			FractionLost( FractionLost ),
-			FractionConvected( FractionConvected ),
-			CO2DesignRate( CO2DesignRate ),
-			CO2RateFactor( CO2RateFactor ),
-			NomMinDesignLevel( NomMinDesignLevel ),
-			NomMaxDesignLevel( NomMaxDesignLevel ),
-			ManageDemand( ManageDemand ),
-			DemandLimit( DemandLimit ),
-			Power( Power ),
-			RadGainRate( RadGainRate ),
-			ConGainRate( ConGainRate ),
-			LatGainRate( LatGainRate ),
-			LostRate( LostRate ),
-			TotGainRate( TotGainRate ),
-			CO2GainRate( CO2GainRate ),
-			Consumption( Consumption ),
-			RadGainEnergy( RadGainEnergy ),
-			ConGainEnergy( ConGainEnergy ),
-			LatGainEnergy( LatGainEnergy ),
-			LostEnergy( LostEnergy ),
-			TotGainEnergy( TotGainEnergy ),
-			EndUseSubcategory( EndUseSubcategory )
 		{}
 
 	};
@@ -2820,150 +1882,6 @@ namespace DataHeatBalance {
 			RHBelowDeltaRH( 0.0 )
 		{}
 
-		// Member Constructor
-		ITEquipData(
-			std::string const & Name, // EQUIPMENT object name
-			int const ZonePtr, // Which zone internal gain is in
-			Real64 const DesignTotalPower, // Design level for internal gain [W]
-			Real64 const NomMinDesignLevel, // Nominal Minimum Design Level (min sch X design level)
-			Real64 const NomMaxDesignLevel, // Nominal Maximum Design Level (max sch X design level)
-			Real64 const DesignFanPowerFrac, // Fraction (0.0-1.0) of design power level that is fans
-			int const OperSchedPtr, // Schedule pointer for design power input or operating schedule
-			int const CPULoadSchedPtr, // Schedule pointer for CPU loading schedule
-			Real64 const DesignTAirIn, // Design entering air temperature [C]
-			Real64 const DesignFanPower, // Design fan power input [W]
-			Real64 const DesignCPUPower, // Design CPU power input [W]
-			Real64 const DesignAirVolFlowRate, // Design air volume flow rate [m3/s]
-			int const Class, // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-			int const AirFlowFLTCurve, // Index for airflow function of CPULoadFrac (x) and TAirIn (y) curve
-			int const CPUPowerFLTCurve, // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
-			int const FanPowerFFCurve, // Index for fan power function of flow fraction curve
-			int const AirConnectionType, // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
-			int InletRoomAirNodeNum, // Room air model node number for air inlet
-			int OutletRoomAirNodeNum, // Room air model node number for air outlet
-			int SupplyAirNodeNum, // Node number for supply air inlet
-			Real64 const DesignRecircFrac, // Design recirculation fraction (0.0-0.5)
-			int const RecircFLTCurve, // Index for recirculation function of CPULoadFrac (x) and TAirIn (y) curve
-			Real64 const DesignUPSEfficiency, // Design power supply efficiency (>0.0 - 1.0)
-			int const UPSEfficFPLRCurve, // Index for recirculation function of part load ratio
-			Real64 const UPSLossToZoneFrac, // Fraction of UPS power loss to zone (0.0 - 1.0), remainder is lost
-			std::string const & EndUseSubcategoryCPU, // user defined name for the end use category for the CPU
-			std::string const & EndUseSubcategoryFan, // user defined name for the end use category for the Fans
-			std::string const & EndUseSubcategoryUPS, // user defined name for the end use category for the power supply
-			bool const EMSCPUPowerOverrideOn, // EMS actuating CPU power if .TRUE.
-			Real64 const EMSCPUPower, // Value EMS is directing to use for override of CPU power [W]
-			bool const EMSFanPowerOverrideOn, // EMS actuating Fan power if .TRUE.
-			Real64 const EMSFanPower, // Value EMS is directing to use for override of Fan power [W]
-			bool const EMSUPSPowerOverrideOn, // EMS actuating UPS power if .TRUE.
-			Real64 const EMSUPSPower, // Value EMS is directing to use for override of UPS power [W]
-			// Report variables
-			Real64 const CPUPower, // ITE CPU Electric Power [W]
-			Real64 const FanPower, // ITE Fan Electric Power [W]
-			Real64 const UPSPower, // ITE UPS Electric Power [W]
-			Real64 const CPUPowerAtDesign, // ITE CPU Electric Power at Design Inlet Conditions [W]
-			Real64 const FanPowerAtDesign, // ITE Fan Electric Power at Design Inlet Conditions [W]
-			Real64 const UPSGainRateToZone, // ITE UPS Heat Gain to Zone Rate [W] - convective gain
-			Real64 const ConGainRateToZone, // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
-			Real64 const CPUConsumption, // ITE CPU Electric Energy [J]
-			Real64 const FanConsumption, // ITE Fan Electric Energy [J]
-			Real64 const UPSConsumption, // ITE UPS Electric Energy [J]
-			Real64 const CPUEnergyAtDesign, // ITE CPU Electric Energy at Design Inlet Conditions [J]
-			Real64 const FanEnergyAtDesign, // ITE Fan Electric Energy at Design Inlet Conditions [J]
-			Real64 const UPSGainEnergyToZone, // ITE UPS Heat Gain to Zone Energy [J] - convective gain
-			Real64 const ConGainEnergyToZone, // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
-			Real64 const AirVolFlowStdDensity, // Air volume flow rate at standard density [m3/s]
-			Real64 const AirVolFlowCurDensity, // Air volume flow rate at current density [m3/s]
-			Real64 const AirMassFlow, // Air mass flow rate [kg/s]
-			Real64 const AirInletDryBulbT, // Air inlet dry-bulb temperature [C]
-			Real64 const AirInletDewpointT, // Air inlet dewpoit temperature [C]
-			Real64 const AirInletRelHum, // Air inlet relative humidity [%]
-			Real64 const AirOutletDryBulbT, // Air outlet dry-bulb temperature [C]
-			Real64 const SHI, // Supply Heat Index []
-			Real64 const TimeOutOfOperRange, // ITE Air Inlet Operating Range Exceeded Time [hr]
-			Real64 const TimeAboveDryBulbT, // ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
-			Real64 const TimeBelowDryBulbT, // ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
-			Real64 const TimeAboveDewpointT, // ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
-			Real64 const TimeBelowDewpointT, // ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
-			Real64 const TimeAboveRH, // ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
-			Real64 const TimeBelowRH, // ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
-			Real64 const DryBulbTAboveDeltaT, // ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
-			Real64 const DryBulbTBelowDeltaT, // ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
-			Real64 const DewpointTAboveDeltaT, // ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
-			Real64 const DewpointTBelowDeltaT, // ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
-			Real64 RHAboveDeltaRH, // ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
-			Real64 RHBelowDeltaRH // ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
-			) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			DesignTotalPower( DesignTotalPower ),
-			NomMinDesignLevel( NomMinDesignLevel ),
-			NomMaxDesignLevel( NomMaxDesignLevel ),
-			DesignFanPowerFrac( DesignFanPowerFrac ),
-			OperSchedPtr( OperSchedPtr ),
-			CPULoadSchedPtr( CPULoadSchedPtr ),
-			DesignTAirIn( DesignTAirIn ),
-			DesignFanPower( DesignFanPower ),
-			DesignCPUPower( DesignCPUPower ),
-			DesignAirVolFlowRate( DesignAirVolFlowRate ),
-			Class( Class ),
-			AirFlowFLTCurve( AirFlowFLTCurve ),
-			CPUPowerFLTCurve( CPUPowerFLTCurve ),
-			FanPowerFFCurve( FanPowerFFCurve ),
-			AirConnectionType( AirConnectionType ),
-			InletRoomAirNodeNum( InletRoomAirNodeNum ),
-			OutletRoomAirNodeNum( OutletRoomAirNodeNum ),
-			SupplyAirNodeNum( SupplyAirNodeNum ),
-			DesignRecircFrac( DesignRecircFrac ),
-			RecircFLTCurve( RecircFLTCurve ),
-			DesignUPSEfficiency( DesignUPSEfficiency ),
-			UPSEfficFPLRCurve( UPSEfficFPLRCurve ),
-			UPSLossToZoneFrac( UPSLossToZoneFrac ),
-			EndUseSubcategoryCPU( EndUseSubcategoryCPU ),
-			EndUseSubcategoryFan( EndUseSubcategoryFan ),
-			EndUseSubcategoryUPS( EndUseSubcategoryUPS ),
-			EMSCPUPowerOverrideOn( EMSCPUPowerOverrideOn ),
-			EMSCPUPower( EMSCPUPower ),
-			EMSFanPowerOverrideOn( EMSFanPowerOverrideOn ),
-			EMSFanPower( EMSFanPower ),
-			EMSUPSPowerOverrideOn( EMSUPSPowerOverrideOn ),
-			EMSUPSPower( EMSUPSPower ),
-			CPUPower( CPUPower ),
-			FanPower( FanPower ),
-			UPSPower( UPSPower ),
-			CPUPowerAtDesign( CPUPowerAtDesign ),
-			FanPowerAtDesign( FanPowerAtDesign ),
-			UPSGainRateToZone( UPSGainRateToZone ),
-			ConGainRateToZone( ConGainRateToZone ),
-			CPUConsumption( CPUConsumption ),
-			FanConsumption( FanConsumption ),
-			UPSConsumption( UPSConsumption ),
-			CPUEnergyAtDesign( CPUEnergyAtDesign ),
-			FanEnergyAtDesign( FanEnergyAtDesign ),
-			UPSGainEnergyToZone( UPSGainEnergyToZone ),
-			ConGainEnergyToZone( ConGainEnergyToZone ),
-			AirVolFlowStdDensity( AirVolFlowStdDensity ),
-			AirVolFlowCurDensity( AirVolFlowCurDensity ),
-			AirMassFlow( AirMassFlow ),
-			AirInletDryBulbT( AirInletDryBulbT ),
-			AirInletDewpointT( AirInletDewpointT ),
-			AirInletRelHum( AirInletRelHum ),
-			AirOutletDryBulbT( AirOutletDryBulbT ),
-			SHI( SHI ),
-			TimeOutOfOperRange( TimeOutOfOperRange ),
-			TimeAboveDryBulbT( TimeAboveDryBulbT ),
-			TimeBelowDryBulbT( TimeBelowDryBulbT ),
-			TimeAboveDewpointT( TimeAboveDewpointT ),
-			TimeBelowDewpointT( TimeBelowDewpointT ),
-			TimeAboveRH( TimeAboveRH ),
-			TimeBelowRH( TimeBelowRH ),
-			DryBulbTAboveDeltaT( DryBulbTAboveDeltaT ),
-			DryBulbTBelowDeltaT( DryBulbTBelowDeltaT ),
-			DewpointTAboveDeltaT( DewpointTAboveDeltaT ),
-			DewpointTBelowDeltaT( DewpointTBelowDeltaT ),
-			RHAboveDeltaRH( RHAboveDeltaRH ),
-			RHBelowDeltaRH( RHBelowDeltaRH )
-			{}
-
 	};
 
 	struct BBHeatData
@@ -3015,55 +1933,6 @@ namespace DataHeatBalance {
 			RadGainEnergy( 0.0 ),
 			ConGainEnergy( 0.0 ),
 			TotGainEnergy( 0.0 )
-		{}
-
-		// Member Constructor
-		BBHeatData(
-			std::string const & Name, // BASEBOARD HEAT object name
-			int const ZonePtr,
-			int const SchedPtr,
-			Real64 const CapatLowTemperature,
-			Real64 const LowTemperature,
-			Real64 const CapatHighTemperature,
-			Real64 const HighTemperature,
-			bool const EMSZoneBaseboardOverrideOn, // EMS actuating equipment power if .TRUE.
-			Real64 const EMSZoneBaseboardPower, // Value EMS is directing to use for override
-			Real64 const FractionRadiant,
-			Real64 const FractionConvected,
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const DemandLimit, // Demand limit set by demand manager [W]
-			Real64 const Power, // Electric power [W]
-			Real64 const RadGainRate, // Radiant heat gain [W]
-			Real64 const ConGainRate, // Convective heat gain [W]
-			Real64 const TotGainRate, // Total heat gain [W]
-			Real64 const Consumption, // Electric consumption [J]
-			Real64 const RadGainEnergy, // Radiant heat gain [J]
-			Real64 const ConGainEnergy, // Convective heat gain [J]
-			Real64 const TotGainEnergy, // Total heat gain [J]
-			std::string const & EndUseSubcategory // user defined name for the end use category
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			CapatLowTemperature( CapatLowTemperature ),
-			LowTemperature( LowTemperature ),
-			CapatHighTemperature( CapatHighTemperature ),
-			HighTemperature( HighTemperature ),
-			EMSZoneBaseboardOverrideOn( EMSZoneBaseboardOverrideOn ),
-			EMSZoneBaseboardPower( EMSZoneBaseboardPower ),
-			FractionRadiant( FractionRadiant ),
-			FractionConvected( FractionConvected ),
-			ManageDemand( ManageDemand ),
-			DemandLimit( DemandLimit ),
-			Power( Power ),
-			RadGainRate( RadGainRate ),
-			ConGainRate( ConGainRate ),
-			TotGainRate( TotGainRate ),
-			Consumption( Consumption ),
-			RadGainEnergy( RadGainEnergy ),
-			ConGainEnergy( ConGainEnergy ),
-			TotGainEnergy( TotGainEnergy ),
-			EndUseSubcategory( EndUseSubcategory )
 		{}
 
 	};
@@ -3122,57 +1991,6 @@ namespace DataHeatBalance {
 			OABalancePtr( 0 ),
 			VolumeFlowRate( 0.0 ),
 			MassFlowRate( 0.0 )
-		{}
-
-		// Member Constructor
-		InfiltrationData(
-			std::string const & Name,
-			int const ZonePtr, // Which zone infiltration is in
-			int const SchedPtr, // Schedule for infiltration
-			int const ModelType, // which model is used for infiltration
-			Real64 const DesignLevel,
-			Real64 const ConstantTermCoef,
-			Real64 const TemperatureTermCoef,
-			Real64 const VelocityTermCoef,
-			Real64 const VelocitySQTermCoef,
-			Real64 const LeakageArea, // "AL" effective air leakage area
-			Real64 const BasicStackCoefficient, // "Cs" Stack coefficient
-			Real64 const BasicWindCoefficient, // "Cw" wind coefficient
-			Real64 const FlowCoefficient, // "c" Flow coefficient
-			Real64 const AIM2StackCoefficient, // "Cs" stack coefficient
-			Real64 const AIM2WindCoefficient, // "Cw" wind coefficient
-			Real64 const PressureExponent, // "n" pressure power law exponent
-			Real64 const ShelterFactor, // "s" shelter factor
-			bool const EMSOverrideOn, // if true then EMS is requesting to override
-			Real64 const EMSAirFlowRateValue, // value EMS is setting for air flow rate
-			bool const QuadratureSum, // If quadrature sum of zone air balance method is used
-			int const OABalancePtr, // A pointer to ZoneAirBalance If quadrature is true
-			Real64 const VolumeFlowRate, // infiltration air volume flow rate
-			Real64 const MassFlowRate   // infiltration air mass flow rate
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			ModelType( ModelType ),
-			DesignLevel( DesignLevel ),
-			ConstantTermCoef( ConstantTermCoef ),
-			TemperatureTermCoef( TemperatureTermCoef ),
-			VelocityTermCoef( VelocityTermCoef ),
-			VelocitySQTermCoef( VelocitySQTermCoef ),
-			LeakageArea( LeakageArea ),
-			BasicStackCoefficient( BasicStackCoefficient ),
-			BasicWindCoefficient( BasicWindCoefficient ),
-			FlowCoefficient( FlowCoefficient ),
-			AIM2StackCoefficient( AIM2StackCoefficient ),
-			AIM2WindCoefficient( AIM2WindCoefficient ),
-			PressureExponent( PressureExponent ),
-			ShelterFactor( ShelterFactor ),
-			EMSOverrideOn( EMSOverrideOn ),
-			EMSAirFlowRateValue( EMSAirFlowRateValue ),
-			QuadratureSum( QuadratureSum ),
-			OABalancePtr( OABalancePtr ),
-			VolumeFlowRate( VolumeFlowRate ),
-			MassFlowRate( MassFlowRate )
 		{}
 
 	};
@@ -3269,95 +2087,6 @@ namespace DataHeatBalance {
 			DiscCoef( 0.0 )
 		{}
 
-		// Member Constructor
-		VentilationData(
-			std::string const & Name,
-			int const ZonePtr,
-			int const SchedPtr,
-			int const ModelType, // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
-			Real64 const DesignLevel,
-			bool const EMSSimpleVentOn, // EMS actuating ventilation flow rate if .TRUE.
-			Real64 const EMSimpleVentFlowRate, // Value EMS is directing to use for override
-			Real64 const MinIndoorTemperature,
-			Real64 const DelTemperature,
-			int const FanType,
-			Real64 const FanPressure,
-			Real64 const FanEfficiency,
-			Real64 const FanPower,
-			Real64 const AirTemp,
-			Real64 const ConstantTermCoef,
-			Real64 const TemperatureTermCoef,
-			Real64 const VelocityTermCoef,
-			Real64 const VelocitySQTermCoef,
-			Real64 const MaxIndoorTemperature,
-			Real64 const MinOutdoorTemperature,
-			Real64 const MaxOutdoorTemperature,
-			Real64 const MaxWindSpeed,
-			int const MinIndoorTempSchedPtr, // Minimum indoor temperature schedule index
-			int const MaxIndoorTempSchedPtr, // Maximum indoor temperature schedule index
-			int const DeltaTempSchedPtr, // Delta temperature schedule index
-			int const MinOutdoorTempSchedPtr, // Minimum outdoor temperature schedule index
-			int const MaxOutdoorTempSchedPtr, // Maximum outdoor temperature schedule index
-			int const IndoorTempErrCount, // Indoor temperature error count
-			int const OutdoorTempErrCount, // Outdoor temperature error count
-			int const IndoorTempErrIndex, // Indoor temperature error Index
-			int const OutdoorTempErrIndex, // Outdoor temperature error Index
-			int const HybridControlType, // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
-			int const HybridControlMasterNum, // Hybrid ventilation control master object number
-			bool const HybridControlMasterStatus, // Hybrid ventilation control master object opening status
-			bool const QuadratureSum, // If quadrature sum of zone air balance method is used
-			int const OABalancePtr, // A pointer to ZoneAirBalance
-			Real64 const OpenArea, // Opening area [m2]
-			int const OpenAreaSchedPtr, // Opening area fraction schedule pointer
-			Real64 const OpenEff, // Opening effectiveness [dimensionless]
-			Real64 const EffAngle, // Effective angle [degree]
-			Real64 const DH, // Height difference [m]
-			Real64 const DiscCoef // Discharge coefficient
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			ModelType( ModelType ),
-			DesignLevel( DesignLevel ),
-			EMSSimpleVentOn( EMSSimpleVentOn ),
-			EMSimpleVentFlowRate( EMSimpleVentFlowRate ),
-			MinIndoorTemperature( MinIndoorTemperature ),
-			DelTemperature( DelTemperature ),
-			FanType( FanType ),
-			FanPressure( FanPressure ),
-			FanEfficiency( FanEfficiency ),
-			FanPower( FanPower ),
-			AirTemp( AirTemp ),
-			ConstantTermCoef( ConstantTermCoef ),
-			TemperatureTermCoef( TemperatureTermCoef ),
-			VelocityTermCoef( VelocityTermCoef ),
-			VelocitySQTermCoef( VelocitySQTermCoef ),
-			MaxIndoorTemperature( MaxIndoorTemperature ),
-			MinOutdoorTemperature( MinOutdoorTemperature ),
-			MaxOutdoorTemperature( MaxOutdoorTemperature ),
-			MaxWindSpeed( MaxWindSpeed ),
-			MinIndoorTempSchedPtr( MinIndoorTempSchedPtr ),
-			MaxIndoorTempSchedPtr( MaxIndoorTempSchedPtr ),
-			DeltaTempSchedPtr( DeltaTempSchedPtr ),
-			MinOutdoorTempSchedPtr( MinOutdoorTempSchedPtr ),
-			MaxOutdoorTempSchedPtr( MaxOutdoorTempSchedPtr ),
-			IndoorTempErrCount( IndoorTempErrCount ),
-			OutdoorTempErrCount( OutdoorTempErrCount ),
-			IndoorTempErrIndex( IndoorTempErrIndex ),
-			OutdoorTempErrIndex( OutdoorTempErrIndex ),
-			HybridControlType( HybridControlType ),
-			HybridControlMasterNum( HybridControlMasterNum ),
-			HybridControlMasterStatus( HybridControlMasterStatus ),
-			QuadratureSum( QuadratureSum ),
-			OABalancePtr( OABalancePtr ),
-			OpenArea( OpenArea ),
-			OpenAreaSchedPtr( OpenAreaSchedPtr ),
-			OpenEff( OpenEff ),
-			EffAngle( EffAngle ),
-			DH( DH ),
-			DiscCoef( DiscCoef )
-		{}
-
 	};
 
 	struct ZoneAirBalanceData
@@ -3394,43 +2123,6 @@ namespace DataHeatBalance {
 			ERVMassFlowRate( 0.0 ),
 			OneTimeFlag( false ),
 			NumOfERVs( 0 )
-		{}
-
-		// Member Constructor
-		ZoneAirBalanceData(
-			std::string const & Name, // Object name
-			std::string const & ZoneName, // Zone name
-			int const ZonePtr, // Zone number
-			int const BalanceMethod, // Air Balance Method: None=0, Quadrature = 1
-			Real64 const InducedAirRate, // Induced Outdoor Air Due to Duct Leakage Unbalance [m3/s]
-			int const InducedAirSchedPtr, // Induced Outdoor Air Fraction Schedule
-			Real64 const BalMassFlowRate, // balanced mass flow rate
-			Real64 const InfMassFlowRate, // unbalanced mass flow rate from infiltration
-			Real64 const NatMassFlowRate, // unbalanced mass flow rate from natural ventilaton
-			Real64 const ExhMassFlowRate, // unbalanced mass flow rate from exhaust ventilaton
-			Real64 const IntMassFlowRate, // unbalanced mass flow rate from intake ventilaton
-			Real64 const ERVMassFlowRate, // unbalanced mass flow rate from stand-alond ERV
-			bool const OneTimeFlag, // One time flag to get nodes of stand alond ERV
-			int const NumOfERVs, // Number of zone stand alone ERVs
-			Array1_int const & ERVInletNode, // Stand alone ERV supply air inlet nodes
-			Array1_int const & ERVExhaustNode // Stand alone ERV air exhaust nodes
-		) :
-			Name( Name ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			BalanceMethod( BalanceMethod ),
-			InducedAirRate( InducedAirRate ),
-			InducedAirSchedPtr( InducedAirSchedPtr ),
-			BalMassFlowRate( BalMassFlowRate ),
-			InfMassFlowRate( InfMassFlowRate ),
-			NatMassFlowRate( NatMassFlowRate ),
-			ExhMassFlowRate( ExhMassFlowRate ),
-			IntMassFlowRate( IntMassFlowRate ),
-			ERVMassFlowRate( ERVMassFlowRate ),
-			OneTimeFlag( OneTimeFlag ),
-			NumOfERVs( NumOfERVs ),
-			ERVInletNode( ERVInletNode ),
-			ERVExhaustNode( ERVExhaustNode )
 		{}
 
 	};
@@ -3510,87 +2202,6 @@ namespace DataHeatBalance {
 			EMSimpleMixingFlowRate( 0.0 )
 		{}
 
-		// Member Constructor
-		MixingData(
-			std::string const & Name,
-			int const ZonePtr,
-			int const SchedPtr,
-			Real64 const DesignLevel,
-			int const FromZone,
-			Real64 const DeltaTemperature,
-			Real64 const DesiredAirFlowRate,
-			Real64 const DesiredAirFlowRateSaved,
-			Real64 const MixingMassFlowRate,
-			int const DeltaTempSchedPtr, // Delta temperature schedule index
-			int const MinIndoorTempSchedPtr, // Minimum indoor temperature schedule index
-			int const MaxIndoorTempSchedPtr, // Maximum indoor temperature schedule index
-			int const MinSourceTempSchedPtr, // Minimum source zone temperature schedule index
-			int const MaxSourceTempSchedPtr, // Maximum source zone temperature schedule index
-			int const MinOutdoorTempSchedPtr, // Minimum outdoor temperature schedule index
-			int const MaxOutdoorTempSchedPtr, // Maximum outdoor temperature schedule index
-			int const IndoorTempErrCount, // Indoor temperature error count
-			int const SourceTempErrCount, // Source zone temperature error count
-			int const OutdoorTempErrCount, // Outdoor temperature error count
-			int const IndoorTempErrIndex, // Indoor temperature error Index
-			int const SourceTempErrIndex, // Source zone temperature error Index
-			int const OutdoorTempErrIndex, // Outdoor temperature error Index
-			int const HybridControlType, // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
-			int const HybridControlMasterNum, // Hybrid ventilation control master ventilation object number
-			int const NumRefDoorConnections,
-			bool const EMSSimpleMixingOn, // EMS actuating ventilation flow rate if .TRUE.
-			bool const RefDoorMixFlag, // Refrigeration door mixing within zone
-			Real64 const EMSimpleMixingFlowRate, // Value EMS is directing to use for override
-			Array1_bool const & EMSRefDoorMixingOn,
-			Array1< Real64 > const & EMSRefDoorFlowRate,
-			Array1< Real64 > const & VolRefDoorFlowRate,
-			Array1_int const & OpenSchedPtr, // Schedule for Refrigeration door open fraction
-			Array1< Real64 > const & DoorHeight, // Door height for refrigeration door, m
-			Array1< Real64 > const & DoorArea, // Door area for refrigeration door, m2
-			Array1< Real64 > const & Protection, // Refrigeration door protection factor, dimensionless
-			Array1_int const & MateZonePtr, // Zone connected by refrigeration door (MateZone > ZonePtr)
-			Array1_string const & DoorMixingObjectName, // Used in one error statement and eio
-			Array1_string const & DoorProtTypeName // Used in eio
-		) :
-			Name( Name ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			DesignLevel( DesignLevel ),
-			FromZone( FromZone ),
-			DeltaTemperature( DeltaTemperature ),
-			DesiredAirFlowRate( DesiredAirFlowRate ),
-			DesiredAirFlowRateSaved( DesiredAirFlowRateSaved ),
-			MixingMassFlowRate( MixingMassFlowRate ),
-			DeltaTempSchedPtr( DeltaTempSchedPtr ),
-			MinIndoorTempSchedPtr( MinIndoorTempSchedPtr ),
-			MaxIndoorTempSchedPtr( MaxIndoorTempSchedPtr ),
-			MinSourceTempSchedPtr( MinSourceTempSchedPtr ),
-			MaxSourceTempSchedPtr( MaxSourceTempSchedPtr ),
-			MinOutdoorTempSchedPtr( MinOutdoorTempSchedPtr ),
-			MaxOutdoorTempSchedPtr( MaxOutdoorTempSchedPtr ),
-			IndoorTempErrCount( IndoorTempErrCount ),
-			SourceTempErrCount( SourceTempErrCount ),
-			OutdoorTempErrCount( OutdoorTempErrCount ),
-			IndoorTempErrIndex( IndoorTempErrIndex ),
-			SourceTempErrIndex( SourceTempErrIndex ),
-			OutdoorTempErrIndex( OutdoorTempErrIndex ),
-			HybridControlType( HybridControlType ),
-			HybridControlMasterNum( HybridControlMasterNum ),
-			NumRefDoorConnections( NumRefDoorConnections ),
-			EMSSimpleMixingOn( EMSSimpleMixingOn ),
-			RefDoorMixFlag( RefDoorMixFlag ),
-			EMSimpleMixingFlowRate( EMSimpleMixingFlowRate ),
-			EMSRefDoorMixingOn( EMSRefDoorMixingOn ),
-			EMSRefDoorFlowRate( EMSRefDoorFlowRate ),
-			VolRefDoorFlowRate( VolRefDoorFlowRate ),
-			OpenSchedPtr( OpenSchedPtr ),
-			DoorHeight( DoorHeight ),
-			DoorArea( DoorArea ),
-			Protection( Protection ),
-			MateZonePtr( MateZonePtr ),
-			DoorMixingObjectName( DoorMixingObjectName ),
-			DoorProtTypeName( DoorProtTypeName )
-		{}
-
 	};
 
 	struct ZoneAirMassFlowConservation
@@ -3610,18 +2221,6 @@ namespace DataHeatBalance {
 			InfiltrationZoneType( 0 )
 		{}
 
-		// Member Constructor
-		ZoneAirMassFlowConservation(
-			bool const EnforceZoneMassBalance,
-			bool const BalanceMixing,
-			int const InfiltrationTreatment,
-			int const InfiltrationZoneType
-			) :
-			EnforceZoneMassBalance( EnforceZoneMassBalance ),
-			BalanceMixing( BalanceMixing ),
-			InfiltrationTreatment( InfiltrationTreatment ),
-			InfiltrationZoneType( InfiltrationZoneType )
-		{}
 	};
 
 
@@ -3662,42 +2261,6 @@ namespace DataHeatBalance {
 			IncludeInfilToZoneMassBal(0)
 		{}
 
-		// Member Constructor
-		ZoneMassConservationData(
-			std::string const & Name,
-			int const ZonePtr,
-			Real64 const InMassFlowRate,
-			Real64 const ExhMassFlowRate,
-			Real64 const RetMassFlowRate,
-			Real64 const MixingMassFlowRate,
-			Real64 const MixingSourceMassFlowRate,
-			int const NumSourceZonesMixingObject,
-			int const NumReceivingZonesMixingObject,
-			bool const IsOnlySourceZone,
-			int const InfiltrationPtr,
-			Real64 const InfiltrationMassFlowRate,
-			int const IncludeInfilToZoneMassBal,
-			Array1_int const & ZoneMixingSourcesPtr,
-			Array1_int const & ZoneMixingReceivingPtr,
-			Array1< Real64 > const & ZoneMixingReceivingFr
-			) :
-			Name(Name),
-			ZonePtr(ZonePtr),
-			InMassFlowRate(InMassFlowRate),
-			ExhMassFlowRate(ExhMassFlowRate),
-			RetMassFlowRate(RetMassFlowRate),
-			MixingMassFlowRate(MixingMassFlowRate),
-			MixingSourceMassFlowRate(MixingSourceMassFlowRate),
-			NumSourceZonesMixingObject(NumSourceZonesMixingObject),
-			NumReceivingZonesMixingObject(NumReceivingZonesMixingObject),
-			IsOnlySourceZone(IsOnlySourceZone),
-			InfiltrationPtr(InfiltrationPtr),
-			InfiltrationMassFlowRate(InfiltrationMassFlowRate),
-			IncludeInfilToZoneMassBal(IncludeInfilToZoneMassBal),
-			ZoneMixingSourcesPtr(ZoneMixingSourcesPtr),
-			ZoneMixingReceivingPtr(ZoneMixingReceivingPtr),
-			ZoneMixingReceivingFr(ZoneMixingReceivingFr)
-		{}
 	};
 
 	struct GenericComponentZoneIntGainStruct
@@ -3731,45 +2294,6 @@ namespace DataHeatBalance {
 			ReturnAirLatentGainRate( 0.0 ),
 			CarbonDioxideGainRate( 0.0 ),
 			GenericContamGainRate( 0.0 )
-		{}
-
-		// Member Constructor
-		GenericComponentZoneIntGainStruct(
-			std::string const & CompObjectType, // device object class name
-			std::string const & CompObjectName, // device user unique name
-			int const CompTypeOfNum, // type of internal gain device identifier
-			Reference< Real64 > const PtrConvectGainRate, // fortan POINTER to value of convection heat gain rate for device, watts
-			Real64 const ConvectGainRate, // current timestep value of convection heat gain rate for device, watts
-			Reference< Real64 > const PtrReturnAirConvGainRate, // fortan POINTER to value of return air convection heat gain rate for device, W
-			Real64 const ReturnAirConvGainRate, // urrent timestep value of return air convection heat gain rate for device, W
-			Reference< Real64 > const PtrRadiantGainRate, // fortan POINTER to value of thermal radiation heat gain rate for device, watts
-			Real64 const RadiantGainRate, // current timestep value of thermal radiation heat gain rate for device, watts
-			Reference< Real64 > const PtrLatentGainRate, // fortan POINTER to value of moisture gain rate for device, Watts
-			Real64 const LatentGainRate, // current timestep value of moisture gain rate for device, Watts
-			Reference< Real64 > const PtrReturnAirLatentGainRate, // fortan POINTER to value of return air moisture gain rate for device, Watts
-			Real64 const ReturnAirLatentGainRate, // current timestep value of return air moisture gain rate for device, Watts
-			Reference< Real64 > const PtrCarbonDioxideGainRate, // fortan POINTER to value of carbon dioxide gain rate for device
-			Real64 const CarbonDioxideGainRate, // current timestep value of carbon dioxide gain rate for device
-			Reference< Real64 > const PtrGenericContamGainRate, // fortan POINTER to value of generic contaminant gain rate for device
-			Real64 const GenericContamGainRate // current timestep value of generic contaminant gain rate for device
-		) :
-			CompObjectType( CompObjectType ),
-			CompObjectName( CompObjectName ),
-			CompTypeOfNum( CompTypeOfNum ),
-			PtrConvectGainRate( PtrConvectGainRate ),
-			ConvectGainRate( ConvectGainRate ),
-			PtrReturnAirConvGainRate( PtrReturnAirConvGainRate ),
-			ReturnAirConvGainRate( ReturnAirConvGainRate ),
-			PtrRadiantGainRate( PtrRadiantGainRate ),
-			RadiantGainRate( RadiantGainRate ),
-			PtrLatentGainRate( PtrLatentGainRate ),
-			LatentGainRate( LatentGainRate ),
-			PtrReturnAirLatentGainRate( PtrReturnAirLatentGainRate ),
-			ReturnAirLatentGainRate( ReturnAirLatentGainRate ),
-			PtrCarbonDioxideGainRate( PtrCarbonDioxideGainRate ),
-			CarbonDioxideGainRate( CarbonDioxideGainRate ),
-			PtrGenericContamGainRate( PtrGenericContamGainRate ),
-			GenericContamGainRate( GenericContamGainRate )
 		{}
 
 	};
@@ -3851,83 +2375,6 @@ namespace DataHeatBalance {
 			QBBRAD( 0.0 ),
 			NumberOfDevices( 0 ),
 			MaxNumberOfDevices( 0 )
-		{}
-
-		// Member Constructor
-		ZoneSimData(
-			Real64 const NOFOCC, // Number of Occupants, zone total
-			Real64 const QOCTOT, // Total Energy from Occupants
-			Real64 const QOCSEN, // Sensible Energy from Occupants
-			Real64 const QOCCON, // ENERGY CONVECTED FROM OCCUPANTS (WH)
-			Real64 const QOCRAD, // ENERGY RADIATED FROM OCCUPANTS
-			Real64 const QOCLAT, // LATENT ENERGY FROM OCCUPANTS
-			Real64 const QLTTOT, // TOTAL ENERGY INTO LIGHTS (WH)
-			Real64 const QLTCON, // ENERGY CONVECTED TO SPACE AIR FROM LIGHTS
-			Real64 const QLTRAD, // ENERGY RADIATED TO SPACE FROM LIGHTS
-			Real64 const QLTCRA, // ENERGY CONVECTED TO RETURN AIR FROM LIGHTS
-			Real64 const QLTSW, // VISIBLE ENERGY FROM LIGHTS
-			Real64 const QEECON, // ENERGY CONVECTED FROM ELECTRIC EQUIPMENT
-			Real64 const QEERAD, // ENERCY RADIATED FROM ELECTRIC EQUIPMENT
-			Real64 const QEELost, // Energy from Electric Equipment (lost)
-			Real64 const QEELAT, // LATENT ENERGY FROM Electric Equipment
-			Real64 const QGECON, // ENERGY CONVECTED FROM GAS EQUIPMENT
-			Real64 const QGERAD, // ENERGY RADIATED FROM GAS EQUIPMENT
-			Real64 const QGELost, // Energy from Gas Equipment (lost)
-			Real64 const QGELAT, // LATENT ENERGY FROM Gas Equipment
-			Real64 const QOECON, // ENERGY CONVECTED FROM OTHER EQUIPMENT
-			Real64 const QOERAD, // ENERGY RADIATED FROM OTHER EQUIPMENT
-			Real64 const QOELost, // Energy from Other Equipment (lost)
-			Real64 const QOELAT, // LATENT ENERGY FROM Other Equipment
-			Real64 const QHWCON, // ENERGY CONVECTED FROM Hot Water EQUIPMENT
-			Real64 const QHWRAD, // ENERGY RADIATED FROM Hot Water EQUIPMENT
-			Real64 const QHWLost, // Energy from Hot Water Equipment (lost)
-			Real64 const QHWLAT, // LATENT ENERGY FROM Hot Water Equipment
-			Real64 const QSECON, // ENERGY CONVECTED FROM Steam EQUIPMENT
-			Real64 const QSERAD, // ENERGY RADIATED FROM Steam EQUIPMENT
-			Real64 const QSELost, // Energy from Steam Equipment (lost)
-			Real64 const QSELAT, // LATENT ENERGY FROM Steam Equipment
-			Real64 const QBBCON, // ENERGY CONVECTED FROM BASEBOARD HEATING
-			Real64 const QBBRAD, // ENERGY RADIATED FROM BASEBOARD HEATING
-			int const NumberOfDevices,
-			int const MaxNumberOfDevices,
-			Array1< GenericComponentZoneIntGainStruct > const & Device
-		) :
-			NOFOCC( NOFOCC ),
-			QOCTOT( QOCTOT ),
-			QOCSEN( QOCSEN ),
-			QOCCON( QOCCON ),
-			QOCRAD( QOCRAD ),
-			QOCLAT( QOCLAT ),
-			QLTTOT( QLTTOT ),
-			QLTCON( QLTCON ),
-			QLTRAD( QLTRAD ),
-			QLTCRA( QLTCRA ),
-			QLTSW( QLTSW ),
-			QEECON( QEECON ),
-			QEERAD( QEERAD ),
-			QEELost( QEELost ),
-			QEELAT( QEELAT ),
-			QGECON( QGECON ),
-			QGERAD( QGERAD ),
-			QGELost( QGELost ),
-			QGELAT( QGELAT ),
-			QOECON( QOECON ),
-			QOERAD( QOERAD ),
-			QOELost( QOELost ),
-			QOELAT( QOELAT ),
-			QHWCON( QHWCON ),
-			QHWRAD( QHWRAD ),
-			QHWLost( QHWLost ),
-			QHWLAT( QHWLAT ),
-			QSECON( QSECON ),
-			QSERAD( QSERAD ),
-			QSELost( QSELost ),
-			QSELAT( QSELAT ),
-			QBBCON( QBBCON ),
-			QBBRAD( QBBRAD ),
-			NumberOfDevices( NumberOfDevices ),
-			MaxNumberOfDevices( MaxNumberOfDevices ),
-			Device( Device )
 		{}
 
 	};
@@ -4120,151 +2567,6 @@ namespace DataHeatBalance {
 			IRBackEmiss( MaxSlatAngs, 0.0 )
 		{}
 
-		// Member Constructor
-		WindowBlindProperties(
-			std::string const & Name,
-			int const MaterialNumber, // Material pointer for the blind
-			int const SlatOrientation, // HORIZONTAL or VERTICAL
-			int const SlatAngleType, // FIXED or VARIABLE
-			Real64 const SlatWidth, // Slat width (m)
-			Real64 const SlatSeparation, // Slat separation (m)
-			Real64 const SlatThickness, // Slat thickness (m)
-			Real64 const SlatCrown, // the height of the slate (length from the chord to the curve)
-			Real64 const SlatAngle, // Slat angle (deg)
-			Real64 const MinSlatAngle, // Minimum slat angle for variable-angle slats (deg) (user input)
-			Real64 const MaxSlatAngle, // Maximum slat angle for variable-angle slats (deg) (user input)
-			Real64 const SlatConductivity, // Slat conductivity (W/m-K)
-			Real64 const SlatTransSolBeamDiff, // Slat solar beam-diffuse transmittance
-			Real64 const SlatFrontReflSolBeamDiff, // Slat front solar beam-diffuse reflectance
-			Real64 const SlatBackReflSolBeamDiff, // Slat back solar beam-diffuse reflectance
-			Real64 const SlatTransSolDiffDiff, // Slat solar diffuse-diffuse transmittance
-			Real64 const SlatFrontReflSolDiffDiff, // Slat front solar diffuse-diffuse reflectance
-			Real64 const SlatBackReflSolDiffDiff, // Slat back solar diffuse-diffuse reflectance
-			Real64 const SlatTransVisBeamDiff, // Slat visible beam-diffuse transmittance
-			Real64 const SlatFrontReflVisBeamDiff, // Slat front visible beam-diffuse reflectance
-			Real64 const SlatBackReflVisBeamDiff, // Slat back visible beam-diffuse reflectance
-			Real64 const SlatTransVisDiffDiff, // Slat visible diffuse-diffuse transmittance
-			Real64 const SlatFrontReflVisDiffDiff, // Slat front visible diffuse-diffuse reflectance
-			Real64 const SlatBackReflVisDiffDiff, // Slat back visible diffuse-diffuse reflectance
-			Real64 const SlatTransIR, // Slat IR transmittance
-			Real64 const SlatFrontEmissIR, // Slat front emissivity
-			Real64 const SlatBackEmissIR, // Slat back emissivity
-			Real64 const BlindToGlassDist, // Distance between window shade and adjacent glass (m)
-			Real64 const BlindTopOpeningMult, // Area of air-flow opening at top of blind, expressed as a fraction
-			Real64 const BlindBottomOpeningMult, // Area of air-flow opening at bottom of blind, expressed as a fraction
-			Real64 const BlindLeftOpeningMult, // Area of air-flow opening at left side of blind, expressed as a fraction
-			Real64 const BlindRightOpeningMult, // Area of air-flow opening at right side of blind, expressed as a fraction
-			Array2< Real64 > const & SolFrontBeamBeamTrans, // Blind solar front beam-beam transmittance vs.
-			Array2< Real64 > const & SolFrontBeamBeamRefl, // Blind solar front beam-beam reflectance vs. profile angle,
-			Array2< Real64 > const & SolBackBeamBeamTrans, // Blind solar back beam-beam transmittance vs. profile angle,
-			Array2< Real64 > const & SolBackBeamBeamRefl, // Blind solar back beam-beam reflectance vs. profile angle,
-			Array2< Real64 > const & SolFrontBeamDiffTrans, // Blind solar front beam-diffuse transmittance
-			Array2< Real64 > const & SolFrontBeamDiffRefl, // Blind solar front beam-diffuse reflectance
-			Array2< Real64 > const & SolBackBeamDiffTrans, // Blind solar back beam-diffuse transmittance
-			Array2< Real64 > const & SolBackBeamDiffRefl, // Blind solar back beam-diffuse reflectance
-			Array1< Real64 > const & SolFrontDiffDiffTrans, // Blind solar front diffuse-diffuse transmittance
-			Array1< Real64 > const & SolFrontDiffDiffTransGnd, // Blind ground solar front diffuse-diffuse transmittance
-			Array1< Real64 > const & SolFrontDiffDiffTransSky, // Blind sky solar front diffuse-diffuse transmittance
-			Array1< Real64 > const & SolFrontDiffDiffRefl, // Blind solar front diffuse-diffuse reflectance
-			Array1< Real64 > const & SolFrontDiffDiffReflGnd, // Blind ground solar front diffuse-diffuse reflectance
-			Array1< Real64 > const & SolFrontDiffDiffReflSky, // Blind sky solar front diffuse-diffuse reflectance
-			Array1< Real64 > const & SolBackDiffDiffTrans, // Blind solar back diffuse-diffuse transmittance
-			Array1< Real64 > const & SolBackDiffDiffRefl, // Blind solar back diffuse-diffuse reflectance
-			Array2< Real64 > const & SolFrontBeamAbs, // Blind solar front beam absorptance vs. slat angle
-			Array2< Real64 > const & SolBackBeamAbs, // Blind solar back beam absorptance vs. slat angle
-			Array1< Real64 > const & SolFrontDiffAbs, // Blind solar front diffuse absorptance vs. slat angle
-			Array1< Real64 > const & SolFrontDiffAbsGnd, // Blind ground solar front diffuse absorptance vs. slat angle
-			Array1< Real64 > const & SolFrontDiffAbsSky, // Blind sky solar front diffuse absorptance vs. slat angle
-			Array1< Real64 > const & SolBackDiffAbs, // Blind solar back diffuse absorptance vs. slat angle
-			Array2< Real64 > const & VisFrontBeamBeamTrans, // Blind visible front beam-beam transmittance
-			Array2< Real64 > const & VisFrontBeamBeamRefl, // Blind visible front beam-beam reflectance
-			Array2< Real64 > const & VisBackBeamBeamTrans, // Blind visible back beam-beam transmittance
-			Array2< Real64 > const & VisBackBeamBeamRefl, // Blind visible back beam-beam reflectance
-			Array2< Real64 > const & VisFrontBeamDiffTrans, // Blind visible front beam-diffuse transmittance
-			Array2< Real64 > const & VisFrontBeamDiffRefl, // Blind visible front beam-diffuse reflectance
-			Array2< Real64 > const & VisBackBeamDiffTrans, // Blind visible back beam-diffuse transmittance
-			Array2< Real64 > const & VisBackBeamDiffRefl, // Blind visible back beam-diffuse reflectance
-			Array1< Real64 > const & VisFrontDiffDiffTrans, // Blind visible front diffuse-diffuse transmittance
-			Array1< Real64 > const & VisFrontDiffDiffRefl, // Blind visible front diffuse-diffuse reflectance
-			Array1< Real64 > const & VisBackDiffDiffTrans, // Blind visible back diffuse-diffuse transmittance
-			Array1< Real64 > const & VisBackDiffDiffRefl, // Blind visible back diffuse-diffuse reflectance
-			Array1< Real64 > const & IRFrontTrans, // Blind IR front transmittance vs. slat angle
-			Array1< Real64 > const & IRFrontEmiss, // Blind IR front emissivity vs. slat angle
-			Array1< Real64 > const & IRBackTrans, // Blind IR back transmittance vs. slat angle
-			Array1< Real64 > const & IRBackEmiss // Blind IR back emissivity vs. slat angle
-		) :
-			Name( Name ),
-			MaterialNumber( MaterialNumber ),
-			SlatOrientation( SlatOrientation ),
-			SlatAngleType( SlatAngleType ),
-			SlatWidth( SlatWidth ),
-			SlatSeparation( SlatSeparation ),
-			SlatThickness( SlatThickness ),
-			SlatCrown( SlatCrown ),
-			SlatAngle( SlatAngle ),
-			MinSlatAngle( MinSlatAngle ),
-			MaxSlatAngle( MaxSlatAngle ),
-			SlatConductivity( SlatConductivity ),
-			SlatTransSolBeamDiff( SlatTransSolBeamDiff ),
-			SlatFrontReflSolBeamDiff( SlatFrontReflSolBeamDiff ),
-			SlatBackReflSolBeamDiff( SlatBackReflSolBeamDiff ),
-			SlatTransSolDiffDiff( SlatTransSolDiffDiff ),
-			SlatFrontReflSolDiffDiff( SlatFrontReflSolDiffDiff ),
-			SlatBackReflSolDiffDiff( SlatBackReflSolDiffDiff ),
-			SlatTransVisBeamDiff( SlatTransVisBeamDiff ),
-			SlatFrontReflVisBeamDiff( SlatFrontReflVisBeamDiff ),
-			SlatBackReflVisBeamDiff( SlatBackReflVisBeamDiff ),
-			SlatTransVisDiffDiff( SlatTransVisDiffDiff ),
-			SlatFrontReflVisDiffDiff( SlatFrontReflVisDiffDiff ),
-			SlatBackReflVisDiffDiff( SlatBackReflVisDiffDiff ),
-			SlatTransIR( SlatTransIR ),
-			SlatFrontEmissIR( SlatFrontEmissIR ),
-			SlatBackEmissIR( SlatBackEmissIR ),
-			BlindToGlassDist( BlindToGlassDist ),
-			BlindTopOpeningMult( BlindTopOpeningMult ),
-			BlindBottomOpeningMult( BlindBottomOpeningMult ),
-			BlindLeftOpeningMult( BlindLeftOpeningMult ),
-			BlindRightOpeningMult( BlindRightOpeningMult ),
-			SolFrontBeamBeamTrans( MaxSlatAngs, 37, SolFrontBeamBeamTrans ),
-			SolFrontBeamBeamRefl( MaxSlatAngs, 37, SolFrontBeamBeamRefl ),
-			SolBackBeamBeamTrans( MaxSlatAngs, 37, SolBackBeamBeamTrans ),
-			SolBackBeamBeamRefl( MaxSlatAngs, 37, SolBackBeamBeamRefl ),
-			SolFrontBeamDiffTrans( MaxSlatAngs, 37, SolFrontBeamDiffTrans ),
-			SolFrontBeamDiffRefl( MaxSlatAngs, 37, SolFrontBeamDiffRefl ),
-			SolBackBeamDiffTrans( MaxSlatAngs, 37, SolBackBeamDiffTrans ),
-			SolBackBeamDiffRefl( MaxSlatAngs, 37, SolBackBeamDiffRefl ),
-			SolFrontDiffDiffTrans( MaxSlatAngs, SolFrontDiffDiffTrans ),
-			SolFrontDiffDiffTransGnd( MaxSlatAngs, SolFrontDiffDiffTransGnd ),
-			SolFrontDiffDiffTransSky( MaxSlatAngs, SolFrontDiffDiffTransSky ),
-			SolFrontDiffDiffRefl( MaxSlatAngs, SolFrontDiffDiffRefl ),
-			SolFrontDiffDiffReflGnd( MaxSlatAngs, SolFrontDiffDiffReflGnd ),
-			SolFrontDiffDiffReflSky( MaxSlatAngs, SolFrontDiffDiffReflSky ),
-			SolBackDiffDiffTrans( MaxSlatAngs, SolBackDiffDiffTrans ),
-			SolBackDiffDiffRefl( MaxSlatAngs, SolBackDiffDiffRefl ),
-			SolFrontBeamAbs( MaxSlatAngs, 37, SolFrontBeamAbs ),
-			SolBackBeamAbs( MaxSlatAngs, 37, SolBackBeamAbs ),
-			SolFrontDiffAbs( MaxSlatAngs, SolFrontDiffAbs ),
-			SolFrontDiffAbsGnd( MaxSlatAngs, SolFrontDiffAbsGnd ),
-			SolFrontDiffAbsSky( MaxSlatAngs, SolFrontDiffAbsSky ),
-			SolBackDiffAbs( MaxSlatAngs, SolBackDiffAbs ),
-			VisFrontBeamBeamTrans( MaxSlatAngs, 37, VisFrontBeamBeamTrans ),
-			VisFrontBeamBeamRefl( MaxSlatAngs, 37, VisFrontBeamBeamRefl ),
-			VisBackBeamBeamTrans( MaxSlatAngs, 37, VisBackBeamBeamTrans ),
-			VisBackBeamBeamRefl( MaxSlatAngs, 37, VisBackBeamBeamRefl ),
-			VisFrontBeamDiffTrans( MaxSlatAngs, 37, VisFrontBeamDiffTrans ),
-			VisFrontBeamDiffRefl( MaxSlatAngs, 37, VisFrontBeamDiffRefl ),
-			VisBackBeamDiffTrans( MaxSlatAngs, 37, VisBackBeamDiffTrans ),
-			VisBackBeamDiffRefl( MaxSlatAngs, 37, VisBackBeamDiffRefl ),
-			VisFrontDiffDiffTrans( MaxSlatAngs, VisFrontDiffDiffTrans ),
-			VisFrontDiffDiffRefl( MaxSlatAngs, VisFrontDiffDiffRefl ),
-			VisBackDiffDiffTrans( MaxSlatAngs, VisBackDiffDiffTrans ),
-			VisBackDiffDiffRefl( MaxSlatAngs, VisBackDiffDiffRefl ),
-			IRFrontTrans( MaxSlatAngs, IRFrontTrans ),
-			IRFrontEmiss( MaxSlatAngs, IRFrontEmiss ),
-			IRBackTrans( MaxSlatAngs, IRBackTrans ),
-			IRBackEmiss( MaxSlatAngs, IRBackEmiss )
-		{}
-
 	};
 
 	struct SurfaceScreenProperties
@@ -4326,59 +2628,6 @@ namespace DataHeatBalance {
 			ScreenBeamReflectanceAccounting( 0 )
 		{}
 
-		// Member Constructor
-		SurfaceScreenProperties(
-			int const MaterialNumber, // Material pointer for the screen
-			Real64 const BmBmTrans, // Beam solar transmittance (dependent on sun angle)
-			Real64 const BmBmTransBack, // Beam solar transmittance (dependent on sun angle) from back side of screen
-			Real64 const BmBmTransVis, // Visible solar transmittance (dependent on sun angle)
-			Real64 const BmDifTrans, // Beam solar transmitted as diffuse radiation (dependent on sun angle)
-			Real64 const BmDifTransBack, // Beam solar transmitted as diffuse radiation (dependent on sun angle) from back side
-			Real64 const BmDifTransVis, // Visible solar transmitted as diffuse radiation (dependent on sun angle)
-			Real64 const ReflectSolBeamFront, // Beam solar reflected as diffuse radiation when sun is in front of screen
-			Real64 const ReflectVisBeamFront, // Visible solar reflected as diffuse radiation when sun is in front of screen
-			Real64 const ReflectSolBeamBack, // Beam solar reflected as diffuse radiation when sun is in back of screen
-			Real64 const ReflectVisBeamBack, // Visible solar reflected as diffuse radiation when sun is in back of screen
-			Real64 const AbsorpSolarBeamFront, // Front surface solar beam absorptance
-			Real64 const AbsorpSolarBeamBack, // Back surface solar beam absorptance
-			Real64 const DifDifTrans, // Back surface diffuse solar transmitted
-			Real64 const DifDifTransVis, // Back surface diffuse visible solar transmitted
-			Real64 const DifScreenAbsorp, // Absorption of diffuse radiation
-			Real64 const DifReflect, // Back reflection of solar diffuse radiation
-			Real64 const DifReflectVis, // Back reflection of visible diffuse radiation
-			Real64 const ReflectScreen, // Screen assembly solar reflectance (user input adjusted for holes in screen)
-			Real64 const ReflectScreenVis, // Screen assembly visible reflectance (user input adjusted for holes in screen)
-			Real64 const ReflectCylinder, // Screen material solar reflectance (user input, does not account for holes in screen)
-			Real64 const ReflectCylinderVis, // Screen material visible reflectance (user input, does not account for holes in screen)
-			Real64 const ScreenDiameterToSpacingRatio, // ratio of screen material diameter to screen material spacing
-			int const ScreenBeamReflectanceAccounting // user specified method of accounting for scattered solar beam
-		) :
-			MaterialNumber( MaterialNumber ),
-			BmBmTrans( BmBmTrans ),
-			BmBmTransBack( BmBmTransBack ),
-			BmBmTransVis( BmBmTransVis ),
-			BmDifTrans( BmDifTrans ),
-			BmDifTransBack( BmDifTransBack ),
-			BmDifTransVis( BmDifTransVis ),
-			ReflectSolBeamFront( ReflectSolBeamFront ),
-			ReflectVisBeamFront( ReflectVisBeamFront ),
-			ReflectSolBeamBack( ReflectSolBeamBack ),
-			ReflectVisBeamBack( ReflectVisBeamBack ),
-			AbsorpSolarBeamFront( AbsorpSolarBeamFront ),
-			AbsorpSolarBeamBack( AbsorpSolarBeamBack ),
-			DifDifTrans( DifDifTrans ),
-			DifDifTransVis( DifDifTransVis ),
-			DifScreenAbsorp( DifScreenAbsorp ),
-			DifReflect( DifReflect ),
-			DifReflectVis( DifReflectVis ),
-			ReflectScreen( ReflectScreen ),
-			ReflectScreenVis( ReflectScreenVis ),
-			ReflectCylinder( ReflectCylinder ),
-			ReflectCylinderVis( ReflectCylinderVis ),
-			ScreenDiameterToSpacingRatio( ScreenDiameterToSpacingRatio ),
-			ScreenBeamReflectanceAccounting( ScreenBeamReflectanceAccounting )
-		{}
-
 	};
 
 	struct ScreenTransData
@@ -4389,15 +2638,6 @@ namespace DataHeatBalance {
 
 		// Default Constructor
 		ScreenTransData()
-		{}
-
-		// Member Constructor
-		ScreenTransData(
-			Array2< Real64 > const & Trans,
-			Array2< Real64 > const & Scatt
-		) :
-			Trans( Trans ),
-			Scatt( Scatt )
 		{}
 
 	};
@@ -4418,19 +2658,6 @@ namespace DataHeatBalance {
 			EELatent( {0,25}, 0.0 )
 		{}
 
-		// Member Constructor
-		ZoneCatEUseData(
-			Array1< Real64 > const & EEConvected, // Category (0 to 25) Energy Convected from Electric Equipment
-			Array1< Real64 > const & EERadiated, // Category (0 to 25) Energy Radiated from Electric Equipment
-			Array1< Real64 > const & EELost, // Category (0 to 25) Energy from Electric Equipment (lost)
-			Array1< Real64 > const & EELatent // Category (0 to 25) Latent Energy from Electric Equipment
-		) :
-			EEConvected( {0,25}, EEConvected ),
-			EERadiated( {0,25}, EERadiated ),
-			EELost( {0,25}, EELost ),
-			EELatent( {0,25}, EELatent )
-		{}
-
 	};
 
 	struct RefrigCaseCreditData
@@ -4448,19 +2675,6 @@ namespace DataHeatBalance {
 			LatCaseCreditToZone( 0.0 ),
 			SenCaseCreditToHVAC( 0.0 ),
 			LatCaseCreditToHVAC( 0.0 )
-		{}
-
-		// Member Constructor
-		RefrigCaseCreditData(
-			Real64 const SenCaseCreditToZone, // Refrigerated display case sensible energy delivered to zone
-			Real64 const LatCaseCreditToZone, // Refrigerated display case latent energy delivered to zone
-			Real64 const SenCaseCreditToHVAC, // Refrigerated display case sensible energy delivered to HVAC RA duct
-			Real64 const LatCaseCreditToHVAC // Refrigerated display case latent energy delivered to HVAC RA duct
-		) :
-			SenCaseCreditToZone( SenCaseCreditToZone ),
-			LatCaseCreditToZone( LatCaseCreditToZone ),
-			SenCaseCreditToHVAC( SenCaseCreditToHVAC ),
-			LatCaseCreditToHVAC( LatCaseCreditToHVAC )
 		{}
 
 		// Reset to Zeros
@@ -4491,21 +2705,6 @@ namespace DataHeatBalance {
 			UsedHVACCoil( 0.0 )
 		{}
 
-		// Member Constructor
-		HeatReclaimRefrigeratedRackData(
-			std::string const & Name, // Name of refrigerated rack
-			std::string const & SourceType, // object type for refrigerated rack
-			Real64 const AvailCapacity, // Total available heat reclaim capacity
-			Real64 const UsedWaterHeater, // amount of avail used at plant water heater
-			Real64 const UsedHVACCoil // amount of avail used at hvac coil
-		) :
-			Name( Name ),
-			SourceType( SourceType ),
-			AvailCapacity( AvailCapacity ),
-			UsedWaterHeater( UsedWaterHeater ),
-			UsedHVACCoil( UsedHVACCoil )
-		{}
-
 	};
 
 	struct HeatReclaimRefrigCondenserData
@@ -4527,23 +2726,6 @@ namespace DataHeatBalance {
 			UsedHVACCoil( 0.0 )
 		{}
 
-		// Member Constructor
-		HeatReclaimRefrigCondenserData(
-			std::string const & Name, // Name of refrigeration system
-			int const SourceType, // object type for refrigeration system
-			Real64 const AvailCapacity, // Total available heat reclaim capacity
-			Real64 const AvailTemperature, // Temperature of heat reclaim source
-			Real64 const UsedWaterHeater, // amount of avail used at plant water heater
-			Real64 const UsedHVACCoil // amount of avail used at hvac coil
-		) :
-			Name( Name ),
-			SourceType( SourceType ),
-			AvailCapacity( AvailCapacity ),
-			AvailTemperature( AvailTemperature ),
-			UsedWaterHeater( UsedWaterHeater ),
-			UsedHVACCoil( UsedHVACCoil )
-		{}
-
 	};
 
 	struct HeatReclaimDXCoilData
@@ -4556,17 +2738,6 @@ namespace DataHeatBalance {
 		// Default Constructor
 		HeatReclaimDXCoilData() :
 			AvailCapacity( 0.0 )
-		{}
-
-		// Member Constructor
-		HeatReclaimDXCoilData(
-			std::string const & Name, // Name of DX Coil
-			std::string const & SourceType, // SourceType for DX Coil
-			Real64 const AvailCapacity // Total available heat reclaim capacity
-		) :
-			Name( Name ),
-			SourceType( SourceType ),
-			AvailCapacity( AvailCapacity )
 		{}
 
 	};
@@ -5207,6 +3378,15 @@ namespace DataHeatBalance {
 	clear_state();
 
 	void
+	SetZoneOutBulbTempAt();
+
+	void
+	CheckZoneOutBulbTempAt();
+
+	void
+	SetZoneWindSpeedAt();
+
+	void
 	CheckAndSetConstructionProperties(
 		int const ConstrNum, // Construction number to be set/checked
 		bool & ErrorsFound // error flag that is set when certain errors have occurred
@@ -5241,29 +3421,6 @@ namespace DataHeatBalance {
 		int const numSurf, // index for Surface array.
 		bool & isValid // returns true if result is valid
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataHeatBalance
 

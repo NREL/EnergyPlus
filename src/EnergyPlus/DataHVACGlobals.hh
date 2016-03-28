@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataHVACGlobals_hh_INCLUDED
 #define DataHVACGlobals_hh_INCLUDED
 
@@ -58,6 +116,14 @@ namespace DataHVACGlobals {
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
 	extern int const MaxHeaterOutletTempSizing; // request sizing for heating coil maximum outlet temperature
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
+	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
+	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
+	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
+	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
+
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -377,27 +443,6 @@ namespace DataHVACGlobals {
 			OpType( 0 )
 		{}
 
-		// Member Constructor
-		ComponentSetPtData(
-			std::string const & EquipmentType,
-			std::string const & EquipmentName,
-			int const NodeNumIn,
-			int const NodeNumOut,
-			Real64 const EquipDemand,
-			Real64 const DesignFlowRate,
-			std::string const & HeatOrCool,
-			int const OpType
-		) :
-			EquipmentType( EquipmentType ),
-			EquipmentName( EquipmentName ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			EquipDemand( EquipDemand ),
-			DesignFlowRate( DesignFlowRate ),
-			HeatOrCool( HeatOrCool ),
-			OpType( OpType )
-		{}
-
 	};
 
 	struct DefineZoneCompAvailMgrs
@@ -426,33 +471,6 @@ namespace DataHVACGlobals {
 			Count ( 0 )
 		{}
 
-		// Member Constructor
-		DefineZoneCompAvailMgrs(
-			int const NumAvailManagers, // number of availability managers for this system
-			int const AvailStatus, // system availability status
-			int const StartTime, // cycle on time (in SimTimeSteps)
-			int const StopTime, // cycle off time (in SimTimeSteps)
-			std::string const & AvailManagerListName, // name of each availability manager
-			Array1_string const & AvailManagerName, // name of each availability manager
-			Array1_int const & AvailManagerType, // type of availability manager
-			Array1_int const & AvailManagerNum, // index for availability manager
-			int const ZoneNum, // cycle off time (in SimTimeSteps)
-			bool const Input,
-			int const Count
-		) :
-			NumAvailManagers( NumAvailManagers ),
-			AvailStatus( AvailStatus ),
-			StartTime( StartTime ),
-			StopTime( StopTime ),
-			AvailManagerListName( AvailManagerListName ),
-			AvailManagerName( AvailManagerName ),
-			AvailManagerType( AvailManagerType ),
-			AvailManagerNum( AvailManagerNum ),
-			ZoneNum( ZoneNum ),
-			Input( Input ),
-			Count ( Count )
-		{}
-
 	};
 
 	struct ZoneCompTypeData
@@ -466,15 +484,6 @@ namespace DataHVACGlobals {
 			TotalNumComp( 0 )
 		{}
 
-		// Member Constructor
-		ZoneCompTypeData(
-			Array1< DefineZoneCompAvailMgrs > const & ZoneCompAvailMgrs,
-			int const TotalNumComp // total number of components of a zone equip type
-		) :
-			ZoneCompAvailMgrs( ZoneCompAvailMgrs ),
-			TotalNumComp( TotalNumComp )
-		{}
-
 	};
 
 	struct OptStartDataType
@@ -486,17 +495,6 @@ namespace DataHVACGlobals {
 
 		// Default Constructor
 		OptStartDataType()
-		{}
-
-		// Member Constructor
-		OptStartDataType(
-			Array1_int const & ActualZoneNum,
-			Array1< Real64 > const & OccStartTime,
-			Array1_bool const & OptStartFlag
-		) :
-			ActualZoneNum( ActualZoneNum ),
-			OccStartTime( OccStartTime ),
-			OptStartFlag( OptStartFlag )
 		{}
 
 	};

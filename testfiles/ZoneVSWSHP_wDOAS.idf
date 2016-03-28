@@ -85,7 +85,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   ZoneHVAC:WaterToAirHeatPump,
     Zone1WTAHP,              !- Name

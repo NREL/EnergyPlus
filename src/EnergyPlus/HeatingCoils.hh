@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef HeatingCoils_hh_INCLUDED
 #define HeatingCoils_hh_INCLUDED
 
@@ -111,6 +169,8 @@ namespace HeatingCoils {
 		Array1D< Real64 > MSNominalCapacity; // Nominal Capacity MS AC Furnace [W]
 		Array1D< Real64 > MSEfficiency; // Efficiency for MS AC Furnace [dimensionless]
 		Array1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		HeatingCoilEquipConditions() :
@@ -152,106 +212,9 @@ namespace HeatingCoils {
 			PLFErrorCount( 0 ),
 			ReclaimHeatingSourceIndexNum( 0 ),
 			ReclaimHeatingSource( 0 ),
-			NumOfStages( 0 )
-		{}
-
-		// Member Constructor
-		HeatingCoilEquipConditions(
-			std::string const & Name, // Name of the HeatingCoil
-			std::string const & HeatingCoilType, // Type of HeatingCoil ie. Heating or Cooling
-			std::string const & HeatingCoilModel, // Type of HeatingCoil ie. Simple, Detailed, etc.
-			int const HCoilType_Num,
-			std::string const & Schedule, // HeatingCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			int const InsuffTemperatureWarn, // Used for recurring error message
-			Real64 const InletAirMassFlowRate, // MassFlow through the HeatingCoil being Simulated [kg/Sec]
-			Real64 const OutletAirMassFlowRate,
-			Real64 const InletAirTemp,
-			Real64 const OutletAirTemp,
-			Real64 const InletAirHumRat,
-			Real64 const OutletAirHumRat,
-			Real64 const InletAirEnthalpy,
-			Real64 const OutletAirEnthalpy,
-			Real64 const HeatingCoilLoad, // Total Load on the Coil [J]
-			Real64 const HeatingCoilRate, // Total Coil Rate on the Coil [W]
-			Real64 const GasUseLoad, // Gas Usage of Coil [J]
-			Real64 const ElecUseLoad, // Electric Usage of Coil [J]
-			Real64 const GasUseRate, // Gas Usage of Coil [W]
-			Real64 const ElecUseRate, // Electric Usage of Coil [W]
-			Real64 const Efficiency, // HeatingCoil Efficiency Value
-			Real64 const NominalCapacity, // Nominal Capacity of Coil [W]
-			Real64 const DesiredOutletTemp,
-			Real64 const DesiredOutletHumRat,
-			Real64 const AvailTemperature, // Used in heat recovery test [C]
-			int const AirInletNodeNum,
-			int const AirOutletNodeNum,
-			int const TempSetPointNodeNum, // If applicable this is the node number that the temp setpoint exists.
-			int const Control,
-			int const PLFCurveIndex, // Index for part-load factor curve index for gas heating coil
-			Real64 const ParasiticElecLoad, // parasitic electric load associated with the gas heating coil
-			Real64 const ParasiticGasLoad, // parasitic gas load associated with the gas heating coil
-			Real64 const ParasiticGasRate, // avg. parasitic gas consumption rate with the gas heating coil
-			Real64 const ParasiticGasCapacity, // capacity of parasitic gas consumption rate, input by user [W]
-			Real64 const RTF, // Heater runtime fraction, including PLF curve impacts
-			int const RTFErrorIndex, // used in recurring error warnings
-			int const RTFErrorCount, // used in recurring error warnings
-			int const PLFErrorIndex, // used in recurring error warnings
-			int const PLFErrorCount, // used in recurring error warnings
-			std::string const & ReclaimHeatingCoilName, // Name of reclaim heating coil
-			int const ReclaimHeatingSourceIndexNum, // Index to reclaim heating source (condenser) of a specific type
-			int const ReclaimHeatingSource, // The source for the Reclaim Heating Coil
-			int const NumOfStages, // Number of speeds
-			Array1< Real64 > const & MSNominalCapacity, // Nominal Capacity MS AC Furnace [W]
-			Array1< Real64 > const & MSEfficiency, // Efficiency for MS AC Furnace [dimensionless]
-			Array1< Real64 > const & MSParasiticElecLoad // Parasitic elec load MS AC Furnace (gas only) [W]
-		) :
-			Name( Name ),
-			HeatingCoilType( HeatingCoilType ),
-			HeatingCoilModel( HeatingCoilModel ),
-			HCoilType_Num( HCoilType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			InsuffTemperatureWarn( InsuffTemperatureWarn ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			OutletAirMassFlowRate( OutletAirMassFlowRate ),
-			InletAirTemp( InletAirTemp ),
-			OutletAirTemp( OutletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			OutletAirHumRat( OutletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			HeatingCoilLoad( HeatingCoilLoad ),
-			HeatingCoilRate( HeatingCoilRate ),
-			GasUseLoad( GasUseLoad ),
-			ElecUseLoad( ElecUseLoad ),
-			GasUseRate( GasUseRate ),
-			ElecUseRate( ElecUseRate ),
-			Efficiency( Efficiency ),
-			NominalCapacity( NominalCapacity ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			AvailTemperature( AvailTemperature ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			TempSetPointNodeNum( TempSetPointNodeNum ),
-			Control( Control ),
-			PLFCurveIndex( PLFCurveIndex ),
-			ParasiticElecLoad( ParasiticElecLoad ),
-			ParasiticGasLoad( ParasiticGasLoad ),
-			ParasiticGasRate( ParasiticGasRate ),
-			ParasiticGasCapacity( ParasiticGasCapacity ),
-			RTF( RTF ),
-			RTFErrorIndex( RTFErrorIndex ),
-			RTFErrorCount( RTFErrorCount ),
-			PLFErrorIndex( PLFErrorIndex ),
-			PLFErrorCount( PLFErrorCount ),
-			ReclaimHeatingCoilName( ReclaimHeatingCoilName ),
-			ReclaimHeatingSourceIndexNum( ReclaimHeatingSourceIndexNum ),
-			ReclaimHeatingSource( ReclaimHeatingSource ),
-			NumOfStages( NumOfStages ),
-			MSNominalCapacity( MSNominalCapacity ),
-			MSEfficiency( MSEfficiency ),
-			MSParasiticElecLoad( MSParasiticElecLoad )
+			NumOfStages( 0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -264,12 +227,6 @@ namespace HeatingCoils {
 		HeatingCoilNumericFieldData()
 		{}
 
-		// Member Constructor
-		HeatingCoilNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-		) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	// Object Data
@@ -473,32 +430,17 @@ namespace HeatingCoils {
 	void
 	clear_state();
 
+	// sets data to a coil that is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetHeatingCoilData(
+		int const CoilNum, // Number of electric or gas heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
+	);
+
 	//        End of Utility subroutines for the HeatingCoil Module
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatingCoils
 

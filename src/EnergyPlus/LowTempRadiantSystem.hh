@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef LowTempRadiantSystem_hh_INCLUDED
 #define LowTempRadiantSystem_hh_INCLUDED
 
@@ -200,134 +258,6 @@ namespace LowTempRadiantSystem {
 			ScaledCoolingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		HydronicRadiantSystemData(
-			std::string const & Name, // name of hydronic radiant system
-			std::string const & SchedName, // availability schedule
-			int const SchedPtr, // index to schedule
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr, // Point to this zone in the Zone derived type
-			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
-			int const NumOfSurfaces, // Number of surfaces included in this radiant system (coordinated control)
-			Array1_int const & SurfacePtr, // Pointer to the surface(s) in the Surface derived type
-			Array1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
-			Array1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
-			Array1< Real64 > const & NumCircuits, // Number of fluid circuits in the surface
-			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this radiant system
-			Real64 const TubeDiameter, // tube diameter for embedded tubing
-			Real64 const TubeLength, // tube length embedded in radiant surface
-			int const ControlType, // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
-			bool const HeatingSystem, // .TRUE. when the system is able to heat (parameters are valid)
-			Real64 const WaterVolFlowMaxHeat, // maximum water flow rate for heating, m3/s
-			Real64 const WaterFlowMaxHeat, // maximum water flow rate for heating, kg/s
-			int const HotWaterInNode, // hot water inlet node
-			int const HotWaterOutNode, // hot water outlet node
-			Real64 const HotThrottlRange, // Throttling range for heating [C]
-			std::string const & HotSetptSched, // Schedule name for the zone setpoint temperature
-			int const HotSetptSchedPtr, // Schedule index for the zone setpoint temperature
-			int const HWLoopNum,
-			int const HWLoopSide,
-			int const HWBranchNum,
-			int const HWCompNum,
-			Real64 const WaterVolFlowMaxCool, // maximum water flow rate for cooling, m3/s
-			Real64 const WaterFlowMaxCool, // maximum water flow rate for cooling, kg/s
-			bool const CoolingSystem, // .TRUE. when the system is able to cool (parameters are valid)
-			int const ColdWaterInNode, // cold water inlet node
-			int const ColdWaterOutNode, // cold water outlet node
-			Real64 const ColdThrottlRange, // Throttling range for cooling [C]
-			std::string const & ColdSetptSched, // Schedule name for the zone setpoint temperature
-			int const ColdSetptSchedPtr, // Schedule index for the zone setpoint temperature
-			int const CWLoopNum,
-			int const CWLoopSide,
-			int const CWBranchNum,
-			int const CWCompNum,
-			int const GlycolIndex, // Index to Glycol (Water) Properties
-			int const CondErrIndex, // Error index for recurring warning messages
-			int const CondCtrlType, // Condensation control type (initialize to simple off)
-			Real64 const CondDewPtDeltaT, // Diff between surface temperature and dew point for cond. shut-off
-			Real64 const CondCausedTimeOff, // Amount of time condensation did or could have turned system off
-			bool const CondCausedShutDown, // .TRUE. when condensation predicted at surface
-			int const NumCircCalcMethod, // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
-			Real64 const CircLength, // Circuit length {m}
-			bool const EMSOverrideOnWaterMdot,
-			Real64 const EMSWaterMdotOverrideValue,
-			Real64 const WaterInletTemp, // water inlet temperature
-			Real64 const WaterOutletTemp, // water outlet temperature
-			Real64 const WaterMassFlowRate, // water mass flow rate
-			Real64 const HeatPower, // heating sent to panel in Watts
-			Real64 const HeatEnergy, // heating sent to panel in Joules
-			Real64 const CoolPower, // cooling sent to panel in Watts
-			Real64 const CoolEnergy, // cooling sent to panel in Joules
-			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
-			int const OutRangeLoErrorCount, // recurring errors for crazy results too low fluid temperature
-			int const HeatingCapMethod, // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledHeatingCapacity, // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-			int const CoolingCapMethod, // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
-			Real64 const ScaledCoolingCapacity // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-		) :
-			Name( Name ),
-			SchedName( SchedName ),
-			SchedPtr( SchedPtr ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			SurfListName( SurfListName ),
-			NumOfSurfaces( NumOfSurfaces ),
-			SurfacePtr( SurfacePtr ),
-			SurfaceName( SurfaceName ),
-			SurfaceFlowFrac( SurfaceFlowFrac ),
-			NumCircuits( NumCircuits ),
-			TotalSurfaceArea( TotalSurfaceArea ),
-			TubeDiameter( TubeDiameter ),
-			TubeLength( TubeLength ),
-			ControlType( ControlType ),
-			HeatingSystem( HeatingSystem ),
-			WaterVolFlowMaxHeat( WaterVolFlowMaxHeat ),
-			WaterFlowMaxHeat( WaterFlowMaxHeat ),
-			HotWaterInNode( HotWaterInNode ),
-			HotWaterOutNode( HotWaterOutNode ),
-			HotThrottlRange( HotThrottlRange ),
-			HotSetptSched( HotSetptSched ),
-			HotSetptSchedPtr( HotSetptSchedPtr ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			WaterVolFlowMaxCool( WaterVolFlowMaxCool ),
-			WaterFlowMaxCool( WaterFlowMaxCool ),
-			CoolingSystem( CoolingSystem ),
-			ColdWaterInNode( ColdWaterInNode ),
-			ColdWaterOutNode( ColdWaterOutNode ),
-			ColdThrottlRange( ColdThrottlRange ),
-			ColdSetptSched( ColdSetptSched ),
-			ColdSetptSchedPtr( ColdSetptSchedPtr ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSide( CWLoopSide ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			GlycolIndex( GlycolIndex ),
-			CondErrIndex( CondErrIndex ),
-			CondCtrlType( CondCtrlType ),
-			CondDewPtDeltaT( CondDewPtDeltaT ),
-			CondCausedTimeOff( CondCausedTimeOff ),
-			CondCausedShutDown( CondCausedShutDown ),
-			NumCircCalcMethod( NumCircCalcMethod ),
-			CircLength( CircLength ),
-			EMSOverrideOnWaterMdot( EMSOverrideOnWaterMdot ),
-			EMSWaterMdotOverrideValue( EMSWaterMdotOverrideValue ),
-			WaterInletTemp( WaterInletTemp ),
-			WaterOutletTemp( WaterOutletTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ),
-			CoolPower( CoolPower ),
-			CoolEnergy( CoolEnergy ),
-			OutRangeHiErrorCount( OutRangeHiErrorCount ),
-			OutRangeLoErrorCount( OutRangeLoErrorCount ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity ),
-			CoolingCapMethod( CoolingCapMethod ),
-			ScaledCoolingCapacity( ScaledCoolingCapacity )
-		{}
 	};
 
 	struct ConstantFlowRadiantSystemData
@@ -496,175 +426,6 @@ namespace LowTempRadiantSystem {
 			OutRangeLoErrorCount( 0 )
 		{}
 
-		// Member Constructor
-		ConstantFlowRadiantSystemData(
-			std::string const & Name, // name of hydronic radiant system
-			std::string const & SchedName, // availability schedule
-			int const SchedPtr, // index to schedule
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr, // Point to this zone in the Zone derived type
-			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
-			int const NumOfSurfaces, // Number of surfaces included in this radiant system (coordinated control)
-			Array1_int const & SurfacePtr, // Pointer to the surface(s) in the Surface derived type
-			Array1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
-			Array1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
-			Array1< Real64 > const & NumCircuits, // Number of fluid circuits in the surface
-			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this radiant system
-			Real64 const TubeDiameter, // tube diameter for embedded tubing
-			Real64 const TubeLength, // tube length embedded in radiant surface
-			int const ControlType, // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
-			Real64 const WaterVolFlowMax, // design nominal capacity of constant flow pump (volumetric flow rate)
-			Real64 const ColdDesignWaterMassFlowRate,
-			Real64 const HotDesignWaterMassFlowRate,
-			Real64 const WaterMassFlowRate, // current flow rate through system (calculated)
-			std::string const & VolFlowSched, // schedule of maximum flow at the current time
-			int const VolFlowSchedPtr, // index to the volumetric flow schedule
-			Real64 const NomPumpHead, // nominal head of the constant flow pump
-			Real64 const NomPowerUse, // nominal power use of the constant flow pump
-			Real64 const MotorEffic, // efficiency of the pump motor
-			Real64 const PumpEffic, // overall efficiency of the pump (calculated)
-			Real64 const FracMotorLossToFluid, // amount of heat generated by pump motor that is added to the fluid
-			bool const HeatingSystem, // .TRUE. when the system is able to heat (parameters are valid)
-			int const HotWaterInNode, // hot water inlet node
-			int const HotWaterOutNode, // hot water outlet node
-			std::string const & HotWaterHiTempSched, // Schedule name for the highest water temperature
-			int const HotWaterHiTempSchedPtr, // Schedule index for the highest water temperature
-			std::string const & HotWaterLoTempSched, // Schedule name for the lowest water temperature
-			int const HotWaterLoTempSchedPtr, // Schedule index for the lowest water temperature
-			std::string const & HotCtrlHiTempSched, // Schedule name for the highest control temperature
-			int const HotCtrlHiTempSchedPtr, // Schedule index for the highest control temperature
-			std::string const & HotCtrlLoTempSched, // Schedule name for the lowest control temperature
-			int const HotCtrlLoTempSchedPtr, // Schedule index for the lowest control temperature
-			int const HWLoopNum,
-			int const HWLoopSide,
-			int const HWBranchNum,
-			int const HWCompNum,
-			bool const CoolingSystem, // .TRUE. when the system is able to cool (parameters are valid)
-			int const ColdWaterInNode, // cold water inlet node
-			int const ColdWaterOutNode, // cold water outlet node
-			std::string const & ColdWaterHiTempSched, // Schedule name for the highest water temperature
-			int const ColdWaterHiTempSchedPtr, // Schedule index for the highest water temperature
-			std::string const & ColdWaterLoTempSched, // Schedule name for the lowest water temperature
-			int const ColdWaterLoTempSchedPtr, // Schedule index for the lowest water temperature
-			std::string const & ColdCtrlHiTempSched, // Schedule name for the highest control temperature
-			int const ColdCtrlHiTempSchedPtr, // Schedule index for the highest control temperature
-			std::string const & ColdCtrlLoTempSched, // Schedule name for the lowest control temperature
-			int const ColdCtrlLoTempSchedPtr, // Schedule index for the lowest control temperature
-			int const CWLoopNum,
-			int const CWLoopSide,
-			int const CWBranchNum,
-			int const CWCompNum,
-			int const GlycolIndex, // Index to Glycol (Water) Properties
-			int const CondErrIndex, // Error index for warning messages
-			int const CondCtrlType, // Condensation control type (initialize to simple off)
-			Real64 const CondDewPtDeltaT, // Diff between surface temperature and dew point for cond. shut-off
-			Real64 const CondCausedTimeOff, // Amount of time condensation did or could have turned system off
-			bool const CondCausedShutDown, // .TRUE. when condensation predicted at surface
-			int const NumCircCalcMethod, // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
-			Real64 const CircLength, // Circuit length {m}
-			bool const EMSOverrideOnWaterMdot,
-			Real64 const EMSWaterMdotOverrideValue,
-			Real64 const WaterInletTemp, // water inlet temperature
-			Real64 const WaterOutletTemp, // water outlet temperature
-			Real64 const WaterInjectionRate, // water injection mass flow rate from main loop
-			Real64 const WaterRecircRate, // water recirculation rate (outlet from radiant system recirculated)
-			Real64 const HeatPower, // heating sent to panel in Watts
-			Real64 const HeatEnergy, // heating sent to panel in Joules
-			Real64 const CoolPower, // cooling sent to panel in Watts
-			Real64 const CoolEnergy, // cooling sent to panel in Joules
-			Real64 const PumpPower, // pump power in Watts
-			Real64 const PumpEnergy, // pump energy consumption in Joules
-			Real64 const PumpMassFlowRate, // mass flow rate through the radiant system in kg/sec
-			Real64 const PumpHeattoFluid, // heat transfer rate from pump motor to fluid in Watts
-			Real64 const PumpHeattoFluidEnergy, // Pump Energy dissipated into fluid stream in Joules
-			Real64 const PumpInletTemp, // inlet temperature of pump (inlet temperature from loop)
-			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
-			int const OutRangeLoErrorCount // recurring errors for crazy results too low fluid temperature
-		) :
-			Name( Name ),
-			SchedName( SchedName ),
-			SchedPtr( SchedPtr ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			SurfListName( SurfListName ),
-			NumOfSurfaces( NumOfSurfaces ),
-			SurfacePtr( SurfacePtr ),
-			SurfaceName( SurfaceName ),
-			SurfaceFlowFrac( SurfaceFlowFrac ),
-			NumCircuits( NumCircuits ),
-			TotalSurfaceArea( TotalSurfaceArea ),
-			TubeDiameter( TubeDiameter ),
-			TubeLength( TubeLength ),
-			ControlType( ControlType ),
-			WaterVolFlowMax( WaterVolFlowMax ),
-			ColdDesignWaterMassFlowRate( ColdDesignWaterMassFlowRate ),
-			HotDesignWaterMassFlowRate( HotDesignWaterMassFlowRate ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			VolFlowSched( VolFlowSched ),
-			VolFlowSchedPtr( VolFlowSchedPtr ),
-			NomPumpHead( NomPumpHead ),
-			NomPowerUse( NomPowerUse ),
-			MotorEffic( MotorEffic ),
-			PumpEffic( PumpEffic ),
-			FracMotorLossToFluid( FracMotorLossToFluid ),
-			HeatingSystem( HeatingSystem ),
-			HotWaterInNode( HotWaterInNode ),
-			HotWaterOutNode( HotWaterOutNode ),
-			HotWaterHiTempSched( HotWaterHiTempSched ),
-			HotWaterHiTempSchedPtr( HotWaterHiTempSchedPtr ),
-			HotWaterLoTempSched( HotWaterLoTempSched ),
-			HotWaterLoTempSchedPtr( HotWaterLoTempSchedPtr ),
-			HotCtrlHiTempSched( HotCtrlHiTempSched ),
-			HotCtrlHiTempSchedPtr( HotCtrlHiTempSchedPtr ),
-			HotCtrlLoTempSched( HotCtrlLoTempSched ),
-			HotCtrlLoTempSchedPtr( HotCtrlLoTempSchedPtr ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			CoolingSystem( CoolingSystem ),
-			ColdWaterInNode( ColdWaterInNode ),
-			ColdWaterOutNode( ColdWaterOutNode ),
-			ColdWaterHiTempSched( ColdWaterHiTempSched ),
-			ColdWaterHiTempSchedPtr( ColdWaterHiTempSchedPtr ),
-			ColdWaterLoTempSched( ColdWaterLoTempSched ),
-			ColdWaterLoTempSchedPtr( ColdWaterLoTempSchedPtr ),
-			ColdCtrlHiTempSched( ColdCtrlHiTempSched ),
-			ColdCtrlHiTempSchedPtr( ColdCtrlHiTempSchedPtr ),
-			ColdCtrlLoTempSched( ColdCtrlLoTempSched ),
-			ColdCtrlLoTempSchedPtr( ColdCtrlLoTempSchedPtr ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSide( CWLoopSide ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			GlycolIndex( GlycolIndex ),
-			CondErrIndex( CondErrIndex ),
-			CondCtrlType( CondCtrlType ),
-			CondDewPtDeltaT( CondDewPtDeltaT ),
-			CondCausedTimeOff( CondCausedTimeOff ),
-			CondCausedShutDown( CondCausedShutDown ),
-			NumCircCalcMethod( NumCircCalcMethod ),
-			CircLength( CircLength ),
-			EMSOverrideOnWaterMdot( EMSOverrideOnWaterMdot ),
-			EMSWaterMdotOverrideValue( EMSWaterMdotOverrideValue ),
-			WaterInletTemp( WaterInletTemp ),
-			WaterOutletTemp( WaterOutletTemp ),
-			WaterInjectionRate( WaterInjectionRate ),
-			WaterRecircRate( WaterRecircRate ),
-			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ),
-			CoolPower( CoolPower ),
-			CoolEnergy( CoolEnergy ),
-			PumpPower( PumpPower ),
-			PumpEnergy( PumpEnergy ),
-			PumpMassFlowRate( PumpMassFlowRate ),
-			PumpHeattoFluid( PumpHeattoFluid ),
-			PumpHeattoFluidEnergy( PumpHeattoFluidEnergy ),
-			PumpInletTemp( PumpInletTemp ),
-			OutRangeHiErrorCount( OutRangeHiErrorCount ),
-			OutRangeLoErrorCount( OutRangeLoErrorCount )
-		{}
-
 	};
 
 	struct ElectricRadiantSystemData
@@ -715,56 +476,6 @@ namespace LowTempRadiantSystem {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		ElectricRadiantSystemData(
-			std::string const & Name, // name of hydronic radiant system
-			std::string const & SchedName, // availability schedule
-			int const SchedPtr, // index to schedule
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr, // Point to this zone in the Zone derived type
-			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
-			int const NumOfSurfaces, // Number of surfaces included in this radiant system (coordinated control)
-			Array1_int const & SurfacePtr, // Pointer to the surface(s) in the Surface derived type
-			Array1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
-			Array1< Real64 > const & SurfacePowerFrac, // Fraction of total power input to surface
-			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this radiant system
-			Real64 const MaxElecPower, // Maximum electric power that can be supplied to surface, Watts
-			int const ControlType, // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
-			Real64 const ThrottlRange, // Throttling range for heating [C]
-			std::string const & SetptSched, // Schedule name for the zone setpoint temperature
-			int const SetptSchedPtr, // Schedule index for the zone setpoint temperature
-			Real64 const ElecPower, // heating sent to panel in Watts
-			Real64 const ElecEnergy, // heating sent to panel in Joules
-			Real64 const HeatPower, // heating sent to panel in Watts (same as ElecPower)
-			Real64 const HeatEnergy, // heating sent to panel in Joules (same as ElecEnergy)
-			int const HeatingCapMethod,     // - Method for Low Temp Radiant system heating capacity scalable sizing calculation
-			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledHeatingCapacity   // - Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-		) :
-			Name( Name ),
-			SchedName( SchedName ),
-			SchedPtr( SchedPtr ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			SurfListName( SurfListName ),
-			NumOfSurfaces( NumOfSurfaces ),
-			SurfacePtr( SurfacePtr ),
-			SurfaceName( SurfaceName ),
-			SurfacePowerFrac( SurfacePowerFrac ),
-			TotalSurfaceArea( TotalSurfaceArea ),
-			MaxElecPower( MaxElecPower ),
-			ControlType( ControlType ),
-			ThrottlRange( ThrottlRange ),
-			SetptSched( SetptSched ),
-			SetptSchedPtr( SetptSchedPtr ),
-			ElecPower( ElecPower ),
-			ElecEnergy( ElecEnergy ),
-			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
-
 	};
 
 	struct RadSysTypeData
@@ -781,17 +492,6 @@ namespace LowTempRadiantSystem {
 			CompIndex( 0 )
 		{}
 
-		// Member Constructor
-		RadSysTypeData(
-			std::string const & Name, // name of radiant system
-			int const SystemType, // Type of System (see System Types in Parameters)
-			int const CompIndex // Index in specific system types
-		) :
-			Name( Name ),
-			SystemType( SystemType ),
-			CompIndex( CompIndex )
-		{}
-
 	};
 
 	struct ElecRadSysNumericFieldData
@@ -803,12 +503,6 @@ namespace LowTempRadiantSystem {
 		ElecRadSysNumericFieldData()
 		{}
 
-		// Member Constructor
-		ElecRadSysNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	struct HydronicRadiantSysNumericFieldData
@@ -820,12 +514,6 @@ namespace LowTempRadiantSystem {
 		HydronicRadiantSysNumericFieldData()
 		{}
 
-		// Member Constructor
-		HydronicRadiantSysNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data
@@ -837,6 +525,9 @@ namespace LowTempRadiantSystem {
 	extern Array1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimLowTempRadiantSystem(
@@ -934,29 +625,6 @@ namespace LowTempRadiantSystem {
 		int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
 		int const SystemType // Type of radiant system: hydronic, constant flow, or electric
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // LowTempRadiantSystem
 

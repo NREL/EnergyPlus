@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataSizing_hh_INCLUDED
 #define DataSizing_hh_INCLUDED
 
@@ -238,8 +296,8 @@ namespace DataSizing {
 	extern Array1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
 	extern Array1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	extern char SizingFileColSep; // Character to separate columns in sizing outputs
-
-
+	extern int DataDesicDehumNum; // index to desiccant dehumidifier
+	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
 	// Types
 
 	struct ZoneSizingInputData
@@ -670,33 +728,6 @@ namespace DataSizing {
 			DesHeatingLoad( 0.0 )
 		{}
 
-		// Member Constructor
-		TermUnitSizingData(
-			Real64 const AirVolFlow, // design air vol flow rate for single duct terminal unit [m3/s]
-			Real64 const MaxHWVolFlow, // design Hot Water vol flow for single duct terminal unit [m3/s]
-			Real64 const MaxSTVolFlow, // design Steam vol flow rate for single duct terminal unit [m3/s]
-			Real64 const MaxCWVolFlow, // design Cold Water vol flow for single duct terminal unit [m3/s]
-			Real64 const MinFlowFrac, // design minimum flow fraction for a terminal unit
-			Real64 const InducRat, // design induction ratio for a terminal unit
-			bool const InducesPlenumAir, // True if secondary air comes from the plenum
-			Real64 const ReheatAirFlowMult, // multiplier for air flow in reheat coil UA calculation
-			Real64 const ReheatLoadMult, // multiplier for load in reheat coil UA calculation
-			Real64 const DesCoolingLoad, // design cooling load used for zone equipment [W]
-			Real64 const DesHeatingLoad // design heating load used for zone equipment [W]
-		) :
-			AirVolFlow( AirVolFlow ),
-			MaxHWVolFlow( MaxHWVolFlow ),
-			MaxSTVolFlow( MaxSTVolFlow ),
-			MaxCWVolFlow( MaxCWVolFlow ),
-			MinFlowFrac( MinFlowFrac ),
-			InducRat( InducRat ),
-			InducesPlenumAir( InducesPlenumAir ),
-			ReheatAirFlowMult( ReheatAirFlowMult ),
-			ReheatLoadMult( ReheatLoadMult ),
-			DesCoolingLoad( DesCoolingLoad ),
-			DesHeatingLoad( DesHeatingLoad )
-		{}
-
 	};
 
 	struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents
@@ -745,51 +776,6 @@ namespace DataSizing {
 			DesignSizeFromParent( false ) // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
 		{}
 
-		// Member Constructor
-		ZoneEqSizingData(
-			Real64 const AirVolFlow, // design air vol flow rate for zone equipment unit [m3/s]
-			Real64 const MaxHWVolFlow, // design Hot Water vol flow for zone equipment unit [m3/s]
-			Real64 const MaxCWVolFlow, // design Cold Water vol flow for zone equipment unit [m3/s]
-			Real64 const OAVolFlow, // design outside air flow for zone equipment unit [m3/s]
-			Real64 const DesCoolingLoad, // design cooling load used for zone equipment [W]
-			Real64 const DesHeatingLoad, // design heating load used for zone equipment [W]
-			Real64 const  CoolingAirVolFlow, // design cooling air vol flow rate for equipment[m3/s]
-			Real64 const  HeatingAirVolFlow, // design heating air vol flow rate for equipment[m3/s]
-			Real64 const  SystemAirVolFlow, // design heating air vol flow rate for equipment[m3/s]
-			bool const  AirFlow, // TRUE if AirloopHVAC system air flow rate is calcualted
-			bool const  CoolingAirFlow, // TRUE if AirloopHVAC system cooling air flow rate is calcualted
-			bool const  HeatingAirFlow, // TRUE if AirloopHVAC system heating air flow rate is calcualted
-			bool const  SystemAirFlow, // TRUE if AirloopHVAC system heating air flow rate is calcualted
-			bool const  Capacity, // TRUE if AirloopHVAC system capacity is calculated
-			bool const  CoolingCapacity, // TRUE if AirloopHVAC system cooling capacity is calculated
-			bool const  HeatingCapacity, // TRUE if AirloopHVAC system heating capacity is calculated
-			bool const  SystemCapacity, // TRUE if AirloopHVAC system heating capacity is calculated
-			bool const  DesignSizeFromParent, // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
-			Array1_int const & SizingMethod,  // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
-			Array1D_int const CapSizingMethod // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
-		) :
-			AirVolFlow( AirVolFlow ),
-			MaxHWVolFlow( MaxHWVolFlow ),
-			MaxCWVolFlow( MaxCWVolFlow ),
-			OAVolFlow( OAVolFlow ),
-			DesCoolingLoad( DesCoolingLoad ),
-			DesHeatingLoad( DesHeatingLoad ),
-			CoolingAirVolFlow( CoolingAirVolFlow ),
-			HeatingAirVolFlow( HeatingAirVolFlow ),
-			SystemAirVolFlow( SystemAirVolFlow ),
-			AirFlow( AirFlow ),
-			CoolingAirFlow( CoolingAirFlow ),
-			HeatingAirFlow( HeatingAirFlow ),
-			SystemAirFlow( SystemAirFlow ),
-			Capacity( Capacity ),
-			CoolingCapacity( CoolingCapacity ),
-			HeatingCapacity( HeatingCapacity ),
-			SystemCapacity( SystemCapacity ),
-			DesignSizeFromParent( DesignSizeFromParent ),
-			SizingMethod( SizingMethod ),
-			CapSizingMethod( CapSizingMethod )
-		{}
-
 	};
 
 
@@ -824,37 +810,6 @@ namespace DataSizing {
 			ScaledCoolingCapacity(0.0),
 			ScaledHeatingCapacity(0.0),
 			RequestAutoSize(false)
-		{}
-
-		// Member Constructor
-		ZoneHVACSizingData(
-			std::string const & Name,
-			int const CoolingSAFMethod, // - Method for cooling supply air flow rate sizing calculation
-			int const HeatingSAFMethod, // - Method for heating supply air flow rate sizing calculation
-			int const NoCoolHeatSAFMethod, // - Method for supply air flow rate sizing during no cooling and heating calculation
-			int const CoolingCapMethod, // - Method for cooling capacity scaledsizing calculation
-			int const HeatingCapMethod, // - Method for heatiing capacity scaledsizing calculation
-			Real64 const MaxCoolAirVolFlow, // - maximum cooling supply air flow rate, m3/s
-			Real64 const MaxHeatAirVolFlow, // - maximum heating supply air flow rate, m3/s
-			Real64 const MaxNoCoolHeatAirVolFlow, // - maximum supply air flow rate when no cooling or heating, m3/s
-			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of zone HVAC equipment, W
-			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of zone HVAC equipment, W
-			bool const RequestAutoSize, // - true if autosizing is requested
-			bool const EP_UNUSED( CoolCoilExists ), // True if a cooling coil is specified in the ZoneHVAC equip
-			bool const EP_UNUSED( HeatCoilExists ) // True if a heating coil is specified in the ZoneHVAC equipm
-			) :
-			Name(Name),
-			CoolingSAFMethod(CoolingSAFMethod),
-			HeatingSAFMethod(HeatingSAFMethod),
-			NoCoolHeatSAFMethod(NoCoolHeatSAFMethod),
-			CoolingCapMethod(CoolingCapMethod),
-			HeatingCapMethod(HeatingCapMethod),
-			MaxCoolAirVolFlow(MaxCoolAirVolFlow),
-			MaxHeatAirVolFlow(MaxHeatAirVolFlow),
-			MaxNoCoolHeatAirVolFlow(MaxNoCoolHeatAirVolFlow),
-			ScaledCoolingCapacity(ScaledCoolingCapacity),
-			ScaledHeatingCapacity(ScaledHeatingCapacity),
-			RequestAutoSize(RequestAutoSize)
 		{}
 
 	};
@@ -947,89 +902,6 @@ namespace DataSizing {
 			CoolCapControl( 0 ) // wfb
 		{}
 
-		// Member Constructor
-		SystemSizingInputData(
-			std::string const & AirPriLoopName, // name of an AirLoopHVAC object
-			int const AirLoopNum, // index number of air loop
-			int const LoadSizeType, // type of load to size on;
-			int const SizingOption, // 1 = noncoincident, 2 = coincident
-			int const CoolOAOption, // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-			int const HeatOAOption, // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-			Real64 const DesOutAirVolFlow, // design (minimum) outside air flow rate [m3/s]
-			Real64 const SysAirMinFlowRat, // minimum system air flow ratio
-			Real64 const PreheatTemp, // preheat design set temperature [C]
-			Real64 const PrecoolTemp, // precool design set temperature [C]
-			Real64 const PreheatHumRat, // preheat design humidity ratio [kg water/kg dry air]
-			Real64 const PrecoolHumRat, // precool design humidity ratio [kg water/kg dry air]
-			Real64 const CoolSupTemp, // cooling design supply air temperature [C]
-			Real64 const HeatSupTemp, // heating design supply air temperature [C]
-			Real64 const CoolSupHumRat, // cooling design supply air humidity ratio [kg water/kg dry air]
-			Real64 const HeatSupHumRat, // heating design supply air humidity ratio [kg water/kg dry air]
-			int const CoolAirDesMethod, // choice of how to get system cooling design air flow rates;
-			Real64 const DesCoolAirFlow, // design system supply air flow rate for cooling[m3/s]
-			int const HeatAirDesMethod, // choice of how to get system heating design air flow rates;
-			Real64 const DesHeatAirFlow, // design system heating supply air flow rate [m3/s]
-			int const ScaleCoolSAFMethod, // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-			int const ScaleHeatSAFMethod, // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-			int const SystemOAMethod, // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
-			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
-			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
-			int const CoolingCapMethod, // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
-			int const HeatingCapMethod, // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of cooling coil in an air loop
-			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of cooling coil in an air loop
-			Real64 const FloorAreaOnAirLoopCooled, // total floor of cooled zones served by an airloop
-			Real64 const EP_UNUSED( FloorAreaOnAirLoopHeated ), // total floor of heated zones served by an airloop
-			Real64 const FlowPerFloorAreaCooled, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-			Real64 const FlowPerFloorAreaHeated, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-			Real64 const FractionOfAutosizedCoolingAirflow, // fraction of of cooling supply air flow rate an airloop
-			Real64 const FractionOfAutosizedHeatingAirflow, // fraction of of heating supply air flow rate an airloop
-			Real64 const FlowPerCoolingCapacity, // ratio of cooling supply air flow rate to cooling capacity of an airloop
-			Real64 const FlowPerHeatingCapacity, // ratio of heating supply air flow rate to heating capacity of an airloop
-			// wfb
-			int const CoolingPeakLoadType, // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCoolingLoad
-			int const CoolCapControl // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
-		) :
-			AirPriLoopName( AirPriLoopName ),
-			AirLoopNum( AirLoopNum ),
-			LoadSizeType( LoadSizeType ),
-			SizingOption( SizingOption ),
-			CoolOAOption( CoolOAOption ),
-			HeatOAOption( HeatOAOption ),
-			DesOutAirVolFlow( DesOutAirVolFlow ),
-			SysAirMinFlowRat( SysAirMinFlowRat ),
-			PreheatTemp( PreheatTemp ),
-			PrecoolTemp( PrecoolTemp ),
-			PreheatHumRat( PreheatHumRat ),
-			PrecoolHumRat( PrecoolHumRat ),
-			CoolSupTemp( CoolSupTemp ),
-			HeatSupTemp( HeatSupTemp ),
-			CoolSupHumRat( CoolSupHumRat ),
-			HeatSupHumRat( HeatSupHumRat ),
-			CoolAirDesMethod( CoolAirDesMethod ),
-			DesCoolAirFlow( DesCoolAirFlow ),
-			HeatAirDesMethod( HeatAirDesMethod ),
-			DesHeatAirFlow( DesHeatAirFlow ),
-			ScaleCoolSAFMethod( ScaleCoolSAFMethod ),
-			ScaleHeatSAFMethod( ScaleHeatSAFMethod ),
-			SystemOAMethod( SystemOAMethod ),
-			MaxZoneOAFraction( MaxZoneOAFraction ),
-			OAAutoSized( OAAutoSized ),
-			CoolingCapMethod( CoolingCapMethod ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledCoolingCapacity( ScaledCoolingCapacity ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity ),
-			FloorAreaOnAirLoopCooled( FloorAreaOnAirLoopCooled ),
-			FloorAreaOnAirLoopHeated( FloorAreaOnAirLoopCooled ),
-			FlowPerFloorAreaCooled( FlowPerFloorAreaCooled ),
-			FlowPerFloorAreaHeated( FlowPerFloorAreaHeated ),
-			FractionOfAutosizedCoolingAirflow( FractionOfAutosizedCoolingAirflow ),
-			FractionOfAutosizedHeatingAirflow( FractionOfAutosizedHeatingAirflow ),
-			FlowPerCoolingCapacity( FlowPerCoolingCapacity ),
-			FlowPerHeatingCapacity( FlowPerHeatingCapacity ),
-			CoolingPeakLoadType( CoolingPeakLoadType ), // wfb
-			CoolCapControl( CoolCapControl) // wfb
-		{}
 	};
 
 	struct SystemSizingData // Contains data for system sizing
@@ -1238,211 +1110,6 @@ namespace DataSizing {
 			CoolCapControl( 0 ) // wfb
 		{}
 
-		// Member Constructor
-		SystemSizingData(
-			std::string const & AirPriLoopName, // name of an AirLoopHVAC object
-			std::string const & CoolDesDay, // name of a cooling design day
-			std::string const & HeatDesDay, // name of a heating design day
-			int const LoadSizeType, // type of load to size on;
-			int const SizingOption, // 1 = noncoincident, 2 = coincident.
-			int const CoolOAOption, // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-			int const HeatOAOption, // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-			Real64 const DesOutAirVolFlow, // design (minimum) outside air flow rate [m3/s]
-			Real64 const SysAirMinFlowRat, // minimum system air flow ratio
-			Real64 const PreheatTemp, // preheat design set temperature
-			Real64 const PrecoolTemp, // precool design set temperature [C]
-			Real64 const PreheatHumRat, // preheat design humidity ratio [kg water/kg dry air]
-			Real64 const PrecoolHumRat, // precool design humidity ratio [kg water/kg dry air]
-			Real64 const CoolSupTemp, // cooling design supply air temperature [C]
-			Real64 const HeatSupTemp, // heating design supply air temperature[C]
-			Real64 const CoolSupHumRat, // cooling design supply air humidity ratio [kg water/kg dry air]
-			Real64 const HeatSupHumRat, // heating design supply air humidity ratio [kg water/kg dry air]
-			int const CoolAirDesMethod, // choice of how to get system design cooling air flow rates;
-			int const HeatAirDesMethod, // choice of how to get system design heating air flow rates;
-			Real64 const InpDesCoolAirFlow, // input design system supply air flow rate [m3/s]
-			Real64 const InpDesHeatAirFlow, // input design system heating supply air flow rate [m3/s]
-			Real64 const CoinCoolMassFlow, // coincident peak cooling mass flow rate [kg/s]
-			bool const EMSOverrideCoinCoolMassFlowOn, // If true, EMS to change coincident peak cooling mass flow rate
-			Real64 const EMSValueCoinCoolMassFlow, // Value EMS wants for coincident peak cooling mass flow rate [kg/s]
-			Real64 const CoinHeatMassFlow, // coincident peak heating mass flow rate [kg/s]
-			bool const EMSOverrideCoinHeatMassFlowOn, // If true, EMS to set coincident peak heating mass flow rate
-			Real64 const EMSValueCoinHeatMassFlow, // Value EMS wants for coincident peak heating mass flow rate [kg/s]
-			Real64 const NonCoinCoolMassFlow, // noncoincident peak cooling mass flow rate [kg/s]
-			bool const EMSOverrideNonCoinCoolMassFlowOn, // true, EMS to set noncoincident peak cooling mass flow rate
-			Real64 const EMSValueNonCoinCoolMassFlow, // Value EMS for noncoincident peak cooling mass flow rate [kg/s]
-			Real64 const NonCoinHeatMassFlow, // noncoincident peak heating mass flow rate [kg/s]
-			bool const EMSOverrideNonCoinHeatMassFlowOn, // true, EMS to set noncoincident peak heating mass flow rate
-			Real64 const EMSValueNonCoinHeatMassFlow, // Value EMS for noncoincident peak heating mass flow rate [kg/s]
-			Real64 const DesMainVolFlow, // design main supply duct volume flow [m3/s]
-			bool const EMSOverrideDesMainVolFlowOn, // If true, EMS is acting to change DesMainVolFlow
-			Real64 const EMSValueDesMainVolFlow, // Value EMS providing for design main supply duct volume flow [m3/s]
-			Real64 const DesHeatVolFlow, // design heat supply duct volume flow [m3/s]
-			bool const EMSOverrideDesHeatVolFlowOn, // If true, EMS is acting to change DesCoolVolFlow
-			Real64 const EMSValueDesHeatVolFlow, // Value EMS providing for design cool  supply duct volume flow [m3/s]
-			Real64 const DesCoolVolFlow, // design cool  supply duct volume flow [m3/s]
-			bool const EMSOverrideDesCoolVolFlowOn, // If true, EMS is acting to change DesCoolVolFlow
-			Real64 const EMSValueDesCoolVolFlow, // Value EMS providing for design cool  supply duct volume flow [m3/s]
-			Real64 const SensCoolCap, // design sensible cooling capacity [W]
-			Real64 const TotCoolCap, //design total cooling capacity [W]
-			Real64 const HeatCap, // design heating capacity [W]
-			Real64 const PreheatCap, // design preheat capacity [W]
-			Real64 const MixTempAtCoolPeak, // design mixed air temperature for cooling [C]
-			Real64 const MixHumRatAtCoolPeak, // design mixed air hum ratio for cooling [kg water/kg dry air]
-			Real64 const RetTempAtCoolPeak, // design return air temperature for cooling [C]
-			Real64 const RetHumRatAtCoolPeak, // design return air hum ratio for cooling [kg water/kg dry air]
-			Real64 const OutTempAtCoolPeak, // design outside air temperature for cooling [C]
-			Real64 const OutHumRatAtCoolPeak, // design outside air hum ratio for cooling [kg water/kg dry air]
-			Real64 const MassFlowAtCoolPeak, // air mass flow rate at the cooling peak [kg/s]
-			Real64 const HeatMixTemp, // design mixed air temperature for heating [C]
-			Real64 const HeatMixHumRat, // design mixed air hum ratio for heating [kg water/kg dry air]
-			Real64 const HeatRetTemp, // design return air temperature for heating [C]
-			Real64 const HeatRetHumRat, // design return air hum ratio for heating [kg water/kg dry air]
-			Real64 const HeatOutTemp, // design outside air temperature for heating [C]
-			Real64 const HeatOutHumRat, // design outside air hum ratio for Heating [kg water/kg dry air]
-			Real64 const DesCoolVolFlowMin, // design minimum system cooling flow rate [m3/s]
-			Array1< Real64 > const & HeatFlowSeq, // daily sequence of system heating air mass flow rate
-			Array1< Real64 > const & CoolFlowSeq, // daily sequence of system cooling air mass flow rate
-			Array1< Real64 > const & SumZoneCoolLoadSeq, // daily sequence of zones summed cooling load [W]
-			Array1< Real64 > const & CoolZoneAvgTempSeq, // daily sequence of zone average temperature [c]
-			Array1< Real64 > const & SensCoolCapSeq, // daily sequence of system sensible cooling capacity
-			Array1< Real64 > const & TotCoolCapSeq, // daily sequence of system total cooling capacity
-			Array1< Real64 > const & HeatCapSeq, // daily sequence of system heating capacity [zone time step]
-			Array1< Real64 > const & PreheatCapSeq, // daily sequence of system preheat capacity [zone time step]
-			Array1< Real64 > const & SysCoolRetTempSeq, // daily sequence of system cooling return temperatures [C]
-			Array1< Real64 > const & SysCoolRetHumRatSeq, // daily sequence of system cooling return humidity ratios
-			Array1< Real64 > const & SysHeatRetTempSeq, // daily sequence of system heating return temperatures [C]
-			Array1< Real64 > const & SysHeatRetHumRatSeq, // daily sequence of system heating return humidity ratios
-			Array1< Real64 > const & SysCoolOutTempSeq, // daily sequence of system cooling outside temperatures [C]
-			Array1< Real64 > const & SysCoolOutHumRatSeq, // daily sequence of system cooling outside humidity ratios
-			Array1< Real64 > const & SysHeatOutTempSeq, // daily sequence of system heating outside temperatures [C]
-			Array1< Real64 > const & SysHeatOutHumRatSeq, // daily sequence of system heating outside humidity ratios
-			int const SystemOAMethod, // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
-			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
-			Real64 const SysUncOA, // uncorrected system outdoor air flow based on zone people and
-			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
-			int const ScaleCoolSAFMethod, // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-			int const ScaleHeatSAFMethod, // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-			int const CoolingCapMethod, // - Method for cooling capacity scaledsizing calculation //- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
-			int const HeatingCapMethod, // - Method for heatiing capacity scaledsizing calculation //- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of cooling coil in an air loop
-			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of cooling coil in an air loop
-			Real64 const FloorAreaOnAirLoopCooled, // total floor of cooled zones served by an airloop
-			Real64 const FloorAreaOnAirLoopHeated, // total floor of heated zones served by an airloop
-			Real64 const FlowPerFloorAreaCooled, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-			Real64 const FlowPerFloorAreaHeated, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-			Real64 const FractionOfAutosizedCoolingAirflow, // fraction of of cooling supply air flow rate an airloop
-			Real64 const FractionOfAutosizedHeatingAirflow, // fraction of of heating supply air flow rate an airloop
-			Real64 const FlowPerCoolingCapacity, // ratio of cooling supply air flow rate to cooling capacity of an airloop
-			Real64 const FlowPerHeatingCapacity, // ratio of heating supply air flow rate to heating capacity of an airloop
-			Real64 const FractionOfAutosizedCoolingCapacity, // fraction of of cooling total capacity
-			Real64 const FractionOfAutosizedHeatingCapacity, // fraction of of heating total capacity
-			Real64 const CoolingTotalCapacity, // system total cooling capacity
-			Real64 const HeatingTotalCapacity, // system total heating capacity
-			int const CoolingPeakLoadType, // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
-			int const CoolCapControl // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
-		) :
-			AirPriLoopName( AirPriLoopName ),
-			CoolDesDay( CoolDesDay ),
-			HeatDesDay( HeatDesDay ),
-			LoadSizeType( LoadSizeType ),
-			SizingOption( SizingOption ),
-			CoolOAOption( CoolOAOption ),
-			HeatOAOption( HeatOAOption ),
-			DesOutAirVolFlow( DesOutAirVolFlow ),
-			SysAirMinFlowRat( SysAirMinFlowRat ),
-			PreheatTemp( PreheatTemp ),
-			PrecoolTemp( PrecoolTemp ),
-			PreheatHumRat( PreheatHumRat ),
-			PrecoolHumRat( PrecoolHumRat ),
-			CoolSupTemp( CoolSupTemp ),
-			HeatSupTemp( HeatSupTemp ),
-			CoolSupHumRat( CoolSupHumRat ),
-			HeatSupHumRat( HeatSupHumRat ),
-			CoolAirDesMethod( CoolAirDesMethod ),
-			HeatAirDesMethod( HeatAirDesMethod ),
-			InpDesCoolAirFlow( InpDesCoolAirFlow ),
-			InpDesHeatAirFlow( InpDesHeatAirFlow ),
-			CoinCoolMassFlow( CoinCoolMassFlow ),
-			EMSOverrideCoinCoolMassFlowOn( EMSOverrideCoinCoolMassFlowOn ),
-			EMSValueCoinCoolMassFlow( EMSValueCoinCoolMassFlow ),
-			CoinHeatMassFlow( CoinHeatMassFlow ),
-			EMSOverrideCoinHeatMassFlowOn( EMSOverrideCoinHeatMassFlowOn ),
-			EMSValueCoinHeatMassFlow( EMSValueCoinHeatMassFlow ),
-			NonCoinCoolMassFlow( NonCoinCoolMassFlow ),
-			EMSOverrideNonCoinCoolMassFlowOn( EMSOverrideNonCoinCoolMassFlowOn ),
-			EMSValueNonCoinCoolMassFlow( EMSValueNonCoinCoolMassFlow ),
-			NonCoinHeatMassFlow( NonCoinHeatMassFlow ),
-			EMSOverrideNonCoinHeatMassFlowOn( EMSOverrideNonCoinHeatMassFlowOn ),
-			EMSValueNonCoinHeatMassFlow( EMSValueNonCoinHeatMassFlow ),
-			DesMainVolFlow( DesMainVolFlow ),
-			EMSOverrideDesMainVolFlowOn( EMSOverrideDesMainVolFlowOn ),
-			EMSValueDesMainVolFlow( EMSValueDesMainVolFlow ),
-			DesHeatVolFlow( DesHeatVolFlow ),
-			EMSOverrideDesHeatVolFlowOn( EMSOverrideDesHeatVolFlowOn ),
-			EMSValueDesHeatVolFlow( EMSValueDesHeatVolFlow ),
-			DesCoolVolFlow( DesCoolVolFlow ),
-			EMSOverrideDesCoolVolFlowOn( EMSOverrideDesCoolVolFlowOn ),
-			EMSValueDesCoolVolFlow( EMSValueDesCoolVolFlow ),
-			SensCoolCap( SensCoolCap ),
-			TotCoolCap( TotCoolCap ),
-			HeatCap( HeatCap ),
-			PreheatCap( PreheatCap ),
-			MixTempAtCoolPeak( MixTempAtCoolPeak ),
-			MixHumRatAtCoolPeak( MixHumRatAtCoolPeak ),
-			RetTempAtCoolPeak( RetTempAtCoolPeak ),
-			RetHumRatAtCoolPeak( RetHumRatAtCoolPeak ),
-			OutTempAtCoolPeak( OutTempAtCoolPeak ),
-			OutHumRatAtCoolPeak( OutHumRatAtCoolPeak ),
-			MassFlowAtCoolPeak( MassFlowAtCoolPeak ),
-			HeatMixTemp( HeatMixTemp ),
-			HeatMixHumRat( HeatMixHumRat ),
-			HeatRetTemp( HeatRetTemp ),
-			HeatRetHumRat( HeatRetHumRat ),
-			HeatOutTemp( HeatOutTemp ),
-			HeatOutHumRat( HeatOutHumRat ),
-			DesCoolVolFlowMin( DesCoolVolFlowMin ),
-			HeatFlowSeq( HeatFlowSeq ),
-			CoolFlowSeq( CoolFlowSeq ),
-			SumZoneCoolLoadSeq(SumZoneCoolLoadSeq ),
-			CoolZoneAvgTempSeq(CoolZoneAvgTempSeq ),
-			SensCoolCapSeq( SensCoolCapSeq ),
-			TotCoolCapSeq( TotCoolCapSeq ),
-			HeatCapSeq( HeatCapSeq ),
-			PreheatCapSeq( PreheatCapSeq ),
-			SysCoolRetTempSeq( SysCoolRetTempSeq ),
-			SysCoolRetHumRatSeq( SysCoolRetHumRatSeq ),
-			SysHeatRetTempSeq( SysHeatRetTempSeq ),
-			SysHeatRetHumRatSeq( SysHeatRetHumRatSeq ),
-			SysCoolOutTempSeq( SysCoolOutTempSeq ),
-			SysCoolOutHumRatSeq( SysCoolOutHumRatSeq ),
-			SysHeatOutTempSeq( SysHeatOutTempSeq ),
-			SysHeatOutHumRatSeq( SysHeatOutHumRatSeq ),
-			SystemOAMethod( SystemOAMethod ),
-			MaxZoneOAFraction( MaxZoneOAFraction ),
-			SysUncOA( SysUncOA ),
-			OAAutoSized( OAAutoSized ),
-			ScaleCoolSAFMethod( ScaleCoolSAFMethod ),
-			ScaleHeatSAFMethod( ScaleHeatSAFMethod ),
-			CoolingCapMethod( CoolingCapMethod ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledCoolingCapacity( ScaledCoolingCapacity ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity ),
-			FloorAreaOnAirLoopCooled( FloorAreaOnAirLoopCooled ),
-			FloorAreaOnAirLoopHeated( FloorAreaOnAirLoopHeated ),
-			FlowPerFloorAreaCooled( FlowPerFloorAreaCooled ),
-			FlowPerFloorAreaHeated( FlowPerFloorAreaHeated ),
-			FractionOfAutosizedCoolingAirflow( FractionOfAutosizedCoolingAirflow ),
-			FractionOfAutosizedHeatingAirflow( FractionOfAutosizedHeatingAirflow ),
-			FlowPerCoolingCapacity( FlowPerCoolingCapacity ),
-			FlowPerHeatingCapacity( FlowPerHeatingCapacity ),
-			FractionOfAutosizedCoolingCapacity( FractionOfAutosizedCoolingCapacity ),
-			FractionOfAutosizedHeatingCapacity( FractionOfAutosizedHeatingCapacity ),
-			CoolingTotalCapacity( CoolingTotalCapacity ),
-			HeatingTotalCapacity( HeatingTotalCapacity ),
-			CoolingPeakLoadType( CoolingPeakLoadType ),
-			CoolCapControl( CoolCapControl ) //
-		{}
-
 	};
 
 	struct SysSizPeakDDNumData
@@ -1460,23 +1127,6 @@ namespace DataSizing {
 			SensCoolPeakDD( 0 ),
 			TotCoolPeakDD( 0 ),
 			CoolFlowPeakDD( 0 )
-		{}
-
-		// Member Constructor
-		SysSizPeakDDNumData(
-			int const SensCoolPeakDD, // design day containing the sensible cooling peak
-			int const TotCoolPeakDD, // design day containing total cooling peak
-			int const CoolFlowPeakDD, // design day containing the cooling air flow peak
-			Array1< int > const & TimeStepAtSensCoolPk, // time step of the sensible cooling peak
-			Array1< int > const & TimeStepAtTotCoolPk, // time step of the total cooling peak
-			Array1< int > const & TimeStepAtCoolFlowPk // time step of the cooling air flow peak
-		) :
-			SensCoolPeakDD( SensCoolPeakDD ),
-			TotCoolPeakDD( TotCoolPeakDD ),
-			CoolFlowPeakDD( CoolFlowPeakDD ),
-			TimeStepAtSensCoolPk( TimeStepAtSensCoolPk ),
-			TimeStepAtTotCoolPk( TimeStepAtTotCoolPk ),
-			TimeStepAtCoolFlowPk( TimeStepAtCoolFlowPk )
 		{}
 
 	};
@@ -1521,19 +1171,6 @@ namespace DataSizing {
 
 		// Default Constructor
 		DesDayWeathData()
-		{}
-
-		// Member Constructor
-		DesDayWeathData(
-			std::string const & DateString, // date of design day weather values
-			Array1< Real64 > const & Temp, // design day temperatures at the major time step
-			Array1< Real64 > const & HumRat, // design day humidity ratios at the major time step
-			Array1< Real64 > const & Press // design day braometric pressure at the major time step
-		) :
-			DateString( DateString ),
-			Temp( Temp ),
-			HumRat( HumRat ),
-			Press( Press )
 		{}
 
 	};
@@ -1586,27 +1223,6 @@ namespace DataSizing {
 			MaxOAFractionSchValue( 0.0 )
 		{}
 
-		// Member Constructor
-		OARequirementsData(
-			std::string const & Name,
-			int const OAFlowMethod, // - Method for OA flow calculation
-			Real64 const OAFlowPerPerson, // - OA requirement per person
-			Real64 const OAFlowPerArea, // - OA requirement per zone area
-			Real64 const OAFlowPerZone, // - OA requirement per zone
-			Real64 const OAFlowACH, // - OA requirement per zone per hour
-			int const OAFlowFracSchPtr, // - Fraction schedule applied to total OA requirement
-			Real64 const MaxOAFractionSchValue // - Maximum value from OAFlow fraction schedule (used for sizing)
-		) :
-			Name( Name ),
-			OAFlowMethod( OAFlowMethod ),
-			OAFlowPerPerson( OAFlowPerPerson ),
-			OAFlowPerArea( OAFlowPerArea ),
-			OAFlowPerZone( OAFlowPerZone ),
-			OAFlowACH( OAFlowACH ),
-			OAFlowFracSchPtr( OAFlowFracSchPtr ),
-			MaxOAFractionSchValue( MaxOAFractionSchValue )
-		{}
-
 	};
 
 	struct ZoneAirDistributionData
@@ -1625,23 +1241,6 @@ namespace DataSizing {
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
 			ZoneADEffSchPtr( 0 )
-		{}
-
-		// Member Constructor
-		ZoneAirDistributionData(
-			std::string const & Name,
-			std::string const & ZoneADEffSchName, // - Zone air distribution effectiveness schedule name
-			Real64 const ZoneADEffCooling, // - Zone air distribution effectiveness in cooling mode
-			Real64 const ZoneADEffHeating, // - Zone air distribution effectiveness in heating mode
-			Real64 const ZoneSecondaryRecirculation, // - Zone air secondary recirculation ratio
-			int const ZoneADEffSchPtr // - Zone air distribution effectiveness schedule index
-		) :
-			Name( Name ),
-			ZoneADEffSchName( ZoneADEffSchName ),
-			ZoneADEffCooling( ZoneADEffCooling ),
-			ZoneADEffHeating( ZoneADEffHeating ),
-			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation ),
-			ZoneADEffSchPtr( ZoneADEffSchPtr )
 		{}
 
 	};

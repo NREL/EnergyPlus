@@ -118,7 +118,6 @@ derivative works thereof, in binary and source code form.
 
 
 FILE *f1 = NULL; 
-#define HEADER_LENGTH 54 // =10 + 4*(10+1);
 int REQUIRED_READ_LENGTH  = 0;
 int REQUIRED_WRITE_LENGTH = 0;
 int SERVER_VERSION = 0; 

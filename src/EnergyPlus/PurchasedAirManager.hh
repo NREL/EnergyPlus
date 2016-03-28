@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef PurchasedAirManager_hh_INCLUDED
 #define PurchasedAirManager_hh_INCLUDED
 
@@ -311,249 +369,6 @@ namespace PurchasedAirManager {
 			HVACSizingIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZonePurchasedAir(
-			std::string const & cObjectName, // Name of the object from IDD
-			std::string const & Name, // Name or identifier of this piece of equipment
-			std::string const & AvailSched, // System availablity schedule
-			int const AvailSchedPtr, // Index to system availability schedule
-			int const ZoneSupplyAirNodeNum, // Node number of zone supply air node for purchased air
-			int const ZoneExhaustAirNodeNum, // Node number of zone exhaust air node for purchased air
-			int const ZoneRecircAirNodeNum, // Node number of recirculation air node for purchased air
-			Real64 const MaxHeatSuppAirTemp, // Maximum supply air temperature for heating [C]
-			Real64 const MinCoolSuppAirTemp, // Minimum supply air temperature for cooling [C]
-			Real64 const MaxHeatSuppAirHumRat, // Maximum supply heating air humidity ratio [kg water/kg dry air]
-			Real64 const MinCoolSuppAirHumRat, // Minimum supply cooling air humidity ratio [kg water/kg dry air]
-			int const HeatingLimit, // Heating capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
-			Real64 const MaxHeatVolFlowRate, // Maximum heating supply air flow[m3/s]
-			Real64 const MaxHeatSensCap, // Maximum heating sensible capacity [W]
-			int const CoolingLimit, // Cooling capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
-			Real64 const MaxCoolVolFlowRate, // Maximum cooling supply air flow [m3/s]
-			Real64 const MaxCoolTotCap, // Maximum cooling total capacity [W]
-			std::string const & HeatSched, // Heating availablity schedule
-			int const HeatSchedPtr, // Index to heating availability schedule
-			std::string const & CoolSched, // Cooling availability schedule
-			int const CoolSchedPtr, // Index to the cooling availability schedule
-			int const DehumidCtrlType, // Dehumidification control type - ConstantSensibleHeatRatio,
-			Real64 const CoolSHR, // Cooling sensible heat ratio
-			int const HumidCtrlType, // Humidification control type - None,
-			int const OARequirementsPtr, // Index to DesignSpecification:OutdoorAir object
-			int const DCVType, // Demand controlled ventilation type - None,
-			int const EconomizerType, // Outdoor air economizer type - NoEconomizer,
-			bool const OutdoorAir, // Is there outdoor air?
-			int const OutdoorAirNodeNum, // Node number of the outdoor air inlet node
-			int const HtRecType, // Outdoor air heat recovery type - None, Sensible, Enthalpy
-			Real64 const HtRecSenEff, // Sensible heat recovery effectiveness
-			Real64 const HtRecLatEff, // Latent heat recovery effectiveness
-			int const OAFlowFracSchPtr, // Fraction schedule applied to total OA requirement
-			Real64 const MaxHeatMassFlowRate, // The maximum heating air mass flow rate [kg/s]
-			Real64 const MaxCoolMassFlowRate, // The maximum cooling air mass flow rate [kg/s]
-			bool const EMSOverrideMdotOn, // if true, then EMS is calling to override supply mass flow rate
-			Real64 const EMSValueMassFlowRate, // Value EMS is directing to use for supply mass flow rate [kg/s]
-			bool const EMSOverrideOAMdotOn, // if true, then EMS is calling to override OA mass flow rate
-			Real64 const EMSValueOAMassFlowRate, // Value EMS is directing to use for OA mass flow rate [kg/s]
-			bool const EMSOverrideSupplyTempOn, // if true, then EMS is calling to override supply temperature
-			Real64 const EMSValueSupplyTemp, // Value EMS is directing to use for supply temperature [C]
-			bool const EMSOverrideSupplyHumRatOn, // if true, then EMS is calling to override supply humidity ratio
-			Real64 const EMSValueSupplyHumRat, // Value EMS is directing to use for supply humidity ratio [kg-H2O/kg-dryair]
-			Real64 const MinOAMassFlowRate, // The minimum required outdoor air mass flow rate [kg/s]
-			Real64 const OutdoorAirMassFlowRate, // The outdoor air mass flow rate [kg/s]
-			Real64 const OutdoorAirVolFlowRateStdRho, //  The outdoor air volume flow rate using standard density  [m3/s]
-			Real64 const SupplyAirMassFlowRate, // Supply air mass flow rate [kg/s]
-			Real64 const SupplyAirVolFlowRateStdRho, // supply air volume flow using standard density [m3/s]
-			Real64 const FinalMixedAirTemp, // Dry-bulb temperature of the mixed air, saved for system ventilation load reporting [C]
-			Real64 const FinalMixedAirHumRat, // Humidity ratio of the mixed air, saved for system ventilation load reporting [kg-H2O/kg-dryair]
-			Real64 const HtRecSenOutput, // Sensible heating/cooling rate from heat recovery (<0 means cooling) [W]
-			Real64 const HtRecLatOutput, // Latent heating/cooling rate from heat recovery (<0 means cooling or dehumidfying) [W]
-			Real64 const OASenOutput, // Outdoor air sensible output relative to zone conditions [W], <0 means OA is cooler than zone air
-			Real64 const OALatOutput, // Outdoor air latent output relative to zone conditions [W], <0 means OA is drier than zone air
-			Real64 const SenOutputToZone, // Ideal Loads System sensible output to zone [W], <0 means supply is cooler than zone air
-			Real64 const LatOutputToZone, // Ideal Loads System latent heat output to zone [W], <0 means supply is drier than zone air
-			Real64 const SenCoilLoad, // Ideal Loads System sensible load on "coils" (<0 means cooling) [W]
-			Real64 const LatCoilLoad, // Ideal Loads System latent load on "coils" (<0 means cooling or dehumidfying) [W]
-			int const OAFlowMaxCoolOutputError, // Counter for OAFlow > Max Cooling Flow error
-			int const OAFlowMaxHeatOutputError, // Counter for OAFlow > Max Heating Flow error
-			int const SaturationOutputError, // Counter for OAFlow > Max Heating Flow error
-			int const OAFlowMaxCoolOutputIndex, // Recurring warning index for OAFlow > Max Cooling Flow error
-			int const OAFlowMaxHeatOutputIndex, // Recurring warning index for OAFlow > Max Heating Flow error
-			int const SaturationOutputIndex, // Recurring warning index for OAFlow > Max Heating Flow error
-			int const AvailStatus,
-			int const CoolErrIndex, // Cooling setpoint error index (recurring errors)
-			int const HeatErrIndex, // Heating setpoint error index (recurring errors)
-			Real64 const SenHeatEnergy, // Sensible heating energy consumed [J]
-			Real64 const LatHeatEnergy, // Latent   heating energy consumed [J]
-			Real64 const TotHeatEnergy, // Total    heating energy consumed [J]
-			Real64 const SenCoolEnergy, // Sensible cooling energy consumed [J]
-			Real64 const LatCoolEnergy, // Latent   cooling energy consumed [J]
-			Real64 const TotCoolEnergy, // Total    cooling energy consumed [J]
-			Real64 const ZoneSenHeatEnergy, // Sensible heating energy supplied to the zone [J]
-			Real64 const ZoneLatHeatEnergy, // Latent   heating energy supplied to the zone [J]
-			Real64 const ZoneTotHeatEnergy, // Total    heating energy supplied to the zone [J]
-			Real64 const ZoneSenCoolEnergy, // Sensible cooling energy supplied to the zone [J]
-			Real64 const ZoneLatCoolEnergy, // Latent   cooling energy supplied to the zone [J]
-			Real64 const ZoneTotCoolEnergy, // Total    cooling energy supplied to the zone [J]
-			Real64 const OASenHeatEnergy, // Sensible heating energy required for OA to equal zone air [J]
-			Real64 const OALatHeatEnergy, // Latent   heating energy required for OA to equal zone air [J]
-			Real64 const OATotHeatEnergy, // Total    heating energy required for OA to equal zone air [J]
-			Real64 const OASenCoolEnergy, // Sensible cooling energy required for OA to equal zone air [J]
-			Real64 const OALatCoolEnergy, // Latent   cooling energy required for OA to equal zone air [J]
-			Real64 const OATotCoolEnergy, // Total    cooling energy required for OA to equal zone air [J]
-			Real64 const HtRecSenHeatEnergy, // Sensible heating energy from heat reocovery [J]
-			Real64 const HtRecLatHeatEnergy, // Latent   heating energy from heat reocovery [J]
-			Real64 const HtRecTotHeatEnergy, // Total    heating energy from heat reocovery [J]
-			Real64 const HtRecSenCoolEnergy, // Sensible cooling energy from heat reocovery [J]
-			Real64 const HtRecLatCoolEnergy, // Latent   cooling energy from heat reocovery [J]
-			Real64 const HtRecTotCoolEnergy, // Total    cooling energy from heat reocovery [J]
-			Real64 const SenHeatRate, // Sensible heating rate consumed [W]
-			Real64 const LatHeatRate, // Latent   heating rate consumed [W]
-			Real64 const TotHeatRate, // Total    heating rate consumed [W]
-			Real64 const SenCoolRate, // Sensible cooling rate consumed [W]
-			Real64 const LatCoolRate, // Latent   cooling rate consumed [W]
-			Real64 const TotCoolRate, // Total    cooling rate consumed [W]
-			Real64 const ZoneSenHeatRate, // Sensible heating rate supplied to the zone [W]
-			Real64 const ZoneLatHeatRate, // Latent   heating rate supplied to the zone [W]
-			Real64 const ZoneTotHeatRate, // Total    heating rate supplied to the zone [W]
-			Real64 const ZoneSenCoolRate, // Sensible cooling rate supplied to the zone [W]
-			Real64 const ZoneLatCoolRate, // Latent   cooling rate supplied to the zone [W]
-			Real64 const ZoneTotCoolRate, // Total    cooling rate supplied to the zone [W]
-			Real64 const OASenHeatRate, // Sensible heating rate required for OA to equal zone air [W]
-			Real64 const OALatHeatRate, // Latent   heating rate required for OA to equal zone air [W]
-			Real64 const OATotHeatRate, // Total    heating rate required for OA to equal zone air [W]
-			Real64 const OASenCoolRate, // Sensible cooling rate required for OA to equal zone air [W]
-			Real64 const OALatCoolRate, // Latent   cooling rate required for OA to equal zone air [W]
-			Real64 const OATotCoolRate, // Total    cooling rate required for OA to equal zone air [W]
-			Real64 const HtRecSenHeatRate, // Sensible heating rate from heat reocovery [W]
-			Real64 const HtRecLatHeatRate, // Latent   heating rate from heat reocovery [W]
-			Real64 const HtRecTotHeatRate, // Total    heating rate from heat reocovery [W]
-			Real64 const HtRecSenCoolRate, // Sensible cooling rate from heat reocovery [W]
-			Real64 const HtRecLatCoolRate, // Latent   cooling rate from heat reocovery [W]
-			Real64 const HtRecTotCoolRate, // Total    cooling rate from heat reocovery [W]
-			Real64 const TimeEconoActive, // Time economizer is active [hrs]
-			Real64 const TimeHtRecActive, // Time heat reocovery is active [hrs]
-			int const ZonePtr, // pointer to a zone served by an Ideal load air system
-			int const HVACSizingIndex // index of a HVAC Sizing object for an Ideal load air system
-		) :
-			cObjectName( cObjectName ),
-			Name( Name ),
-			AvailSched( AvailSched ),
-			AvailSchedPtr( AvailSchedPtr ),
-			ZoneSupplyAirNodeNum( ZoneSupplyAirNodeNum ),
-			ZoneExhaustAirNodeNum( ZoneExhaustAirNodeNum ),
-			ZoneRecircAirNodeNum( ZoneRecircAirNodeNum ),
-			MaxHeatSuppAirTemp( MaxHeatSuppAirTemp ),
-			MinCoolSuppAirTemp( MinCoolSuppAirTemp ),
-			MaxHeatSuppAirHumRat( MaxHeatSuppAirHumRat ),
-			MinCoolSuppAirHumRat( MinCoolSuppAirHumRat ),
-			HeatingLimit( HeatingLimit ),
-			MaxHeatVolFlowRate( MaxHeatVolFlowRate ),
-			MaxHeatSensCap( MaxHeatSensCap ),
-			CoolingLimit( CoolingLimit ),
-			MaxCoolVolFlowRate( MaxCoolVolFlowRate ),
-			MaxCoolTotCap( MaxCoolTotCap ),
-			HeatSched( HeatSched ),
-			HeatSchedPtr( HeatSchedPtr ),
-			CoolSched( CoolSched ),
-			CoolSchedPtr( CoolSchedPtr ),
-			DehumidCtrlType( DehumidCtrlType ),
-			CoolSHR( CoolSHR ),
-			HumidCtrlType( HumidCtrlType ),
-			OARequirementsPtr( OARequirementsPtr ),
-			DCVType( DCVType ),
-			EconomizerType( EconomizerType ),
-			OutdoorAir( OutdoorAir ),
-			OutdoorAirNodeNum( OutdoorAirNodeNum ),
-			HtRecType( HtRecType ),
-			HtRecSenEff( HtRecSenEff ),
-			HtRecLatEff( HtRecLatEff ),
-			OAFlowFracSchPtr( OAFlowFracSchPtr ),
-			MaxHeatMassFlowRate( MaxHeatMassFlowRate ),
-			MaxCoolMassFlowRate( MaxCoolMassFlowRate ),
-			EMSOverrideMdotOn( EMSOverrideMdotOn ),
-			EMSValueMassFlowRate( EMSValueMassFlowRate ),
-			EMSOverrideOAMdotOn( EMSOverrideOAMdotOn ),
-			EMSValueOAMassFlowRate( EMSValueOAMassFlowRate ),
-			EMSOverrideSupplyTempOn( EMSOverrideSupplyTempOn ),
-			EMSValueSupplyTemp( EMSValueSupplyTemp ),
-			EMSOverrideSupplyHumRatOn( EMSOverrideSupplyHumRatOn ),
-			EMSValueSupplyHumRat( EMSValueSupplyHumRat ),
-			MinOAMassFlowRate( MinOAMassFlowRate ),
-			OutdoorAirMassFlowRate( OutdoorAirMassFlowRate ),
-			OutdoorAirVolFlowRateStdRho( OutdoorAirVolFlowRateStdRho ),
-			SupplyAirMassFlowRate( SupplyAirMassFlowRate ),
-			SupplyAirVolFlowRateStdRho( SupplyAirVolFlowRateStdRho ),
-			FinalMixedAirTemp( FinalMixedAirTemp ),
-			FinalMixedAirHumRat( FinalMixedAirHumRat ),
-			HtRecSenOutput( HtRecSenOutput ),
-			HtRecLatOutput( HtRecLatOutput ),
-			OASenOutput( OASenOutput ),
-			OALatOutput( OALatOutput ),
-			SenOutputToZone( SenOutputToZone ),
-			LatOutputToZone( LatOutputToZone ),
-			SenCoilLoad( SenCoilLoad ),
-			LatCoilLoad( LatCoilLoad ),
-			OAFlowMaxCoolOutputError( OAFlowMaxCoolOutputError ),
-			OAFlowMaxHeatOutputError( OAFlowMaxHeatOutputError ),
-			SaturationOutputError( SaturationOutputError ),
-			OAFlowMaxCoolOutputIndex( OAFlowMaxCoolOutputIndex ),
-			OAFlowMaxHeatOutputIndex( OAFlowMaxHeatOutputIndex ),
-			SaturationOutputIndex( SaturationOutputIndex ),
-			AvailStatus( AvailStatus ),
-			CoolErrIndex( CoolErrIndex ),
-			HeatErrIndex( HeatErrIndex ),
-			SenHeatEnergy( SenHeatEnergy ),
-			LatHeatEnergy( LatHeatEnergy ),
-			TotHeatEnergy( TotHeatEnergy ),
-			SenCoolEnergy( SenCoolEnergy ),
-			LatCoolEnergy( LatCoolEnergy ),
-			TotCoolEnergy( TotCoolEnergy ),
-			ZoneSenHeatEnergy( ZoneSenHeatEnergy ),
-			ZoneLatHeatEnergy( ZoneLatHeatEnergy ),
-			ZoneTotHeatEnergy( ZoneTotHeatEnergy ),
-			ZoneSenCoolEnergy( ZoneSenCoolEnergy ),
-			ZoneLatCoolEnergy( ZoneLatCoolEnergy ),
-			ZoneTotCoolEnergy( ZoneTotCoolEnergy ),
-			OASenHeatEnergy( OASenHeatEnergy ),
-			OALatHeatEnergy( OALatHeatEnergy ),
-			OATotHeatEnergy( OATotHeatEnergy ),
-			OASenCoolEnergy( OASenCoolEnergy ),
-			OALatCoolEnergy( OALatCoolEnergy ),
-			OATotCoolEnergy( OATotCoolEnergy ),
-			HtRecSenHeatEnergy( HtRecSenHeatEnergy ),
-			HtRecLatHeatEnergy( HtRecLatHeatEnergy ),
-			HtRecTotHeatEnergy( HtRecTotHeatEnergy ),
-			HtRecSenCoolEnergy( HtRecSenCoolEnergy ),
-			HtRecLatCoolEnergy( HtRecLatCoolEnergy ),
-			HtRecTotCoolEnergy( HtRecTotCoolEnergy ),
-			SenHeatRate( SenHeatRate ),
-			LatHeatRate( LatHeatRate ),
-			TotHeatRate( TotHeatRate ),
-			SenCoolRate( SenCoolRate ),
-			LatCoolRate( LatCoolRate ),
-			TotCoolRate( TotCoolRate ),
-			ZoneSenHeatRate( ZoneSenHeatRate ),
-			ZoneLatHeatRate( ZoneLatHeatRate ),
-			ZoneTotHeatRate( ZoneTotHeatRate ),
-			ZoneSenCoolRate( ZoneSenCoolRate ),
-			ZoneLatCoolRate( ZoneLatCoolRate ),
-			ZoneTotCoolRate( ZoneTotCoolRate ),
-			OASenHeatRate( OASenHeatRate ),
-			OALatHeatRate( OALatHeatRate ),
-			OATotHeatRate( OATotHeatRate ),
-			OASenCoolRate( OASenCoolRate ),
-			OALatCoolRate( OALatCoolRate ),
-			OATotCoolRate( OATotCoolRate ),
-			HtRecSenHeatRate( HtRecSenHeatRate ),
-			HtRecLatHeatRate( HtRecLatHeatRate ),
-			HtRecTotHeatRate( HtRecTotHeatRate ),
-			HtRecSenCoolRate( HtRecSenCoolRate ),
-			HtRecLatCoolRate( HtRecLatCoolRate ),
-			HtRecTotCoolRate( HtRecTotCoolRate ),
-			TimeEconoActive( TimeEconoActive ),
-			TimeHtRecActive( TimeHtRecActive ),
-			ZonePtr( ZonePtr ),
-			HVACSizingIndex( HVACSizingIndex )
-		{}
-
 	};
 
 	struct PurchAirNumericFieldData
@@ -565,12 +380,6 @@ namespace PurchasedAirManager {
 		PurchAirNumericFieldData()
 		{}
 
-		// Member Constructor
-		PurchAirNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data
@@ -654,29 +463,6 @@ namespace PurchasedAirManager {
 
 	void
 	clear_state();
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PurchasedAirManager
 

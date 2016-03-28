@@ -1,0 +1,9 @@
+\section{Display Strings}\label{display-strings}
+
+Two display routines are useful for displaying to the ``run'' log the progress of the simulation.~ Since EnergyPlus usually runs as a ``console'' mode application, users may monitor progress of the simulation.~ Thus, at times it is useful to have messages displayed there.~ These should be minimal in number though can be used effectively during debugging of new modules.
+
+~ subroutine DisplayString(String)
+
+~ subroutine DisplayNumberandString(Number,String)
+
+The ``String'' parameters are normal strings.~ The ``Number'' parameter must be an integer.

@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -3067,7 +3067,12 @@
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT,            !- Pump Control Type
-    CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
+    CoolingPumpAvailSched,   !- Pump Flow Rate Schedule Name
+    ,                        !- Zone Name
+    ,                        !- Skin Loss Radiative Fraction
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    ,                        !- Design Electric Power per Unit Flow Rate
+    1.282051282;             !- Design Shaft Power per Unit Flow Rate per Unit Head
 
   Chiller:Electric,
     Central Chiller 1,       !- Name

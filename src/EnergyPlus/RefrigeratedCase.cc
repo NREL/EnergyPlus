@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -120,7 +178,7 @@ namespace RefrigeratedCase {
 	// for other loads upon the primary system. For cases and walk-ins served by cascade condensers, energy associated
 	// with hot gas defrost is reclaimed from the primary system.  The refrigeration load the cascade condenser
 	// places upon the primary system is the sum of all case and walk-in loads served by the secondary system plus
-	// the sum of the secondary loop’s compressor power. The same name used to identify the condenser in the
+	// the sum of the secondary loop's compressor power. The same name used to identify the condenser in the
 	// secondary loop is used to identify the cascade load on the primary system.
 
 	// Detailed transcritical CO2 refrigeration systems model each compressor individually using the manufacturer's
@@ -1246,7 +1304,7 @@ namespace RefrigeratedCase {
 						ErrorsFound = true;
 					}
 					//   disregard defrost power for Off-Cycle or None defrost types
-					if ( ( DefType == DefOffCycle || DefType == DefOffCycle ) && ( RefrigCase( CaseNum ).DefrostPower > 0.0 ) ) {
+					if ( ( DefType == DefOffCycle || DefType == DefNone ) && ( RefrigCase( CaseNum ).DefrostPower > 0.0 ) ) {
 						RefrigCase( CaseNum ).DefrostPower = 0.0;
 						ShowWarningError( CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", " + cNumericFieldNames( NumNum ) + " for " + cAlphaFieldNames( 8 ) + " None or Off-Cycle will be set to 0 and simulation continues." );
 					}
@@ -6542,7 +6600,7 @@ namespace RefrigeratedCase {
 			for ( int i = RefrigRack.l(), e = RefrigRack.u(); i <= e; ++i ) {
 				RefrigRack( i ).reset_init();
 			}
-			HeatReclaimRefrigeratedRack.AvailCapacity() = 0.0;
+			for ( auto & e : HeatReclaimRefrigeratedRack ) e.AvailCapacity = 0.0;
 			//Note don't reset basin heat to zero when no load because heater would remain on
 			//RefrigRack.BasinHeaterPower = 0.0;
 			//RefrigRack.BasinHeaterConsumption = 0.0;
@@ -6554,8 +6612,10 @@ namespace RefrigeratedCase {
 				Condenser( i ).reset_init();
 			}
 			//N don't reset basin heat to zero when no load because heater would remain on
-			HeatReclaimRefrigCondenser.AvailCapacity() = 0.0;
-			HeatReclaimRefrigCondenser.AvailTemperature() = 0.0;
+			for ( auto & e : HeatReclaimRefrigCondenser ) {
+				e.AvailCapacity = 0.0;
+				e.AvailTemperature = 0.0;
+			}
 		}
 
 		if ( NumSimulationGasCooler > 0 ) {
@@ -6603,37 +6663,49 @@ namespace RefrigeratedCase {
 				}
 			}
 			if ( NumRefrigSystems > 0 ) {
-				System.UnmetEnergy() = 0.0;
+				for ( auto & e : System ) e.UnmetEnergy = 0.0;
 			}
 			if ( NumSimulationWalkIns > 0 ) {
-				WalkIn.KgFrost() = 0.0;
-				WalkIn.StoredEnergy() = 0.0;
+				for ( auto & e : WalkIn ) {
+					e.KgFrost = 0.0;
+					e.StoredEnergy = 0.0;
+				}
 				for ( WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID ) {
 					WalkIn( WalkInID ).IceTemp = WalkIn( WalkInID ).TEvapDesign;
 				}
 			}
 			if ( NumSimulationRefrigAirChillers > 0 ) {
-				WarehouseCoil.KgFrost() = 0.0;
-				WarehouseCoil.KgFrostSaved() = 0.0;
+				for ( auto & e : WarehouseCoil ) {
+					e.KgFrost = 0.0;
+					e.KgFrostSaved = 0.0;
+				}
 				for ( CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID ) {
 					WarehouseCoil( CoilID ).IceTemp = WarehouseCoil( CoilID ).TEvapDesign;
 					WarehouseCoil( CoilID ).IceTempSaved = WarehouseCoil( CoilID ).TEvapDesign;
 				}
 			}
 			if ( NumSimulationSecondarySystems > 0 ) {
-				Secondary.UnmetEnergy() = 0.0;
+				for ( auto & e : Secondary ) e.UnmetEnergy = 0.0;
 			}
 			if ( NumRefrigeratedRacks > 0 ) {
-				HeatReclaimRefrigeratedRack.UsedHVACCoil() = 0.0;
-				HeatReclaimRefrigeratedRack.UsedWaterHeater() = 0.0;
-				RefrigRack.LaggedUsedWaterHeater() = 0.0;
-				RefrigRack.LaggedUsedHVACCoil() = 0.0;
+				for ( auto & e : HeatReclaimRefrigeratedRack ) {
+					e.UsedHVACCoil = 0.0;
+					e.UsedWaterHeater = 0.0;
+				}
+				for ( auto & e : RefrigRack ) {
+					e.LaggedUsedWaterHeater = 0.0;
+					e.LaggedUsedHVACCoil = 0.0;
+				}
 			}
 			if ( NumRefrigCondensers > 0 ) {
-				HeatReclaimRefrigCondenser.UsedHVACCoil() = 0.0;
-				HeatReclaimRefrigCondenser.UsedWaterHeater() = 0.0;
-				Condenser.LaggedUsedWaterHeater() = 0.0;
-				Condenser.LaggedUsedHVACCoil() = 0.0;
+				for ( auto & e : HeatReclaimRefrigCondenser ) {
+					e.UsedHVACCoil = 0.0;
+					e.UsedWaterHeater = 0.0;
+				}
+				for ( auto & e : Condenser ) {
+					e.LaggedUsedWaterHeater = 0.0;
+					e.LaggedUsedHVACCoil = 0.0;
+				}
 			}
 			for ( SystemID = 1; SystemID <= NumRefrigSystems; ++SystemID ) {
 				if ( allocated( System( SystemID ).MechSCLoad ) ) System( SystemID ).MechSCLoad = 0.0;
@@ -12764,24 +12836,32 @@ namespace RefrigeratedCase {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 
 			if ( NumRefrigSystems > 0 ) {
-				System.PipeHeatLoad() = 0.0;
-				System.NetHeatRejectLoad() = 0.0;
+				for ( auto & e : System ) {
+					e.PipeHeatLoad = 0.0;
+					e.NetHeatRejectLoad = 0.0;
+				}
 			}
 
 			if ( NumTransRefrigSystems > 0 ) {
-				TransSystem.PipeHeatLoadMT() = 0.0;
-				TransSystem.PipeHeatLoadLT() = 0.0;
-				TransSystem.NetHeatRejectLoad() = 0.0;
+				for ( auto & e : TransSystem ) {
+					e.PipeHeatLoadMT = 0.0;
+					e.PipeHeatLoadLT = 0.0;
+					e.NetHeatRejectLoad = 0.0;
+				}
 			}
 
 			if ( NumRefrigeratedRacks > 0 ) {
-				RefrigRack.SensZoneCreditHeatRate() = 0.0;
-				RefrigRack.SensHVACCreditHeatRate() = 0.0;
+				for ( auto & e : RefrigRack ) {
+					e.SensZoneCreditHeatRate = 0.0;
+					e.SensHVACCreditHeatRate = 0.0;
+				}
 			}
 
 			if ( NumSimulationSecondarySystems > 0 ) {
-				Secondary.DistPipeZoneHeatGain() = 0.0;
-				Secondary.ReceiverZoneHeatGain() = 0.0;
+				for ( auto & e : Secondary ) {
+					e.DistPipeZoneHeatGain = 0.0;
+					e.ReceiverZoneHeatGain = 0.0;
+				}
 			}
 
 			if ( NumSimulationWalkIns > 0 ) {
@@ -12791,10 +12871,12 @@ namespace RefrigeratedCase {
 				}
 			}
 			if ( NumSimulationCases > 0 ) {
-				RefrigCase.SensZoneCreditRate() = 0.0;
-				RefrigCase.SensHVACCreditRate() = 0.0;
-				RefrigCase.LatZoneCreditRate() = 0.0;
-				RefrigCase.LatHVACCreditRate() = 0.0;
+				for ( auto & e : RefrigCase ) {
+					e.SensZoneCreditRate = 0.0;
+					e.SensHVACCreditRate = 0.0;
+					e.LatZoneCreditRate = 0.0;
+					e.LatHVACCreditRate = 0.0;
+				}
 			}
 			MyEnvrnFlag = false;
 		}
@@ -12911,29 +12993,6 @@ namespace RefrigeratedCase {
 		} // NumRefrigCondensers>0
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RefrigeratedCase
 

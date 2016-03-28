@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
 !----------------------------------------------------------------
 
@@ -3408,9 +3408,9 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Zone Coupled Surface Heat Flux,hourly;
+  Output:Variable,*,GroundDomain Slab Zone Coupled Surface Heat Flux,hourly;
 
-  Output:Variable,*,Zone Coupled Surface Temperature,hourly;
+  Output:Variable,*,GroundDomain Slab Zone Coupled Surface Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
 

@@ -1,3 +1,64 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
+// C++ Headers
+#include <algorithm>
+
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
@@ -39,6 +100,7 @@
 #include <PlantComponentTemperatureSources.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
 #include <PlantLoadProfile.hh>
+#include <PlantLocation.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>
@@ -159,8 +221,6 @@ namespace PlantLoopEquip {
 		using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
 		using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
 		using OutsideEnergySources::SimOutsideEnergy;
-		using Pipes::SimPipes;
-		using PipeHeatTransfer::SimPipesHeatTransfer;
 		using Pumps::SimPumps;
 
 		using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
@@ -175,11 +235,8 @@ namespace PlantLoopEquip {
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
-		using GroundHeatExchangers::SimGroundHeatExchangers;
-		using SurfaceGroundHeatExchanger::SimSurfaceGroundHeatExchanger;
-		using PondGroundHeatExchanger::SimPondGroundHeatExchanger;
 
-		using PlantLoadProfile::SimulatePlantProfile;
+		// using PlantLoadProfile::PlantProfileData::simulate;
 		using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 		using WaterUse::SimulateWaterUseConnection;
 		using SolarCollectors::SimSolarCollector;
@@ -195,24 +252,10 @@ namespace PlantLoopEquip {
 		using PlantComponentTemperatureSources::SimWaterSource;
 		using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
 		bool RunFlag; // TRUE if operating this iteration
-		// std::string EquipType; // local equipment type
-		// std::string EquipName; // local equipment name
 		int EquipFlowCtrl;
 		Real64 CurLoad;
 		Real64 MaxLoad;
@@ -222,47 +265,62 @@ namespace PlantLoopEquip {
 		int GeneralEquipType; // Basic Equipment type from EquipType Used to help organize this routine
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
+		EnergyPlus::PlantLocation sim_component_location( LoopNum, LoopSideNum, BranchNum, Num );
 
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
-		GeneralEquipType = sim_component.GeneralEquipType;
-		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
-// no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
-
-//		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-//			sim_component.SizFac = 0.0;
-//			return;
-//		}
+		static std::vector< int > compsToSimAfterInitLoopEquip = { TypeOf_Pipe, TypeOf_PipeSteam };
 
 		//set local variables
-		// EquipType = sim_component.TypeOf;
 		EquipTypeNum = sim_component.TypeOf_Num;
 		EquipFlowCtrl = sim_component.FlowCtrl;
 		GeneralEquipType = sim_component.GeneralEquipType;
-		// EquipName = sim_component.Name;
 		EquipNum = sim_component.CompNum;
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
+
+		if ( sim_component.compPtr != nullptr ) {
+			if ( InitLoopEquip ) {
+				sim_component.compPtr->onInitLoopEquip( sim_component_location );
+				sim_component.compPtr->getDesignCapacities( sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
+				sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
+
+				// KLUGEY HACK ALERT!!!
+				// Some components before transition were never checking InitLoopEquip, and each call to SimXYZ would actually just pass through the calculation
+				// Other components, on the other hand, would check InitLoopEquip, do a few things, then exit early without doing any calculation
+				// This may be wrong...but during this transition, it would be very nice to keep no diffs
+				// Thus, I will return here for all components that actually returned after their onInitLoopEquip stuff
+				//   and I will fall through and actually call simulate on the components that did that before
+				// I anticipate the list of components that fall through to be very small, so that is the check I will do.
+				// If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall through, so RETURN
+				if ( std::find( compsToSimAfterInitLoopEquip.begin(), compsToSimAfterInitLoopEquip.end(), EquipTypeNum ) == compsToSimAfterInitLoopEquip.end() ) {
+					return;
+				}
+			}
+			if ( GetCompSizFac ) {
+				sim_component.compPtr->getSizingFactor( sim_component.SizFac );
+			}
+		}
 
 		//select equipment and call equiment simulation
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				SimPipes( TypeOf_Pipe, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				SimPipes( TypeOf_PipeSteam, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeInterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( TypeOf_PipeUnderground, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -715,7 +773,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_HeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_FluidToFluidPlantHtExchg ) {
-				SimFluidHeatExchanger( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
+				SimFluidHeatExchanger( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -733,29 +791,13 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_GroundHeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_GrndHtExchgVertical ) { // 'GROUND HEAT EXCHANGER:VERTICAL'
-				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'
-				SimSurfaceGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgPond ) { // 'GROUND HEAT EXCHANGER:POND'
-				SimPondGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgHorizTrench ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -765,11 +807,8 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSlinky ) { // 'GROUND HEAT EXCHANGER:SLINKY'
-				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
 
 			}
 			// THERMAL STORAGE
@@ -922,7 +961,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_LoadProfile ) { // DSU2 draft out InitLoopEquip on a demand side component
 
 			if ( EquipTypeNum == TypeOf_PlantLoadProfile ) {
-				SimulatePlantProfile( sim_component.TypeOf, sim_component.Name, TypeOf_PlantLoadProfile, EquipNum, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
 
@@ -958,7 +997,7 @@ namespace PlantLoopEquip {
 				//            PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(Num)%CompNum =  EquipNum
 				//          ENDIF
 			} else if ( EquipTypeNum == TypeOf_CoilSteamAirHeating ) {
-				//CALL UpdateSteamToAirCoilPlantConnection(  )
+				//CALL UpdateSteamToAirCoilPlantConnection()
 
 			} else if ( EquipTypeNum == TypeOf_CoilWAHPHeatingEquationFit ) {
 
@@ -1132,29 +1171,6 @@ namespace PlantLoopEquip {
 		} // TypeOfEquip
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantLoopEquip
 

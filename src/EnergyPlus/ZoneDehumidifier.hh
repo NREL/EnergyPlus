@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef ZoneDehumidifier_hh_INCLUDED
 #define ZoneDehumidifier_hh_INCLUDED
 
@@ -159,119 +217,15 @@ namespace ZoneDehumidifier {
 			OffCycleParasiticElecCons( 0.0 )
 		{}
 
-		// Member Constructor
-		ZoneDehumidifierData(
-			std::string const & Name, // Name of unit
-			std::string const & UnitType, // Type of unit
-			int const UnitType_Num, // Parameter equivalent to type of unit
-			int const SchedPtr, // Index number to availability schedule
-			Real64 const RatedWaterRemoval, // Rated water removal [liters/day]
-			Real64 const RatedEnergyFactor, // Rated energy factor [liters/kWh]
-			Real64 const RatedAirVolFlow, // Rated air flow rate through the dehumidifier [m3/s]
-			Real64 const RatedAirMassFlow, // Rated air mass flow rate through the dehumidifier [kg/s]
-			Real64 const MinInletAirTemp, // Minimum dry-bulb temperature for dehumidifier operation [C]
-			Real64 const MaxInletAirTemp, // Maximum dry-bulb temperature for dehumidifier operation [C]
-			Real64 const InletAirMassFlow, // Inlet air mass flow rate for the time step being simulated [kg/s]
-			Real64 const OutletAirEnthalpy, // Dehumidifier outlet air enthalpy [J/kg]
-			Real64 const OutletAirHumRat, // Dehumidifier outlet air humidity ratio [kg/kg]
-			Real64 const OffCycleParasiticLoad, // Off Cycle Parasitic Load, user input [W]
-			int const AirInletNodeNum, // Inlet air node number
-			int const AirOutletNodeNum, // Outlet air node number
-			int const WaterRemovalCurveIndex, // Index for water removal curve
-			int const WaterRemovalCurveType, // Water removal curve type. 2 = biquadratic
-			int const WaterRemovalCurveErrorCount, // Count number of times water removal curve returns a negative value
-			int const WaterRemovalCurveErrorIndex, // Index for negative value water removal factor recurring messages
-			int const EnergyFactorCurveIndex, // Index for energy factor curve
-			int const EnergyFactorCurveType, // Energy factor curve type. 2 = biquadratic
-			int const EnergyFactorCurveErrorCount, // Count number of times energy factor curve returns negative value
-			int const EnergyFactorCurveErrorIndex, // Index for negative value energy factor recurring messages
-			int const PartLoadCurveIndex, // Index for part load curve
-			int const PartLoadCurveType, // Part load curve type. 1 = quadratic, cubic = 3
-			int const LowPLFErrorCount, // Count number of times PLF < 0.7
-			int const LowPLFErrorIndex, // Index for PLF < 0.7 recurring warning messages
-			int const HighPLFErrorCount, // Count number of times PLF > 1.0
-			int const HighPLFErrorIndex, // Index for PLF > 1.0 recurring warning messages
-			int const HighRTFErrorCount, // Count number of times RTF > 1.0
-			int const HighRTFErrorIndex, // Index for RTF > 1.0 recurring warning messages
-			int const PLFPLRErrorCount, // Count number of times PLF < PLR
-			int const PLFPLRErrorIndex, // Index for PLF < PLR recurring warning messages
-			int const CondensateCollectMode, // Where does water come from
-			std::string const & CondensateCollectName, // Name of water storage (collection) tank
-			int const CondensateTankID, // Condensate collection tank ID number
-			int const CondensateTankSupplyARRID, // Condensate collection tank supply ID number
-			Real64 const SensHeatingRate, // Zone Dehumidifier Sensible Heating Rate [W]
-			Real64 const SensHeatingEnergy, // Zone Dehumidifier Sensible Heating Energy [J]
-			Real64 const WaterRemovalRate, // Zone Dehumidifier Water Removal Rate [kg/s]
-			Real64 const WaterRemoved, // Zone Dehumidifier Water Removed [kg]
-			Real64 const ElecPower, // Zone Dehumidifier Electric Power [W]
-			Real64 const ElecConsumption, // Zone Dehumidifier Electric Consumption [J]
-			Real64 const DehumidPLR, // Zone Dehumidifier Part-Load Ratio [-]
-			Real64 const DehumidRTF, // Zone Dehumidifier Runtime Fraction [-]
-			Real64 const DehumidCondVolFlowRate, // Zone Dehumidifier Condensate Volumetric Flow Rate [m3/s]
-			Real64 const DehumidCondVol, // Zone Dehumidifier Condensate Volume [m3]
-			Real64 const OutletAirTemp, // Zone Dehumidifier Outlet Air Temperature [C]
-			Real64 const OffCycleParasiticElecPower, // Zone Dehumidifier Off-Cycle Parasitic Electric Power [W]
-			Real64 const OffCycleParasiticElecCons // Zone Dehumidifier Off-Cycle Parasitic Electric Consumption [J]
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			SchedPtr( SchedPtr ),
-			RatedWaterRemoval( RatedWaterRemoval ),
-			RatedEnergyFactor( RatedEnergyFactor ),
-			RatedAirVolFlow( RatedAirVolFlow ),
-			RatedAirMassFlow( RatedAirMassFlow ),
-			MinInletAirTemp( MinInletAirTemp ),
-			MaxInletAirTemp( MaxInletAirTemp ),
-			InletAirMassFlow( InletAirMassFlow ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			OutletAirHumRat( OutletAirHumRat ),
-			OffCycleParasiticLoad( OffCycleParasiticLoad ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			WaterRemovalCurveIndex( WaterRemovalCurveIndex ),
-			WaterRemovalCurveType( WaterRemovalCurveType ),
-			WaterRemovalCurveErrorCount( WaterRemovalCurveErrorCount ),
-			WaterRemovalCurveErrorIndex( WaterRemovalCurveErrorIndex ),
-			EnergyFactorCurveIndex( EnergyFactorCurveIndex ),
-			EnergyFactorCurveType( EnergyFactorCurveType ),
-			EnergyFactorCurveErrorCount( EnergyFactorCurveErrorCount ),
-			EnergyFactorCurveErrorIndex( EnergyFactorCurveErrorIndex ),
-			PartLoadCurveIndex( PartLoadCurveIndex ),
-			PartLoadCurveType( PartLoadCurveType ),
-			LowPLFErrorCount( LowPLFErrorCount ),
-			LowPLFErrorIndex( LowPLFErrorIndex ),
-			HighPLFErrorCount( HighPLFErrorCount ),
-			HighPLFErrorIndex( HighPLFErrorIndex ),
-			HighRTFErrorCount( HighRTFErrorCount ),
-			HighRTFErrorIndex( HighRTFErrorIndex ),
-			PLFPLRErrorCount( PLFPLRErrorCount ),
-			PLFPLRErrorIndex( PLFPLRErrorIndex ),
-			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( CondensateCollectName ),
-			CondensateTankID( CondensateTankID ),
-			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
-			SensHeatingRate( SensHeatingRate ),
-			SensHeatingEnergy( SensHeatingEnergy ),
-			WaterRemovalRate( WaterRemovalRate ),
-			WaterRemoved( WaterRemoved ),
-			ElecPower( ElecPower ),
-			ElecConsumption( ElecConsumption ),
-			DehumidPLR( DehumidPLR ),
-			DehumidRTF( DehumidRTF ),
-			DehumidCondVolFlowRate( DehumidCondVolFlowRate ),
-			DehumidCondVol( DehumidCondVol ),
-			OutletAirTemp( OutletAirTemp ),
-			OffCycleParasiticElecPower( OffCycleParasiticElecPower ),
-			OffCycleParasiticElecCons( OffCycleParasiticElecCons )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< ZoneDehumidifierData > ZoneDehumid;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimZoneDehumidifier(
@@ -308,29 +262,6 @@ namespace ZoneDehumidifier {
 
 	bool
 	GetZoneDehumidifierNodeNumber( int const NodeNumber ); // Node being tested
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ZoneDehumidifier
 
