@@ -1880,8 +1880,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    ChW Circ Pump,           !- Component 1 Name",
 		"    ChW Supply Inlet Node,   !- Component 1 Inlet Node Name",
-		"    ChW Pump Outlet Node,    !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    ChW Pump Outlet Node;    !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Cooling Purchased Chilled Water Branch,  !- Name",
@@ -1890,8 +1889,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    Purchased Cooling,       !- Component 1 Name",
 		"    Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Purchased Cooling Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Purchased Cooling Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Cooling Supply Bypass Branch,  !- Name",
@@ -1900,8 +1898,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Cooling Supply Side Bypass,  !- Component 1 Name",
 		"    Cooling Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Cooling Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    Cooling Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Cooling Supply Outlet Branch,  !- Name",
@@ -1910,8 +1907,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Cooling Supply Outlet,   !- Component 1 Name",
 		"    Cooling Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    ChW Supply Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    ChW Supply Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesChWInletBranch,     !- Name",
@@ -1920,8 +1916,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesChWInletPipe,       !- Component 1 Name",
 		"    ChW Demand Inlet Node,   !- Component 1 Inlet Node Name",
-		"    ChW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    ChW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesChWOutletBranch,    !- Name",
@@ -1930,8 +1925,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesChWOutletPipe,      !- Component 1 Name",
 		"    ChW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    ChW Demand Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    ChW Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Zone1ChWBranch,          !- Name",
@@ -1940,8 +1934,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    Zone1VentSlabCoolingCoil,!- Component 1 Name",
 		"    Zone1VentSlabChWInletNode,  !- Component 1 Inlet Node Name",
-		"    Zone1VentSlabChWOutletNode,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Zone1VentSlabChWOutletNode;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesChWBypassBranch,    !- Name",
@@ -1950,8 +1943,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesChWBypassPipe,      !- Component 1 Name",
 		"    ZonesChWBypassInletNode, !- Component 1 Inlet Node Name",
-		"    ZonesChWBypassOutletNode,!- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    ZonesChWBypassOutletNode;!- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Supply Inlet Branch,  !- Name",
@@ -1960,8 +1952,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HW Circ Pump,            !- Component 1 Name",
 		"    HW Supply Inlet Node,    !- Component 1 Inlet Node Name",
-		"    HW Pump Outlet Node,     !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    HW Pump Outlet Node;     !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Purchased Hot Water Branch,  !- Name",
@@ -1970,8 +1961,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,       !- Component 1 Name",
 		"    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Supply Bypass Branch,  !- Name",
@@ -1980,8 +1970,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Side Bypass,  !- Component 1 Name",
 		"    Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Supply Outlet Branch,  !- Name",
@@ -1990,8 +1979,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Outlet,   !- Component 1 Name",
 		"    Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HW Supply Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Supply Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesHWInletBranch,      !- Name",
@@ -2000,8 +1988,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWInletPipe,        !- Component 1 Name",
 		"    HW Demand Inlet Node,    !- Component 1 Inlet Node Name",
-		"    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesHWOutletBranch,     !- Name",
@@ -2010,8 +1997,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWOutletPipe,       !- Component 1 Name",
 		"    HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HW Demand Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Demand Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Zone1HWBranch,           !- Name",
@@ -2020,8 +2006,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    Zone1VentSlabHeatingCoil,!- Component 1 Name",
 		"    Zone1VentSlabHWInletNode,!- Component 1 Inlet Node Name",
-		"    Zone1VentSlabHWOutletNode,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Zone1VentSlabHWOutletNode;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesHWBypassBranch,     !- Name",
@@ -2030,8 +2015,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWBypassPipe,       !- Component 1 Name",
 		"    ZonesHWBypassInletNode,  !- Component 1 Inlet Node Name",
-		"    ZonesHWBypassOutletNode, !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    ZonesHWBypassOutletNode; !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Zone4ChWBranch,          !- Name",
@@ -2040,8 +2024,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    Zone4VentSlabCoolingCoil,!- Component 1 Name",
 		"    Zone4VentSlabChWInletNode,  !- Component 1 Inlet Node Name",
-		"    Zone4VentSlabChWOutletNode,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Zone4VentSlabChWOutletNode;  !- Component 1 Outlet Node Name",
 
 		"  BranchList,",
 		"    Cooling Supply Side Branches,  !- Name",
@@ -2378,13 +2361,13 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		ErrorsFound = false;
 		GetSurfaceListsInputs(); // read surface data
 		EXPECT_FALSE( ErrorsFound );
-		
+
 		GetVentilatedSlabInput(); // read ventilated slab data
 		EXPECT_EQ( 2, NumOfVentSlabs );
 		EXPECT_EQ( "ZONE1VENTSLAB", VentSlab( 1 ).Name );
 		EXPECT_EQ( "ZONE4VENTSLAB", VentSlab( 2 ).Name );
 
-		InitVentilatedSlab( Item, VentSlabZoneNum, FirstHVACIteration );		
+		InitVentilatedSlab( Item, VentSlabZoneNum, FirstHVACIteration );
 		EXPECT_EQ( 324.38499999999999, VentSlab( 1 ).TotalSurfaceArea );
 		EXPECT_EQ( 139.21499999999997, VentSlab( 2 ).TotalSurfaceArea );
 

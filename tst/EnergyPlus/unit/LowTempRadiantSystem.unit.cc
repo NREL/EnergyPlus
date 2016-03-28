@@ -690,8 +690,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HW Circ Pump,            !- Component 1 Name",
 		"    HW Supply Inlet Node,    !- Component 1 Inlet Node Name",
-		"    HW Pump Outlet Node,     !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    HW Pump Outlet Node;     !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Purchased Hot Water Branch,  !- Name",
@@ -700,8 +699,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,       !- Component 1 Name",
 		"    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Supply Bypass Branch,  !- Name",
@@ -710,8 +708,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Side Bypass,  !- Component 1 Name",
 		"    Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Heating Supply Side Bypass,  !- Name",
@@ -725,8 +722,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Outlet,   !- Component 1 Name",
 		"    Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HW Supply Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Supply Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Heating Supply Outlet,   !- Name",
@@ -754,8 +750,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Reheat Inlet Pipe,       !- Component 1 Name",
 		"    HW Demand Inlet Node,    !- Component 1 Inlet Node Name",
-		"    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Reheat Inlet Pipe,       !- Name",
@@ -769,8 +764,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Reheat Outlet Pipe,      !- Component 1 Name",
 		"    HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HW Demand Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Demand Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Reheat Outlet Pipe,      !- Name",
@@ -784,8 +778,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type",
 		"    West Zone Radiant Floor, !- Component 1 Name",
 		"    West Zone Radiant Water Inlet Node,  !- Component 1 Inlet Node Name",
-		"    West Zone Radiant Water Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    West Zone Radiant Water Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Reheat Bypass Branch,    !- Name",
@@ -794,8 +787,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Reheat Bypass,           !- Component 1 Name",
 		"    Reheat Bypass Inlet Node,!- Component 1 Inlet Node Name",
-		"    Reheat Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    Reheat Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Reheat Bypass,           !- Name",
@@ -944,8 +936,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Demand Side Inlet Pipe,  !- Component 1 Name",
 		"    CW Demand Inlet Node,    !- Component 1 Inlet Node Name",
-		"    CW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    CW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Schedule:Compact,",
 		"    RADIANT COOLING SETPOINTS,  !- Name",
@@ -966,9 +957,8 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type",
 		"    West Zone Radiant Floor,   !- Component 1 Name",
 		"    Zone 1 Cooling Water Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Zone 1 Cooling Water Outlet Node, !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
-		
+		"    Zone 1 Cooling Water Outlet Node; !- Component 1 Outlet Node Name",
+
 		"  Branch,",
 		"    Demand Bypass Branch,    !- Name",
 		"    0,                       !- Maximum Flow Rate {m3/s}",
@@ -976,8 +966,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Demand Side Bypass,      !- Component 1 Name",
 		"    CW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CW Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    CW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Demand Side Bypass,      !- Name",
@@ -991,8 +980,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CW Demand Side Outlet Pipe,  !- Component 1 Name",
 		"    CW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CW Demand Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    CW Demand Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    CW Demand Side Outlet Pipe,  !- Name",
@@ -1006,8 +994,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Supply Side Outlet Pipe, !- Component 1 Name",
 		"    Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CW Supply Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    CW Supply Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Supply Side Outlet Pipe, !- Name",
@@ -1021,8 +1008,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    Circ Pump,               !- Component 1 Name",
 		"    CW Supply Inlet Node,    !- Component 1 Inlet Node Name",
-		"    CW Pump Outlet Node,     !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    CW Pump Outlet Node;     !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Purchased Cooling Branch,!- Name",
@@ -1031,8 +1017,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    Purchased Cooling,       !- Component 1 Name",
 		"    Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Purchased Cooling Outlet Node, !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Purchased Cooling Outlet Node; !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Supply Bypass Branch,    !- Name",
@@ -1041,8 +1026,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Supply Side Bypass,      !- Component 1 Name",
 		"    CW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CW Supply Bypass Outlet Node, !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    CW Supply Bypass Outlet Node; !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Supply Side Bypass,      !- Name",
@@ -1133,7 +1117,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	GetZoneEquipmentData1();
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
-	
+
 	HeatBalanceManager::SetPreConstructionInputParameters();
 	GetMaterialData( ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
@@ -1157,7 +1141,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	EXPECT_EQ( 1, LowTempRadiantSystem::NumOfHydrLowTempRadSys );
 	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
 	EXPECT_EQ( LowTempRadiantSystem::HydronicSystem, RadSysTypes( RadSysNum ).SystemType );
-	
+
 	ErrorsFound = false;
 	ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum, _, _, _, HydrRadSys( RadSysNum ).HotWaterInNode, _, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );

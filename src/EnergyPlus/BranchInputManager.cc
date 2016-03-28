@@ -1622,17 +1622,6 @@ namespace BranchInputManager {
 		//         \required-field
 		//    A6, \field Component 1 Outlet Node Name
 		//         \required-field
-		//    A7, \field Component 1 Branch Control Type
-		//         \required-field
-		//        \type choice
-		//        \key Active
-		//        \key Passive
-		//        \key SeriesActive
-		//        \key Bypass
-		//        \note for ACTIVE, Component tries to set branch flow and turns off branch if the component is off
-		//        \note for PASSIVE, Component does not try to set branch flow
-		//        \note for SERIESACTIVE, component is active but does not turn off branch when the component is off
-		//        \note for BYPASS,  Component designates a loop bypass
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -1730,12 +1719,12 @@ namespace BranchInputManager {
 					}
 					Branch( BCount ).PressureCurveType = PressureCurveType;
 					Branch( BCount ).PressureCurveIndex = PressureCurveIndex;
-					Branch( BCount ).NumOfComponents = ( NumAlphas - 2 ) / 5;
-					if ( Branch( BCount ).NumOfComponents * 5 != ( NumAlphas - 2 ) ) ++Branch( BCount ).NumOfComponents;
+					Branch( BCount ).NumOfComponents = ( NumAlphas - 2 ) / 4;
+					if ( Branch( BCount ).NumOfComponents * 4 != ( NumAlphas - 2 ) ) ++Branch( BCount ).NumOfComponents;
 					NumInComps = Branch( BCount ).NumOfComponents;
 					Branch( BCount ).Component.allocate( Branch( BCount ).NumOfComponents );
 					Comp = 1;
-					for ( Loop = 3; Loop <= NumAlphas; Loop += 5 ) {
+					for ( Loop = 3; Loop <= NumAlphas; Loop += 4 ) {
 						if ( SameString( Alphas( Loop ), cSPLITTER ) || SameString( Alphas( Loop ), cMIXER ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
 							ShowContinueError( "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject );

@@ -145,7 +145,7 @@ namespace EnergyPlus {
 		"    no,                     !- Do Plant Sizing Calculation",
 		"    Yes,                     !- Run Simulation for Sizing Periods",
 		"    no;                     !- Run Simulation for Weather File Run Periods",
-		
+
 		"  Timestep,6;",
 
 		"  ScheduleTypeLimits,",
@@ -337,8 +337,7 @@ namespace EnergyPlus {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name",
 		"    TowerWaterSys Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    TowerWaterSys Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    TowerWaterSys Demand Inlet Branch,  !- Name",
@@ -347,8 +346,7 @@ namespace EnergyPlus {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Demand Inlet Pipe,  !- Component 1 Name",
 		"    TowerWaterSys Demand Inlet Node,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    TowerWaterSys Demand Load Branch 1,  !- Name",
@@ -357,8 +355,7 @@ namespace EnergyPlus {
 		"    LoadProfile:Plant,  !- Component 1 Object Type",
 		"    Load Profile 1,      !- Component 1 Name",
 		"    Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Demand Load Profile 1 Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  LoadProfile:Plant,",
 		"    Load Profile 1,          !- Name",
@@ -389,8 +386,7 @@ namespace EnergyPlus {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Demand Outlet Pipe,  !- Component 1 Name",
 		"    TowerWaterSys Demand Mixer-TowerWaterSys Demand Outlet Pipe,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Demand Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    TowerWaterSys Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    TowerWaterSys Supply Equipment Branch 1,  !- Name",
@@ -399,8 +395,7 @@ namespace EnergyPlus {
 		"    CoolingTower:VariableSpeed:Merkel,  !- Component 1 Object Type",
 		"    TowerWaterSys CoolTower1,!- Component 1 Name",
 		"    TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    TowerWaterSys Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    TowerWaterSys Supply Equipment Bypass Branch,  !- Name",
@@ -409,8 +404,7 @@ namespace EnergyPlus {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Supply Equipment Bypass Pipe,  !- Component 1 Name",
 		"    TowerWaterSys Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    TowerWaterSys Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    TowerWaterSys Supply Inlet Branch,  !- Name",
@@ -419,8 +413,7 @@ namespace EnergyPlus {
 		"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 		"    TowerWaterSys Pump,      !- Component 1 Name",
 		"    TowerWaterSys Supply Inlet Node,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Component 1 Outlet Node Name",
-    		"Active;                  !- Component 1 Branch Control Type",
+		"    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    TowerWaterSys Supply Outlet Branch,  !- Name",
@@ -429,8 +422,7 @@ namespace EnergyPlus {
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Supply Outlet Pipe,  !- Component 1 Name",
 		"    TowerWaterSys Supply Mixer-TowerWaterSys Supply Outlet Pipe,  !- Component 1 Inlet Node Name",
-		"    TowerWaterSys Supply Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    TowerWaterSys Supply Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  OutdoorAir:Node,",
 		"    TowerWaterSys CoolTower OA ref Node;  !- Name",

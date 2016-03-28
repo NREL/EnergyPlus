@@ -2405,8 +2405,7 @@ namespace EnergyPlus {
 			"  Pump:VariableSpeed, !- Component 1 Object Type",
 			"  Pump, !- Component 1 Name",
 			"  Supply Inlet Node, !- Component 1 Inlet Node Name",
-			"  Supply Pump-Heating Node, !- Component 1 Outlet Node Name",
-			"  ACTIVE;                  !- Component 1 Branch Control Type",
+			"  Supply Pump-Heating Node; !- Component 1 Outlet Node Name",
 			" ",
 			"Pump:VariableSpeed,",
 			"  Pump, !- Name",
@@ -2431,8 +2430,7 @@ namespace EnergyPlus {
 			"  DistrictHeating, !- Component 1 Object Type",
 			"  Purchased Heating, !- Component 1 Name",
 			"  Supply Heating Inlet Node, !- Component 1 Inlet Node Name",
-			"  Supply Heating Outlet Node, !- Component 1 Outlet Node Name",
-			"  ACTIVE;                  !- Component 1 Branch Control Type",
+			"  Supply Heating Outlet Node; !- Component 1 Outlet Node Name",
 			" ",
 			"DistrictHeating,",
 			"  Purchased Heating, !- Name",
@@ -2447,8 +2445,7 @@ namespace EnergyPlus {
 			"  Pipe:Adiabatic, !- Component 1 Object Type",
 			"  Supply Outlet Pipe, !- Component 1 Name",
 			"  Supply Heating-Pipe Node, !- Component 1 Inlet Node Name",
-			"  Supply Outlet Node, !- Component 1 Outlet Node Name",
-			"  PASSIVE;                 !- Component 1 Branch Control Type",
+			"  Supply Outlet Node; !- Component 1 Outlet Node Name",
 			" ",
 			"Pipe:Adiabatic,",
 			"  Supply Outlet Pipe, !- Name",
@@ -2485,8 +2482,7 @@ namespace EnergyPlus {
 			"  Pipe:Adiabatic, !- Component 1 Object Type",
 			"  Demand Inlet Pipe, !- Component 1 Name",
 			"  Demand Inlet Node, !- Component 1 Inlet Node Name",
-			"  VRF Water Inlet Node, !- Component 1 Outlet Node Name",
-			"  PASSIVE;                 !- Component 1 Branch Control Type",
+			"  VRF Water Inlet Node; !- Component 1 Outlet Node Name",
 			" ",
 			"Pipe:Adiabatic,",
 			"  Demand Inlet Pipe, !- Name",
@@ -2500,8 +2496,7 @@ namespace EnergyPlus {
 			"  AirConditioner:VariableRefrigerantFlow, !- Component 1 Object Type",
 			"  VRF Water Cooled HP, !- Component 1 Name",
 			"  VRF Water Inlet Node, !- Component 1 Inlet Node Name",
-			"  VRF Water Outlet Node, !- Component 1 Outlet Node Name",
-			"  ACTIVE;                  !- Component 1 Branch Control Type",
+			"  VRF Water Outlet Node; !- Component 1 Outlet Node Name",
 			" ",
 			"Branch,",
 			"  Demand Outlet Branch, !- Name",
@@ -2510,8 +2505,7 @@ namespace EnergyPlus {
 			"  Pipe:Adiabatic, !- Component 1 Object Type",
 			"  Demand Outlet Pipe, !- Component 1 Name",
 			"  VRF Water Outlet Node, !- Component 1 Inlet Node Name",
-			"  Demand Outlet Node, !- Component 1 Outlet Node Name",
-			"  PASSIVE;                 !- Component 1 Branch Control Type",
+			"  Demand Outlet Node; !- Component 1 Outlet Node Name",
 			" ",
 			"Pipe:Adiabatic,",
 			"  Demand Outlet Pipe, !- Name",
@@ -2691,7 +2685,7 @@ namespace EnergyPlus {
 		int CurZoneNum( 1 );              // index to zone
 		int ZoneInletAirNode( 0 );        // zone inlet node number
 		int OutsideAirNode( 0 );          // VRFTU Outside air inlet node
-		Real64 AverageOAMassFlow( 0.0 );  // VRFTU Outside air mass flow rate 
+		Real64 AverageOAMassFlow( 0.0 );  // VRFTU Outside air mass flow rate
 		int ZoneNum( 1 );                 // current zone index
 		Real64 QZnReq( 0.0 );             // current zone load to set point
 		Real64 PartLoadRatio( 0.0 );      // unit part load ratio
@@ -3371,10 +3365,10 @@ namespace EnergyPlus {
 		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function
 		OutsideAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum; // outside air air inlet node num
 		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate( 1 );
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 0.0;  // No load 
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 0.0;  // No load 
-		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 0.0;  // No load 
-		QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired;  // No load 
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 0.0;  // No load
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 0.0;  // No load
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 0.0;  // No load
+		QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired;  // No load
 		// Initialize terminal unit
 		Schedule( VRFTU( VRFTUNum ).FanOpModeSchedPtr ).CurrentValue = 1.0; // set continuous fan operating mode
 		InitVRF( VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq ); // Initialize all VRFTU related parameters

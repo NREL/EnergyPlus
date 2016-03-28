@@ -2510,7 +2510,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	CoolingLoad = false;
 
 	// zone predicted load is assume to be heating and the unitary system zone equipment
-	// inlet and outlet air conditions were set for heating 
+	// inlet and outlet air conditions were set for heating
 	HeatingLoad = true;
 	// set up zone equipment inlet node condtions
 	Node( InletNode ).Temp = 17.57;
@@ -2534,7 +2534,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 
 }
 
-	
+
 TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	std::string const idf_objects = delimited_string( {
@@ -2997,7 +2997,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  ,                       !- Maximum Curve Output",
 		"  Temperature,            !- Input Unit Type for X",
 		"  Temperature,            !- Input Unit Type for Y",
-		"  Dimensionless;          !- Output Unit Type",	
+		"  Dimensionless;          !- Output Unit Type",
 
 		"  Sizing:Zone,",
 		"    EAST ZONE,      !- Zone or ZoneList Name",
@@ -3284,8 +3284,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
 		"  DXAC Heat Pump 1, !- Component 2 Name",
 		"  	Mixed Air Node, !- Component 2 Inlet Node Name",
-		"  Air Loop Outlet Node, !- Component 2 Outlet Node Name",
-		"  ACTIVE;                  !- Component 2 Branch Control Type",
+		"  Air Loop Outlet Node; !- Component 2 Outlet Node Name",
 		"  ",
 		"AirLoopHVAC,",
 		"  Heat Pump Sys 1, !- Name",
@@ -3976,7 +3975,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 
-	HVACUnitarySystem::GetInputFlag = true; 
+	HVACUnitarySystem::GetInputFlag = true;
 	GetUnitarySystemInput( ); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 

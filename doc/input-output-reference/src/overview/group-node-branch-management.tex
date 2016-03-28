@@ -322,7 +322,7 @@ This is an optional field used to specify pressure drop information for this par
 
 \paragraph{Field Set (Branch Specifications)}\label{field-set-branch-specifications}
 
-Following the two introductory items, there are groups of 5 repeated items: a type, a name, inlet and outlet node names, and a branch control type. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed.
+Following the two introductory items, there are groups of 5 repeated items: a type, a name, inlet and outlet node names. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed.
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type-000}
 
@@ -340,10 +340,6 @@ This field references an inlet node name that will be found in the actual compon
 
 This field references an outlet node name that will be found in the actual component specification.
 
-\paragraph{Field: Component \textless{}\#\textgreater{} Branch Control Type}\label{field-component-branch-control-type}
-
-This field is being deprecated and is no longer used or required. Prior to version 7 it was used by plant to resolve branch flow rates but now this is handled automatically by the program.~ The field will be removed in a future version.
-
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -355,8 +351,7 @@ Branch,
       AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,  !- Comp1 Type
       GasHeat CBVAV System,    !- Comp1 Name
       Air Loop Inlet Node,     !- Comp1 Inlet Node Name
-      Air Loop Outlet Node,    !- Comp1 Outlet Node Name
-      ;                        !- Comp1 Branch Control Type
+      Air Loop Outlet Node;    !- Comp1 Outlet Node Name
 \end{lstlisting}
 
 And a more complex one:
@@ -371,12 +366,10 @@ And a more complex one:
       Supply Fan 1,            !- Comp1 Name
       Air Loop Inlet Node,     !- Comp1 Inlet Node Name
       Cooling Coil Air Inlet Node,  !- Comp1 Outlet Node Name
-      ,                  !- Comp1 Branch Control Type
       COIL:Water:DetailedFlatCooling,  !- Comp2 Type
       Detailed Cooling Coil,   !- Comp2 Name
       Cooling Coil Air Inlet Node,  !- Comp2 Inlet Node Name
-      Air Loop Outlet Node,    !- Comp2 Outlet Node Name
-      ;                 !- Comp2 Branch Control Type
+      Air Loop Outlet Node;    !- Comp2 Outlet Node Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-014}
