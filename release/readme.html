@@ -18,8 +18,8 @@
 <body bgcolor="#FFFFFF">
 <h1 align="left"><b>Installing EnergyPlus</b></h1>
 <img align="right" alt="ep.gif (6134 bytes)" height="203" src="ep.gif" width="300"><br>
-<b>Version 8.4.0<br>
-30 September 2015<br></b>
+<b>Version 8.5.0<br>
+31 March 2016<br></b>
 <h5 align="center"><i>EnergyPlus is a trademark of the US Department of Energy.</i></h5>
 <hr>
 <h2>EnergyPlus</h2>
@@ -28,7 +28,7 @@
 engine without a 'user friendly' graphical interface . . . EnergyPlus reads input and writes output as text files.</p>
 <p>Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor and EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development.  For the latest tools, please see <a href="https://energyplus.net/interfaces">this EnergyPlus website for third party interfaces</a>.
 <p>A number of third-party tools are available to create EnergyPlus input files (IDF).  For the latest tools, please see <a href="https://energyplus.net/input-files">this EnergyPlus website for third party IDF creation tools</a>.  Some of these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older files to current EnergyPlus version (you may need to use the Multiple Version Conversions set -- see below.</p>
-<h3>What's going on in V8.4?</h3>
+<h3>What's going on in V8.5?</h3>
 <p><i>Will there be any considerable difference between version 8.3 and 8.4?</i></p>
 <blockquote>
 <p class=MsoNormal>Yes.... and no.&nbsp; The basic structure of EnergyPlus is still as it has been but there are some significant changes that you will want to be aware of:</p>
@@ -37,26 +37,23 @@ engine without a 'user friendly' graphical interface . . . EnergyPlus reads inpu
 </blockquote>
 <p><i>How about IDF and IDD? Do they remain unchanged?</i></p>
 <blockquote>
-<p class=MsoNormal>There are a few key changes in the V8.4 IDD. For best results, use the transition program to transfer from the earlier V8.3 files. Use the IDFVersionUpdater program for best results.
-<p><i>Is version 8.4 backward compatible? Can I run v8.3 file in v8.4?</i></p>
+<p class=MsoNormal>There are a few key changes in the V8.4 IDD. For best results, use the transition program to transfer from the earlier V8.4 files. Use the IDFVersionUpdater program for best results.
+<p><i>Is version 8.5 backward compatible? Can I run v8.4 file in v8.5?</i></p>
 <blockquote>
 <p class=MsoNormal>There have been changes in the following objects which require conversion. Either read and follow the Rules spreadsheet or use the IDFVersionUpdater utility.  The "Rules" spreadsheet that contains information on exact object
-changes that you can do by hand.
-For the v8.4 release, the following objects require conversion (from V8.3):
-<li>Coil:WaterHeating:Airtowaterheatpump</li>
-<li>WaterHeater:Stratified</li>
-<li>WaterHeater:HeatPump</li>
-<li>EvaporativeCooler:Direct:ResearchSpecial</li>
-<li>Controller:MechanicalVentilation</li>
-<li>Site:GroundDomain:slab</li>
-<li>Site:GroundDomain:Basement</li>
-<li>PipingSystem:Underground:Domain</li>
-<li>Pipe:Underground</li>
-<li>GroundHeatExchanger:HorizontalTrench</li>
-<li>GroundHeatExchanger:Slinky</li>
-<li>ZoneAirMassFlowConservation</li>
+changes that you can do by hand.  The updater program is described more fully in the Auxiliary Programs document. 
+For the v8.5 release, the following objects require conversion (from V8.4):
+<li>AirTerminal:SingleDuct:SeriesPIU:Reheat</li>
+<li>AirTerminal:SingleDuct:ParallelPIU:Reheat</li>
+<li>AirTerminal:SingleDuct:ConstantVolume:Reheat</li>
+<li>AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat</li>
+<li>AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction</li>
+<li>AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan</li>
+<li>UnitarySystemPerformance:Multispeed</li>
+<li>ElectricLoadCenter:Transformer</li>
+<li>EnergyManagementSystem:InternalVariable</li>
+<li>EnergyManagementSystem:Actuator</li>
 </blockquote>
-<p class=MsoNormal>There is also the "Rules" spreadsheet that contains information on exact object changes that you can do by hand - for best results, the included conversion (utility IDFVersionUpdater) program can be used.  The updater program is described more fully in the Auxiliary Programs document. The next section describes how to get the set of programs for multiple version conversions.</p>
 <p class=MsoNormal>In addition, as happens in every EnergyPlus release, there are new checks on user input. Even if your file ran in an earlier version, it may not run in the newer version after conversion due to newer checks on the validity of input.</p>
 </blockquote>
 <h3>Multiple Version Conversions</h3>
@@ -72,14 +69,13 @@ For the v8.4 release, the following objects require conversion (from V8.3):
 <h3>Weather Data</h3>
 <p>A small subset of weather files that are available on the web site are also installed in the WeatherData folder. EnergyPlus uses these files directly for annual simulations.&nbsp;The Weather
 Converter program that is part of EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics reports about the included (or other) files.&nbsp;
-<b>Weather data</b> for more than 2100 locations in more than 100 countries can be downloaded on the <a href="http://apps1.eere.energy.gov/buildings/energyplus/weatherdata_about.cfm">DOE EnergyPlus web site
-weather data page</a>.</p>
-<h3>Highlights of this release (V8.4.0)</h3>
+<b>Weather data</b> for more than 2100 locations in more than 100 countries can be downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
+<h3>Highlights of this release (V8.5.0)</h3>
 <p>The highlights &ndash; improved and new features &ndash; are displayed by category.</p>
 <blockquote>
 <h4>Core changes to EnergyPlus</h4>
 <ul>
-<li>Many new features were added, described below, see the installed changelog for a full list of changes</li>
+<li>This release of EnergyPlus was focused heavily on bug fixes and robustness.  Some new features were still added, check the installed changelog file for full details.</li>
 </ul>
 <h4>General</h4>
 <ul>
@@ -87,23 +83,20 @@ weather data page</a>.</p>
 </ul>
 <h4>New Features</h4>
 <ul>
- <li>Residential Heat Pump Water Heater Improvements</li>
- <li>New Variable Speed Heat Pump Water Heater Model</li>
- <li>Update Life cycle costing data set files for 2013 and 2014</li>
- <li>Add Fault Simulation for Dirty Air Filters</li>
- <li>Add PlantEquipmentOperation:ThermalEnergyStorage controls</li>
- <li>New VRF Heat Pump Model</li>
- <li>Add Multiple Tower Support in Condenser Entering Temp Reset Setpoint Managers</li>
- <li>Link Infiltration to HVAC Operation and Add Return Air Flow Controls</li>
- <li>Four pipe beam air terminal</li>
- <li>Improved Ground Temperature Models</li>
+ <li>Improved Scalable Pump Sizing</li>
+ <li>Add conduction finite difference node heat flux output</li>
+ <li>Improved economizer integration and single mode option for multi-speed coils</li>
+ <li>Add HeatExchanger:AirToAir:SensibleAndLatent as a valid air loop main branch component</li>
+ <li>Add Humidifier as valid component to OA subsystem</li>
+ <li>Add new ASHRAE single-zone VAV fan control for fan coil units</li>
+ <li>EnergyPlus Documentation now based on LaTeX</li>
 </ul>
 <h4>Platforms</h4>
 <ul>
 <li>Windows 7 & 8</li>
 <li>Linux (Ubuntu 14.04 and compatible) 64 bit versions; (32-bit and RHEL-compatible versions may be available via Helpdesk)</li>
 <li>Mac OSX 10.9 64 bit versions</li>
-<li>EnergyPlus V8.4 has been tested on all of these platforms</li>
+<li>EnergyPlus V8.5 has been tested on all of these platforms</li>
 <li><i>EnergyPlus does intensive computations, and based on configuration, can write massive amounts of data to disk.  For best performance, computers should have a substantial amount of memory and high speed hard drives.</i></li>
 </ul>
 <p>And many other enhancements throughout.</p>
@@ -123,7 +116,7 @@ installed similarly in the <a href="changelog.html">changelog</a>.</p>
 <p><b>EnergyPlus Development, Testing, and Support Team</b></p>
 <p>Additional steps you may want to consider:</p>
 <ol>
-<li>Download additional <a href="http://apps1.eere.energy.gov/buildings/energyplus/weatherdata_about.cfm">Weather Data</a> for use in running example files or your files.&nbsp;<br>
+<li>Download additional <a href="https://energyplus.net/weather">Weather Data</a> for use in running example files or your files.&nbsp;<br>
 </li>
 <br>
 <li>The helpdesk (<a href="http://energyplus.helpserve.com">energyplus.helpserve.com</a>) is the primary support site.
@@ -138,10 +131,10 @@ attachments to email are also allowed. &nbsp; The main page for the group is at:
 &nbsp;</li>
 <li><b>BLDG-SIM<br></b> A free e-mail list for all building energy simulation program users to ask questions to other users. See <a href=
 "http://lists.onebuilding.org/listinfo.cgi/bldg-sim-onebuilding.org">lists.onebuilding.org/listinfo.cgi/bldg-sim-onebuilding.org</a>&nbsp; for information on joining this email list.<br>&nbsp;</li>
-<li><b>Open-Source License (or distribution license)<br></b> Licenses for the source code and distribution are available from the website: <a href="http://apps1.eere.energy.gov/buildings/energyplus/energyplus_licensing.cfm">Licensing Info</a></li>
+<li><b>Open-Source License (or distribution license)<br></b> Licenses for the source code and distribution are available from the website: <a href="https://energyplus.net/licensing">Licensing Info</a></li>
 </ol>
 If you have any other questions, contact <a href="mailto:energyplus-support@gard.com">EnergyPlus Support</a>.<br>
-<p>Copyright &copy; 1996-2015 The Board of Trustees of the University of Illinois and The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory. All
+<p>Copyright &copy; 1996-2016 The Board of Trustees of the University of Illinois and The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory. All
 rights reserved.</p>
 <p>Other Notices and Acknowledgments are found in the <a href="Documentation/Acknowledgments.pdf">Acknowledgments</a> document.</p>
 </body>
