@@ -8921,8 +8921,7 @@ DO iZone = 1, numCompactZoneVAV
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vzNameOff,' Reheat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + vzNameOff,' Reheat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + vzNameOff,' Reheat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + vzNameOff,' Reheat Coil HW Outlet',.TRUE.)
   ELSEIF (reheatCoilType .EQ. ctElectric) THEN
     !SINGLE DUCT:VAV:REHEAT ~ line 122
     CALL CreateNewObj('AirTerminal:SingleDuct:VAV:Reheat')
@@ -9058,8 +9057,7 @@ DO iZone = 1, numCompactZoneVAV
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + vzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + vzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + vzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + vzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + vzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -9478,8 +9476,7 @@ DO iZone = 1, numCompactZoneFPVAV
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + fpvzNameOff,' Reheat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + fpvzNameOff,' Reheat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + fpvzNameOff,' Reheat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + fpvzNameOff,' Reheat Coil HW Outlet',.TRUE.)
   ELSEIF (reheatCoilType .EQ. ctElectric) THEN
     !COIL:Electric:Heating ~ line 163 of FPVAV tab
     CALL CreateNewObj('Coil:Heating:Electric')
@@ -9548,8 +9545,7 @@ DO iZone = 1, numCompactZoneFPVAV
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + fpvzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + fpvzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + fpvzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + fpvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + fpvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -9855,8 +9851,7 @@ DO iZone = 1, numCompactZoneHCVAV
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + hcvzNameOff,' Reheat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + hcvzNameOff,' Reheat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + hcvzNameOff,' Reheat Coil HW Outlet',.TRUE.)
   ELSEIF (reheatCoilType .EQ. ctElectric) THEN
     !SINGLE DUCT:VAV:REHEAT ~ line 122
     CALL CreateNewObj('AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat')
@@ -9973,8 +9968,7 @@ DO iZone = 1, numCompactZoneHCVAV
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + hcvzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + hcvzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + hcvzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + hcvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + hcvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -10327,19 +10321,16 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Humidifier')
     CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Mixed Air Outlet')
     CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Humidifier Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   IF (supFanPlacement .EQ. sfpBlowThru) THEN
     CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
@@ -10350,7 +10341,6 @@ DO iSys = 1, numCompactSysVAV
       CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Humidifier Outlet')
     END IF
     CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Supply Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active')
   END IF
 ! MJW 18 Aug 2005 - Switch to Detailed cooling coil model to avoid sizing problem
 ! MJW 27 Jun 2007 - Cooling coil type is a choice now, revert to COIL:WATER:COOLING as the default, sizing is better than it was
@@ -10369,11 +10359,10 @@ DO iSys = 1, numCompactSysVAV
       CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Humidifier Outlet')
     END IF
   END IF
-  CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
   IF ((heatCoilType .EQ. ctNone) .AND. (supFanPlacement .NE. sfpDrawThru)) THEN
-    CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet',.TRUE.)
   ELSE
-    CALL AddToObjStr('Component Branch Control Type','Passive')
+    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
   END IF
   IF (heatCoilType .NE. ctNone) THEN
     IF (heatCoilType .EQ. ctHotWater) THEN
@@ -10385,11 +10374,10 @@ DO iSys = 1, numCompactSysVAV
     END IF
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Heating Coil Outlet')
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
-      CALL AddToObjStr('Component Branch Control Type','Passive')
+      CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Heating Coil Outlet')
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Heating Coil Outlet',.TRUE.)
     END IF
   END IF
   IF (supFanPlacement .EQ. sfpDrawThru) THEN
@@ -10400,8 +10388,7 @@ DO iSys = 1, numCompactSysVAV
     ELSE
       CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
     END IF
-    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Supply Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Supply Fan Outlet',.TRUE.)
   END IF
   IF (isSupplyPlenumBlank) THEN
     !ZONE SUPPLY AIR PATH ~ line 236
@@ -10835,8 +10822,7 @@ DO iSys = 1, numCompactSysVAV
   END IF
   CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Cooling Coil')
   CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil ChW Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil ChW Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil ChW Outlet',.TRUE.)
   IF (heatCoilType .EQ. ctHotWater) THEN
     !COIL:Water:SimpleHeating ~ line 406
     CALL CreateNewObj('Coil:Heating:Water')
@@ -10865,8 +10851,7 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Heating Coil HW Outlet',.TRUE.)
     !CONTROLLER:SIMPLE ~line 425
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Heating Coil Controller')
@@ -11275,8 +11260,7 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Preheat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + vsAirHandlerNameOff,' Preheat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Preheat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + vsAirHandlerNameOff,' Preheat Coil HW Outlet',.TRUE.)
     !CONTROLLER:SIMPLE ~ line 634
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Preheat Coil Controller')
@@ -11713,19 +11697,16 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' Humidifier')
     CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Mixed Air Outlet')
     CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Humidifier Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   IF (supFanPlacement .EQ. sfpBlowThru) THEN
     CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
@@ -11736,7 +11717,6 @@ DO iSys = 1, numCompactSysPVAV
       CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Humidifier Outlet')
     END IF
     CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Supply Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active')
   END IF
   CALL AddToObjStr('Component Object Type','CoilSystem:Cooling:DX')
   CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' System')
@@ -11749,11 +11729,10 @@ DO iSys = 1, numCompactSysPVAV
       CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Humidifier Outlet')
     END IF
   END IF
-  CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet')
   IF ((heatCoilType .EQ. ctNone) .AND. (supFanPlacement .NE. sfpDrawThru)) THEN
-    CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet',.TRUE.)
   ELSE
-    CALL AddToObjStr('Component Branch Control Type','Passive')
+    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet')
   END IF
   IF (heatCoilType .NE. ctNone) THEN
     IF (heatCoilType .EQ. ctHotWater) THEN
@@ -11765,11 +11744,10 @@ DO iSys = 1, numCompactSysPVAV
     END IF
     CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil Outlet')
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
-      CALL AddToObjStr('Component Branch Control Type','Passive')
+     CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil Outlet')
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil Outlet',.TRUE.)
     END IF
   END IF
   IF (supFanPlacement .EQ. sfpDrawThru) THEN
@@ -11780,8 +11758,7 @@ DO iSys = 1, numCompactSysPVAV
     ELSE
       CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet')
     END IF
-    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Supply Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Supply Fan Outlet',.TRUE.)
   END IF
   IF (isSupplyPlenumBlank) THEN
     !Object ==> AirLoopHVAC:SupplyPath
@@ -12532,8 +12509,7 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil HW Outlet',.TRUE.)
     !Object ==> Controller:WaterCoil
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Heating Coil Controller')
@@ -13428,8 +13404,7 @@ DO iZone = 1, numCompactZoneUnit
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + uzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + uzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + uzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + uzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + uzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -13682,19 +13657,16 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + usAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' Humidifier')
     CALL AddToObjFld('Component Inlet Node Name', base + usAirHandlerNameOff,' Mixed Air Outlet')
     CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Humidifier Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   IF (coolCoilKind .EQ. ccNone) THEN
     CALL AddToObjStr('Component Object Type','AirLoopHVAC:Unitary:Furnace:HeatOnly')
@@ -13708,8 +13680,7 @@ DO iSys = 1, numCompactSysUnit
   ELSE
     CALL AddToObjFld('Component Inlet Node Name', base + usAirHandlerNameOff,' Humidifier Outlet')
   END IF
-  CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Air Loop Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Air Loop Outlet',.TRUE.)
   IF (isSupplyPlenumBlank) THEN
     !ZONE SUPPLY AIR PATH
     CALL CreateNewObj('AirLoopHVAC:SupplyPath')
@@ -14126,8 +14097,7 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + usAirHandlerNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Heating Coil HW Outlet',.TRUE.)
     CALL AddToStrList(TRIM(FldVal(base + usAirHandlerNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
   END IF
 
@@ -14205,8 +14175,7 @@ DO iSys = 1, numCompactSysUnit
         CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
         CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' Reheat Coil')
         CALL AddToObjFld('Component Inlet Node Name', base + usAirHandlerNameOff,' Reheat Coil HW Inlet')
-        CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Reheat Coil HW Outlet')
-        CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+        CALL AddToObjFld('Component Outlet Node Name', base + usAirHandlerNameOff,' Reheat Coil HW Outlet',.TRUE.)
         CALL AddToStrList(TRIM(FldVal(base + usAirHandlerNameOff)) // ' Reheat Coil HW Branch',handleHeatingCoilBranch)
       END IF
     END IF
@@ -14721,19 +14690,16 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjFld('Component Name', base + uhpsAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + uhpsAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + uhpsAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + uhpsAirHandlerNameOff,' Humidifier')
     CALL AddToObjFld('Component Inlet Node Name', base + uhpsAirHandlerNameOff,' Mixed Air Outlet')
     CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Humidifier Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:UnitaryHeatPump:AirToAir')
   CALL AddToObjFld('Component Name', base + uhpsAirHandlerNameOff,' Heat Pump')
@@ -14742,8 +14708,7 @@ DO iSys = 1, numCompactSysUnitHP
   ELSE
     CALL AddToObjFld('Component Inlet Node Name', base + uhpsAirHandlerNameOff,' Humidifier Outlet')
   END IF
-  CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Air Loop Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Air Loop Outlet',.TRUE.)
   IF (isSupplyPlenumBlank) THEN
     !Object ==> AirLoopHVAC:SupplyPath
     CALL CreateNewObj('AirLoopHVAC:SupplyPath')
@@ -15150,8 +15115,7 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil HW Outlet',.TRUE.)
     CALL AddToStrList(TRIM(FldVal(base + uhpsAirHandlerNameOff)) // ' Sup Heat Coil HW Branch',handleHeatingCoilBranch)
   END IF
   ! Cooling coil
@@ -15847,24 +15811,20 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff, TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:UnitarySystem')
   CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Unitary System')
   CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff, TRIM(unitInlet))
   CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff, TRIM(unitOutlet))
-  CALL AddToObjStr('Component Branch Control Type','Active',isHumidifierNone)
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Humidifier')
     CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,TRIM(humidifierInlet))
-    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,TRIM(humidifierOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,TRIM(humidifierOutlet),.TRUE.)
   END IF
   IF (isSupplyPlenumBlank) THEN
     !Object ==> AirLoopHVAC:SupplyPath
@@ -16135,7 +16095,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Unitary System MultiSpeed Performance')
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
-    CALL AddToObjStr('Single Mode Operation', 'No') 
+    CALL AddToObjStr('Single Mode Operation', 'No')
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
@@ -17098,8 +17058,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Component Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
       CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Cooling Coil')
       CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,' WAHP Cooling Water Inlet Node')
-      CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' WAHP Cooling Water Outlet Node')
-      CALL AddToObjStr('Component Branch Control Type','ACTIVE',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' WAHP Cooling Water Outlet Node',.TRUE.)
     CASE (ccNone)
       ! nothing to do if no cooling coil specified
   END SELECT
@@ -17119,8 +17078,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     END IF
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Cooling Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil ChW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil ChW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil ChW Outlet',.TRUE.)
   ENDIF
 
 
@@ -17263,8 +17221,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Heating Coil HW Outlet',.TRUE.)
     CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
   ELSE IF (heatcoilKind .EQ. hcSingleSpeedDXHPAir) THEN
     !Object ==> Coil:Heating:DX:SingleSpeed
@@ -17557,8 +17514,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Component Object Type','Coil:Heating:WaterToAirHeatPump:EquationFit')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,' WAHP Heating Water Inlet Node')
-    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' WAHP Heating Water Outlet Node')
-    CALL AddToObjStr('Component Branch Control Type','ACTIVE',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' WAHP Heating Water Outlet Node',.TRUE.)
   END IF
   ! Supplemental Heating Coil
   IF (supHeatCoilKind .EQ. hcElectric) THEN
@@ -17622,8 +17578,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjStr('Component Name', TRIM(supHeatCoilObjectName))
     CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff,' Sup Heat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Sup Heat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff,' Sup Heat Coil HW Outlet',.TRUE.)
     CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Sup Heat Coil HW Branch',handleHeatingCoilBranch)
   ELSE IF (supHeatCoilKind .EQ. hcDeSuperHeat) THEN
     CALL CreateNewObj('Coil:Heating:Desuperheater')
@@ -18722,8 +18677,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Reheat Coil HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Reheat Coil HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Reheat Coil HW Outlet',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctElectric) THEN
       CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Electric')
@@ -18808,8 +18762,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + cvzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + cvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -19180,29 +19133,25 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + cvsAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Humidifier')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(humidifierInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(humidifierOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   IF (supFanPlacement .EQ. sfpBlowThru) THEN
     CALL AddToObjStr('Component Object Type','Fan:ConstantVolume')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(fanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
     IF ((coolCoilKind .NE. ccNone) .OR. (heatCoilType .NE. ctNone)) THEN
-      CALL AddToObjStr('Component Branch Control Type','Active')
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet),.TRUE.)
     END IF
   END IF
   IF (coolCoilKind .NE. ccNone) THEN
@@ -19217,11 +19166,10 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Heat Exchanger Assisted Cooling Coil')
     END IF
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coolCoilUnitInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilUnitOutlet))
     IF ((heatCoilType .EQ. ctNone) .AND. (supFanPlacement .NE. sfpDrawThru)) THEN
-      CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilUnitOutlet),.TRUE.)
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Passive')
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilUnitOutlet))
     END IF
   END IF
   IF (heatCoilType .NE. ctNone) THEN
@@ -19234,19 +19182,17 @@ DO iSys = 1, numCompactSysConstVol
     END IF
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(heatCoilInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet))
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
-      CALL AddToObjStr('Component Branch Control Type','Passive')
+     CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet))
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet),.TRUE.)
     END IF
   END IF
   IF (supFanPlacement .EQ. sfpDrawThru) THEN
     CALL AddToObjStr('Component Object Type','Fan:ConstantVolume')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(fanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet),.TRUE.)
   END IF
   IF (isSupplyPlenumBlank) THEN
     !ZONE SUPPLY AIR PATH
@@ -19653,8 +19599,7 @@ DO iSys = 1, numCompactSysConstVol
     END IF
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Cooling Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + cvsAirHandlerNameOff,' Cooling Coil ChW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Cooling Coil ChW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Cooling Coil ChW Outlet',.TRUE.)
   ENDIF
 
   IF (heatCoilType .EQ. ctHotWater) THEN
@@ -19690,8 +19635,7 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + cvsAirHandlerNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Heating Coil HW Outlet',.TRUE.)
     !***Controller:WaterCoil
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heating Coil Controller')
@@ -20081,8 +20025,7 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Preheat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Outlet',.TRUE.)
     !CONTROLLER:SIMPLE ~ line 634
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil Controller')
@@ -20685,8 +20628,7 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + ddzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + ddzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + ddzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + ddzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ddzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -21185,13 +21127,11 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Return Fan')
     CALL AddToObjFld('Component Inlet Node Name', base + ddsAirHandlerNameOff,' Air Loop Inlet')
     CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Return Fan Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
   CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',(supFanKind .EQ. sfkNone))
   IF (supFanKind .NE. sfkNone) THEN
     IF (supFanKind .EQ. sfkVAV) THEN
       CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
@@ -21200,8 +21140,7 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Main Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(supfanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(supfanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(supfanOutlet),.TRUE.)
   END IF
 
   !HOT BRANCH
@@ -21218,7 +21157,6 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Hot Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(hotfanInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(hotfanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',(isHumidifierNone .AND. heatCoilType == ctNone))
   END IF
   IF (heatCoilType .NE. ctNone) THEN
     IF (heatCoilType .EQ. ctHotWater) THEN
@@ -21231,16 +21169,12 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(heatCoilInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive', &
-                                             (isHumidifierNone .AND. (hotSupFanPlacement .NE. sfpDrawThru)))
   END IF
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Humidifier')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(humidifierInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(humidifierOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive', &
-                                            (hotSupFanPlacement .NE. sfpDrawThru))
   END IF
   IF (hotSupFanPlacement .EQ. sfpDrawThru) THEN
     IF (hotFanKind .EQ. sfkVAV) THEN
@@ -21250,8 +21184,7 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Hot Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(hotfanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(hotfanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(hotfanOutlet),.TRUE.)
   END IF
 
   !COLD BRANCH
@@ -21268,7 +21201,6 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Cold Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coldfanInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(coldfanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',(coolCoilType == ctNone))
   END IF
   IF (coolCoilType .NE. ctNone) THEN
     IF (coolCoilType .EQ. ccChWater) THEN
@@ -21279,7 +21211,6 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Cooling Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coolCoilInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive',(coldSupFanPlacement .NE. sfpDrawThru))
   END IF
   IF (coldSupFanPlacement .EQ. sfpDrawThru) THEN
     IF (coldFanKind .EQ. sfkVAV) THEN
@@ -21289,8 +21220,7 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Cold Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coldfanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(coldfanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(coldfanOutlet),.TRUE.)
   END IF
 
     !HOT SUPPLY AIR PATH
@@ -21713,8 +21643,7 @@ DO iSys = 1, numCompactSysDualDuct
   END IF
   CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Cooling Coil')
   CALL AddToObjFld('Component Inlet Node Name', base + ddsAirHandlerNameOff,' Cooling Coil ChW Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Cooling Coil ChW Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Cooling Coil ChW Outlet',.TRUE.)
   IF (heatCoilType .EQ. ctHotWater) THEN
     !COIL:Water:SimpleHeating ~ line 406
     CALL CreateNewObj('Coil:Heating:Water')
@@ -21748,8 +21677,7 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + ddsAirHandlerNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Heating Coil HW Outlet',.TRUE.)
     !CONTROLLER:SIMPLE ~line 425
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Heating Coil Controller')
@@ -22297,8 +22225,7 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Preheat Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + ddsAirHandlerNameOff,' Preheat Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Preheat Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Preheat Coil HW Outlet',.TRUE.)
     !CONTROLLER:SIMPLE ~ line 634
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Preheat Coil Controller')
@@ -22968,8 +22895,7 @@ DO iZone = 1, numCompactZoneVRF
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + vrfzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + vrfzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + vrfzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + vrfzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + vrfzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -23129,8 +23055,7 @@ DO iSys = 1, numCompactSysVRF
     CALL AddToObjStr('Component Object Type','AirConditioner:VariableRefrigerantFlow')
     CALL AddToObjFld('Component Name', base + vrfsNameOff,' VRF Heat Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + vrfsNameOff,' Condenser Inlet Node')
-    CALL AddToObjFld('Component Outlet Node Name', base + vrfsNameOff,' Condenser Outlet Node')
-    CALL AddToObjStr('Component Branch Control Type','ACTIVE',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + vrfsNameOff,' Condenser Outlet Node',.TRUE.)
   ELSE
     !OUTSIDE AIR NODE
     CALL CreateNewObj('OutdoorAir:Node')
@@ -23905,8 +23830,7 @@ DO iZone = 1, numCompactFanCoil
   END IF
   CALL AddToObjFld('Component Name', base + fczNameOff,' Cooling Coil')
   CALL AddToObjFld('Component Inlet Node Name', base + fczNameOff,' Cooling Coil ChW Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Cooling Coil ChW Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Cooling Coil ChW Outlet',.TRUE.)
   !COIL:Water:SimpleHeating ~ line
   CALL CreateNewObj('Coil:Heating:Water')
   CALL AddToObjFld('Name', base + fczNameOff,' Heating Coil')
@@ -23934,8 +23858,7 @@ DO iZone = 1, numCompactFanCoil
   CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
   CALL AddToObjFld('Component Name', base + fczNameOff,' Heating Coil')
   CALL AddToObjFld('Component Inlet Node Name', base + fczNameOff,' Heating Coil HW Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Heating Coil HW Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Heating Coil HW Outlet',.TRUE.)
 
   !Baseboards
   SELECT CASE (baseboardKind)
@@ -23964,8 +23887,7 @@ DO iZone = 1, numCompactFanCoil
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + fczNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + fczNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + fczNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -24525,8 +24447,7 @@ DO iZone = 1, numCompactBaseboard
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + bbzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + bbzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + bbzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + bbzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + bbzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -25069,8 +24990,7 @@ DO iZone = 1, numCompactPTAC
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + ptaczNameOff,' PTAC Heating Coil')
       CALL AddToObjFld('Component Inlet Node Name', base + ptaczNameOff,' PTAC Heating Coil HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + ptaczNameOff,' PTAC Heating Coil HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + ptaczNameOff,' PTAC Heating Coil HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ptaczNameOff)) // ' PTAC Heating Coil HW Branch',handleHeatingCoilBranch)
   END SELECT
   !Baseboards
@@ -25100,8 +25020,7 @@ DO iZone = 1, numCompactPTAC
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + ptaczNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + ptaczNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + ptaczNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + ptaczNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ptaczNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -25740,8 +25659,7 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + pthpzNameOff,' PTHP Supp Heating Coil')
       CALL AddToObjFld('Component Inlet Node Name', base + pthpzNameOff,' PTHP Supp Heating Coil HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + pthpzNameOff,' PTHP Supp Heating Coil HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + pthpzNameOff,' PTHP Supp Heating Coil HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + pthpzNameOff)) // ' PTHP Supp Heating Coil HW Branch',handleHeatingCoilBranch)
   END SELECT
   !Baseboards
@@ -25771,8 +25689,7 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + pthpzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + pthpzNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + pthpzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + pthpzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + pthpzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -25981,8 +25898,7 @@ DO iBoiler = 1, numCompactBoiler
       CALL AddToObjStr('Component Object Type','Boiler:HotWater')
       CALL AddToObjFld('Component Name', base + blrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + blrNameOff,' HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the boiler
       IF (isHotPumpVariable) THEN
@@ -25993,12 +25909,10 @@ DO iBoiler = 1, numCompactBoiler
       CALL AddToObjFld('Component Name', base + blrNameOff,' Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + blrNameOff,' HW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','Boiler:HotWater')
       CALL AddToObjFld('Component Name', base + blrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + blrNameOff,' HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet',.TRUE.)
     END IF
   ELSE
     !PURCHASED:HOT WATER ~ line 33
@@ -26026,8 +25940,7 @@ DO iBoiler = 1, numCompactBoiler
       CALL AddToObjStr('Component Object Type','DistrictHeating')
       CALL AddToObjFld('Component Name', base + blrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + blrNameOff,' HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet',.TRUE.)
     ELSE
       IF (isHotPumpVariable) THEN
         CALL AddToObjStr('Component Object Type','Pump:VariableSpeed')
@@ -26037,12 +25950,10 @@ DO iBoiler = 1, numCompactBoiler
       CALL AddToObjFld('Component Name', base + blrNameOff,' Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + blrNameOff,' HW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','DistrictHeating')
       CALL AddToObjFld('Component Name', base + blrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + blrNameOff,' HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + blrNameOff,' HW Outlet',.TRUE.)
     END IF
   END IF
   !Add branch pumps if required - the branch is created above
@@ -26156,8 +26067,7 @@ DO iBoiler = 1, numCompactBoilerOR
     CALL AddToObjFld('Component Object Type',base + blrorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + blrorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(blrInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(blrOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(blrOutletNode),.TRUE.)
   ELSE
     ! using a branch pump define the pump first followed by the boiler
     IF (isHotPumpVariable) THEN
@@ -26168,12 +26078,10 @@ DO iBoiler = 1, numCompactBoilerOR
     CALL AddToObjFld('Component Name', base + blrorObjNameOff,' Branch Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + blrorObjNameOff,' HW Pump Inlet')
     CALL AddToObjStr('Component Outlet Node Name', TRIM(blrInletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active')
     CALL AddToObjFld('Component Object Type',base + blrorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + blrorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(blrInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(blrOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(blrOutletNode),.TRUE.)
   ENDIF
   !Add branch pumps if required - the branch is created above
   IF (isPumpBranch) THEN
@@ -26573,8 +26481,7 @@ IF (isSupplyBypassYes) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Side Bypass Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Supply Bypass Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Supply Bypass Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Supply Bypass Outlet',.TRUE.)
   !PIPE ~line 113
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Side Bypass Pipe')
@@ -26595,8 +26502,7 @@ IF (isPumpBranch) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Side Inlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Supply Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Supply Pipe Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Supply Pipe Outlet',.TRUE.)
 ELSE
   ! normal pump arrangement with the pump on the supply inlet branch
   !PUMP:CONSTANT SPEED ~ line 82
@@ -26648,8 +26554,7 @@ ELSE
     END IF
     CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Supply Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Pump Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Pump Outlet',.TRUE.)
   ELSE
     !PUMP:VARIABLE SPEED ~ line 118
     IF (PumpConfig .EQ. pcVariable) THEN
@@ -26724,8 +26629,7 @@ ELSE
     END IF
     CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Supply Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Pump Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Pump Outlet',.TRUE.)
   END IF
 END IF
 !BRANCH ~ line 149
@@ -26736,8 +26640,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Outlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Supply Outlet Pipe Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Supply Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Supply Outlet',.TRUE.)
 !PIPE ~ line 158
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Outlet Pipe')
@@ -26804,8 +26707,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Demand Inlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Demand Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Demand Inlet Pipe Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Demand Inlet Pipe Outlet',.TRUE.)
 !PIPE ~ line 198
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + hwpNameOff,' HW Demand Inlet Pipe')
@@ -26821,8 +26723,7 @@ IF (isDemandBypassYes) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Demand Side Bypass Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Demand Bypass Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Demand Bypass Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Demand Bypass Outlet',.TRUE.)
   !PIPE ~ line 198
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + hwpNameOff,' HW Demand Side Bypass Pipe')
@@ -26837,8 +26738,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Demand Outlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + hwpNameOff,' HW Demand Outlet Pipe Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Demand Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + hwpNameOff,' HW Demand Outlet',.TRUE.)
 !PIPE ~ line 212
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + hwpNameOff,' HW Demand Outlet Pipe')
@@ -27050,8 +26950,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','DistrictCooling')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the chiller/district cooling
       IF (isPriChwPumpVariable) THEN
@@ -27062,12 +26961,10 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Component Name', base + chlNameOff,' ChW Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','DistrictCooling')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ENDIF
   ELSEIF  (chlrType .EQ. chtCentrifugal) THEN
     !CHILLER:ELECTRIC:EIR  ~line 20
@@ -27119,8 +27016,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the chiller/district cooling
       IF (isPriChwPumpVariable) THEN
@@ -27131,12 +27027,10 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Component Name', base + chlNameOff,' ChW Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ENDIF
     IF (condType .EQ. condWater) THEN
       !BRANCH ~ line 59
@@ -27149,8 +27043,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' Cnd Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' Cnd Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' Cnd Outlet',.TRUE.)
     END IF
     !CURVE:BIQUADRATIC ~ line 68
     CALL CreateNewObj('Curve:Biquadratic')
@@ -27245,8 +27138,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the chiller/district cooling
       IF (isPriChwPumpVariable) THEN
@@ -27257,12 +27149,10 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Component Name', base + chlNameOff,' ChW Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ENDIF
     IF (condType .EQ. condWater) THEN
       !BRANCH ~ line 141
@@ -27275,8 +27165,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' Cnd Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' Cnd Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' Cnd Outlet',.TRUE.)
     END IF
     !CURVE:BIQUADRATIC ~ line 150
     CALL CreateNewObj('Curve:Biquadratic')
@@ -27369,8 +27258,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the chiller/district cooling
       IF (isPriChwPumpVariable) THEN
@@ -27381,12 +27269,10 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Component Name', base + chlNameOff,' ChW Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' ChW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' ChW Outlet',.TRUE.)
     ENDIF
     IF (condType .EQ. condWater) THEN
       !BRANCH
@@ -27399,8 +27285,7 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + chlNameOff,' Cnd Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' Cnd Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + chlNameOff,' Cnd Outlet',.TRUE.)
       !CURVE:BIQUADRATIC
       CALL CreateNewObj('Curve:Biquadratic')
       CALL WriteComment('Cooling Capacity Function of Temperature Curve for water cooled screw chillers')
@@ -27650,8 +27535,7 @@ DO iChiller = 1, numCompactChillerOR
     CALL AddToObjFld('Component Object Type',base + chlorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + chlorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(chwInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(chwOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(chwOutletNode),.TRUE.)
   ELSE
     ! using a branch pump define the pump first followed by the chiller/district cooling
     IF (isPriChwPumpVariable) THEN
@@ -27662,12 +27546,10 @@ DO iChiller = 1, numCompactChillerOR
     CALL AddToObjFld('Component Name', base + chlorObjNameOff,' ChW Branch Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + chlorObjNameOff,' ChW Pump Inlet')
     CALL AddToObjStr('Component Outlet Node Name', TRIM(chwInletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active')
     CALL AddToObjFld('Component Object Type',base + chlorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + chlorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(chwInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(chwOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(chwOutletNode),.TRUE.)
   ENDIF
   IF (condType .EQ. condWater) THEN
     !BRANCH ~ line 59
@@ -27680,8 +27562,7 @@ DO iChiller = 1, numCompactChillerOR
     CALL AddToObjFld('Component Object Type',base + chlorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + chlorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(cndwInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(cndwOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(cndwOutletNode),.TRUE.)
   END IF
 !  IF ((condType .EQ. condAir) .OR. (condType .EQ. condEvap)) THEN
 !    CALL CreateNewObj('OutdoorAir:Node')
@@ -27930,20 +27811,17 @@ DO iTower = 1, numCompactTower
       CALL AddToObjStr('Component Object Type','CoolingTower:SingleSpeed')
       CALL AddToObjFld('Component Name', base + twrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + twrNameOff,' CndW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the tower
       CALL AddToObjStr('Component Object Type','Pump:ConstantSpeed')
       CALL AddToObjFld('Component Name', base + twrNameOff,' CndW Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + twrNameOff,' CndW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','CoolingTower:SingleSpeed')
       CALL AddToObjFld('Component Name', base + twrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + twrNameOff,' CndW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet',.TRUE.)
     ENDIF
   ELSE
     !check if autosizing is used properly
@@ -28054,20 +27932,17 @@ DO iTower = 1, numCompactTower
       CALL AddToObjStr('Component Object Type','CoolingTower:TwoSpeed')
       CALL AddToObjFld('Component Name', base + twrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + twrNameOff,' CndW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet',.TRUE.)
     ELSE
       ! using a branch pump define the pump first followed by the tower
       CALL AddToObjStr('Component Object Type','Pump:ConstantSpeed')
       CALL AddToObjFld('Component Name', base + twrNameOff,' CndW Branch Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + twrNameOff,' CndW Pump Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Inlet')
-      CALL AddToObjStr('Component Branch Control Type','Active')
       CALL AddToObjStr('Component Object Type','CoolingTower:TwoSpeed')
       CALL AddToObjFld('Component Name', base + twrNameOff,'')
       CALL AddToObjFld('Component Inlet Node Name', base + twrNameOff,' CndW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + twrNameOff,' CndW Outlet',.TRUE.)
     END IF
   END IF
   !Add branch pumps if required - the branch is created above
@@ -28196,20 +28071,17 @@ DO iTower = 1, numCompactTowerOR
     CALL AddToObjFld('Component Object Type',base + twrorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + twrorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(twrInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(twrOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(twrOutletNode),.TRUE.)
   ELSE
     ! using a branch pump define the pump first followed by the tower
     CALL AddToObjStr('Component Object Type','Pump:ConstantSpeed')
     CALL AddToObjFld('Component Name', base + twrorObjNameOff,' CndW Branch Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + twrorObjNameOff,' CndW Pump Inlet')
     CALL AddToObjStr('Component Outlet Node Name', TRIM(twrInletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active')
     CALL AddToObjFld('Component Object Type',base + twrorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + twrorObjNameOff,'')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(twrInletNode))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(twrOutletNode))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(twrOutletNode),.TRUE.)
   ENDIF
   !Tower branch pumps are always constant speed
   IF (isPumpBranch) THEN
@@ -28678,8 +28550,7 @@ IF (isChWSupplyBypassYes) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Side Bypass Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Bypass Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Supply Bypass Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Supply Bypass Outlet',.TRUE.)
   !PIPE ~ line 117
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Side Bypass Pipe')
@@ -28700,8 +28571,7 @@ IF (isChwPrimPumpBranch) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Side Inlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Supply Pipe Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Supply Pipe Outlet',.TRUE.)
 ELSE
   IF ((loopPumpConfig .EQ. pumpConstant) .OR. (loopPumpConfig .EQ. pumpConstPriVarSec)) THEN
     !PUMP:CONSTANT SPEED ~ line 86
@@ -28769,9 +28639,8 @@ ELSE
     ELSEIF (loopPumpConfig .EQ. pumpConstPriVarSec) THEN
       CALL AddToObjFld('Name', base + cwpNameOff,' ChW Primary Supply Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Primary Pump Outlet')
+      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Primary Pump Outlet',.TRUE.)
     END IF
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
   ELSEIF ((loopPumpConfig .EQ. pumpVariable) .OR. (loopPumpConfig .EQ. pumpVarPriConstSec)) THEN
     !PUMP:VARIABLE SPEED ~ line 122
     CALL WriteComment('Pump part load coefficients based on simple parabola to represent a generic VSD drive.')
@@ -28855,7 +28724,6 @@ ELSE
       CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Primary Pump Outlet')
     END IF
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
   END IF
 END IF
 !BRANCH ~ line 153
@@ -28866,8 +28734,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Outlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Outlet Pipe Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Supply Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Supply Outlet',.TRUE.)
 !PIPE ~ line 162
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Outlet Pipe')
@@ -28940,8 +28807,7 @@ IF (loopPumpConfig .EQ. pumpVarPriConstSec) THEN
   END IF
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Secondary Pump')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Demand Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Secondary Pump Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Secondary Pump Outlet',.TRUE.)
 ELSEIF (loopPumpConfig .EQ. pumpConstPriVarSec) THEN
   IF (.NOT. isChwSecPumpHeader) THEN
     CALL AddToObjStr('Component Object Type','Pump:VariableSpeed')
@@ -28950,14 +28816,12 @@ ELSEIF (loopPumpConfig .EQ. pumpConstPriVarSec) THEN
   END IF
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Secondary Pump')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Demand Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Secondary Pump Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Secondary Pump Outlet',.TRUE.)
 ELSEIF ((loopPumpConfig .EQ. pumpConstant) .OR. (loopPumpConfig .EQ. pumpVariable)) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Demand Inlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Demand Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Demand Inlet Pipe Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Demand Inlet Pipe Outlet',.TRUE.)
 END IF
 IF (loopPumpConfig .EQ. pumpVarPriConstSec) THEN
   IF (.NOT. isChwSecPumpHeader) THEN
@@ -29063,8 +28927,7 @@ IF (isChWDemandBypassYes) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Demand Side Bypass Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Demand Bypass Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Demand Bypass Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Demand Bypass Outlet',.TRUE.)
   !PIPE ~ line 220
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + cwpNameOff,' ChW Demand Side Bypass Pipe')
@@ -29079,8 +28942,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Demand Outlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Demand Outlet Pipe Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Demand Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Demand Outlet',.TRUE.)
 !PIPE ~ line 234
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + cwpNameOff,' ChW Demand Outlet Pipe')
@@ -29292,8 +29154,7 @@ IF (isChillerWithWaterCooled) THEN
     CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Side Inlet Pipe')
     CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Supply Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Supply Pipe Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Supply Pipe Outlet',.TRUE.)
   ELSE
     !PUMP:VARIABLE SPEED ~ line 319
     CALL WriteComment('Pump part load coefficients are linear to represent condenser pumps dedicated to each chiller.')
@@ -29356,8 +29217,7 @@ IF (isChillerWithWaterCooled) THEN
     END IF
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Supply Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Pump Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Pump Outlet',.TRUE.)
     END IF
   !BRANCH ~ line 346
   CALL CreateNewObj('Branch')
@@ -29367,8 +29227,7 @@ IF (isChillerWithWaterCooled) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Outlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Supply Outlet Pipe Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Supply Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Supply Outlet',.TRUE.)
   !PIPE ~ line 355
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + cwpNameOff,' CndW Supply Outlet Pipe')
@@ -29383,8 +29242,7 @@ IF (isChillerWithWaterCooled) THEN
     CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Side Bypass Pipe')
     CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Supply Bypass Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Supply Bypass Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Supply Bypass Outlet',.TRUE.)
     !PIPE ~ line 383
     CALL CreateNewObj('Pipe:Adiabatic')
     CALL AddToObjFld('Name', base + cwpNameOff,' CndW Supply Side Bypass Pipe')
@@ -29451,8 +29309,7 @@ IF (isChillerWithWaterCooled) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Demand Inlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Demand Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Demand Inlet Pipe Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Demand Inlet Pipe Outlet',.TRUE.)
   !PIPE ~ line 409
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + cwpNameOff,' CndW Demand Inlet Pipe')
@@ -29468,8 +29325,7 @@ IF (isChillerWithWaterCooled) THEN
     CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Demand Side Bypass Pipe')
     CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Demand Bypass Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Demand Bypass Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Demand Bypass Outlet',.TRUE.)
     !PIPE ~ line 395
     CALL CreateNewObj('Pipe:Adiabatic')
     CALL AddToObjFld('Name', base + cwpNameOff,' CndW Demand Side Bypass Pipe')
@@ -29484,8 +29340,7 @@ IF (isChillerWithWaterCooled) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Demand Outlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' CndW Demand Outlet Pipe Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Demand Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' CndW Demand Outlet',.TRUE.)
   !PIPE ~ line 409
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + cwpNameOff,' CndW Demand Outlet Pipe')
@@ -30058,8 +29913,7 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Supp Heating Coil')
       CALL AddToObjFld('Component Inlet Node Name', base + wahpNameOff,' WAHP Supp Heating Coil HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' WAHP Supp Heating Coil HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' WAHP Supp Heating Coil HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' WAHP Supp Heating Coil HW Branch',handleHeatingCoilBranch)
     CASE DEFAULT
   END SELECT
@@ -30072,8 +29926,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Component Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Cooling Coil')
   CALL AddToObjFld('Component Inlet Node Name', base + wahpNameOff,' WAHP Cooling Water Inlet Node')
-  CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' WAHP Cooling Water Outlet Node')
-  CALL AddToObjStr('Component Branch Control Type','ACTIVE',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' WAHP Cooling Water Outlet Node',.TRUE.)
   !***Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + wahpNameOff,' Heating Condenser Branch')
@@ -30083,8 +29936,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Component Object Type','Coil:Heating:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Heating Coil')
   CALL AddToObjFld('Component Inlet Node Name', base + wahpNameOff,' WAHP Heating Water Inlet Node')
-  CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' WAHP Heating Water Outlet Node')
-  CALL AddToObjStr('Component Branch Control Type','ACTIVE',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' WAHP Heating Water Outlet Node',.TRUE.)
   !Baseboards
   SELECT CASE (baseboardKind)
     CASE (baseboardHotWater)
@@ -30112,8 +29964,7 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + wahpNameOff,' Baseboard Heat')
       CALL AddToObjFld('Component Inlet Node Name', base + wahpNameOff,' Baseboard HW Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+      CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
       IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
@@ -30569,8 +30420,7 @@ IF (isSupplyBypassYes) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Side Bypass Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Supply Bypass Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Supply Bypass Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Supply Bypass Outlet',.TRUE.)
   !***Pipe:Adiabatic
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + hwpNameOff,' Mixed Supply Side Bypass Pipe')
@@ -30591,8 +30441,7 @@ IF (isPumpBranch) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Side Inlet Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Supply Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Supply Pipe Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Supply Pipe Outlet',.TRUE.)
 ELSE
   IF (PumpConfig .EQ. pcConstant) THEN
     IF (.NOT. isPumpHeader) THEN
@@ -30644,8 +30493,7 @@ ELSE
     END IF
     CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Supply Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Pump Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Pump Outlet',.TRUE.)
   ELSE
     !***Pump:VariableSpeed
     CALL WriteComment('Pump part load coefficients based on simple parabola to represent a generic VSD drive.')
@@ -30711,8 +30559,7 @@ ELSE
     END IF
     CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Pump')
     CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Supply Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Pump Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Pump Outlet',.TRUE.)
   END IF
 END IF
 !***Branch
@@ -30723,8 +30570,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Outlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Supply Outlet Pipe Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Supply Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Supply Outlet',.TRUE.)
 !***Pipe:Adiabatic
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Supply Outlet Pipe')
@@ -30790,8 +30636,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Demand Inlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Demand Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Demand Inlet Pipe Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Demand Inlet Pipe Outlet',.TRUE.)
 !***Pipe:Adiabatic
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Inlet Pipe')
@@ -30806,8 +30651,7 @@ IF (isDemandBypassYes) THEN
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Demand Side Bypass Pipe')
   CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Demand Bypass Inlet')
-  CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Demand Bypass Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Bypass',.TRUE.)
+  CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Demand Bypass Outlet',.TRUE.)
   !***Pipe:Adiabatic
   CALL CreateNewObj('Pipe:Adiabatic')
   CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Side Bypass Pipe')
@@ -30822,8 +30666,7 @@ CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Demand Outlet Pipe')
 CALL AddToObjFld('Component Inlet Node Name', base + mwpNameOff,' Mixed Demand Outlet Pipe Inlet')
-CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Demand Outlet')
-CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+CALL AddToObjFld('Component Outlet Node Name', base + mwpNameOff,' Mixed Demand Outlet',.TRUE.)
 !***Pipe:Adiabatic
 CALL CreateNewObj('Pipe:Adiabatic')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Outlet Pipe')
@@ -31325,23 +31168,20 @@ DO iSys = 1, numCompactDedOutAir
   CALL AddToObjFld('Component Name', base + doasNameOff,' OA System')
   CALL AddToObjFld('Component Inlet Node Name', base + doasNameOff,' Air Loop Inlet')
   CALL AddToObjFld('Component Outlet Node Name', base + doasNameOff,' Mixed Air Outlet')
-  CALL AddToObjStr('Component Branch Control Type','Passive')
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + doasNameOff,' Humidifier')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(humidifierInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(humidifierOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   IF (supFanPlacement .EQ. sfpBlowThru) THEN
     CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
     CALL AddToObjFld('Component Name', base + doasNameOff,' Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(fanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
     IF ((coolCoilKind .NE. ccNone) .OR. (heatCoilType .NE. ctNone)) THEN
-      CALL AddToObjStr('Component Branch Control Type','Active')
+          CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+          CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet),.TRUE.)
     END IF
   END IF
   IF (coolCoilKind .NE. ccNone) THEN
@@ -31368,11 +31208,10 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjFld('Component Name', base + doasNameOff,' DX Cooling System')
     END IF
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coolCoilUnitInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilUnitOutlet))
     IF ((heatCoilType .EQ. ctNone) .AND. (supFanPlacement .NE. sfpDrawThru)) THEN
-      CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilUnitOutlet),.TRUE.)
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Passive')
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilUnitOutlet))
     END IF
   END IF
   IF (dehumidCtrlKind .EQ. dehumidCoolRhtDesuper) THEN
@@ -31380,7 +31219,6 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Component Name', base + doasNameOff,' Reheat Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(reheatCoilInlet))
     CALL AddToObjStr('Component Outlet Node Name', TRIM(reheatCoilOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Passive')
   END IF
   IF (heatCoilType .NE. ctNone) THEN
     IF (heatCoilType .EQ. ctHotWater) THEN
@@ -31392,19 +31230,17 @@ DO iSys = 1, numCompactDedOutAir
     END IF
     CALL AddToObjFld('Component Name', base + doasNameOff,' Heating Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(heatCoilInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet))
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
-      CALL AddToObjStr('Component Branch Control Type','Passive')
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet))
     ELSE
-      CALL AddToObjStr('Component Branch Control Type','Passive',.TRUE.)
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet),.TRUE.)
     END IF
   END IF
   IF (supFanPlacement .EQ. sfpDrawThru) THEN
     CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
     CALL AddToObjFld('Component Name', base + doasNameOff,' Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(fanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet),.TRUE.)
   END IF
   !***AirLoopHVAC:SupplyPath
   CALL CreateNewObj('AirLoopHVAC:SupplyPath')
@@ -32197,8 +32033,7 @@ DO iSys = 1, numCompactDedOutAir
     END IF
     CALL AddToObjFld('Component Name', base + doasNameOff,' Cooling Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + doasNameOff,' Cooling Coil ChW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + doasNameOff,' Cooling Coil ChW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + doasNameOff,' Cooling Coil ChW Outlet',.TRUE.)
   ENDIF
 
   ! Reheat coil - if dehumidification control is CoolReheatDesuperheater
@@ -32243,8 +32078,7 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + doasNameOff,' Heating Coil')
     CALL AddToObjFld('Component Inlet Node Name', base + doasNameOff,' Heating Coil HW Inlet')
-    CALL AddToObjFld('Component Outlet Node Name', base + doasNameOff,' Heating Coil HW Outlet')
-    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    CALL AddToObjFld('Component Outlet Node Name', base + doasNameOff,' Heating Coil HW Outlet',.TRUE.)
     !***Controller:WaterCoil
     CALL CreateNewObj('Controller:WaterCoil')
     CALL AddToObjFld('Name', base + doasNameOff,' Heating Coil Controller')

@@ -1769,7 +1769,7 @@ namespace BranchInputManager {
 						}
 						Branch( BCount ).Component( Comp ).OutletNodeName = Alphas( Loop + 3 );
 						// If last component on branch, then outlet node is outlet from branch, otherwise node is internal
-						if ( Loop == NumAlphas - 4 ) {
+						if ( Loop == NumAlphas - 3 ) {
 							ConnectionType = NodeConnectionType_Outlet;
 						} else {
 							ConnectionType = NodeConnectionType_Internal;
