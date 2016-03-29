@@ -357,12 +357,10 @@
     DX Cooling Coil System 1,!- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     EC Plug Fan 1,           !- Component 2 Name
     Main Cooling Coil 1 Outlet Node,  !- Component 2 Inlet Node Name
-    Supply Outlet Node,      !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Supply Outlet Node;      !- Component 2 Outlet Node Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 1,!- Name

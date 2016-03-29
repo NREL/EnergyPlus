@@ -12289,12 +12289,10 @@
     SPLITSYSTEMAC:01_OA,     !- Component 1 Name
     SPLITSYSTEMAC:01 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:01_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:01_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:01_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:01 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:01 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:02 Air Loop Main Branch,  !- Name
@@ -12304,12 +12302,10 @@
     SPLITSYSTEMAC:02_OA,     !- Component 1 Name
     SPLITSYSTEMAC:02 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:02_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:02_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:02_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:02 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:02 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:03 Air Loop Main Branch,  !- Name
@@ -12319,12 +12315,10 @@
     SPLITSYSTEMAC:03_OA,     !- Component 1 Name
     SPLITSYSTEMAC:03 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:03_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:03_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:03_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:03 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:03 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:04 Air Loop Main Branch,  !- Name
@@ -12334,12 +12328,10 @@
     SPLITSYSTEMAC:04_OA,     !- Component 1 Name
     SPLITSYSTEMAC:04 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:04_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:04_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:04_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:04 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:04 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:05 Air Loop Main Branch,  !- Name
@@ -12349,12 +12341,10 @@
     SPLITSYSTEMAC:05_OA,     !- Component 1 Name
     SPLITSYSTEMAC:05 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:05_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:05_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:05_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:05 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:05 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:06 Air Loop Main Branch,  !- Name
@@ -12364,12 +12354,10 @@
     SPLITSYSTEMAC:06_OA,     !- Component 1 Name
     SPLITSYSTEMAC:06 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:06_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:06_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:06_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:06 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:06 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:07 Air Loop Main Branch,  !- Name
@@ -12379,12 +12367,10 @@
     SPLITSYSTEMAC:07_OA,     !- Component 1 Name
     SPLITSYSTEMAC:07 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:07_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:07_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:07_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:07 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:07 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:08 Air Loop Main Branch,  !- Name
@@ -12394,12 +12380,10 @@
     SPLITSYSTEMAC:08_OA,     !- Component 1 Name
     SPLITSYSTEMAC:08 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:08_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:08_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:08_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:08 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:08 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:09 Air Loop Main Branch,  !- Name
@@ -12409,12 +12393,10 @@
     SPLITSYSTEMAC:09_OA,     !- Component 1 Name
     SPLITSYSTEMAC:09 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:09_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:09_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:09_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:09 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:09 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:10 Air Loop Main Branch,  !- Name
@@ -12424,12 +12406,10 @@
     SPLITSYSTEMAC:10_OA,     !- Component 1 Name
     SPLITSYSTEMAC:10 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:10_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:10_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:10_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:10 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:10 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:11 Air Loop Main Branch,  !- Name
@@ -12439,12 +12419,10 @@
     SPLITSYSTEMAC:11_OA,     !- Component 1 Name
     SPLITSYSTEMAC:11 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:11_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:11_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:11_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:11 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:11 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:12 Air Loop Main Branch,  !- Name
@@ -12454,12 +12432,10 @@
     SPLITSYSTEMAC:12_OA,     !- Component 1 Name
     SPLITSYSTEMAC:12 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:12_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:12_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:12_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:12 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:12 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:13 Air Loop Main Branch,  !- Name
@@ -12469,12 +12445,10 @@
     SPLITSYSTEMAC:13_OA,     !- Component 1 Name
     SPLITSYSTEMAC:13 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:13_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:13_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:13_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:13 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:13 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:14 Air Loop Main Branch,  !- Name
@@ -12484,12 +12458,10 @@
     SPLITSYSTEMAC:14_OA,     !- Component 1 Name
     SPLITSYSTEMAC:14 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:14_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:14_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:14_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:14 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:14 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:15 Air Loop Main Branch,  !- Name
@@ -12499,12 +12471,10 @@
     SPLITSYSTEMAC:15_OA,     !- Component 1 Name
     SPLITSYSTEMAC:15 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:15_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:15_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:15_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:15 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:15 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:16 Air Loop Main Branch,  !- Name
@@ -12514,12 +12484,10 @@
     SPLITSYSTEMAC:16_OA,     !- Component 1 Name
     SPLITSYSTEMAC:16 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:16_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:16_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:16_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:16 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:16 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:17 Air Loop Main Branch,  !- Name
@@ -12529,12 +12497,10 @@
     SPLITSYSTEMAC:17_OA,     !- Component 1 Name
     SPLITSYSTEMAC:17 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:17_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:17_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:17_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:17 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:17 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:18 Air Loop Main Branch,  !- Name
@@ -12544,12 +12510,10 @@
     SPLITSYSTEMAC:18_OA,     !- Component 1 Name
     SPLITSYSTEMAC:18 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:18_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:18_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:18_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:18 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:18 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:19 Air Loop Main Branch,  !- Name
@@ -12559,12 +12523,10 @@
     SPLITSYSTEMAC:19_OA,     !- Component 1 Name
     SPLITSYSTEMAC:19 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:19_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:19_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:19_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:19 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:19 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:20 Air Loop Main Branch,  !- Name
@@ -12574,12 +12536,10 @@
     SPLITSYSTEMAC:20_OA,     !- Component 1 Name
     SPLITSYSTEMAC:20 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:20_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:20_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:20_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:20 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:20 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:21 Air Loop Main Branch,  !- Name
@@ -12589,12 +12549,10 @@
     SPLITSYSTEMAC:21_OA,     !- Component 1 Name
     SPLITSYSTEMAC:21 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:21_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:21_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:21_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:21 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:21 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:22 Air Loop Main Branch,  !- Name
@@ -12604,12 +12562,10 @@
     SPLITSYSTEMAC:22_OA,     !- Component 1 Name
     SPLITSYSTEMAC:22 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:22_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:22_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:22_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:22 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:22 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:23 Air Loop Main Branch,  !- Name
@@ -12619,12 +12575,10 @@
     SPLITSYSTEMAC:23_OA,     !- Component 1 Name
     SPLITSYSTEMAC:23 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:23_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:23_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:23_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:23 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:23 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     SPLITSYSTEMAC:24 Air Loop Main Branch,  !- Name
@@ -12634,12 +12588,10 @@
     SPLITSYSTEMAC:24_OA,     !- Component 1 Name
     SPLITSYSTEMAC:24 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     OA-SPLITSYSTEMAC:24_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     SPLITSYSTEMAC:24_Unitary_Package,  !- Component 2 Name
     OA-SPLITSYSTEMAC:24_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    SPLITSYSTEMAC:24 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    SPLITSYSTEMAC:24 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     SPLITSYSTEMAC:01_OA_Controllers,  !- Name
@@ -14822,8 +14774,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
     SWHSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
@@ -14832,8 +14783,7 @@
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
     SWHSys1 Pump-SWHSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
@@ -14842,8 +14792,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SWHSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
@@ -14852,8 +14801,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name
     SWHSys1 Supply Mixer-SWHSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
@@ -14862,8 +14810,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
@@ -14872,8 +14819,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G SW Apartment Water Equipment,  !- Component 1 Name
     G SW Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G SW Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G SW Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 2,  !- Name
@@ -14882,8 +14828,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G NW Apartment Water Equipment,  !- Component 1 Name
     G NW Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G NW Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G NW Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 3,  !- Name
@@ -14892,8 +14837,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G NE Apartment Water Equipment,  !- Component 1 Name
     G NE Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G NE Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G NE Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 4,  !- Name
@@ -14902,8 +14846,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G N1 Apartment Water Equipment,  !- Component 1 Name
     G N1 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G N1 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G N1 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 5,  !- Name
@@ -14912,8 +14855,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G N2 Apartment Water Equipment,  !- Component 1 Name
     G N2 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G N2 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G N2 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 6,  !- Name
@@ -14922,8 +14864,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G S1 Apartment Water Equipment,  !- Component 1 Name
     G S1 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G S1 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G S1 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 7,  !- Name
@@ -14932,8 +14873,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     G S2 Apartment Water Equipment,  !- Component 1 Name
     G S2 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    G S2 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    G S2 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 8,  !- Name
@@ -14942,8 +14882,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M SW Apartment Water Equipment,  !- Component 1 Name
     M SW Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M SW Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M SW Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 9,  !- Name
@@ -14952,8 +14891,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M NW Apartment Water Equipment,  !- Component 1 Name
     M NW Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M NW Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M NW Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 10,  !- Name
@@ -14962,8 +14900,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M SE Apartment Water Equipment,  !- Component 1 Name
     M SE Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M SE Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M SE Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 11,  !- Name
@@ -14972,8 +14909,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M NE Apartment Water Equipment,  !- Component 1 Name
     M NE Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M NE Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M NE Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 12,  !- Name
@@ -14982,8 +14918,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M N1 Apartment Water Equipment,  !- Component 1 Name
     M N1 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M N1 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M N1 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 13,  !- Name
@@ -14992,8 +14927,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M N2 Apartment Water Equipment,  !- Component 1 Name
     M N2 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M N2 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M N2 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 14,  !- Name
@@ -15002,8 +14936,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M S1 Apartment Water Equipment,  !- Component 1 Name
     M S1 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M S1 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M S1 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 15,  !- Name
@@ -15012,8 +14945,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     M S2 Apartment Water Equipment,  !- Component 1 Name
     M S2 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    M S2 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    M S2 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 16,  !- Name
@@ -15022,8 +14954,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T SW Apartment Water Equipment,  !- Component 1 Name
     T SW Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T SW Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T SW Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 17,  !- Name
@@ -15032,8 +14963,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T NW Apartment Water Equipment,  !- Component 1 Name
     T NW Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T NW Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T NW Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 18,  !- Name
@@ -15042,8 +14972,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T SE Apartment Water Equipment,  !- Component 1 Name
     T SE Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T SE Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T SE Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 19,  !- Name
@@ -15052,8 +14981,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T NE Apartment Water Equipment,  !- Component 1 Name
     T NE Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T NE Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T NE Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 20,  !- Name
@@ -15062,8 +14990,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T N1 Apartment Water Equipment,  !- Component 1 Name
     T N1 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T N1 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T N1 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 21,  !- Name
@@ -15072,8 +14999,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T N2 Apartment Water Equipment,  !- Component 1 Name
     T N2 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T N2 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T N2 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 22,  !- Name
@@ -15082,8 +15008,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T S1 Apartment Water Equipment,  !- Component 1 Name
     T S1 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T S1 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T S1 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 23,  !- Name
@@ -15092,8 +15017,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     T S2 Apartment Water Equipment,  !- Component 1 Name
     T S2 Apartment Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    T S2 Apartment Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    T S2 Apartment Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
@@ -15102,8 +15026,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
     SWHSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
@@ -15112,8 +15035,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Mixer-SWHSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Connector:Splitter,
     SWHSys1 Supply Splitter, !- Name

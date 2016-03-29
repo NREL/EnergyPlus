@@ -31967,27 +31967,22 @@
     AHU-1_OA,                !- Component 1 Name
     AHU-1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     AHU-1_OA-AHU-1_CoolCNode,!- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     AHU-1_CoolC,             !- Component 2 Name
     AHU-1_OA-AHU-1_CoolCNode,!- Component 2 Inlet Node Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     AHU-1_HeatC,             !- Component 3 Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- Component 3 Inlet Node Name
     AHU-1_HeatC-AHU-1_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     AHU-1_Fan,               !- Component 4 Name
     AHU-1_HeatC-AHU-1_FanNode,  !- Component 4 Inlet Node Name
     AHU-1_Fan-AHU-1 HumidifierNode,  !- Component 4 Outlet Node Name
-    Active,                  !- Component 4 Branch Control Type
     Humidifier:Steam:Electric,  !- Component 5 Object Type
     AHU-1 Humidifier,        !- Component 5 Name
     AHU-1_Fan-AHU-1 HumidifierNode,  !- Component 5 Inlet Node Name
-    AHU-1 Supply Equipment Outlet Node,  !- Component 5 Outlet Node Name
-    Passive;                 !- Component 5 Branch Control Type
+    AHU-1 Supply Equipment Outlet Node;  !- Component 5 Outlet Node Name
 
   Branch,
     AHU-2 Air Loop Main Branch,  !- Name
@@ -31997,22 +31992,18 @@
     AHU-2_OA,                !- Component 1 Name
     AHU-2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     AHU-2_OA-AHU-2_CoolCNode,!- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     AHU-2_CoolC,             !- Component 2 Name
     AHU-2_OA-AHU-2_CoolCNode,!- Component 2 Inlet Node Name
     AHU-2_CoolC-AHU-2_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     AHU-2_HeatC,             !- Component 3 Name
     AHU-2_CoolC-AHU-2_HeatCNode,  !- Component 3 Inlet Node Name
     AHU-2_HeatC-AHU-2_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     AHU-2_Fan,               !- Component 4 Name
     AHU-2_HeatC-AHU-2_FanNode,  !- Component 4 Inlet Node Name
-    AHU-2 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    AHU-2 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     AHU-1_Controllers,       !- Name
@@ -32645,8 +32636,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
@@ -32655,8 +32645,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
@@ -32665,8 +32654,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Anesthesia VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Anesthesia VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Anesthesia VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Anesthesia VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
@@ -32675,8 +32663,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Humid VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Humid VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Humid VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Humid VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
@@ -32685,8 +32672,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 IT Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 IT Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 IT Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 IT Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
@@ -32695,8 +32681,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 IT Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 IT Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 IT Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 IT Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
@@ -32705,8 +32690,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Lobby VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Lobby VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Lobby VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Lobby VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
@@ -32715,8 +32699,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Lobby Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Lobby Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Lobby Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Lobby Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 16,  !- Name
@@ -32725,8 +32708,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Locker Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Locker Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Locker Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Locker Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 17,  !- Name
@@ -32735,8 +32717,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Locker Room Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Locker Room Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Locker Room Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Locker Room Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 18,  !- Name
@@ -32745,8 +32726,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Lounge VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Lounge VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Lounge VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Lounge VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 19,  !- Name
@@ -32755,8 +32735,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Med Gas VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Med Gas VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Med Gas VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Med Gas VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
@@ -32765,8 +32744,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Bio Haz VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Bio Haz VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Bio Haz VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Bio Haz VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 20,  !- Name
@@ -32775,8 +32753,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 MRI Control Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 MRI Control Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 MRI Control Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 MRI Control Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 21,  !- Name
@@ -32785,8 +32762,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 MRI Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 MRI Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 MRI Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 MRI Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 22,  !- Name
@@ -32795,8 +32771,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 MRI Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 MRI Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 MRI Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 MRI Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 24,  !- Name
@@ -32805,8 +32780,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Nourishment VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Nourishment VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Nourishment VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Nourishment VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 25,  !- Name
@@ -32815,8 +32789,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Nurse Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Nurse Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Nurse Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Nurse Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 27,  !- Name
@@ -32825,8 +32798,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Nurse Station VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Nurse Station VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Nurse Station VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Nurse Station VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 29,  !- Name
@@ -32835,8 +32807,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Office VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Office VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Office VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Office VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
@@ -32845,8 +32816,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Cafe VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Cafe VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Cafe VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Cafe VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 30,  !- Name
@@ -32855,8 +32825,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Operating Room 1 VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Operating Room 1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Operating Room 1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Operating Room 1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 31,  !- Name
@@ -32865,8 +32834,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Operating Room 2 VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Operating Room 2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Operating Room 2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Operating Room 2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 32,  !- Name
@@ -32875,8 +32843,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Operating Room 3 VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Operating Room 3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Operating Room 3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Operating Room 3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 33,  !- Name
@@ -32885,8 +32852,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 PACU VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 PACU VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 PACU VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 PACU VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 34,  !- Name
@@ -32895,8 +32861,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Pre-Op Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Pre-Op Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Pre-Op Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Pre-Op Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 35,  !- Name
@@ -32905,8 +32870,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Pre-Op Room 1 VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Pre-Op Room 1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Pre-Op Room 1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Pre-Op Room 1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 36,  !- Name
@@ -32915,8 +32879,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Pre-Op Room 2 VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Pre-Op Room 2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Pre-Op Room 2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Pre-Op Room 2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 38,  !- Name
@@ -32925,8 +32888,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Procedure Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Procedure Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Procedure Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Procedure Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 39,  !- Name
@@ -32935,8 +32897,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Reception VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Reception VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Reception VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Reception VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
@@ -32945,8 +32906,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Clean VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Clean VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Clean VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Clean VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 40,  !- Name
@@ -32955,8 +32915,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Reception Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Reception Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Reception Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Reception Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 41,  !- Name
@@ -32965,8 +32924,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Recovery Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Recovery Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Recovery Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Recovery Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 42,  !- Name
@@ -32975,8 +32933,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Scheduling VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Scheduling VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Scheduling VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Scheduling VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 43,  !- Name
@@ -32985,8 +32942,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Scrub VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Scrub VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Scrub VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Scrub VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 44,  !- Name
@@ -32995,8 +32951,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Soil VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Soil VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Soil VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Soil VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 45,  !- Name
@@ -33005,8 +32960,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Soil Hold VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Soil Hold VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Soil Hold VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Soil Hold VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 46,  !- Name
@@ -33015,8 +32969,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Soil Work VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Soil Work VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Soil Work VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Soil Work VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 47,  !- Name
@@ -33025,8 +32978,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Step Down VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Step Down VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Step Down VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Step Down VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 48,  !- Name
@@ -33035,8 +32987,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Sterile Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Sterile Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Sterile Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Sterile Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 49,  !- Name
@@ -33045,8 +32996,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Sterile Storage VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Sterile Storage VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Sterile Storage VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Sterile Storage VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
@@ -33055,8 +33005,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Clean Work VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Clean Work VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Clean Work VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Clean Work VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 51,  !- Name
@@ -33065,8 +33014,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Sub-Sterile VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Sub-Sterile VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Sub-Sterile VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Sub-Sterile VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 52,  !- Name
@@ -33075,8 +33023,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Utility Hall VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Utility Hall VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Utility Hall VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Utility Hall VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 55,  !- Name
@@ -33085,8 +33032,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Vestibule VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Vestibule VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Vestibule VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Vestibule VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 56,  !- Name
@@ -33095,8 +33041,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     AHU-1_HeatC,             !- Component 1 Name
     AHU-1_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    AHU-1_HeatCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    AHU-1_HeatCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 57,  !- Name
@@ -33105,8 +33050,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     AHU-2_HeatC,             !- Component 1 Name
     AHU-2_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    AHU-2_HeatCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    AHU-2_HeatCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
@@ -33115,8 +33059,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Dictation VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Dictation VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Dictation VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Dictation VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
@@ -33125,8 +33068,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Dressing Room VAV Box Reheat Coil,  !- Component 1 Name
     Floor 1 Dressing Room VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Dressing Room VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Dressing Room VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
@@ -33135,8 +33077,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
@@ -33145,8 +33086,7 @@
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
@@ -33155,8 +33095,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
@@ -33165,8 +33104,7 @@
     Pump:ConstantSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
@@ -33175,8 +33113,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   ConnectorList,
     HeatSys1 Demand Connectors,  !- Name
@@ -33694,8 +33631,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
     SWHSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
@@ -33704,8 +33640,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
@@ -33714,8 +33649,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Anesthesia Water Equipment,  !- Component 1 Name
     Floor 1 Anesthesia Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Anesthesia Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Anesthesia Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 10,  !- Name
@@ -33724,8 +33658,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Procedure Room Water Equipment,  !- Component 1 Name
     Floor 1 Procedure Room Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Procedure Room Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Procedure Room Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 11,  !- Name
@@ -33734,8 +33667,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Recovery Room Water Equipment,  !- Component 1 Name
     Floor 1 Recovery Room Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Recovery Room Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Recovery Room Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 12,  !- Name
@@ -33744,8 +33676,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Step Down Water Equipment,  !- Component 1 Name
     Floor 1 Step Down Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Step Down Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Step Down Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 13,  !- Name
@@ -33754,8 +33685,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 2 X-Ray Water Equipment,  !- Component 1 Name
     Floor 2 X-Ray Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 2 X-Ray Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 2 X-Ray Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 14,  !- Name
@@ -33764,8 +33694,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 3 Physical Therapy 1 Water Equipment,  !- Component 1 Name
     Floor 3 Physical Therapy 1 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 3 Physical Therapy 1 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 3 Physical Therapy 1 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 15,  !- Name
@@ -33774,8 +33703,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 3 Physical Therapy 2 Water Equipment,  !- Component 1 Name
     Floor 3 Physical Therapy 2 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 3 Physical Therapy 2 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 3 Physical Therapy 2 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 2,  !- Name
@@ -33784,8 +33712,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 MRI Control Room Water Equipment,  !- Component 1 Name
     Floor 1 MRI Control Room Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 MRI Control Room Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 MRI Control Room Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 3,  !- Name
@@ -33794,8 +33721,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 MRI Room Water Equipment,  !- Component 1 Name
     Floor 1 MRI Room Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 MRI Room Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 MRI Room Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 4,  !- Name
@@ -33804,8 +33730,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Operating Room 1 Water Equipment,  !- Component 1 Name
     Floor 1 Operating Room 1 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Operating Room 1 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Operating Room 1 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 5,  !- Name
@@ -33814,8 +33739,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Operating Room 2 Water Equipment,  !- Component 1 Name
     Floor 1 Operating Room 2 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Operating Room 2 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Operating Room 2 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 6,  !- Name
@@ -33824,8 +33748,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Operating Room 3 Water Equipment,  !- Component 1 Name
     Floor 1 Operating Room 3 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Operating Room 3 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Operating Room 3 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 7,  !- Name
@@ -33834,8 +33757,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 PACU Water Equipment,  !- Component 1 Name
     Floor 1 PACU Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 PACU Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 PACU Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 8,  !- Name
@@ -33844,8 +33766,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Pre-Op Room 1 Water Equipment,  !- Component 1 Name
     Floor 1 Pre-Op Room 1 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Pre-Op Room 1 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Pre-Op Room 1 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 9,  !- Name
@@ -33854,8 +33775,7 @@
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Pre-Op Room 2 Water Equipment,  !- Component 1 Name
     Floor 1 Pre-Op Room 2 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    Floor 1 Pre-Op Room 2 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Floor 1 Pre-Op Room 2 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
@@ -33864,8 +33784,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Mixer-SWHSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
@@ -33874,8 +33793,7 @@
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
     SWHSys1 Pump-SWHSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
@@ -33884,8 +33802,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SWHSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
@@ -33894,8 +33811,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
     SWHSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
@@ -33904,8 +33820,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name
     SWHSys1 Supply Mixer-SWHSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   ConnectorList,
     SWHSys1 Demand Connectors,  !- Name

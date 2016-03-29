@@ -1669,22 +1669,18 @@
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan 1,            !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
     DX Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     Supermarket Rooftop DX,  !- Component 3 Name
     DX Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     DX Coil Air Outlet Node, !- Component 3 Outlet Node Name
-    SERIESACTIVE,            !- Component 3 Branch Control Type
     Coil:Heating:Water,      !- Component 4 Object Type
     Air Loop Heating Coil,   !- Component 4 Name
     DX Coil Air Outlet Node, !- Component 4 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 4 Outlet Node Name
-    SERIESACTIVE;            !- Component 4 Branch Control Type
+    Air Loop Outlet Node;    !- Component 4 Outlet Node Name
 
   Branch,
     HW Supply Inlet Branch,  !- Name
@@ -1693,8 +1689,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump 2,                  !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Water Heater Branch,     !- Name
@@ -1703,8 +1698,7 @@
     WaterHeater:Mixed,       !- Component 1 Object Type
     Water Heater 1,          !- Component 1 Name
     HW Supply Heating Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Heating Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Heating Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HW Supply Outlet Branch, !- Name
@@ -1713,8 +1707,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Supply Outlet Pipe,   !- Component 1 Name
     HW Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     HW Demand Inlet Branch,  !- Name
@@ -1723,8 +1716,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Inlet Pipe,    !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Pipe-Coil Node,!- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Pipe-Coil Node;!- Component 1 Outlet Node Name
 
   Branch,
     HW Coil Branch,          !- Name
@@ -1733,8 +1725,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     Air Loop Heating Coil,   !- Component 1 Name
     Heating Coil Water Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Coil Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Heating Coil Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HW Demand Bypass,        !- Name
@@ -1743,8 +1734,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Bypass Pipe,   !- Component 1 Name
     HW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    HW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HW Demand Outlet Branch, !- Name
@@ -1753,8 +1743,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Outlet Pipe,   !- Component 1 Name
     HW Demand Coil-Pipe Node,!- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Supply Inlet Branch,     !- Name
@@ -1763,8 +1752,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump 1,                  !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Pump-Cooling Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Pump-Cooling Node;!- Component 1 Outlet Node Name
 
   Branch,
     Cooling Branch,          !- Name
@@ -1774,12 +1762,10 @@
     Water Heater 1,          !- Component 1 Name
     Water Heater Source Inlet Node,  !- Component 1 Inlet Node Name
     Supply Cooling Inlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoolingTower:SingleSpeed,!- Component 2 Object Type
     Cooling Tower 1,         !- Component 2 Name
     Supply Cooling Inlet Node,  !- Component 2 Inlet Node Name
-    Supply Cooling Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE;                 !- Component 2 Branch Control Type
+    Supply Cooling Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     Supply Outlet Branch,    !- Name
@@ -1788,8 +1774,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Cooling-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Branch,
     Demand Inlet Branch,     !- Name
@@ -1798,8 +1783,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-Cond Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Pipe-Cond Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Branch,        !- Name
@@ -1808,8 +1792,7 @@
     Refrigeration:Condenser:WaterCooled,  !- Component 1 Object Type
     MediumTempCondenser,     !- Component 1 Name
     Condenser Inlet Node,    !- Component 1 Inlet Node Name
-    Condenser Outlet Node,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Demand Outlet Branch,    !- Name
@@ -1818,8 +1801,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand Cond-Pipe Node,   !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 

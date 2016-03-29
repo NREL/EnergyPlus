@@ -3490,8 +3490,7 @@ Branch,
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE1-1 HP Cooling Mode,!- Component 1 Name
     SPACE1-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE1-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE1-1 HP Heating Mode Branch,  !- Name
@@ -3500,8 +3499,7 @@ Branch,
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE1-1 HP Heating Mode,!- Component 1 Name
     SPACE1-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE1-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE2-1 HP Cooling Mode Branch,  !- Name
@@ -3510,8 +3508,7 @@ Branch,
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE2-1 HP Cooling Mode,!- Component 1 Name
     SPACE2-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE2-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE2-1 HP Heating Mode Branch,  !- Name
@@ -3520,8 +3517,7 @@ Branch,
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE2-1 HP Heating Mode,!- Component 1 Name
     SPACE2-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE2-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE3-1 HP Cooling Mode Branch,  !- Name
@@ -3530,8 +3526,7 @@ Branch,
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE3-1 HP Cooling Mode,!- Component 1 Name
     SPACE3-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE3-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE3-1 HP Heating Mode Branch,  !- Name
@@ -3540,8 +3535,7 @@ Branch,
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE3-1 HP Heating Mode,!- Component 1 Name
     SPACE3-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE3-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE4-1 HP Cooling Mode Branch,  !- Name
@@ -3550,8 +3544,7 @@ Branch,
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE4-1 HP Cooling Mode,!- Component 1 Name
     SPACE4-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE4-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE4-1 HP Heating Mode Branch,  !- Name
@@ -3560,8 +3553,7 @@ Branch,
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE4-1 HP Heating Mode,!- Component 1 Name
     SPACE4-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE4-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE5-1 HP Cooling Mode Branch,  !- Name
@@ -3570,8 +3562,7 @@ Branch,
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE5-1 HP Cooling Mode,!- Component 1 Name
     SPACE5-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE5-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE5-1 HP Heating Mode Branch,  !- Name
@@ -3580,8 +3571,7 @@ Branch,
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE5-1 HP Heating Mode,!- Component 1 Name
     SPACE5-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE5-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     DOAS Main Branch,        !- Name
@@ -3591,12 +3581,10 @@ Branch,
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    DOAS Supply Fan Outlet;  !- Component 2 Outlet Node Name
 
 Branch,
     Condenser Supply Inlet Branch,  !- Name
@@ -3605,8 +3593,7 @@ Branch,
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Supply GHE Branch,  !- Name
@@ -3615,8 +3602,7 @@ Branch,
     GroundHeatExchanger:Vertical,  !- Component 1 Object Type
     Vertical Ground Heat Exchanger,  !- Component 1 Name
     GHE Inlet Node,          !- Component 1 Inlet Node Name
-    GHE Outlet Node,         !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    GHE Outlet Node;         !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Supply Bypass Branch,  !- Name
@@ -3625,8 +3611,7 @@ Branch,
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Side Bypass,  !- Component 1 Name
     Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Supply Outlet Branch,  !- Name
@@ -3635,8 +3620,7 @@ Branch,
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet, !- Component 1 Name
     Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Demand Inlet Branch,  !- Name
@@ -3645,8 +3629,7 @@ Branch,
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
     Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Demand Bypass Branch,  !- Name
@@ -3655,8 +3638,7 @@ Branch,
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Side Bypass,  !- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Demand Outlet Branch,  !- Name
@@ -3665,8 +3647,7 @@ Branch,
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name
     Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
 
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========

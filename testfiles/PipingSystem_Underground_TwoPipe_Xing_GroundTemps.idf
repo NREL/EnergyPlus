@@ -341,12 +341,10 @@
     Cond Circ Pump,          !- Component 1 Name
     Plant Supply Inlet Node, !- Component 1 Inlet Node Name
     Plant Supply Intermediate Node,  !- Component 1 Outlet Node Name
-    SERIESACTIVE,            !- Component 1 Branch Control Type
     PipingSystem:Underground:PipeCircuit,  !- Component 2 Object Type
     My Pipe Circuit,         !- Component 2 Name
     Plant Supply Intermediate Node,  !- Component 2 Inlet Node Name
-    Plant Supply Outlet Node,!- Component 2 Outlet Node Name
-    SERIESACTIVE;            !- Component 2 Branch Control Type
+    Plant Supply Outlet Node;!- Component 2 Outlet Node Name
 
   BranchList,
     Plant Demand Side Branches,  !- Name
@@ -359,8 +357,7 @@
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile,            !- Component 1 Name
     Plant Demand Inlet Node, !- Component 1 Inlet Node Name
-    Plant Demand Outlet Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Plant Demand Outlet Node;!- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile,            !- Name

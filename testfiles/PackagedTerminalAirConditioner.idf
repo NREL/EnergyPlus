@@ -1712,8 +1712,7 @@
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Demand Bypass Pipe,  !- Component 1 Name
     Steam Boiler Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Boiler Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone3 Steam-Branch,      !- Name
@@ -1722,8 +1721,7 @@
     Coil:Heating:Steam,      !- Component 1 Object Type
     Zone3PTACHeater,         !- Component 1 Name
     Zone3 Steam Coil Inlet Node,  !- Component 1 Inlet Node Name
-    Zone3 Steam Coil Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone3 Steam Coil Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Demand 1 Steam Inlet Branch,  !- Name
@@ -1732,8 +1730,7 @@
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Demand 1 Steam Inlet Pipe,  !- Component 1 Name
     Steam Demand 1 Steam Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Demand 1 Steam Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Demand 1 Steam Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Demand 1 Steam Outlet Branch,  !- Name
@@ -1742,8 +1739,7 @@
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Demand 1 Steam Outlet Pipe,  !- Component 1 Name
     Steam Demand 1 Steam Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Demand 1 Steam Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Demand 1 Steam Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Plant Boiler Branch,  !- Name
@@ -1752,8 +1748,7 @@
     Boiler:Steam,            !- Component 1 Object Type
     Steam Boiler Plant Boiler,  !- Component 1 Name
     Steam Boiler Plant Boiler Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Plant Boiler Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Steam Boiler Plant Boiler Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Bypass Branch,  !- Name
@@ -1762,8 +1757,7 @@
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Bypass Pipe,!- Component 1 Name
     Steam Boiler Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Boiler Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Plant Steam Supply Outlet Branch,  !- Name
@@ -1772,8 +1766,7 @@
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Plant Steam Supply Outlet,  !- Component 1 Name
     Steam Boiler Plant Steam Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Plant Steam Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Boiler Plant Steam Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Plant Steam Supply Inlet Branch,  !- Name
@@ -1782,8 +1775,7 @@
     Pump:VariableSpeed:Condensate,  !- Component 1 Object Type
     Steam Boiler Plant Steam Circ Pump,  !- Component 1 Name
     Steam Boiler Plant Steam Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Plant Steam Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Steam Boiler Plant Steam Pump Outlet Node;  !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 

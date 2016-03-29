@@ -248,8 +248,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Inlet Pipe,       !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Inlet Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Inlet Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Inlet Pipe,       !- Name
@@ -264,12 +263,10 @@
     Branch Pump 1,           !- Component 1 Name
     Branch Pump 1 Inlet Node,!- Component 1 Inlet Node Name
     Supply Heating 1 Inlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     DistrictHeating,         !- Component 2 Object Type
     Purchased Heating 1,     !- Component 2 Name
     Supply Heating 1 Inlet Node,  !- Component 2 Inlet Node Name
-    Supply Heating 1 Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Supply Heating 1 Outlet Node;  !- Component 2 Outlet Node Name
 
   Pump:ConstantSpeed,
     Branch Pump 1,           !- Name
@@ -296,12 +293,10 @@
     Branch Pump 2,           !- Component 1 Name
     Branch Pump 2 Inlet Node,!- Component 1 Inlet Node Name
     Supply Heating 2 Inlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     DistrictHeating,         !- Component 2 Object Type
     Purchased Heating 2,     !- Component 2 Name
     Supply Heating 2 Inlet Node,  !- Component 2 Inlet Node Name
-    Supply Heating 2 Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Supply Heating 2 Outlet Node;  !- Component 2 Outlet Node Name
 
   Pump:ConstantSpeed,
     Branch Pump 2,           !- Name
@@ -327,8 +322,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Heating-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Outlet Pipe,      !- Name
@@ -365,8 +359,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     Demand Pump 1,           !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Demand Pump 1,           !- Name
@@ -391,8 +384,7 @@
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
-    Demand Load Profile 1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name
@@ -409,8 +401,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Outlet Pipe,      !- Name

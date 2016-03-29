@@ -1281,8 +1281,7 @@
     AirLoopHVAC:UnitaryHeatPump:AirToAir,  !- Component 1 Object Type
     DXAC Heat Pump 1,        !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
   AirLoopHVAC,
     Typical Residential System,  !- Name

@@ -195,8 +195,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump,                    !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Pump-Cooling Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Pump-Cooling Node;!- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Pump,                    !- Name
@@ -221,8 +220,7 @@
     PlantComponent:TemperatureSource,  !- Component 1 Object Type
     FluidSource,             !- Component 1 Name
     FluidSource Inlet Node,  !- Component 1 Inlet Node Name
-    FluidSource Outlet Node, !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    FluidSource Outlet Node; !- Component 1 Outlet Node Name
 
   Sizing:Plant,
     Main Loop,               !- Plant or Condenser Loop Name
@@ -246,8 +244,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Bypass Pipe,      !- Component 1 Name
     Supply Bypass Inlet Node,!- Component 1 Inlet Node Name
-    Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Bypass Pipe,      !- Name
@@ -261,8 +258,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Cooling-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Outlet Pipe,      !- Name
@@ -280,8 +276,7 @@
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name

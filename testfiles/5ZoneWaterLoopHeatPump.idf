@@ -1974,8 +1974,7 @@
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 1 DXAC Heat Pump,    !- Component 1 Name
     AHU 1 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 1 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 1 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 1 Supply Path,       !- Name
@@ -2162,8 +2161,7 @@
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 2 DXAC Heat Pump,    !- Component 1 Name
     AHU 2 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 2 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 2 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 2 Supply Path,       !- Name
@@ -2347,8 +2345,7 @@
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 3 DXAC Heat Pump,    !- Component 1 Name
     AHU 3 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 3 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 3 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 3 Supply Path,       !- Name
@@ -2532,8 +2529,7 @@
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 4 DXAC Heat Pump,    !- Component 1 Name
     AHU 4 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 4 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 4 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 4 Supply Path,       !- Name
@@ -2717,8 +2713,7 @@
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 5 DXAC Heat Pump,    !- Component 1 Name
     AHU 5 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 5 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 5 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 5 Supply Path,       !- Name
@@ -2930,8 +2925,7 @@
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Plant Circ Pump,         !- Component 1 Name
     Plant Supply Inlet Node, !- Component 1 Inlet Node Name
-    Plant Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Plant Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Plant Supply Chiller Branch,  !- Name
@@ -2940,8 +2934,7 @@
     Chiller:Electric,        !- Component 1 Object Type
     Central Chiller,         !- Component 1 Name
     Central Chiller Inlet Node,  !- Component 1 Inlet Node Name
-    Central Chiller Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Central Chiller Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Central Boiler Branch,   !- Name
@@ -2950,8 +2943,7 @@
     Boiler:HotWater,         !- Component 1 Object Type
     Central Boiler,          !- Component 1 Name
     Central Boiler Inlet Node,  !- Component 1 Inlet Node Name
-    Central Boiler Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Central Boiler Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Plant Supply Bypass Branch,  !- Name
@@ -2960,8 +2952,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Supply Side Bypass,!- Component 1 Name
     Plant Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Plant Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Supply Side Bypass,!- Name
@@ -2975,8 +2966,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Supply Outlet,     !- Component 1 Name
     Plant Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Supply Outlet Node,!- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Plant Supply Outlet Node;!- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Supply Outlet,     !- Name
@@ -3013,8 +3003,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Inlet Pipe, !- Component 1 Name
     Plant Demand Inlet Node, !- Component 1 Inlet Node Name
-    Plant Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Plant Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Demand Inlet Pipe, !- Name
@@ -3028,8 +3017,7 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU1,  !- Component 1 Name
     AHU1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU1 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU1,  !- Name
@@ -3038,8 +3026,7 @@
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU1,  !- Component 1 Name
     AHU1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU1 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU2,  !- Name
@@ -3048,8 +3035,7 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU2,  !- Component 1 Name
     AHU2 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU2 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU2 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU2,  !- Name
@@ -3058,8 +3044,7 @@
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU2,  !- Component 1 Name
     AHU2 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU2 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU2 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU3,  !- Name
@@ -3068,8 +3053,7 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU3,  !- Component 1 Name
     AHU3 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU3 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU3 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU3,  !- Name
@@ -3078,8 +3062,7 @@
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU3,  !- Component 1 Name
     AHU3 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU3 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU3 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU4,  !- Name
@@ -3088,8 +3071,7 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU4,  !- Component 1 Name
     AHU4 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU4 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU4 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU4,  !- Name
@@ -3098,8 +3080,7 @@
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU4,  !- Component 1 Name
     AHU4 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU4 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU4 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU5,  !- Name
@@ -3108,8 +3089,7 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU5,  !- Component 1 Name
     AHU5 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU5 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU5,  !- Name
@@ -3118,8 +3098,7 @@
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU5,  !- Component 1 Name
     AHU5 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU5 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Plant Demand Bypass Branch,  !- Name
@@ -3128,8 +3107,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Side Bypass,!- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Demand Side Bypass,!- Name
@@ -3143,8 +3121,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Outlet Pipe,!- Component 1 Name
     Plant Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Demand Outlet Node,!- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Plant Demand Outlet Node;!- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Demand Outlet Pipe,!- Name

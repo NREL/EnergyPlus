@@ -2258,22 +2258,18 @@
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
     DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active,                  !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     DOAS DX Cooling System,  !- Component 3 Name
     DOAS Supply Fan Outlet,  !- Component 3 Inlet Node Name
     DOAS Cooling Coil Outlet,!- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Coil:Heating:Gas,        !- Component 4 Object Type
     DOAS Heating Coil,       !- Component 4 Name
     DOAS Cooling Coil Outlet,!- Component 4 Inlet Node Name
-    DOAS Heating Coil Outlet,!- Component 4 Outlet Node Name
-    Passive;                 !- Component 4 Branch Control Type
+    DOAS Heating Coil Outlet;!- Component 4 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     DOAS Supply Path,        !- Name

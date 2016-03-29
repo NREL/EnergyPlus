@@ -583,17 +583,14 @@
     Heat Recovery Circ Pump, !- Component 1 Name
     Heat Recovery Supply Inlet Node,  !- Component 1 Inlet Node Name
     Micro CHP Heat Rec Inlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     Generator:MicroCHP,      !- Component 2 Object Type
     Gen 1,                   !- Component 2 Name
     Micro CHP Heat Rec Inlet Node,  !- Component 2 Inlet Node Name
     Micro CHP Heat Rec Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Pipe:Adiabatic,          !- Component 3 Object Type
     Heat Recovery Supply Outlet,  !- Component 3 Name
     Micro CHP Heat Rec Outlet Node,  !- Component 3 Inlet Node Name
-    Heat Recovery Supply Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE;                 !- Component 3 Branch Control Type
+    Heat Recovery Supply Outlet Node;  !- Component 3 Outlet Node Name
 
   Pump:ConstantSpeed,
     Heat Recovery Circ Pump, !- Name
@@ -626,12 +623,10 @@
     Heat Recovery Inlet Pipe,!- Component 1 Name
     Heat Recovery Demand Inlet Node,  !- Component 1 Inlet Node Name
     Heat Recovery Demand Drain Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     WaterUse:Connections,    !- Component 2 Object Type
     Heat Recovery Drain,     !- Component 2 Name
     Heat Recovery Demand Drain Node,  !- Component 2 Inlet Node Name
-    Heat Recovery Demand Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Heat Recovery Demand Outlet Node;  !- Component 2 Outlet Node Name
 
   Pipe:Adiabatic,
     Heat Recovery Inlet Pipe,!- Name

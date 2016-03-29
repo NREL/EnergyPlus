@@ -9049,8 +9049,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN1_SW_1 Reheat Coil,    !- Component 1 Name
     ZN1_SW_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN1_SW_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN1_SW_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN2_S_1,                 !- Zone or ZoneList Name
@@ -9152,8 +9151,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN2_S_1 Reheat Coil,     !- Component 1 Name
     ZN2_S_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN2_S_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN2_S_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN3_SE_1,                !- Zone or ZoneList Name
@@ -9255,8 +9253,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN3_SE_1 Reheat Coil,    !- Component 1 Name
     ZN3_SE_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN3_SE_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN3_SE_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN4_E_1,                 !- Zone or ZoneList Name
@@ -9358,8 +9355,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN4_E_1 Reheat Coil,     !- Component 1 Name
     ZN4_E_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN4_E_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN4_E_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN5_NE_1,                !- Zone or ZoneList Name
@@ -9461,8 +9457,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN5_NE_1 Reheat Coil,    !- Component 1 Name
     ZN5_NE_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN5_NE_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN5_NE_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN6_N_1,                 !- Zone or ZoneList Name
@@ -9564,8 +9559,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN6_N_1 Reheat Coil,     !- Component 1 Name
     ZN6_N_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN6_N_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN6_N_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN7_NW_1,                !- Zone or ZoneList Name
@@ -9667,8 +9661,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN7_NW_1 Reheat Coil,    !- Component 1 Name
     ZN7_NW_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN7_NW_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN7_NW_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN8_W_1,                 !- Zone or ZoneList Name
@@ -9770,8 +9763,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN8_W_1 Reheat Coil,     !- Component 1 Name
     ZN8_W_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN8_W_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN8_W_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:Zone,
     ZN9_Core_1,              !- Zone or ZoneList Name
@@ -9904,8 +9896,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN9_Core_1 Reheat Coil,  !- Component 1 Name
     ZN9_Core_1 Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    ZN9_Core_1 Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN9_Core_1 Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
   Sizing:System,
     VAV SYS 1,               !- AirLoop Name
@@ -9975,17 +9966,14 @@
     VAV SYS 1 OA,            !- Component 1 Name
     VAV SYS 1 Air Loop Inlet,!- Component 1 Inlet Node Name
     VAV SYS 1 Mixed Air Node,!- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water:DetailedGeometry,  !- Component 2 Object Type
     VAV SYS 1 Cooling Coil,  !- Component 2 Name
     VAV SYS 1 Mixed Air Node,!- Component 2 Inlet Node Name
     VAV SYS 1 Cooling Coil Outlet,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:VariableVolume,      !- Component 3 Object Type
     VAV SYS 1 Supply Fan,    !- Component 3 Name
     VAV SYS 1 Cooling Coil Outlet,  !- Component 3 Inlet Node Name
-    VAV SYS 1 Air Loop Outlet,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    VAV SYS 1 Air Loop Outlet;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     VAV SYS 1 OAControllers, !- Name
@@ -10151,8 +10139,7 @@
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     VAV SYS 1 Cooling Coil,  !- Component 1 Name
     VAV SYS 1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
-    VAV SYS 1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV SYS 1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
   Fan:VariableVolume,
     VAV SYS 1 Supply Fan,    !- Name
@@ -10206,8 +10193,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHW Demand 1 ChW Inlet Pipe,  !- Component 1 Name
     CHW Demand 1 ChW Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CHW Demand 1 ChW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CHW Demand 1 ChW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHW Demand 1 ChW Inlet Pipe,  !- Name
@@ -10221,8 +10207,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHW Demand 1 ChW Outlet Pipe,  !- Component 1 Name
     CHW Demand 1 ChW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CHW Demand 1 ChW Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CHW Demand 1 ChW Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHW Demand 1 ChW Outlet Pipe,  !- Name
@@ -10236,8 +10221,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHW Demand 1 ChW Bypass Pipe,  !- Component 1 Name
     CHW Demand 1 ChW Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CHW Demand 1 ChW Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CHW Demand 1 ChW Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHW Demand 1 ChW Bypass Pipe,  !- Name
@@ -10301,8 +10285,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand 1 HW Inlet Pipe,  !- Component 1 Name
     HW Demand 1 HW Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand 1 HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand 1 HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HW Demand 1 HW Inlet Pipe,  !- Name
@@ -10316,8 +10299,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand 1 HW Outlet Pipe,  !- Component 1 Name
     HW Demand 1 HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand 1 HW Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand 1 HW Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HW Demand 1 HW Outlet Pipe,  !- Name
@@ -10331,8 +10313,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand 1 HW Bypass Pipe,  !- Component 1 Name
     HW Demand 1 HW Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand 1 HW Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    HW Demand 1 HW Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HW Demand 1 HW Bypass Pipe,  !- Name
@@ -10405,8 +10386,7 @@
     Chiller:Electric,        !- Component 1 Object Type
     Chiller Plant Chiller,   !- Component 1 Name
     Chiller Plant Chiller Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Chiller Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Plant Chiller Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Chiller Plant ChW Supply Bypass Branch,  !- Name
@@ -10415,8 +10395,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant ChW Supply Side Bypass,  !- Component 1 Name
     Chiller Plant ChW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant ChW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Chiller Plant ChW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Chiller Plant ChW Supply Outlet Branch,  !- Name
@@ -10425,8 +10404,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant ChW Supply Outlet,  !- Component 1 Name
     Chiller Plant ChW Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant ChW Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Chiller Plant ChW Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Chiller Plant ChW Supply Side Bypass,  !- Name
@@ -10456,8 +10434,7 @@
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Chiller Plant ChW Circ Pump,  !- Component 1 Name
     Chiller Plant ChW Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant ChW Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Plant ChW Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   PlantEquipmentOperationSchemes,
     Chiller Plant Operation, !- Name
@@ -10538,8 +10515,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant Cnd Demand Inlet Pipe,  !- Component 1 Name
     Chiller Plant Cnd Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Cnd Demand In Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Chiller Plant Cnd Demand In Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Chiller Plant Cnd Demand Inlet Pipe,  !- Name
@@ -10553,8 +10529,7 @@
     Chiller:Electric,        !- Component 1 Object Type
     Chiller Plant Chiller,   !- Component 1 Name
     Chiller Plant Chiller Cond Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Chiller Cond Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Plant Chiller Cond Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Chiller Plant Condenser Demand Bypass Branch,  !- Name
@@ -10563,8 +10538,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant Condenser Demand Side Bypass,  !- Component 1 Name
     Chiller Plant Condenser Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Condenser Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Chiller Plant Condenser Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Chiller Plant Condenser Demand Side Bypass,  !- Name
@@ -10578,8 +10552,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant Condenser Demand Outlet,  !- Component 1 Name
     Chiller Plant Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Cnd Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Chiller Plant Cnd Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Chiller Plant Condenser Demand Outlet,  !- Name
@@ -10661,8 +10634,7 @@
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     Chiller Plant Condenser, !- Component 1 Name
     Chiller Plant Condenser Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Condenser Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Plant Condenser Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Chiller Plant Condenser Supply Bypass Branch,  !- Name
@@ -10671,8 +10643,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant Condenser Supply Side Bypass,  !- Component 1 Name
     Chiller Plant Condenser Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Condenser Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Chiller Plant Condenser Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Chiller Plant Condenser Supply Side Bypass,  !- Name
@@ -10686,8 +10657,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chiller Plant Condenser Supply Outlet,  !- Component 1 Name
     Chiller Plant Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Cnd Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Chiller Plant Cnd Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Chiller Plant Condenser Supply Outlet,  !- Name
@@ -10717,8 +10687,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     Chiller Plant Cnd Circ Pump,  !- Component 1 Name
     Chiller Plant Cnd Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Plant Cnd Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Plant Cnd Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   CondenserEquipmentOperationSchemes,
     Chiller Plant Condenser Loop Operation,  !- Name
@@ -10826,8 +10795,7 @@
     Boiler:HotWater,         !- Component 1 Object Type
     Boiler Plant Boiler,     !- Component 1 Name
     Boiler Plant Boiler Inlet Node,  !- Component 1 Inlet Node Name
-    Boiler Plant Boiler Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Boiler Plant Boiler Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Boiler Plant HW Supply Bypass Branch,  !- Name
@@ -10836,8 +10804,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Boiler Plant HW Supply Side Bypass,  !- Component 1 Name
     Boiler Plant HW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Boiler Plant HW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Boiler Plant HW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Boiler Plant HW Supply Outlet Branch,  !- Name
@@ -10846,8 +10813,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     Boiler Plant HW Supply Outlet,  !- Component 1 Name
     Boiler Plant HW Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Boiler Plant HW Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Boiler Plant HW Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Boiler Plant HW Supply Side Bypass,  !- Name
@@ -10882,8 +10848,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     Boiler Plant HW Circ Pump,  !- Component 1 Name
     Boiler Plant HW Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Boiler Plant HW Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Boiler Plant HW Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   PlantEquipmentOperationSchemes,
     Boiler Plant Operation,  !- Name

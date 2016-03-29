@@ -196,8 +196,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     USE Pump,                !- Component 1 Name
     USE Supply Inlet Node,   !- Component 1 Inlet Node Name
-    USE Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     USE Pump,                !- Name
@@ -222,8 +221,7 @@
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     TRANSFER to USE HX,      !- Component 1 Name
     USE Supply Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    USE Supply Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Supply Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   HeatExchanger:FluidToFluid,
     TRANSFER to USE HX,      !- Name
@@ -248,8 +246,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     USE Supply Outlet Pipe,  !- Component 1 Name
     USE Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name
-    USE Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    USE Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     USE Supply Outlet Pipe,  !- Name
@@ -286,8 +283,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     USE Demand Inlet Pipe,   !- Component 1 Name
     USE Demand Inlet Node,   !- Component 1 Inlet Node Name
-    USE Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     USE Demand Inlet Pipe,   !- Name
@@ -301,8 +297,7 @@
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
-    Demand Load Profile 1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name
@@ -319,8 +314,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     USE Demand Outlet Pipe,  !- Component 1 Name
     USE Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    USE Demand Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     USE Demand Outlet Pipe,  !- Name
@@ -410,8 +404,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     TRANSFER Pump,           !- Component 1 Name
     TRANSFER Supply Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     TRANSFER Pump,           !- Name
@@ -436,8 +429,7 @@
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     SOURCE to TRANSFER HX,   !- Component 1 Name
     TRANSFER Supply Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Supply Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Supply Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   HeatExchanger:FluidToFluid,
     SOURCE to TRANSFER HX,   !- Name
@@ -462,8 +454,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     TRANSFER Supply Outlet Pipe,  !- Component 1 Name
     TRANSFER Supply Cooling-Pipe Node,  !- Component 1 Inlet Node Name
-    TRANSFER Supply Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TRANSFER Supply Outlet Pipe,  !- Name
@@ -500,8 +491,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     TRANSFER Demand Inlet Pipe,  !- Component 1 Name
     TRANSFER Demand Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TRANSFER Demand Inlet Pipe,  !- Name
@@ -515,8 +505,7 @@
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     TRANSFER to USE HX,      !- Component 1 Name
     TRANSFER Demand HX Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Demand HX Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    TRANSFER Demand HX Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     TRANSFER Demand Outlet Branch,  !- Name
@@ -525,8 +514,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     TRANSFER Demand Outlet Pipe,  !- Component 1 Name
     TRANSFER Demand HX-Pipe Node,  !- Component 1 Inlet Node Name
-    TRANSFER Demand Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TRANSFER Demand Outlet Pipe,  !- Name
@@ -616,8 +604,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     SOURCE Pump,             !- Component 1 Name
     SOURCE Supply Inlet Node,!- Component 1 Inlet Node Name
-    SOURCE Supply Pump-Cooling Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Supply Pump-Cooling Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SOURCE Pump,             !- Name
@@ -642,8 +629,7 @@
     DistrictCooling,         !- Component 1 Object Type
     SOURCE Purchased Cooling,!- Component 1 Name
     SOURCE Supply Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    SOURCE Supply Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Supply Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   DistrictCooling,
     SOURCE Purchased Cooling,!- Name
@@ -658,8 +644,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SOURCE Supply Outlet Pipe,  !- Component 1 Name
     SOURCE Supply Cooling-Pipe Node,  !- Component 1 Inlet Node Name
-    SOURCE Supply Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SOURCE Supply Outlet Pipe,  !- Name
@@ -696,8 +681,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SOURCE Demand Inlet Pipe,!- Component 1 Name
     SOURCE Demand Inlet Node,!- Component 1 Inlet Node Name
-    SOURCE Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SOURCE Demand Inlet Pipe,!- Name
@@ -711,8 +695,7 @@
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     SOURCE to TRANSFER HX,   !- Component 1 Name
     SOURCE Demand HX Inlet Node,  !- Component 1 Inlet Node Name
-    SOURCE Demand HX Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Demand HX Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SOURCE Demand Outlet Branch,  !- Name
@@ -721,8 +704,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     SOURCE Demand Outlet Pipe,  !- Component 1 Name
     SOURCE Demand HX-Pipe Node,  !- Component 1 Inlet Node Name
-    SOURCE Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SOURCE Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SOURCE Demand Outlet Pipe,  !- Name
