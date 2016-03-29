@@ -5655,6 +5655,23 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 
 }
 
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest )
+{
+
+	SetPredefinedTables();
+
+	PreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting", 1000., 2 );
+	EXPECT_EQ( "1000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting" ) );
+	EXPECT_EQ( "NOT FOUND", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING" ) );
+
+	PreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING", 2000., 2 );
+	EXPECT_EQ( "1000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting" ) );
+	EXPECT_EQ( "2000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING" ) );
+
+}
+
+
+
 
 
 
