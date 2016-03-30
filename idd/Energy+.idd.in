@@ -38915,6 +38915,7 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
   A5,  \field Fan Object Type
        \required-field
        \type choice
+       \key Fan:SystemModel
        \key Fan:VariableVolume
   A6,  \field Fan Name
        \required-field
@@ -39089,7 +39090,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \type object-list
        \object-list ZoneMixers
   A8,  \field Fan Name
-       \note Fan type must be Fan:ConstantVolume
+       \note Fan type must be Fan:SystemModel or Fan:ConstantVolume
        \type object-list
        \object-list FansCV
   A9,  \field Reheat Coil Object Type
@@ -39170,7 +39171,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \type object-list
        \object-list ZoneMixers
   A8,  \field Fan Name
-       \note Fan type must be Fan:ConstantVolume
+       \note Fan type must be Fan:SystemModel or Fan:ConstantVolume
        \type object-list
        \object-list FansCV
   A9,  \field Reheat Coil Object Type

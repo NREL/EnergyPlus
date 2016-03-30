@@ -87,6 +87,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
+#include <HVACFan.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -172,9 +173,7 @@ namespace SingleDuct {
 	int const HCoilType_Electric( 2 );
 	int const HCoilType_SimpleHeating( 3 );
 	int const HCoilType_SteamAirHeating( 4 );
-	// Fan types used here
-	int const FanType_None( 0 );
-	int const FanType_VS( 1 );
+
 	// Minimum Flow Fraction Input Method
 	int const ConstantMinFrac( 1 );
 	int const ScheduledMinFrac( 2 );
@@ -1275,7 +1274,10 @@ namespace SingleDuct {
 			}
 			Sys( SysNum ).FanType = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
-				Sys( SysNum ).Fan_Num = FanType_VS;
+				Sys( SysNum ).Fan_Num = DataHVACGlobals::FanType_SimpleVAV;
+			} else if ( SameString( Sys( SysNum ).FanType, "Fan:SystemModel" ) ) {
+				Sys( SysNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+
 			} else if ( Sys( SysNum ).FanType != "" ) {
 				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).FanType + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -1286,6 +1288,9 @@ namespace SingleDuct {
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
+			}
+			if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				Sys( SysNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( Sys( SysNum ).FanName );
 			}
 
 			Sys( SysNum ).Schedule = Alphas( 2 );
@@ -3810,11 +3815,18 @@ namespace SingleDuct {
 		AirMassFlow = AirFlow;
 		Node( FanInNode ).MassFlowRate = AirMassFlow;
 		CpAirZn = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
-		if ( FanType == FanType_VS && FanOn == 1 ) {
+		if ( FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1 ) {
 			SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
+		} else if ( FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1 ) {
+			HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->simulate( _,_,TurnFansOffSav,_ );
+
 		} else { // pass through conditions
 			TurnFansOff = true;
-			SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
+			if ( FanType == DataHVACGlobals::FanType_SimpleVAV ) {
+				SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
+			} else if ( FanType == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->simulate( _,_,TurnFansOff,_ );
+			}
 			TurnFansOff = TurnFansOffSav;
 			Node( FanOutNode ).MassFlowRate = Node( FanInNode ).MassFlowRate;
 			Node( FanOutNode ).MassFlowRateMaxAvail = Node( FanInNode ).MassFlowRateMaxAvail;
