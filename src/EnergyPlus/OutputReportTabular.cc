@@ -5326,6 +5326,7 @@ namespace OutputReportTabular {
 					lineType = stdHDDLine;
 				} else if ( has( lineIn, "(standard) cooling degree-days (10°C baseline)" ) ) {
 					lineType = stdCDDLine;
+
 				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
 					lineType = maxDryBulbLine;
 				} else if ( has( lineIn, "Minimum Dry Bulb" ) ) {
