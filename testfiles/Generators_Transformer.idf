@@ -2591,7 +2591,7 @@
     AlternatingCurrent,      !- Electrical Buss Type
     ,                        !- Inverter Object Name
     ,                        !- Electrical Storage Object Name
-    Transformer 2;           !- Transformer Object Name
+    ;                        !- Transformer Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ELECTRICLOADCENTER:Transformer ===========
 
