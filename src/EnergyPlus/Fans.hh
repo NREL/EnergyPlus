@@ -466,11 +466,8 @@ namespace Fans {
 		Real64 & FanVolFlow
 	);
 
-	void
-	GetFanPower(
-		int const FanIndex,
-		Real64 & FanPower
-	);
+	Real64
+	GetFanPower( int const FanIndex );
 
 	void
 	GetFanType(

@@ -672,6 +672,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CoolOutAirMassFlow; // OA mass flow rate during cooling operation [kg/s]
 		Real64 HeatOutAirMassFlow; // OA mass flow rate during heating operation [kg/s]
 		Real64 NoCoolHeatOutAirMassFlow; // OA mass flow rate when no cooling or heating [kg/s]
+		int fanType_Num; // index to fan type
 		int FanOpModeSchedPtr; // Pointer to the correct fan operating mode schedule
 		int FanAvailSchedPtr; // Pointer to the correct fan availability schedule
 		int FanIndex; // Index to fan object
@@ -746,6 +747,7 @@ namespace HVACVariableRefrigerantFlow {
 			CoolOutAirMassFlow( 0.0 ),
 			HeatOutAirMassFlow( 0.0 ),
 			NoCoolHeatOutAirMassFlow( 0.0 ),
+			fanType_Num( 0 ),
 			FanOpModeSchedPtr( 0 ),
 			FanAvailSchedPtr( 0 ),
 			FanIndex( 0 ),

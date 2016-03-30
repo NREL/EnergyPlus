@@ -87,6 +87,7 @@
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -212,6 +213,7 @@ namespace MixedAir {
 	int const Coil_UserDefined( 20 );
 	int const UnitarySystem( 21 );
 	int const Humidifier( 22 );
+	int const Fan_System_Object( 23 );
 
 	int const ControllerOutsideAir( 2 );
 	int const ControllerStandAloneERV( 3 );
@@ -676,6 +678,14 @@ namespace MixedAir {
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
 			if ( Sim ) {
 				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+
+		} else if ( SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
+			if ( CompIndex == 0 ) {// 0 means has not been filled because of 1-based arrays in old fortran
+				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+			}
+			if ( Sim ) {
+				HVACFan::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift 
 			}
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
@@ -1193,6 +1203,11 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_CV;
 				} else if ( SELECT_CASE_var == "FAN:VARIABLEVOLUME" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_VAV;
+				} else if (  SELECT_CASE_var == "FAN:SYSTEMMODEL" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_System_Object;
+					// construct fan object
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
+					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = HVACFan::fanObjs.size();
 					//cpw22Aug2010 Add Fan:ComponentModel (new)
 				} else if ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_ComponentModel;

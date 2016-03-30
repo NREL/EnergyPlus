@@ -84,6 +84,7 @@
 #include <DataZoneEquipment.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
@@ -97,6 +98,7 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SimAirServingZones.hh>
 #include <StandardRatings.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
@@ -12163,12 +12165,13 @@ Label50: ;
 		static gio::Fmt Format_891( "(' VAV DX Cooling Coil Standard Rating Information, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 
 		// Get fan index and name if not already available
-		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName );
+		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName, DXCoil( DXCoilNum ).SupplyFan_TypeNum );
 		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) { // didn't find VAV fan, do not rate this coil
 			DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject = false;
-			ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: Did not find a variable air volume fan associated with DX coil named = \"" + DXCoil( DXCoilNum ).Name + "\". Standard Ratings will not be calculated." );
+			ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: Did not find an appropirate fan associated with DX coil named = \"" + DXCoil( DXCoilNum ).Name + "\". Standard Ratings will not be calculated." );
 			return;
 		}
+
 
 		// CALL CheckCurveLimitsForStandardRatings(
 
@@ -12212,7 +12215,7 @@ Label50: ;
 
 				SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-				GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
+				FanPowerCorrection = GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
 
 				NetCoolingCapRated = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 			}
@@ -12336,7 +12339,7 @@ Label50: ;
 					Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat );
 					SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 					FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-					GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
+					FanPowerCorrection = GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex );
 
 				} else {
 					FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -12488,7 +12491,8 @@ Label50: ;
 	GetFanIndexForTwoSpeedCoil(
 		int const CoolingCoilIndex,
 		int & SupplyFanIndex,
-		std::string & SupplyFanName
+		std::string & SupplyFanName,
+		int & SupplyFan_TypeNum
 	)
 	{
 
@@ -12519,7 +12523,6 @@ Label50: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const DXSystem( 14 ); // must match SimAirServingZones.cc (not public)
-		int const Fan_Simple_VAV( 3 ); // must match SimAirServingZones.cc (not public)
 		int const UnitarySystem( 19 ); // must match SimAirServingZones.cc (not public)
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -12563,11 +12566,17 @@ Label50: ;
 
 				if ( FoundBranch > 0 && FoundAirSysNum > 0 ) {
 					for ( CompNum = 1; CompNum <= PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).TotalComponents; ++CompNum ) {
-						if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == Fan_Simple_VAV ) {
+						if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == SimAirServingZones::Fan_Simple_VAV ) {
 							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
 							GetFanIndex( SupplyFanName, SupplyFanIndex, ErrorsFound );
+							SupplyFan_TypeNum = SimAirServingZones::Fan_Simple_VAV;
 							break;
 							// these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
+						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
+							SupplyFanIndex =  HVACFan::getFanObjectVectorIndex( SupplyFanName );
+							SupplyFan_TypeNum = SimAirServingZones::Fan_System_Object;
+
 						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == UnitarySystem ) {
 							// fan may not be specified in a unitary system object, keep looking
 							// Unitary System will "set" the fan index to the DX coil if contained within the HVAC system
@@ -13789,7 +13798,8 @@ Label50: ;
 		Optional< Real64 > HeatSizeRatio,
 		Optional< Real64 > TotCap,
 		Optional_int SupplyFanIndex,
-		Optional_string SupplyFanName
+		Optional_string SupplyFanName,
+		Optional_int SupplyFan_TypeNum
 	)
 	{
 
@@ -13922,6 +13932,10 @@ Label50: ;
 
 		if ( present( SupplyFanName ) ) {
 			DXCoil( DXCoilNum ).SupplyFanName = SupplyFanName;
+		}
+
+		if ( present( SupplyFan_TypeNum ) ) {
+			DXCoil( DXCoilNum ).SupplyFan_TypeNum = SupplyFan_TypeNum;
 		}
 
 	}

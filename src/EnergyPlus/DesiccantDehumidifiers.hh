@@ -128,6 +128,7 @@ namespace DesiccantDehumidifiers {
 		Real64 NomRotorPower; // rotor power consumption at full output [W]
 		int RegenCoilIndex; // Index for regen coil
 		int RegenFanIndex; // Index for regen fan
+		int regenFanType_Num; // Fan type number (see DataHVACGlobals)
 		int ProcDryBulbCurvefTW; // number of process leaving dry bulb f(edb,ew) curve
 		int ProcDryBulbCurvefV; // number of process leaving dry bulb f(v) curve
 		int ProcHumRatCurvefTW; // number of process leaving humidity ratio f(edb,ew) curve
@@ -237,6 +238,7 @@ namespace DesiccantDehumidifiers {
 			NomRotorPower( 0.0 ),
 			RegenCoilIndex( 0 ),
 			RegenFanIndex( 0 ),
+			regenFanType_Num( 0 ),
 			ProcDryBulbCurvefTW( 0 ),
 			ProcDryBulbCurvefV( 0 ),
 			ProcHumRatCurvefTW( 0 ),

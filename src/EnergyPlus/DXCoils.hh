@@ -267,6 +267,7 @@ namespace DXCoils {
 		Real64 InternalStaticPressureDrop; // for rating VAV system
 		bool RateWithInternalStaticAndFanObject;
 		int SupplyFanIndex;
+		int SupplyFan_TypeNum; // type of fan, in DataHVACGlobals
 		std::string SupplyFanName;
 		std::string CoilSystemName;
 		// end of multi-speed compressor variables
@@ -581,6 +582,7 @@ namespace DXCoils {
 			InternalStaticPressureDrop( 0.0 ),
 			RateWithInternalStaticAndFanObject( false ),
 			SupplyFanIndex( 0 ),
+			SupplyFan_TypeNum( 0 ),
 			RatedEIR( MaxModes, 0.0 ),
 			InletAirMassFlowRate( 0.0 ),
 			InletAirMassFlowRateMax( 0.0 ),
@@ -987,7 +989,8 @@ namespace DXCoils {
 	GetFanIndexForTwoSpeedCoil(
 		int const CoolingCoilIndex,
 		int & SupplyFanIndex,
-		std::string & SupplyFanName
+		std::string & SupplyFanName,
+		int & SupplyFan_TypeNum
 	);
 
 	Real64
@@ -1123,7 +1126,8 @@ namespace DXCoils {
 		Optional< Real64 > HeatSizeRatio = _,
 		Optional< Real64 > TotCap = _,
 		Optional_int SupplyFanIndex = _,
-		Optional_string SupplyFanName = _
+		Optional_string SupplyFanName = _,
+		Optional_int SupplyFan_TypeNum = _
 	);
 
 	void

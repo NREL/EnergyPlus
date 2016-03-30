@@ -245,6 +245,12 @@ namespace DataAirSystems {
 
 	};
 
+	enum fanModelTypeEnum {
+		fanModelTypeNotYetSet,
+		structArrayLegacyFanModels,
+		objectVectorOOFanSystemModel
+		};
+
 	struct DefinePrimaryAirSystem // There is an array of these for each primary air system
 	{
 		// Members
@@ -281,8 +287,12 @@ namespace DataAirSystems {
 		int NumOAHeatCoils; // number of heating coils in the outside air system
 		int NumOAHXs; // number of heat exchangers in the outside air system
 		bool SizeAirloopCoil; // simulates air loop coils before calling controllers
-		int SupFanNum; // index of the supply fan in the Fan data structure
-		int RetFanNum; // index of the return fan in the Fan data structure
+		fanModelTypeEnum supFanModelTypeEnum; // indicates which type of fan model to call for supply fan, legacy or new OO
+		int SupFanNum; // index of the supply fan in the Fan data structure when model type is structArrayLegacyFanModels
+		int supFanVecIndex; // index in fan object vector for supply fan when model type is objectVectorOOFanSystemModel, zero-based index
+		fanModelTypeEnum retFanModelTypeEnum; // indicates which type of fan model to call for return fan, legacy or new OO
+		int RetFanNum; // index of the return fan in the Fan data structure when model type is structArrayLegacyFanModels
+		int retFanVecIndex; // index in fan object vector for return fan when model type is objectVectorOOFanSystemModel, zero-based index
 		Real64 FanDesCoolLoad; // design fan heat gain for the air loop [W]
 
 		// Default Constructor
@@ -309,8 +319,12 @@ namespace DataAirSystems {
 			NumOAHeatCoils( 0 ),
 			NumOAHXs( 0 ),
 			SizeAirloopCoil( true ),
+			supFanModelTypeEnum( fanModelTypeNotYetSet ),
 			SupFanNum( 0 ),
+			supFanVecIndex( -1 ),
+			retFanModelTypeEnum( fanModelTypeNotYetSet ),
 			RetFanNum( 0 ),
+			retFanVecIndex( -1 ),
 			FanDesCoolLoad(0.0)
 		{}
 

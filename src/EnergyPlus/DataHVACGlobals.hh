@@ -156,6 +156,8 @@ namespace DataHVACGlobals {
 	extern int const FanType_SimpleOnOff;
 	extern int const FanType_ZoneExhaust;
 	extern int const FanType_ComponentModel; // cpw22Aug2010 (new)
+	extern int const FanType_SystemModelObject; // 
+
 	// Fan Minimum Flow Fraction Input Method
 	extern int const MinFrac;
 	extern int const FixedMin;
