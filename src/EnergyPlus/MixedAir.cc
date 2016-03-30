@@ -2816,24 +2816,26 @@ namespace MixedAir {
 				ErrorsFound = true;
 			}
 
-			// Fix #3001 (CR 8225) moved here as part of #5119
-			Real64 DesSupplyVolFlowRate = AirLoopFlow( AirLoopNum ).DesSupply / StdRhoAir;
-			if ( ( OAController( OAControllerNum ).MinOA - DesSupplyVolFlowRate ) > 0.0001 ) {
-				ShowWarningError( "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + OAController( OAControllerNum ).Name + " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + PrimaryAirSystem( AirLoopNum ).Name + "." );
-				ShowContinueError( "...Minimum Outdoor Air Flow Rate= " + RoundSigDigits( OAController( OAControllerNum ).MinOA, 6 ) + " will be reset to loop Design Supply Air Flow Rate=" + RoundSigDigits( DesSupplyVolFlowRate, 6 ) );
-				OAController( OAControllerNum ).MinOA = DesSupplyVolFlowRate;
-			} else if ( ( OAController( OAControllerNum ).MinOA - DesSupplyVolFlowRate ) > 0.0 ) {
-				// If difference is tiny, reset silently
-				OAController( OAControllerNum ).MinOA = DesSupplyVolFlowRate;
-			}
-			if ((OAController(OAControllerNum).MaxOA - DesSupplyVolFlowRate) > 0.0001) {
-				ShowWarningError( "InitOAController: Maximum Outdoor Air Flow Rate for Controller:OutdoorAir=" + OAController( OAControllerNum ).Name + " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + PrimaryAirSystem( AirLoopNum ).Name + "." );
-				ShowContinueError( "...Maximum Outdoor Air Flow Rate= " + RoundSigDigits( OAController( OAControllerNum ).MaxOA, 6 ) + " will be reset to loop Design Supply Air Flow Rate=" + RoundSigDigits( DesSupplyVolFlowRate, 6 ) );
-				OAController(OAControllerNum).MaxOA = DesSupplyVolFlowRate;
-			}
-			else if ((OAController(OAControllerNum).MaxOA - DesSupplyVolFlowRate) > 0.0) {
-				// If difference is tiny, reset silently
-				OAController(OAControllerNum).MaxOA = DesSupplyVolFlowRate;
+			if ( AirLoopNum > 0 ) {
+				// Fix #3001 (CR 8225) moved here as part of #5119
+				Real64 DesSupplyVolFlowRate = AirLoopFlow( AirLoopNum ).DesSupply / StdRhoAir;
+				if ( ( OAController( OAControllerNum ).MinOA - DesSupplyVolFlowRate ) > 0.0001 ) {
+					ShowWarningError( "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + OAController( OAControllerNum ).Name + " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + PrimaryAirSystem( AirLoopNum ).Name + "." );
+					ShowContinueError( "...Minimum Outdoor Air Flow Rate=" + RoundSigDigits( OAController( OAControllerNum ).MinOA, 6 ) + " will be reset to loop Design Supply Air Flow Rate=" + RoundSigDigits( DesSupplyVolFlowRate, 6 ) );
+					OAController( OAControllerNum ).MinOA = DesSupplyVolFlowRate;
+				} else if ( ( OAController( OAControllerNum ).MinOA - DesSupplyVolFlowRate ) > 0.0 ) {
+					// If difference is tiny, reset silently
+					OAController( OAControllerNum ).MinOA = DesSupplyVolFlowRate;
+				}
+				if ( ( OAController( OAControllerNum ).MaxOA - DesSupplyVolFlowRate ) > 0.0001 ) {
+					ShowWarningError( "InitOAController: Maximum Outdoor Air Flow Rate for Controller:OutdoorAir=" + OAController( OAControllerNum ).Name + " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + PrimaryAirSystem( AirLoopNum ).Name + "." );
+					ShowContinueError( "...Maximum Outdoor Air Flow Rate=" + RoundSigDigits( OAController( OAControllerNum ).MaxOA, 6 ) + " will be reset to loop Design Supply Air Flow Rate=" + RoundSigDigits( DesSupplyVolFlowRate, 6 ) );
+					OAController( OAControllerNum ).MaxOA = DesSupplyVolFlowRate;
+				}
+				else if ( ( OAController( OAControllerNum ).MaxOA - DesSupplyVolFlowRate ) > 0.0 ) {
+					// If difference is tiny, reset silently
+					OAController( OAControllerNum ).MaxOA = DesSupplyVolFlowRate;
+				}
 			}
 
 			OAControllerMySizeFlag( OAControllerNum ) = false;
