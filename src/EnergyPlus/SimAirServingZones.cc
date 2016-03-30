@@ -1931,12 +1931,13 @@ namespace SimAirServingZones {
 			// calculate the ratio of air loop design flow to the sum of the zone design flows
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				SumZoneDesFlow = 0.0;
+				AirLoopFlow( AirLoopNum ).DesSupply = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate * StdRhoAir;
 				for ( ZoneInSysIndex = 1; ZoneInSysIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++ZoneInSysIndex ) {
 					TUInNode = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex );
 					SumZoneDesFlow += Node( TUInNode ).MassFlowRateMax;
 				}
 				if ( SumZoneDesFlow > VerySmallMassFlow ) {
-					AirLoopFlow( AirLoopNum ).SysToZoneDesFlowRatio = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate * StdRhoAir / SumZoneDesFlow;
+					AirLoopFlow( AirLoopNum ).SysToZoneDesFlowRatio = AirLoopFlow( AirLoopNum ).DesSupply / SumZoneDesFlow;
 				} else {
 					AirLoopFlow( AirLoopNum ).SysToZoneDesFlowRatio = 1.0;
 				}
@@ -2082,7 +2083,6 @@ namespace SimAirServingZones {
 					MassFlowSaved = Node( NodeNumIn ).MassFlowRate;
 
 					Node( NodeNumIn ).MassFlowRate = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).MaxMassFlowRate;
-					AirLoopFlow( AirLoopNum ).DesSupply = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).MaxMassFlowRate;
 
 					// [DC/LBNL] Detect if air mass flow rate has changed since last air loop simulation
 					if ( Node( NodeNumIn ).MassFlowRate != MassFlowSaved ) {
@@ -2239,15 +2239,6 @@ namespace SimAirServingZones {
 
 			//   Set current system number for sizing routines
 			CurSysNum = AirLoopNum;
-
-			// RR why is this called here, it's called first in SimAirLoop. Causes no diff's to comment out.
-			//    IF (AirLoopControlInfo(AirLoopNum)%OACtrlNum > 0) THEN
-			//      CALL SimOAController( &
-			//        AirLoopControlInfo(AirLoopNum)%OACtrlName, &
-			//        AirLoopControlInfo(AirLoopNum)%OACtrlNum,  &
-			//        FirstHVACIteration, &
-			//        AirLoopNum )
-			//    END IF
 
 			// 2 passes; 1 usually suffices; 2 is done if ResolveSysFlow detects a failure of mass balance
 			for ( AirLoopPass = 1; AirLoopPass <= 2; ++AirLoopPass ) {
