@@ -932,7 +932,7 @@ namespace Fans {
 			SetupOutputVariable( "Fan Electric Power [W]", Fan( FanNum ).FanPower, "System", "Average", Fan( FanNum ).FanName );
 			SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", Fan( FanNum ).DeltaTemp, "System", "Average", Fan( FanNum ).FanName );
 			SetupOutputVariable( "Fan Electric Energy [J]", Fan( FanNum ).FanEnergy, "System", "Sum", Fan( FanNum ).FanName, _, "Electric", "Fans", Fan( FanNum ).EndUseSubcategoryName, "System" );
-
+			SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", Fan( FanNum ).OutletAirMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 			if ( ( Fan( FanNum ).FanType_Num == FanType_ZoneExhaust ) && ( Fan( FanNum ).BalancedFractSchedNum > 0 ) ) {
 				SetupOutputVariable( "Fan Unbalanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).UnbalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 				SetupOutputVariable( "Fan Balanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).BalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );

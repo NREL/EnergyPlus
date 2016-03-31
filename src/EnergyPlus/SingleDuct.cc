@@ -1290,7 +1290,26 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 			if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( Sys( SysNum ).FanName ) ); // call constructor
 				Sys( SysNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( Sys( SysNum ).FanName );
+				Sys( SysNum ).OutletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->outletNodeNum();
+				Sys( SysNum ).InletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->inletNodeNum();
+			} else if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SimpleVAV ) {
+				IsNotOK = false;
+
+				Sys( SysNum ).OutletNodeNum = GetFanOutletNode( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK );
+				if ( IsNotOK ) {
+					ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+					ErrorsFound = true;
+				}
+
+				IsNotOK = false;
+				Sys( SysNum ).InletNodeNum = GetFanInletNode( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK );
+				if ( IsNotOK ) {
+					ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+					ErrorsFound = true;
+				}
+
 			}
 
 			Sys( SysNum ).Schedule = Alphas( 2 );
@@ -1305,30 +1324,6 @@ namespace SingleDuct {
 				}
 			}
 
-			//  A5,     \field heating coil air inlet node
-			//          \note same as fan outlet node
-			//          \type alpha
-			//          \required-field
-			IsNotOK = false;
-
-			Sys( SysNum ).OutletNodeNum = GetFanOutletNode( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK );
-			if ( IsNotOK ) {
-				ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
-				ErrorsFound = true;
-			}
-			//               GetOnlySingleNode(Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
-			//                            NodeType_Air,NodeConnectionType_Outlet,1,ObjectIsParent)
-			//  A3,     \field Unit supply air inlet node
-			//          \note same as fan inlet node
-			//          \type alpha
-			IsNotOK = false;
-			Sys( SysNum ).InletNodeNum = GetFanInletNode( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK );
-			if ( IsNotOK ) {
-				ShowContinueError( "..Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
-				ErrorsFound = true;
-			}
-			//               GetOnlySingleNode(Alphas(3),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
-			//                           NodeType_Air,NodeConnectionType_Inlet,1,ObjectIsParent)
 			AirTermSysInletNodeName = NodeID( Sys( SysNum ).InletNodeNum );
 			if ( ! SameString( Alphas( 3 ), AirTermSysInletNodeName ) ) {
 				ShowWarningError( RoutineName + "Invalid air terminal object air inlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );

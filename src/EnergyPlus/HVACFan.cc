@@ -518,6 +518,7 @@ namespace HVACFan {
 		SetupOutputVariable( "Fan Electric Power [W]", fanPower_, "System", "Average", name_ );
 		SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", deltaTemp_, "System", "Average", name_ );
 		SetupOutputVariable( "Fan Electric Energy [J]", fanEnergy_, "System", "Sum", name_, _, "Electric", "Fans", endUseSubcategoryName_, "System" );
+		SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", outletAirMassFlowRate_, "System", "Average", name_ );
 		if ( speedControl_ == SpeedControlMethod::discrete && numSpeeds_ == 1 ) {
 			SetupOutputVariable( "Fan Runtime Fraction []", fanRunTimeFractionAtSpeed_[ 0 ], "System", "Average", name_ );
 		} else if ( speedControl_ == SpeedControlMethod::discrete && numSpeeds_ > 1 ) {
