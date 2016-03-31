@@ -2360,7 +2360,6 @@ namespace HeatBalanceSurfaceManager {
 											// absorptances from beam hitting back of the window which passes through rest of exterior windows
 											QRadSWwinAbs( Lay, SurfNum ) = SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyFtAbs( Lay ) * SkySolarInc + SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyGndAbs( Lay ) * GndSolarInc + AWinSurf( Lay, SurfNum ) * BeamSolar + AWinCFOverlap( Lay, SurfNum ) * BeamSolar;
 										}
-										QRadSWwinAbs( Lay, SurfNum ) = max( QRadSWwinAbs( Lay, SurfNum ), 0.0 );
 										// Total solar absorbed in solid layer (W), for reporting
 										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
 
@@ -2383,7 +2382,6 @@ namespace HeatBalanceSurfaceManager {
 										//     include light, ...
 										AbsDiffWin( Lay ) = Construct( ConstrNum ).AbsDiffFrontEQL( Lay );
 										QRadSWwinAbs( Lay, SurfNum ) = AWinSurf( Lay, SurfNum ) * BeamSolar + AbsDiffWin( Lay ) * ( SkySolarInc + GndSolarInc );
-										QRadSWwinAbs( Lay, SurfNum ) = max( QRadSWwinAbs( Lay, SurfNum ), 0.0 );
 
 										// Total solar absorbed in solid layer (W), for reporting
 										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
@@ -2787,7 +2785,6 @@ namespace HeatBalanceSurfaceManager {
 					if ( ShadeFlag <= 0 ) { // No window shading
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * Construct( ConstrNum ).AbsDiffBack( IGlass );
-							QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 						}
 					} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
@@ -2796,7 +2793,6 @@ namespace HeatBalanceSurfaceManager {
 							if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ) {
 								BlAbsDiffBk = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( _, IGlass ) );
 								QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * BlAbsDiffBk;
-								QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 							}
 						}
 						BlNum = SurfaceWindow( SurfNum ).BlindNumber;
@@ -2816,7 +2812,6 @@ namespace HeatBalanceSurfaceManager {
 					} else if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * InterpSw( SurfaceWindow( SurfNum ).SwitchingFactor, Construct( ConstrNum ).AbsDiffBack( IGlass ), Construct( ConstrNumSh ).AbsDiffBack( IGlass ) );
-							QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 						}
 
 					} // End of shading flag check
@@ -2872,7 +2867,6 @@ namespace HeatBalanceSurfaceManager {
 					EQLNum = Construct( ConstrNum ).EQLConsPtr;
 					for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 						QRadSWwinAbs( Lay, SurfNum ) += QS( ZoneNum ) * Construct( ConstrNum ).AbsDiffBackEQL( Lay );
-						QRadSWwinAbs( Lay, SurfNum ) = max( QRadSWwinAbs( Lay, SurfNum ), 0.0 );
 					}
 					// Window frame has not been included for equivalent layer model yet
 
@@ -2891,8 +2885,6 @@ namespace HeatBalanceSurfaceManager {
 					if ( SurfaceWindow( SurfNumAdjZone ).WindowModelType != WindowEQLModel ) {
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNumAdjZone ) += QS( ZoneNum ) * Construct( Surface( SurfNumAdjZone ).Construction ).AbsDiff( IGlass );
-							QRadSWwinAbs( IGlass, SurfNumAdjZone ) = max( QRadSWwinAbs( IGlass, SurfNumAdjZone ), 0.0 );
-
 							// Note that AbsDiff rather than AbsDiffBack is used in the above since the
 							// radiation from the current zone is incident on the outside of the adjacent
 							// zone's window.
@@ -2902,7 +2894,6 @@ namespace HeatBalanceSurfaceManager {
 						EQLNum = Construct( ConstrNum ).EQLConsPtr;
 						for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 							QRadSWwinAbs( Lay, SurfNumAdjZone ) += QS( ZoneNum ) * Construct( ConstrNum ).AbsDiffFrontEQL( Lay );
-							QRadSWwinAbs( Lay, SurfNumAdjZone ) = max( QRadSWwinAbs( Lay, SurfNumAdjZone ), 0.0 );
 							// Note that AbsDiffFrontEQL rather than AbsDiffBackEQL is used in the above
 							// since the radiation from the current zone is incident on the outside of the
 							// adjacent zone's window.
@@ -2950,13 +2941,11 @@ namespace HeatBalanceSurfaceManager {
 					if ( ShadeFlag <= 0 ) { // No window shading
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += InitialDifSolwinAbs( IGlass, SurfNum );
-							QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 						}
 					} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
 						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += InitialDifSolwinAbs( IGlass, SurfNum );
-							QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 						}
 						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) SurfaceWindow( SurfNum ).IntSWAbsByShade += SurfaceWindow( SurfNum ).InitialDifSolAbsByShade;
 						if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
@@ -2965,14 +2954,12 @@ namespace HeatBalanceSurfaceManager {
 					} else if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += InitialDifSolwinAbs( IGlass, SurfNum );
-							QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 						}
 					} // End of shading flag check
 				} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 					TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
 					for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 						QRadSWwinAbs( IGlass, SurfNum ) += InitialDifSolwinAbs( IGlass, SurfNum );
-						QRadSWwinAbs( IGlass, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 					}
 				} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
 
@@ -2981,7 +2968,6 @@ namespace HeatBalanceSurfaceManager {
 
 					for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 						QRadSWwinAbs( Lay, SurfNum ) += InitialDifSolwinAbs( Lay, SurfNum );
-						QRadSWwinAbs( Lay, SurfNum ) = max( QRadSWwinAbs( IGlass, SurfNum ), 0.0 );
 					}
 
 				}
