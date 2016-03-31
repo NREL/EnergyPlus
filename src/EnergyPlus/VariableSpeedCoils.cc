@@ -218,8 +218,8 @@ namespace VariableSpeedCoils {
 	void
 	clear_state()
 	{
-		NumWatertoAirHPs = 0; 
-		GetCoilsInputFlag = true ; 
+		NumWatertoAirHPs = 0;
+		GetCoilsInputFlag = true ;
 		SourceSideMassFlowRate = 0.0;
 		SourceSideInletTemp = 0.0;
 		SourceSideInletEnth = 0.0;
@@ -233,12 +233,12 @@ namespace VariableSpeedCoils {
 		LoadSideOutletEnth = 0.0;
 		QSensible = 0.0;
 		QLoadTotal = 0.0;
-		QLatRated = 0.0; 
-		QLatActual = 0.0; 
-		QSource = 0.0; 
-		Winput = 0.0; 
+		QLatRated = 0.0;
+		QLatActual = 0.0;
+		QSource = 0.0;
+		Winput = 0.0;
 		PLRCorrLoadSideMdot = 0.0;
-		VSHPWHHeatingCapacity = 0.0; 
+		VSHPWHHeatingCapacity = 0.0;
 		VSHPWHHeatingCOP = 0.0;
 		VarSpeedCoil.deallocate();
 	}
@@ -509,7 +509,7 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false; 
+			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPCoolingEquationFit;
@@ -2031,7 +2031,7 @@ namespace VariableSpeedCoils {
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
 			VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum );
-			
+
 			//Water nodes
 			VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
@@ -2340,7 +2340,7 @@ namespace VariableSpeedCoils {
 			SetupOutputVariable("Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergySensible, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergyLatent, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Water Side Heat Transfer Energy [J]", VarSpeedCoil(DXCoilNum).EnergySource, "System", "Summed", VarSpeedCoil(DXCoilNum).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System");
-			
+
 			if( VarSpeedCoil( DXCoilNum ).IsDXCoilInZone ){
 				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			} else {
@@ -2733,7 +2733,7 @@ namespace VariableSpeedCoils {
 			//check air side nodes
 			if ((0 == VarSpeedCoil(DXCoilNum).AirInletNodeNum) || (0 == VarSpeedCoil(DXCoilNum).AirOutletNodeNum)) {
 				ShowFatalError("InitVarSpeedCoil: Invalid inlet or outlet air node" + TrimSigDigits(DXCoilNum) +
-					", Inlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).AirInletNodeNum) + 
+					", Inlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).AirInletNodeNum) +
 					", Outlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).AirOutletNodeNum));
 			}
 
@@ -2771,15 +2771,15 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).FanDelayTime = FanDelayTime;
 
 			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) ) {
-				
+
 				//check water side nodes
 				if ((0 == VarSpeedCoil(DXCoilNum).WaterInletNodeNum) || (0 == VarSpeedCoil(DXCoilNum).WaterOutletNodeNum)) {
 					ShowFatalError("InitVarSpeedCoil: Invalid inlet or outlet water node" + TrimSigDigits(DXCoilNum) +
 						", Inlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).WaterInletNodeNum) +
 						", Outlet Node No =" + TrimSigDigits(VarSpeedCoil(DXCoilNum).WaterOutletNodeNum));
 				}
-				
-				
+
+
 				WaterInletNode = VarSpeedCoil( DXCoilNum ).WaterInletNodeNum;
 
 				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
@@ -4432,7 +4432,7 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
 		VarSpeedCoil( DXCoilNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
 		rhoair = PsyRhoAirFnPbTdbW(OutBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName);
-		VarSpeedCoil(DXCoilNum).AirVolFlowRate = VarSpeedCoil(DXCoilNum).AirMassFlowRate / rhoair; 
+		VarSpeedCoil(DXCoilNum).AirVolFlowRate = VarSpeedCoil(DXCoilNum).AirMassFlowRate / rhoair;
 
 		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = 0.0;
@@ -4891,7 +4891,7 @@ namespace VariableSpeedCoils {
 			if (CBFSpeed > 0.999) CBFSpeed = 0.999;
 
 			if (CBFSpeed < 0.001){
-				SHR = 1.0; 
+				SHR = 1.0;
 			}
 			else{
 				hDelta = QLoadTotal / LoadSideMassFlowRate;
@@ -5025,7 +5025,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil(DXCoilNum).EnergyLoadTotal = 0.0;
 			VarSpeedCoil(DXCoilNum).EnergySensible = 0.0;
 			VarSpeedCoil(DXCoilNum).EnergyLatent = 0.0;
-			VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption = 0.0; 
+			VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption = 0.0;
 		}
 	}
 
@@ -5607,7 +5607,7 @@ namespace VariableSpeedCoils {
 		IndexNum = FindItemInList( CoilName, VarSpeedCoil );
 
 		if ( IndexNum == 0 ) {
-		//	ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );//screen the message for IHP coil call
+			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );//screen the message for IHP coil call
 			ErrorsFound = true;
 		}
 
@@ -6682,7 +6682,7 @@ namespace VariableSpeedCoils {
 			}
 
 			if (CBF < 0.001) {
-				SHRCalc = 1.0; 
+				SHRCalc = 1.0;
 				LoopOn = false;
 			}
 			else{
