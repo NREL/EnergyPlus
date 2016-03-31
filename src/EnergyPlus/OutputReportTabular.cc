@@ -9443,7 +9443,8 @@ namespace OutputReportTabular {
 		static Array1D< Real64 > zstArea( 4 );
 		static Array1D< Real64 > zstVolume( 4 );
 		static Array1D< Real64 > zstWallArea( 4 );
-		static Array1D< Real64 > zstWindowArea( 4 );
+		static Array1D< Real64 > zstUndWallArea(4);
+		static Array1D< Real64 > zstWindowArea(4);
 		static Array1D< Real64 > zstLight( 4 );
 		static Array1D< Real64 > zstPeople( 4 );
 		static Array1D< Real64 > zstPlug( 4 );
@@ -9451,6 +9452,7 @@ namespace OutputReportTabular {
 		zstArea = 0.0;
 		zstVolume = 0.0;
 		zstWallArea = 0.0;
+		zstUndWallArea = 0.0;
 		zstWindowArea = 0.0;
 		zstLight = 0.0;
 		zstPeople  = 0.0;
@@ -9852,21 +9854,22 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 10 );
-			columnWidth.allocate( 10 );
+			columnHead.allocate( 11 );
+			columnWidth.allocate( 11 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 10, NumOfZones + 4 );
+			tableBody.allocate( 11, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
 			columnHead( 3 ) = "Part of Total Floor Area (Y/N)";
 			columnHead( 4 ) = "Volume " + m3_unitName;
 			columnHead( 5 ) = "Multipliers";
-			columnHead( 6 ) = "Gross Wall Area " + m2_unitName;
-			columnHead( 7 ) = "Window Glass Area " + m2_unitName;
-			columnHead( 8 ) = "Lighting " + Wm2_unitName;
-			columnHead( 9 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
-			columnHead( 10 ) = "Plug and Process " + Wm2_unitName;
+			columnHead( 6 ) = "Above Ground Gross Wall Area " + m2_unitName;
+			columnHead( 7 ) = "Underground Gross Wall Area " + m2_unitName;
+			columnHead( 8 ) = "Window Glass Area " + m2_unitName;
+			columnHead( 9 ) = "Lighting " + Wm2_unitName;
+			columnHead( 10 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
+			columnHead( 11 ) = "Plug and Process " + Wm2_unitName;
 
 			rowHead = "";
 
@@ -9907,7 +9910,8 @@ namespace OutputReportTabular {
 				}
 				tableBody( 5, iZone ) = RealToStr( mult, 2 );
 				tableBody( 6, iZone ) = RealToStr( Zone( iZone ).ExtGrossWallArea * m2_unitConv, 2 );
-				tableBody( 7, iZone ) = RealToStr( Zone( iZone ).ExtWindowArea * m2_unitConv, 2 );
+				tableBody( 7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
+				tableBody( 8, iZone) = RealToStr(Zone(iZone).ExtWindowArea * m2_unitConv, 2);
 				// lighting density
 				totLightPower = 0.0;
 				for ( iLight = 1; iLight <= TotLights; ++iLight ) {
@@ -9916,7 +9920,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( 8, iZone ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
+					tableBody( 9, iZone ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
 				}
 				// people density
 				totNumPeople = 0.0;
@@ -9926,7 +9930,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( totNumPeople > 0 ) {
-					tableBody( 9, iZone ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
+					tableBody( 10, iZone ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
 				}
 				// plug and process density
 				totPlugProcess = 0.0;
@@ -9951,13 +9955,14 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( 10, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
+					tableBody( 11, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
 					zstArea( grandTotal ) += mult * Zone( iZone ).FloorArea;
 					zstVolume( grandTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
+					zstUndWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( grandTotal ) += mult * Zone( iZone ).ExtWindowArea;
 					zstLight( grandTotal ) += mult * totLightPower;
 					zstPeople( grandTotal ) += mult * totNumPeople;
@@ -9966,6 +9971,7 @@ namespace OutputReportTabular {
 					zstArea( notpartTotal ) += mult * Zone( iZone ).FloorArea;
 					zstVolume( notpartTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
+					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
@@ -9975,6 +9981,7 @@ namespace OutputReportTabular {
 					zstArea( condTotal ) += mult * Zone( iZone ).FloorArea;
 					zstVolume( condTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
+					zstUndWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( condTotal ) += mult * Zone( iZone ).ExtWindowArea;
 					zstLight( condTotal ) += mult * totLightPower;
 					zstPeople( condTotal ) += mult * totNumPeople;
@@ -9983,6 +9990,7 @@ namespace OutputReportTabular {
 					zstArea( uncondTotal ) += mult * Zone( iZone ).FloorArea;
 					zstVolume( uncondTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
+					zstUndWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( uncondTotal ) += mult * Zone( iZone ).ExtWindowArea;
 					zstLight( uncondTotal ) += mult * totLightPower;
 					zstPeople( uncondTotal ) += mult * totNumPeople;
@@ -9991,6 +9999,7 @@ namespace OutputReportTabular {
 					zstArea( notpartTotal ) += mult * Zone( iZone ).FloorArea;
 					zstVolume( notpartTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
+					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
@@ -10001,13 +10010,14 @@ namespace OutputReportTabular {
 				tableBody( 1, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv, 2 );
 				tableBody( 4, NumOfZones + iTotal ) = RealToStr( zstVolume( iTotal ) * m3_unitConv, 2 );
 				tableBody( 6, NumOfZones + iTotal ) = RealToStr( zstWallArea( iTotal ) * m2_unitConv, 2 );
-				tableBody( 7, NumOfZones + iTotal ) = RealToStr( zstWindowArea( iTotal ) * m2_unitConv, 2 );
+				tableBody( 7, NumOfZones + iTotal) = RealToStr( zstUndWallArea( iTotal ) * m2_unitConv, 2);
+				tableBody( 8, NumOfZones + iTotal) = RealToStr( zstWindowArea( iTotal ) * m2_unitConv, 2);
 				if ( zstArea( iTotal ) != 0 ) {
-					tableBody( 8, NumOfZones + iTotal ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
-					tableBody( 10, NumOfZones + iTotal ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( 9, NumOfZones + iTotal ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( 11, NumOfZones + iTotal ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
 				}
 				if ( zstPeople( iTotal ) != 0 ) {
-					tableBody( 9, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
+					tableBody( 10, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
 				}
 			}
 			PreDefTableEntry( pdchLeedSutSpArea, "Totals", zstArea( grandTotal ), 2 );
