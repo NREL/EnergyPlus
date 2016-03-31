@@ -58,15 +58,7 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
-option( BUILD_DOCS "Build markdown based documentation" OFF )
-
-if (BUILD_DOCS)
-  option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
-
-  if (BUILD_PACKAGE)
-    option( PACKAGE_BUILT_DOCS "Add built docs to package" OFF )
-  endif()
-endif()
+option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
@@ -129,18 +121,6 @@ endif ()
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-
-# Advanced, time consuming compiler optimization options
-
-option(ENABLE_LTO "Enable link-time-optimization" FALSE)
-option(PROFILE_GENERATE "Generate profile data" FALSE)
-option(PROFILE_USE "Use profile data" FALSE)
-
-
-if (PROFILE_USE AND PROFILE_GENERATE)
-  message(SEND_ERROR "Cannot enable PROFILE_USE and PROFILE_GENERATE simultaneously")
-endif()
-
 
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
@@ -241,132 +221,6 @@ if( BUILD_PACKAGE )
   include(cmake/Install.cmake)
 endif()
 
-
-set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib
-    )
-if(NOT APPLE AND NOT MSVC)
-  list(APPEND OPTIMIZABLE_TARGETS parser)
-endif()
-
-if(NOT MSVC)
-  list(APPEND OPTIMIZABLE_TARGETS objexx_tests energyplus_tests)
-endif()
-
-if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
-  get_filename_component(LINKER_DIR "${CMAKE_LINKER}" PATH)
-  get_filename_component(LINKER_DIR_NAME "${LINKER_DIR}" NAME)
-
-  if (MSVC12)
-    set(PGORTVER "120")
-  elseif(MSVC14)
-    set(PGORTVER "140")
-  endif()
-
-  message("Examining ${LINKER_DIR_NAME} for PGO RT DLL")
-
-  if ("${LINKER_DIR_NAME}" MATCHES ".*amd64.*")
-    get_filename_component(LINKER_PARENT_DIR "${LINKER_DIR}" PATH)
-    set(PGORTDIR "${LINKER_PARENT_DIR}/amd64")
-    message("Retrieving amd64 PGO dll from: ${PGORTDIR}")
-  else()
-    set(PGORTDIR "${LINKER_DIR}")
-  endif()
-
-  file(COPY "${PGORTDIR}/pgort${PGORTVER}.dll" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release" )
-
-  foreach(target ${OPTIMIZABLE_TARGETS})
-    get_target_property(targ_link_flags ${target} LINK_FLAGS)
-    get_target_property(targ_static_link_flags ${target} STATIC_LIBRARY_FLAGS)
-    get_target_property(targ_compile_flags ${target} COMPILE_FLAGS)
-
-    # message("${target}: ${targ_link_flags}; ${targ_static_link_flags}; ${targ_compile_flags}")
-    if(targ_link_flags STREQUAL "targ_link_flags-NOTFOUND")
-      set(targ_link_flags "")
-    endif()
-
-    if(targ_static_link_flags STREQUAL "targ_static_link_flags-NOTFOUND")
-      set(targ_static_link_flags "")
-    endif()
-
-    if(targ_compile_flags STREQUAL "targ_compile_flags-NOTFOUND")
-      set(targ_compile_flags "")
-    endif()
-
-    if (ENABLE_LTO OR PROFILE_GENERATE OR PROFILE_USE)
-      set(targ_compile_flags "${targ_compile_flags} /GL")
-    endif()
-
-    if(ENABLE_LTO AND NOT PROFILE_GENERATE AND NOT PROFILE_USE)
-      set(targ_link_flags "${targ_link_flags} /LTCG")
-      set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
-    endif()
-
-    if (PROFILE_GENERATE)
-      set(targ_link_flags "${targ_link_flags} /LTCG:PGI")
-      set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
-    endif()
-
-    if (PROFILE_USE)
-      set(targ_link_flags "${targ_link_flags} /LTCG:PGO")
-      set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
-    endif()
-
-    set_target_properties(${target} PROPERTIES LINK_FLAGS "${targ_link_flags}" STATIC_LIBRARY_FLAGS "${targ_static_link_flags}"
-       COMPILE_FLAGS "${targ_compile_flags}")
-
-  endforeach()
-
-elseif (CMAKE_COMPILER_IS_GNUCXX)
-  if(ENABLE_LTO)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin")
-    set_target_properties(energyplus
-      PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program")
-  endif()
-
-  if (PROFILE_GENERATE)
-    set_target_properties(${OPTIMIZABLE_TARGETS} energyplus_tests TestEnergyPlusCallbacks
-      PROPERTIES LINK_FLAGS "-fprofile-generate"  COMPILE_FLAGS "-fprofile-generate")
-  endif()
-
-  if (PROFILE_USE)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-fprofile-use"  COMPILE_FLAGS "-fprofile-use")
-  endif()
-
-  if (PROFILE_USE AND ENABLE_LTO)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use")
-    set_target_properties(energyplus
-      PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use")
-  endif()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
-  if(ENABLE_LTO)
-    set_target_properties(energyplus
-      PROPERTIES LINK_FLAGS "-flto" COMPILE_FLAGS "-flto")
-  endif()
-
-  if (PROFILE_GENERATE)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-fprofile-instr-generate" COMPILE_FLAGS "-fprofile-instr-generate")
-  endif()
-
-  if (PROFILE_USE)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata" COMPILE_FLAGS "-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
-  endif()
-
-  if (PROFILE_USE AND ENABLE_LTO)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata" COMPILE_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
-  endif()
-
-
-endif()
-
-
-
 if (BUILD_VALIDATION_REPORTS)
   include(ExternalProject)
   ExternalProject_Add(ValidationReports
@@ -380,7 +234,19 @@ if (BUILD_VALIDATION_REPORTS)
     )
 endif()
 
-
 if (BUILD_DOCS)
-  add_subdirectory(doc/src)
+  # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
+  find_package(LATEX)
+  # so we'll create a cache variable which will be available to the add_subdirectory call below
+  set(XELATEX "XeLaTeX Compiler" CACHE INTERNAL "")
+  # and we'll simply take the found pdflatex compiler path and replace pdflatex with xelatex
+  string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
+  # and then verify it actually exists at that location...which it should pretty much every time...
+  if( EXISTS ${XELATEX} )
+    # and if it does, just add the doc/CMakeLists commands
+    add_subdirectory(doc)
+  else()
+    # and if it doesn't, clearly state why it fails
+    message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
+  endif()
 endif()

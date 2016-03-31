@@ -73,9 +73,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Kusuda model factory
-	std::shared_ptr< KusudaGroundTempsModel > 
-	KusudaGroundTempsModel::KusudaGTMFactory( 
-		int objectType, 
+	std::shared_ptr< KusudaGroundTempsModel >
+	KusudaGroundTempsModel::KusudaGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -94,7 +94,7 @@ namespace EnergyPlus {
 		using namespace GroundTemperatureManager;
 
 		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:	
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -141,10 +141,10 @@ namespace EnergyPlus {
 
 					for ( int monthIndex = 1; monthIndex <= 12; ++monthIndex ) {
 						Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
-						
+
 						// Calculate Average Ground Temperature for all 12 months of the year:
 						averageGroundTemp += currMonthTemp;
-						
+
 						// Need max temp, min temp, and month of min surf temp to set amplitude and month of min surf temp
 						if ( currMonthTemp <= minSurfTemp ) {
 							monthOfMinSurfTemp = monthIndex;
@@ -226,7 +226,7 @@ namespace EnergyPlus {
 		Real64 const _depth,
 		Real64 const _seconds
 	)
-	{	
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -287,7 +287,7 @@ namespace EnergyPlus {
 		if ( simTimeInSeconds > secondsPerYear ) {
 			simTimeInSeconds = remainder( simTimeInSeconds, secondsPerYear );
 		}
-		
+
 		// Get and return ground temperature
 		return getGroundTemp();
 	}

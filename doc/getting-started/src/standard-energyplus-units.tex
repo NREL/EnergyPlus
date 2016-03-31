@@ -1,0 +1,63 @@
+\chapter{Standard EnergyPlus Units}\label{standard-energyplus-units}
+
+EnergyPlus has adopted the standard SI units for input and output.
+
+ASCII with no spaces is used for abbreviations. Note that exponents appear without any indication of exponentiation: i.e., kg/m3 not kg/m\^{}3 or kg/m**3. Also note the use of dashes. We have W/m2-K not W/m2*K or W/(m2*K).
+
+At the end we note the ``problem'' variables -- the inputs that have non-standard units. Inputs using these units will have to be changed and the code checked to see how the quantities are used internally.
+
+% table 10
+\begin{longtable}[c]{p{1.59in}p{2.9in}p{1.5in}}
+\caption{Standard EnergyPlus Units \label{table:standard-energyplus-units}} \tabularnewline
+\toprule 
+Quantity & unit & abbreviation \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Standard EnergyPlus Units} \tabularnewline
+\toprule 
+Quantity & unit & abbreviation \tabularnewline
+\midrule
+\endhead
+
+angular degrees & degree & deg \tabularnewline
+Length & meter & m \tabularnewline
+Area & square meter & m2 \tabularnewline
+Volume & cubic meter & m3 \tabularnewline
+Time & seconds & s \tabularnewline
+frequency & Hertz & Hz \tabularnewline
+temperature & Celsius & C \tabularnewline
+absolute temperature & Kelvin & K \tabularnewline
+temperature difference & Celsius & deltaC \tabularnewline
+Speed & meters per second & m/s \tabularnewline
+energy (or work) & Joules & J \tabularnewline
+Power & Watts & W \tabularnewline
+Mass & kilograms & kg \tabularnewline
+Force & Newton & N \tabularnewline
+mass flow & kilograms per second & kg/s \tabularnewline
+volume flow & cubic meters per second & m3/s \tabularnewline
+Pressure & Pascals & Pa \tabularnewline
+pressure difference & Pascals & Pa \tabularnewline
+specific enthalpy & Joules per kilogram & J/kg \tabularnewline
+Density & kilograms per cubic meter & kg/m3 \tabularnewline
+heat flux & watts per square meter & W/m2 \tabularnewline
+specific heat & ------------------------------------------------------------------------ & J/kg-K \tabularnewline
+conductivity & ------------------------------------------------------------------------ & W/m-K \tabularnewline
+Diffusivity & ------------------------------------------------------------------------ & m2/s \tabularnewline
+heat transfer coefficient & ------------------------------------------------------------------------ & W/m2-K \tabularnewline
+R-value & ------------------------------------------------------------------------ & m2-K/W \tabularnewline
+heating or cooling capacity & Watts & W \tabularnewline
+electric potential & volts & V \tabularnewline
+electric current & Amperes & A \tabularnewline
+illuminace & lux & lx \tabularnewline
+luminous flux & lumen & lm \tabularnewline
+luminous intensity & candelas & cd \tabularnewline
+luminance & candelas per square meter & cd/m2 \tabularnewline
+vapor diffusivity & m2/s & ~ \tabularnewline
+Viscosity & ------------------------------------------------------------------------ & kg/m-s \tabularnewline
+Dynamic Viscosity & ------------------------------------------------------------------------ & N-s/m2 \tabularnewline
+Porosity & ------------------------------------------------------------------------ & m3/m3 \tabularnewline
+thermal gradient coeff for moisture capacity & ------------------------------------------------------------------------ & kg/kg-K \tabularnewline
+isothermal moisture capacity & ------------------------------------------------------------------------ & m3/kg \tabularnewline
+\bottomrule
+\end{longtable}

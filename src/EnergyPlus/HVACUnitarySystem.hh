@@ -467,6 +467,8 @@ namespace HVACUnitarySystem {
 		int HeatIndexAvail; // Index used to minimize the occurrence of output warnings
 		bool FirstPass; // used to determine when first call is made
 		int SingleMode; // Single mode operation Yes/No; 1=Yes, 0=No
+		int iterationCounter; // track time step iterations
+		Array1D< int > iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
 
 		// Default Constructor
 		UnitarySystemData() :
@@ -715,8 +717,10 @@ namespace HVACUnitarySystem {
 			HeatCountAvail( 0 ),
 			HeatIndexAvail( 0 ),
 			FirstPass( true ),
-			SingleMode( 0 )
-		{}
+			SingleMode( 0 ),
+			iterationCounter( 0 ),
+			iterationMode( 0 )
+			{}
 
 	};
 

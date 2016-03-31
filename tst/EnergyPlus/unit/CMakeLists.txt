@@ -64,6 +64,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
@@ -72,6 +73,7 @@ set( test_src
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  Photovoltaics.unit.cc
   PierceSurface.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
@@ -104,6 +106,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc

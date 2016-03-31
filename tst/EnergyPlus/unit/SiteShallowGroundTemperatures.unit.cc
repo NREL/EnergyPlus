@@ -69,7 +69,7 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
- 
+
 TEST_F( EnergyPlusFixture, SiteShallowGroundTempTest )
 {
 	std::string const idf_objects = delimited_string({
@@ -83,14 +83,14 @@ TEST_F( EnergyPlusFixture, SiteShallowGroundTempTest )
 		"	26.00,	!- June",
 		"	27.00,	!- July",
 		"	28.00,	!- August",
-		"	29.00,	!- Septeber",
+		"	29.00,	!- September",
 		"	30.00,	!- October",
 		"	31.00,	!- November",
 		"	32.00;	!- December",
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
+
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteShallowGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

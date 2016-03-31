@@ -1,0 +1,87 @@
+\section{Group -- Detailed Ground Heat Transfer}\label{group-detailed-ground-heat-transfer}
+
+\subsection{Detailed Ground Heat Transfer}\label{detailed-ground-heat-transfer}
+
+The following objects may be included in an EnergyPlus input IDF file but are handled by the Slab preprocessor:
+
+\begin{itemize}
+\tightlist
+\item
+  GroundHeatTransfer:Slab:Materials
+\item
+  GroundHeatTransfer:Slab:MatlProps
+\item
+  GroundHeatTransfer:Slab:BoundConds
+\item
+  GroundHeatTransfer:Slab:BldgProps
+\item
+  GroundHeatTransfer:Slab:Insulation
+\item
+  GroundHeatTransfer:Slab:EquivalentSlab
+\item
+  GroundHeatTransfer:Slab:AutoGrid
+\item
+  GroundHeatTransfer:Slab:ManualGrid
+\item
+  GroundHeatTransfer:Slab:XFACE
+\item
+  GroundHeatTransfer:Slab:YFACE
+\item
+  GroundHeatTransfer:Slab:ZFACE
+\end{itemize}
+
+The following objects may be included in an EnergyPlus input IDF file but are handled by the Basement preprocessor:
+
+\begin{itemize}
+\tightlist
+\item
+  GroundHeatTransfer:Basement:SimParameters
+\item
+  GroundHeatTransfer:Basement:MatlProps
+\item
+  GroundHeatTransfer:Basement:Insulation
+\item
+  GroundHeatTransfer:Basement:SurfaceProps
+\item
+  GroundHeatTransfer:Basement:BldgData
+\item
+  GroundHeatTransfer:Basement:Interior
+\item
+  GroundHeatTransfer:Basement:ComBldg
+\item
+  GroundHeatTransfer:Basement:EquivSlab
+\item
+  GroundHeatTransfer:Basement:EquivAutoGrid
+\item
+  GroundHeatTransfer:Basement:AutoGrid
+\item
+  GroundHeatTransfer:Basement:ManualGrid
+\item
+  GroundHeatTransfer:Basement:XFACE
+\item
+  GroundHeatTransfer:Basement:YFACE
+\item
+  GroundHeatTransfer:Basement:ZFACE
+\end{itemize}
+
+The documentation both the Slab and Basement objects appear in the AuxiliaryPrograms document under the ``Ground Heat Transfer in EnergyPlus'' heading.
+
+The only object described in this section is the control object which activates the use of the preprocessor.
+
+\subsection{GroundHeatTransfer:Control}\label{groundheattransfercontrol}
+
+The GroundHeatTransfer:Control object determines if the Slab and Basement preprocessors are going to be executed. When a Slab or Basement run is performed the results are saved in files with extensions .SLAB or .BSMT so that they do not need to be rerun if no input changes are made to the GroundHeatTransfer:Slab or GroundHeatTransfer:Basement objects.
+
+\subsubsection{Inputs}\label{inputs-013}
+
+\paragraph{Field: Name}\label{field-name-012}
+
+This alpha field is the name of the GroundHeatTransfer:Control object. It is used as an identifier.
+
+\paragraph{Field: Run Basement Preprocessor}\label{field-run-basement-preprocessor}
+
+The field can either be Yes or No and defaults to No. It is used to control whether the Basement preprocessor program is executed. If it has been previously executed the results are stored in the .BSMT file and do not necessary need to be run again unless the GroundHeatTransfer:Basement objects have changed.
+
+\paragraph{Field: Run Slab Preprocessor}\label{field-run-slab-preprocessor}
+
+The field can either be Yes or No and defaults to No. It is used to control whether the Slab preprocessor program is executed. If it has been previously executed the results are stored in the .SLAB file and do not necessary need to be run again unless the GroundHeatTransfer:Slab objects have changed.

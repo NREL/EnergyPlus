@@ -3536,6 +3536,7 @@ namespace WindowManager {
 				NetIRHeatGainGlass = ShadeArea * ( emis( 2 * ngllayer ) * TauShIR / ShGlReflFacIR ) * ( sigma * pow_4( thetas( 2 * ngllayer ) ) - Rmir );
 				ConvHeatGainFrZoneSideOfShade = ShadeArea * hcin * ( thetas( nglfacep ) - tin );
 				WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
+				WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 				// store components for reporting
 				WinGainConvGlazShadGapToZoneRep( SurfNum ) = ConvHeatFlowNatural;
 				WinGainConvShadeToZoneRep( SurfNum ) = ConvHeatGainFrZoneSideOfShade;
@@ -3547,6 +3548,7 @@ namespace WindowManager {
 				NetIRHeatGainGlass = Surface( SurfNum ).Area * emis( 2 * ngllayer ) * ( sigma * pow_4( thetas( 2 * ngllayer ) ) - Rmir );
 				ConvHeatGainFrZoneSideOfGlass = Surface( SurfNum ).Area * hcin * ( thetas( 2 * ngllayer ) - tin );
 				WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
+				WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 				// store components for reporting
 				WinGainConvGlazToZoneRep( SurfNum ) = ConvHeatGainFrZoneSideOfGlass;
 				WinGainIRGlazToZoneRep( SurfNum ) = NetIRHeatGainGlass;
@@ -3579,6 +3581,7 @@ namespace WindowManager {
 					if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_IndoorAir ) {
 						SurfaceWindow( SurfNum ).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;
 						WinHeatGain( SurfNum ) += ConvHeatGainToZoneAir;
+						WinHeatTransfer( SurfNum ) += ConvHeatGainToZoneAir;
 					} else {
 						SurfaceWindow( SurfNum ).RetHeatGainToZoneAir = ConvHeatGainToZoneAir;
 					}
@@ -3607,6 +3610,7 @@ namespace WindowManager {
 				TransDiff = InterpSw( SurfaceWindow( SurfNum ).SwitchingFactor, Construct( ConstrNum ).TransDiff, Construct( ConstrNumSh ).TransDiff );
 			}
 			WinHeatGain( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
+			WinHeatTransfer( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
 			// shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
 			WinLossSWZoneToOutWinRep( SurfNum ) = QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
 
@@ -6193,12 +6197,11 @@ namespace WindowManager {
 		int TotLayers; // Total number of layers in unshaded construction
 		Real64 DivTempOut; // Outside surface divider temperature (K)
 		Real64 FrameHeatGain; // Heat gain to zone from frame (W)
+		Real64 FrameHeatTransfer; // Heat tansfer through frame (W)
 		Real64 ProjCorrWinHeatGain; // Inside projection correction to IR from divider to zone
 		//   for window heat gain calculation
-		Real64 DividerConduction; // Conduction through divider from outside to inside face (W)
-		Real64 DividerConvHeatGain; // Convective heat gain from divider to zone (W)
-		Real64 DividerRadHeatGain; // Convective IR radiative gain from divider to zone (W)
-		Real64 DividerHeatGain; // Heat gain from divider to zone (W)
+		Real64 DividerHeatGain; // Heat gain to zone from divider (W)
+		Real64 DividerHeatTransfer; // Heat transfer through divider (W)
 
 		TInRad = root_4( SurfaceWindow( SurfNum ).IRfromParentZone / sigma );
 		TOutRad = root_4( Outir / sigma );
@@ -6209,7 +6212,7 @@ namespace WindowManager {
 		EmisGlassOut = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
 		EmisGlassIn = Material( Construct( ConstrNum ).LayerPoint( TotLayers ) ).AbsorpThermalBack;
 		FrameHeatGain = 0.0;
-		DividerConduction = 0.0;
+		DividerHeatGain = 0.0;
 		SurfaceWindow( SurfNum ).FrameHeatGain = 0.0;
 		SurfaceWindow( SurfNum ).FrameHeatLoss = 0.0;
 		SurfaceWindow( SurfNum ).DividerHeatGain = 0.0;
@@ -6224,7 +6227,7 @@ namespace WindowManager {
 			TInRadFr = TInRad * root_4( ( 1.0 + 0.5 * ProjCorrFrIn ) / ( 1.0 + ProjCorrFrIn ) );
 			FrameCon = SurfaceWindow( SurfNum ).FrameConductance;
 			HInRad = 0.5 * SurfaceWindow( SurfNum ).FrameEmis * sigma * pow_3( TInRadFr + SurfaceWindow( SurfNum ).FrameTempSurfIn + TKelvin );
-			HInConvFr = 0.0;
+			HInConvFr = HInConv;
 			HOutRad = 0.5 * SurfaceWindow( SurfNum ).FrameEmis * sigma * pow_3( TOutRadFr + SurfaceWindow( SurfNum ).FrameTempSurfOut + TKelvin );
 			HOutConvFr = HOutConv;
 			if ( FrameDivider( FrDivNum ).FrameProjectionOut > 0.0 ) {
@@ -6247,11 +6250,8 @@ namespace WindowManager {
 			SurfaceWindow( SurfNum ).FrameTempSurfOut = Afac + Bfac * ( SurfaceWindow( SurfNum ).FrameTempSurfIn + TKelvin ) - TKelvin;
 			// Heat gain to zone from frame
 
-			//  FrameHeatGain = SurfaceWindow(SurfNum)%FrameArea * (1.0d0+SurfaceWindow(SurfNum)%ProjCorrFrIn) * &
-			//  ( SurfaceWindow(SurfNum)%FrameEmis*(sigma*(SurfaceWindow(SurfNum)%FrameTempSurfIn+TKelvin)**4 - rmir) + &
-			//    hcin*(SurfaceWindow(SurfNum)%FrameTempSurfIn+TKelvin - tin) )
-
-			FrameHeatGain = SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * ( hcin * ( SurfaceWindow( SurfNum ).FrameTempSurfIn + TKelvin - tin ) );
+			FrameHeatTransfer = SurfaceWindow( SurfNum ).FrameArea * FrameCon * ( SurfaceWindow( SurfNum ).FrameTempSurfOut - SurfaceWindow( SurfNum ).FrameTempSurfIn );
+			FrameHeatGain = SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * ( HInConvFr * ( SurfaceWindow( SurfNum ).FrameTempSurfIn + TKelvin - tin ) );
 
 			if ( FrameHeatGain > 0.0 ) {
 				SurfaceWindow( SurfNum ).FrameHeatGain = FrameHeatGain;
@@ -6260,6 +6260,7 @@ namespace WindowManager {
 			}
 
 			WinHeatGain( SurfNum ) += FrameHeatGain;
+			WinHeatTransfer( SurfNum ) += FrameHeatTransfer;
 			WinGainFrameDividerToZoneRep( SurfNum ) = FrameHeatGain;
 		} // End of check if window has a frame
 
@@ -6310,23 +6311,23 @@ namespace WindowManager {
 			SurfaceWindow( SurfNum ).DividerTempSurfOut = Afac + Bfac * ( SurfaceWindow( SurfNum ).DividerTempSurfIn + TKelvin ) - TKelvin;
 			// Contribution of divider to window heat gain
 			ProjCorrWinHeatGain = 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn;
-			DividerConduction = SurfaceWindow( SurfNum ).DividerArea * DivCon * ( SurfaceWindow( SurfNum ).DividerTempSurfOut - SurfaceWindow( SurfNum ).DividerTempSurfIn );
-			if ( DividerConduction > 0.0 ) {
-				SurfaceWindow( SurfNum ).DividerHeatGain = DividerConduction;
+
+			DividerHeatGain = SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivIn ) * ( HInConvDiv * ( SurfaceWindow( SurfNum ).DividerTempSurfIn + TKelvin - tin ) );
+			DividerHeatTransfer = SurfaceWindow( SurfNum ).DividerArea * DivCon * ( SurfaceWindow( SurfNum ).DividerTempSurfOut - SurfaceWindow( SurfNum ).DividerTempSurfIn );
+
+			if ( DividerHeatGain > 0.0 ) {
+				SurfaceWindow( SurfNum ).DividerHeatGain = DividerHeatGain;
 			} else {
-				SurfaceWindow( SurfNum ).DividerHeatLoss = std::abs( DividerConduction );
+				SurfaceWindow( SurfNum ).DividerHeatLoss = std::abs( DividerHeatGain );
 			}
-			WinHeatGain( SurfNum ) += DividerConduction;
-			WinGainFrameDividerToZoneRep( SurfNum ) += DividerConduction;
-			// The following three statements are for debugging purposes only
-			DividerConvHeatGain = SurfaceWindow( SurfNum ).DividerArea * HInConvDiv * ( SurfaceWindow( SurfNum ).DividerTempSurfIn + TKelvin - tin );
-			DividerRadHeatGain = SurfaceWindow( SurfNum ).DividerArea * HInRad * ( SurfaceWindow( SurfNum ).DividerTempSurfIn + TKelvin - TInRadDiv ) - SurfaceWindow( SurfNum ).DividerArea * SurfaceWindow( SurfNum ).DividerQRadInAbs;
-			DividerHeatGain = DividerConvHeatGain + DividerRadHeatGain;
+			WinHeatGain( SurfNum ) += DividerHeatGain;
+			WinHeatTransfer( SurfNum ) += DividerHeatTransfer;
+			WinGainFrameDividerToZoneRep( SurfNum ) += DividerHeatGain;
 			// If interior shade is present it is assumed that both the convective and IR radiative gain
 			// from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
 			// interaction between divider and shade is ignored due to the difficulty of calculating this interaction
 			// at the same time that the interaction between glass and shade is calculated.
-			if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SurfaceWindow( SurfNum ).DividerConduction = DividerConduction;
+			if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SurfaceWindow( SurfNum ).DividerHeatGain = DividerHeatGain;
 			DivTempOut = SurfaceWindow( SurfNum ).DividerTempSurfOut + TKelvin;
 		} // End of check if window has dividers
 

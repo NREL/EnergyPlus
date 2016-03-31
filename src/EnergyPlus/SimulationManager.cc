@@ -452,8 +452,8 @@ namespace SimulationManager {
 			}
 
 			CreateEnergyReportStructure();
-
-			ManageEMS( emsCallFromSetupSimulation ); // point to finish setup processing EMS, sensor ready now
+			bool anyEMSRan;
+			ManageEMS( emsCallFromSetupSimulation, anyEMSRan ); // point to finish setup processing EMS, sensor ready now
 
 			ProduceRDDMDD();
 
@@ -518,7 +518,8 @@ namespace SimulationManager {
 				isFinalYear = true;
 			}
 
-			ManageEMS( emsCallFromBeginNewEvironment ); // calling point
+			bool anyEMSRan;
+			ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 

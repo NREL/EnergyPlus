@@ -115,7 +115,8 @@ namespace EnergyPlus {
 
 		EMSManager::FinishProcessingUserInput = true;
 
-		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation );
+		bool anyEMSRan;
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation,anyEMSRan );
 
 		DataLoopNode::Node( 1 ).Temp = 20.0;
 		DataLoopNode::Node( 1 ).HumRat = 0.01;

@@ -4954,7 +4954,7 @@ namespace ZoneTempPredictorCorrector {
 					// from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
 					// interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
 					// at the same time that the interaction between glass and shade is calculated.
-					SumIntGain += SurfaceWindow( SurfNum ).DividerConduction;
+					SumIntGain += SurfaceWindow( SurfNum ).DividerHeatGain;
 				}
 
 				// Other convection term is applicable to equivalent layer window (ASHWAT) model
@@ -4969,6 +4969,7 @@ namespace ZoneTempPredictorCorrector {
 					if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
 						SumIntGain += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
 						WinHeatGain( SurfNum ) += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
+						WinHeatTransfer( SurfNum ) += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );
 							WinHeatGainRepEnergy( SurfNum ) = WinHeatGainRep( SurfNum ) * TimeStepZoneSec;
@@ -4976,6 +4977,7 @@ namespace ZoneTempPredictorCorrector {
 							WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
 							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 						}
+						WinHeatTransferRepEnergy( SurfNum ) = WinHeatTransfer( SurfNum ) * TimeStepZoneSec;
 					}
 				}
 
@@ -5322,7 +5324,7 @@ namespace ZoneTempPredictorCorrector {
 					// from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
 					// interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
 					// at the same time that the interaction between glass and shade is calculated.
-					SumIntGains += SurfaceWindow( SurfNum ).DividerConduction;
+					SumIntGains += SurfaceWindow( SurfNum ).DividerHeatGain;
 				}
 
 				// Other convection term is applicable to equivalent layer window (ASHWAT) model

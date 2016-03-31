@@ -4907,13 +4907,7 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).StandAlone ) {
 				SizeStandAloneWaterHeater( WaterThermalTankNum );
 			}
-
-			CalcStandardRatings( WaterThermalTankNum );
 			SetLoopIndexFlag( WaterThermalTankNum ) = false;
-		}
-
-		if ( WaterThermalTank( WaterThermalTankNum ).StandAlone && ( ! AlreadyRated( WaterThermalTankNum ) ) ) {
-			CalcStandardRatings( WaterThermalTankNum );
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag( WaterThermalTankNum ) && ! SetLoopIndexFlag( WaterThermalTankNum ) ) {
@@ -5245,10 +5239,10 @@ namespace WaterThermalTanks {
 				//     autosize info must be calculated in GetWaterThermalTankInputFlag for use in StandardRating procedure
 				//       (called at end of GetWaterThermalTankInputFlag)
 				//     report autosizing information here (must be done after GetWaterThermalTankInputFlag is complete)
-				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized ) {
+				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized && ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Condenser water flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingWaterFlowRate );
 				}
-				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized ) {
+				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized && ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
 				}
 				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
@@ -5256,7 +5250,7 @@ namespace WaterThermalTanks {
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
 				}
-				MyHPSizeFlag( HPNum ) = false;
+				if ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) MyHPSizeFlag( HPNum ) = false;
 			}
 
 			HPAirInletNode = HPWaterHeater( HPNum ).HeatPumpAirInletNode;
@@ -5445,6 +5439,17 @@ namespace WaterThermalTanks {
 			}
 
 		} //  IF(WaterThermalTank(WaterThermalTankNum)%HeatPumpNum .GT. 0)THEN
+
+		// calling CalcStandardRatings early bypasses fan sizing since DataNonZoneNonAirloopValue has not been set yet
+		if ( !AlreadyRated( WaterThermalTankNum ) ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
+				AlreadyRated( WaterThermalTankNum ) = true;
+			} else {
+				if ( !AnyPlantInModel || PlantFirstSizesOkayToReport || WaterThermalTank( WaterThermalTankNum ).MaxCapacity > 0.0 || WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
+					CalcStandardRatings( WaterThermalTankNum );
+				}
+			}
+		}
 
 	}
 
@@ -10486,6 +10491,7 @@ namespace WaterThermalTanks {
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
 					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
 
+					// ?? why is HPWH condenser inlet node temp reset inside the for loop? shouldn't it chnage with the tank temp throughout these iterations?
 					if ( HPWaterHeater(HPNum).TypeNum == TypeOf_HeatPumpWtrHeaterPumped ){
 						// set the condenser inlet node mass flow rate and temperature
 						Node( HPWaterHeater( HPNum ).CondWaterInletNode ).MassFlowRate = MdotWater;
@@ -10561,13 +10567,23 @@ namespace WaterThermalTanks {
 						bIsVSCoil = false;
 						//       simulate the HPWH coil/fan to find heating capacity
 						if (HPWaterHeater(HPNum).FanPlacement == BlowThru) {
+							if( FirstTimeFlag ) { // first time DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and reset water inlet temp. If already sized, no harm.
+								SimulateFanComponents( HPWaterHeater( HPNum ).FanName, true, HPWaterHeater( HPNum ).FanNum );
+								SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+								Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+							}
+							// ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy. PLR=1 here.
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
-							//         CALL SimDXCoil(HPWaterHeater(HPNum)%DXCoilName, CompOp,  .TRUE.,PartLoadRatio, HPWaterHeater(HPNum)%DXCoilNum,FanOpMode)
 							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
 							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
 						} else {
-							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+							if( FirstTimeFlag ) { // first time DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and reset water inlet temp. If already sized, no harm.
+								SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
+								Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+							}
+							// ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy. PLR=1 here.
+							SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
 							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
