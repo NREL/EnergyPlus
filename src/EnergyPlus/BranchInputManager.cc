@@ -1599,7 +1599,7 @@ namespace BranchInputManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the following IDD structure:
 		// Branch,
-		//         \extensible:5 Just duplicate last 5 fields and \ comments (changing numbering, please)
+		//         \extensible:4 Just duplicate last 4 fields and \ comments (changing numbering, please)
 		//         \memo List components on the branch in simulation and connection order
 		//         \memo Note: this should NOT include splitters or mixers which define
 		//         \memo endpoints of branches
@@ -3381,7 +3381,7 @@ namespace BranchInputManager {
 					Found = FindItemInList( BranchNodes( Count ).UniqueNodeNames( Loop2 ), BranchNodes( Loop ).UniqueNodeNames, BranchNodes( Loop ).NumNodes );
 					if ( Found != 0 ) {
 						ShowSevereError( "Non-unique node name found, name=" + BranchNodes( Count ).UniqueNodeNames( Loop2 ) );
-						ShowContinueError( "..1st occurence in Branch=" + Branch( Count ).Name );
+						ShowContinueError( "..1st occurrence in Branch=" + Branch( Count ).Name );
 						ShowContinueError( "..duplicate occurrence in Branch=" + Branch( Loop ).Name );
 						ErrFound = true;
 					}

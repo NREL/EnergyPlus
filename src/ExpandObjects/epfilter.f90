@@ -13533,17 +13533,6 @@ DO iSys = 1, numCompactSysUnit
                     ' in the Dehumidification Control Type field: '//TRIM(FldVal(base + usDehumCtrlTypeOff)))
     dehumidCtrlKind = 0
   END IF
-  ! Dehumidification Control Zone Name is deprecated but still present - should be the same as control zone name - check and warn
-  IF (dehumidCtrlKind .NE. dehumidNone) THEN
-    IF ((TRIM(FldVal(base + usDehumCtrlZoneOff)) .NE. '') .AND. &
-        (.NOT. SameString(FldVal(base +  usDehumCtrlZoneOff),FldVal(base +  usControlZoneOff)))) THEN
-      CALL WriteError('In HVACTemplate:System:Unitary "'//TRIM(FldVal(base + usAirHandlerNameOff))//'"'// &
-                     ' Dehumidification Control Zone Name is a deprecated field. The Control Zone or Thermostat Location Name'// &
-                     ' will be used: "'//TRIM(FldVal(base + usControlZoneOff))//'" for dehumidification control.',msgWarning)
-    END IF
-    FldVal(base +  usDehumCtrlZoneOff) = FldVal(base +  usControlZoneOff)
-  END IF
-
 
   !set the humidifier indicators
   isHumidifierNone = SameString(FldVal(base + usHumidCtrlTypeOff),'None')

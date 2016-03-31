@@ -1372,7 +1372,7 @@ namespace SetPointManager {
 			SZMinHumSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinHumRat;
 
 			NodeListError = false;
-			GetNodeNums( cAlphaArgs( 4 ), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames( 4 ) ); // nodes whose min humidity ratio will be set
+			GetNodeNums( cAlphaArgs( 2 ), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames( 4 ) ); // nodes whose min humidity ratio will be set
 			if ( ! NodeListError ) {
 				NumNodesCtrld = NumNodes;
 				SZMinHumSetPtMgr( SetPtMgrNum ).CtrlNodes.allocate( NumNodesCtrld );

@@ -276,7 +276,7 @@ namespace NodeInputManager {
 			NodeNumbers( 1 ) = 0;
 		}
 
-		// Most calls to this routined use a fixed fluid stream number for all nodes, this is the default
+		// Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
 		FluidStreamNum = NodeFluidStream;
 		for ( Loop = 1; Loop <= NumNodes; ++Loop ) {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {

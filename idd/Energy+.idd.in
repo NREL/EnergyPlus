@@ -61623,7 +61623,7 @@ Chiller:CombustionTurbine,
        \note throughout the entire simulation.
 
 ChillerHeater:Absorption:DirectFired,
-  \min-fields 35
+  \min-fields 34
   \memo Direct fired gas absorption chiller-heater using performance curves similar to DOE-2
   A1,  \field Name
        \required-field
