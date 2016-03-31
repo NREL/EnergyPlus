@@ -4498,14 +4498,11 @@ namespace Furnaces {
 		int OutNode; // Outlet node number in MSHP loop
 		Real64 RhoAir; // Air density at InNode
 		static bool MyAirLoopPass( true ); // one time allocation flag
-<<<<<<< HEAD
-		int IHPIndex(0); //coil id of IHP coil
-=======
+		int IHPIndex( 0 ); // coil id of IHP coil
 		int OperatingMode; // track cooling, heating, and no cooling or heating modes
 		int OperatingModeMinusOne;
 		int OperatingModeMinusTwo;
 		bool Oscillate; // detection of oscillating operating modes
->>>>>>> develop
 
 		InNode = Furnace( FurnaceNum ).FurnaceInletNodeNum;
 		OutNode = Furnace( FurnaceNum ).FurnaceOutletNodeNum;
@@ -5514,14 +5511,10 @@ namespace Furnaces {
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		bool ErrFound; // flag returned from mining functions
 		Real64 BranchFlow; // branch volumetric flow rate [m3/s]
-<<<<<<< HEAD
-		int IHPCoilIndex(0);//refer to cooling or heating coil in IHP
-
-		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
-=======
+		int IHPCoilIndex( 0 ); // refer to cooling or heating coil in IHP
 		bool anyRan;
 		ManageEMS( emsCallFromUnitarySystemSizing, anyRan ); // calling point
->>>>>>> develop
+
 		ThisCtrlZoneNum = 0;
 		DXCoolCap = 0.0;
 		UnitaryHeatCap = 0.0;
