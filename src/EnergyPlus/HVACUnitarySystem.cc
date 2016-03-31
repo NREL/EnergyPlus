@@ -2835,7 +2835,6 @@ namespace HVACUnitarySystem {
 		std::string SuppHeatCoilName; // Used in mining function calls
 		std::string FanType; // Used in mining function calls
 		std::string FanName; // Used in mining function calls
-		int FanIndex; // Used in mining function calls
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		Array1D< Real64 > Numbers; // Numeric input items for object

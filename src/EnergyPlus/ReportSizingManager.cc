@@ -1678,6 +1678,10 @@ namespace ReportSizingManager {
 									FanCoolLoad = HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->getFanDesignHeatGain( DesVolFlow );
 									break;
 								}
+								case DataAirSystems::fanModelTypeNotYetSet: {
+									// do nothing
+									break;
+								}
 							} // end switch
 
 							switch ( PrimaryAirSystem( CurSysNum ).retFanModelTypeEnum ){
@@ -1687,6 +1691,10 @@ namespace ReportSizingManager {
 								}
 								case DataAirSystems::objectVectorOOFanSystemModel: {
 									FanCoolLoad += ( 1.0 - OutAirFrac ) * HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).retFanVecIndex ]->getFanDesignHeatGain( DesVolFlow );
+									break;
+								}
+								case DataAirSystems::fanModelTypeNotYetSet: {
+									// do nothing
 									break;
 								}
 							} // end switch

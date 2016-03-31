@@ -252,6 +252,10 @@ namespace HVACFan {
 				designElecPower_ = designAirVolFlowRate_ * deltaPress_ / fanTotalEff_;
 				break;
 			}
+			case PowerSizingMethod::powerSizingMethodNotSet: {
+				// do nothing
+				break;
+			}
 		
 			} // end switch
 
@@ -348,12 +352,12 @@ namespace HVACFan {
 		eMSFanEffValue_( 0.0 ),
 		eMSMaxMassFlowOverrideOn_( false ),
 		eMSAirMassFlowValue_( 0.0 ),
-		faultyFilterFlag_( false ),
-		faultyFilterIndex_( 0 ),
+		//faultyFilterFlag_( false ),
+		//faultyFilterIndex_( 0 ),
 		massFlowRateMaxAvail_( 0.0 ),
 		massFlowRateMinAvail_( 0.0 ),
-		rhoAirStdInit_( 0.0 ),
-		oneTimePowerCurveCheck_( true ) 
+		rhoAirStdInit_( 0.0 )
+		//oneTimePowerCurveCheck_( true ) 
 	{
 
 		std::string const routineName = "HVACFan constructor ";
@@ -684,6 +688,10 @@ namespace HVACFan {
 				}
 				break;
 			} // continuous speed control case
+			case SpeedControlMethod::notSet: {
+				// do nothing
+				break;
+			}
 			} // end switch
 
 		} else { // fan is off

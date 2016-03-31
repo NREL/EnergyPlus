@@ -241,13 +241,13 @@ private: // data
 	bool eMSMaxMassFlowOverrideOn_; // if true, then EMS is calling to override mass flow
 	Real64 eMSAirMassFlowValue_; // value EMS is directing to use [kg/s]
 
-	bool faultyFilterFlag_; // Indicate whether there is a fouling air filter corresponding to the fan
-	int faultyFilterIndex_;  // Index of the fouling air filter corresponding to the fan
+//	bool faultyFilterFlag_; // Indicate whether there is a fouling air filter corresponding to the fan
+//	int faultyFilterIndex_;  // Index of the fouling air filter corresponding to the fan
 	// Mass Flow Rate Control Variables
 	Real64 massFlowRateMaxAvail_;
 	Real64 massFlowRateMinAvail_;
 	Real64 rhoAirStdInit_;
-	bool oneTimePowerCurveCheck_; // one time flag used for error message
+//	bool oneTimePowerCurveCheck_; // one time flag used for error message
 
 }; //class FanSystem 
 
