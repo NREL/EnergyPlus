@@ -1613,7 +1613,7 @@ namespace EnergyPlus {
 			using InputProcessor::FindItemInList;
 
 			// Return value
-			int NodeNumber; // returned outlet node of matched coil
+			int NodeNumber( 0 ); // returned outlet node of matched coil
 
 			// Locals
 			// FUNCTION ARGUMENT DEFINITIONS:
@@ -2121,8 +2121,7 @@ namespace EnergyPlus {
 			int IHPCoilIndex( 0 );
 			Real64 AirMassFlowRate( 0.0 );
 			Real64 FlowScale( 1.0 );
-			bool IsResultFlow(
-			false ); //IsResultFlow = true, the air flow rate will be from a simultaneous mode, won't be re-calculated
+			bool IsResultFlow( false ); //IsResultFlow = true, the air flow rate will be from a simultaneous mode, won't be re-calculated
 			Real64 WaterDensity( 986.0 ); //standard water density at 60 C
 
 			// Obtains and Allocates WatertoAirHP related parameters from input file
@@ -2239,7 +2238,7 @@ namespace EnergyPlus {
 
 		void
 		ConnectIHP(
-		int const WhichCoil // must match coil names for the coil type
+			int const WhichCoil // must match coil names for the coil type
 		) {
 			using VariableSpeedCoils::SetAirNodes;
 			using VariableSpeedCoils::SetWaterNodes;
@@ -2304,7 +2303,7 @@ namespace EnergyPlus {
 
 		void
 		DisconnectIHP(
-		int const WhichCoil // must match coil names for the coil type
+			int const WhichCoil // must match coil names for the coil type
 		) {
 			using VariableSpeedCoils::SetAirNodes;
 			using VariableSpeedCoils::SetWaterNodes;
