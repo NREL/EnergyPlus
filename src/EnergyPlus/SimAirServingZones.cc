@@ -767,7 +767,8 @@ namespace SimAirServingZones {
 				OutletNodeNames.allocate( NumCompsOnBranch );
 				OutletNodeNumbers.dimension( NumCompsOnBranch, 0 );
 
-				GetBranchData( PrimaryAirSystem( AirSysNum ).Name, BranchNames( BranchNum ), PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MaxVolFlowRate, DummyInteger( 1 ), DummyInteger( 2 ), NumCompsOnBranch, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); //Placeholders for plant branch pressure data (not used in air loops)
+				Real64 DummyBranchMaxVolumeFlow;
+				GetBranchData( PrimaryAirSystem( AirSysNum ).Name, BranchNames( BranchNum ), DummyBranchMaxVolumeFlow, DummyInteger( 1 ), DummyInteger( 2 ), NumCompsOnBranch, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); //Placeholders for plant branch pressure data (not used in air loops)
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp.allocate( NumCompsOnBranch );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents = NumCompsOnBranch;
 
@@ -850,11 +851,11 @@ namespace SimAirServingZones {
 				} // end of component loop
 
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).ControlType = "";
-				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MinVolFlowRate = 0.0;
+//				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MinVolFlowRate = 0.0;
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNumIn = InletNodeNumbers( 1 );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNumOut = OutletNodeNumbers( NumCompsOnBranch );
-				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MaxMassFlowRate = 0.0;
-				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MinMassFlowRate = 0.0;
+//				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MaxMassFlowRate = 0.0;
+//				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MinMassFlowRate = 0.0;
 
 				CompTypes.deallocate();
 				CompNames.deallocate();
@@ -1959,8 +1960,8 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // Start looping through all of the air loops...
 
 				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) { // loop over all branches in system
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxMassFlowRate = StdRhoAir * PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate;
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MinMassFlowRate = StdRhoAir * PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MinVolFlowRate;
+//					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxMassFlowRate = StdRhoAir * PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate;
+//					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MinMassFlowRate = StdRhoAir * PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MinVolFlowRate;
 					for ( NodeIndex = 1; NodeIndex <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalNodes; ++NodeIndex ) { // loop over alll nodes on branch
 
 						NodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNum( NodeIndex );
@@ -1970,10 +1971,10 @@ namespace SimAirServingZones {
 						Node( NodeNum ).Temp = 20.0;
 						Node( NodeNum ).HumRat = OutHumRat;
 						Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).Temp, Node( NodeNum ).HumRat );
-						// set the node mass flow rates to the branch mass flow rate
-						Node( NodeNum ).MassFlowRate = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxMassFlowRate;
-						Node( NodeNum ).MassFlowRateMax = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxMassFlowRate;
-						Node( NodeNum ).MassFlowRateMaxAvail = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxMassFlowRate;
+						// set the node mass flow rates to the airloop max mass flow rate
+						Node( NodeNum ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply;
+						Node( NodeNum ).MassFlowRateMax = AirLoopFlow( AirLoopNum ).DesSupply;
+						Node( NodeNum ).MassFlowRateMaxAvail = AirLoopFlow( AirLoopNum ).DesSupply;
 						Node( NodeNum ).MassFlowRateMin = 0.0;
 						Node( NodeNum ).MassFlowRateSetPoint = 0.0;
 						Node( NodeNum ).MassFlowRateMinAvail = 0.0;
@@ -2031,8 +2032,8 @@ namespace SimAirServingZones {
 
 				if ( ! FirstHVACIteration ) {
 					MassFlowSet = Node( ZoneSideNodeNum ).MassFlowRate;
-				} else { // first time through in each HVAC timestep, use design mass flow rates for required mass flows
-					MassFlowSet = PrimaryAirSystem( AirLoopNum ).Branch( OutBranchNum ).MaxMassFlowRate;
+				} else { // first time through in each HVAC timestep, use loop design mass flow rates for required mass flows
+					MassFlowSet = AirLoopFlow( AirLoopNum ).DesSupply;
 				}
 				// Need to make sure that flows are greater than zero
 				if ( MassFlowSet >= 0.0 ) {
@@ -2082,7 +2083,7 @@ namespace SimAirServingZones {
 					// [DC/LBNL] Save previous mass flow rate
 					MassFlowSaved = Node( NodeNumIn ).MassFlowRate;
 
-					Node( NodeNumIn ).MassFlowRate = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).MaxMassFlowRate;
+					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply;
 
 					// [DC/LBNL] Detect if air mass flow rate has changed since last air loop simulation
 					if ( Node( NodeNumIn ).MassFlowRate != MassFlowSaved ) {
@@ -3408,28 +3409,28 @@ namespace SimAirServingZones {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate == AutoSize ) {
-
-			CheckSysSizing( "Branch", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Name );
-
-			{ auto const SELECT_CASE_var( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).DuctType );
-			if ( SELECT_CASE_var == Main ) {
-				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-			} else if ( SELECT_CASE_var == Cooling ) {
-				// PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%MaxVolFlowRate = FinalSysSizing(AirLoopNum)%DesCoolVolFlow
-				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-			} else if ( SELECT_CASE_var == Heating ) {
-				// PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%MaxVolFlowRate = FinalSysSizing(AirLoopNum)%DesHeatVolFlow
-				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-			} else if ( SELECT_CASE_var == Other ) {
-				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-			} else {
-				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-			}}
-
-			ReportSizingOutput( "Branch", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Name, "Maximum Flow Rate [m3/s]", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate );
-
-		}
+//		if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate == AutoSize ) {
+//
+//			CheckSysSizing( "Branch", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Name );
+//
+//			{ auto const SELECT_CASE_var( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).DuctType );
+//			if ( SELECT_CASE_var == Main ) {
+//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
+//			} else if ( SELECT_CASE_var == Cooling ) {
+//				// PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%MaxVolFlowRate = FinalSysSizing(AirLoopNum)%DesCoolVolFlow
+//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
+//			} else if ( SELECT_CASE_var == Heating ) {
+//				// PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%MaxVolFlowRate = FinalSysSizing(AirLoopNum)%DesHeatVolFlow
+//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
+//			} else if ( SELECT_CASE_var == Other ) {
+//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
+//			} else {
+//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
+//			}}
+//
+//			ReportSizingOutput( "Branch", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Name, "Maximum Flow Rate [m3/s]", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate );
+//
+//		}
 
 		if ( BranchNum == 1 ) {
 
@@ -3474,7 +3475,7 @@ namespace SimAirServingZones {
 					CoilName = CompName;
 					CoilType = CompType;
 				}
-				SetCoilDesFlow( CoilType, CoilName, PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate, ErrorsFound );
+				SetCoilDesFlow( CoilType, CoilName, PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate, ErrorsFound );
 			}
 		} // End of component loop
 		if ( ErrorsFound ) {
