@@ -1318,7 +1318,6 @@ namespace MixedAir {
 		using CurveManager::GetCurveType;
 		using namespace OutputReportPredefined;
 
-		using DataAirSystems::PrimaryAirSystem;
 		using DataContaminantBalance::Contaminant;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
