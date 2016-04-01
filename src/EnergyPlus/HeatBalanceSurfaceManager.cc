@@ -2332,7 +2332,6 @@ namespace HeatBalanceSurfaceManager {
 												QRadSWwinAbs( Lay, SurfNum ) = SkySolarInc * ( 0.5 * ACosTlt * AbsDiffGlassLayGnd + ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLaySky ) + GndSolarInc * ( ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
 											}
 										}
-										QRadSWwinAbs( Lay, SurfNum ) = max( QRadSWwinAbs( Lay, SurfNum ), 0.0 );
 
 										// Total solar absorbed in solid layer (W), for reporting
 										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
