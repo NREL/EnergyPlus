@@ -27323,7 +27323,7 @@ HVACTemplate:System:VRF,
       \default 45
 
 HVACTemplate:System:Unitary,
-      \min-fields 52
+      \min-fields 51
       \memo Unitary furnace with air conditioner
   A1, \field Name
       \required-field
@@ -27954,7 +27954,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
       \default 1.0
 
 HVACTemplate:System:UnitarySystem,
-      \min-fields 72
+      \min-fields 71
       \memo Unitary HVAC system with optional cooling and heating. Supports DX and chilled water,
       \memo cooling, gas, electric, and hot water heating, air-to-air and water-to-air heat pumps.
   A1, \field Name
@@ -28306,10 +28306,6 @@ HVACTemplate:System:UnitarySystem,
       \key CoolReheat
       \key Multimode
       \default None
- A24, \field Dehumidification Control Zone Name
-      \note Zone name where humidistat is located
-      \type object-list
-      \object-list ZoneNames
  N34, \field Dehumidification Relative Humidity Setpoint
       \note Zone relative humidity setpoint in percent (0 to 100)
       \note Ignored if Dehumidification Relative Humidity Setpoint Schedule specified below
@@ -28318,17 +28314,17 @@ HVACTemplate:System:UnitarySystem,
       \maximum 100.0
       \default 60.0
       \units percent
- A25, \field Dehumidification Relative Humidity Setpoint Schedule Name
+ A24, \field Dehumidification Relative Humidity Setpoint Schedule Name
       \note Leave blank to use constant setpoint specified in Dehumidification Relative Humidity
       \note Setpoint above. Schedule values must be in percent relative humidity (0 to 100).
       \type object-list
       \object-list ScheduleNames
- A26, \field Humidifier Type
+ A25, \field Humidifier Type
       \type choice
       \key None
       \key ElectricSteam
       \default None
- A27, \field Humidifier Availability Schedule Name
+ A26, \field Humidifier Availability Schedule Name
       \note If blank, always available
       \type object-list
       \object-list ScheduleNames
@@ -28350,7 +28346,7 @@ HVACTemplate:System:UnitarySystem,
       \autosizable
       \default autosize
       \ip-units W
- A28, \field Humidifier Control Zone Name
+ A27, \field Humidifier Control Zone Name
       \note Zone name where humidistat is located
       \type object-list
       \object-list ZoneNames
@@ -28362,19 +28358,19 @@ HVACTemplate:System:UnitarySystem,
       \maximum 100.0
       \default 30.0
       \units percent
- A29, \field Humidifier Relative Humidity Setpoint Schedule Name
+ A28, \field Humidifier Relative Humidity Setpoint Schedule Name
       \note Leave blank to use constant setpoint specified in Humidifier Relative Humidity
       \note  Setpoint above.Schedule values must be in percent relative humidity (0 to 100).
       \type object-list
       \object-list ScheduleNames
- A30, \field Sizing Option
+ A29, \field Sizing Option
       \note Select whether autosized system supply flow rate is the sum of Coincident or NonCoincident
       \note zone air flow rates.
       \type choice
       \key Coincident
       \key NonCoincident
       \default NonCoincident
- A31, \field Return Fan
+ A30, \field Return Fan
       \note Specifies if the system has a return fan.
       \type choice
       \key Yes

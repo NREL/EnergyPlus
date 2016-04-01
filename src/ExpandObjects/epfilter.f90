@@ -520,19 +520,18 @@ INTEGER,PARAMETER :: usHeatRecTypeOff = 36
 INTEGER,PARAMETER :: usHeatRecSenEffOff = 37
 INTEGER,PARAMETER :: usHeatRecLatEffOff = 38
 INTEGER,PARAMETER :: usDehumCtrlTypeOff = 39
-INTEGER,PARAMETER :: usDehumCtrlZoneOff = 40
-INTEGER,PARAMETER :: usDehumSetPtOff = 41
-INTEGER,PARAMETER :: usHumidCtrlTypeOff = 42
-INTEGER,PARAMETER :: usHumidAvailSchedNameOff = 43
-INTEGER,PARAMETER :: usHumidCapOff = 44
-INTEGER,PARAMETER :: usHumidRatedElecOff = 45
-INTEGER,PARAMETER :: usHumidCtrlZoneOff = 46
-INTEGER,PARAMETER :: usHumidSetPtOff = 47
-INTEGER,PARAMETER :: usReturnFanPresentOff = 48
-INTEGER,PARAMETER :: usReturnEfficiencyOff = 49
-INTEGER,PARAMETER :: usReturnPressureOff = 50
-INTEGER,PARAMETER :: usReturnFanMotorEffOff = 51
-INTEGER,PARAMETER :: usReturnFanFractionOff = 52
+INTEGER,PARAMETER :: usDehumSetPtOff = 40
+INTEGER,PARAMETER :: usHumidCtrlTypeOff = 41
+INTEGER,PARAMETER :: usHumidAvailSchedNameOff = 42
+INTEGER,PARAMETER :: usHumidCapOff = 43
+INTEGER,PARAMETER :: usHumidRatedElecOff = 44
+INTEGER,PARAMETER :: usHumidCtrlZoneOff = 45
+INTEGER,PARAMETER :: usHumidSetPtOff = 46
+INTEGER,PARAMETER :: usReturnFanPresentOff = 47
+INTEGER,PARAMETER :: usReturnEfficiencyOff = 48
+INTEGER,PARAMETER :: usReturnPressureOff = 49
+INTEGER,PARAMETER :: usReturnFanMotorEffOff = 50
+INTEGER,PARAMETER :: usReturnFanFractionOff = 51
 
 INTEGER,PARAMETER :: cvzNameOff = 1
 INTEGER,PARAMETER :: cvzAirHandlerNameOff = 2
@@ -1065,22 +1064,21 @@ INTEGER,PARAMETER :: ussHeatRecLatEffOff = 53
 INTEGER,PARAMETER :: ussHXTypeOff = 54
 INTEGER,PARAMETER :: ussFrostControlOff = 55
 INTEGER,PARAMETER :: ussDehumCtrlTypeOff = 56
-INTEGER,PARAMETER :: ussDehumCtrlZoneOff = 57
-INTEGER,PARAMETER :: ussDehumSetPtOff = 58
-INTEGER,PARAMETER :: ussDehumSetPtSchedNameOff = 59
-INTEGER,PARAMETER :: ussHumidCtrlTypeOff = 60
-INTEGER,PARAMETER :: ussHumidAvailSchedNameOff = 61
-INTEGER,PARAMETER :: ussHumidCapOff = 62
-INTEGER,PARAMETER :: ussHumidRatedElecOff = 63
-INTEGER,PARAMETER :: ussHumidCtrlZoneOff = 64
-INTEGER,PARAMETER :: ussHumidSetPtOff = 65
-INTEGER,PARAMETER :: ussHumidSetPtSchedNameOff = 66
-INTEGER,PARAMETER :: ussSizingOptionOff = 67
-INTEGER,PARAMETER :: ussReturnFanPresentOff = 68
-INTEGER,PARAMETER :: ussReturnEfficiencyOff = 69
-INTEGER,PARAMETER :: ussReturnPressureOff = 70
-INTEGER,PARAMETER :: ussReturnFanMotorEffOff = 71
-INTEGER,PARAMETER :: ussReturnFanFractionOff = 72
+INTEGER,PARAMETER :: ussDehumSetPtOff = 57
+INTEGER,PARAMETER :: ussDehumSetPtSchedNameOff = 58
+INTEGER,PARAMETER :: ussHumidCtrlTypeOff = 59
+INTEGER,PARAMETER :: ussHumidAvailSchedNameOff = 60
+INTEGER,PARAMETER :: ussHumidCapOff = 61
+INTEGER,PARAMETER :: ussHumidRatedElecOff = 62
+INTEGER,PARAMETER :: ussHumidCtrlZoneOff = 63
+INTEGER,PARAMETER :: ussHumidSetPtOff = 64
+INTEGER,PARAMETER :: ussHumidSetPtSchedNameOff = 65
+INTEGER,PARAMETER :: ussSizingOptionOff = 66
+INTEGER,PARAMETER :: ussReturnFanPresentOff = 67
+INTEGER,PARAMETER :: ussReturnEfficiencyOff = 68
+INTEGER,PARAMETER :: ussReturnPressureOff = 69
+INTEGER,PARAMETER :: ussReturnFanMotorEffOff = 70
+INTEGER,PARAMETER :: ussReturnFanFractionOff = 71
 
 INTEGER,PARAMETER :: ddzNameOff = 1
 INTEGER,PARAMETER :: ddzAirHandlerNameOff = 2
@@ -2217,7 +2215,9 @@ SUBROUTINE SetUpObjectsToProcess(doGatherSurfaces)
           ! HVACTemplate:Zone:WaterToAirHeatPump,
           !       \min-fields 39
           ! HVACTemplate:System:Unitary,
-          !       \min-fields 44
+          !       \min-fields 51
+          ! HVACTemplate:System:UnitarySystem,
+          !       \min-fields 71
           ! HVACTemplate:System:UnitaryHeatPump:AirToAir,
           !       \min-fields 54
           ! HVACTemplate:System:VAV,
@@ -2267,9 +2267,9 @@ CALL AddObjToProcess('HVACTemplate:Thermostat',.TRUE.,              tCoolSchedNa
 CALL AddObjToProcess('HVACTemplate:Zone:VAV',.TRUE.,                vzConstantMinFracOff,        vzDesSpecOADistNameOff,    34)
 CALL AddObjToProcess('HVACTemplate:Zone:VAV:FanPowered',.TRUE.,     fpvzAirHandlerNameOff,       fpvzDesSpecOADistNameOff,  33)
 CALL AddObjToProcess('HVACTemplate:Zone:VAV:HeatAndCool',.TRUE.,    hcvzAirHandlerNameOff,       hcvzHeatDesignTempDiffOff, 27)
-CALL AddObjToProcess('HVACTemplate:System:Unitary',.TRUE.,          usHeatCoilKindOff,           usReturnFanFractionOff,    52)
+CALL AddObjToProcess('HVACTemplate:System:Unitary',.TRUE.,          usHeatCoilKindOff,           usReturnFanFractionOff,    51)
 CALL AddObjToProcess('HVACTemplate:System:UnitaryHeatPump:AirToAir',.TRUE.,uhpsHPHeatCoilKindOff,uhpsReturnFanFractionOff,  61)
-CALL AddObjToProcess('HVACTemplate:System:UnitarySystem',.TRUE.,    ussAirHandlerNameOff,        ussReturnFanFractionOff,   72)
+CALL AddObjToProcess('HVACTemplate:System:UnitarySystem',.TRUE.,    ussAirHandlerNameOff,        ussReturnFanFractionOff,   71)
 CALL AddObjToProcess('HVACTemplate:Zone:Unitary',.TRUE.,            uzAirHandlerNameOff,         uzDesSpecOADistNameOff,    23)
 CALL AddObjToProcess('HVACTemplate:System:VAV',.TRUE.,              vsAirHandlerNameOff,         vsReturnFanPLRCoeffOff,    61)
 CALL AddObjToProcess('HVACTemplate:System:PackagedVAV',.TRUE.,      pvavsAirHandlerNameOff,      pvavsReturnFanPLRCoeffOff, 59)
@@ -13891,10 +13891,10 @@ DO iSys = 1, numCompactSysUnit
   ! Humdistat(s) if needed
   !    Single humidistat if humidification and dehumidification are both active and control zones are the same
   IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
-       .AND. SameString(FldVal(base +  usDehumCtrlZoneOff),FldVal(base +  usHumidCtrlZoneOff))) THEN
+       .AND. SameString(FldVal(base +  usControlZoneOff),FldVal(base +  usHumidCtrlZoneOff))) THEN
     CALL CreateNewObj('ZoneControl:Humidistat')
     CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Humidistat')
-    CALL AddToObjFld('Zone Name', base + usDehumCtrlZoneOff,'')
+    CALL AddToObjFld('Zone Name', base + usControlZoneOff,'')
     CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
                      'HVACTemplate-Always ' // TRIM(FldVal(base + usHumidSetPtOff)))
     CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
@@ -13908,7 +13908,7 @@ DO iSys = 1, numCompactSysUnit
   !   Dehumidification humidistat
       CALL CreateNewObj('ZoneControl:Humidistat')
       CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Dehumidification Humidistat')
-      CALL AddToObjFld('Zone Name', base + usDehumCtrlZoneOff,'')
+      CALL AddToObjFld('Zone Name', base + usControlZoneOff,'')
       CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
       CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
                        'HVACTemplate-Always ' // TRIM(FldVal(base + usDehumSetPtOff)),.TRUE.)
@@ -15983,10 +15983,10 @@ DO iSys = 1, numCompactSysUnitarySystem
 
   !    Single humidistat if humidification and dehumidification are both active and control zones are the same
   IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
-       .AND. SameString(FldVal(base +  ussDehumCtrlZoneOff),FldVal(base +  ussHumidCtrlZoneOff))) THEN
+       .AND. SameString(FldVal(base +  ussControlZoneOff),FldVal(base +  ussHumidCtrlZoneOff))) THEN
     CALL CreateNewObj('ZoneControl:Humidistat')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Humidistat')
-    CALL AddToObjFld('Zone Name', base + ussDehumCtrlZoneOff,'')
+    CALL AddToObjFld('Zone Name', base + ussControlZoneOff,'')
     CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', TRIM(humscheduleName))
     CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', TRIM(dehumscheduleName),.TRUE.)
   ELSE
@@ -15994,7 +15994,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   !   Dehumidification humidistat
       CALL CreateNewObj('ZoneControl:Humidistat')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Dehumidification Humidistat')
-      CALL AddToObjFld('Zone Name', base + ussDehumCtrlZoneOff,'')
+      CALL AddToObjFld('Zone Name', base + ussControlZoneOff,'')
       CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
       CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', TRIM(dehumscheduleName),.TRUE.)
 
