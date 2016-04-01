@@ -1855,9 +1855,9 @@ Fan:SystemModel,
   Fan Energy, !- End-Use Subcategory
   3, !- Number of Speeds
   0.33, !- Speed 1 Flow Fraction
-  0.33, !- Speed 1 Electric Power Fraction
+  0.12, !- Speed 1 Electric Power Fraction
   0.66, !- Speed 2 Flow Fraction
-  0.66, !- Speed 2 Electric Power Fraction
+  0.51, !- Speed 2 Electric Power Fraction
   1.0,  !- Speed 3 Flow Fraction
   1.0;  !- Speed 3 Electric Power Fraction
 
