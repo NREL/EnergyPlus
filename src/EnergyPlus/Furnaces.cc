@@ -5305,7 +5305,7 @@ namespace Furnaces {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using General::TrimSigDigits;
-		using BranchInputManager::CheckSystemBranchFlow;
+//		using BranchInputManager::CheckSystemBranchFlow;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -5562,8 +5562,8 @@ namespace Furnaces {
 
 		BranchFlow = 0.0;
 		ErrFound = false;
-		CheckSystemBranchFlow( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ), Furnace( FurnaceNum ).Name, BranchFlow, Furnace( FurnaceNum ).DesignFanVolFlowRate, ErrFound );
-		if ( ErrFound ) ShowContinueError( "...occurs in " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name );
+		//CheckSystemBranchFlow( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ), Furnace( FurnaceNum ).Name, BranchFlow, Furnace( FurnaceNum ).DesignFanVolFlowRate, ErrFound );
+		//if ( ErrFound ) ShowContinueError( "...occurs in " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name );
 	}
 
 	// End Initialization Section of the Module

@@ -399,7 +399,7 @@ namespace BranchInputManager {
 	GetBranchData(
 		std::string const & LoopName, // Loop Name of this Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
+//		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -458,7 +458,7 @@ namespace BranchInputManager {
 
 		BComponents.allocate( NumComps );
 
-		GetInternalBranchData( LoopName, BranchName, BranchMaxFlow, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+		GetInternalBranchData( LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 
 		MinCompsAllowed = min( size( CompType ), size( CompName ), size( CompInletNodeNames ), size( CompInletNodeNums ), size( CompOutletNodeNames ), size( CompOutletNodeNums ) );
 		if ( MinCompsAllowed < NumComps ) {
@@ -659,7 +659,7 @@ namespace BranchInputManager {
 			ShowSevereError( "GetBranchFlow:  Branch index not found = " + TrimSigDigits( BranchNum ) );
 		} else {
 			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
-				GetBranchFlow = Branch( BranchNum ).MaxFlowRate;
+//				GetBranchFlow = Branch( BranchNum ).MaxFlowRate;
 			}
 		}
 
@@ -829,7 +829,7 @@ namespace BranchInputManager {
 	GetInternalBranchData(
 		std::string const & LoopName, // Loop Name for Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
+//		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -884,12 +884,12 @@ namespace BranchInputManager {
 		if ( Found == 0 ) {
 			ShowSevereError( "GetInternalBranchData:  Branch not found=" + BranchName );
 			ErrorsFound = true;
-			BranchMaxFlow = 0.0;
+//			BranchMaxFlow = 0.0;
 			NumComps = 0;
 		} else {
 			if ( Branch( Found ).AssignedLoopName == BlankString ) {
 				Branch( Found ).AssignedLoopName = LoopName;
-				BranchMaxFlow = Branch( Found ).MaxFlowRate;
+//				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -903,10 +903,10 @@ namespace BranchInputManager {
 				ShowContinueError( "Branch already assigned to loop=" + Branch( Found ).AssignedLoopName );
 				ShowContinueError( "New attempt to assign to loop=" + LoopName );
 				ErrorsFound = true;
-				BranchMaxFlow = 0.0;
+//				BranchMaxFlow = 0.0;
 				NumComps = 0;
 			} else {
-				BranchMaxFlow = Branch( Found ).MaxFlowRate;
+//				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -1123,7 +1123,7 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-		Real64 MaxFlowRate; // Branch Max Flow Rate
+//		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1177,7 +1177,7 @@ namespace BranchInputManager {
 			GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
-			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
+			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..occurs for Connector:Mixer Name=" + Mixers( Count ).Name );
 				ErrorsFound = true;
@@ -1199,7 +1199,7 @@ namespace BranchInputManager {
 				InletNodeNames = "";
 
 				for ( Loop = 1; Loop <= Mixers( Count ).NumInletBranches; ++Loop ) {
-					GetInternalBranchData( LoopName, Mixers( Count ).InletBranchNames( Loop ), MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+					GetInternalBranchData( LoopName, Mixers( Count ).InletBranchNames( Loop ), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 					if ( NumComps > 0 ) {
 						InletNodeNames( Loop ) = BComponents( NumComps ).OutletNodeName;
 						InletNodeNums( Loop ) = BComponents( NumComps ).OutletNode;
@@ -1272,7 +1272,7 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-		Real64 MaxFlowRate; // Branch Max Flow Rate
+//		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1330,7 +1330,7 @@ namespace BranchInputManager {
 			GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
-			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
+			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..occurs for Splitter Name=" + Splitters( Count ).Name );
 				ErrorsFound = true;
@@ -1352,7 +1352,7 @@ namespace BranchInputManager {
 				OutletNodeNames = "";
 
 				for ( Loop = 1; Loop <= Splitters( Count ).NumOutletBranches; ++Loop ) {
-					GetInternalBranchData( LoopName, Splitters( Count ).OutletBranchNames( Loop ), MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+					GetInternalBranchData( LoopName, Splitters( Count ).OutletBranchNames( Loop ), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 					if ( NumComps > 0 ) {
 						OutletNodeNames( Loop ) = BComponents( 1 ).InletNodeName;
 						OutletNodeNums( Loop ) = BComponents( 1 ).InletNode;
@@ -1560,7 +1560,7 @@ namespace BranchInputManager {
 		OASysFlag = false;
 
 		if ( BranchNum > 0 && BranchNum <= SizeBranch ) {
-			BranchFlow = Branch( BranchNum ).MaxFlowRate;
+//			BranchFlow = Branch( BranchNum ).MaxFlowRate;
 			BranchName = Branch( BranchNum ).Name;
 		} else {
 			ErrFound = true;
@@ -1718,7 +1718,7 @@ namespace BranchInputManager {
 					}
 					++BCount;
 					Branch( BCount ).Name = Alphas( 1 );
-					Branch( BCount ).MaxFlowRate = Numbers( 1 );
+//					Branch( BCount ).MaxFlowRate = Numbers( 1 );
 					GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
 					if ( PressureCurveType == PressureCurve_Error ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
@@ -3322,10 +3322,10 @@ namespace BranchInputManager {
 					}
 				}
 				Branch( Found ).FluidType = BranchFluidType;
-				if ( IsAirBranch && Branch( Found ).MaxFlowRate == 0.0 ) {
-					ShowSevereError( "Branch=" + Branch( Found ).Name + " is an air branch with zero max flow rate." );
-					ErrFound = true;
-				}
+//				if ( IsAirBranch && Branch( Found ).MaxFlowRate == 0.0 ) {
+//					ShowSevereError( "Branch=" + Branch( Found ).Name + " is an air branch with zero max flow rate." );
+//					ErrFound = true;
+//				}
 				BranchOutletNodeName = MatchNodeName;
 				if ( Branch( Found ).AssignedLoopName == BlankString ) {
 					BranchLoopName = "**Unknown**";

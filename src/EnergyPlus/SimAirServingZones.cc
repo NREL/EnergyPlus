@@ -767,8 +767,7 @@ namespace SimAirServingZones {
 				OutletNodeNames.allocate( NumCompsOnBranch );
 				OutletNodeNumbers.dimension( NumCompsOnBranch, 0 );
 
-				Real64 DummyBranchMaxVolumeFlow;
-				GetBranchData( PrimaryAirSystem( AirSysNum ).Name, BranchNames( BranchNum ), DummyBranchMaxVolumeFlow, DummyInteger( 1 ), DummyInteger( 2 ), NumCompsOnBranch, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); //Placeholders for plant branch pressure data (not used in air loops)
+				GetBranchData( PrimaryAirSystem( AirSysNum ).Name, BranchNames( BranchNum ), DummyInteger( 1 ), DummyInteger( 2 ), NumCompsOnBranch, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); //Placeholders for plant branch pressure data (not used in air loops)
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp.allocate( NumCompsOnBranch );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents = NumCompsOnBranch;
 
