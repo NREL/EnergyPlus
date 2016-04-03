@@ -1281,7 +1281,6 @@ namespace HVACUnitarySystem {
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
 		using DataZoneEnergyDemands::Setback;
 		using DataZoneControls::StageZoneLogic;
-//		using BranchInputManager::CheckSystemBranchFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1436,16 +1435,12 @@ namespace HVACUnitarySystem {
 								ShowContinueError( "...Unitary system volumetric flow rate = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, 5 ) + " m3/s." );
 							}
 						}
-					} else {
-						//CheckSystemBranchFlow( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
 					}
 				}
 				MyFanFlag( UnitarySysNum ) = false;
 			} else {
 				if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( BlankString, BlankString, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
-				} else {
-					//CheckSystemBranchFlow( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
 				}
 			}
 		}
@@ -1842,10 +1837,8 @@ namespace HVACUnitarySystem {
 		// na
 
 		// Using/Aliasing
-//		using BranchInputManager::CheckSystemBranchFlow;
 		using BranchInputManager::GetAirBranchIndex;
 		using BranchInputManager::GetBranchFanTypeName;
-//		using BranchInputManager::GetBranchFlow;
 		using DataAirSystems::PrimaryAirSystem;
 		using CurveManager::CurveValue;
 		using DXCoils::SimDXCoil; // , SetDXCoolingCoilData

@@ -5305,7 +5305,6 @@ namespace Furnaces {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using General::TrimSigDigits;
-//		using BranchInputManager::CheckSystemBranchFlow;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -5330,8 +5329,6 @@ namespace Furnaces {
 		int ThisCtrlZoneNum; // the controlled zone number of the control zone !!!
 		int Iter; // iteration count
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
-		bool ErrFound; // flag returned from mining functions
-		Real64 BranchFlow; // branch volumetric flow rate [m3/s]
 		bool anyRan;
 		ManageEMS( emsCallFromUnitarySystemSizing, anyRan ); // calling point
 		ThisCtrlZoneNum = 0;
@@ -5560,10 +5557,6 @@ namespace Furnaces {
 		UnitaryHeatCap = Furnace( FurnaceNum ).DesignHeatingCapacity;
 		SuppHeatCap = Furnace( FurnaceNum ).DesignSuppHeatingCapacity;
 
-		BranchFlow = 0.0;
-		ErrFound = false;
-		//CheckSystemBranchFlow( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ), Furnace( FurnaceNum ).Name, BranchFlow, Furnace( FurnaceNum ).DesignFanVolFlowRate, ErrFound );
-		//if ( ErrFound ) ShowContinueError( "...occurs in " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name );
 	}
 
 	// End Initialization Section of the Module

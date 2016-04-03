@@ -273,22 +273,11 @@ namespace BranchInputManager {
 		std::string const & CompName
 	);
 
-	Real64
-	GetBranchFlow( int const BranchNum );
-
 	void
 	GetBranchFanTypeName(
 		int const BranchNum,
 		std::string & FanType,
 		std::string & FanName,
-		bool & ErrFound
-	);
-
-	void
-	CheckBranchForOASys(
-		std::string const & CompType,
-		std::string const & CompName,
-		bool & OASysFlag,
 		bool & ErrFound
 	);
 
@@ -357,15 +346,6 @@ namespace BranchInputManager {
 
 	std::string
 	GetLastBranchOutletNodeName( std::string const & BranchListName ); // Branch List name to search
-
-	void
-	CheckSystemBranchFlow(
-		std::string const & SystemType, // type of air loop equipment
-		std::string const & SystemName, // name of air loop equipment
-		Real64 & BranchFlow, // branch volumetric flow rate [m3/s]
-		Real64 const BranchFanFlow, // branch flow rate [m3/s]
-		bool & ErrFound // logical error flag
-	);
 
 	//==================================================================================
 	//   Routines that get the input for the internal branch management structure
