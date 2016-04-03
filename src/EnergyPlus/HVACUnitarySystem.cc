@@ -1843,8 +1843,8 @@ namespace HVACUnitarySystem {
 
 		// Using/Aliasing
 //		using BranchInputManager::CheckSystemBranchFlow;
-//		using BranchInputManager::GetAirBranchIndex;
-//		using BranchInputManager::GetBranchFanTypeName;
+		using BranchInputManager::GetAirBranchIndex;
+		using BranchInputManager::GetBranchFanTypeName;
 //		using BranchInputManager::GetBranchFlow;
 		using DataAirSystems::PrimaryAirSystem;
 		using CurveManager::CurveValue;
@@ -1899,7 +1899,7 @@ namespace HVACUnitarySystem {
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int MSHPIndex; // Index to design Specification object
 		int BranchNum; // Index to branch on air loop
-		Real64 BranchFlow; // branch flow rate [m3/s]
+		Real64 SystemFlow; // AirloopHVAC flow rate [m3/s]
 		Real64 BranchFanFlow; // branch fan flow rate [m3/s]
 		bool ErrFound; // logical error flag
 		std::string FanType; // fan type
@@ -2454,25 +2454,29 @@ namespace HVACUnitarySystem {
 			}
 		}
 
-//		Not sure if this may be needed for special cases - reference PR#5582 - branch flow rate is no longer an input
-//		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 ) {
-//			if ( ! SysSizingRunDone ) {
-//				BranchNum = GetAirBranchIndex( "AirloopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name );
-//				FanType = "";
-//				FanName = "";
-//				BranchFanFlow = 0.0;
-//				if ( BranchNum > 0.0 ) GetBranchFanTypeName( BranchNum, FanType, FanName, ErrFound );
-//				if ( ! ErrFound && BranchNum > 0 ) BranchFanFlow = GetFanDesignVolumeFlowRate( FanType, FanName, ErrFound );
-//				if ( BranchNum > 0.0 ) BranchFlow = GetBranchFlow( BranchNum );
-//				if ( BranchFanFlow > 0.0 ) {
-//					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = BranchFanFlow;
-//				} else if ( BranchFlow > 0.0 ) {
-//					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = BranchFlow;
-//				} else if ( BranchFlow == AutoSize ) {
-//					// what do I do?
-//				}
-//			}
-//		}
+//		Not sure if this may be needed for special cases
+		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 ) {
+			if ( ! SysSizingRunDone ) {
+				BranchNum = GetAirBranchIndex( "AirloopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name );
+				FanType = "";
+				FanName = "";
+				BranchFanFlow = 0.0;
+				if ( BranchNum > 0.0 ) GetBranchFanTypeName( BranchNum, FanType, FanName, ErrFound );
+				if ( ! ErrFound && BranchNum > 0 ) BranchFanFlow = GetFanDesignVolumeFlowRate( FanType, FanName, ErrFound );
+				if ( BranchFanFlow > 0.0 ) {
+					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = BranchFanFlow;
+				} else {
+					SystemFlow = 0.0;
+					if ( AirLoopNum > 0.0 ) SystemFlow = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate;
+					if (SystemFlow > 0.0) {
+						UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow = SystemFlow;
+					}
+					else {
+						// what do I do?
+					}
+				}
+			}
+		}
 
 		//Change the Volume Flow Rates to Mass Flow Rates
 		UnitarySystem( UnitarySysNum ).DesignMassFlowRate = UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate * StdRhoAir;
@@ -2617,21 +2621,17 @@ namespace HVACUnitarySystem {
 			RegisterPlantCompDesignFlow( UnitarySystem( UnitarySysNum ).HeatRecoveryInletNodeNum, UnitarySystem( UnitarySysNum ).DesignHRWaterVolumeFlow );
 		}
 
-//		 Not sure if this may be needed for special cases - reference PR#5582 - branch flow rate is no longer an input
-//		if ( CurOASysNum == 0 && CurZoneEqNum == 0 && UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate <= 0.0 ) {
-//			BranchFlow = 0.0;
-//			SystemType = cFurnaceTypes( UnitarySystem( UnitarySysNum ).UnitarySystemType_Num );
-//			ErrFound = false;
-//			// check branch flow rate vs system flow rate. Branch must match system if OA system is present
-//			CheckSystemBranchFlow( SystemType, UnitarySystem( UnitarySysNum ).Name, BranchFlow, UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate, ErrFound );
-//			if ( ErrFound ) ShowContinueError( "...occurs in " + SystemType + " \"" + UnitarySystem( UnitarySysNum ).Name );
-//			if ( BranchFlow != AutoSize ) {
-//				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = BranchFlow;
-//			} else {
-//				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-//			}
-//			UnitarySystem( UnitarySysNum ).DesignMassFlowRate = UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate * StdRhoAir;
-//		}
+		// Set flow rate for unitary system with no fan
+		if ( CurOASysNum == 0 && CurZoneEqNum == 0 && UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate <= 0.0 ) {
+			SystemFlow = 0;
+			if (AirLoopNum > 0) SystemFlow = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate;
+			if (SystemFlow > 0.0 ) {
+				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = SystemFlow;
+			} else {
+				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+			}
+			UnitarySystem( UnitarySysNum ).DesignMassFlowRate = UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate * StdRhoAir;
+		}
 
 		CoolingLoad = TempCoolingLoad;
 		HeatingLoad = TempHeatingLoad;
