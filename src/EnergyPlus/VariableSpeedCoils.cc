@@ -5554,7 +5554,8 @@ namespace VariableSpeedCoils {
 	GetCoilIndexVariableSpeed(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
-		bool & ErrorsFound // set to true if problem
+		bool & ErrorsFound, // set to true if problem
+		Optional_bool_const SuppressWarning
 	)
 	{
 
@@ -5607,6 +5608,8 @@ namespace VariableSpeedCoils {
 		IndexNum = FindItemInList( CoilName, VarSpeedCoil );
 
 		if ( IndexNum == 0 ) {
+
+			if (false == SuppressWarning) 
 			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );//screen the message for IHP coil call
 			ErrorsFound = true;
 		}

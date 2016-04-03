@@ -1615,7 +1615,7 @@ namespace WaterThermalTanks {
 					if ( DXCoilErrFlag ) {
 						// This could be a variable speed heat pump water heater
 						bool bVSCoilErrFlag = false;
-						HPWH.DXCoilNum = GetCoilIndexVariableSpeed("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag);
+						HPWH.DXCoilNum = GetCoilIndexVariableSpeed("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag, true);
 						if (bVSCoilErrFlag) {
 							bVSCoilErrFlag = false;
 							HPWH.DXCoilNum = GetCoilIndexIHP("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag);
@@ -10414,6 +10414,7 @@ namespace WaterThermalTanks {
 		bool bIsVSCoil(false); // variable-speed HPWH identifier
 		Real64 RhoWater; //water density
 		int VSCoilNum(0);
+		std::string VSCoilName = ""; 
 
 		// Formats
 		static gio::Fmt Format_720( "('Water Heater Information',6(',',A))" );
@@ -10523,8 +10524,12 @@ namespace WaterThermalTanks {
 					if (SameString(HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") || (true == HPWaterHeater(HPNum).bIsIHP))
 					{
 						bIsVSCoil = true;
+						VSCoilName = HPWaterHeater(HPNum).DXCoilName; 
 						VSCoilNum = HPWaterHeater(HPNum).DXCoilNum;
-						if (true == HPWaterHeater(HPNum).bIsIHP) VSCoilNum = IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
+						if (true == HPWaterHeater(HPNum).bIsIHP){
+							VSCoilNum = IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
+							VSCoilName = IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilName; 
+						}
 
 						RhoWater = RhoH2O(WaterThermalTank(WaterThermalTankNum).TankTemp);
 						SetVSHPWHFlowRates(WaterThermalTankNum, HPNum,
@@ -10534,20 +10539,20 @@ namespace WaterThermalTanks {
 						if (HPWaterHeater(HPNum).FanPlacement == BlowThru) {
 							//   simulate fan and DX coil twice
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
-							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, VSCoilNum,
+							SimVariableSpeedCoils(VSCoilName, VSCoilNum,
 								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
 								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
-							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, VSCoilNum,
+							SimVariableSpeedCoils(VSCoilName, VSCoilNum,
 								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
 								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
 						} else {
 							//   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
-							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, VSCoilNum,
+							SimVariableSpeedCoils(VSCoilName, VSCoilNum,
 								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
 								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
-							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, VSCoilNum,
+							SimVariableSpeedCoils(VSCoilName, VSCoilNum,
 								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
 								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
@@ -10645,9 +10650,11 @@ namespace WaterThermalTanks {
 			} else {
 				RecoveryEfficiency = 0.0;
 				EnergyFactor = 0.0;
-
-				ShowWarningError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings" );
-				ShowContinueError( "Setpoint was never recovered and/or heater never turned on" );
+				if (false == HPWaterHeater(HPNum).bIsIHP)
+				{
+					ShowWarningError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings" );
+					ShowContinueError( "Setpoint was never recovered and/or heater never turned on" );
+				}
 			}
 
 		} else {
