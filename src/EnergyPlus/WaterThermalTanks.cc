@@ -58,18 +58,15 @@
 
 
 // C++ Headers
-#include <cassert>
-#include <cmath>
-#include <string>
 #include <map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/floops.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
-#include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <WaterThermalTanks.hh>
@@ -106,6 +103,7 @@
 #include <SolarCollectors.hh>
 #include <UtilityRoutines.hh>
 #include <IntegratedHeatPump.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -157,6 +155,7 @@ namespace WaterThermalTanks {
 	using namespace DataPlant;
 	using General::TrimSigDigits;
 	using ReportSizingManager::ReportSizingOutput;
+	using VariableSpeedCoils::MaxSpedLevels;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -272,6 +271,113 @@ namespace WaterThermalTanks {
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	// Default Constructor
+	HeatPumpWaterHeaterData::HeatPumpWaterHeaterData() :
+		TypeNum( 0 ),
+		TankTypeNum( 0 ),
+		StandAlone( false ),
+		AvailSchedPtr( 0 ),
+		SetPointTempSchedule( 0 ),
+		DeadBandTempDiff( 0.0 ),
+		Capacity( 0.0 ),
+		BackupElementCapacity( 0.0 ),
+		BackupElementEfficiency( 0.0 ),
+		WHOnCycParaLoad( 0.0 ),
+		WHOffCycParaLoad( 0.0 ),
+		WHOnCycParaFracToTank( 0.0 ),
+		WHOffCycParaFracToTank( 0.0 ),
+		WHPLFCurve( 0 ),
+		OperatingAirFlowRate( 0.0 ),
+		OperatingWaterFlowRate( 0.0 ),
+		COP( 0.0 ),
+		SHR( 0.0 ),
+		RatedInletDBTemp( 0.0 ),
+		RatedInletWBTemp( 0.0 ),
+		RatedInletWaterTemp( 0.0 ),
+		FoundTank( false ),
+		HeatPumpAirInletNode( 0 ),
+		HeatPumpAirOutletNode( 0 ),
+		OutsideAirNode( 0 ),
+		ExhaustAirNode( 0 ),
+		CondWaterInletNode( 0 ),
+		CondWaterOutletNode( 0 ),
+		WHUseInletNode( 0 ),
+		WHUseOutletNode( 0 ),
+		WHUseSidePlantLoopNum( 0 ),
+		DXCoilNum( 0 ),
+		DXCoilTypeNum( 0 ),
+		DXCoilAirInletNode( 0 ),
+		DXCoilPLFFPLR( 0 ),
+		FanType_Num( 0 ),
+		FanNum( 0 ),
+		FanPlacement( 0 ),
+		FanOutletNode( 0 ),
+		WaterHeaterTankNum( 0 ),
+		OutletAirSplitterSchPtr( 0 ),
+		InletAirMixerSchPtr( 0 ),
+		Mode( 0 ),
+		SaveMode( 0 ),
+		SaveWHMode( 0 ),
+		Power( 0.0 ),
+		Energy( 0.0 ),
+		HeatingPLR( 0.0 ),
+		SetPointTemp( 0.0 ),
+		MinAirTempForHPOperation( 5.0 ),
+		MaxAirTempForHPOperation( 48.8888888889 ),
+		InletAirMixerNode( 0 ),
+		OutletAirSplitterNode( 0 ),
+		SourceMassFlowRate( 0.0 ),
+		InletAirConfiguration( 0 ),
+		AmbientTempSchedule( 0 ),
+		AmbientRHSchedule( 0 ),
+		AmbientTempZone( 0 ),
+		CrankcaseTempIndicator( 0 ),
+		CrankcaseTempSchedule( 0 ),
+		CrankcaseTempZone( 0 ),
+		OffCycParaLoad( 0.0 ),
+		OnCycParaLoad( 0.0 ),
+		ParasiticTempIndicator( 0 ),
+		OffCycParaFuelRate( 0.0 ),
+		OnCycParaFuelRate( 0.0 ),
+		OffCycParaFuelEnergy( 0.0 ),
+		OnCycParaFuelEnergy( 0.0 ),
+		AirFlowRateAutoSized( false ),
+		WaterFlowRateAutoSized( false ),
+		HPSetPointError( 0 ),
+		HPSetPointErrIndex1( 0 ),
+		IterLimitErrIndex1( 0 ),
+		IterLimitExceededNum1( 0 ),
+		RegulaFalsiFailedIndex1( 0 ),
+		RegulaFalsiFailedNum1( 0 ),
+		IterLimitErrIndex2( 0 ),
+		IterLimitExceededNum2( 0 ),
+		RegulaFalsiFailedIndex2( 0 ),
+		RegulaFalsiFailedNum2( 0 ),
+		FirstTimeThroughFlag( true ),
+		ShowSetPointWarning( true ),
+		HPWaterHeaterSensibleCapacity( 0.0 ),
+		HPWaterHeaterLatentCapacity( 0.0 ),
+		WrappedCondenserBottomLocation( 0.0 ),
+		WrappedCondenserTopLocation( 0.0 ),
+		ControlSensor1Height( -1.0 ),
+		ControlSensor1Node( 1 ),
+		ControlSensor1Weight( 1.0 ),
+		ControlSensor2Height( -1.0 ),
+		ControlSensor2Node( 2 ),
+		ControlSensor2Weight( 0.0 ),
+		ControlTempAvg( 0.0 ),
+		ControlTempFinal( 0.0 ),
+		AllowHeatingElementAndHeatPumpToRunAtSameTime( true ),
+		NumofSpeed( 0 ),
+		HPWHAirVolFlowRate( MaxSpedLevels, 0.0 ),
+		HPWHAirMassFlowRate( MaxSpedLevels, 0.0 ),
+		HPWHWaterVolFlowRate( MaxSpedLevels, 0.0 ),
+		HPWHWaterMassFlowRate( MaxSpedLevels, 0.0 ),
+		MSAirSpeedRatio( MaxSpedLevels, 0.0 ),
+		MSWaterSpeedRatio( MaxSpedLevels, 0.0 ),
+		bIsIHP(false)
+	{}
 
 	void
 	SimWaterThermalTank(
@@ -1613,36 +1719,39 @@ namespace WaterThermalTanks {
 
 					GetDXCoilIndex( HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, cCurrentModuleObject, true );
 					if ( DXCoilErrFlag ) {
-						// This could be a variable speed heat pump water heater
-						bool bVSCoilErrFlag = false;
-						HPWH.DXCoilNum = GetCoilIndexVariableSpeed("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag, true);
-						if (bVSCoilErrFlag) {
-							bVSCoilErrFlag = false;
-							HPWH.DXCoilNum = GetCoilIndexIHP("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag);
+							// This could be a variable speed heat pump water heater
+							bool bVSCoilErrFlag = false;
 
-							if (bVSCoilErrFlag) {
-								ShowContinueError("...occurs in " + cCurrentModuleObject + " =" + HPWH.Name);
-								ShowContinueError("...could not find either DXCoil or Variable Speed Coil " + HPWH.DXCoilName);
-								ErrorsFound = true;
+							bool checkIHPFirst = IntegratedHeatPump::HasIHP();
+							if ( checkIHPFirst ) {
+								HPWH.DXCoilNum = GetCoilIndexIHP( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag );
+
+								if ( ! bVSCoilErrFlag ) {
+									HPWH.bIsIHP = true;
+								}
+							}
+
+							if ( bVSCoilErrFlag || ! checkIHPFirst ) {
+								bVSCoilErrFlag = false;
+								HPWH.DXCoilNum = GetCoilIndexVariableSpeed( "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag) ;
+
+								if ( bVSCoilErrFlag ) {
+									ShowContinueError( "...occurs in " + cCurrentModuleObject + " =" + HPWH.Name );
+									ShowContinueError( "...could not find either DXCoil or Variable Speed Coil " + HPWH.DXCoilName );
+									ErrorsFound = true;
+								}
+							}
+
+							bIsVScoil = true;
+							HPWH.DXCoilTypeNum = 0;
+							if (true == HPWH.bIsIHP)
+							{
+								HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
 							}
 							else
 							{
-								HPWH.bIsIHP = true;
-								ErrorsFound = false;
+								HPWH.DXCoilType = VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
 							}
-
-						}
-
-						bIsVScoil = true;
-						HPWH.DXCoilTypeNum = 0;
-						if (true == HPWH.bIsIHP)
-						{
-							HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
-						}
-						else
-						{
-							HPWH.DXCoilType = VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
-						}
 					} else {
 						// this is a single speed coil
 						DXCoils::DXCoilData & Coil = DXCoil(HPWH.DXCoilNum);
@@ -7413,7 +7522,6 @@ namespace WaterThermalTanks {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::RhoH2O;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
-		using VariableSpeedCoils::VarSpeedCoil;
 		using IntegratedHeatPump::IntegratedHeatPumps;
 		using IntegratedHeatPump::SimIHP;
 		using IntegratedHeatPump::GetLowSpeedNumIHP;

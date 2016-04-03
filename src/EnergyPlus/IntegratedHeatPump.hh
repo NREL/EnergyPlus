@@ -371,6 +371,9 @@ namespace EnergyPlus {
 		                       bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
 		);
 
+		bool
+		HasIHP();
+
 		int
 		GetCoilIndexIHP(
 			std::string const & CoilType, // must match coil types in this module

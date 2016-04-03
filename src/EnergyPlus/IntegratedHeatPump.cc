@@ -67,9 +67,12 @@
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
+#include <DataGlobals.hh>
+#include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSizing.hh>
 #include <DataWater.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
@@ -88,6 +91,7 @@
 #include <WaterManager.hh>
 #include <WaterThermalTanks.hh>
 #include <InputProcessor.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -1522,6 +1526,15 @@ namespace EnergyPlus {
 			return ( IntegratedHeatPumps( DXCoilNum ).CurMode );
 		}
 
+		bool
+		HasIHP()
+		{
+			if ( GetCoilsInputFlag ) {
+				GetIHPInput();
+				GetCoilsInputFlag = false;
+			}
+			return ! IntegratedHeatPumps.empty();
+		}
 
 		int
 		GetCoilIndexIHP(
