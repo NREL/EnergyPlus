@@ -15808,7 +15808,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:UnitarySystem')
   CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Unitary System')
   CALL AddToObjFld('Component Inlet Node Name', base + ussAirHandlerNameOff, TRIM(unitInlet))
-  CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff, TRIM(unitOutlet))
+  CALL AddToObjFld('Component Outlet Node Name', base + ussAirHandlerNameOff, TRIM(unitOutlet),isHumidifierNone)
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Humidifier')
@@ -21120,7 +21120,7 @@ DO iSys = 1, numCompactSysDualDuct
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' OA System')
   CALL AddToObjStr('Component Inlet Node Name', TRIM(returnInletToOAMIxer))
-  CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Mixed Air Outlet')
+  CALL AddToObjFld('Component Outlet Node Name', base + ddsAirHandlerNameOff,' Mixed Air Outlet',(supFanKind .EQ. sfkNone))
   IF (supFanKind .NE. sfkNone) THEN
     IF (supFanKind .EQ. sfkVAV) THEN
       CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
@@ -21145,7 +21145,7 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Hot Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(hotfanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(hotfanOutlet))
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(hotfanOutlet),(isHumidifierNone .AND. heatCoilType == ctNone))
   END IF
   IF (heatCoilType .NE. ctNone) THEN
     IF (heatCoilType .EQ. ctHotWater) THEN
@@ -21157,13 +21157,15 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(heatCoilInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet))
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(heatCoilOutlet), &
+                                             (isHumidifierNone .AND. (hotSupFanPlacement .NE. sfpDrawThru)))
   END IF
   IF (humidifierKind .EQ. humidifyElecSteam) THEN
     CALL AddToObjStr('Component Object Type','Humidifier:Steam:Electric')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Humidifier')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(humidifierInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(humidifierOutlet))
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(humidifierOutlet), &
+                                            (hotSupFanPlacement .NE. sfpDrawThru))
   END IF
   IF (hotSupFanPlacement .EQ. sfpDrawThru) THEN
     IF (hotFanKind .EQ. sfkVAV) THEN
@@ -21189,7 +21191,7 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Cold Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coldfanInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(coldfanOutlet))
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(coldfanOutlet),(coolCoilType == ctNone))
   END IF
   IF (coolCoilType .NE. ctNone) THEN
     IF (coolCoilType .EQ. ccChWater) THEN
@@ -21199,7 +21201,7 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Cooling Coil')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(coolCoilInlet))
-    CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilOutlet))
+    CALL AddToObjStr('Component Outlet Node Name', TRIM(coolCoilOutlet),(coldSupFanPlacement .NE. sfpDrawThru))
   END IF
   IF (coldSupFanPlacement .EQ. sfpDrawThru) THEN
     IF (coldFanKind .EQ. sfkVAV) THEN
@@ -28624,7 +28626,7 @@ ELSE
     IF (loopPumpConfig .EQ. pumpConstant) THEN
       CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Pump Outlet')
+      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Pump Outlet',.TRUE.)
     ELSEIF (loopPumpConfig .EQ. pumpConstPriVarSec) THEN
       CALL AddToObjFld('Name', base + cwpNameOff,' ChW Primary Supply Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
@@ -28707,11 +28709,11 @@ ELSE
     IF (loopPumpConfig .EQ. pumpVariable) THEN
       CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Pump Outlet')
+      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Pump Outlet',.TRUE.)
     ELSEIF (loopPumpConfig .EQ. pumpVarPriConstSec) THEN
       CALL AddToObjFld('Name', base + cwpNameOff,' ChW Primary Supply Pump')
       CALL AddToObjFld('Component Inlet Node Name', base + cwpNameOff,' ChW Supply Inlet')
-      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Primary Pump Outlet')
+      CALL AddToObjFld('Component Outlet Node Name', base + cwpNameOff,' ChW Primary Pump Outlet',.TRUE.)
     END IF
   END IF
 END IF
@@ -31168,9 +31170,9 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Component Name', base + doasNameOff,' Supply Fan')
     CALL AddToObjStr('Component Inlet Node Name', TRIM(fanInlet))
     IF ((coolCoilKind .NE. ccNone) .OR. (heatCoilType .NE. ctNone)) THEN
-          CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet))
     ELSE
-          CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet),.TRUE.)
+      CALL AddToObjStr('Component Outlet Node Name', TRIM(fanOutlet),.TRUE.)
     END IF
   END IF
   IF (coolCoilKind .NE. ccNone) THEN
