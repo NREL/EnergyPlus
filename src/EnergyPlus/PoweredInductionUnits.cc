@@ -448,10 +448,7 @@ namespace PoweredInductionUnits {
 			//find fan type
 			//test if Fan:SystemModel fan of this name exists
 			if ( HVACFan::checkIfFanNameIsAFanSystem( PIU( PIUNum ).FanName ) ) {
-							HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( PIU( PIUNum ).FanName ) ); // call constructor
-				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
-			//	PIU( PIUNum ).OutletNodeNum = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->outletNodeNum();
-			//	PIU( PIUNum ).InletNodeNum = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->inletNodeNum();
+				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
 			} else {
 				bool isNotOkay( false );
 				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
@@ -459,8 +456,8 @@ namespace PoweredInductionUnits {
 					ShowContinueError( "In " + PIU( PIUNum ).UnitType + " = " + PIU( PIUNum ).Name );
 					ErrorsFound = true;
 				}
+				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
 			}
-			
 
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
@@ -594,6 +591,19 @@ namespace PoweredInductionUnits {
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
+			//find fan type
+			//test if Fan:SystemModel fan of this name exists
+			if ( HVACFan::checkIfFanNameIsAFanSystem( PIU( PIUNum ).FanName ) ) {
+				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+			} else {
+				bool isNotOkay( false );
+				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
+				if ( isNotOkay ) {
+					ShowContinueError( "In " + PIU( PIUNum ).UnitType + " = " + PIU( PIUNum ).Name );
+					ErrorsFound = true;
+				}
+				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+			}
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
 			if ( IsNotOK ) {
@@ -638,6 +648,11 @@ namespace PoweredInductionUnits {
 		}
 
 		for ( PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum ) {
+			if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( PIU( PIUNum ).FanName ) ); // call constructor
+				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
+			}
+
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					//      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
@@ -1446,7 +1461,12 @@ namespace PoweredInductionUnits {
 				Node( PriNode ).MassFlowRate = 0.0;
 				Node( SecNode ).MassFlowRate = PIU( PIUNum ).MaxTotAirMassFlow;
 				SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num ); // fire the mixer
-				SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+					SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+				}
+
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
 				// using the required zone load, calculate the air temperature needed to meet the load
 				// PIU(PIUNum)%MaxTotAirMassFlow * CpAirZn * (OutletTempNeeded - Node(ZoneNodeNum)%Temp) = QZnReq
@@ -1475,7 +1495,11 @@ namespace PoweredInductionUnits {
 		// fire the mixer
 		SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num );
 		// fire the fan
-		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index );
+		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+			SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+		}
 		// check if heating coil is off
 		QActualHeating = QToHeatSetPt - Node( HCoilInAirNode ).MassFlowRate * CpAirZn * ( Node( HCoilInAirNode ).Temp - Node( ZoneNode ).Temp );
 		if ( ( ! UnitOn ) || ( QActualHeating < SmallLoad ) || ( TempControlType( ZoneNum ) == SingleCoolingSetPoint ) || ( PriAirMassFlow > PriAirMassFlowMin ) ) {
@@ -1676,7 +1700,11 @@ namespace PoweredInductionUnits {
 				Node( SecNode ).MassFlowRate = PIU( PIUNum ).MaxSecAirMassFlow;
 				Node( SecNode ).MassFlowRateMaxAvail = PIU( PIUNum ).MaxSecAirMassFlow;
 				Node( PriNode ).MassFlowRate = 0.0;
-				SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+					SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+				}
 				SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num ); // fire the mixer
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
 				// Assuming the fan is off, calculate the primary air flow needed to meet the zone cooling demand.
@@ -1706,7 +1734,11 @@ namespace PoweredInductionUnits {
 		Node( SecNode ).MassFlowRateMaxAvail = SecAirMassFlow;
 		//now that inlet airflows have been set, the terminal bos components can be simulated.
 		// fire the fan
-		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index );
+		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+			SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+		}
 		// fire the mixer
 		SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num );
 		// check if heating coil is off
