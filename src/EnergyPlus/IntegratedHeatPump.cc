@@ -181,7 +181,6 @@ namespace EnergyPlus {
 			using InputProcessor::FindItemInList;
 			using General::TrimSigDigits;
 			using VariableSpeedCoils::SimVariableSpeedCoils;
-			using VariableSpeedCoils::VarSpeedCoil;
 			using VariableSpeedCoils::UpdateVarSpeedCoil;
 			using VariableSpeedCoils::InitVarSpeedCoil;
 
@@ -587,8 +586,8 @@ namespace EnergyPlus {
 			int NumAlphas; // Number of variables in String format
 			int NumNums; // Number of variables in Numeric format
 			int NumParams; // Total number of input fields
-			static int MaxNums( 0 ); // Maximum number of numeric input fields
-			static int MaxAlphas( 0 ); // Maximum number of alpha input fields
+			int MaxNums( 0 ); // Maximum number of numeric input fields
+			int MaxAlphas( 0 ); // Maximum number of alpha input fields
 			std::string CoilName; // Name of the  Coil
 			std::string Coiltype; // type of coil
 
@@ -601,7 +600,7 @@ namespace EnergyPlus {
 			Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 			Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
-			static bool ErrorsFound( false ); // If errors detected in input
+			bool ErrorsFound( false ); // If errors detected in input
 			int CoilCounter; // Counter
 
 			int IOStat;
@@ -617,10 +616,7 @@ namespace EnergyPlus {
 			NumASIHPs = GetNumObjectsFound( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" );
 			DXCoilNum = 0;
 
-			if ( NumASIHPs <= 0 ) {
-				ShowSevereError( "No Equipment found in Integrated Heat Pumps" );
-				ErrorsFound = true;
-			}
+			if ( NumASIHPs <= 0 ) return;
 
 			// Allocate Arrays
 			if ( NumASIHPs > 0 ) {
