@@ -1177,16 +1177,24 @@ namespace EMSManager {
 		} // SensorNum
 
 		// added for FMU
-		for ( ActuatorNum = 1; ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed; ++ActuatorNum ) {
+		for ( ActuatorNum = 1; ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed 
+			+ NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed 
+			+ NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed; ++ActuatorNum ) {
 			// If we process the ExternalInterface actuators, all we need to do is to change the
 
 			if ( ActuatorNum <= numActuatorsUsed ) {
 				cCurrentModuleObject = "EnergyManagementSystem:Actuator";
 			} else if ( ActuatorNum > numActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed ) {
 				cCurrentModuleObject = "ExternalInterface:Actuator";
-			} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed ) {
+			} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed 
+				&& ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed 
+				+ NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed ) {
 				cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-			} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed ) {
+			} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed 
+				+ NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed 
+				&& ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed 
+				+ NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed 
+				+ NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed ) {
 				cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
 			}
 
