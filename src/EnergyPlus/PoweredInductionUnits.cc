@@ -82,6 +82,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
+#include <HVACFan.hh>
 #include <InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
@@ -443,6 +444,24 @@ namespace PoweredInductionUnits {
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
+
+			//find fan type
+			//test if Fan:SystemModel fan of this name exists
+			if ( HVACFan::checkIfFanNameIsAFanSystem( PIU( PIUNum ).FanName ) ) {
+							HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( PIU( PIUNum ).FanName ) ); // call constructor
+				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
+			//	PIU( PIUNum ).OutletNodeNum = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->outletNodeNum();
+			//	PIU( PIUNum ).InletNodeNum = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->inletNodeNum();
+			} else {
+				bool isNotOkay( false );
+				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
+				if ( isNotOkay ) {
+					ShowContinueError( "In " + PIU( PIUNum ).UnitType + " = " + PIU( PIUNum ).Name );
+					ErrorsFound = true;
+				}
+			}
+			
+
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
 			if ( IsNotOK ) {
