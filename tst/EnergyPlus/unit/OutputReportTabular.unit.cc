@@ -509,6 +509,21 @@ TEST( OutputReportTabularTest, ConvertUnicodeToUTF8 )
 }
 
 
+TEST( OutputReportTabularTest, GetUnitSubStringTest )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitSubStringTest" );
+	EXPECT_EQ( "", GetUnitSubString( "" ) );
+	EXPECT_EQ( "", GetUnitSubString( " " ) );
+	EXPECT_EQ( "J/KG", GetUnitSubString( "[J/KG]" ) );
+	EXPECT_EQ( "M3/S-PERSON", GetUnitSubString( " [M3/S-PERSON]" ) ); //leading space
+	EXPECT_EQ( "W/M2-K", GetUnitSubString( "[W/M2-K] " ) ); // trailing space
+	EXPECT_EQ( "MJ/m2", GetUnitSubString( " [MJ/m2] " ) ); // leading and trailing space
+	EXPECT_EQ( "PA", GetUnitSubString( "This is a column header with units [PA] " ) );
+	EXPECT_EQ( "W", GetUnitSubString( "This is a column header with units [W] " ) );
+	EXPECT_EQ( "K/M", GetUnitSubString( "This is a column header with units [K/M] and trailing text." ) );
+}
+
+
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
 	// AUTHOR: R. Raustad, FSEC
