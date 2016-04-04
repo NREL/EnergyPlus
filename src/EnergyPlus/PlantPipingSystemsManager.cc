@@ -600,7 +600,7 @@ namespace PlantPipingSystemsManager {
 							// Zone interface cells
 							if ( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).CellType == CellType_ZoneGroundInterface ){
 								auto & cell( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ) );
-								PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux += PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) * Width( cell ) * Depth( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+								PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux += PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) * cell.width() * cell.depth() * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
 							}
 						}
 					}
@@ -615,7 +615,7 @@ namespace PlantPipingSystemsManager {
 							if ( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ).CellType == CellType_ZoneGroundInterface ) {
 								auto & cell( PipingSystemDomains( DomainNum ).Cells( X, Ymax, Z ) );
 								PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) = PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) / PipingSystemDomains( DomainNum ).HeatFluxWeightingFactor;
-								PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux += PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) * Width( cell ) * Depth( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+								PipingSystemDomains( DomainNum ).TotalEnergyWeightedHeatFlux += PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) * cell.width() * cell.depth() * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
 							}
 						}
 					}
@@ -3236,60 +3236,17 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	RadialCellInfo_XY_CrossSectArea( RadialCellInformation const & r )
+	RadialCellInformation::XY_CrossSectArea()
 	{
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
+		//       MODIFIED       April 2016
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
 
 		using DataGlobals::Pi;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return Pi * ( pow_2( r.OuterRadius ) - pow_2( r.InnerRadius ) );
-	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	bool
-	DomainRectangle_Contains(
-		DomainRectangle const & Rect,
-		Point const & p
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return ( IsInRange( p.X, Rect.XMin, Rect.XMax ) && IsInRange( p.Y, Rect.YMin, Rect.YMax ) );
+		return Pi * ( pow_2( this->OuterRadius ) - pow_2( this->InnerRadius ) );
 	}
 
 	//*********************************************************************************************!
@@ -3380,7 +3337,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	BaseThermalPropertySet_Diffusivity( BaseThermalPropertySet const & p )
+	BaseThermalPropertySet::diffusivity()
 	{
 
 		// FUNCTION INFORMATION:
@@ -3389,21 +3346,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-		Real64 RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		RetVal = p.Conductivity / ( p.Density * p.SpecificHeat );
-
-		return RetVal;
+		return this->Conductivity / ( this->Density * this->SpecificHeat );
 
 	}
 
@@ -3412,8 +3355,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	bool
-	RectangleF_Contains(
-		RectangleF const & rect,
+	RectangleF::contains(
 		PointF const & p
 	)
 	{
@@ -3424,18 +3366,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return ( ( rect.X_min <= p.X ) && ( p.X < ( rect.X_min + rect.Width ) ) && ( rect.Y_min <= p.Y ) && ( p.Y < ( rect.Y_min + rect.Height ) ) );
+		return ( ( this->X_min <= p.X ) && ( p.X < ( this->X_min + this->Width ) ) && ( this->Y_min <= p.Y ) && ( p.Y < ( this->Y_min + this->Height ) ) );
 	}
 
 	//*********************************************************************************************!
@@ -3447,7 +3378,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	RadialSizing_Thickness( RadialSizing const & r )
+	RadialSizing::thickness()
 	{
 
 		// FUNCTION INFORMATION:
@@ -3456,18 +3387,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return ( r.OuterDia - r.InnerDia ) / 2.0;
+		return ( this->OuterDia - this->InnerDia ) / 2.0;
 	}
 
 	//*********************************************************************************************!
@@ -3475,8 +3395,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	PipeSegmentInfo_InitPipeCells(
-		PipeSegmentInfo & s,
+	PipeSegmentInfo::initPipeCells(
 		int const x,
 		int const y
 	)
@@ -3488,25 +3407,12 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
 		Point TempPt;
-
 		TempPt.X = x;
 		TempPt.Y = y;
 
-		s.PipeCellCoordinates = TempPt;
-		s.PipeCellCoordinatesSet = true;
+		this->PipeCellCoordinates = TempPt;
+		this->PipeCellCoordinatesSet = true;
 
 	}
 
@@ -3515,8 +3421,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	PipeCircuitInfo_InitInOutCells(
-		PipeCircuitInfo & c,
+	PipeCircuitInfo::initInOutCells(
 		CartesianCell const & in,
 		CartesianCell const & out
 	)
@@ -3528,17 +3433,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		c.CircuitInletCell = Point3DInteger( in.X_index, in.Y_index, in.Z_index );
-		c.CircuitOutletCell = Point3DInteger( out.X_index, out.Y_index, out.Z_index );
+		this->CircuitInletCell = Point3DInteger( in.X_index, in.Y_index, in.Z_index );
+		this->CircuitOutletCell = Point3DInteger( out.X_index, out.Y_index, out.Z_index );
 
 	}
 
@@ -3843,7 +3739,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	Width( CartesianCell const & c )
+	CartesianCell::width() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -3852,18 +3748,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return c.X_max - c.X_min;
+		return this->X_max - this->X_min;
 	}
 
 	//*********************************************************************************************!
@@ -3871,7 +3756,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	Height( CartesianCell const & c )
+	CartesianCell::height() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -3880,18 +3765,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return c.Y_max - c.Y_min;
+		return this->Y_max - this->Y_min;
 	}
 
 	//*********************************************************************************************!
@@ -3899,7 +3773,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	Depth( CartesianCell const & c )
+	CartesianCell::depth() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -3908,18 +3782,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return c.Z_max - c.Z_min;
+		return this->Z_max - this->Z_min;
 	}
 
 	//*********************************************************************************************!
@@ -3927,7 +3790,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	XNormalArea( CartesianCell const & c )
+	CartesianCell::XNormalArea() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -3936,18 +3799,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return Depth( c ) * Height( c );
+		return this->depth() * this->height();
 	}
 
 	//*********************************************************************************************!
@@ -3955,7 +3807,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	YNormalArea( CartesianCell const & c )
+	CartesianCell::YNormalArea() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -3964,18 +3816,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return Depth( c ) * Width( c );
+		return this->depth() * this->width();
 	}
 
 	//*********************************************************************************************!
@@ -3983,7 +3824,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	ZNormalArea( CartesianCell const & c )
+	CartesianCell::ZNormalArea() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -3992,18 +3833,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		return Width( c ) * Height( c );
+		return this->width() * this->height();
 	}
 
 	//*********************************************************************************************!
@@ -4011,7 +3841,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	Volume( CartesianCell const & c )
+	CartesianCell::volume() const
 	{
 
 		// FUNCTION INFORMATION:
@@ -4031,7 +3861,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		return Width( c ) * Depth( c ) * Height( c );
+		return this->width() * this->depth() * this->height();
 	}
 
 	//*********************************************************************************************!
@@ -4059,7 +3889,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		return RectangleF( c.X_min, c.Y_min, Width( c ), Height( c ) );
+		return RectangleF( c.X_min, c.Y_min, c.width(), c.height() );
 	}
 
 	//*********************************************************************************************!
@@ -4087,7 +3917,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		return RectangleF( c.X_min, c.Z_min, Width( c ), Depth( c ) );
+		return RectangleF( c.X_min, c.Z_min, c.width(), c.depth() );
 	}
 
 	//*********************************************************************************************!
@@ -4115,7 +3945,7 @@ namespace PlantPipingSystemsManager {
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		return RectangleF( c.Y_min, c.Z_min, Height( c ), Depth( c ) );
+		return RectangleF( c.Y_min, c.Z_min, c.height(), c.depth() );
 	}
 
 	//*********************************************************************************************!
@@ -4148,11 +3978,11 @@ namespace PlantPipingSystemsManager {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		if ( ( Direction == Direction_PositiveY ) || ( Direction == Direction_NegativeY ) ) {
-			RetVal = YNormalArea( c );
+			RetVal = c.YNormalArea();
 		} else if ( ( Direction == Direction_PositiveX ) || ( Direction == Direction_NegativeX ) ) {
-			RetVal = XNormalArea( c );
+			RetVal = c.XNormalArea();
 		} else if ( ( Direction == Direction_PositiveZ ) || ( Direction == Direction_NegativeZ ) ) {
-			RetVal = ZNormalArea( c );
+			RetVal = c.ZNormalArea();
 		} else {
 			assert( false );
 		}
@@ -5936,7 +5766,7 @@ namespace PlantPipingSystemsManager {
 						for ( PipeCounter = PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces.l1(); PipeCounter <= PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces.u1(); ++PipeCounter ) {
 
 							ThisSegment = PipingSystemSegments( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces( PipeCounter ) );
-							if ( RectangleF_Contains( XYRectangle, ThisSegment.PipeLocation ) ) {
+							if ( XYRectangle.contains( ThisSegment.PipeLocation ) ) {
 								//'inform the cell that it is a pipe node
 								CellType = CellType_Pipe;
 								//'inform the cell of which pipe it contains
@@ -5944,7 +5774,7 @@ namespace PlantPipingSystemsManager {
 								//'inform the cell of which pipe circuit contains it
 								CircuitIndex = FoundOnCircuitIndex;
 								//'inform the pipe of what cell it is inside
-								PipeSegmentInfo_InitPipeCells( PipingSystemSegments( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces( PipeCounter ) ), CellXIndex, CellYIndex );
+								PipingSystemSegments( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces( PipeCounter ) ).initPipeCells( CellXIndex, CellYIndex );
 								//'set the number of cells to be generated in this near-pipe region
 								NumRadialCells = PipingSystemCircuits( FoundOnCircuitIndex ).NumRadialCells;
 								//'exit the pipe counter loop
@@ -5964,7 +5794,7 @@ namespace PlantPipingSystemsManager {
 					// if we were found on a pipe circuit, get some things for convenience
 					if ( CircuitIndex != -1 ) {
 						if ( PipingSystemCircuits( CircuitIndex ).HasInsulation ) {
-							InsulationThickness = RadialSizing_Thickness( PipingSystemCircuits( CircuitIndex ).InsulationSize );
+							InsulationThickness = PipingSystemCircuits( CircuitIndex ).InsulationSize.thickness();
 						}
 						PipeSizing = PipingSystemCircuits( CircuitIndex ).PipeSize;
 						RadialMeshThickness = PipingSystemCircuits( CircuitIndex ).RadialMeshThickness;
@@ -5986,7 +5816,7 @@ namespace PlantPipingSystemsManager {
 
 					if ( PipeIndex != -1 ) {
 						cell.PipeIndex = PipeIndex;
-						CartesianPipeCellInformation_ctor( cell.PipeCellData, cell.X_max - cell.X_min, PipeSizing, NumRadialCells, Depth( cell ), InsulationThickness, RadialMeshThickness, HasInsulation );
+						CartesianPipeCellInformation_ctor( cell.PipeCellData, cell.X_max - cell.X_min, PipeSizing, NumRadialCells, cell.depth(), InsulationThickness, RadialMeshThickness, HasInsulation );
 					}
 
 //#ifdef CalcEnergyBalance
@@ -6287,7 +6117,7 @@ namespace PlantPipingSystemsManager {
 
 			}
 
-			PipeCircuitInfo_InitInOutCells( PipingSystemCircuits( CircuitIndex ), cells( CircuitInletCellX, CircuitInletCellY, CircuitInletCellZ ), cells( CircuitOutletCellX, CircuitOutletCellY, CircuitOutletCellZ ) );
+			PipingSystemCircuits( CircuitIndex ).initInOutCells( cells( CircuitInletCellX, CircuitInletCellY, CircuitInletCellZ ), cells( CircuitOutletCellX, CircuitOutletCellY, CircuitOutletCellZ ) );
 
 		}
 
@@ -6669,7 +6499,7 @@ namespace PlantPipingSystemsManager {
 
 #ifdef CalcEnergyBalance
 					if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-						Real64 massCp = cell.MyBase.Properties.Density * Volume( cell ) * cell.MyBase.Properties.SpecificHeat;
+						Real64 massCp = cell.MyBase.Properties.Density * cell.volume() * cell.MyBase.Properties.SpecificHeat;
 						cell.MyBase.totalEnergyChange = massCp * ( cell.MyBase.Temperature_PrevIteration - cell.MyBase.Temperature_PrevTimeStep );
 						cell.MyBase.energyImbalance = std::abs( cell.MyBase.totalEnergyChange - cell.MyBase.sumEnergyFromAllSides );
 						cell.MyBase.tempDiffDueToImbalance = cell.MyBase.energyImbalance / massCp;
@@ -7328,11 +7158,11 @@ namespace PlantPipingSystemsManager {
 
 			// get the average basement wall heat flux and add it to the tally
 			HeatFlux = GetBasementWallHeatFlux( DomainNum );
-			Numerator += Beta * HeatFlux * Height( cell );
+			Numerator += Beta * HeatFlux * cell.height();
 
 #ifdef CalcEnergyBalance
 			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				energyFromThisSide = HeatFlux * Height( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				energyFromThisSide = HeatFlux * cell.height() * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
 				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
 				cell.MyBase.numberOfSidesCalculated += 1;
 			}
@@ -7355,11 +7185,11 @@ namespace PlantPipingSystemsManager {
 
 			// get the average basement floor heat flux and add it to the tally
 			HeatFlux = GetBasementFloorHeatFlux( DomainNum );
-			Numerator += Beta * HeatFlux * Width( cell );
+			Numerator += Beta * HeatFlux * cell.width();
 
 #ifdef CalcEnergyBalance
 			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				energyFromThisSide = HeatFlux * Width( cell ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				energyFromThisSide = HeatFlux * cell.width() * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
 				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
 				cell.MyBase.numberOfSidesCalculated += 1;
 			}
@@ -7638,21 +7468,21 @@ namespace PlantPipingSystemsManager {
 				// Get the average basement wall heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).WallHeatFlux;
 				if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex ) {
-					ConductionArea = Depth( cell ) * Height( cell );
+					ConductionArea = cell.depth() * cell.height();
 					Numerator += Beta * HeatFlux * ConductionArea;
 				} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ) {
-					ConductionArea = Width( cell ) * Height( cell );
+					ConductionArea = cell.width() * cell.height();
 					Numerator += Beta * HeatFlux * ConductionArea;
 				}
 			} else if ( cell.CellType == CellType_BasementFloor ) {
 				// Get the average basement floor heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).FloorHeatFlux;
-				ConductionArea = Width( cell ) * Depth( cell );
+				ConductionArea = cell.width() * cell.depth();
 				Numerator += Beta * HeatFlux * ConductionArea;
 			} else if ( cell.CellType ==  CellType_ZoneGroundInterface ) {
 				// Get the average slab heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).WeightedHeatFlux( cell.X_index, cell.Z_index );
-				ConductionArea = Width( cell ) * Depth( cell );
+				ConductionArea = cell.width() * cell.depth();
 				Numerator += Beta * HeatFlux * ConductionArea;
 			}
 
@@ -7872,7 +7702,7 @@ namespace PlantPipingSystemsManager {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto const & cell( cells( X, Y, Z ) );
 					if ( cell.CellType == CellType ) {
-						CellVolume = Volume( cell );
+						CellVolume = cell.volume();
 						RunningVolume += CellVolume;
 						RunningSummation += CellVolume * cell.MyBase.Temperature;
 						AvgTemp += cell.MyBase.Temperature;
@@ -8041,11 +7871,11 @@ namespace PlantPipingSystemsManager {
 		Real64 distance( 0.0 );
 
 		if ( ( direction == Direction_NegativeX ) || ( direction == Direction_PositiveX ) ) {
-			distance = ( Width( cell ) / 2.0 );
+			distance = ( cell.width() / 2.0 );
 		} else if ( ( direction == Direction_NegativeY ) || ( direction == Direction_PositiveY ) ) {
-			distance = ( Height( cell ) / 2.0 );
+			distance = ( cell.height() / 2.0 );
 		} else if ( ( direction == Direction_NegativeZ ) || ( direction == Direction_PositiveZ ) ) {
-			distance = ( Depth( cell ) / 2.0 );
+			distance = ( cell.depth() / 2.0 );
 		} else {
 			assert( false );
 		}
@@ -8098,7 +7928,7 @@ namespace PlantPipingSystemsManager {
 		CurTime = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
 
 		z = PipingSystemDomains( DomainNum ).Extents.Ymax - cell.Centroid.Y;
-		Diffusivity = BaseThermalPropertySet_Diffusivity( PipingSystemDomains( DomainNum ).GroundProperties );
+		Diffusivity = PipingSystemDomains( DomainNum ).GroundProperties.diffusivity();
 
 		RetVal = PipingSystemDomains( DomainNum ).Farfield.groundTempModel->getGroundTempAtTimeInSeconds( z, CurTime );
 
@@ -8464,7 +8294,7 @@ namespace PlantPipingSystemsManager {
 		OutermostRadialCellOuterRadius = cell.PipeCellData.Soil( cell.PipeCellData.Soil.u1() ).OuterRadius;
 		OutermostRadialCellRadialCentroid = cell.PipeCellData.Soil( cell.PipeCellData.Soil.u1() ).RadialCentroid;
 		OutermostRadialCellTemperature = cell.PipeCellData.Soil( cell.PipeCellData.Soil.u1() ).MyBase.Temperature;
-		Resistance = std::log( OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid ) / ( 2.0 * Pi * Depth( cell ) * cell.MyBase.Properties.Conductivity );
+		Resistance = std::log( OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid ) / ( 2.0 * Pi * cell.depth() * cell.MyBase.Properties.Conductivity );
 		Numerator += ( Beta / Resistance ) * OutermostRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
@@ -8579,12 +8409,12 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		//'add effects from interface cell
-		Resistance = std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity );
+		Resistance = std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * cell.depth() * ThisRadialCellConductivity );
 		Numerator += ( Beta / Resistance ) * cell.MyBase.Temperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from inner radial cell
-		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) ) + ( std::log( NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * NextOuterRadialCellConductivity ) );
+		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * cell.depth() * ThisRadialCellConductivity ) ) + ( std::log( NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid ) / ( 2 * Pi * cell.depth() * NextOuterRadialCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * NextOuterRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
@@ -8687,12 +8517,12 @@ namespace PlantPipingSystemsManager {
 			++Denominator;
 
 			//'add effects from outer cell
-			Resistance = ( std::log( OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * OuterRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) );
+			Resistance = ( std::log( OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius ) / ( 2 * Pi * cell.depth() * OuterRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * cell.depth() * ThisRadialCellConductivity ) );
 			Numerator += ( Beta / Resistance ) * OuterRadialCellTemperature;
 			Denominator += ( Beta / Resistance );
 
 			//'add effects from inner cell
-			Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) ) + ( std::log( InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * InnerRadialCellConductivity ) );
+			Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * cell.depth() * ThisRadialCellConductivity ) ) + ( std::log( InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid ) / ( 2 * Pi * cell.depth() * InnerRadialCellConductivity ) );
 			Numerator += ( Beta / Resistance ) * InnerRadialCellTemperature;
 			Denominator += ( Beta / Resistance );
 
@@ -8800,12 +8630,12 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		//'add effects from outer radial cell
-		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) );
+		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * cell.depth() * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid ) / ( 2 * Pi * cell.depth() * ThisRadialCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * OuterNeighborRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from pipe cell
-		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisRadialCellConductivity ) ) + ( std::log( InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * InnerNeighborRadialCellConductivity ) );
+		Resistance = ( std::log( ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius ) / ( 2 * Pi * cell.depth() * ThisRadialCellConductivity ) ) + ( std::log( InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid ) / ( 2 * Pi * cell.depth() * InnerNeighborRadialCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * InnerNeighborRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
@@ -8872,12 +8702,12 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		//'add effects from outer radial cell
-		Resistance = ( std::log( NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius ) / ( 2 * Pi * Depth( cell ) * NextInnerRadialCell.MyBase.Properties.Conductivity ) ) + ( std::log( ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisInsulationCell.MyBase.Properties.Conductivity ) );
+		Resistance = ( std::log( NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius ) / ( 2 * Pi * cell.depth() * NextInnerRadialCell.MyBase.Properties.Conductivity ) ) + ( std::log( ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid ) / ( 2 * Pi * cell.depth() * ThisInsulationCell.MyBase.Properties.Conductivity ) );
 		Numerator += ( Beta / Resistance ) * NextInnerRadialCell.MyBase.Temperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from pipe cell
-		Resistance = ( std::log( ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisInsulationCell.MyBase.Properties.Conductivity ) ) + ( std::log( PipeCell.OuterRadius / PipeCell.RadialCentroid ) / ( 2 * Pi * Depth( cell ) * PipeCell.MyBase.Properties.Conductivity ) );
+		Resistance = ( std::log( ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius ) / ( 2 * Pi * cell.depth() * ThisInsulationCell.MyBase.Properties.Conductivity ) ) + ( std::log( PipeCell.OuterRadius / PipeCell.RadialCentroid ) / ( 2 * Pi * cell.depth() * PipeCell.MyBase.Properties.Conductivity ) );
 		Numerator += ( Beta / Resistance ) * PipeCell.MyBase.Temperature;
 		Denominator += ( Beta / Resistance );
 
@@ -8979,13 +8809,13 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		//'add effects from outer radial cell
-		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid ) / ( 2 * Pi * Depth( cell ) * ThisPipeCellConductivity ) );
+		Resistance = ( std::log( OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius ) / ( 2 * Pi * cell.depth() * OuterNeighborRadialCellConductivity ) ) + ( std::log( ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid ) / ( 2 * Pi * cell.depth() * ThisPipeCellConductivity ) );
 		Numerator += ( Beta / Resistance ) * OuterNeighborRadialCellTemperature;
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from water cell
-		PipeConductionResistance = std::log( ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * ThisPipeCellConductivity );
-		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * Depth( cell ) );
+		PipeConductionResistance = std::log( ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius ) / ( 2 * Pi * cell.depth() * ThisPipeCellConductivity );
+		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * cell.depth() );
 		Resistance = PipeConductionResistance + ConvectiveResistance;
 		Numerator += ( Beta / Resistance ) * FluidCellTemperature;
 		Denominator += ( Beta / Resistance );
@@ -9067,8 +8897,8 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		//'add effects from outer pipe cell
-		PipeConductionResistance = std::log( PipeCellRadialCentroid / PipeCellInnerRadius ) / ( 2 * Pi * Depth( cell ) * PipeCellConductivity );
-		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * Depth( cell ) );
+		PipeConductionResistance = std::log( PipeCellRadialCentroid / PipeCellInnerRadius ) / ( 2 * Pi * cell.depth() * PipeCellConductivity );
+		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * cell.depth() );
 		TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
 		Numerator += ( Beta / TotalPipeResistance ) * PipeCellTemperature;
 		Denominator += ( Beta / TotalPipeResistance );
@@ -9375,12 +9205,12 @@ namespace PlantPipingSystemsManager {
 
 							// UPDATE BETA VALUE
 							//'these are basic cartesian calculation cells
-							Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.MyBase.Properties.Density * Volume( cell ) * cell.MyBase.Properties.SpecificHeat );
+							Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.MyBase.Properties.Density * cell.volume() * cell.MyBase.Properties.SpecificHeat );
 							cell.MyBase.Beta = Beta;
 
 					} else if ( ( SELECT_CASE_var == CellType_HorizInsulation ) || ( SELECT_CASE_var == CellType_VertInsulation ) || ( SELECT_CASE_var == CellType_Slab ) || ( SELECT_CASE_var == CellType_ZoneGroundInterface ) || ( SELECT_CASE_var == CellType_SlabOnGradeEdgeInsu ) ) {
 
-						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.MyBase.Properties.Density * Volume( cell ) * cell.MyBase.Properties.SpecificHeat );
+						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.MyBase.Properties.Density * cell.volume() * cell.MyBase.Properties.SpecificHeat );
 						PipingSystemDomains ( DomainNum ).Cells ( X, Y, Z ).MyBase.Beta = Beta;
 
 					} else if ( SELECT_CASE_var == CellType_Pipe ) {
@@ -9405,18 +9235,18 @@ namespace PlantPipingSystemsManager {
 
 							//'set the radial soil cells
 							for ( rCtr = 0; rCtr <= cell.PipeCellData.Soil.u1(); ++rCtr ) {
-								Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Soil( rCtr ).MyBase.Properties.Density * RadialCellInfo_XY_CrossSectArea( cell.PipeCellData.Soil( rCtr ) ) * Depth( cell ) * cell.PipeCellData.Soil( rCtr ).MyBase.Properties.SpecificHeat );
+								Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Soil( rCtr ).MyBase.Properties.Density * cell.PipeCellData.Soil( rCtr ).XY_CrossSectArea() * cell.depth() * cell.PipeCellData.Soil( rCtr ).MyBase.Properties.SpecificHeat );
 								cell.PipeCellData.Soil( rCtr ).MyBase.Beta = Beta;
 							}
 
 							//'then insulation if it exists
 							if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
-								Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Insulation.MyBase.Properties.Density * RadialCellInfo_XY_CrossSectArea( cell.PipeCellData.Insulation ) * Depth( cell ) * cell.PipeCellData.Insulation.MyBase.Properties.SpecificHeat );
+								Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Insulation.MyBase.Properties.Density * cell.PipeCellData.Insulation.XY_CrossSectArea() * cell.depth() * cell.PipeCellData.Insulation.MyBase.Properties.SpecificHeat );
 								cell.PipeCellData.Insulation.MyBase.Beta = Beta;
 							}
 
 							//'set the pipe cell
-							Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Pipe.MyBase.Properties.Density * RadialCellInfo_XY_CrossSectArea( cell.PipeCellData.Pipe ) * Depth( cell ) * cell.PipeCellData.Pipe.MyBase.Properties.SpecificHeat );
+							Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Pipe.MyBase.Properties.Density * cell.PipeCellData.Pipe.XY_CrossSectArea() * cell.depth() * cell.PipeCellData.Pipe.MyBase.Properties.SpecificHeat );
 							cell.PipeCellData.Pipe.MyBase.Beta = Beta;
 
 							// now the fluid cell also

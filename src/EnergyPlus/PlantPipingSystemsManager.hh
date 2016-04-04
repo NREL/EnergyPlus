@@ -197,6 +197,9 @@ namespace PlantPipingSystemsManager {
 			SpecificHeat( SpecificHeat )
 		{}
 
+		Real64
+		diffusivity();
+
 	};
 
 	struct ExtendedFluidProperties // : Inherits BaseThermalPropertySet
@@ -260,6 +263,9 @@ namespace PlantPipingSystemsManager {
 		// Default Constructor
 		RadialCellInformation()
 		{}
+
+		// Get the XY cross sectional area of the radial cell
+		Real64 XY_CrossSectArea();
 
 	};
 
@@ -497,6 +503,10 @@ namespace PlantPipingSystemsManager {
 			Height( Height )
 		{}
 
+		bool
+		contains(
+			PointF const & p
+		);
 	};
 
 	struct NeighborInformation
@@ -524,6 +534,8 @@ namespace PlantPipingSystemsManager {
 		RadialSizing()
 		{}
 
+		Real64
+		thickness();
 	};
 
 	struct DirectionNeighbor_Dictionary
@@ -560,6 +572,27 @@ namespace PlantPipingSystemsManager {
 		// Default Constructor
 		CartesianCell()
 		{}
+
+		Real64
+		width() const;
+
+		Real64
+		height() const;
+
+		Real64
+		depth() const;
+
+		Real64
+		XNormalArea() const;
+
+		Real64
+		YNormalArea() const;
+
+		Real64
+		ZNormalArea() const;
+
+		Real64
+		volume() const;
 
 	};
 
@@ -801,6 +834,12 @@ namespace PlantPipingSystemsManager {
 			IsActuallyPartOfAHorizontalTrench( false )
 		{}
 
+		void
+		initPipeCells(
+			int const x,
+			int const y
+		);
+
 	};
 
 	struct PipeCircuitInfo
@@ -890,6 +929,14 @@ namespace PlantPipingSystemsManager {
 			OutletTemperature( 0.0 ),
 			FluidHeatLoss( 0.0 )
 		{}
+
+
+		void
+		initInOutCells(
+			CartesianCell const & in,
+			CartesianCell const & out
+		);
+
 
 	};
 
@@ -1397,13 +1444,6 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	Real64
-	RadialCellInfo_XY_CrossSectArea( RadialCellInformation const & r );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	bool
 	DomainRectangle_Contains(
 		DomainRectangle const & Rect,
@@ -1425,56 +1465,6 @@ namespace PlantPipingSystemsManager {
 	MeshPartition_CompareByDimension(
 		MeshPartition const & x,
 		MeshPartition const & y
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	BaseThermalPropertySet_Diffusivity( BaseThermalPropertySet const & p );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	bool
-	RectangleF_Contains(
-		RectangleF const & rect,
-		PointF const & p
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-	//Extension methods for Sim classes
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	RadialSizing_Thickness( RadialSizing const & r );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	PipeSegmentInfo_InitPipeCells(
-		PipeSegmentInfo & s,
-		int const x,
-		int const y
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	PipeCircuitInfo_InitInOutCells(
-		PipeCircuitInfo & c,
-		CartesianCell const & in,
-		CartesianCell const & out
 	);
 
 	//*********************************************************************************************!
@@ -1526,55 +1516,6 @@ namespace PlantPipingSystemsManager {
 
 	bool
 	CheckForOutOfRangeTemps( int const DomainNum );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	Width( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	Height( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	Depth( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	XNormalArea( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	YNormalArea( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	ZNormalArea( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	Volume( CartesianCell const & c );
 
 	//*********************************************************************************************!
 
