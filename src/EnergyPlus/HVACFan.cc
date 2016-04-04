@@ -354,6 +354,7 @@ namespace HVACFan {
 		eMSAirMassFlowValue_( 0.0 ),
 		//faultyFilterFlag_( false ),
 		//faultyFilterIndex_( 0 ),
+		fanIsSecondaryDriver_( false ),
 		massFlowRateMaxAvail_( 0.0 ),
 		massFlowRateMinAvail_( 0.0 ),
 		rhoAirStdInit_( 0.0 )
@@ -697,13 +698,19 @@ namespace HVACFan {
 		} else { // fan is off
 			//Fan is off and not operating no power consumed and mass flow rate.
 			fanPower_ = 0.0;
-			outletAirMassFlowRate_ = 0.0;
 			outletAirHumRat_ = inletAirHumRat_;
 			outletAirEnthalpy_ = inletAirEnthalpy_;
 			outletAirTemp_ = inletAirTemp_;
 			// Set the Control Flow variables to 0.0 flow when OFF.
-			massFlowRateMaxAvail_ = 0.0;
-			massFlowRateMinAvail_ = 0.0;
+			if ( fanIsSecondaryDriver_ ) {
+				outletAirMassFlowRate_ = localAirMassFlow; // sometimes the air is moving with the fan off, eg. AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+
+			} else {
+				outletAirMassFlowRate_ = 0.0;
+				massFlowRateMaxAvail_ = 0.0;
+				massFlowRateMinAvail_ = 0.0;
+			}
+			
 		}
 	}
 
@@ -833,6 +840,12 @@ namespace HVACFan {
 		} else {
 			return false;
 		}
+	}
+
+	void
+	FanSystem::fanIsSecondaryDriver() 
+	{
+		fanIsSecondaryDriver_ = true;
 	}
 
 } //HVACFan namespace

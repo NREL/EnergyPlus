@@ -135,6 +135,9 @@ public: // Methods
 	bool
 	getIfContinuousSpeedControl() const;
 
+	void
+	fanIsSecondaryDriver();
+
 private: //methods
 
 	void
@@ -244,6 +247,7 @@ private: // data
 //	bool faultyFilterFlag_; // Indicate whether there is a fouling air filter corresponding to the fan
 //	int faultyFilterIndex_;  // Index of the fouling air filter corresponding to the fan
 	// Mass Flow Rate Control Variables
+	bool fanIsSecondaryDriver_; // true if this fan is used to augment flow and may pass air when off. 
 	Real64 massFlowRateMaxAvail_;
 	Real64 massFlowRateMinAvail_;
 	Real64 rhoAirStdInit_;

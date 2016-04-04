@@ -1294,6 +1294,7 @@ namespace SingleDuct {
 				Sys( SysNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( Sys( SysNum ).FanName );
 				Sys( SysNum ).OutletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->outletNodeNum();
 				Sys( SysNum ).InletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->inletNodeNum();
+				HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->fanIsSecondaryDriver();
 			} else if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SimpleVAV ) {
 				IsNotOK = false;
 
@@ -3813,7 +3814,7 @@ namespace SingleDuct {
 		if ( FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1 ) {
 			SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
 		} else if ( FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1 ) {
-			HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->simulate( _,_,TurnFansOffSav,_ );
+			HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->simulate( _,_,_,_ );
 
 		} else { // pass through conditions
 			TurnFansOff = true;
