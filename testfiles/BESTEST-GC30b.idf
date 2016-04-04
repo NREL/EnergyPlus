@@ -14,10 +14,12 @@
 ! Modified:
 !----------------------------------------------------------------
 
+Output:Diagnostics,DisplayAdvancedReportVariables;
+Output:Variable,ZONE SURFACE FLOOR,Surface Inside Face Convection Heat Gain Rate,Timestep;
 
  Lead Input;
 
-  VERSION,8.4;
+  VERSION,8.5;
 
   Site:Location,
     FICTIOUS,                !- Name
@@ -30,7 +32,7 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    12,                      !- End Month
+    1, !12,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- Day of Week for Start Day
     NO,                      !- Use Weather File Holidays and Special Days
@@ -82,7 +84,7 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
 Site:GroundDomain:BESTEST:GroundSurfaceConditions,
     CoupledSlab,               !- Object Name
     IngradeCoupledSlab,        !- Ground Domain Name
-    ConstConvCoefficient       !- Ground Surface Conditions
+    ConstConvCoefficient,      !- Ground Surface Conditions
     100,                       !- Ground Surface Convection Coefficient
     10;                        !- Ground Surface Temperature
 

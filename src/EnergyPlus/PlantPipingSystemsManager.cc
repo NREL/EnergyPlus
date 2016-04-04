@@ -125,7 +125,6 @@ namespace PlantPipingSystemsManager {
 
 	// Using/Aliasing
 	using DataGlobals::Pi;
-	using namespace DataPlantPipingSystems;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -178,11 +177,85 @@ namespace PlantPipingSystemsManager {
 	// ***************************************** !
 	// ***************************************** !
 
+	int const PartitionType_BasementWall( -1 );
+	int const PartitionType_BasementFloor( -2 );
+	int const PartitionType_Pipe( -3 );
+	int const PartitionType_Slab( -4 );
+	int const PartitionType_XSide( -5 );
+	int const PartitionType_XSideWall( -6 );
+	int const PartitionType_ZSide( -7 );
+	int const PartitionType_ZSideWall( -8 );
+	int const PartitionType_FloorInside( -9 );
+	int const PartitionType_UnderFloor( -10 );
+	int const PartitionType_HorizInsXSide( -11 );
+	int const PartitionType_VertInsLowerEdge( -12 );
+	int const PartitionType_HorizInsZSide( -13 );
+
+	int const RegionType_Pipe( -1 );
+	int const RegionType_BasementWall( -2 );
+	int const RegionType_BasementFloor( -3 );
+	int const RegionType_XDirection( -4 );
+	int const RegionType_YDirection( -5 );
+	int const RegionType_ZDirection( -6 );
+	int const RegionType_XSide( -7 );
+	int const RegionType_XSideWall( -8 );
+	int const RegionType_ZSide( -9 );
+	int const RegionType_ZSideWall( -10 );
+	int const RegionType_FloorInside( -11 );
+	int const RegionType_UnderFloor( -12 );
+	int const RegionType_HorizInsXSide( -13 );
+	int const RegionType_HorizInsZSide( -14 );
+	int const RegionType_VertInsLowerEdge( -15 );
+
+	int const MeshDistribution_Uniform( -1 );
+	int const MeshDistribution_SymmetricGeometric( -2 );
+	int const MeshDistribution_Geometric( -3 );
+
+	int const SegmentFlow_IncreasingZ( -1 );
+	int const SegmentFlow_DecreasingZ( -2 );
+
+	int const Direction_PositiveY( -1 );
+	int const Direction_NegativeY( -2 );
+	int const Direction_PositiveX( -3 );
+	int const Direction_NegativeX( -4 );
+	int const Direction_PositiveZ( -5 );
+	int const Direction_NegativeZ( -6 );
+
+	int const CellType_Unknown( -1 );
+	int const CellType_Pipe( -2 );
+	int const CellType_GeneralField( -3 );
+	int const CellType_GroundSurface( -4 );
+	int const CellType_FarfieldBoundary( -5 );
+	int const CellType_AdiabaticWall( -6 );
+	int const CellType_BasementWall( -7 );
+	int const CellType_BasementFloor( -8 );
+	int const CellType_BasementCorner( -9 );
+	int const CellType_BasementCutaway( -10 );
+	int const CellType_Slab( -11 );
+	int const CellType_HorizInsulation( -12 );
+	int const CellType_VertInsulation( -13 );
+	int const CellType_ZoneGroundInterface( -14 );
+	int const CellType_BasementWallInsu( -15 );
+	int const CellType_BasementFloorInsu( -16 );
+	int const CellType_SlabOnGradeEdgeInsu( -17 );
+
 	//*********************************************************************************************!
+
+	Array1D< FullDomainStructureInfo > PipingSystemDomains;
+	Array1D< PipeCircuitInfo > PipingSystemCircuits;
+	Array1D< PipeSegmentInfo > PipingSystemSegments;
 
 	//*********************************************************************************************!
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		PipingSystemDomains.deallocate();
+		PipingSystemCircuits.deallocate();
+		PipingSystemSegments.deallocate();
+	}
 
 	void
 	CheckIfAnySlabs()
@@ -395,7 +468,7 @@ namespace PlantPipingSystemsManager {
 		static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
 		static gio::Fmt DomainCellsToEIO( "(A,',',I5',',I5',',I5)" );
 
-		int ZoneNum( 0 );
+		//int ZoneNum( 0 );
 		int SurfCtr( 0 );
 
 		// Read input if necessary
@@ -424,7 +497,7 @@ namespace PlantPipingSystemsManager {
 
 				if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 					int Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
-					int Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
+					//int Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
 					int Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
 
 					PipingSystemDomains( DomainNum ).WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );

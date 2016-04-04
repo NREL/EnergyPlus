@@ -62,7 +62,6 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "EnergyPlus/DataPlantPipingSystems.hh"
 #include "EnergyPlus/DataSurfaces.hh"
 #include "EnergyPlus/HeatBalanceManager.hh"
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
@@ -70,7 +69,6 @@
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
-using DataPlantPipingSystems::PipingSystemDomains;
 using DataSurfaces::Surface;
 using HeatBalanceManager::GetMaterialData;
 using SurfaceGeometry::GetOSCMData;

@@ -110,6 +110,7 @@ ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_Simple_SmallOffice.idf EPW_FILE USA_
 ADD_SIMULATION_TEST(IDF_FILE AirflowWindowsAndBetweenGlassBlinds.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowWindowsAndBetweenGlassShades.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BaseBoardElectric.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE BESTEST-GC30b.idf EPW_FILE BESTEST-GC30b.epw ANNUAL_SIMULATION)
 ADD_SIMULATION_TEST(IDF_FILE CVRhMinHum.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CentralChillerHeaterSystem_Cooling_Heating.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CentralChillerHeaterSystem_Simultaneous_Cooling_Heating.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

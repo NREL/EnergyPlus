@@ -63,11 +63,9 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "EnergyPlus/DataPlantPipingSystems.hh"
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
 
 using namespace EnergyPlus;
-using namespace DataPlantPipingSystems;
 using namespace PlantPipingSystemsManager;
 
 TEST_F( EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking )
