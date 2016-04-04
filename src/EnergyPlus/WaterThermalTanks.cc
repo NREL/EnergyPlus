@@ -10512,7 +10512,7 @@ namespace WaterThermalTanks {
 		Real64 MaxCapacity; // Maximum heating capacity (W)
 		Real64 RecoveryEfficiency; // Standard water heater rating
 		Real64 EnergyFactor; // Standard water heater rating
-		int HPNum; // index to heat pump water heater
+		int HPNum( 0 ); // index to heat pump water heater
 		Real64 MdotWater; // water mass flow rate through HP water heater condenser (kg/s)
 		Real64 AmbientHumRat; // used during HPWH rating procedure
 		Real64 RatedDXCoilTotalCapacity; // used during HPWH rating procedure
@@ -10522,7 +10522,7 @@ namespace WaterThermalTanks {
 		bool bIsVSCoil(false); // variable-speed HPWH identifier
 		Real64 RhoWater; //water density
 		int VSCoilNum(0);
-		std::string VSCoilName = ""; 
+		std::string VSCoilName = "";
 
 		// Formats
 		static gio::Fmt Format_720( "('Water Heater Information',6(',',A))" );
@@ -10632,11 +10632,11 @@ namespace WaterThermalTanks {
 					if (SameString(HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") || (true == HPWaterHeater(HPNum).bIsIHP))
 					{
 						bIsVSCoil = true;
-						VSCoilName = HPWaterHeater(HPNum).DXCoilName; 
+						VSCoilName = HPWaterHeater(HPNum).DXCoilName;
 						VSCoilNum = HPWaterHeater(HPNum).DXCoilNum;
 						if (true == HPWaterHeater(HPNum).bIsIHP){
 							VSCoilNum = IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
-							VSCoilName = IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilName; 
+							VSCoilName = IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilName;
 						}
 
 						RhoWater = RhoH2O(WaterThermalTank(WaterThermalTankNum).TankTemp);
@@ -10758,8 +10758,7 @@ namespace WaterThermalTanks {
 			} else {
 				RecoveryEfficiency = 0.0;
 				EnergyFactor = 0.0;
-				if (false == HPWaterHeater(HPNum).bIsIHP)
-				{
+				if ( HPWaterHeater.empty() || ! HPWaterHeater( HPNum ).bIsIHP ) {
 					ShowWarningError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings" );
 					ShowContinueError( "Setpoint was never recovered and/or heater never turned on" );
 				}
