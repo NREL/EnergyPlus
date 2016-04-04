@@ -1527,7 +1527,7 @@ namespace EnergyPlus {
 		}
 
 		bool
-		HasIHP()
+		IHPInModel()
 		{
 			if ( GetCoilsInputFlag ) {
 				GetIHPInput();

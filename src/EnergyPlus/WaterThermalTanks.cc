@@ -1722,7 +1722,7 @@ namespace WaterThermalTanks {
 							// This could be a variable speed heat pump water heater
 							bool bVSCoilErrFlag = false;
 
-							bool checkIHPFirst = IntegratedHeatPump::HasIHP();
+							bool checkIHPFirst = IntegratedHeatPump::IHPInModel();
 							if ( checkIHPFirst ) {
 								HPWH.DXCoilNum = GetCoilIndexIHP( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag );
 

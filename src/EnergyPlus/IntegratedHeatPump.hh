@@ -372,7 +372,7 @@ namespace EnergyPlus {
 		);
 
 		bool
-		HasIHP();
+		IHPInModel();
 
 		int
 		GetCoilIndexIHP(
