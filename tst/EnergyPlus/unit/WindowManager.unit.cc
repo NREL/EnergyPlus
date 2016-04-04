@@ -28,6 +28,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::WindowManager;
 
 TEST_F(EnergyPlusFixture, WindowFrameTest )
 {
@@ -253,3 +254,30 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 	EXPECT_GT(DataSurfaces::WinHeatLossRep( winNum ), DataSurfaces::WinHeatTransfer( winNum ));
 
 }
+
+TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
+{
+	
+	Real64 const cs = 0.86603;  // Cosine of incidence angle
+	Real64 const tf0 = 0.8980; // Transmittance at zero incidence angle
+	Real64 const rf0 = 0.0810; // Front reflectance at zero incidence angle
+	Real64 const rb0 = 0.0810; // Back reflectance at zero incidence angle
+
+	Real64 tfp = 0.; // Transmittance at cs
+	Real64 rfp = 0.; // Front reflectance at cs
+	Real64 rbp = 0.; // Back reflectance at cs
+
+	bool const SimpleGlazingSystem = false; // .TRUE. if simple block model being used
+	Real64 const SimpleGlazingSHGC = 0.; // SHGC value to use in alternate model for simple glazing system
+	Real64 const SimpleGlazingU = 0.; // U-factor value to use in alternate model for simple glazing system
+
+	TransAndReflAtPhi(cs, tf0, rf0, rb0, tfp, rfp, rbp, SimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+
+	EXPECT_NEAR(tfp, 0.89455, 0.0001);
+	EXPECT_NEAR(rfp, 0.08323, 0.0001);
+	EXPECT_NEAR(rbp, 0.08323, 0.0001);
+
+}
+
+
+
