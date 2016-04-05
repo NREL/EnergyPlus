@@ -117,12 +117,6 @@ namespace PlantPipingSystemsManager {
 	// The mesh can include any number of pipe circuits placed within the domain
 	// The mesh can interact with basement walls also
 
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
-
 	// Using/Aliasing
 	using DataGlobals::Pi;
 
@@ -136,46 +130,9 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_ZoneCoupled_Basement( "Site:GroundDomain:Basement" );
 	std::string const ObjName_BESTEST_SurfaceConditions( "Site:GroundDomain:BESTEST:GroundSurfaceConditions" );
 
-	// MODULE INTERFACE DEFINITIONS:
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
-
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_int NeighborFieldCells;
 	Array1D_int NeighborBoundaryCells;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE:
-	// ************************************* !
-	// Driver/Manager Routines               !
-	// ************************************* !
-	//   Public Entry Point                  !
-	//   Other Management                    !
-	//   Management/Input workers
-	// ************************************* !
-	// ************************************* !
-
-	// ******************************************** !
-	// Utility Routines                             !
-	// ******************************************** !
-	//   Useful numeric routines                    !
-	//   Extensions for data classes                !
-	//   Convergence checks                         !
-	//   Array shifting                             !
-	//   Error checking                             !
-	//   Other utilities                            !
-	//   Cartesian cell property routines           !
-	//   Class "constructors"                       !
-	// ******************************************** !
-	// ******************************************** !
-
-	// ***************************************** !
-	// Simulation Algorithms                     !
-	// ***************************************** !
-	//   Mesh Development routines               !
-	//   Simulation algorithms                   !
-	// ***************************************** !
-	// ***************************************** !
 
 	int const PartitionType_BasementWall( -1 );
 	int const PartitionType_BasementFloor( -2 );
@@ -239,15 +196,9 @@ namespace PlantPipingSystemsManager {
 	int const CellType_BasementFloorInsu( -16 );
 	int const CellType_SlabOnGradeEdgeInsu( -17 );
 
-	//*********************************************************************************************!
-
 	Array1D< FullDomainStructureInfo > PipingSystemDomains;
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
-
-	//*********************************************************************************************!
-
-	// Functions
 
 	void
 	clear_state()
@@ -267,23 +218,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using DataGlobals::AnySlabsInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int numSlabsCheck( GetNumObjectsFound( ObjName_ZoneCoupled_Slab ) );
 
 		AnySlabsInModel = ( numSlabsCheck > 0 );
@@ -300,23 +239,10 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using DataGlobals::AnyBasementsInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int const numBasementsCheck( GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
 
@@ -339,18 +265,9 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimPipingSystems" );
@@ -408,9 +325,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	void
 	SimulateGroundDomains(
 		bool initOnly
@@ -422,12 +336,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Spring 2014
 		//       MODIFIED       by Sushobhit Acharya, March 2015
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
@@ -636,10 +544,6 @@ namespace PlantPipingSystemsManager {
 		}
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	GetPipingSystemsAndGroundDomainsInput()
 	{
@@ -650,30 +554,14 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPipingSystemsAndGroundDomainsInput" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -818,10 +706,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	int
 	GetNumSegmentsForHorizontalTrenches( int const NumHorizontalTrenches )
 	{
@@ -832,27 +716,12 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::GetObjectItem;
 		using namespace DataIPShortCuts;
 
 		// Return value
 		int Total;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int HorizontalCtr;
@@ -878,10 +747,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ReadGeneralDomainInputs(
 		int const IndexStart,
@@ -895,12 +760,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::GetObjectItem;
@@ -1127,9 +986,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	void
 	ReadZoneCoupledDomainInputs(
 		int const StartingDomainNumForZone,
@@ -1144,15 +1000,6 @@ namespace PlantPipingSystemsManager {
 			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accommodate ground coupled calculations
 			//       RE-ENGINEERED  na
 
-			// PURPOSE OF THIS SUBROUTINE:
-			// <description>
-
-			// METHODOLOGY EMPLOYED:
-			// <description>
-
-			// REFERENCES:
-			// na
-
 			// Using/Aliasing
 			using InputProcessor::GetObjectItem;
 			using InputProcessor::FindItemInList;
@@ -1164,9 +1011,6 @@ namespace PlantPipingSystemsManager {
 			using DataHeatBalance::Material;
 			using DataHeatBalance::TotMaterials;
 			using namespace GroundTemperatureManager;
-
-			// Locals
-			// SUBROUTINE ARGUMENT DEFINITIONS:
 
 			// SUBROUTINE PARAMETER DEFINITIONS:
 			static std::string const RoutineName( "ReadZoneCoupledDomainInputs" );
@@ -1499,10 +1343,6 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ReadBasementInputs(
 		int const StartingDomainNumForBasement,
@@ -1517,12 +1357,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       Summer 2014  Sushobhit Acharya to accommodate basement calculations
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
@@ -1534,10 +1368,6 @@ namespace PlantPipingSystemsManager {
 		using General::TrimSigDigits;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::TotMaterials;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadBasementInputs" );
@@ -1856,10 +1686,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ReadBESTESTInputs(
 		int const TotalNumDomains,
@@ -1915,10 +1741,6 @@ namespace PlantPipingSystemsManager {
 		}
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -1931,12 +1753,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::GetObjectItem;
@@ -2041,10 +1857,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ReadPipeSegmentInputs(
 		int const NumPipeSegmentsInInput,
@@ -2057,12 +1869,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::GetObjectItem;
@@ -2124,10 +1930,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ReadHorizontalTrenchInputs(
 		int const StartingDomainNumForHorizontal,
@@ -2143,12 +1945,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   September 2012
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::GetObjectItem;
@@ -2402,10 +2198,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	SetupPipingSystemOutputVariables(
 		int const TotalNumSegments,
@@ -2418,26 +2210,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   September 2012
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeCircuitCounter;
@@ -2482,10 +2254,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	SetupZoneCoupledOutputVariables(
 		int const DomainNum
@@ -2497,28 +2265,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   August 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
@@ -2563,10 +2309,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	InitPipingSystems(
 		int const DomainNum,
@@ -2579,12 +2321,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
@@ -2605,17 +2341,8 @@ namespace PlantPipingSystemsManager {
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPipingSystems" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool errFlag;
@@ -2713,10 +2440,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	UpdatePipingSystems(
 		int const DomainNum,
@@ -2730,26 +2453,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNodeNum;
@@ -2759,12 +2464,6 @@ namespace PlantPipingSystemsManager {
 		Node( OutletNodeNum ).Temp = PipingSystemDomains( DomainNum ).Cells( out_cell.X, out_cell.Y, out_cell.Z ).PipeCellData.Fluid.MyBase.Temperature;
 
 	}
-
-	//*********************************************************************************************!
-
-	//=====================  Utility/Other routines for module.
-
-	//*********************************************************************************************!
 
 	void
 	IssueSevereInputFieldError(
@@ -2784,26 +2483,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		ShowSevereError( RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry + "\", Condition: " + Condition );
 
 		ErrorsFound = true;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	IssueSevereInputFieldError(
@@ -2823,27 +2507,14 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		ShowSevereError( RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + TrimSigDigits( FieldEntry, 3 ) + "\", Condition: " + Condition );
 
 		ErrorsFound = true;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	int
 	GetSurfaceCountForOSCM( int const OSCMIndex )
@@ -2855,25 +2526,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 
 		// Return value
 		int RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		RetVal = 0;
 		for ( int SurfCtr = 1; SurfCtr <= isize( Surface ); ++SurfCtr ) {
@@ -2883,10 +2540,6 @@ namespace PlantPipingSystemsManager {
 		return RetVal;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Array1D_int
 	GetSurfaceIndecesForOSCM(
@@ -2901,27 +2554,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 
 		// Return value
 		Array1D_int RetVal( {1,SurfCount} );
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION RETURN VALUE DEFINITION:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		int FoundSurfIndexCtr( 0 );
 		for ( int SurfCtr = 1; SurfCtr <= isize( Surface ); ++SurfCtr ) {
@@ -2934,10 +2571,6 @@ namespace PlantPipingSystemsManager {
 		return RetVal;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Array1D <ZoneCoupledSurfaceData>
 		GetSurfaceDataForOSCM(
@@ -2988,10 +2621,6 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	bool
 	IsInRange(
 		int const i,
@@ -3006,23 +2635,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		return ( ( i >= lower ) && ( i <= upper ) );
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	bool
 	IsInRange(
@@ -3038,23 +2652,9 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		return ( ( r >= lower ) && ( r <= upper ) );
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	bool
 	IsInRange_BasementModel(
 		Real64 const r,
@@ -3069,23 +2669,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       Sushobhit Acharya Fall 2014
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		return ( ( r >= lower ) && ( r < upper ) );
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Real64
 	Real_ConstrainTo(
@@ -3101,23 +2686,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		return min( max( r, MinVal ), MaxVal );
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	bool
 	CellType_IsFieldCell( int const CellType ) // From Enum: CellType
@@ -3129,23 +2699,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		return ( ( CellType == CellType_GeneralField ) || ( CellType == CellType_BasementCorner ) || ( CellType == CellType_BasementWall ) || ( CellType == CellType_BasementFloor ) );
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	bool
 	MeshPartitionArray_Contains(
@@ -3159,9 +2714,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -3183,10 +2735,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	RadialCellInformation::XY_CrossSectArea()
 	{
@@ -3200,10 +2748,6 @@ namespace PlantPipingSystemsManager {
 		using DataGlobals::Pi;
 		return Pi * ( pow_2( this->OuterRadius ) - pow_2( this->InnerRadius ) );
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	MeshPartition_SelectionSort( Array1< MeshPartition > & X )
@@ -3243,10 +2787,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	int
 	MeshPartition_CompareByDimension(
 		MeshPartition const & x,
@@ -3259,9 +2799,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -3284,10 +2821,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	BaseThermalPropertySet::diffusivity()
 	{
@@ -3301,10 +2834,6 @@ namespace PlantPipingSystemsManager {
 		return this->Conductivity / ( this->Density * this->SpecificHeat );
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	bool
 	RectangleF::contains(
@@ -3321,14 +2850,7 @@ namespace PlantPipingSystemsManager {
 		return ( ( this->X_min <= p.X ) && ( p.X < ( this->X_min + this->Width ) ) && ( this->Y_min <= p.Y ) && ( p.Y < ( this->Y_min + this->Height ) ) );
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	// Extension methods for Sim classes
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	RadialSizing::thickness()
 	{
@@ -3341,10 +2863,6 @@ namespace PlantPipingSystemsManager {
 
 		return ( this->OuterDia - this->InnerDia ) / 2.0;
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	PipeSegmentInfo::initPipeCells(
@@ -3368,10 +2886,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	PipeCircuitInfo::initInOutCells(
 		CartesianCell const & in,
@@ -3390,14 +2904,7 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	// Convergence checking
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	bool
 	IsConverged_CurrentToPrevIteration( int const DomainNum )
 	{
@@ -3407,17 +2914,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -3434,10 +2930,6 @@ namespace PlantPipingSystemsManager {
 		return ( LocalMax < PipingSystemDomains( DomainNum ).SimControls.Convergence_CurrentToPrevIteration );
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	bool
 	IsConverged_PipeCurrentToPrevIteration(
 		int const CircuitNum,
@@ -3451,9 +2943,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -3503,10 +2992,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ShiftTemperaturesForNewTimeStep( int const DomainNum )
 	{
@@ -3554,10 +3039,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	ShiftTemperaturesForNewIteration( int const DomainNum )
@@ -3607,10 +3088,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	ShiftPipeTemperaturesForNewIteration( CartesianCell & ThisPipeCell )
 	{
@@ -3646,10 +3123,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	bool
 	CheckForOutOfRangeTemps( int const DomainNum )
 	{
@@ -3659,9 +3132,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -3677,10 +3147,6 @@ namespace PlantPipingSystemsManager {
 		return false;
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	CartesianCell::width() const
 	{
@@ -3693,10 +3159,6 @@ namespace PlantPipingSystemsManager {
 
 		return this->X_max - this->X_min;
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Real64
 	CartesianCell::height() const
@@ -3711,10 +3173,6 @@ namespace PlantPipingSystemsManager {
 		return this->Y_max - this->Y_min;
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	CartesianCell::depth() const
 	{
@@ -3727,10 +3185,6 @@ namespace PlantPipingSystemsManager {
 
 		return this->Z_max - this->Z_min;
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Real64
 	CartesianCell::XNormalArea() const
@@ -3745,10 +3199,6 @@ namespace PlantPipingSystemsManager {
 		return this->depth() * this->height();
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	CartesianCell::YNormalArea() const
 	{
@@ -3761,10 +3211,6 @@ namespace PlantPipingSystemsManager {
 
 		return this->depth() * this->width();
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Real64
 	CartesianCell::ZNormalArea() const
@@ -3779,10 +3225,6 @@ namespace PlantPipingSystemsManager {
 		return this->width() * this->height();
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	CartesianCell::volume() const
 	{
@@ -3793,23 +3235,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		return this->width() * this->depth() * this->height();
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	Real64
 	CartesianCell::normalArea(
@@ -3835,10 +3262,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	NeighborInformation
 	NeighborInformationArray_Value(
 		Array1D< DirectionNeighbor_Dictionary > const & dict,
@@ -3852,21 +3275,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		// Return value
 		NeighborInformation RetVal;
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		for ( int Index = dict.l1(), Index_end = dict.u1(); Index <= Index_end; ++Index ) {
 			if ( dict( Index ).Direction == Direction ) {
@@ -3880,14 +3290,7 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	// Constructors for generic classes
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	CartesianPipeCellInformation_ctor(
 		CartesianPipeCellInformation & c,
@@ -3907,13 +3310,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		using DataGlobals::Pi;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 InsulationInnerRadius;
@@ -3975,10 +3372,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	RadialCellInformation_ctor(
 		RadialCellInformation & c,
@@ -3994,21 +3387,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		c.RadialCentroid = m_RadialCentroid;
 		c.InnerRadius = m_MinRadius;
 		c.OuterRadius = m_MaxRadius;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	FluidCellInformation_ctor(
@@ -4024,26 +3407,12 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		using DataGlobals::Pi;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		c.PipeInnerRadius = m_PipeInnerRadius;
 		c.Volume = Pi * pow_2( m_PipeInnerRadius ) * m_CellDepth;
 
 	}
-
-	//*********************************************************************************************!
-
-	// ==================================================
-	// =========== Mesh Development routines ============
-	// ==================================================
-
-	//*********************************************************************************************!
 
 	void
 	FullDomainStructureInfo::developMesh()
@@ -4184,10 +3553,6 @@ namespace PlantPipingSystemsManager {
 		if ( allocated( ZBoundaryPoints ) ) ZBoundaryPoints.deallocate();
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	FullDomainStructureInfo::createPartitionCenterList()
@@ -4688,10 +4053,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Array1D< GridRegion >
 	FullDomainStructureInfo::createPartitionRegionList(
 		Array1D< MeshPartition > const & ThesePartitionCenters,
@@ -4707,25 +4068,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		Array1D< GridRegion > ThesePartitionRegions( {0,PartitionsUBound} );
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CreatePartitionRegionList" );
@@ -4737,8 +4081,6 @@ namespace PlantPipingSystemsManager {
 		Real64 CellLeft;
 		Real64 CellRight;
 		int SubIndex;
-
-		// FUNCTION RETURN VALUE
 
 		if ( ! PartitionsExist ) {
 			return ThesePartitionRegions;
@@ -4830,10 +4172,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	int
 	CreateRegionListCount(
 		Array1D< GridRegion > const & ThesePartitionRegions,
@@ -4848,25 +4186,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// USE STATEMENTS:
 		using DataGlobals::AnyBasementsInModel;
 
 		// Return value
 		int RetVal;
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Index;
@@ -4897,10 +4221,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Array1D< GridRegion >
 	FullDomainStructureInfo::createRegionList(
 		Array1D< GridRegion > const & ThesePartitionRegions,
@@ -4928,27 +4248,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		Array1D< GridRegion > RetVal( {0,RetValUBound} );
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		Real64 LeftRegionExtent;
 		int PreviousUbound;
@@ -5061,10 +4362,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	int
 	CreateBoundaryListCount(
 		Array1D< GridRegion > const & RegionList,
@@ -5078,34 +4375,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		int RetVal;
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Index;
@@ -5131,10 +4402,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Array1D< Real64 >
 	CreateBoundaryList(
 		Array1D< GridRegion > const & RegionList,
@@ -5151,33 +4418,14 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		Array1D< Real64 > RetVal( {RetValLbound,RetValUBound} );
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 StartingPointCounter;
 		int Index;
 		int Counter;
 		int CellWidthCtr;
-
-		// FUNCTION RETURN VALUE
 
 		Counter = -1;
 		for ( Index = RegionList.l1(); Index <= RegionList.u1(); ++Index ) {
@@ -5202,10 +4450,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	FullDomainStructureInfo::createCellArray(
 		Array1D< Real64 > const & XBoundaryPoints,
@@ -5219,22 +4463,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int YIndexMax;
@@ -5630,10 +4858,6 @@ namespace PlantPipingSystemsManager {
 		this->NumInsulationCells = NumInsulationCells;
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	FullDomainStructureInfo::setupCellNeighbors()
 	{
@@ -5742,10 +4966,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	FullDomainStructureInfo::addNeighborInformation(
 		int const X,
@@ -5785,10 +5005,6 @@ namespace PlantPipingSystemsManager {
 		cell.NeighborInformation( PrevUBound + 1 ).Value.ThisWallToNeighborCentroid = ThisWallToNeighborCentroid;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	FullDomainStructureInfo::setupPipeCircuitInOutCells()
@@ -5875,10 +5091,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	int
 	FullDomainStructureInfo::getCellWidthsCount(
 		int const dir, // From Enum: RegionType
@@ -5891,18 +5103,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 
 		// Return value
 		int RetVal( 0 );
@@ -5934,10 +5134,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	FullDomainStructureInfo::getCellWidths(
 		GridRegion & g
@@ -5949,21 +5145,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 GridWidth;
@@ -6112,10 +5293,6 @@ namespace PlantPipingSystemsManager {
 		RetVal.deallocate();
 	}
 
-	//*********************************************************************************************!
-
-
-	//*********************************************************************************************!
 	void
 	PerformIterationLoop(
 		int const DomainNum,
@@ -6173,10 +5350,6 @@ namespace PlantPipingSystemsManager {
 			}
 		}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	PerformTemperatureFieldUpdate( int const DomainNum )
 	{
@@ -6232,10 +5405,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	EvaluateFieldCellTemperature(
 		int const DomainNum,
@@ -6248,21 +5417,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -6317,10 +5471,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	EvaluateGroundSurfaceTemperature(
 		int const DomainNum,
@@ -6334,15 +5484,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::Latitude;
 		using DataEnvironment::Longitude;
@@ -6351,9 +5492,6 @@ namespace PlantPipingSystemsManager {
 		using DataEnvironment::WindSpeed;
 		using DataGlobals::SecsInDay;
 		using DataGlobals::SecInHour;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const AirDensity( 1.22521 ); // '[kg/m3]
@@ -6366,12 +5504,6 @@ namespace PlantPipingSystemsManager {
 		Real64 const Convert_Wm2_To_MJhrmin( 3600.0 / 1000000.0 );
 		Real64 const Convert_MJhrmin_To_Wm2( 1.0 / Convert_Wm2_To_MJhrmin );
 		Real64 const Rho_water( 998.0 ); // [kg/m3]
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// declare some variables
@@ -6708,10 +5840,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	EvaluateAdiabaticSurfaceTemperature(
 		int const DomainNum,
@@ -6724,21 +5852,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -6808,10 +5921,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	EvaluateBasementCellTemperature(
 		int const DomainNum,
@@ -6824,21 +5933,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -6957,10 +6051,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	GetBasementWallHeatFlux( int const DomainNum )
 	{
@@ -6971,26 +6061,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalSurface::QdotConvOutRepPerArea;
 
 		// Return value
 		Real64 RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 RunningSummation;
@@ -7012,10 +6087,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	GetBasementFloorHeatFlux( int const DomainNum )
 	{
@@ -7026,26 +6097,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalSurface::QdotConvOutRepPerArea;
 
 		// Return value
 		Real64 RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 RunningSummation;
@@ -7067,10 +6123,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	UpdateBasementSurfaceTemperatures( int const DomainNum )
 	{
@@ -7081,17 +6133,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::OSCM;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const BigNumber( 10000.0 );
@@ -7121,9 +6164,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	Real64
 	EvaluateZoneInterfaceTemperature(
 		int const DomainNum,
@@ -7266,10 +6306,6 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	GetZoneInterfaceHeatFlux( int const DomainNum )
 	{
@@ -7321,10 +6357,6 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	UpdateZoneSurfaceTemperatures( int const DomainNum )
 	{
@@ -7368,10 +6400,6 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	GetAverageTempByType(
 		int const DomainNum,
@@ -7385,26 +6413,8 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		Real64 RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 RunningSummation = 0.0;
@@ -7442,10 +6452,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	EvaluateFarfieldBoundaryTemperature(
 		int const DomainNum,
@@ -7458,18 +6464,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -7549,10 +6543,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	EvaluateFarfieldCharacteristics(
 		int const DomainNum,
@@ -7587,10 +6577,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	GetFarfieldTemp(
 		int const DomainNum,
@@ -7603,15 +6589,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace GroundTemperatureManager;
@@ -7637,10 +6614,6 @@ namespace PlantPipingSystemsManager {
 		return RetVal;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	PreparePipeCircuitSimulation(
@@ -7709,10 +6682,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	PerformPipeCircuitSimulation(
 		int const DomainNum,
@@ -7725,17 +6694,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CircuitCrossTemp;
@@ -7839,10 +6797,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	PerformPipeCellSimulation(
 		int const DomainNum,
@@ -7901,10 +6855,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	SimulateRadialToCartesianInterface(
@@ -7969,10 +6919,6 @@ namespace PlantPipingSystemsManager {
 		cell.MyBase.Temperature = Numerator / Denominator;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	SimulateOuterMostRadialSoilSlice(
@@ -8061,10 +7007,6 @@ namespace PlantPipingSystemsManager {
 		cell.PipeCellData.Soil( MaxRadialIndex ).MyBase.Temperature = Numerator / Denominator;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	SimulateAllInteriorRadialSoilSlices(
@@ -8156,10 +7098,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	SimulateInnerMostRadialSoilSlice(
@@ -8253,10 +7191,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	SimulateRadialInsulationCell(
 		CartesianCell & cell
@@ -8309,10 +7243,6 @@ namespace PlantPipingSystemsManager {
 		cell.PipeCellData.Insulation.MyBase.Temperature = Numerator / Denominator;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	SimulateRadialPipeCell(
@@ -8404,10 +7334,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	SimulateFluidCell(
 		CartesianCell & cell,
@@ -8480,10 +7406,6 @@ namespace PlantPipingSystemsManager {
 		cell.PipeCellData.Fluid.MyBase.Temperature = Numerator / Denominator;
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	DoOneTimeInitializations(
@@ -8662,10 +7584,6 @@ namespace PlantPipingSystemsManager {
 	}
 
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	DoStartOfTimeStepInitializations(
 		int const DomainNum,
@@ -8679,12 +7597,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutRelHum;
@@ -8695,9 +7607,6 @@ namespace PlantPipingSystemsManager {
 		using FluidProperties::GetConductivityGlycol;
 		using FluidProperties::GetViscosityGlycol;
 		using DataPlant::PlantLoop; // only for fluid name/index
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
@@ -8830,10 +7739,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	DoEndOfIterationOperations(
 		int const DomainNum,
@@ -8886,10 +7791,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	EvaluateSoilRhoCp(
@@ -8974,10 +7875,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	SetAdditionalNeighborData(
 		int const DomainNum,
@@ -9008,10 +7905,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	void
 	EvaluateNeighborCharacteristics(
@@ -9123,10 +8016,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	void
 	EvaluateCellNeighborDirections(
 		int const DomainNum,
@@ -9233,10 +8122,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	Real64
 	CalcAdiabaticMultiplier(
 		int const DomainNum,
@@ -9255,10 +8140,6 @@ namespace PlantPipingSystemsManager {
 			return 1.0;
 		}
 	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 #ifdef CalcEnergyBalance
 	void
