@@ -87,71 +87,18 @@ namespace PlantPipingSystemsManager {
 	extern std::string const ObjName_ZoneCoupled_Slab;
 	extern std::string const ObjName_ZoneCoupled_Basement;
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D_int NeighborFieldCells;
-	extern Array1D_int NeighborBoundaryCells;
-
 	// Using/Aliasing
 	using namespace GroundTemperatureManager;
 
 	enum class SegmentFlow { IncreasingZ, DecreasingZ };
 	enum class MeshDistribution { Uniform, SymmetricGeometric, Geometric };
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const PartitionType_BasementWall;
-	extern int const PartitionType_BasementFloor;
-	extern int const PartitionType_Pipe;
-	extern int const PartitionType_Slab;
-	extern int const PartitionType_XSide;
-	extern int const PartitionType_XSideWall;
-	extern int const PartitionType_ZSide;
-	extern int const PartitionType_ZSideWall;
-	extern int const PartitionType_FloorInside;
-	extern int const PartitionType_UnderFloor;
-	extern int const PartitionType_HorizInsXSide;
-	extern int const PartitionType_HorizInsZSide;
-	extern int const PartitionType_VertInsLowerEdge;
+	enum class RegionType { Pipe, BasementWall, BasementFloor, XDirection, YDirection, ZDirection, XSide, XSideWall, ZSide, ZSideWall, FloorInside, UnderFloor, HorizInsXSide, HorizInsZSide, VertInsLowerEdge };
+	enum class Direction { PositiveY, NegativeY, PositiveX, NegativeX, PositiveZ, NegativeZ };
+	enum class PartitionType { BasementWall, BasementFloor, Pipe, Slab, XSide, XSideWall, ZSide, ZSideWall, FloorInside, UnderFloor, HorizInsXSide, VertInsLowerEdge, HorizInsZSide };
+	enum class CellType { Unknown, Pipe, GeneralField, GroundSurface, FarfieldBoundary, BasementWall, BasementFloor, BasementCorner, BasementCutaway, Slab, HorizInsulation, VertInsulation, ZoneGroundInterface, BasementWallInsu, BasementFloorInsu, SlabOnGradeEdgeInsu };
 
-	extern int const RegionType_Pipe;
-	extern int const RegionType_BasementWall;
-	extern int const RegionType_BasementFloor;
-	extern int const RegionType_XDirection;
-	extern int const RegionType_YDirection;
-	extern int const RegionType_ZDirection;
-	extern int const RegionType_XSide;
-	extern int const RegionType_XSideWall;
-	extern int const RegionType_ZSide;
-	extern int const RegionType_ZSideWall;
-	extern int const RegionType_FloorInside;
-	extern int const RegionType_UnderFloor;
-	extern int const RegionType_HorizInsXSide;
-	extern int const RegionType_HorizInsZSide;
-	extern int const RegionType_VertInsLowerEdge;
-
-	extern int const Direction_PositiveY;
-	extern int const Direction_NegativeY;
-	extern int const Direction_PositiveX;
-	extern int const Direction_NegativeX;
-	extern int const Direction_PositiveZ;
-	extern int const Direction_NegativeZ;
-
-	extern int const CellType_Unknown;
-	extern int const CellType_Pipe;
-	extern int const CellType_GeneralField;
-	extern int const CellType_GroundSurface;
-	extern int const CellType_FarfieldBoundary;
-	extern int const CellType_AdiabaticWall;
-	extern int const CellType_BasementWall;
-	extern int const CellType_BasementFloor;
-	extern int const CellType_BasementCorner;
-	extern int const CellType_BasementCutaway;
-	extern int const CellType_Slab;
-	extern int const CellType_HorizInsulation;
-	extern int const CellType_VertInsulation;
-	extern int const CellType_SlabOnGradeEdgeInsu;
-	extern int const CellType_ZoneGroundInterface;
-	extern int const CellType_BasementWallInsu;
-	extern int const CellType_BasementFloorInsu;
+	extern Array1D< Direction > NeighborFieldCells;
+	extern Array1D< Direction > NeighborBoundaryCells;
 
 	struct BaseThermalPropertySet
 	{
@@ -441,7 +388,7 @@ namespace PlantPipingSystemsManager {
 	{
 		// Members
 		Real64 rDimension;
-		int PartitionType; // From Enum: ParitionType
+		PartitionType partitionType; // From Enum: ParitionType
 		Real64 TotalWidth;
 
 		// Default Constructor
@@ -451,11 +398,11 @@ namespace PlantPipingSystemsManager {
 		// Member Constructor
 		MeshPartition(
 			Real64 const rDimension,
-			int const PartitionType, // From Enum: ParitionType
+			PartitionType const partitionType, // From Enum: ParitionType
 			Real64 const TotalWidth
 		) :
 			rDimension( rDimension ),
-			PartitionType( PartitionType ),
+			partitionType( partitionType ),
 			TotalWidth( TotalWidth )
 		{}
 
@@ -466,7 +413,7 @@ namespace PlantPipingSystemsManager {
 		// Members
 		Real64 Min;
 		Real64 Max;
-		int RegionType; // From Enum: RegionType
+		RegionType thisRegionType; // From Enum: RegionType
 		Array1D< Real64 > CellWidths;
 
 		// Default Constructor
@@ -480,7 +427,7 @@ namespace PlantPipingSystemsManager {
 		// Members
 		Real64 Min;
 		Real64 Max;
-		int RegionType; // From Enum: RegionType
+		RegionType thisRegionType;
 
 		// Default Constructor
 		TempGridRegionData()
@@ -490,11 +437,11 @@ namespace PlantPipingSystemsManager {
 		TempGridRegionData(
 			Real64 const Min,
 			Real64 const Max,
-			int const RegionType // From Enum: RegionType
+			RegionType const thisRegionType
 		) :
 			Min( Min ),
 			Max( Max ),
-			RegionType( RegionType )
+			thisRegionType( thisRegionType )
 		{}
 
 	};
@@ -537,10 +484,11 @@ namespace PlantPipingSystemsManager {
 		Real64 ThisCentroidToNeighborWall;
 		Real64 ThisWallToNeighborCentroid;
 		Real64 ConductionResistance;
+		Real64 adiabaticMultiplier;
 		Point3DInteger NeighborCellIndeces;
 
 		// Default Constructor
-		NeighborInformation()
+		NeighborInformation() : adiabaticMultiplier( 1.0 )
 		{}
 
 	};
@@ -548,7 +496,7 @@ namespace PlantPipingSystemsManager {
 	struct DirectionNeighbor_Dictionary
 	{
 		// Members
-		int Direction; // From Enum: Direction
+		Direction direction;
 		NeighborInformation Value;
 
 		// Default Constructor
@@ -571,7 +519,7 @@ namespace PlantPipingSystemsManager {
 		Real64 Z_min;
 		Real64 Z_max;
 		Point3DReal Centroid;
-		int CellType; // From Enum: CellType
+		CellType cellType;
 		int PipeIndex;
 		Array1D< DirectionNeighbor_Dictionary > NeighborInformation;
 		CartesianPipeCellInformation PipeCellData;
@@ -594,7 +542,7 @@ namespace PlantPipingSystemsManager {
 
 		Real64 inline volume() const {return this->width() * this->depth() * this->height();}
 
-		Real64 normalArea(int const Direction) const;
+		Real64 normalArea(Direction const direction) const;
 
 	};
 
@@ -1170,7 +1118,7 @@ namespace PlantPipingSystemsManager {
 		createRegionList(
 			Array1D< GridRegion > const & ThesePartitionRegions,
 			Real64 const DirExtentMax,
-			int const DirDirection,
+			RegionType const DirDirection,
 			int const RetValUBound,
 			bool const PartitionsExist,
 			Optional_int BasementWallXIndex = _,
@@ -1202,7 +1150,7 @@ namespace PlantPipingSystemsManager {
 
 		int
 		getCellWidthsCount(
-			int const dir, // From Enum: RegionType
+			RegionType const dir,
 			int const n
 		);
 
@@ -1216,10 +1164,11 @@ namespace PlantPipingSystemsManager {
 			int const X,
 			int const Y,
 			int const Z,
-			int const Direction, // From Enum: Direction
+			Direction const direction,
 			Real64 const ThisCentroidToNeighborCentroid,
 			Real64 const ThisCentroidToNeighborWall,
-			Real64 const ThisWallToNeighborCentroid
+			Real64 const ThisWallToNeighborCentroid,
+			Real64 const ThisAdiabaticMultiplier
 		);
 
 
@@ -1240,7 +1189,7 @@ namespace PlantPipingSystemsManager {
 
 		Real64
 		GetAverageTempByType(
-			int const CellType
+			CellType const cellType
 		);
 
 	};
@@ -1493,14 +1442,14 @@ namespace PlantPipingSystemsManager {
 	int
 	CreateBoundaryListCount(
 		Array1D< GridRegion > const & RegionList,
-		int const DirDirection
+		RegionType const DirDirection
 	);
 
 	Array1D< Real64 >
 	CreateBoundaryList(
 		Array1D< GridRegion > const & RegionList,
 		Real64 const DirExtentMax,
-		int const DirDirection,
+		RegionType const DirDirection,
 		int const RetValLbound,
 		int const RetValUBound
 	);
@@ -1522,12 +1471,6 @@ namespace PlantPipingSystemsManager {
 
 	Real64
 	EvaluateGroundSurfaceTemperature(
-		int const DomainNum,
-		CartesianCell & cell
-	);
-
-	Real64
-	EvaluateAdiabaticSurfaceTemperature(
 		int const DomainNum,
 		CartesianCell & cell
 	);
@@ -1561,9 +1504,10 @@ namespace PlantPipingSystemsManager {
 	EvaluateFarfieldCharacteristics(
 		int const DomainNum,
 		CartesianCell const & cell,
-		int const direction,
+		Direction const direction,
 		Real64 & neighbortemp,
-		Real64 & resistance
+		Real64 & resistance,
+		Real64 & adiabaticMultiplier
 	);
 
 	Real64
@@ -1667,7 +1611,7 @@ namespace PlantPipingSystemsManager {
 		int const X,
 		int const Y,
 		int const Z,
-		int const Direction,
+		Direction const direction,
 		Real64 const Resistance,
 		CartesianCell const & NeighborCell
 	);
@@ -1676,9 +1620,10 @@ namespace PlantPipingSystemsManager {
 	EvaluateNeighborCharacteristics(
 		int const DomainNum,
 		CartesianCell const & ThisCell,
-		int const CurDirection,
+		Direction const CurDirection,
 		Real64 & NeighborTemp,
 		Real64 & Resistance,
+		Real64 & AdiabaticMultiplier,
 		Optional_int NeighborX = _,
 		Optional_int NeighborY = _,
 		Optional_int NeighborZ = _
@@ -1688,13 +1633,6 @@ namespace PlantPipingSystemsManager {
 	EvaluateCellNeighborDirections(
 		int const DomainNum,
 		CartesianCell const & cell
-	);
-
-	Real64
-	CalcAdiabaticMultiplier(
-		int const DomainNum,
-		CartesianCell const & cell,
-		int CurDirection
 	);
 
 #ifdef CalcEnergyBalance
