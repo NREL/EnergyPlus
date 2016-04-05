@@ -158,20 +158,6 @@ namespace PlantPipingSystemsManager {
 	extern int const CellType_BasementWallInsu;
 	extern int const CellType_BasementFloorInsu;
 
-	// DERIVED TYPE DEFINITIONS:
-
-	//Input data structure
-
-	// Internal structure
-
-	//Simulation data structures
-
-	// 'Current' data structure for variables, this is one-per-domain
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	// Types
-
 	struct BaseThermalPropertySet
 	{
 		// Members
@@ -573,26 +559,21 @@ namespace PlantPipingSystemsManager {
 		CartesianCell()
 		{}
 
-		Real64
-		width() const;
+		Real64 width() const;
 
-		Real64
-		height() const;
+		Real64 height() const;
 
-		Real64
-		depth() const;
+		Real64 depth() const;
 
-		Real64
-		XNormalArea() const;
+		Real64 XNormalArea() const;
 
-		Real64
-		YNormalArea() const;
+		Real64 YNormalArea() const;
 
-		Real64
-		ZNormalArea() const;
+		Real64 ZNormalArea() const;
 
-		Real64
-		volume() const;
+		Real64 volume() const;
+
+		Real64 normalArea(int const Direction) const;
 
 	};
 
@@ -1149,6 +1130,77 @@ namespace PlantPipingSystemsManager {
 			NumSlabCells( 0 )
 		{}
 
+
+		void
+		developMesh();
+
+		void
+		createPartitionCenterList();
+
+		Array1D< GridRegion >
+		createPartitionRegionList(
+			Array1D< MeshPartition > const & ThesePartitionCenters,
+			bool const PartitionsExist,
+			Real64 const DirExtentMax,
+			int const PartitionsUBound
+		);
+
+		Array1D< GridRegion >
+		createRegionList(
+			Array1D< GridRegion > const & ThesePartitionRegions,
+			Real64 const DirExtentMax,
+			int const DirDirection,
+			int const RetValUBound,
+			bool const PartitionsExist,
+			Optional_int BasementWallXIndex = _,
+			Optional_int BasementFloorYIndex = _,
+			Optional_int XIndex = _,
+			Optional_int XWallIndex = _,
+			Optional_int InsulationXIndex = _,
+			Optional_int YIndex = _,
+			Optional_int YFloorIndex = _,
+			Optional_int InsulationYIndex = _,
+			Optional_int ZIndex = _,
+			Optional_int ZWallIndex = _,
+			Optional_int InsulationZIndex = _
+		);
+
+		void
+		createCellArray(
+			Array1D< Real64 > const & XBoundaryPoints,
+			Array1D< Real64 > const & YBoundaryPoints,
+			Array1D< Real64 > const & ZBoundaryPoints
+		);
+
+
+		void
+		setupCellNeighbors();
+
+		void
+		setupPipeCircuitInOutCells();
+
+		int
+		getCellWidthsCount(
+			int const dir, // From Enum: RegionType
+			int const n
+		);
+
+		void
+		getCellWidths(
+			GridRegion & g
+		);
+
+		void
+		addNeighborInformation(
+			int const X,
+			int const Y,
+			int const Z,
+			int const Direction, // From Enum: Direction
+			Real64 const ThisCentroidToNeighborCentroid,
+			Real64 const ThisCentroidToNeighborWall,
+			Real64 const ThisWallToNeighborCentroid
+		);
+
 	};
 
 	// Object Data
@@ -1521,37 +1573,6 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	RectangleF
-	XYRectangle( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	RectangleF
-	XZRectangle( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	RectangleF
-	YZRectangle( CartesianCell const & c );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Real64
-	NormalArea(
-		CartesianCell const & c,
-		int const Direction // From Enum: Direction
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
 	NeighborInformation
 	NeighborInformationArray_Value(
 		Array1D< DirectionNeighbor_Dictionary > const & dict,
@@ -1609,63 +1630,14 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	void
-	DevelopMesh( int const DomainNum );
-
 	//*********************************************************************************************!
 
-	//*********************************************************************************************!
-
-	void
-	CreatePartitionCenterList( int const DomainNum );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Array1D< GridRegion >
-	CreatePartitionRegionList(
-		int const DomainNum,
-		Array1D< MeshPartition > const & ThesePartitionCenters,
-		bool const PartitionsExist,
-		Real64 const DirExtentMax,
-		int const PartitionsUBound
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 
 	int
 	CreateRegionListCount(
 		Array1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		bool const PartitionsExist
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	Array1D< GridRegion >
-	CreateRegionList(
-		int const DomainNum,
-		Array1D< GridRegion > const & ThesePartitionRegions,
-		Real64 const DirExtentMax,
-		int const DirDirection,
-		int const RetValUBound,
-		bool const PartitionsExist,
-		Optional_int BasementWallXIndex = _,
-		Optional_int BasementFloorYIndex = _,
-		Optional_int XIndex = _,
-		Optional_int XWallIndex = _,
-		Optional_int InsulationXIndex = _,
-		Optional_int YIndex = _,
-		Optional_int YFloorIndex = _,
-		Optional_int InsulationYIndex = _,
-		Optional_int ZIndex = _,
-		Optional_int ZWallIndex = _,
-		Optional_int InsulationZIndex = _
 	);
 
 	//*********************************************************************************************!
@@ -1689,69 +1661,6 @@ namespace PlantPipingSystemsManager {
 		int const DirDirection,
 		int const RetValLbound,
 		int const RetValUBound
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	CreateCellArray(
-		int const DomainNum,
-		Array1D< Real64 > const & XBoundaryPoints,
-		Array1D< Real64 > const & YBoundaryPoints,
-		Array1D< Real64 > const & ZBoundaryPoints
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	SetupCellNeighbors( int const DomainNum );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	AddNeighborInformation(
-		int const DomainNum,
-		int const X,
-		int const Y,
-		int const Z,
-		int const Direction, // From Enum: Direction
-		Real64 const ThisCentroidToNeighborCentroid,
-		Real64 const ThisCentroidToNeighborWall,
-		Real64 const ThisWallToNeighborCentroid
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	SetupPipeCircuitInOutCells( int const DomainNum );
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	int
-	GetCellWidthsCount(
-		int const DomainNum,
-		int const dir, // From Enum: RegionType
-		int const n
-	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	GetCellWidths(
-		int const DomainNum,
-		GridRegion & g
 	);
 
 	//*********************************************************************************************!
