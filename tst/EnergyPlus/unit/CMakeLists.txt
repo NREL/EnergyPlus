@@ -86,6 +86,7 @@ set( test_src
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
   VariableSpeedCoils.unit.cc
+  VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc

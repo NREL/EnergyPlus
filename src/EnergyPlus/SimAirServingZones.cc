@@ -4633,9 +4633,7 @@ namespace SimAirServingZones {
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
-		Real64 EvzMin( 0.0 ); // minimum ventilation efficiency
 		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flaw rate [m3/s]
-		Real64 DesCoolVolFlowMin( 0.0 ); // minimum design flow rate for cooling supply air (zone) [m3/s]
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
@@ -5000,7 +4998,6 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
-								EvzMin = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
 								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
@@ -5022,12 +5019,8 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
-									if ( SysCoolingEv < EvzMin ) {
-										LimitZoneVentEff( EvzMin, Xs, VozClg, ZoneOAFrac, DesCoolVolFlowMin );
-										FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
-										FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = DesCoolVolFlowMin;
-										SysCoolingEv = EvzMin;
-									}
+									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
+									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum ); // Save previous EvzByZoneCool
@@ -5227,7 +5220,6 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
-								EvzMin = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
 								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
@@ -5248,12 +5240,8 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
-									if ( SysCoolingEv < EvzMin ) {
-										LimitZoneVentEff( EvzMin, Xs, VozClg, ZoneOAFrac, DesCoolVolFlowMin );
-										FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
-										FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = DesCoolVolFlowMin;
-										SysCoolingEv = EvzMin;
-									}
+									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
+									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum );
@@ -6532,11 +6520,10 @@ namespace SimAirServingZones {
 
 	void
 		LimitZoneVentEff(
-		Real64 Evz, // minimum zone ventilation efficiency
-		Real64 Xs,  // ratio of uncorected system outdoor air flow rate to the design system supply flow rate
+		Real64 Xs,  // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
 		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
-		Real64 & ZoneOAFrac, // ratio of Voz to available zone supply air flow
-		Real64 & AvailSAFlow // available zone supply air flow [m3/s]
+		int CtrlZoneNum, //controlled zone number
+		Real64 & SystemCoolingEv // system ventilation efficiency
 		)
 	{
 		// FUNCTION INFORMATION:
@@ -6546,7 +6533,8 @@ namespace SimAirServingZones {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// Givene the minimum ventilation efficiency, calculate the available supply air flow rate
+		// Check that system ventilation eff is not less than input minimum system ventilation efficiency.
+		// If it is, back calculate and reset ZpzClgByZone and DesCoolVolFlowMin and system ventilation efficiency
 
 		// METHODOLOGY EMPLOYED:
 		// Ventilation Rate Procedure for single pass system
@@ -6557,9 +6545,16 @@ namespace SimAirServingZones {
 		// Using/Aliasing
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
+		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]
 
-		ZoneOAFrac = 1.0 + Xs - Evz;
-		AvailSAFlow = Voz/ZoneOAFrac;
+		if ( SystemCoolingEv < FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff ) {
+			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+			AvailSAFlow = Voz/ZoneOAFrac;
+			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+		}
 	}
 
 

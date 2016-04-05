@@ -1768,7 +1768,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
-						DesHeatMaxAirFlowFracUsrInp = false;
+						DesHeatMaxAirFlowFracUsrInp = true;
 					}
 					// make sure the user specified inputs of the previous 3 inputs override the defaults
 					if ( DesHeatMaxAirFlowPerAreaUsrInp || DesHeatMaxAirFlowUsrInp || DesHeatMaxAirFlowFracUsrInp ) {

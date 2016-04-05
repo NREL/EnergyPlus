@@ -1981,8 +1981,7 @@ namespace SingleDuct {
 					// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 						Sys( SysNum ).ZoneMinAirFrac = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
-					}
-					else {
+					} else {
 						Sys( SysNum ).ZoneMinAirFrac = 0.0;
 					}
 				}
@@ -1992,8 +1991,7 @@ namespace SingleDuct {
 					MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) /
 						Sys( SysNum ).MaxAirVolFlowRate;
 					Sys( SysNum ).ZoneMinAirFrac = max( 0.2, MinMinFlowRatio );
-				}
-				else {
+				} else {
 					Sys( SysNum ).ZoneMinAirFrac = 0.0;
 				}
 			}
@@ -2005,8 +2003,7 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).ZoneFixedMinAir == AutoSize ) {
 			if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
 				IsAutoSize = true;
-			}
-			else {
+			} else {
 				Sys( SysNum ).ZoneFixedMinAir = 0.0;
 			}
 		}
