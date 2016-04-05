@@ -94,6 +94,8 @@ namespace PlantPipingSystemsManager {
 	// Using/Aliasing
 	using namespace GroundTemperatureManager;
 
+	enum class SegmentFlow { IncreasingZ, DecreasingZ };
+	enum class MeshDistribution { Uniform, SymmetricGeometric, Geometric };
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const PartitionType_BasementWall;
@@ -125,13 +127,6 @@ namespace PlantPipingSystemsManager {
 	extern int const RegionType_HorizInsXSide;
 	extern int const RegionType_HorizInsZSide;
 	extern int const RegionType_VertInsLowerEdge;
-
-	extern int const MeshDistribution_Uniform;
-	extern int const MeshDistribution_SymmetricGeometric;
-	extern int const MeshDistribution_Geometric;
-
-	extern int const SegmentFlow_IncreasingZ;
-	extern int const SegmentFlow_DecreasingZ;
 
 	extern int const Direction_PositiveY;
 	extern int const Direction_NegativeY;
@@ -238,6 +233,20 @@ namespace PlantPipingSystemsManager {
 
 	};
 
+	struct RadialSizing
+	{
+		// Members
+		Real64 InnerDia;
+		Real64 OuterDia;
+
+		// Default Constructor
+		RadialSizing()
+		{}
+
+		Real64
+		thickness();
+	};
+
 	struct RadialCellInformation // : Inherits BaseCell
 	{
 		// Members
@@ -249,6 +258,14 @@ namespace PlantPipingSystemsManager {
 		// Default Constructor
 		RadialCellInformation()
 		{}
+
+		// Eventually this should be the real constructor
+		static void ctor(
+			RadialCellInformation & c,
+			Real64 const m_RadialCentroid,
+			Real64 const m_MinRadius,
+			Real64 const m_MaxRadius
+		);
 
 		// Get the XY cross sectional area of the radial cell
 		Real64 XY_CrossSectArea();
@@ -267,6 +284,12 @@ namespace PlantPipingSystemsManager {
 		FluidCellInformation()
 		{}
 
+		// Eventually this should be the real constructor
+		static void ctor(
+			FluidCellInformation & c,
+			Real64 const m_PipeInnerRadius,
+			Real64 const m_CellDepth
+		);
 	};
 
 	struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
@@ -282,6 +305,18 @@ namespace PlantPipingSystemsManager {
 		// Default Constructor
 		CartesianPipeCellInformation()
 		{}
+
+		// Eventually this should be the real constructor
+		static void ctor(
+			CartesianPipeCellInformation & c,
+			Real64 const GridCellWidth,
+			RadialSizing const & PipeSizes,
+			int const NumRadialNodes,
+			Real64 const CellDepth,
+			Real64 const InsulationThickness,
+			Real64 const RadialGridExtent,
+			bool const SimHasInsulation
+		);
 
 	};
 
@@ -510,20 +545,6 @@ namespace PlantPipingSystemsManager {
 
 	};
 
-	struct RadialSizing
-	{
-		// Members
-		Real64 InnerDia;
-		Real64 OuterDia;
-
-		// Default Constructor
-		RadialSizing()
-		{}
-
-		Real64
-		thickness();
-	};
-
 	struct DirectionNeighbor_Dictionary
 	{
 		// Members
@@ -559,19 +580,19 @@ namespace PlantPipingSystemsManager {
 		CartesianCell()
 		{}
 
-		Real64 width() const;
+		Real64 inline width() const {return this->X_max - this->X_min;}
 
-		Real64 height() const;
+		Real64 inline height() const {return this->Y_max - this->Y_min;}
 
-		Real64 depth() const;
+		Real64 inline depth() const {return this->Z_max - this->Z_min;}
 
-		Real64 XNormalArea() const;
+		Real64 inline XNormalArea() const {return this->depth() * this->height();}
 
-		Real64 YNormalArea() const;
+		Real64 inline YNormalArea() const {return this->depth() * this->width();}
 
-		Real64 ZNormalArea() const;
+		Real64 inline ZNormalArea() const {return this->width() * this->height();}
 
-		Real64 volume() const;
+		Real64 inline volume() const {return this->width() * this->depth() * this->height();}
 
 		Real64 normalArea(int const Direction) const;
 
@@ -607,13 +628,13 @@ namespace PlantPipingSystemsManager {
 	struct DistributionStructure
 	{
 		// Members
-		int MeshDistribution; // From Enum: MeshDistribution
+		MeshDistribution thisMeshDistribution;
 		int RegionMeshCount;
 		Real64 GeometricSeriesCoefficient;
 
 		// Default Constructor
 		DistributionStructure() :
-			MeshDistribution( 0 ),
+			thisMeshDistribution( MeshDistribution::Uniform ),
 			RegionMeshCount( 0 ),
 			GeometricSeriesCoefficient( 0.0 )
 		{}
@@ -792,7 +813,7 @@ namespace PlantPipingSystemsManager {
 		// Misc inputs
 		PointF PipeLocation;
 		Point PipeCellCoordinates;
-		int FlowDirection; // From Enum: SegmentFlow
+		SegmentFlow FlowDirection;
 		// Pointer to parent pipe circuit
 		int ParentCircuitIndex;
 		// Reporting variables
@@ -806,7 +827,7 @@ namespace PlantPipingSystemsManager {
 
 		// Default Constructor
 		PipeSegmentInfo() :
-			FlowDirection( 0 ),
+			FlowDirection( SegmentFlow::IncreasingZ ),
 			ParentCircuitIndex( 0 ),
 			InletTemperature( 0.0 ),
 			OutletTemperature( 0.0 ),
@@ -1201,6 +1222,27 @@ namespace PlantPipingSystemsManager {
 			Real64 const ThisWallToNeighborCentroid
 		);
 
+
+		Real64
+		GetBasementWallHeatFlux();
+
+		Real64
+		GetBasementFloorHeatFlux();
+
+		void
+		UpdateBasementSurfaceTemperatures();
+
+		Real64
+		GetZoneInterfaceHeatFlux();
+
+		void
+		UpdateZoneSurfaceTemperatures();
+
+		Real64
+		GetAverageTempByType(
+			int const CellType
+		);
+
 	};
 
 	// Object Data
@@ -1345,32 +1387,48 @@ namespace PlantPipingSystemsManager {
 	);
 
 	bool
+	inline
 	IsInRange(
 		int const i,
 		int const lower,
 		int const upper
-	);
+	)
+	{
+		return ( ( i >= lower ) && ( i <= upper ) );
+	}
 
 	bool
+	inline
 	IsInRange(
 		Real64 const r,
 		Real64 const lower,
 		Real64 const upper
-	);
+	)
+	{
+		return ( ( r >= lower ) && ( r <= upper ) );
+	}
 
 	bool
+	inline
 	IsInRange_BasementModel(
 		Real64 const r,
 		Real64 const lower,
 		Real64 const upper
-	);
+	)
+	{
+		return ( ( r >= lower ) && ( r < upper ) );
+	}
 
 	Real64
+	inline
 	Real_ConstrainTo(
 		Real64 const r,
 		Real64 const MinVal,
 		Real64 const MaxVal
-	);
+	)
+	{
+		return min( max( r, MinVal ), MaxVal );
+	}
 
 	bool
 	CellType_IsFieldCell( int const CellType ); // From Enum: CellType
@@ -1423,34 +1481,6 @@ namespace PlantPipingSystemsManager {
 	NeighborInformationArray_Value(
 		Array1D< DirectionNeighbor_Dictionary > const & dict,
 		int const Direction // From Enum: Direction
-	);
-
-	// Constructors for generic classes
-	void
-	CartesianPipeCellInformation_ctor(
-		CartesianPipeCellInformation & c,
-		Real64 const GridCellWidth,
-		RadialSizing const & PipeSizes,
-		int const NumRadialNodes,
-		Real64 const CellDepth,
-		Real64 const InsulationThickness,
-		Real64 const RadialGridExtent,
-		bool const SimHasInsulation
-	);
-
-	void
-	RadialCellInformation_ctor(
-		RadialCellInformation & c,
-		Real64 const m_RadialCentroid,
-		Real64 const m_MinRadius,
-		Real64 const m_MaxRadius
-	);
-
-	void
-	FluidCellInformation_ctor(
-		FluidCellInformation & c,
-		Real64 const m_PipeInnerRadius,
-		Real64 const m_CellDepth
 	);
 
 	int
@@ -1509,30 +1539,9 @@ namespace PlantPipingSystemsManager {
 	);
 
 	Real64
-	GetBasementWallHeatFlux( int const DomainNum );
-
-	Real64
-	GetBasementFloorHeatFlux( int const DomainNum );
-
-	void
-	UpdateBasementSurfaceTemperatures( int const DomainNum );
-
-	Real64
 	EvaluateZoneInterfaceTemperature(
 		int const DomainNum,
 		CartesianCell & cell
-	);
-
-	Real64
-	GetZoneInterfaceHeatFlux( int const DomainNum );
-
-	void
-	UpdateZoneSurfaceTemperatures( int const DomainNum );
-
-	Real64
-	GetAverageTempByType(
-		int const DomainNum,
-		int const CellType
 	);
 
 	Real64
