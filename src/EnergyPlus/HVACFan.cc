@@ -704,11 +704,12 @@ namespace HVACFan {
 			// Set the Control Flow variables to 0.0 flow when OFF.
 			if ( fanIsSecondaryDriver_ ) {
 				outletAirMassFlowRate_ = localAirMassFlow; // sometimes the air is moving with the fan off, eg. AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
-
+				if ( localAirMassFlow == 0.0  ) {
+					massFlowRateMaxAvail_ = 0.0;
+					massFlowRateMinAvail_ = 0.0;
+				}
 			} else {
 				outletAirMassFlowRate_ = 0.0;
-				massFlowRateMaxAvail_ = 0.0;
-				massFlowRateMinAvail_ = 0.0;
 			}
 			
 		}

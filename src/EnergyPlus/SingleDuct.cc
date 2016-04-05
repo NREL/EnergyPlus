@@ -1290,7 +1290,7 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 			if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( Sys( SysNum ).FanName ) ); // call constructor
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( Sys( SysNum ).FanName ) ); // call constructor, safe here because get input is not using DataIPShortCuts.
 				Sys( SysNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( Sys( SysNum ).FanName );
 				Sys( SysNum ).OutletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->outletNodeNum();
 				Sys( SysNum ).InletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->inletNodeNum();
@@ -3308,8 +3308,8 @@ namespace SingleDuct {
 			CalcVAVVS( SysNum, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff );
 		}
 
-		// Active cooling
-		if ( QTotLoad < QCoolFanOnMin - SmallLoad && SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 && ! CurDeadBandOrSetback( ZoneNum ) ) {
+		// Active cooling with fix for issue #5592
+		if ( QTotLoad < ( -1.0 * SmallLoad ) && QTotLoad < QCoolFanOnMin - SmallLoad && SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 && ! CurDeadBandOrSetback( ZoneNum ) ) {
 			// check that it can meet the load
 			FanOp = 1;
 			if ( QCoolFanOnMax < QTotLoad - SmallLoad ) {
