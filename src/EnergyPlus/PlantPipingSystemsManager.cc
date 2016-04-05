@@ -267,9 +267,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -302,9 +299,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   May 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -344,9 +338,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -431,9 +422,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Spring 2014
 		//       MODIFIED       by Sushobhit Acharya, March 2015
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -661,9 +649,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -910,9 +895,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -1535,9 +1517,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       Summer 2014  Sushobhit Acharya to accommodate basement calculations
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -1953,9 +1932,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -2082,9 +2058,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -2170,9 +2143,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   September 2012
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -2449,9 +2419,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -2530,9 +2497,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   August 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -2615,9 +2579,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -2769,9 +2730,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -2826,9 +2784,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -2867,9 +2822,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -3565,9 +3517,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -3620,9 +3569,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -3674,9 +3620,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -3964,9 +3907,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -4054,9 +3994,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -4086,9 +4023,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -4120,21 +4054,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D< Real64 > XBoundaryPoints;
@@ -4279,21 +4198,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 BasementCellFraction( 0.001 ); // the fraction of domain extent to use for the basement cells
@@ -5316,9 +5220,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -5743,21 +5644,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 ThisCellCentroidX;
 		Real64 ThisCellCentroidY;
@@ -5878,21 +5764,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PrevUBound;
 
@@ -5928,21 +5799,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CircuitNum;
@@ -6273,21 +6129,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IterationIndex;
 		bool FinishedIterationLoop;
@@ -6345,21 +6186,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -7255,9 +7081,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -7746,21 +7569,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 distance( 0.0 );
 
@@ -7847,21 +7655,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		Real64 const StagnantFluidConvCoeff( 200.0 );
 
@@ -7932,9 +7725,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
@@ -8069,21 +7859,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Iter;
 		Real64 MaxDeviationAmount;
@@ -8143,21 +7918,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_int const Directions( 4, { Direction_NegativeX, Direction_NegativeY, Direction_PositiveX, Direction_PositiveY } );
@@ -8227,21 +7987,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -8332,21 +8077,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -8445,21 +8175,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
 		Real64 Denominator;
@@ -8554,21 +8269,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
 		Real64 Denominator;
@@ -8628,21 +8328,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -8738,21 +8423,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Beta;
 		Real64 Numerator;
@@ -8827,21 +8497,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int rCtr;
@@ -9024,9 +8679,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
@@ -9195,21 +8847,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "DoEndOfIterationOperations" );
 
@@ -9268,21 +8905,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//'static variables only calculated once per simulation run
@@ -9374,21 +8996,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NeighborIndex;
 
@@ -9424,21 +9031,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 ThisCellLength;
@@ -9547,21 +9139,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Xmax;
