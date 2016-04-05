@@ -257,6 +257,9 @@ private: // data
 
 extern std::vector< std::unique_ptr< FanSystem > > fanObjs;
 
+void
+clearHVACFanObjects();
+
 } // Fan namespace
 
 } // EnergyPlus namespace

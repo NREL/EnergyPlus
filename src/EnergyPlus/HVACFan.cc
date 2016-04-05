@@ -89,6 +89,12 @@ namespace HVACFan {
 
 	std::vector < std::unique_ptr <FanSystem> > fanObjs;
 
+	void
+	clearHVACFanObjects()
+	{
+		fanObjs.clear();
+	}
+
 	int
 	getFanObjectVectorIndex(  // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
 		std::string const objectName  // IDF name in input
@@ -437,8 +443,8 @@ namespace HVACFan {
 		if ( ! DataIPShortCuts::lAlphaFieldBlanks( 7 ) ) {
 			powerModFuncFlowFractionCurveIndex_ = CurveManager::GetCurveIndex( DataIPShortCuts::cAlphaArgs( 7 ) );
 		}
-		 nightVentPressureDelta_       = DataIPShortCuts::rNumericArgs( 10 );
-		 nightVentFlowFraction_        = DataIPShortCuts::rNumericArgs( 11 );
+		nightVentPressureDelta_       = DataIPShortCuts::rNumericArgs( 10 );
+		nightVentFlowFraction_        = DataIPShortCuts::rNumericArgs( 11 );
 		zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 8 ), DataHeatBalance::Zone );
 		if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 		if ( zoneNum_ == 0 ) {
@@ -575,7 +581,11 @@ namespace HVACFan {
 				localFlowFraction = flowFraction;
 				localAirMassFlow = localFlowFraction * maxAirMassFlowRate_;
 			} else {
-				localFlowFraction = inletAirMassFlowRate_ / maxAirMassFlowRate_;
+				if ( maxAirMassFlowRate_ > 0.0 ) {
+					localFlowFraction = inletAirMassFlowRate_ / maxAirMassFlowRate_;
+				} else {
+					localFlowFraction = 1.0;
+				}
 				localAirMassFlow  = inletAirMassFlowRate_;
 			}
 		}
