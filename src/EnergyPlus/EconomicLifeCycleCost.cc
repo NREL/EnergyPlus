@@ -1379,10 +1379,17 @@ namespace EconomicLifeCycleCost {
 		for ( iResource = 1; iResource <= NumOfResourceTypes; ++iResource ) {
 			if ( resourceCostNotZero( iResource ) ) {
 				++cashFlowCounter;
-				CashFlow( cashFlowCounter ).Category = costCatEnergy;
-				CashFlow( cashFlowCounter ).Resource = iResource + ResourceTypeInitialOffset;
+				int curResource_iRT = iResource + ResourceTypeInitialOffset;
+				if ( curResource_iRT == iRT_Water || ( curResource_iRT >= iRT_OnSiteWater &&  curResource_iRT <= iRT_Condensate )){
+					CashFlow( cashFlowCounter ).Category = costCatWater;
+				} else if ( curResource_iRT >= iRT_Electricity &&  curResource_iRT <= iRT_SolarAir ) { //iRT_Water already filtered by first if block
+					CashFlow( cashFlowCounter ).Category = costCatEnergy;
+				} else {
+					CashFlow( cashFlowCounter ).Category = costCatOperation;
+				}
+				CashFlow( cashFlowCounter ).Resource = curResource_iRT;
 				CashFlow( cashFlowCounter ).SourceKind = skResource;
-				CashFlow( cashFlowCounter ).name = GetResourceTypeChar( iResource + ResourceTypeInitialOffset );
+				CashFlow( cashFlowCounter ).name = GetResourceTypeChar( curResource_iRT );
 				if ( cashFlowCounter <= numCashFlow ) {
 					//put the monthly energy costs into the cashflow prior to adjustments
 					//energy costs (a.k.a. resource costs) start at the start of service and repeat
@@ -2173,7 +2180,7 @@ namespace EconomicLifeCycleCost {
 			rowHead.deallocate();
 			columnWidth.deallocate();
 			tableBody.deallocate();
-			//---- Energy Cost Cash Flows
+			//---- Energy and Water Cost Cash Flows
 			numColumns = max( 1, numResourcesUsed );
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( numColumns );
@@ -2190,10 +2197,10 @@ namespace EconomicLifeCycleCost {
 					tableBody( jObj, iYear ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
 				}
 			}
-			WriteSubtitle( "Energy Cost Cash Flows (Without Escalation)" );
+			WriteSubtitle( "Energy and Water Cost Cash Flows (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (Without Escalation)" );
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -2392,8 +2399,13 @@ namespace EconomicLifeCycleCost {
 				} else if ( SELECT_CASE_var == skRecurring ) {
 					tableBody( 2, jObj ) = "Recurring";
 				} else if ( SELECT_CASE_var == skResource ) {
-					tableBody( 2, jObj ) = "Energy Cost";
-				} else {
+					if ( CashFlow( offset + jObj ).Category == costCatWater ){
+						tableBody( 2, jObj ) = "Water Cost";
+					} else {
+						tableBody( 2, jObj ) = "Energy Cost";
+					}
+				}
+				else {
 					tableBody( 2, jObj ) = "-";
 				}}
 				tableBody( 3, jObj ) = RealToStr( CashFlow( offset + jObj ).orginalCost, 2 );
