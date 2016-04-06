@@ -2531,20 +2531,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	Real64
-	RadialCellInformation::XY_CrossSectArea()
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       April 2016
-		//       RE-ENGINEERED  na
-
-		using DataGlobals::Pi;
-		return Pi * ( pow_2( this->OuterRadius ) - pow_2( this->InnerRadius ) );
-	}
-
 	void
 	MeshPartition_SelectionSort( Array1< MeshPartition > & X )
 	{
@@ -2581,82 +2567,6 @@ namespace PlantPipingSystemsManager {
 			if ( ISWAP1 != I ) swap( X( I ), X( ISWAP1 ) );
 		}
 
-	}
-
-	int
-	MeshPartition_CompareByDimension(
-		MeshPartition const & x,
-		MeshPartition const & y
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-		int RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		if ( x.rDimension < y.rDimension ) {
-			RetVal = -1;
-		} else if ( x.rDimension > y.rDimension ) {
-			RetVal = 1;
-		} else {
-			RetVal = 0;
-		}
-
-		return RetVal;
-
-	}
-
-	Real64
-	BaseThermalPropertySet::diffusivity()
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		return this->Conductivity / ( this->Density * this->SpecificHeat );
-
-	}
-
-	bool
-	RectangleF::contains(
-		PointF const & p
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		return ( ( this->X_min <= p.X ) && ( p.X < ( this->X_min + this->Width ) ) && ( this->Y_min <= p.Y ) && ( p.Y < ( this->Y_min + this->Height ) ) );
-	}
-
-	Real64
-	RadialSizing::thickness()
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		return ( this->OuterDia - this->InnerDia ) / 2.0;
 	}
 
 	void
@@ -4119,25 +4029,17 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Return value
 		Array1D< Real64 > RetVal( {RetValLbound,RetValUBound} );
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 StartingPointCounter;
-		int Index;
-		int Counter;
-		int CellWidthCtr;
-
-		Counter = -1;
-		for ( Index = RegionList.l1(); Index <= RegionList.u1(); ++Index ) {
+		int Counter = -1;
+		for ( int Index = RegionList.l1(); Index <= RegionList.u1(); ++Index ) {
 			if ( std::set< RegionType >( { RegionType::Pipe, RegionType::BasementFloor, RegionType::BasementWall, RegionType::XSide, RegionType::XSideWall, RegionType::ZSide, RegionType::ZSideWall,
 							RegionType::HorizInsXSide, RegionType::HorizInsZSide, RegionType::FloorInside, RegionType::UnderFloor, RegionType::VertInsLowerEdge } ).count( RegionList( Index ).thisRegionType ) != 0 ) {
 				++Counter;
 				RetVal( Counter ) = RegionList( Index ).Min;
 			} else {
 				if ( RegionList( Index ).thisRegionType == DirDirection ) {
-					StartingPointCounter = RegionList( Index ).Min;
-					for ( CellWidthCtr = RegionList( Index ).CellWidths.l1(); CellWidthCtr <= RegionList( Index ).CellWidths.u1(); ++CellWidthCtr ) {
+					Real64 StartingPointCounter = RegionList( Index ).Min;
+					for ( int CellWidthCtr = RegionList( Index ).CellWidths.l1(); CellWidthCtr <= RegionList( Index ).CellWidths.u1(); ++CellWidthCtr ) {
 						++Counter;
 						RetVal( Counter ) = StartingPointCounter;
 						StartingPointCounter += RegionList( Index ).CellWidths( CellWidthCtr );
@@ -4146,7 +4048,6 @@ namespace PlantPipingSystemsManager {
 			}
 		}
 		RetVal( RetVal.u1() ) = DirExtentMax;
-
 		return RetVal;
 
 	}
@@ -4590,7 +4491,7 @@ namespace PlantPipingSystemsManager {
 		Real64 LowerZCellCentroidZ;
 		Real64 LowerZCellUpperWallZ;
 
-		bool DoingBESTEST = true;
+		bool DoingBESTEST = false;
 
 		auto const & cells( this->Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -4639,6 +4540,10 @@ namespace PlantPipingSystemsManager {
 						this->addNeighborInformation( X, Y, Z, Direction::PositiveX, RightCellCentroidX - ThisCellCentroidX, RightCellLeftWallX - ThisCellCentroidX, RightCellCentroidX - RightCellLeftWallX, ThisAdiabaticMultiplier );
 					}
 
+					// Reset for the Y direction assignments
+					ThisAdiabaticMultiplier = 1.0;
+					ThisAdiabaticMultiplierMirror = 1.0;
+
 					//'setup north/south cell neighbors
 					if ( Y == 0 ) {
 						UpperCellCentroidY = cells( X, Y + 1, Z ).Centroid.Y;
@@ -4662,6 +4567,10 @@ namespace PlantPipingSystemsManager {
 						this->addNeighborInformation( X, Y, Z, Direction::NegativeY, ThisCellCentroidY - LowerCellCentroidY, ThisCellCentroidY - LowerCellUpperWallY, LowerCellUpperWallY - LowerCellCentroidY, ThisAdiabaticMultiplier );
 						this->addNeighborInformation( X, Y, Z, Direction::PositiveY, UpperCellCentroidY - ThisCellCentroidY, UpperCellLowerWallY - ThisCellCentroidY, UpperCellCentroidY - UpperCellLowerWallY, ThisAdiabaticMultiplier );
 					}
+
+					// Reset for the Z direction assignments
+					ThisAdiabaticMultiplier = 1.0;
+					ThisAdiabaticMultiplierMirror = 1.0;
 
 					//'setup forward/backward cell neighbors
 					if ( Z == 0 ) {
@@ -4751,11 +4660,6 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CircuitNum;
-		int CircuitIndex;
-		bool CircuitInletCellSet;
-		int SegmentCtr;
-
 		int SegmentInletCellX;
 		int SegmentInletCellY;
 		int SegmentInletCellZ;
@@ -4769,22 +4673,15 @@ namespace PlantPipingSystemsManager {
 		int CircuitOutletCellY;
 		int CircuitOutletCellZ;
 
-		// Object Data
-		CartesianCell CircuitInletCell;
-		CartesianCell CircuitOutletCell;
-		CartesianCell SegmentInletCell;
-		CartesianCell SegmentOutletCell;
-		PipeSegmentInfo Segment;
-
 		auto const & cells( this->Cells );
-		for ( CircuitNum = this->CircuitIndeces.l1(); CircuitNum <= this->CircuitIndeces.u1(); ++CircuitNum ) {
+		for ( int CircuitNum = this->CircuitIndeces.l1(); CircuitNum <= this->CircuitIndeces.u1(); ++CircuitNum ) {
 
-			CircuitIndex = this->CircuitIndeces( CircuitNum );
-			CircuitInletCellSet = false;
+			int CircuitIndex = this->CircuitIndeces( CircuitNum );
+			bool CircuitInletCellSet = false;
 
-			for ( SegmentCtr = PipingSystemCircuits( CircuitIndex ).PipeSegmentIndeces.l1(); SegmentCtr <= PipingSystemCircuits( CircuitIndex ).PipeSegmentIndeces.u1(); ++SegmentCtr ) {
+			for ( int SegmentCtr = PipingSystemCircuits( CircuitIndex ).PipeSegmentIndeces.l1(); SegmentCtr <= PipingSystemCircuits( CircuitIndex ).PipeSegmentIndeces.u1(); ++SegmentCtr ) {
 
-				Segment = PipingSystemSegments( PipingSystemCircuits( CircuitIndex ).PipeSegmentIndeces( SegmentCtr ) );
+				auto & Segment = PipingSystemSegments( PipingSystemCircuits( CircuitIndex ).PipeSegmentIndeces( SegmentCtr ) );
 				switch ( Segment.FlowDirection ) {
 				case SegmentFlow::IncreasingZ:
 					SegmentInletCellX = Segment.PipeCellCoordinates.X;
@@ -4875,7 +4772,6 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 GridWidth;
 		int NumCellsOnEachSide;
 		int NumCells;
 		Real64 SummationTerm;
@@ -4887,8 +4783,6 @@ namespace PlantPipingSystemsManager {
 
 		// Object Data
 		DistributionStructure ThisMesh;
-
-		//ThisMesh.thisMeshDistribution = MeshDistribution::Uniform;
 		ThisMesh.RegionMeshCount = 0;
 		ThisMesh.GeometricSeriesCoefficient = 0.0;
 
@@ -4903,8 +4797,9 @@ namespace PlantPipingSystemsManager {
 			ThisMesh = this->Mesh.Z;
 			break;
 		default:
-			//std::cout << "Invalid RegionType passed to PlantPipingSystems::FullDomainStructureInfo::getCellWidths; should be x, y, or z direction only." << std::endl;
-			//std::cout << static_cast<std::underlying_type<RegionType>::type>(g.thisRegionType) << std::endl;
+			ShowSevereError( "Invalid RegionType passed to PlantPipingSystems::FullDomainStructureInfo::getCellWidths; should be x, y, or z direction only." );
+			ShowContinueError( "This is a developer problem, as the code should never reach this point." );
+			ShowFatalError( "EnergyPlus aborts due to the previous severe error" );
 		}
 
 		if ( ThisMesh.RegionMeshCount > 0 ) {
@@ -4915,7 +4810,7 @@ namespace PlantPipingSystemsManager {
 			RetMaxIndex = 0;
 		}
 
-		GridWidth = g.Max - g.Min;
+		Real64 GridWidth = g.Max - g.Min;
 
 		if ( ThisMesh.thisMeshDistribution == MeshDistribution::Uniform ) {
 			if ( this->HasZoneCoupledSlab && g.thisRegionType == RegionType::YDirection && g.Max == this->Extents.Ymax ) {//Slab region
@@ -5036,10 +4931,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int IterationIndex;
-		bool FinishedIterationLoop;
-
 		// Always do start of time step inits
 		DoStartOfTimeStepInitializations( DomainNum, CircuitNum );
 
@@ -5049,7 +4940,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// Begin iterating for this time step
-		for ( IterationIndex = 1; IterationIndex <= PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS; ++IterationIndex ) {
+		for ( int IterationIndex = 1; IterationIndex <= PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS; ++IterationIndex ) {
 
 			ShiftTemperaturesForNewIteration( DomainNum );
 
@@ -5058,7 +4949,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			if ( PipingSystemDomains( DomainNum ).DomainNeedsSimulation ) PerformTemperatureFieldUpdate( DomainNum );
-			FinishedIterationLoop = false;
+			bool FinishedIterationLoop = false;
 			DoEndOfIterationOperations( DomainNum, FinishedIterationLoop );
 
 #ifdef CalcEnergyBalance
@@ -5095,6 +4986,10 @@ namespace PlantPipingSystemsManager {
 			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
+
+					if ( X==10 && Y==10 && Z==1 ) {
+						int j = 23;
+					}
 
 					{ auto const SELECT_CASE_var( cell.cellType );
 					if ( SELECT_CASE_var == CellType::Pipe ) {
@@ -5145,20 +5040,10 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Beta;
-		Real64 NeighborTemp;
-		Real64 Resistance;
-		Real64 AdiabaticMultiplier;
-		int DirectionCounter;
-		Direction CurDirection; // From Enum: Direction
-
-		// Set up once-per-cell items
-		Numerator = 0.0;
-		Denominator = 0.0;
-		AdiabaticMultiplier = 1.0;
-		Beta = cell.MyBase.Beta;
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 AdiabaticMultiplier = 1.0;
+		Real64 Beta = cell.MyBase.Beta;
 
 		// add effect from cell history
 		Numerator += cell.MyBase.Temperature_PrevTimeStep;
@@ -5174,9 +5059,11 @@ namespace PlantPipingSystemsManager {
 #endif
 
 		// loop across each direction in the simulation
-		for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
 
-			CurDirection = NeighborFieldCells( DirectionCounter );
+			Real64 NeighborTemp = 0.0;
+			Real64 Resistance = 0.0;
+			Direction CurDirection = NeighborFieldCells( DirectionCounter );
 
 			//'evaluate the transient expression terms
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
@@ -5580,19 +5467,13 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Beta;
-		Real64 Resistance;
-		Real64 NeighborTemp;
-		Real64 AdiabaticMultiplier;
-		Real64 HeatFlux;
-
-		// Initialize
-		Numerator = 0.0;
-		Denominator = 0.0;
-		Resistance = 0.0;
-		AdiabaticMultiplier = 1.0;
+		Real64 Beta = 0.0;
+		Real64 NeighborTemp = 0.0;
+		Real64 HeatFlux = 0.0;
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 Resistance = 0.0;
+		Real64 AdiabaticMultiplier = 1.0;
 
 #ifdef CalcEnergyBalance
 		Real64 energyFromThisSide = 0.0;
@@ -5699,6 +5580,207 @@ namespace PlantPipingSystemsManager {
 	}
 
 	Real64
+	EvaluateFarfieldBoundaryTemperature(
+		int const DomainNum,
+		CartesianCell & cell
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 Resistance = 0.0;
+		Real64 AdiabaticMultiplier = 1.0;
+		Real64 Beta = cell.MyBase.Beta;
+
+#ifdef CalcEnergyBalance
+		Real64 energyFromThisSide = 0.0;
+		cell.MyBase.sumEnergyFromAllSides = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
+#endif
+
+		// add effect from previous time step
+		Numerator += cell.MyBase.Temperature_PrevTimeStep;
+		++Denominator;
+
+		// now that we aren't infinitesimal, we need to determine the neighbor types based on cell location
+		EvaluateCellNeighborDirections( DomainNum, cell );
+
+		// Do all neighbor cells
+		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+			Direction CurDirection = NeighborFieldCells( DirectionCounter );
+
+			Real64 NeighborTemp = 0.0;
+			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+
+#ifdef CalcEnergyBalance
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance  ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
+#endif
+		}
+
+		// Then all farfield boundaries
+		for ( int DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
+			Direction CurDirection = NeighborBoundaryCells( DirectionCounter );
+
+			Real64 NeighborTemp = 0.0;
+			EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+
+			//if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
+				//if ( CurDirection == Direction::PositiveX || CurDirection == Direction::PositiveZ ) {
+					//AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at Xmax, Ymin, Zmax
+				//}
+			//}
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+
+#ifdef CalcEnergyBalance
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
+#endif
+		}
+
+		return Numerator / Denominator;
+
+	}
+
+	Real64
+	EvaluateZoneInterfaceTemperature(
+		int const DomainNum,
+		CartesianCell & cell
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 HeatFlux = 0.0;
+		Real64 ConductionArea = 0.0;
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 Resistance = 0.0;
+		Real64 AdiabaticMultiplier = 1.0;
+		Real64 Beta = cell.MyBase.Beta;
+
+#ifdef CalcEnergyBalance
+		Real64 energyFromThisSide = 0.0;
+		cell.MyBase.sumEnergyFromAllSides = 0.0;
+		cell.MyBase.numberOfSidesCalculated = 0;
+#endif
+
+		// add effect from previous time step
+		Numerator += cell.MyBase.Temperature_PrevTimeStep;
+		++Denominator;
+
+		// catch invalid types
+		assert( std::set< CellType >( { CellType::BasementWall, CellType::BasementFloor, CellType::ZoneGroundInterface, CellType::BasementCorner } ).count( cell.cellType ) != 0 );
+
+		if ( cell.cellType == CellType::BasementWall ) {
+			// Get the average basement wall heat flux and add it to the tally
+			HeatFlux = PipingSystemDomains( DomainNum ).WallHeatFlux;
+			if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex ) {
+				ConductionArea = cell.depth() * cell.height();
+				Numerator += Beta * HeatFlux * ConductionArea;
+			} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ) {
+				ConductionArea = cell.width() * cell.height();
+				Numerator += Beta * HeatFlux * ConductionArea;
+			}
+		} else if ( cell.cellType == CellType::BasementFloor ) {
+			// Get the average basement floor heat flux and add it to the tally
+			HeatFlux = PipingSystemDomains( DomainNum ).FloorHeatFlux;
+			ConductionArea = cell.width() * cell.depth();
+			Numerator += Beta * HeatFlux * ConductionArea;
+		} else if ( cell.cellType ==  CellType::ZoneGroundInterface ) {
+			// Get the average slab heat flux and add it to the tally
+			HeatFlux = PipingSystemDomains( DomainNum ).WeightedHeatFlux( cell.X_index, cell.Z_index );
+			ConductionArea = cell.width() * cell.depth();
+			Numerator += Beta * HeatFlux * ConductionArea;
+		}
+
+#ifdef CalcEnergyBalance
+		if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+			energyFromThisSide = HeatFlux * ConductionArea * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+			cell.MyBase.numberOfSidesCalculated += 1;
+		}
+#endif
+		//determine the neighbor types based on cell location
+		EvaluateCellNeighborDirections( DomainNum, cell );
+
+		//loop across each direction in the simulation
+		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+
+			Real64 NeighborTemp = 0.0;
+			Direction CurDirection = NeighborFieldCells( DirectionCounter );
+
+			// Have to be careful here to make sure heat conduction happens only in the appropriate directions
+			if ( cell.cellType == CellType::BasementWall ) {
+				// No heat conduction from the X-side basement wall cell to the +x cell ( basement cutaway )
+				if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex && CurDirection != Direction::PositiveX ) {
+					// Evaluate the transient expression terms
+					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+				}
+				// No heat conduction from the Z-side basement wall cell to the +z cell ( basement cutaway )
+				if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex && CurDirection != Direction::PositiveZ ) {
+					// Evaluate the transient expression terms
+					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+				}
+			} else if ( cell.cellType == CellType::BasementFloor ) {
+				// No heat conduction from the basement floor cell to the +y cell ( basement cutaway )
+				if ( CurDirection != Direction::PositiveY ) {
+					// Evaluate the transient expression terms
+					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+				}
+			} else if ( cell.cellType == CellType::ZoneGroundInterface || cell.cellType == CellType::BasementCorner ) {
+				// Heat conduction in all directions
+				// Evaluate the transient expression terms
+				EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+				Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+				Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+			}
+
+#ifdef CalcEnergyBalance
+			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
+				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
+				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
+			}
+#endif
+		}
+
+		// now that we have passed all directions, update the temperature
+
+		return Numerator / Denominator;
+
+	}
+
+	Real64
 	FullDomainStructureInfo::GetBasementWallHeatFlux()
 	{
 
@@ -5766,135 +5848,6 @@ namespace PlantPipingSystemsManager {
 		DataSurfaces::OSCM( OSCMIndex ).HConv = BigNumber;
 		DataSurfaces::OSCM( OSCMIndex ).TRad = this->BasementFloorTemp;
 		DataSurfaces::OSCM( OSCMIndex ).HRad = 0.0;
-
-	}
-
-	Real64
-	EvaluateZoneInterfaceTemperature(
-		int const DomainNum,
-		CartesianCell & cell
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Beta;
-		Real64 Resistance;
-		Real64 NeighborTemp;
-		Real64 HeatFlux;
-		Real64 ConductionArea;
-		int DirectionCounter;
-		Direction CurDirection; // From Enum: Direction
-		Real64 AdiabaticMultiplier;
-
-		// Initialize
-		Numerator = 0.0;
-		Denominator = 0.0;
-		Resistance = 0.0;
-		AdiabaticMultiplier = 1.0;
-		Beta = cell.MyBase.Beta;
-
-#ifdef CalcEnergyBalance
-		Real64 energyFromThisSide = 0.0;
-		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.numberOfSidesCalculated = 0;
-#endif
-
-		// add effect from previous time step
-		Numerator += cell.MyBase.Temperature_PrevTimeStep;
-		++Denominator;
-
-		// catch invalid types
-		assert( std::set< CellType >( { CellType::BasementWall, CellType::BasementFloor, CellType::ZoneGroundInterface, CellType::BasementCorner } ).count( cell.cellType ) != 0 );
-
-		if ( cell.cellType == CellType::BasementWall ) {
-			// Get the average basement wall heat flux and add it to the tally
-			HeatFlux = PipingSystemDomains( DomainNum ).WallHeatFlux;
-			if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex ) {
-				ConductionArea = cell.depth() * cell.height();
-				Numerator += Beta * HeatFlux * ConductionArea;
-			} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ) {
-				ConductionArea = cell.width() * cell.height();
-				Numerator += Beta * HeatFlux * ConductionArea;
-			}
-		} else if ( cell.cellType == CellType::BasementFloor ) {
-			// Get the average basement floor heat flux and add it to the tally
-			HeatFlux = PipingSystemDomains( DomainNum ).FloorHeatFlux;
-			ConductionArea = cell.width() * cell.depth();
-			Numerator += Beta * HeatFlux * ConductionArea;
-		} else if ( cell.cellType ==  CellType::ZoneGroundInterface ) {
-			// Get the average slab heat flux and add it to the tally
-			HeatFlux = PipingSystemDomains( DomainNum ).WeightedHeatFlux( cell.X_index, cell.Z_index );
-			ConductionArea = cell.width() * cell.depth();
-			Numerator += Beta * HeatFlux * ConductionArea;
-		}
-
-#ifdef CalcEnergyBalance
-		if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-			energyFromThisSide = HeatFlux * ConductionArea * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			cell.MyBase.numberOfSidesCalculated += 1;
-		}
-#endif
-		//determine the neighbor types based on cell location
-		EvaluateCellNeighborDirections( DomainNum, cell );
-
-		//loop across each direction in the simulation
-		for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
-
-			CurDirection = NeighborFieldCells( DirectionCounter );
-
-			// Have to be careful here to make sure heat conduction happens only in the appropriate directions
-			if ( cell.cellType == CellType::BasementWall ) {
-				// No heat conduction from the X-side basement wall cell to the +x cell ( basement cutaway )
-				if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex && CurDirection != Direction::PositiveX ) {
-					// Evaluate the transient expression terms
-					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-				}
-				// No heat conduction from the Z-side basement wall cell to the +z cell ( basement cutaway )
-				if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex && CurDirection != Direction::PositiveZ ) {
-					// Evaluate the transient expression terms
-					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-				}
-			} else if ( cell.cellType == CellType::BasementFloor ) {
-				// No heat conduction from the basement floor cell to the +y cell ( basement cutaway )
-				if ( CurDirection != Direction::PositiveY ) {
-					// Evaluate the transient expression terms
-					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-				}
-			} else if ( cell.cellType == CellType::ZoneGroundInterface || cell.cellType == CellType::BasementCorner ) {
-				// Heat conduction in all directions
-				// Evaluate the transient expression terms
-				EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-				Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-				Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-			}
-
-#ifdef CalcEnergyBalance
-			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
-			}
-#endif
-		}
-
-		// now that we have passed all directions, update the temperature
-
-		return Numerator / Denominator;
 
 	}
 
@@ -5991,94 +5944,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 		return RetVal;
-
-	}
-
-	Real64
-	EvaluateFarfieldBoundaryTemperature(
-		int const DomainNum,
-		CartesianCell & cell
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Beta;
-		Real64 Resistance;
-		int DirectionCounter;
-		Direction CurDirection;
-		Real64 NeighborTemp;
-		Real64 AdiabaticMultiplier;
-
-		Numerator = 0.0;
-		Denominator = 0.0;
-		Resistance = 0.0;
-		AdiabaticMultiplier = 1.0;
-		Beta = cell.MyBase.Beta;
-
-#ifdef CalcEnergyBalance
-		Real64 energyFromThisSide = 0.0;
-		cell.MyBase.sumEnergyFromAllSides = 0.0;
-		cell.MyBase.numberOfSidesCalculated = 0;
-#endif
-
-		// add effect from previous time step
-		Numerator += cell.MyBase.Temperature_PrevTimeStep;
-		++Denominator;
-
-		// now that we aren't infinitesimal, we need to determine the neighbor types based on cell location
-		EvaluateCellNeighborDirections( DomainNum, cell );
-
-		// Do all neighbor cells
-		for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
-			CurDirection = NeighborFieldCells( DirectionCounter );
-
-			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-
-			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-
-#ifdef CalcEnergyBalance
-			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance  ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
-			}
-#endif
-		}
-
-		// Then all farfield boundaries
-		for ( DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
-			CurDirection = NeighborBoundaryCells( DirectionCounter );
-
-			EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-
-			//if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
-				//if ( CurDirection == Direction::PositiveX || CurDirection == Direction::PositiveZ ) {
-					//AdiabaticMultiplier = 0.0; // Do nothing. This should only apply to lower corner cell at Xmax, Ymin, Zmax
-				//}
-			//}
-
-			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-
-#ifdef CalcEnergyBalance
-			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-				cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-				cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
-			}
-#endif
-		}
-
-		return Numerator / Denominator;
 
 	}
 
@@ -6351,7 +6216,7 @@ namespace PlantPipingSystemsManager {
 			SimulateRadialToCartesianInterface( DomainNum, ThisCell );
 
 			//'simulate the outermost radial slice
-			SimulateOuterMostRadialSoilSlice( DomainNum, CircuitNum, ThisCell );
+			SimulateOuterMostRadialSoilSlice( CircuitNum, ThisCell );
 
 			//'we only need to simulate these if they actually exist!
 			if ( size( ThisCell.PipeCellData.Soil ) > 1 ) {
@@ -6360,7 +6225,7 @@ namespace PlantPipingSystemsManager {
 				SimulateAllInteriorRadialSoilSlices( ThisCell );
 
 				//'simulate the innermost radial soil slice
-				SimulateInnerMostRadialSoilSlice( DomainNum, CircuitNum, ThisCell );
+				SimulateInnerMostRadialSoilSlice( CircuitNum, ThisCell );
 
 			}
 
@@ -6369,7 +6234,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			//'simulate the pipe cell
-			SimulateRadialPipeCell( DomainNum, CircuitNum, ThisCell, PipingSystemCircuits( CircuitNum ).CurCircuitConvectionCoefficient );
+			SimulateRadialPipeCell( CircuitNum, ThisCell, PipingSystemCircuits( CircuitNum ).CurCircuitConvectionCoefficient );
 
 			//'simulate the water cell
 			SimulateFluidCell( ThisCell, FlowRate, PipingSystemCircuits( CircuitNum ).CurCircuitConvectionCoefficient, EnteringTemp );
@@ -6449,7 +6314,6 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateOuterMostRadialSoilSlice(
-		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & cell
 	)
@@ -6628,7 +6492,6 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateInnerMostRadialSoilSlice(
-		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & cell
 	)
@@ -6773,7 +6636,6 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateRadialPipeCell(
-		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & cell,
 		Real64 const ConvectionCoefficient
@@ -7111,7 +6973,6 @@ namespace PlantPipingSystemsManager {
 			}
 		}
 	}
-
 
 	void
 	DoStartOfTimeStepInitializations(

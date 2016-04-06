@@ -125,8 +125,7 @@ namespace PlantPipingSystemsManager {
 			SpecificHeat( SpecificHeat )
 		{}
 
-		Real64
-		diffusivity();
+		Real64 inline diffusivity(){return this->Conductivity / ( this->Density * this->SpecificHeat );}
 
 	};
 
@@ -190,8 +189,7 @@ namespace PlantPipingSystemsManager {
 		RadialSizing()
 		{}
 
-		Real64
-		thickness();
+		Real64 inline thickness(){return ( this->OuterDia - this->InnerDia ) / 2.0;}
 	};
 
 	struct RadialCellInformation // : Inherits BaseCell
@@ -215,7 +213,7 @@ namespace PlantPipingSystemsManager {
 		);
 
 		// Get the XY cross sectional area of the radial cell
-		Real64 XY_CrossSectArea();
+		Real64 inline XY_CrossSectArea(){return DataGlobals::Pi * ( pow_2( this->OuterRadius ) - pow_2( this->InnerRadius ) );}
 
 	};
 
@@ -471,10 +469,8 @@ namespace PlantPipingSystemsManager {
 			Height( Height )
 		{}
 
-		bool
-		contains(
-			PointF const & p
-		);
+		bool inline contains(PointF const & p){return ( ( this->X_min <= p.X ) && ( p.X < ( this->X_min + this->Width ) ) && ( this->Y_min <= p.Y ) && ( p.Y < ( this->Y_min + this->Height ) ) );}
+
 	};
 
 	struct NeighborInformation
@@ -1398,13 +1394,6 @@ namespace PlantPipingSystemsManager {
 	void
 	MeshPartition_SelectionSort( Array1< MeshPartition > & X );
 
-	int
-	MeshPartition_CompareByDimension(
-		MeshPartition const & x,
-		MeshPartition const & y
-	);
-
-	// Convergence checking
 	bool
 	IsConverged_CurrentToPrevIteration( int const DomainNum );
 
@@ -1546,7 +1535,6 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateOuterMostRadialSoilSlice(
-		int const DomainNum,
 		int const CircuitNum,
 		CartesianCell & ThisCell
 	);
@@ -1556,7 +1544,6 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateInnerMostRadialSoilSlice(
-		int const DomainNum,
 		int const CircuitNum,
 		CartesianCell & ThisCell
 	);
@@ -1566,7 +1553,6 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateRadialPipeCell(
-		int const DomainNum,
 		int const CircuitNum,
 		CartesianCell & ThisCell,
 		Real64 const ConvectionCoefficient
