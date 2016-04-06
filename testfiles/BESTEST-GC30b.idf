@@ -70,8 +70,8 @@ Site:GroundDomain:Slab,
     ,                         !- Vertical Insulation Depth {m}
     Timestep,                 !- Simulation Timestep
     1.6,                      !- Geometric Mesh Coefficient
-    5;                        !- Mesh Density
-    
+    9;                        !- Mesh Density
+
 Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                   !- Name
     1.9,                       !- Soil Thermal Conductivity {W/m-K}
@@ -80,7 +80,7 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     10,                        !- Kusuda-Achenbach Average Ground Surface Temperature {C}
     0,                         !- Kusuda-Achenbach Average Amplitude of Ground Surface Temperature {deltaC}
     1;                         !- Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature {days}
-    
+
 Site:GroundDomain:BESTEST:GroundSurfaceConditions,
     CoupledSlab,               !- Object Name
     IngradeCoupledSlab,        !- Ground Domain Name
@@ -565,31 +565,31 @@ SurfaceProperty:OtherSideConditionsModel,
   Output:Variable,*,Maximum Domain Energy Imbalance X Location,timestep;
   Output:Variable,*,Maximum Domain Energy Imbalance Y Location,timestep;
   Output:Variable,*,Maximum Domain Energy Imbalance Z Location,timestep;
-  
+
   Output:Variable,*,GroundDomain Slab Zone Coupled Surface Heat Flux,timestep;
   Output:Variable,*,GroundDomain Slab Zone Coupled Surface Temperature,timestep;
-  
+
   Output:Variable,*,Total Heat Flux Energy Uniform Heat Flux,timestep;
   Output:Variable,*,Total Heat Flux Energy Weighted Heat Flux,timestep;
   Output:Variable,*,Heat Flux Weighting Factor,timestep;
-  
+
   Output:Variable,*,Cell with Minimum Number of Sides Calculated,timestep;
   Output:Variable,*,Cell with Minimum Number of Sides Calculated X Location,timestep;
   Output:Variable,*,Cell with Minimum Number of Sides Calculated Y Location,timestep;
   Output:Variable,*,Cell with Minimum Number of Sides Calculated Z Location,timestep;
- 
+
   Output:Variable,*,Cell with Maximum Number of Sides Calculated,timestep;
   Output:Variable,*,Cell with Maximum Number of Sides Calculated X Location,timestep;
   Output:Variable,*,Cell with Maximum Number of Sides Calculated Y Location,timestep;
   Output:Variable,*,Cell with Maximum Number of Sides Calculated Z Location,timestep;
-  
+
   Output:Variable,*,Unweighted GroundDomain Slab Zone Coupled Surface Temperature,timestep;
-  
+
   Output:Variable,*,Max Temperature Difference Due To Energy Imbalance,timestep;
   Output:Variable,*,Max Temperature Difference Due To Energy Imbalance X Location,timestep;
   Output:Variable,*,Max Temperature Difference Due To Energy Imbalance Y Location,timestep;
   Output:Variable,*,Max Temperature Difference Due To Energy Imbalance Z Location,timestep;
-  
+
 !   Output:Variable,*,Surface Inside face Temperature,timestep;
 
 !   Output:Variable,*,Surface Outside face Temperature,timestep;

@@ -4491,7 +4491,7 @@ namespace PlantPipingSystemsManager {
 		Real64 LowerZCellCentroidZ;
 		Real64 LowerZCellUpperWallZ;
 
-		bool DoingBESTEST = false;
+		bool DoingBESTEST = true;
 
 		auto const & cells( this->Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -5404,9 +5404,6 @@ namespace PlantPipingSystemsManager {
 			G_hr = 0.1 * NetIncidentRadiation_MJhr;
 			Cd = 0.24;
 		}
-
-		// Just For Check
-		// Lu Xing Sep 22 2009
 
 		Slope_S = 2503.0 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) ) / pow_2( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 );
 		Pressure = 98.0;
