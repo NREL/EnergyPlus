@@ -1156,7 +1156,8 @@ namespace PlantPipingSystemsManager {
 
 		void
 		getCellWidths(
-			GridRegion & g
+			GridRegion & g,
+			RegionType const direction
 		);
 
 		void

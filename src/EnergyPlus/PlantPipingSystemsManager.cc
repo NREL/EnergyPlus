@@ -4056,7 +4056,7 @@ namespace PlantPipingSystemsManager {
 			if ( allocated( RetVal( Index ).CellWidths ) ) RetVal( Index ).CellWidths.deallocate();
 			RetVal( Index ).CellWidths.allocate( {0,NumCellWidths - 1} );
 
-			this->getCellWidths( RetVal( Index ) );
+			this->getCellWidths( RetVal( Index ), DirDirection );
 		}
 
 		return RetVal;
@@ -4863,7 +4863,8 @@ namespace PlantPipingSystemsManager {
 
 	void
 	FullDomainStructureInfo::getCellWidths(
-		GridRegion & g
+		GridRegion & g,
+		RegionType const direction
 	)
 	{
 
@@ -4884,9 +4885,6 @@ namespace PlantPipingSystemsManager {
 		Array1D< Real64 > RetVal;
 		int RetMaxIndex;
 
-		std::cout << "Getting CellWidths for direction..." << std::endl;
-		std::cout << static_cast<std::underlying_type<RegionType>::type>(g.thisRegionType) << std::endl;
-
 		// Object Data
 		DistributionStructure ThisMesh;
 
@@ -4894,16 +4892,20 @@ namespace PlantPipingSystemsManager {
 		ThisMesh.RegionMeshCount = 0;
 		ThisMesh.GeometricSeriesCoefficient = 0.0;
 
-		{ auto const SELECT_CASE_var( g.thisRegionType );
-		if ( SELECT_CASE_var == RegionType::XDirection || SELECT_CASE_var == RegionType::XSide ) {
+		switch ( direction ) {
+		case RegionType::XDirection:
 			ThisMesh = this->Mesh.X;
-		} else if ( SELECT_CASE_var == RegionType::YDirection || SELECT_CASE_var == RegionType::UnderFloor ) {
+			break;
+		case RegionType::YDirection:
 			ThisMesh = this->Mesh.Y;
-		} else if ( SELECT_CASE_var == RegionType::ZDirection || SELECT_CASE_var == RegionType::ZSide ) {
+			break;
+		case RegionType::ZDirection:
 			ThisMesh = this->Mesh.Z;
-		} else {
-			// Error
-		}}
+			break;
+		default:
+			//std::cout << "Invalid RegionType passed to PlantPipingSystems::FullDomainStructureInfo::getCellWidths; should be x, y, or z direction only." << std::endl;
+			//std::cout << static_cast<std::underlying_type<RegionType>::type>(g.thisRegionType) << std::endl;
+		}
 
 		if ( ThisMesh.RegionMeshCount > 0 ) {
 			RetVal.allocate( {0,ThisMesh.RegionMeshCount - 1} );
@@ -5038,45 +5040,45 @@ namespace PlantPipingSystemsManager {
 		int IterationIndex;
 		bool FinishedIterationLoop;
 
-			// Always do start of time step inits
-			DoStartOfTimeStepInitializations( DomainNum, CircuitNum );
+		// Always do start of time step inits
+		DoStartOfTimeStepInitializations( DomainNum, CircuitNum );
 
-			// Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
+		// Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
+		if ( PipingSystemDomains( DomainNum ).HasAPipeCircuit ) {
+			PreparePipeCircuitSimulation( DomainNum, CircuitNum );
+		}
+
+		// Begin iterating for this time step
+		for ( IterationIndex = 1; IterationIndex <= PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS; ++IterationIndex ) {
+
+			ShiftTemperaturesForNewIteration( DomainNum );
+
 			if ( PipingSystemDomains( DomainNum ).HasAPipeCircuit ) {
-				PreparePipeCircuitSimulation( DomainNum, CircuitNum );
+				PerformPipeCircuitSimulation( DomainNum, CircuitNum );
 			}
 
-			// Begin iterating for this time step
-			for ( IterationIndex = 1; IterationIndex <= PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS; ++IterationIndex ) {
-
-				ShiftTemperaturesForNewIteration( DomainNum );
-
-				if ( PipingSystemDomains( DomainNum ).HasAPipeCircuit ) {
-					PerformPipeCircuitSimulation( DomainNum, CircuitNum );
-				}
-
-				if ( PipingSystemDomains( DomainNum ).DomainNeedsSimulation ) PerformTemperatureFieldUpdate( DomainNum );
-				FinishedIterationLoop = false;
-				DoEndOfIterationOperations( DomainNum, FinishedIterationLoop );
+			if ( PipingSystemDomains( DomainNum ).DomainNeedsSimulation ) PerformTemperatureFieldUpdate( DomainNum );
+			FinishedIterationLoop = false;
+			DoEndOfIterationOperations( DomainNum, FinishedIterationLoop );
 
 #ifdef CalcEnergyBalance
-				if( FinishedIterationLoop ) {
-					UpdateMaxEnergyBalance( DomainNum );
-				}
+			if( FinishedIterationLoop ) {
+				UpdateMaxEnergyBalance( DomainNum );
+			}
 #endif
-				if ( FinishedIterationLoop ) break;
-			}
-
-			// Update the basement surface temperatures, if any
-			if ( PipingSystemDomains( DomainNum ).HasBasement || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
-				PipingSystemDomains( DomainNum ).UpdateBasementSurfaceTemperatures();
-			}
-
-			// Update the slab surface temperatures, if any
-			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
-				PipingSystemDomains( DomainNum ).UpdateZoneSurfaceTemperatures();
-			}
+			if ( FinishedIterationLoop ) break;
 		}
+
+		// Update the basement surface temperatures, if any
+		if ( PipingSystemDomains( DomainNum ).HasBasement || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
+			PipingSystemDomains( DomainNum ).UpdateBasementSurfaceTemperatures();
+		}
+
+		// Update the slab surface temperatures, if any
+		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
+			PipingSystemDomains( DomainNum ).UpdateZoneSurfaceTemperatures();
+		}
+	}
 
 	void
 	PerformTemperatureFieldUpdate( int const DomainNum )
