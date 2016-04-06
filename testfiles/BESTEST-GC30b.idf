@@ -70,7 +70,7 @@ Site:GroundDomain:Slab,
     ,                         !- Vertical Insulation Depth {m}
     Timestep,                 !- Simulation Timestep
     1.6,                      !- Geometric Mesh Coefficient
-    9;                        !- Mesh Density
+    2;                        !- Mesh Density
 
 Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                   !- Name

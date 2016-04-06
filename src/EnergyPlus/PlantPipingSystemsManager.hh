@@ -73,7 +73,7 @@
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
-#define CalcEnergyBalance = true
+//#define CalcEnergyBalance = true
 
 namespace EnergyPlus {
 

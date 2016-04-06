@@ -5098,96 +5098,24 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Using/Aliasing
-		using DataEnvironment::Latitude;
-		using DataEnvironment::Longitude;
-		using DataEnvironment::Elevation;
-		using DataEnvironment::TimeZoneMeridian;
-		using DataEnvironment::WindSpeed;
-		using DataGlobals::SecsInDay;
-		using DataGlobals::SecInHour;
-
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const AirDensity( 1.22521 ); // '[kg/m3]
 		Real64 const AirSpecificHeat( 1003 ); // '[J/kg-K]
-		// evapotranspiration parameters
-		Real64 const MeanSolarConstant( 0.08196 ); // 1367 [W/m2], entered in [MJ/m2-minute]
-		Real64 const A_s( 0.25 ); // ?
-		Real64 const B_s( 0.5 ); // ?
 		Real64 const Absor_Corrected( 0.77 );
 		Real64 const Convert_Wm2_To_MJhrmin( 3600.0 / 1000000.0 );
 		Real64 const Convert_MJhrmin_To_Wm2( 1.0 / Convert_Wm2_To_MJhrmin );
 		Real64 const Rho_water( 998.0 ); // [kg/m3]
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// declare some variables
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Resistance;
-		Real64 NeighborTemp;
-		Real64 AdiabaticMultiplier;
-		Real64 ThisNormalArea;
-		Real64 IncidentHeatGain;
-		int DirectionCounter;
-		Direction CurDirection;
-		Real64 Beta;
-		Real64 Latitude_Degrees; // Latitude, degrees N
-		Real64 StMeridian_Degrees; // Standard meridian, degrees W -- note it is degrees E in DataEnvironment
-		Real64 Longitude_Degrees; // Longitude, degrees W -- note it is degrees E in DataEnvironment
-		// evapotranspiration calculated values
-		Real64 Latitude_Radians;
-		Real64 DayOfYear;
-		Real64 HourOfDay;
-		Real64 CurSecondsIntoToday;
-		Real64 dr;
-		Real64 Declination;
-		Real64 b_SC;
-		Real64 Sc;
-		Real64 Hour_Angle;
-		Real64 X_sunset;
-		Real64 Sunset_Angle;
-		Real64 Altitude_Angle;
-		Real64 Solar_Angle_1;
-		Real64 Solar_Angle_2;
-		Real64 QRAD_A;
-		Real64 QRAD_SO;
-		Real64 Ratio_SO;
-		Real64 IncidentSolar_MJhrmin;
-		Real64 AbsorbedIncidentSolar_MJhrmin;
-		Real64 VaporPressureSaturated_kPa;
-		Real64 VaporPressureActual_kPa;
-		Real64 QRAD_NL;
-		Real64 NetIncidentRadiation_MJhr; // [MJ/hr]
-		Real64 NetIncidentRadiation_Wm2; // [W/m2]
-		Real64 CN;
-		Real64 G_hr;
-		Real64 Cd;
-		Real64 Slope_S;
-		Real64 Pressure;
-		Real64 PsychrometricConstant;
-		Real64 EvapotransFluidLoss_mmhr;
-		Real64 EvapotransFluidLoss_mhr;
-		Real64 LatentHeatVaporization;
-		Real64 EvapotransHeatLoss_MJhrmin; // [MJ/m2-hr]
-		Real64 EvapotransHeatLoss_Wm2; // [W/m2]
-		Real64 CurAirTempK;
-		Real64 GroundCoverCoefficient;
-
-		// retrieve information from E+ globals
-		Latitude_Degrees = Latitude;
-		StMeridian_Degrees = -TimeZoneMeridian; // Standard meridian, degrees W
-		Longitude_Degrees = -Longitude; // Longitude, degrees W
-
 		// retrieve any information from input data structure
-		GroundCoverCoefficient = PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient;
+		Real64 GroundCoverCoefficient = PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient;
 
 		// initialize values
-		Numerator = 0.0;
-		Denominator = 0.0;
-		Resistance = 0.0;
-		AdiabaticMultiplier = 1.0;
-		Beta = cell.MyBase.Beta;
-		ThisNormalArea = cell.normalArea( Direction::PositiveY );
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 Resistance = 0.0;
+		Real64 AdiabaticMultiplier = 1.0;
+		Real64 Beta = cell.MyBase.Beta;
+		Real64 ThisNormalArea = cell.normalArea( Direction::PositiveY );
 
 #ifdef CalcEnergyBalance
 		Real64 energyFromThisSide = 0.0;
@@ -5203,12 +5131,10 @@ namespace PlantPipingSystemsManager {
 		EvaluateCellNeighborDirections( DomainNum, cell );
 
 		// loop over all regular neighbor cells, check if we have adiabatic on opposite surface
-		for ( DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
-			CurDirection = NeighborFieldCells( DirectionCounter );
-
-			// Use the multiplier ( either 1 or 2 ) to calculate the neighbor cell effects
+		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+			Real64 NeighborTemp = 0.0;
+			Direction CurDirection = NeighborFieldCells( DirectionCounter );
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-
 			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
 			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 
@@ -5223,8 +5149,9 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// do all non-adiabatic boundary types here
-		for ( DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
-			CurDirection = NeighborBoundaryCells( DirectionCounter );
+		for ( int DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
+			Real64 NeighborTemp = 0.0;
+			Direction CurDirection = NeighborBoundaryCells( DirectionCounter );
 
 			// reset the adiabatic multiplier for each direction, it will be 1 unless overridden somehow
 			AdiabaticMultiplier = 1.0;
@@ -5243,12 +5170,12 @@ namespace PlantPipingSystemsManager {
 					break;
 				case Direction::PositiveY:
 					// convection at the surface
-					if ( WindSpeed > 0.1 ) {
+					if ( DataEnvironment::WindSpeed > 0.1 ) {
 						if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
 							Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
 							NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
 						} else {
-							Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
+							Resistance = 208.0 / ( AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea );
 							NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 						}
 					} else {
@@ -5267,23 +5194,21 @@ namespace PlantPipingSystemsManager {
 					assert( false ); // debug error, can't get here!
 				}
 			} else { // FHX model
-				//x-direction will always be a farfield boundary
-				//z-direction will be handled above -- adiabatic
+				//x-direction will always be a farfield boundary, z boundaries will be adiabatic, but can be included here
 				//-y we don't handle here because -y will always be a neighbor cell, so handled above
 				//+y will always be the outdoor air
 				switch ( CurDirection ) {
 				case Direction::PositiveX:
 				case Direction::NegativeX:
+				case Direction::PositiveZ:
+				case Direction::NegativeZ:
 					// always farfield
 					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
 					break;
-				case Direction::PositiveZ:
-				case Direction::NegativeZ:
-					assert( false ); // can't get here
 				case Direction::PositiveY:
 					// convection at the surface
-					if ( WindSpeed > 0.1 ) {
-						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
+					if ( DataEnvironment::WindSpeed > 0.1 ) {
+						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea );
 						NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 					} else {
 						// Future development should include additional natural convection effects here
@@ -5307,96 +5232,35 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// Initialize, this variable is used for both evapotranspiration and non-ET cases, [W]
-		IncidentHeatGain = 0.0;
-
-		// Latitude, converted to radians...positive for northern hemisphere, [radians]
-		Latitude_Radians = Pi / 180.0 * Latitude_Degrees;
-
-		// The day of year at this point in the simulation
-		DayOfYear = int( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds / SecsInDay );
-
-		// The number of seconds into the current day
-		CurSecondsIntoToday = int( mod( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds, SecsInDay ) );
-
-		// The number of hours into today
-		HourOfDay = int( CurSecondsIntoToday / SecInHour );
+		Real64 IncidentHeatGain = 0.0;
 
 		// For convenience convert to Kelvin once
-		CurAirTempK = PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 273.15;
-
-		// Calculate some angles
-		dr = 1.0 + 0.033 * std::cos( 2.0 * Pi * DayOfYear / 365.0 );
-		Declination = 0.409 * std::sin( 2.0 * Pi / 365.0 * DayOfYear - 1.39 );
-		b_SC = 2.0 * Pi * ( DayOfYear - 81.0 ) / 364.0;
-		Sc = 0.1645 * std::sin( 2.0 * b_SC ) - 0.1255 * std::cos( b_SC ) - 0.025 * std::sin( b_SC );
-		Hour_Angle = Pi / 12.0 * ( ( ( HourOfDay - 0.5 ) + 0.06667 * ( StMeridian_Degrees - Longitude_Degrees ) + Sc ) - 12.0 );
-
-		// Calculate sunset something, and constrain to a minimum of 0.000001
-		X_sunset = 1.0 - pow_2( std::tan( Latitude_Radians ) ) * pow_2( std::tan( Declination ) );
-		X_sunset = max( X_sunset, 0.000001 );
-
-		// Find sunset angle
-		Sunset_Angle = Pi / 2.0 - std::atan( -std::tan( Latitude_Radians ) * std::tan( Declination ) / std::sqrt( X_sunset ) );
-
-		// Find the current sun angle
-		Altitude_Angle = std::asin( std::sin( Latitude_Radians ) * std::sin( Declination ) + std::cos( Latitude_Radians ) * std::cos( Declination ) * std::cos( Hour_Angle ) );
-
-		// Find solar angles
-		Solar_Angle_1 = Hour_Angle - Pi / 24.0;
-		Solar_Angle_2 = Hour_Angle + Pi / 24.0;
-
-		// Constrain solar angles
-		if ( Solar_Angle_1 < -Sunset_Angle ) Solar_Angle_1 = -Sunset_Angle;
-		if ( Solar_Angle_2 < -Sunset_Angle ) Solar_Angle_2 = -Sunset_Angle;
-		if ( Solar_Angle_1 > Sunset_Angle ) Solar_Angle_1 = Sunset_Angle;
-		if ( Solar_Angle_2 > Sunset_Angle ) Solar_Angle_2 = Sunset_Angle;
-		if ( Solar_Angle_1 > Solar_Angle_2 ) Solar_Angle_1 = Solar_Angle_2;
+		Real64 CurAirTempK = PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 273.15;
 
 		// Convert input solar radiation [w/m2] into units for ET model, [MJ/hr-min]
-		IncidentSolar_MJhrmin = PipingSystemDomains( DomainNum ).Cur.CurIncidentSolar * Convert_Wm2_To_MJhrmin;
-
-		// Calculate another Q term...
-		QRAD_A = 12.0 * 60.0 / Pi * MeanSolarConstant * dr * ( ( Solar_Angle_2 - Solar_Angle_1 ) * std::sin( Latitude_Radians ) * std::sin( Declination ) + std::cos( Latitude_Radians ) * std::cos( Declination ) * ( std::sin( Solar_Angle_2 ) - std::sin( Solar_Angle_1 ) ) );
-
-		// Calculate another Q term...
-		QRAD_SO = ( A_s + B_s + 0.00002 * Elevation ) * QRAD_A;
-
-		// Correct the Qrad term ... better way??
-		if ( IncidentSolar_MJhrmin < 0.01 ) {
-			Ratio_SO = 0.0;
-		} else {
-			if ( QRAD_SO != 0.0 ) {
-				Ratio_SO = IncidentSolar_MJhrmin / QRAD_SO;
-			} else {
-				// I used logic below to choose value, divide by 0 = infinity, so value = 1, not sure if correct...
-				Ratio_SO = 1.0;
-			}
-
-		}
-
-		// Constrain Ratio_SO
-		Ratio_SO = min( Ratio_SO, 1.0 );
-		Ratio_SO = max( Ratio_SO, 0.3 );
+		Real64 IncidentSolar_MJhrmin = PipingSystemDomains( DomainNum ).Cur.CurIncidentSolar * Convert_Wm2_To_MJhrmin;
 
 		// Calculate another Q term, [MJ/hr-min]
-		AbsorbedIncidentSolar_MJhrmin = Absor_Corrected * IncidentSolar_MJhrmin;
+		Real64 AbsorbedIncidentSolar_MJhrmin = Absor_Corrected * IncidentSolar_MJhrmin;
 
 		// Calculate saturated vapor pressure, [kPa]
-		VaporPressureSaturated_kPa = 0.6108 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) );
+		Real64 VaporPressureSaturated_kPa = 0.6108 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) );
 
 		// Calculate actual vapor pressure, [kPa]
-		VaporPressureActual_kPa = VaporPressureSaturated_kPa * PipingSystemDomains( DomainNum ).Cur.CurRelativeHumidity / 100.0;
+		Real64 VaporPressureActual_kPa = VaporPressureSaturated_kPa * PipingSystemDomains( DomainNum ).Cur.CurRelativeHumidity / 100.0;
 
 		// Calculate another Q term, [MJ/m2-hr]
-		QRAD_NL = 2.042E-10 * pow_4( CurAirTempK ) * ( 0.34 - 0.14 * std::sqrt( VaporPressureActual_kPa ) ) * ( 1.35 * Ratio_SO - 0.35 );
+		Real64 QRAD_NL = 2.042E-10 * pow_4( CurAirTempK ) * ( 0.34 - 0.14 * std::sqrt( VaporPressureActual_kPa ) );
 
 		// Calculate another Q term, [MJ/hr]
-		NetIncidentRadiation_MJhr = AbsorbedIncidentSolar_MJhrmin - QRAD_NL;
+		Real64 NetIncidentRadiation_MJhr = AbsorbedIncidentSolar_MJhrmin - QRAD_NL;
 
 		// ?
-		CN = 37.0;
+		Real64 const CN = 37.0;
 
 		// Check whether there was sun
+		Real64 G_hr;
+		Real64 Cd;
 		if ( NetIncidentRadiation_MJhr < 0.0 ) {
 			G_hr = 0.5 * NetIncidentRadiation_MJhr;
 			Cd = 0.96;
@@ -5405,31 +5269,31 @@ namespace PlantPipingSystemsManager {
 			Cd = 0.24;
 		}
 
-		Slope_S = 2503.0 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) ) / pow_2( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 );
-		Pressure = 98.0;
-		PsychrometricConstant = 0.665e-3 * Pressure;
+		Real64 Slope_S = 2503.0 * std::exp( 17.27 * PipingSystemDomains( DomainNum ).Cur.CurAirTemp / ( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 ) ) / pow_2( PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 237.3 );
+		Real64 Pressure = 98.0;
+		Real64 PsychrometricConstant = 0.665e-3 * Pressure;
 
 		// Evapotranspiration constant, [mm/hr]
-		EvapotransFluidLoss_mmhr = ( GroundCoverCoefficient * Slope_S * ( NetIncidentRadiation_MJhr - G_hr ) + PsychrometricConstant * ( CN / CurAirTempK ) * PipingSystemDomains( DomainNum ).Cur.CurWindSpeed * ( VaporPressureSaturated_kPa - VaporPressureActual_kPa ) ) / ( Slope_S + PsychrometricConstant * ( 1 + Cd * PipingSystemDomains( DomainNum ).Cur.CurWindSpeed ) );
+		Real64 EvapotransFluidLoss_mmhr = ( GroundCoverCoefficient * Slope_S * ( NetIncidentRadiation_MJhr - G_hr ) + PsychrometricConstant * ( CN / CurAirTempK ) * PipingSystemDomains( DomainNum ).Cur.CurWindSpeed * ( VaporPressureSaturated_kPa - VaporPressureActual_kPa ) ) / ( Slope_S + PsychrometricConstant * ( 1 + Cd * PipingSystemDomains( DomainNum ).Cur.CurWindSpeed ) );
 
 		// Convert units, [m/hr]
-		EvapotransFluidLoss_mhr = EvapotransFluidLoss_mmhr / 1000.0;
+		Real64 EvapotransFluidLoss_mhr = EvapotransFluidLoss_mmhr / 1000.0;
 
 		// Calculate latent heat, [MJ/kg]
 		// Full formulation is cubic: L(T) = -0.0000614342 * T**3 + 0.00158927 * T**2 - 2.36418 * T + 2500.79[5]
 		// In: Cubic fit to Table 2.1,p.16, Textbook: R.R.Rogers & M.K. Yau, A Short Course in Cloud Physics, 3e,(1989), Pergamon press
 		// But a linear relation should suffice;
 		// note-for now using the previous time step temperature as an approximation to help ensure stability
-		LatentHeatVaporization = 2.501 - 2.361e-3 * cell.MyBase.Temperature_PrevTimeStep;
+		Real64 LatentHeatVaporization = 2.501 - 2.361e-3 * cell.MyBase.Temperature_PrevTimeStep;
 
 		// Calculate evapotranspiration heat loss, [MJ/m2-hr]
-		EvapotransHeatLoss_MJhrmin = Rho_water * EvapotransFluidLoss_mhr * LatentHeatVaporization;
+		Real64 EvapotransHeatLoss_MJhrmin = Rho_water * EvapotransFluidLoss_mhr * LatentHeatVaporization;
 
 		// Convert net incident solar units, [W/m2]
-		NetIncidentRadiation_Wm2 = NetIncidentRadiation_MJhr * Convert_MJhrmin_To_Wm2;
+		Real64 NetIncidentRadiation_Wm2 = NetIncidentRadiation_MJhr * Convert_MJhrmin_To_Wm2;
 
 		// Convert evapotranspiration units, [W/m2]
-		EvapotransHeatLoss_Wm2 = EvapotransHeatLoss_MJhrmin * Convert_MJhrmin_To_Wm2;
+		Real64 EvapotransHeatLoss_Wm2 = EvapotransHeatLoss_MJhrmin * Convert_MJhrmin_To_Wm2;
 
 		// Calculate overall net heat ?gain? into the cell, [W]
 		if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
@@ -5937,7 +5801,9 @@ namespace PlantPipingSystemsManager {
 			}
 		}
 
-		AvgUnweightedSurfTemp = AvgTemp / NumCells;
+#ifdef CalcEnergyBalance
+		this->AvgUnweightedSurfTemp = AvgTemp / NumCells;
+#endif
 
 		if ( RunningVolume > 0.0 ) {
 			RetVal = RunningSummation / RunningVolume;
