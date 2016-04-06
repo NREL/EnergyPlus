@@ -62,7 +62,7 @@
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <InputProcessor.hh>
-#include <DataIPShortCuts.hh>
+//#include <DataIPShortCuts.hh>
 #include <ScheduleManager.hh>
 #include <NodeInputManager.hh>
 #include <DataLoopNode.hh>
@@ -372,101 +372,106 @@ namespace HVACFan {
 		int numNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		bool errorsFound = false;
-		DataIPShortCuts::cCurrentModuleObject = "Fan:SystemModel";
+		std::string locCurrentModuleObject = "Fan:SystemModel";
 
-		int objectNum = InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, objectName );
+		int objectNum = InputProcessor::GetObjectItemNum( locCurrentModuleObject, objectName );
+		Array1D_string alphaArgs;
+		Array1D< Real64 > numericArgs;
+		Array1D_string alphaFieldNames;
+		Array1D_string numericFieldNames;
+		Array1D_bool isNumericFieldBlank;
+		Array1D_bool isAlphaFieldBlank;
+		InputProcessor::GetObjectItem( locCurrentModuleObject, objectNum, alphaArgs, numAlphas, numericArgs, numNums, IOStat, isNumericFieldBlank, isAlphaFieldBlank, alphaFieldNames, numericFieldNames  );
 
-		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, objectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
-
-		name_ = DataIPShortCuts::cAlphaArgs( 1 );
+		name_ = alphaArgs( 1 );
 		//TODO how to check for unique names across objects during get input?
-		fanType_ = DataIPShortCuts::cCurrentModuleObject;
+		fanType_ = locCurrentModuleObject;
 		fanType_Num_ = DataHVACGlobals::FanType_SystemModelObject;
-		if ( DataIPShortCuts::lAlphaFieldBlanks( 2 ) ) {
+		if ( isAlphaFieldBlank( 2 ) ) {
 			availSchedIndex_ = DataGlobals::ScheduleAlwaysOn;
 		} else {
-			availSchedIndex_ = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+			availSchedIndex_ = ScheduleManager::GetScheduleIndex( alphaArgs( 2 ) );
 			if ( availSchedIndex_ == 0 ) {
-				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-				ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 2 ) + " = " + DataIPShortCuts::cAlphaArgs( 2 ) );
+				ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Invalid " + alphaFieldNames( 2 ) + " = " + alphaArgs( 2 ) );
 				errorsFound = true;
 			}
 		}
-		inletNodeNum_ = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 3 ), errorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
-		outletNodeNum_ = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 4 ), errorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+		inletNodeNum_ = NodeInputManager::GetOnlySingleNode( alphaArgs( 3 ), errorsFound, locCurrentModuleObject, alphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+		outletNodeNum_ = NodeInputManager::GetOnlySingleNode( alphaArgs( 4 ), errorsFound, locCurrentModuleObject, alphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
 
-		BranchNodeConnections::TestCompSet( DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ),  DataIPShortCuts::cAlphaArgs( 3 ),  DataIPShortCuts::cAlphaArgs( 4 ),"Air Nodes" );
+		BranchNodeConnections::TestCompSet( locCurrentModuleObject, alphaArgs( 1 ),  alphaArgs( 3 ),  alphaArgs( 4 ),"Air Nodes" );
 
-		designAirVolFlowRate_ =  DataIPShortCuts::rNumericArgs( 1 );
+		designAirVolFlowRate_ =  numericArgs( 1 );
 		if ( designAirVolFlowRate_ == DataSizing::AutoSize ) {
 			designAirVolFlowRateWasAutosized_ = true;
 		}
 
-		if ( DataIPShortCuts::lAlphaFieldBlanks( 5 ) ) {
+		if ( isAlphaFieldBlank( 5 ) ) {
 			speedControl_ = SpeedControlMethod::discrete;
-		} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Continuous") ) {
+		} else if ( InputProcessor::SameString( alphaArgs( 5 ), "Continuous") ) {
 			speedControl_ = SpeedControlMethod::continuous;
-		} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Discrete")  ) {
+		} else if ( InputProcessor::SameString( alphaArgs( 5 ), "Discrete")  ) {
 			speedControl_ = SpeedControlMethod::discrete;
 		} else {
-			ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-			ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 5 ) + " = " + DataIPShortCuts::cAlphaArgs( 5 ) );
+			ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
+			ShowContinueError( "Invalid " + alphaFieldNames( 5 ) + " = " + alphaArgs( 5 ) );
 			errorsFound = true;
 		}
 
-		minPowerFlowFrac_ = DataIPShortCuts::rNumericArgs( 2 );
-		deltaPress_       = DataIPShortCuts::rNumericArgs( 3 );
-		motorEff_         = DataIPShortCuts::rNumericArgs( 4 );
-		motorInAirFrac_   = DataIPShortCuts::rNumericArgs( 5 );
-		designElecPower_  = DataIPShortCuts::rNumericArgs( 6 );
+		minPowerFlowFrac_ = numericArgs( 2 );
+		deltaPress_       = numericArgs( 3 );
+		motorEff_         = numericArgs( 4 );
+		motorInAirFrac_   = numericArgs( 5 );
+		designElecPower_  = numericArgs( 6 );
 		if ( designElecPower_ == DataSizing::AutoSize ) {
 			designElecPowerWasAutosized_ = true;
 		}
 		if ( designElecPowerWasAutosized_ ) {
-			if ( DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
+			if ( isAlphaFieldBlank( 6 ) ) {
 				powerSizingMethod_ = PowerSizingMethod::powerPerFlowPerPressure;
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "PowerPerFlow" ) ) {
+			} else if ( InputProcessor::SameString( alphaArgs( 6 ), "PowerPerFlow" ) ) {
 				powerSizingMethod_ = PowerSizingMethod::powerPerFlow;
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "PowerPerFlowPerPressure" ) ) {
+			} else if ( InputProcessor::SameString( alphaArgs( 6 ), "PowerPerFlowPerPressure" ) ) {
 				powerSizingMethod_ = PowerSizingMethod::powerPerFlowPerPressure;
-			} else if (  InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "TotalEfficiencyAndPressure" ) ) {
+			} else if (  InputProcessor::SameString( alphaArgs( 6 ), "TotalEfficiencyAndPressure" ) ) {
 				powerSizingMethod_ = PowerSizingMethod::totalEfficiencyAndPressure;
 			} else {
-				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-				ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 6 ) + " = " + DataIPShortCuts::cAlphaArgs( 6 ) );
+				ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Invalid " + alphaFieldNames( 6 ) + " = " + alphaArgs( 6 ) );
 				errorsFound = true;
 			}
-			elecPowerPerFlowRate_            = DataIPShortCuts::rNumericArgs( 7 );
-			elecPowerPerFlowRatePerPressure_ = DataIPShortCuts::rNumericArgs( 8 );
-			fanTotalEff_                     = DataIPShortCuts::rNumericArgs( 9 );
+			elecPowerPerFlowRate_            = numericArgs( 7 );
+			elecPowerPerFlowRatePerPressure_ = numericArgs( 8 );
+			fanTotalEff_                     = numericArgs( 9 );
 		}
-		if ( ! DataIPShortCuts::lAlphaFieldBlanks( 7 ) ) {
-			powerModFuncFlowFractionCurveIndex_ = CurveManager::GetCurveIndex( DataIPShortCuts::cAlphaArgs( 7 ) );
+		if ( ! isAlphaFieldBlank( 7 ) ) {
+			powerModFuncFlowFractionCurveIndex_ = CurveManager::GetCurveIndex( alphaArgs( 7 ) );
 		}
-		nightVentPressureDelta_       = DataIPShortCuts::rNumericArgs( 10 );
-		nightVentFlowFraction_        = DataIPShortCuts::rNumericArgs( 11 );
-		zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 8 ), DataHeatBalance::Zone );
+		nightVentPressureDelta_       = numericArgs( 10 );
+		nightVentFlowFraction_        = numericArgs( 11 );
+		zoneNum_ = InputProcessor::FindItemInList( alphaArgs( 8 ), DataHeatBalance::Zone );
 		if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 		if ( zoneNum_ == 0 ) {
-			if ( DataIPShortCuts::lAlphaFieldBlanks( 8 ) ) {
+			if ( isAlphaFieldBlank( 8 ) ) {
 				heatLossesDestination_ = ThermalLossDestination::lostToOutside;
 			} else {
 				heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-				ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-				ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 8 ) + " = " + DataIPShortCuts::cAlphaArgs( 8 ) );
+				ShowWarningError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Invalid " + alphaFieldNames( 8 ) + " = " + alphaArgs( 8 ) );
 				ShowContinueError( "Zone name not found. Fan motor heat losses will not be added to a zone" );
 				// continue with simulation but motor losses not sent to a zone.
 			}
 		}
-		zoneRadFract_ = DataIPShortCuts::rNumericArgs( 12 );
-		if ( ! DataIPShortCuts::lAlphaFieldBlanks( 9 ) ) {
-			endUseSubcategoryName_ = DataIPShortCuts::cAlphaArgs( 9 );
+		zoneRadFract_ = numericArgs( 12 );
+		if ( ! isAlphaFieldBlank( 9 ) ) {
+			endUseSubcategoryName_ = alphaArgs( 9 );
 		} else {
 			endUseSubcategoryName_ = "General";
 		}
 		
-		if ( ! DataIPShortCuts::lNumericFieldBlanks( 13 ) ){
-			numSpeeds_ =  DataIPShortCuts::rNumericArgs( 13 );
+		if ( ! isNumericFieldBlank( 13 ) ){
+			numSpeeds_ =  numericArgs( 13 );
 		} else {
 			numSpeeds_ =  1;
 		}
@@ -478,9 +483,9 @@ namespace HVACFan {
 			powerFractionInputAtSpeed_.resize( numSpeeds_, false );
 			if ( numSpeeds_ == (( numNums - 13 ) / 2 ) || numSpeeds_ == (( numNums + 1 - 13 ) / 2 ) ) {
 				for ( auto loopSet = 0 ; loopSet< numSpeeds_; ++loopSet ) {
-					flowFractionAtSpeed_[ loopSet ]  = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 1 );
-					if ( ! DataIPShortCuts::lNumericFieldBlanks( 13 + loopSet * 2 + 2  )  ) {
-						powerFractionAtSpeed_[ loopSet ] = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 2 );
+					flowFractionAtSpeed_[ loopSet ]  = numericArgs( 13 + loopSet * 2 + 1 );
+					if ( ! isNumericFieldBlank( 13 + loopSet * 2 + 2  )  ) {
+						powerFractionAtSpeed_[ loopSet ] = numericArgs( 13 + loopSet * 2 + 2 );
 						powerFractionInputAtSpeed_[ loopSet ] = true;
 					} else {
 						powerFractionInputAtSpeed_[ loopSet ] = false;
@@ -488,7 +493,7 @@ namespace HVACFan {
 				}
 			} else {
 				// field set input does not match number of speeds, throw warning
-				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
 				errorsFound = true;
 			}
@@ -500,7 +505,7 @@ namespace HVACFan {
 				}
 			}
 			if ( increasingOrderError ) {
-				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in increasing order.");
 				errorsFound = true;
 			}
@@ -516,7 +521,7 @@ namespace HVACFan {
 			}
 			if ( foundMissingPowerFraction ) {
 				// field set input does not match number of speeds, throw warning
-				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
 				errorsFound = true;
 			}
