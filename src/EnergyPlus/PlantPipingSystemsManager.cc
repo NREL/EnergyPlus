@@ -4987,7 +4987,7 @@ namespace PlantPipingSystemsManager {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
-					if ( X==10 && Y==10 && Z==1 ) {
+					if ( X==0 && Y==10 && Z==10 ) {
 						int j = 23;
 					}
 
@@ -5226,6 +5226,8 @@ namespace PlantPipingSystemsManager {
 		for ( DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
 			CurDirection = NeighborBoundaryCells( DirectionCounter );
 
+			// reset the adiabatic multiplier for each direction, it will be 1 unless overridden somehow
+			AdiabaticMultiplier = 1.0;
 			// For Zone-coupled slab or basement configuration
 			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 				//-x-direction will always be a farfield boundary
@@ -5233,36 +5235,35 @@ namespace PlantPipingSystemsManager {
 				//+x and +z will be handled above
 				//-y will always be a neighbor cell, so it is handled above
 				//+y will always be the outdoor air
-				if ( CurDirection == Direction::NegativeX || CurDirection == Direction::NegativeZ ) {
+				switch ( CurDirection ) {
+				case Direction::NegativeX:
+				case Direction::NegativeZ:
 					// always farfield
 					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-				} else if ( CurDirection == Direction::PositiveY ) {
+					break;
+				case Direction::PositiveY:
 					// convection at the surface
 					if ( WindSpeed > 0.1 ) {
 						if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
 							Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
-							Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
 							NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
 						} else {
 							Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
-							Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 							NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 						}
-						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 					} else {
 						// Need to incorporate natural convection effects here
 						if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
 							Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
-							Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
-							Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 							NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
 						}
 					}
-				//} else if ( CurDirection == Direction::PositiveZ || CurDirection == Direction::PositiveX ) {
-				//	AdiabaticMultiplier = 0.0;
-				} else if ( CurDirection == Direction::NegativeY ) {
+					break;
+				case Direction::PositiveZ:
+				case Direction::PositiveX:
+					AdiabaticMultiplier = 0.0;
+					break;
+				case Direction::NegativeY:
 					assert( false ); // debug error, can't get here!
 				}
 			} else { // FHX model
@@ -5270,26 +5271,31 @@ namespace PlantPipingSystemsManager {
 				//z-direction will be handled above -- adiabatic
 				//-y we don't handle here because -y will always be a neighbor cell, so handled above
 				//+y will always be the outdoor air
-				if ( ( CurDirection == Direction::PositiveX ) || ( CurDirection == Direction::NegativeX ) ) {
+				switch ( CurDirection ) {
+				case Direction::PositiveX:
+				case Direction::NegativeX:
 					// always farfield
 					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-					Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-				} else if ( ( CurDirection == Direction::PositiveZ ) || ( CurDirection == Direction::NegativeZ ) ) {
-					// debug error, can't get here
-				} else if ( CurDirection == Direction::PositiveY ) {
+					break;
+				case Direction::PositiveZ:
+				case Direction::NegativeZ:
+					assert( false ); // can't get here
+				case Direction::PositiveY:
 					// convection at the surface
 					if ( WindSpeed > 0.1 ) {
 						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
-						Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
-						Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+						NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 					} else {
 						// Future development should include additional natural convection effects here
 					}
-				} else if ( CurDirection == Direction::NegativeY ) {
+					break;
+				case Direction::NegativeY:
 					assert( false ); // debug error, can't get here!
 				}
 			}
+
+			Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+			Denominator += AdiabaticMultiplier * ( Beta / Resistance );
 
 #ifdef CalcEnergyBalance
 			if ( PipingSystemDomains( DomainNum ).finalIteration ) {
