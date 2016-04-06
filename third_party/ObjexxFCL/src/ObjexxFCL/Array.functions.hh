@@ -674,6 +674,7 @@ inline
 typename Array< T >::size_type
 size( Array< T > const & a )
 {
+	assert( a.size_bounded() );
 	return a.size();
 }
 
@@ -684,6 +685,7 @@ size( Array1< T > const & a, int const dim )
 {
 	switch ( dim ) {
 	case 1:
+		assert( a.I1().bounded() );
 		return a.size1();
 	default:
 		assert( false );
@@ -698,6 +700,7 @@ size( Array2< T > const & a, int const dim )
 {
 	switch ( dim ) {
 	case 1:
+		assert( a.I1().bounded() );
 		return a.size1();
 	case 2:
 		return a.size2();
@@ -714,6 +717,7 @@ size( Array3< T > const & a, int const dim )
 {
 	switch ( dim ) {
 	case 1:
+		assert( a.I1().bounded() );
 		return a.size1();
 	case 2:
 		return a.size2();
@@ -732,6 +736,7 @@ size( Array4< T > const & a, int const dim )
 {
 	switch ( dim ) {
 	case 1:
+		assert( a.I1().bounded() );
 		return a.size1();
 	case 2:
 		return a.size2();
@@ -752,6 +757,7 @@ size( Array5< T > const & a, int const dim )
 {
 	switch ( dim ) {
 	case 1:
+		assert( a.I1().bounded() );
 		return a.size1();
 	case 2:
 		return a.size2();
@@ -774,6 +780,7 @@ size( Array6< T > const & a, int const dim )
 {
 	switch ( dim ) {
 	case 1:
+		assert( a.I1().bounded() );
 		return a.size1();
 	case 2:
 		return a.size2();
@@ -2271,7 +2278,7 @@ minloc( Array1< T > const & a, int const dim )
 template< typename T >
 inline
 Array1D< int >
-minloc( Array2< T > const & a, int const dim )
+minloc( Array2< T > const & a, int const dim, std::size_t const crossover = TypeTraits< T >::loc_2_crossover )
 {
 	assert( a.size_bounded() );
 	typedef  Array< bool >::size_type  size_type;
@@ -2281,11 +2288,12 @@ minloc( Array2< T > const & a, int const dim )
 	case 1:
 		{
 		Array1D< int > loc( as2, as2 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-		if ( as2 <= TypeTraits< T >::loc_2_crossover ) { // Cache-unfriendly small array method
+		if ( static_cast< size_type>( as2 ) < crossover ) { // Cache-unfriendly small array method
 			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
 				size_type l( i2 - 1 );
-				for ( int i1 = 1; i1 <= as1; ++i1, l += as2 ) {
+				T r( a.empty() ? std::numeric_limits< T >::max() : a[ l ] );
+				l += as2;
+				for ( int i1 = 2; i1 <= as1; ++i1, l += as2 ) {
 					if ( a[ l ] < r ) {
 						r = a[ l ];
 						loc( i2 ) = i1;
@@ -2293,9 +2301,9 @@ minloc( Array2< T > const & a, int const dim )
 				}
 			}
 		} else { // Cache-friendly large array method
-			Array1D< T > val( as2, a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
-			size_type l( 0u );
-			for ( int i1 = 1; i1 <= as1; ++i1 ) {
+			Array1D< T > val( a.empty() ? Array1D< T >( as2, std::numeric_limits< T >::max() ) : a( a.l1(), _ ) );
+			size_type l( as2 );
+			for ( int i1 = 2; i1 <= as1; ++i1 ) {
 				for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 					if ( a[ l ] < val( i2 ) ) {
 						val( i2 ) = a[ l ];
@@ -2311,8 +2319,8 @@ minloc( Array2< T > const & a, int const dim )
 		Array1D< int > loc( as1, as1 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		size_type l( 0u );
 		for ( int i1 = 1; i1 <= as1; ++i1 ) {
-			T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
-			for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
+			T r( a.empty() ? std::numeric_limits< T >::max() : a[ l++ ] );
+			for ( int i2 = 2; i2 <= as2; ++i2, ++l ) {
 				if ( a[ l ] < r ) {
 					r = a[ l ];
 					loc( i1 ) = i2;
@@ -2725,7 +2733,7 @@ maxloc( Array1< T > const & a, int const dim )
 template< typename T >
 inline
 Array1D< int >
-maxloc( Array2< T > const & a, int const dim )
+maxloc( Array2< T > const & a, int const dim, std::size_t const crossover = TypeTraits< T >::loc_2_crossover )
 {
 	assert( a.size_bounded() );
 	typedef  Array< bool >::size_type  size_type;
@@ -2735,11 +2743,12 @@ maxloc( Array2< T > const & a, int const dim )
 	case 1:
 		{
 		Array1D< int > loc( as2, as2 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-		if ( as2 <= TypeTraits< T >::loc_2_crossover ) { // Cache-unfriendly small array method
+		if ( static_cast< size_type>( as2 ) < crossover ) { // Cache-unfriendly small array method
 			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
 				size_type l( i2 - 1 );
-				for ( int i1 = 1; i1 <= as1; ++i1, l += as2 ) {
+				T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ l ] );
+				l += as2;
+				for ( int i1 = 2; i1 <= as1; ++i1, l += as2 ) {
 					if ( a[ l ] > r ) {
 						r = a[ l ];
 						loc( i2 ) = i1;
@@ -2747,9 +2756,9 @@ maxloc( Array2< T > const & a, int const dim )
 				}
 			}
 		} else { // Cache-friendly large array method
-			Array1D< T > val( as2, a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
-			size_type l( 0u );
-			for ( int i1 = 1; i1 <= as1; ++i1 ) {
+			Array1D< T > val( a.empty() ? Array1D< T >( as2, std::numeric_limits< T >::max() ) : a( a.l1(), _ ) );
+			size_type l( as2 );
+			for ( int i1 = 2; i1 <= as1; ++i1 ) {
 				for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 					if ( a[ l ] > val( i2 ) ) {
 						val( i2 ) = a[ l ];
@@ -2765,8 +2774,8 @@ maxloc( Array2< T > const & a, int const dim )
 		Array1D< int > loc( as1, as1 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		size_type l( 0u );
 		for ( int i1 = 1; i1 <= as1; ++i1 ) {
-			T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
-			for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
+			T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ l++ ] );
+			for ( int i2 = 2; i2 <= as2; ++i2, ++l ) {
 				if ( a[ l ] > r ) {
 					r = a[ l ];
 					loc( i1 ) = i2;
@@ -3041,7 +3050,7 @@ matmul( Array1< bool > const & a, Array1< bool > const & b )
 template< typename T >
 inline
 Array1D< T >
-matmul( Array1< T > const & a, Array2< T > const & b )
+matmul( Array1< T > const & a, Array2< T > const & b, std::size_t const crossover = TypeTraits< T >::matmul_1_2_crossover )
 {
 	assert( a.size_bounded() );
 	assert( b.size_bounded() );
@@ -3049,7 +3058,7 @@ matmul( Array1< T > const & a, Array2< T > const & b )
 	size_type const as( a.size() );
 	size_type const bs2( b.size2() );
 	assert( as == b.size1() );
-	if ( as <= TypeTraits< T >::matmul_1_2_crossover ) { // Cache-unfriendly small array method
+	if ( as < crossover ) { // Cache-unfriendly small array method
 		Array1D< T > m( static_cast< int >( bs2 ) );
 		for ( size_type l = 0; l < bs2; ++l ) {
 			T d( 0 );
@@ -3074,7 +3083,7 @@ matmul( Array1< T > const & a, Array2< T > const & b )
 // Matrix Product of 1D and 2D Boolean Arrays
 inline
 Array1D< bool >
-matmul( Array1< bool > const & a, Array2< bool > const & b )
+matmul( Array1< bool > const & a, Array2< bool > const & b, std::size_t const crossover = TypeTraits< bool >::matmul_1_2_crossover )
 {
 	assert( a.size_bounded() );
 	assert( b.size_bounded() );
@@ -3082,7 +3091,7 @@ matmul( Array1< bool > const & a, Array2< bool > const & b )
 	size_type const as( a.size() );
 	size_type const bs2( b.size2() );
 	assert( as == b.size1() );
-	if ( as <= TypeTraits< bool >::matmul_1_2_crossover ) { // Cache-unfriendly small array method
+	if ( as < crossover ) { // Cache-unfriendly small array method
 		Array1D< bool > m( static_cast< int >( bs2 ) );
 		for ( size_type l = 0; l < bs2; ++l ) {
 			bool d( false );
@@ -3124,12 +3133,12 @@ matmul( Array2< T > const & a, Array1< T > const & b )
 	size_type const bs( b.size() );
 	assert( a.size2() == bs );
 	Array1D< T > m( static_cast< int >( as1 ) );
-	for ( size_type lr = 0, l = 0; lr < as1; ++lr ) {
+	for ( size_type l = 0, la = 0; l < as1; ++l ) {
 		T d( 0 );
-		for ( size_type lb = 0; lb < bs; ++lb, ++l ) {
-			d += a[ l ] * b[ lb ];
+		for ( size_type lb = 0; lb < bs; ++lb, ++la ) {
+			d += a[ la ] * b[ lb ];
 		}
-		m[ lr ] = d;
+		m[ l ] = d;
 	}
 	return m;
 }
@@ -3147,15 +3156,15 @@ matmul( Array2< bool > const & a, Array1< bool > const & b )
 	size_type const bs( b.size() );
 	assert( as2 == bs );
 	Array1D< bool > m( static_cast< int >( as1 ) );
-	for ( size_type lr = 0; lr < as1; ++lr ) {
+	for ( size_type l = 0; l < as1; ++l ) {
 		bool d( false );
-		for ( size_type lb = 0, l = lr * as2; lb < bs; ++lb, ++l ) {
-			if ( a[ l ] && b[ lb ] ) {
+		for ( size_type lb = 0, la = l * as2; lb < bs; ++lb, ++la ) {
+			if ( a[ la ] && b[ lb ] ) {
 				d = true;
 				break;
 			}
 		}
-		m[ lr ] = d;
+		m[ l ] = d;
 	}
 	return m;
 }
@@ -3164,7 +3173,7 @@ matmul( Array2< bool > const & a, Array1< bool > const & b )
 template< typename T >
 inline
 Array2D< T >
-matmul( Array2< T > const & a, Array2< T > const & b )
+matmul( Array2< T > const & a, Array2< T > const & b, std::size_t const crossover = TypeTraits< T >::matmul_2_2_crossover )
 {
 	assert( a.size_bounded() );
 	assert( b.size_bounded() );
@@ -3173,7 +3182,7 @@ matmul( Array2< T > const & a, Array2< T > const & b )
 	size_type const as2( a.size2() );
 	size_type const bs2( b.size2() );
 	assert( as2 == b.size1() );
-	if ( as2 <= TypeTraits< T >::matmul_2_2_crossover ) { // Cache-unfriendly small array method
+	if ( as2 < crossover ) { // Cache-unfriendly small array method
 		size_type const as( a.size() );
 		size_type const bs( b.size() );
 		Array2D< T > m( static_cast< int >( as1 ), static_cast< int >( bs2 ) );
@@ -3204,7 +3213,7 @@ matmul( Array2< T > const & a, Array2< T > const & b )
 // Matrix Product of 2D Boolean Arrays
 inline
 Array2D< bool >
-matmul( Array2< bool > const & a, Array2< bool > const & b )
+matmul( Array2< bool > const & a, Array2< bool > const & b, std::size_t const crossover = TypeTraits< bool >::matmul_2_2_crossover )
 {
 	assert( a.size_bounded() );
 	assert( b.size_bounded() );
@@ -3213,7 +3222,7 @@ matmul( Array2< bool > const & a, Array2< bool > const & b )
 	size_type const as2( a.size2() );
 	size_type const bs2( b.size2() );
 	assert( as2 == b.size1() );
-	if ( as2 <= TypeTraits< bool >::matmul_2_2_crossover ) { // Cache-unfriendly small array method
+	if ( as2 < crossover ) { // Cache-unfriendly small array method
 		size_type const as( a.size() );
 		size_type const bs( b.size() );
 		Array2D< bool > m( static_cast< int >( as1 ), static_cast< int >( bs2 ) );
