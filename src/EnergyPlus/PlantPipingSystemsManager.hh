@@ -713,12 +713,20 @@ namespace PlantPipingSystemsManager {
 		Real64 Theta_liq; // volumetric moisture content of the soil
 		Real64 Theta_sat; // volumetric moisture content of soil at saturation
 		Real64 GroundCoverCoefficient;
+		Real64 rhoCP_soil_liq;
+		Real64 rhoCP_soil_transient;
+		Real64 rhoCP_soil_ice;
+		Real64 rhoCp_soil_liq_1;
 
 		// Default Constructor
 		MoistureInfo() :
 			Theta_liq( 0.3 ),
 			Theta_sat( 0.5 ),
-			GroundCoverCoefficient( 0.408 )
+			GroundCoverCoefficient( 0.408 ),
+			rhoCP_soil_liq( 0.0 ),
+			rhoCP_soil_transient( 0.0 ),
+			rhoCP_soil_ice( 0.0 ),
+			rhoCp_soil_liq_1( 0.0 )
 		{}
 
 	};
@@ -1189,6 +1197,14 @@ namespace PlantPipingSystemsManager {
 			CellType const cellType
 		);
 
+		void InitializeSoilMoistureCalcs();
+
+		void
+		EvaluateSoilRhoCp(
+			Real64 const CellTemp,
+			Real64 & rhoCp
+		);
+
 	};
 
 	// Object Data
@@ -1585,14 +1601,6 @@ namespace PlantPipingSystemsManager {
 	);
 
 	void
-	EvaluateSoilRhoCp(
-		int const DomainNum,
-		Optional< Real64 const > CellTemp = _,
-		Optional< Real64 > rhoCp = _,
-		Optional_bool_const InitOnly = _
-	);
-
-	void
 	SetAdditionalNeighborData(
 		int const DomainNum,
 		int const X,
@@ -1604,22 +1612,30 @@ namespace PlantPipingSystemsManager {
 	);
 
 	void
+	EvaluateNeighborCoordinates(
+		CartesianCell const & ThisCell,
+		Direction const CurDirection,
+		int & NX,
+		int & NY,
+		int & NZ
+	);
+
+	void
 	EvaluateNeighborCharacteristics(
 		int const DomainNum,
 		CartesianCell const & ThisCell,
 		Direction const CurDirection,
 		Real64 & NeighborTemp,
 		Real64 & Resistance,
-		Real64 & AdiabaticMultiplier,
-		Optional_int NeighborX = _,
-		Optional_int NeighborY = _,
-		Optional_int NeighborZ = _
+		Real64 & AdiabaticMultiplier
 	);
 
 	void
 	EvaluateCellNeighborDirections(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell const & cell,
+		int & NumFieldCells,
+		int & NumBoundaryCells
 	);
 
 #ifdef CalcEnergyBalance

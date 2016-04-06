@@ -130,8 +130,8 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_BESTEST_SurfaceConditions( "Site:GroundDomain:BESTEST:GroundSurfaceConditions" );
 
 	// MODULE VARIABLE DECLARATIONS:
-	Array1D< Direction > NeighborFieldCells;
-	Array1D< Direction > NeighborBoundaryCells;
+	Array1D< Direction > NeighborFieldCells( 6 );
+	Array1D< Direction > NeighborBoundaryCells( 6 );
 	Array1D< FullDomainStructureInfo > PipingSystemDomains;
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
@@ -4987,9 +4987,9 @@ namespace PlantPipingSystemsManager {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
-					if ( X==0 && Y==10 && Z==10 ) {
-						int j = 23;
-					}
+					//if ( X==0 && Y==10 && Z==10 ) {
+					//	int j = 23;
+					//}
 
 					{ auto const SELECT_CASE_var( cell.cellType );
 					if ( SELECT_CASE_var == CellType::Pipe ) {
@@ -5050,7 +5050,8 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		// determine the neighbor types based on cell location
-		EvaluateCellNeighborDirections( DomainNum, cell );
+		int NumFieldCells = 0, NumBoundaryCells = 0;
+		EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
 
 #ifdef CalcEnergyBalance
 		Real64 energyFromThisSide = 0.0;
@@ -5059,7 +5060,7 @@ namespace PlantPipingSystemsManager {
 #endif
 
 		// loop across each direction in the simulation
-		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
 
 			Real64 NeighborTemp = 0.0;
 			Real64 Resistance = 0.0;
@@ -5128,10 +5129,11 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		// now that we aren't infinitesimal, we need to determine the neighbor types based on cell location
-		EvaluateCellNeighborDirections( DomainNum, cell );
+		int NumFieldCells = 0, NumBoundaryCells = 0;
+		EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
 
 		// loop over all regular neighbor cells, check if we have adiabatic on opposite surface
-		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
 			Real64 NeighborTemp = 0.0;
 			Direction CurDirection = NeighborFieldCells( DirectionCounter );
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
@@ -5149,7 +5151,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// do all non-adiabatic boundary types here
-		for ( int DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter ) {
 			Real64 NeighborTemp = 0.0;
 			Direction CurDirection = NeighborBoundaryCells( DirectionCounter );
 
@@ -5477,10 +5479,11 @@ namespace PlantPipingSystemsManager {
 		++Denominator;
 
 		// now that we aren't infinitesimal, we need to determine the neighbor types based on cell location
-		EvaluateCellNeighborDirections( DomainNum, cell );
+		int NumFieldCells = 0, NumBoundaryCells = 0;
+		EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
 
 		// Do all neighbor cells
-		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
 			Direction CurDirection = NeighborFieldCells( DirectionCounter );
 
 			Real64 NeighborTemp = 0.0;
@@ -5499,7 +5502,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// Then all farfield boundaries
-		for ( int DirectionCounter = NeighborBoundaryCells.l1(); DirectionCounter <= NeighborBoundaryCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter ) {
 			Direction CurDirection = NeighborBoundaryCells( DirectionCounter );
 
 			Real64 NeighborTemp = 0.0;
@@ -5592,10 +5595,11 @@ namespace PlantPipingSystemsManager {
 		}
 #endif
 		//determine the neighbor types based on cell location
-		EvaluateCellNeighborDirections( DomainNum, cell );
+		int NumFieldCells = 0, NumBoundaryCells = 0;
+		EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
 
 		//loop across each direction in the simulation
-		for ( int DirectionCounter = NeighborFieldCells.l1(); DirectionCounter <= NeighborFieldCells.u1(); ++DirectionCounter ) {
+		for ( int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
 
 			Real64 NeighborTemp = 0.0;
 			Direction CurDirection = NeighborFieldCells( DirectionCounter );
@@ -5640,8 +5644,6 @@ namespace PlantPipingSystemsManager {
 			}
 #endif
 		}
-
-		// now that we have passed all directions, update the temperature
 
 		return Numerator / Denominator;
 
@@ -6677,30 +6679,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int rCtr;
-		int NX;
-		int NY;
-		int NZ;
-		int CellXIndex;
-		int CellYIndex;
-		int CellZIndex;
-		int SegIndex;
-		int StartingZ;
-		int EndingZ;
-		int Increment;
-		int Zindex;
-		int PipeX;
-		int PipeY;
-		Real64 NeighborTemp;
-		Real64 Resistance;
-		int DirectionCtr;
-		Direction CurDirection;
-		int TotalSegments;
-		int SegCtr2;
-		Real64 ThisCellTemp;
-
-
 		//'initialize cell properties
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -6708,14 +6686,10 @@ namespace PlantPipingSystemsManager {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
-					CellXIndex = X;
-					CellYIndex = Y;
-					CellZIndex = Z;
-
 					{ auto const SELECT_CASE_var( cell.cellType );
 					if ( SELECT_CASE_var == CellType::Pipe ) {
 						cell.MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-						for ( rCtr = 0; rCtr <= cell.PipeCellData.Soil.u1(); ++rCtr ) {
+						for ( int rCtr = 0; rCtr <= cell.PipeCellData.Soil.u1(); ++rCtr ) {
 							cell.PipeCellData.Soil( rCtr ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 						}
 						cell.PipeCellData.Pipe.MyBase.Properties = PipingSystemCircuits( CircuitNum ).PipeProperties;
@@ -6751,11 +6725,14 @@ namespace PlantPipingSystemsManager {
 			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto const & cell( cells( X, Y, Z ) );
-					EvaluateCellNeighborDirections( DomainNum, cell );
-					for ( DirectionCtr = 0; DirectionCtr <= NeighborFieldCells.u1(); ++DirectionCtr ) {
-						CurDirection = NeighborFieldCells( DirectionCtr );
-						Real64 AdiabaticMultiplier = 1.0;
-						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier, NX, NY, NZ );
+					int NumFieldCells = 0, NumBoundaryCells = 0;
+					EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
+					for ( int DirectionCtr = 1; DirectionCtr <= NumFieldCells; ++DirectionCtr ) {
+						Direction CurDirection = NeighborFieldCells( DirectionCtr );
+						Real64 AdiabaticMultiplier = 1.0, NeighborTemp = 0.0, Resistance = 0.0;
+						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
+						int NX = 0, NY = 0, NZ = 0;
+						EvaluateNeighborCoordinates( cell, CurDirection, NX, NY, NZ );
 						SetAdditionalNeighborData( DomainNum, X, Y, Z, CurDirection, Resistance, cells( NX, NY, NZ ) );
 					}
 				}
@@ -6767,15 +6744,17 @@ namespace PlantPipingSystemsManager {
 		if ( present ( CircuitNum ) ) {
 			if ( !allocated( PipingSystemCircuits( CircuitNum ).ListOfCircuitPoints ) ) {
 
+				int SegCtr2 = -1;
 
-				SegCtr2 = -1;
-
-				TotalSegments = size( cells, 3 ) * size( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces );
+				int TotalSegments = size( cells, 3 ) * size( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces );
 				PipingSystemCircuits( CircuitNum ).ListOfCircuitPoints.allocate( { 0, TotalSegments - 1 } );
 
-				for ( SegIndex = PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces.l1(); SegIndex <= PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces.u1(); ++SegIndex ) {
+				for ( int SegIndex = PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces.l1(); SegIndex <= PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces.u1(); ++SegIndex ) {
 
 					//'set simulation flow direction
+					int StartingZ = 0;
+					int EndingZ = 0;
+					int Increment = 0;
 					switch ( PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).FlowDirection ) {
 					case SegmentFlow::IncreasingZ:
 						StartingZ = 0;
@@ -6789,12 +6768,12 @@ namespace PlantPipingSystemsManager {
 						break;
 					}
 
-					PipeX = PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).PipeCellCoordinates.X;
-					PipeY = PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).PipeCellCoordinates.Y;
+					int PipeX = PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).PipeCellCoordinates.X;
+					int PipeY = PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).PipeCellCoordinates.Y;
 
 					//'loop across all z-direction indeces
 					int const Zindex_stop( floop_end( StartingZ, EndingZ, Increment ) );
-					for ( Zindex = StartingZ; Zindex != Zindex_stop; Zindex += Increment ) {
+					for ( int Zindex = StartingZ; Zindex != Zindex_stop; Zindex += Increment ) {
 						++SegCtr2;
 						PipingSystemCircuits( CircuitNum ).ListOfCircuitPoints( SegCtr2 ) = Point3DInteger( PipeX, PipeY, Zindex );
 					}
@@ -6803,7 +6782,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'initialize freezing calculation variables
-		EvaluateSoilRhoCp( DomainNum, _, _, true );
+		PipingSystemDomains( DomainNum ).InitializeSoilMoistureCalcs();
 
 		//'we can also initialize the domain based on the farfield temperature here
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -6812,7 +6791,7 @@ namespace PlantPipingSystemsManager {
 					auto & cell( cells( X, Y, Z ) );
 
 					// On OneTimeInit, the cur sim time should be zero, so this will be OK
-					ThisCellTemp = GetFarfieldTemp( DomainNum, cell );
+					Real64 ThisCellTemp = GetFarfieldTemp( DomainNum, cell );
 					cell.MyBase.Temperature = ThisCellTemp;
 					cell.MyBase.Temperature_PrevIteration = ThisCellTemp;
 					cell.MyBase.Temperature_PrevTimeStep = ThisCellTemp;
@@ -6820,7 +6799,7 @@ namespace PlantPipingSystemsManager {
 
 					if ( cell.cellType == CellType::Pipe ) {
 
-						for ( rCtr = 0; rCtr <= cell.PipeCellData.Soil.u1(); ++rCtr ) {
+						for ( int rCtr = 0; rCtr <= cell.PipeCellData.Soil.u1(); ++rCtr ) {
 							cell.PipeCellData.Soil( rCtr ).MyBase.Temperature = ThisCellTemp;
 							cell.PipeCellData.Soil( rCtr ).MyBase.Temperature_PrevIteration = ThisCellTemp;
 							cell.PipeCellData.Soil( rCtr ).MyBase.Temperature_PrevTimeStep = ThisCellTemp;
@@ -6841,6 +6820,7 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 		}
+
 	}
 
 	void
@@ -6914,7 +6894,7 @@ namespace PlantPipingSystemsManager {
 							// UPDATE CELL PROPERTY SETS
 							//'main ground cells, update with soil properties
 							CellTemp = cell.MyBase.Temperature;
-							EvaluateSoilRhoCp( DomainNum, CellTemp, CellRhoCp );
+							PipingSystemDomains( DomainNum ).EvaluateSoilRhoCp( CellTemp, CellRhoCp );
 							cell.MyBase.Properties.SpecificHeat = CellRhoCp / cell.MyBase.Properties.Density;
 
 							// UPDATE BETA VALUE
@@ -6933,12 +6913,12 @@ namespace PlantPipingSystemsManager {
 							// UPDATE CELL PROPERTY SETS
 							//'first update the outer cell itself
 							CellTemp = cell.MyBase.Temperature;
-							EvaluateSoilRhoCp( DomainNum, CellTemp, CellRhoCp );
+							PipingSystemDomains( DomainNum ).EvaluateSoilRhoCp( CellTemp, CellRhoCp );
 							cell.MyBase.Properties.SpecificHeat = CellRhoCp / cell.MyBase.Properties.Density;
 							//'then update all the soil radial cells
 							for ( radialctr = cell.PipeCellData.Soil.l1(); radialctr <= cell.PipeCellData.Soil.u1(); ++radialctr ) {
 								CellTemp = cell.PipeCellData.Soil( radialctr ).MyBase.Temperature;
-								EvaluateSoilRhoCp( DomainNum, CellTemp, CellRhoCp );
+								PipingSystemDomains( DomainNum ).EvaluateSoilRhoCp( CellTemp, CellRhoCp );
 								cell.PipeCellData.Soil( radialctr ).MyBase.Properties.SpecificHeat = CellRhoCp / cell.PipeCellData.Soil( radialctr ).MyBase.Properties.Density;
 							}
 
@@ -6976,26 +6956,6 @@ namespace PlantPipingSystemsManager {
 		PipingSystemDomains( DomainNum ).finalIteration = false;
 #endif
 
-		//'conductivity calculations
-		//'Dim K_quartz As Double = 7.7! 'W / mk
-		//'Dim RHO_b As Double = 1290 '!Kg / m3
-		//'Dim qua As Double = 0.32
-		//'Dim porosity As Double = Theta_sat
-		//'Dim K_water As Double = 0.594 'w / mk
-		//''"Performance Evaluation of Soil Thermal Conductivity Models"
-		//'Dim K_dry As Double = ( 0.135 * RHO_b + 64.7 ) / ( 2700 - 0.947 * RHO_b )
-		//''from( " An improved model for predicting soil thermal conductivity from water content at room temperature, Fig 4" )
-		//'Dim K_other As Double = 2.0
-		//'Dim K_s As Double = K_quartz ^ qua * K_other ^ ( 1 - qua )
-		//'Dim K_sat As Double = K_s ^ ( 1 - porosity ) * K_water ^ porosity
-		//'Dim Sr As Double = Theta_liq / Theta_sat
-		//'Dim Ke As Double = Math.LOG10( Sr ) + 1.0
-		//'If Ke < 0.0 Then
-		//'  Ke = 0.01
-		//'End If
-		//'Dim K_soil As Double = ( K_sat - K_dry ) * Ke + K_dry
-		//'Dim K1 As Double = K_soil
-
 	}
 
 	void
@@ -7014,10 +6974,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "DoEndOfIterationOperations" );
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool OutOfRange;
-
-		//'check if we have converged for this iteration if we are doing implicit transient
+		//'check if we have converged for this iteration
 		Finished = IsConverged_CurrentToPrevIteration( DomainNum );
 
 #ifdef CalcEnergyBalance
@@ -7029,7 +6986,7 @@ namespace PlantPipingSystemsManager {
 
 		//'check for out of range temperatures here so they aren't plotted
 		//'this routine should be *much* more restrictive than the exceptions, so we should be safe with this location
-		OutOfRange = CheckForOutOfRangeTemps( DomainNum );
+		bool OutOfRange = CheckForOutOfRangeTemps( DomainNum );
 		if ( OutOfRange ) {
 			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 				ShowSevereError( "Site:GroundDomain:Slab" + RoutineName + ": Out of range temperatures detected in the ground domain." );
@@ -7052,11 +7009,39 @@ namespace PlantPipingSystemsManager {
 	}
 
 	void
-	EvaluateSoilRhoCp(
-		int const DomainNum,
-		Optional< Real64 const > CellTemp,
-		Optional< Real64 > rhoCp,
-		Optional_bool_const InitOnly
+	FullDomainStructureInfo::InitializeSoilMoistureCalcs()
+	{
+
+		// These vary by domain now, so we must be careful to retrieve them every time
+		Real64 Theta_liq = this->Moisture.Theta_liq;
+		Real64 Theta_sat = this->Moisture.Theta_sat;
+
+		// Assumption
+		Real64 Theta_ice = Theta_liq;
+
+		//'Cp (freezing) calculations
+		Real64 const rho_ice = 917.0; //'Kg / m3
+		Real64 const rho_liq = 1000.0; //'kg / m3
+
+		//'from( " An improved model for predicting soil thermal conductivity from water content at room temperature, Fig 4" )
+		Real64 const CP_liq = 4180.0; //'J / KgK
+		Real64 const CP_ice = 2066.0; //'J / KgK
+		Real64 const Lat_fus = 334000.0; //'J / Kg
+		Real64 const Cp_transient = Lat_fus / 0.4 + ( 0.5 * CP_ice - ( CP_liq + CP_ice ) / 2.0 * 0.1 ) / 0.4;
+
+		//'from( " Numerical and experimental investigation of melting and freezing processes in phase change material storage" )
+		this->Moisture.rhoCp_soil_liq_1 = 1225000.0 / ( 1.0 - Theta_sat ); //'J/m3K
+		this->Moisture.rhoCP_soil_liq = this->Moisture.rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + rho_liq * CP_liq * Theta_liq;
+		this->Moisture.rhoCP_soil_transient = this->Moisture.rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + ( ( rho_liq + rho_ice ) / 2.0 ) * Cp_transient * Theta_ice;
+		this->Moisture.rhoCP_soil_ice = this->Moisture.rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + rho_ice * CP_ice * Theta_ice; //'!J / m3K
+
+
+	}
+
+	void
+	FullDomainStructureInfo::EvaluateSoilRhoCp(
+		Real64 const CellTemp,
+		Real64 & rhoCp
 	)
 	{
 
@@ -7066,71 +7051,24 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//'static variables only calculated once per simulation run
-		static Real64 Theta_ice;
-		static Real64 Theta_liq;
-		static Real64 Theta_sat;
-		static Real64 rho_ice;
-		static Real64 rho_liq;
-		static Real64 rhoCp_soil_liq_1;
-		static Real64 CP_liq;
-		static Real64 CP_ice;
-		static Real64 Lat_fus;
-		static Real64 Cp_transient;
-		static Real64 rhoCP_soil_liq;
-		static Real64 rhoCP_soil_transient;
-		static Real64 rhoCP_soil_ice;
-		// other variables
-		Real64 frzAllIce;
-		Real64 frzIceTrans;
-		Real64 frzLiqTrans;
-		Real64 frzAllLiq;
-		Real64 rhoCP_soil;
-
-		// These vary by domain now, so we must be careful to retrieve them every time
-		Theta_liq = PipingSystemDomains( DomainNum ).Moisture.Theta_liq;
-		Theta_sat = PipingSystemDomains( DomainNum ).Moisture.Theta_sat;
-
-		// Assumption
-		Theta_ice = Theta_liq;
-
-		if ( present( InitOnly ) ) {
-			//'Cp (freezing) calculations
-			rho_ice = 917.0; //'Kg / m3
-			rho_liq = 1000.0; //'kg / m3
-			rhoCp_soil_liq_1 = 1225000.0 / ( 1.0 - Theta_sat ); //'J/m3K
-			//'from( " An improved model for predicting soil thermal conductivity from water content at room temperature, Fig 4" )
-			CP_liq = 4180.0; //'J / KgK
-			CP_ice = 2066.0; //'J / KgK
-			Lat_fus = 334000.0; //'J / Kg
-			Cp_transient = Lat_fus / 0.4 + ( 0.5 * CP_ice - ( CP_liq + CP_ice ) / 2.0 * 0.1 ) / 0.4;
-			//'from( " Numerical and experimental investigation of melting and freezing processes in phase change material storage" )
-			rhoCP_soil_liq = rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + rho_liq * CP_liq * Theta_liq;
-			rhoCP_soil_transient = rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + ( ( rho_liq + rho_ice ) / 2.0 ) * Cp_transient * Theta_ice;
-			rhoCP_soil_ice = rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + rho_ice * CP_ice * Theta_ice; //'!J / m3K
-			return;
-		}
-
 		//'set some temperatures here for generalization -- these could be set in the input file
-		frzAllIce = -0.5;
-		frzIceTrans = -0.4;
-		frzLiqTrans = -0.1;
-		frzAllLiq = 0.0;
+		Real64 const frzAllIce = -0.5;
+		Real64 const frzIceTrans = -0.4;
+		Real64 const frzLiqTrans = -0.1;
+		Real64 const frzAllLiq = 0.0;
 
 		//'calculate this cell's new Cp value based on the cell temperature
-		if ( CellTemp >= frzAllLiq ) {
-			rhoCP_soil = rhoCp_soil_liq_1;
-		} else if ( CellTemp <= frzAllIce ) {
-			rhoCP_soil = rhoCP_soil_ice;
-		} else if ( ( CellTemp < frzAllLiq ) && ( CellTemp > frzLiqTrans ) ) {
-			rhoCP_soil = rhoCp_soil_liq_1 + ( rhoCP_soil_transient - rhoCP_soil_liq ) / ( frzAllLiq - frzLiqTrans ) * ( frzAllLiq - CellTemp );
-		} else if ( ( CellTemp <= frzLiqTrans ) && ( CellTemp >= frzIceTrans ) ) {
-			rhoCP_soil = rhoCP_soil_transient;
-		} else if ( ( CellTemp < frzIceTrans ) && ( CellTemp > frzAllIce ) ) {
-			rhoCP_soil = rhoCP_soil_ice + ( rhoCP_soil_transient - rhoCP_soil_ice ) / ( frzIceTrans - frzAllIce ) * ( CellTemp - frzAllIce );
+		if ( CellTemp <= frzAllIce ) { // totally frozen
+			rhoCp = this->Moisture.rhoCP_soil_ice;
+		} else if ( ( CellTemp > frzAllIce ) && ( CellTemp < frzIceTrans ) ) { // in between totally frozen and ice transition
+			rhoCp = this->Moisture.rhoCP_soil_ice + ( this->Moisture.rhoCP_soil_transient - this->Moisture.rhoCP_soil_ice ) / ( frzIceTrans - frzAllIce ) * ( CellTemp - frzAllIce );
+		} else if ( ( CellTemp >= frzIceTrans ) && ( CellTemp <= frzLiqTrans ) ) { // in between ice transition and liquid transition
+			rhoCp = this->Moisture.rhoCP_soil_transient;
+		} else if ( ( CellTemp > frzLiqTrans ) && ( CellTemp < frzAllLiq ) ) { // in between liquid transition and all liquid
+			rhoCp = this->Moisture.rhoCp_soil_liq_1 + ( this->Moisture.rhoCP_soil_transient - this->Moisture.rhoCP_soil_liq ) / ( frzAllLiq - frzLiqTrans ) * ( frzAllLiq - CellTemp );
+		} else { // ( CellTemp >= frzAllLiq ) --- greater than or equal to all liquid
+			rhoCp = this->Moisture.rhoCp_soil_liq_1;
 		}
-		rhoCp = rhoCP_soil;
 
 	}
 
@@ -7152,15 +7090,70 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NeighborIndex;
-
 		auto & cell( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
-		for ( NeighborIndex = 0; NeighborIndex <= cell.NeighborInformation.u1(); ++NeighborIndex ) {
+		for ( int NeighborIndex = 0; NeighborIndex <= cell.NeighborInformation.u1(); ++NeighborIndex ) {
 			if ( cell.NeighborInformation( NeighborIndex ).direction == direction ) {
 				cell.NeighborInformation( NeighborIndex ).Value.ConductionResistance = Resistance;
 				cell.NeighborInformation( NeighborIndex ).Value.NeighborCellIndeces = Point3DInteger( NeighborCell.X_index, NeighborCell.Y_index, NeighborCell.Z_index );
 			}
+		}
+
+	}
+
+
+	void
+	EvaluateNeighborCoordinates(
+		CartesianCell const & ThisCell,
+		Direction const CurDirection,
+		int & NX,
+		int & NY,
+		int & NZ
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		int const X = ThisCell.X_index;
+		int const Y = ThisCell.Y_index;
+		int const Z = ThisCell.Z_index;
+
+		switch ( CurDirection ) {
+		case Direction::PositiveY:
+			NX = X;
+			NY = Y + 1;
+			NZ = Z;
+			break;
+		case Direction::NegativeY:
+			NX = X;
+			NY = Y - 1;
+			NZ = Z;
+			break;
+		case Direction::PositiveX:
+			NX = X + 1;
+			NY = Y;
+			NZ = Z;
+			break;
+		case Direction::NegativeX:
+			NX = X - 1;
+			NY = Y;
+			NZ = Z;
+			break;
+		case Direction::PositiveZ:
+			NX = X;
+			NY = Y;
+			NZ = Z + 1;
+			break;
+		case Direction::NegativeZ:
+			NX = X;
+			NY = Y;
+			NZ = Z - 1;
+			break;
+		default:
+			assert( false );
 		}
 
 	}
@@ -7172,10 +7165,7 @@ namespace PlantPipingSystemsManager {
 		Direction const CurDirection,
 		Real64 & NeighborTemp,
 		Real64 & Resistance,
-		Real64 & AdiabaticMultiplier,
-		Optional_int NeighborX,
-		Optional_int NeighborY,
-		Optional_int NeighborZ
+		Real64 & AdiabaticMultiplier
 	)
 	{
 
@@ -7185,64 +7175,22 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 ThisCellLength;
-		Real64 NeighborCellLength;
-		Real64 ThisCellConductivity;
-		Real64 NeighborConductivity;
-		Real64 ThisNormalArea;
+		int NX = 0, NY = 0, NZ = 0;
+		EvaluateNeighborCoordinates( ThisCell, CurDirection, NX, NY, NZ );
 
-		int NX( 0 );
-		int NY( 0 );
-		int NZ( 0 );
-
-		// Object Data
 		NeighborInformation TempNeighborInfo;
 
-		int const X = ThisCell.X_index;
-		int const Y = ThisCell.Y_index;
-		int const Z = ThisCell.Z_index;
-
-		//'get neighbor data
-		if ( CurDirection == Direction::PositiveY ) {
-			NX = X;
-			NY = Y + 1;
-			NZ = Z;
-		} else if ( CurDirection == Direction::NegativeY ) {
-			NX = X;
-			NY = Y - 1;
-			NZ = Z;
-		} else if ( CurDirection == Direction::PositiveX ) {
-			NX = X + 1;
-			NY = Y;
-			NZ = Z;
-		} else if ( CurDirection == Direction::NegativeX ) {
-			NX = X - 1;
-			NY = Y;
-			NZ = Z;
-		} else if ( CurDirection == Direction::PositiveZ ) {
-			NX = X;
-			NY = Y;
-			NZ = Z + 1;
-		} else if ( CurDirection == Direction::NegativeZ ) {
-			NX = X;
-			NY = Y;
-			NZ = Z - 1;
-		} else {
-			assert( false );
-		}
-
 		//'split effects between the two cells so we can carefully calculate resistance values
-		ThisCellLength = 0.0;
-		NeighborCellLength = 0.0;
-		ThisCellConductivity = 10000.0;
+		Real64 ThisCellLength = 0.0;
+		Real64 NeighborCellLength = 0.0;
+		Real64 ThisCellConductivity = 10000.0;
 		if ( ThisCell.MyBase.Properties.Conductivity > 0.0 ) ThisCellConductivity = ThisCell.MyBase.Properties.Conductivity;
-		NeighborConductivity = 10000.0;
+		Real64 NeighborConductivity = 10000.0;
 		auto const & cell( PipingSystemDomains( DomainNum ).Cells( NX, NY, NZ ) );
 		if ( cell.MyBase.Properties.Conductivity > 0.0 ) NeighborConductivity = cell.MyBase.Properties.Conductivity;
 
 		//'calculate normal surface area
-		ThisNormalArea = ThisCell.normalArea( CurDirection );
+		Real64 ThisNormalArea = ThisCell.normalArea( CurDirection );
 
 		//'set distance based on cell types
 		TempNeighborInfo = NeighborInformationArray_Value( ThisCell.NeighborInformation, CurDirection );
@@ -7273,16 +7221,14 @@ namespace PlantPipingSystemsManager {
 		//'return the adiabatic multiplier
 		AdiabaticMultiplier = TempNeighborInfo.adiabaticMultiplier;
 
-		if ( present( NeighborX ) ) NeighborX = NX;
-		if ( present( NeighborX ) ) NeighborY = NY;
-		if ( present( NeighborX ) ) NeighborZ = NZ;
-
 	}
 
 	void
 	EvaluateCellNeighborDirections(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell const & cell,
+		int & NumFieldCells,
+		int & NumBoundaryCells
 	)
 	{
 
@@ -7293,25 +7239,15 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Xmax;
-		int Ymax;
-		int Zmax;
-		int Xindex;
-		int Yindex;
-		int Zindex;
-		int NumFieldCells;
-		int NumBoundaryCells;
-		int FieldCellCtr;
-		int BoundaryCellCtr;
 		int const TotalNumDimensions( 6 );
 
 		auto const & cells( PipingSystemDomains( DomainNum ).Cells );
-		Xmax = cells.u1();
-		Ymax = cells.u2();
-		Zmax = cells.u3();
-		Xindex = cell.X_index;
-		Yindex = cell.Y_index;
-		Zindex = cell.Z_index;
+		int Xmax = cells.u1();
+		int Ymax = cells.u2();
+		int Zmax = cells.u3();
+		int Xindex = cell.X_index;
+		int Yindex = cell.Y_index;
+		int Zindex = cell.Z_index;
 		// Initialize the counters
 
 		NumFieldCells = 0;
@@ -7326,15 +7262,9 @@ namespace PlantPipingSystemsManager {
 		if ( Zindex > 0 ) ++NumFieldCells;
 		NumBoundaryCells = TotalNumDimensions - NumFieldCells;
 
-		// Allocate the arrays
-		if ( allocated( NeighborFieldCells ) ) NeighborFieldCells.deallocate();
-		NeighborFieldCells.allocate( {0,NumFieldCells - 1} );
-		if ( allocated( NeighborBoundaryCells ) ) NeighborBoundaryCells.deallocate();
-		NeighborBoundaryCells.allocate( {0,NumBoundaryCells - 1} );
-
 		// Then add to each array appropriately
-		FieldCellCtr = -1;
-		BoundaryCellCtr = -1;
+		int FieldCellCtr = 0;
+		int BoundaryCellCtr = 0;
 		if ( Xindex < Xmax ) {
 			++FieldCellCtr;
 			NeighborFieldCells( FieldCellCtr ) = Direction::PositiveX;
