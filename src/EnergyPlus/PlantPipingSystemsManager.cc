@@ -6520,31 +6520,15 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Resistance;
-		Real64 Beta;
-		Real64 PipeConductionResistance;
-		Real64 ConvectiveResistance;
-
-		Real64 ThisPipeCellOuterRadius;
-		Real64 ThisPipeCellRadialCentroid;
-		Real64 ThisPipeCellConductivity;
-		Real64 ThisPipeCellInnerRadius;
-		Real64 ThisPipeCellTemperature_PrevTimeStep;
-		Real64 ThisPipeCellTemperature;
-
-		Real64 FluidCellTemperature;
-
 		Real64 OuterNeighborRadialCellOuterRadius;
 		Real64 OuterNeighborRadialCellRadialCentroid;
 		Real64 OuterNeighborRadialCellConductivity;
 		Real64 OuterNeighborRadialCellInnerRadius;
 		Real64 OuterNeighborRadialCellTemperature;
 
-		Numerator = 0.0;
-		Denominator = 0.0;
-		Resistance = 0.0;
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 Resistance = 0.0;
 
 		//'convenience variables
 		if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
@@ -6561,17 +6545,17 @@ namespace PlantPipingSystemsManager {
 			OuterNeighborRadialCellTemperature = cell.PipeCellData.Soil( 0 ).MyBase.Temperature;
 		}
 
-		ThisPipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
-		ThisPipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
-		ThisPipeCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
-		ThisPipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
-		ThisPipeCellTemperature_PrevTimeStep = cell.PipeCellData.Pipe.MyBase.Temperature_PrevTimeStep;
-		ThisPipeCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
+		Real64 ThisPipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+		Real64 ThisPipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+		Real64 ThisPipeCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
+		Real64 ThisPipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+		Real64 ThisPipeCellTemperature_PrevTimeStep = cell.PipeCellData.Pipe.MyBase.Temperature_PrevTimeStep;
+		Real64 ThisPipeCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
 
-		FluidCellTemperature = cell.PipeCellData.Fluid.MyBase.Temperature;
+		Real64 FluidCellTemperature = cell.PipeCellData.Fluid.MyBase.Temperature;
 
 		//'any broadly defined variables
-		Beta = cell.PipeCellData.Pipe.MyBase.Beta;
+		Real64 Beta = cell.PipeCellData.Pipe.MyBase.Beta;
 
 		//'add effects from this cell history
 		Numerator += ThisPipeCellTemperature_PrevTimeStep;
@@ -6583,8 +6567,8 @@ namespace PlantPipingSystemsManager {
 		Denominator += ( Beta / Resistance );
 
 		//'add effects from water cell
-		PipeConductionResistance = std::log( ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius ) / ( 2 * Pi * cell.depth() * ThisPipeCellConductivity );
-		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * cell.depth() );
+		Real64 PipeConductionResistance = std::log( ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius ) / ( 2 * Pi * cell.depth() * ThisPipeCellConductivity );
+		Real64 ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * ThisPipeCellInnerRadius * cell.depth() );
 		Resistance = PipeConductionResistance + ConvectiveResistance;
 		Numerator += ( Beta / Resistance ) * FluidCellTemperature;
 		Denominator += ( Beta / Resistance );
@@ -6610,53 +6594,36 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Beta;
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 TotalPipeResistance;
-		Real64 PipeConductionResistance;
-		Real64 ConvectiveResistance;
-		Real64 UpstreamResistance;
-		Real64 EnteringFluidConductance;
-
-		Real64 FluidCellTemperature_PrevTimeStep;
-		Real64 FluidCellSpecificHeat;
-		Real64 PipeCellOuterRadius;
-		Real64 PipeCellRadialCentroid;
-		Real64 PipeCellConductivity;
-		Real64 PipeCellInnerRadius;
-		Real64 PipeCellTemperature;
-
-		Numerator = 0.0;
-		Denominator = 0.0;
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
 
 		//'convenience variables
-		FluidCellTemperature_PrevTimeStep = cell.PipeCellData.Fluid.MyBase.Temperature_PrevTimeStep;
-		FluidCellSpecificHeat = cell.PipeCellData.Fluid.Properties.MyBase.SpecificHeat;
+		Real64 FluidCellTemperature_PrevTimeStep = cell.PipeCellData.Fluid.MyBase.Temperature_PrevTimeStep;
+		Real64 FluidCellSpecificHeat = cell.PipeCellData.Fluid.Properties.MyBase.SpecificHeat;
 
-		PipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
-		PipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
-		PipeCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
-		PipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
-		PipeCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
+		Real64 PipeCellOuterRadius = cell.PipeCellData.Pipe.OuterRadius;
+		Real64 PipeCellRadialCentroid = cell.PipeCellData.Pipe.RadialCentroid;
+		Real64 PipeCellConductivity = cell.PipeCellData.Pipe.MyBase.Properties.Conductivity;
+		Real64 PipeCellInnerRadius = cell.PipeCellData.Pipe.InnerRadius;
+		Real64 PipeCellTemperature = cell.PipeCellData.Pipe.MyBase.Temperature;
 
-		Beta = cell.PipeCellData.Fluid.MyBase.Beta;
+		Real64 Beta = cell.PipeCellData.Fluid.MyBase.Beta;
 
 		//'add effects from this cell history
 		Numerator += FluidCellTemperature_PrevTimeStep;
 		++Denominator;
 
 		//'add effects from outer pipe cell
-		PipeConductionResistance = std::log( PipeCellRadialCentroid / PipeCellInnerRadius ) / ( 2 * Pi * cell.depth() * PipeCellConductivity );
-		ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * cell.depth() );
-		TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
+		Real64 PipeConductionResistance = std::log( PipeCellRadialCentroid / PipeCellInnerRadius ) / ( 2 * Pi * cell.depth() * PipeCellConductivity );
+		Real64 ConvectiveResistance = 1.0 / ( ConvectionCoefficient * 2 * Pi * PipeCellInnerRadius * cell.depth() );
+		Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
 		Numerator += ( Beta / TotalPipeResistance ) * PipeCellTemperature;
 		Denominator += ( Beta / TotalPipeResistance );
 
 		//'add effects from upstream flow
 		EnteringFluidConductance = 0.0;
 		if ( FlowRate > 0.0 ) {
-			UpstreamResistance = 1 / ( FlowRate * FluidCellSpecificHeat );
+			Real64 UpstreamResistance = 1 / ( FlowRate * FluidCellSpecificHeat );
 			Numerator += ( Beta / UpstreamResistance ) * EnteringFluidTemp;
 			Denominator += ( Beta / UpstreamResistance );
 		}
@@ -6836,17 +6803,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Using/Aliasing
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutRelHum;
-		using DataEnvironment::WindSpeed;
-		using DataEnvironment::BeamSolarRad;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetDensityGlycol;
-		using FluidProperties::GetConductivityGlycol;
-		using FluidProperties::GetViscosityGlycol;
-		using DataPlant::PlantLoop; // only for fluid name/index
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
 		Real64 Beta;
@@ -6861,19 +6817,19 @@ namespace PlantPipingSystemsManager {
 		Real64 FluidPrandtl;
 
 		// Update environmental conditions
-		PipingSystemDomains( DomainNum ).Cur.CurAirTemp = OutDryBulbTemp;
-		PipingSystemDomains( DomainNum ).Cur.CurWindSpeed = WindSpeed;
-		PipingSystemDomains( DomainNum ).Cur.CurRelativeHumidity = OutRelHum;
-		PipingSystemDomains( DomainNum ).Cur.CurIncidentSolar = BeamSolarRad;
+		PipingSystemDomains( DomainNum ).Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
+		PipingSystemDomains( DomainNum ).Cur.CurWindSpeed = DataEnvironment::WindSpeed;
+		PipingSystemDomains( DomainNum ).Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
+		PipingSystemDomains( DomainNum ).Cur.CurIncidentSolar = DataEnvironment::BeamSolarRad;
 
 		// If pipe circuit present
 		if ( present( CircuitNum ) ) {
 			// retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
 			// but need to verify the value of inlet temperature during warm up, etc.
-			FluidCp = GetSpecificHeatGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
-			FluidDensity = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
-			FluidConductivity = GetConductivityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
-			FluidViscosity = GetViscosityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+			FluidCp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+			FluidDensity = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+			FluidConductivity = FluidProperties::GetConductivityGlycol( DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+			FluidViscosity = FluidProperties::GetViscosityGlycol( DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, PipingSystemCircuits( CircuitNum ).InletTemperature, DataPlant::PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 
 			// Doesn't anyone care about poor Ludwig Prandtl?
 			FluidPrandtl = 3.0;
