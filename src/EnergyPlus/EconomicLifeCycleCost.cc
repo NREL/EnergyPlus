@@ -2288,52 +2288,50 @@ namespace EconomicLifeCycleCost {
 			columnWidth.deallocate();
 			tableBody.deallocate();
 			//---- DEBUG ONLY - Monthly Cash Flows
-			// This table is not usually produced but was used as a debugging aid. The code
-			// was kept for future debugging efforts related to cashflows but should generally
-			// be commented out.
-			//  ALLOCATE(rowHead(lengthStudyTotalMonths))
-			//  ALLOCATE(columnHead(numCashFlow))
-			//  ALLOCATE(columnWidth(numCashFlow))
-			//  ALLOCATE(tableBody(lengthStudyTotalMonths,numCashFlow))
-			//  tableBody = ''
-			//  columnHead(1) = 'mnt'
-			//  columnHead(2) = 'rpr'
-			//  columnHead(3) = 'opr'
-			//  columnHead(4) = 'repl'
-			//  columnHead(5) = 'mOvhl'
-			//  columnHead(6) = 'MOvhl'
-			//  columnHead(7) = 'oOpr'
-			//  columnHead(8) = 'cons'
-			//  columnHead(9) = 'slvg'
-			//  columnHead(10) = 'oCap'
-			//  columnHead(11) = 'H20'
-			//  columnHead(12) = 'ene'
-			//  columnHead(13) = 'tEne'
-			//  columnHead(14) = 'tOpr'
-			//  columnHead(15) = 'tCap'
-			//  columnHead(16) = 'Totl'
-			//  DO jObj = countOfCostCat + 1, numCashFlow
-			//    columnHead(jObj) = CashFlow(jObj)%name
-			//  END DO
-			//  DO kMonth = 1,lengthStudyTotalMonths
-			//    rowHead(kMonth) = MonthNames(1 + MOD((kMonth + baseDateMonth - 2),12)) // ' ' // IntToStr(baseDateYear + INT((kMonth - 1) / 12))
-			//  END DO
-			//  DO kMonth = 1,lengthStudyTotalMonths
-			//    DO jObj = 1,numCashFlow
-			//      tableBody(kMonth,jObj) = TRIM(RealToStr(CashFlow(jObj)%mnAmount(kMonth),2))
-			//    END DO
-			//  END DO
-			//  columnWidth = 14 !array assignment - same for all columns
-			//  CALL WriteSubtitle('DEBUG ONLY - Monthly Cash Flows')
-			//  CALL WriteTable(tableBody,rowHead,columnHead,columnWidth)
-			//  CALL CreateSQLiteTabularDataRecords(tableBody,rowHead,columnHead,&
-			//                                      'Life-Cycle Cost Report',&
-			//                                      'Entire Facility',&
-			//                                      'DEBUG ONLY - Monthly Cash Flows')
-			//  DEALLOCATE(columnHead)
-			//  DEALLOCATE(rowHead)
-			//  DEALLOCATE(columnWidth)
-			//  DEALLOCATE(tableBody)
+			bool showMonthlyCashFlows = false;
+			if ( showMonthlyCashFlows ){
+				rowHead.allocate( lengthStudyTotalMonths );
+				columnHead.allocate( numCashFlow );
+				columnWidth.allocate( numCashFlow );
+				tableBody.allocate( numCashFlow, lengthStudyTotalMonths);
+				tableBody = "";
+				columnHead( 1 ) = "mnt";
+				columnHead( 2 ) = "rpr";
+				columnHead( 3 ) = "opr";
+				columnHead( 4 ) = "repl";
+				columnHead( 5 ) = "mOvhl";
+				columnHead( 6 ) = "MOvhl";
+				columnHead( 7 ) = "oOpr";
+				columnHead( 8 ) = "cons";
+				columnHead( 9 ) = "slvg";
+				columnHead( 10 ) = "oCap";
+				columnHead( 11 ) = "H20";
+				columnHead( 12 ) = "ene";
+				columnHead( 13 ) = "tEne";
+				columnHead( 14 ) = "tOpr";
+				columnHead( 15 ) = "tCap";
+				columnHead( 16 ) = "Totl";
+				for ( jObj = countOfCostCat + 1; jObj <= numCashFlow; ++jObj ) {
+					columnHead( jObj ) = CashFlow( jObj ).name;
+				}
+				for ( kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth ) {
+					rowHead( kMonth ) = MonthNames( 1 + ( kMonth + baseDateMonth - 2 ) % 12 ) + ' ' + IntToStr( baseDateYear + int( ( kMonth - 1 ) / 12 ) );
+				}
+				for ( kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth ) {
+					for ( jObj = 1; jObj <= numCashFlow; ++jObj ) {
+						tableBody( jObj, kMonth ) = RealToStr( CashFlow( jObj ).mnAmount( kMonth ), 2 );
+					}
+				}
+				WriteSubtitle( "DEBUG ONLY - Monthly Cash Flows" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows" );
+				}
+				columnHead.deallocate();
+				rowHead.deallocate();
+				columnWidth.deallocate();
+				tableBody.deallocate();
+			}
 			//---- Monthly Total Cash Flow
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( 12 );
