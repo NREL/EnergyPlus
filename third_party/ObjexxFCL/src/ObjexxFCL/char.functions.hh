@@ -106,7 +106,7 @@ inline
 bool
 is_alpha( char const c )
 {
-	return std::isalpha( c );
+	return ( std::isalpha( c ) != 0 );
 }
 
 // char is a Consonant?
@@ -115,7 +115,7 @@ bool
 is_consonant( char const c )
 {
 	static std::string const vowels( "aeiou" );
-	return ( std::isalpha( c ) && ( vowels.find( std::tolower( c ) ) == std::string::npos ) );
+	return ( ( std::isalpha( c ) != 0 ) && ( vowels.find( std::tolower( c ) ) == std::string::npos ) );
 }
 
 // char is a Vowel?
@@ -127,36 +127,20 @@ is_vowel( char const c )
 	return ( vowels.find( std::tolower( c ) ) != std::string::npos );
 }
 
-// char is Lowercase?
+// char is Lowercase Alphabetic?
 inline
 bool
 is_lower( char const c )
 {
-	return ( c == std::tolower( c ) );
+	return ( std::islower( c ) != 0 );
 }
 
-// char is Uppercase?
+// char is Uppercase Alphabetic?
 inline
 bool
 is_upper( char const c )
 {
-	return ( c == std::toupper( c ) );
-}
-
-// char is a Lowercase Alphabetic?
-inline
-bool
-is_lower_alpha( char const c )
-{
-	return ( ( std::isalpha( c ) ) && ( c == std::tolower( c ) ) );
-}
-
-// char is an Uppercase Alphabetic?
-inline
-bool
-is_upper_alpha( char const c )
-{
-	return ( ( std::isalpha( c ) ) && ( c == std::toupper( c ) ) );
+	return ( std::isupper( c ) != 0 );
 }
 
 // char is Alphanumeric?
@@ -164,7 +148,7 @@ inline
 bool
 is_alpha_numeric( char const c )
 {
-	return std::isalnum( c );
+	return ( std::isalnum( c ) != 0 );
 }
 
 // char is Digits?
@@ -172,7 +156,7 @@ inline
 bool
 is_digit( char const c )
 {
-	return std::isdigit( c );
+	return ( std::isdigit( c ) != 0 );
 }
 
 // char is in a string?

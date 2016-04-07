@@ -255,7 +255,7 @@ is_alpha( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! std::isalpha( c ) ) return false;
+			if ( std::isalpha( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -271,7 +271,7 @@ is_consonant( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! std::isalpha( c ) ) return false;
+			if ( std::isalpha( c ) == 0 ) return false;
 			if ( vowels.find( std::tolower( c ) ) != std::string::npos ) return false;
 		}
 		return true;
@@ -294,7 +294,7 @@ is_vowel( std::string const & s )
 	}
 }
 
-// string is Lowercase?
+// string is Lowercase Alphabetic?
 inline
 bool
 is_lower( std::string const & s )
@@ -303,38 +303,7 @@ is_lower( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( c != std::tolower( c ) ) return false;
-		}
-		return true;
-	}
-}
-
-// string is Uppercase?
-inline
-bool
-is_upper( std::string const & s )
-{
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( c != std::toupper( c ) ) return false;
-		}
-		return true;
-	}
-}
-
-// string is Lowercase Alphabetic?
-inline
-bool
-is_lower_alpha( std::string const & s )
-{
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( ! std::isalpha( c ) ) return false;
-			if ( c != std::tolower( c ) ) return false;
+			if ( std::islower( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -343,14 +312,13 @@ is_lower_alpha( std::string const & s )
 // string is Uppercase Alphabetic?
 inline
 bool
-is_upper_alpha( std::string const & s )
+is_upper( std::string const & s )
 {
 	if ( s.empty() ) {
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! std::isalpha( c ) ) return false;
-			if ( c != std::toupper( c ) ) return false;
+			if ( std::isupper( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -365,7 +333,7 @@ is_alpha_numeric( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! std::isalnum( c ) ) return false;
+			if ( std::isalnum( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -380,7 +348,7 @@ is_digit( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! std::isdigit( c ) ) return false;
+			if ( std::isdigit( c ) == 0 ) return false;
 		}
 		return true;
 	}
