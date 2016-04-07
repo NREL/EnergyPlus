@@ -1416,8 +1416,7 @@ namespace PlantPipingSystemsManager {
 	bool
 	IsConverged_PipeCurrentToPrevIteration(
 		int const CircuitNum,
-		CartesianCell const & CellToCheck,
-		Real64 & MaxDivAmount
+		CartesianCell const & CellToCheck
 	);
 
 	void
