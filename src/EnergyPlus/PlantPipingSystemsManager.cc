@@ -2114,11 +2114,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PipeCircuitCounter;
-		int SegmentCtr;
-
-		for ( SegmentCtr = 1; SegmentCtr <= TotalNumSegments; ++SegmentCtr ) {
+		for ( int SegmentCtr = 1; SegmentCtr <= TotalNumSegments; ++SegmentCtr ) {
 
 			if ( ! PipingSystemSegments( SegmentCtr ).IsActuallyPartOfAHorizontalTrench ) {
 
@@ -2131,7 +2127,7 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-		for ( PipeCircuitCounter = 1; PipeCircuitCounter <= TotalNumCircuits; ++PipeCircuitCounter ) {
+		for ( int PipeCircuitCounter = 1; PipeCircuitCounter <= TotalNumCircuits; ++PipeCircuitCounter ) {
 
 			if ( ! PipingSystemCircuits( PipeCircuitCounter ).IsActuallyPartOfAHorizontalTrench ) {
 
@@ -2225,71 +2221,44 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::SysTimeElapsed;
-		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::TypeOf_PipingSystemPipeCircuit;
-		using DataPlant::PlantLoop;
-		using DataPlant::TypeOf_GrndHtExchgHorizTrench;
-		using DataGlobals::BeginSimFlag;
-		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::DayOfSim;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
-		using DataGlobals::InitConvTemp;
-		using DataLoopNode::Node;
-		using PlantUtilities::SetComponentFlowRate;
-		using FluidProperties::GetDensityGlycol;
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPipingSystems" );
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool errFlag;
-		int InletNodeNum;
-		int OutletNodeNum;
-		int CircCtr;
-		int SegCtr;
-		int SegmentIndex;
-		Real64 rho;
-		int TypeToLookFor;
+		auto & thisDomain = PipingSystemDomains( DomainNum );
+		auto & thisCircuit = PipingSystemCircuits( CircuitNum );
 
 		// Do any one-time initializations
-		if ( PipingSystemCircuits( CircuitNum ).NeedToFindOnPlantLoop ) {
+		if ( thisCircuit.NeedToFindOnPlantLoop ) {
 
-			errFlag = false;
-
-			if ( PipingSystemCircuits( CircuitNum ).IsActuallyPartOfAHorizontalTrench ) {
-				TypeToLookFor = TypeOf_GrndHtExchgHorizTrench;
+			int TypeToLookFor;
+			if ( thisCircuit.IsActuallyPartOfAHorizontalTrench ) {
+				TypeToLookFor = DataPlant::TypeOf_GrndHtExchgHorizTrench;
 			} else {
-				TypeToLookFor = TypeOf_PipingSystemPipeCircuit;
+				TypeToLookFor = DataPlant::TypeOf_PipingSystemPipeCircuit;
 			}
 
-			ScanPlantLoopsForObject( PipingSystemCircuits( CircuitNum ).Name, TypeToLookFor, PipingSystemCircuits( CircuitNum ).LoopNum, PipingSystemCircuits( CircuitNum ).LoopSideNum, PipingSystemCircuits( CircuitNum ).BranchNum, PipingSystemCircuits( CircuitNum ).CompNum, _, _, _, _, _, errFlag );
-
+			bool errFlag = false;
+			DataPlant::ScanPlantLoopsForObject( thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s)." );
 			}
 
 			// Once we find ourselves on the plant loop, we can do other things
-			rho = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
-			PipingSystemCircuits( CircuitNum ).DesignMassFlowRate = PipingSystemCircuits( CircuitNum ).DesignVolumeFlowRate * rho;
+			Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( thisCircuit.LoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( thisCircuit.LoopNum ).FluidIndex, RoutineName );
+			thisCircuit.DesignMassFlowRate = thisCircuit.DesignVolumeFlowRate * rho;
 
-			PipingSystemCircuits( CircuitNum ).NeedToFindOnPlantLoop = false;
+			thisCircuit.NeedToFindOnPlantLoop = false;
 
 		}
 
-		if ( PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed ) {
+		if ( thisDomain.DomainNeedsToBeMeshed ) {
 
-			PipingSystemDomains( DomainNum ).developMesh();
+			thisDomain.developMesh();
 
 			// would be OK to do some post-mesh error handling here I think
-			for ( CircCtr = 1; CircCtr <= isize( PipingSystemDomains( DomainNum ).CircuitIndeces ); ++CircCtr ) {
-				for ( SegCtr = 1; SegCtr <= isize( PipingSystemCircuits( PipingSystemDomains( DomainNum ).CircuitIndeces( CircCtr ) ).PipeSegmentIndeces ); ++SegCtr ) {
-					SegmentIndex = PipingSystemCircuits( PipingSystemDomains( DomainNum ).CircuitIndeces( CircCtr ) ).PipeSegmentIndeces( SegCtr );
+			for ( int CircCtr = 1; CircCtr <= isize( thisDomain.CircuitIndeces ); ++CircCtr ) {
+				for ( int SegCtr = 1; SegCtr <= isize( PipingSystemCircuits( thisDomain.CircuitIndeces( CircCtr ) ).PipeSegmentIndeces ); ++SegCtr ) {
+					int SegmentIndex = PipingSystemCircuits( thisDomain.CircuitIndeces( CircCtr ) ).PipeSegmentIndeces( SegCtr );
 					if ( ! PipingSystemSegments( SegmentIndex ).PipeCellCoordinatesSet ) {
 						ShowSevereError( "PipingSystems:" + RoutineName + ":Pipe segment index not set." );
 						ShowContinueError( "...Possibly because pipe segment was placed outside of the domain." );
@@ -2299,47 +2268,46 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 
-			PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed = false;
+			thisDomain.DomainNeedsToBeMeshed = false;
 
 		}
 
 		// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
 		// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
 		// which would be carried over from the previous environment
-		PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepSys * SecInHour;
-		PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed;
+		thisDomain.Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+		thisDomain.Cur.CurSimTimeSeconds = ( DataGlobals::DayOfSim - 1 ) * 24 + ( DataGlobals::HourOfDay - 1 ) + ( DataGlobals::TimeStep - 1 ) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
 		// There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
-		if ( ( BeginSimFlag && PipingSystemDomains( DomainNum ).BeginSimInit ) || ( BeginEnvrnFlag && PipingSystemDomains( DomainNum ).BeginSimEnvrn ) ) {
+		if ( ( DataGlobals::BeginSimFlag && thisDomain.BeginSimInit ) || ( DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvrn ) ) {
 
 			// this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
 			// being based on the inlet temperature, which wasn't updated until later
-			InletNodeNum = PipingSystemCircuits( CircuitNum ).InletNodeNum;
-			PipingSystemCircuits( CircuitNum ).CurCircuitInletTemp = Node( InletNodeNum ).Temp;
-			PipingSystemCircuits( CircuitNum ).InletTemperature = PipingSystemCircuits( CircuitNum ).CurCircuitInletTemp;
+			thisCircuit.CurCircuitInletTemp = DataLoopNode::Node( thisCircuit.InletNodeNum ).Temp;
+			thisCircuit.InletTemperature = thisCircuit.CurCircuitInletTemp;
 
 			DoOneTimeInitializations( DomainNum, CircuitNum );
 
-			PipingSystemDomains( DomainNum ).BeginSimInit = false;
-			PipingSystemDomains( DomainNum ).BeginSimEnvrn = false;
+			thisDomain.BeginSimInit = false;
+			thisDomain.BeginSimEnvrn = false;
 
 		}
 
 		// Shift history arrays only if necessary
-		if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
-			PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
+		if ( std::abs( thisDomain.Cur.CurSimTimeSeconds - thisDomain.Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
+			thisDomain.Cur.PrevSimTimeSeconds = thisDomain.Cur.CurSimTimeSeconds;
 			ShiftTemperaturesForNewTimeStep( DomainNum );
-			PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
+			thisDomain.DomainNeedsSimulation = true;
 		}
 
 		// Get the mass flow and inlet temperature to use for this time step
-		InletNodeNum = PipingSystemCircuits( CircuitNum ).InletNodeNum;
-		OutletNodeNum = PipingSystemCircuits( CircuitNum ).OutletNodeNum;
-		PipingSystemCircuits( CircuitNum ).CurCircuitInletTemp = Node( InletNodeNum ).Temp;
+		int InletNodeNum = thisCircuit.InletNodeNum;
+		int OutletNodeNum = thisCircuit.OutletNodeNum;
+		thisCircuit.CurCircuitInletTemp = DataLoopNode::Node( InletNodeNum ).Temp;
 
 		// request design, set component flow will decide what to give us based on restrictions and flow lock status
-		PipingSystemCircuits( CircuitNum ).CurCircuitFlowRate = PipingSystemCircuits( CircuitNum ).DesignMassFlowRate;
-		SetComponentFlowRate( PipingSystemCircuits( CircuitNum ).CurCircuitFlowRate, InletNodeNum, OutletNodeNum, PipingSystemCircuits( CircuitNum ).LoopNum, PipingSystemCircuits( CircuitNum ).LoopSideNum, PipingSystemCircuits( CircuitNum ).BranchNum, PipingSystemCircuits( CircuitNum ).CompNum );
+		thisCircuit.CurCircuitFlowRate = thisCircuit.DesignMassFlowRate;
+		PlantUtilities::SetComponentFlowRate( thisCircuit.CurCircuitFlowRate, InletNodeNum, OutletNodeNum, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum );
 
 	}
 
@@ -2356,15 +2324,9 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int OutletNodeNum;
-
-		OutletNodeNum = PipingSystemCircuits( CircuitNum ).OutletNodeNum;
+		int OutletNodeNum = PipingSystemCircuits( CircuitNum ).OutletNodeNum;
 		auto const & out_cell( PipingSystemCircuits( CircuitNum ).CircuitOutletCell );
-		Node( OutletNodeNum ).Temp = PipingSystemDomains( DomainNum ).Cells( out_cell.X, out_cell.Y, out_cell.Z ).PipeCellData.Fluid.MyBase.Temperature;
+		DataLoopNode::Node( OutletNodeNum ).Temp = PipingSystemDomains( DomainNum ).Cells( out_cell.X, out_cell.Y, out_cell.Z ).PipeCellData.Fluid.MyBase.Temperature;
 
 	}
 
@@ -2424,8 +2386,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		int RetVal;
-		RetVal = 0;
+		int RetVal = 0;
 		for ( int SurfCtr = 1; SurfCtr <= isize( DataSurfaces::Surface ); ++SurfCtr ) {
 			if ( DataSurfaces::Surface( SurfCtr ).OSCMPtr == OSCMIndex ) ++RetVal;
 		}
@@ -2462,31 +2423,7 @@ namespace PlantPipingSystemsManager {
 		GetSurfaceDataForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
-		)
-	{
-
-			// FUNCTION INFORMATION:
-			//       AUTHOR         Edwin Lee
-			//       DATE WRITTEN   Summer 2011
-			//       MODIFIED       na
-			//       RE-ENGINEERED  na
-
-			Array1D <ZoneCoupledSurfaceData> RetVal( { 1, SurfCount } );
-			int FoundSurfIndexCtr( 0 );
-			for ( int SurfCtr = 1; SurfCtr <= isize( DataSurfaces::Surface ); ++SurfCtr ) {
-				if ( DataSurfaces::Surface( SurfCtr ).OSCMPtr == OSCMIndex ) {
-					++FoundSurfIndexCtr;
-					RetVal( FoundSurfIndexCtr ).IndexInSurfaceArray = SurfCtr;
-					RetVal( FoundSurfIndexCtr ).SurfaceArea = DataSurfaces::Surface( SurfCtr ).Area;
-					RetVal( FoundSurfIndexCtr ).Zone = DataSurfaces::Surface( SurfCtr ).Zone;
-				}
-			}
-			return RetVal;
-
-		}
-
-	bool
-	CellType_IsFieldCell( CellType const cellType )
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -2495,7 +2432,18 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		return ( ( cellType == CellType::GeneralField ) || ( cellType == CellType::BasementCorner ) || ( cellType == CellType::BasementWall ) || ( cellType == CellType::BasementFloor ) );
+		Array1D <ZoneCoupledSurfaceData> RetVal( { 1, SurfCount } );
+		int FoundSurfIndexCtr( 0 );
+		for ( int SurfCtr = 1; SurfCtr <= isize( DataSurfaces::Surface ); ++SurfCtr ) {
+			if ( DataSurfaces::Surface( SurfCtr ).OSCMPtr == OSCMIndex ) {
+				++FoundSurfIndexCtr;
+				RetVal( FoundSurfIndexCtr ).IndexInSurfaceArray = SurfCtr;
+				RetVal( FoundSurfIndexCtr ).SurfaceArea = DataSurfaces::Surface( SurfCtr ).Area;
+				RetVal( FoundSurfIndexCtr ).Zone = DataSurfaces::Surface( SurfCtr ).Zone;
+			}
+		}
+		return RetVal;
+
 	}
 
 	bool
@@ -2511,22 +2459,9 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Return value
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
 		for ( int meshnum = meshes.l1(), meshnum_end = meshes.u1(); meshnum <= meshnum_end; ++meshnum ) {
 			if ( meshes( meshnum ).rDimension == value ) return true;
 		}
-
 		return false;
 
 	}
@@ -2541,19 +2476,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		using std::swap;
-
 		for ( int I = X.l1(), I_end = X.u1() - 1; I <= I_end; ++I ) {
 			int loc( 1 ), l( 1 );
 			Real64 r_min( std::numeric_limits< Real64 >::max() );
@@ -2564,7 +2486,7 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 			int const ISWAP1( loc + I - 1 );
-			if ( ISWAP1 != I ) swap( X( I ), X( ISWAP1 ) );
+			if ( ISWAP1 != I ) std::swap( X( I ), X( ISWAP1 ) );
 		}
 
 	}
@@ -2647,10 +2569,9 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		Real64 MaxDivAmount;
 		Real64 ThisCellMax;
 
-		MaxDivAmount = 0.0;
+		Real64 MaxDivAmount = 0.0;
 		for ( int RadialCtr = CellToCheck.PipeCellData.Soil.l1(); RadialCtr <= CellToCheck.PipeCellData.Soil.u1(); ++RadialCtr ) {
 			auto const & radCell = CellToCheck.PipeCellData.Soil( RadialCtr );
 			ThisCellMax = std::abs( radCell.MyBase.Temperature - radCell.MyBase.Temperature_PrevIteration );
@@ -2689,14 +2610,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -2738,13 +2651,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -2786,18 +2692,9 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int RadCtr;
-
 		if ( ThisPipeCell.cellType == CellType::Pipe ) { // It better be!
 
-			for ( RadCtr = ThisPipeCell.PipeCellData.Soil.l1(); RadCtr <= ThisPipeCell.PipeCellData.Soil.u1(); ++RadCtr ) {
+			for ( int RadCtr = ThisPipeCell.PipeCellData.Soil.l1(); RadCtr <= ThisPipeCell.PipeCellData.Soil.u1(); ++RadCtr ) {
 				ThisPipeCell.PipeCellData.Soil( RadCtr ).MyBase.Temperature_PrevIteration = ThisPipeCell.PipeCellData.Soil( RadCtr ).MyBase.Temperature;
 			}
 
@@ -2820,9 +2717,6 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
 
 		Real64 const MaxLimit = PipingSystemDomains( DomainNum ).SimControls.MaximumTemperatureLimit;
 		Real64 const MinLimit = PipingSystemDomains( DomainNum ).SimControls.MinimumTemperatureLimit;
@@ -2847,14 +2741,19 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		if ( ( direction == Direction::PositiveY ) || ( direction == Direction::NegativeY ) ) {
+		switch ( direction ) {
+		case Direction::PositiveY:
+		case Direction::NegativeY:
 			return this->YNormalArea();
-		} else if ( ( direction == Direction::PositiveX ) || ( direction == Direction::NegativeX ) ) {
+			break;
+		case Direction::PositiveX:
+		case Direction::NegativeX:
 			return this->XNormalArea();
-		} else if ( ( direction == Direction::PositiveZ ) || ( direction == Direction::NegativeZ ) ) {
+			break;
+		case Direction::PositiveZ:
+		case Direction::NegativeZ:
 			return this->ZNormalArea();
-		} else {
-			throw "Invalid direction passed to PlantPipingSystemsManager::CartesianCell::normalArea";
+			break;
 		}
 
 	}
@@ -2872,18 +2771,12 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Return value
-		NeighborInformation RetVal;
-
 		for ( int Index = dict.l1(), Index_end = dict.u1(); Index <= Index_end; ++Index ) {
 			if ( dict( Index ).direction == direction ) {
-				RetVal = dict( Index ).Value;
-				break;
+				return dict( Index ).Value;
 			}
 		}
-		//Autodesk:Return Check/enforce that return value is set
-
-		return RetVal;
+		assert( false );
 
 	}
 
@@ -2912,16 +2805,11 @@ namespace PlantPipingSystemsManager {
 		Real64 InsulationInnerRadius;
 		Real64 InsulationOuterRadius;
 		Real64 InsulationCentroid;
-		Real64 PipeOuterRadius;
-		Real64 PipeInnerRadius;
 		Real64 MinimumSoilRadius;
-		Real64 ThisSliceInnerRadius;
-		Real64 Rval;
-		int RadialCellCtr;
 
 		//'calculate pipe radius
-		PipeOuterRadius = PipeSizes.OuterDia / 2.0;
-		PipeInnerRadius = PipeSizes.InnerDia / 2.0;
+		Real64 PipeOuterRadius = PipeSizes.OuterDia / 2.0;
+		Real64 PipeInnerRadius = PipeSizes.InnerDia / 2.0;
 
 		//'--we will work from inside out, calculating dimensions and instantiating variables--
 		//'first instantiate the water cell
@@ -2952,12 +2840,12 @@ namespace PlantPipingSystemsManager {
 		c.Soil.allocate( {0,NumRadialNodes - 1} );
 
 		// first set Rval to the minimum soil radius plus half a slice thickness for the innermost radial node
-		Rval = MinimumSoilRadius + ( c.RadialSliceWidth / 2.0 );
-		ThisSliceInnerRadius = MinimumSoilRadius;
+		Real64 Rval = MinimumSoilRadius + ( c.RadialSliceWidth / 2.0 );
+		Real64 ThisSliceInnerRadius = MinimumSoilRadius;
 		RadialCellInformation::ctor( c.Soil( 0 ), Rval, ThisSliceInnerRadius, ThisSliceInnerRadius + c.RadialSliceWidth );
 
 		//'then loop through the rest and assign them, each radius is simply one more slice thickness
-		for ( RadialCellCtr = 1; RadialCellCtr <= c.Soil.u1(); ++RadialCellCtr ) {
+		for ( int RadialCellCtr = 1; RadialCellCtr <= c.Soil.u1(); ++RadialCellCtr ) {
 			Rval += c.RadialSliceWidth;
 			ThisSliceInnerRadius += c.RadialSliceWidth;
 			RadialCellInformation::ctor( c.Soil( RadialCellCtr ), Rval, ThisSliceInnerRadius, ThisSliceInnerRadius + c.RadialSliceWidth );
@@ -3668,27 +3556,19 @@ namespace PlantPipingSystemsManager {
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CreatePartitionRegionList" );
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Index;
-		Real64 ThisCellWidthBy2;
-		PartitionType ThisPartitionType;
-		Real64 CellLeft;
-		Real64 CellRight;
-		int SubIndex;
-
 		if ( ! PartitionsExist ) {
 			return ThesePartitionRegions;
 		}
 
 		//'loop across all partitions
-		for ( Index = ThesePartitionCenters.l1(); Index <= ThesePartitionCenters.u1(); ++Index ) {
+		for ( int Index = ThesePartitionCenters.l1(); Index <= ThesePartitionCenters.u1(); ++Index ) {
 
-			ThisCellWidthBy2 = ThesePartitionCenters( Index ).TotalWidth / 2.0;
-			ThisPartitionType = ThesePartitionCenters( Index ).partitionType;
+			Real64 ThisCellWidthBy2 = ThesePartitionCenters( Index ).TotalWidth / 2.0;
+			PartitionType ThisPartitionType = ThesePartitionCenters( Index ).partitionType;
 
 			//'use this half width to validate the region and add it to the collection
-			CellLeft = ThesePartitionCenters( Index ).rDimension - ThisCellWidthBy2;
-			CellRight = ThesePartitionCenters( Index ).rDimension + ThisCellWidthBy2;
+			Real64 CellLeft = ThesePartitionCenters( Index ).rDimension - ThisCellWidthBy2;
+			Real64 CellRight = ThesePartitionCenters( Index ).rDimension + ThisCellWidthBy2;
 
 			// check to make sure this location is valid
 			if ( CellLeft < 0.0 || CellRight > DirExtentMax ) {
@@ -3699,7 +3579,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Scan all grid regions to make sure this range doesn't fall within an already entered range
-			for ( SubIndex = 0; SubIndex <= Index - 1; ++SubIndex ) {
+			for ( int SubIndex = 0; SubIndex <= Index - 1; ++SubIndex ) {
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ) - SA
 				if ( this->HasZoneCoupledBasement && Index ==1 ) {
 					if ( IsInRange_BasementModel( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRange( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
@@ -3780,20 +3660,14 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// USE STATEMENTS:
-		using DataGlobals::AnyBasementsInModel;
-
 		// Return value
 		int RetVal;
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Index;
-
 		RetVal = 0;
 		if ( PartitionsExist ) {
-			for ( Index = ThesePartitionRegions.l1(); Index <= ThesePartitionRegions.u1(); ++Index ) {
+			for ( int Index = ThesePartitionRegions.l1(); Index <= ThesePartitionRegions.u1(); ++Index ) {
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a region to the left of ThesePartitionRegions( 1 ).-SA
-				if ( !AnyBasementsInModel || ( AnyBasementsInModel && ( Index == 0 || Index == 2 ) ) ) {
+				if ( !DataGlobals::AnyBasementsInModel || ( DataGlobals::AnyBasementsInModel && ( Index == 0 || Index == 2 ) ) ) {
 					//'add a mesh region to the "left" of the partition
 					++RetVal;
 				}
@@ -3845,24 +3719,19 @@ namespace PlantPipingSystemsManager {
 		// Return value
 		Array1D< GridRegion > RetVal( {0,RetValUBound} );
 
-		Real64 LeftRegionExtent;
-		int PreviousUbound;
-		int Index;
-		int SubIndex;
 		int CellCountUpToNow;
 		int NumCellWidths;
 
 		// Object Data
 		Array1D< TempGridRegionData > TempRegions( {0,RetValUBound} );
-		GridRegion ThisRegion;
 		TempGridRegionData PreviousRegion;
 
-		PreviousUbound = -1;
+		int PreviousUbound = -1;
 		if ( PartitionsExist ) {
-			for ( Index = ThesePartitionRegions.l1(); Index <= ThesePartitionRegions.u1(); ++Index ) {
+			for ( int Index = ThesePartitionRegions.l1(); Index <= ThesePartitionRegions.u1(); ++Index ) {
 
-				ThisRegion = ThesePartitionRegions( Index );
-
+				GridRegion ThisRegion = ThesePartitionRegions( Index );
+				Real64 LeftRegionExtent;
 				if ( Index == 0 ) {
 					LeftRegionExtent = 0.0;
 				} else {
@@ -3877,7 +3746,7 @@ namespace PlantPipingSystemsManager {
 					//'alert calling routines to the location of the basement cells within the domain
 					CellCountUpToNow = 0;
 
-					for ( SubIndex = TempRegions.l1(); SubIndex <= PreviousUbound; ++SubIndex ) {
+					for ( int SubIndex = TempRegions.l1(); SubIndex <= PreviousUbound; ++SubIndex ) {
 						PreviousRegion = TempRegions( SubIndex );
 						if ( std::set< RegionType >( { RegionType::Pipe, RegionType::BasementFloor, RegionType::BasementWall, RegionType::XSide, RegionType::XSideWall, RegionType::ZSide, RegionType::ZSideWall,
 										RegionType::HorizInsXSide, RegionType::HorizInsZSide, RegionType::FloorInside, RegionType::UnderFloor, RegionType::VertInsLowerEdge } ).count( PreviousRegion.thisRegionType ) != 0 ) {
@@ -3942,7 +3811,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'finally repackage the grid regions into the final class form with cell counts included
-		for ( Index = TempRegions.l1(); Index <= TempRegions.u1(); ++Index ) {
+		for ( int Index = TempRegions.l1(); Index <= TempRegions.u1(); ++Index ) {
 			RetVal( Index ).Min = TempRegions( Index ).Min;
 			RetVal( Index ).Max = TempRegions( Index ).Max;
 			RetVal( Index ).thisRegionType = TempRegions( Index ).thisRegionType;
@@ -3970,29 +3839,20 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// Return value
-		int RetVal;
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Index;
-		int CellWidthCtr;
-
-		RetVal = 0;
-
-		for ( Index = RegionList.l1(); Index <= RegionList.u1(); ++Index ) {
+		int RetVal = 0;
+		for ( int Index = RegionList.l1(); Index <= RegionList.u1(); ++Index ) {
 			if ( std::set< RegionType >( { RegionType::Pipe, RegionType::BasementFloor, RegionType::BasementWall, RegionType::XSide, RegionType::XSideWall, RegionType::ZSide, RegionType::ZSideWall,
 							RegionType::HorizInsXSide, RegionType::HorizInsZSide, RegionType::FloorInside, RegionType::UnderFloor, RegionType::VertInsLowerEdge } ).count( RegionList( Index ).thisRegionType ) != 0 ) {
 				++RetVal;
 			} else {
 				if ( RegionList( Index ).thisRegionType == DirDirection ) {
-					for ( CellWidthCtr = RegionList( Index ).CellWidths.l1(); CellWidthCtr <= RegionList( Index ).CellWidths.u1(); ++CellWidthCtr ) {
+					for ( int CellWidthCtr = RegionList( Index ).CellWidths.l1(); CellWidthCtr <= RegionList( Index ).CellWidths.u1(); ++CellWidthCtr ) {
 						++RetVal;
 					}
 				}
 			}
 		}
 		++RetVal;
-
 		return RetVal;
 
 	}
@@ -4050,52 +3910,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int YIndexMax;
-		CellType cellType;
-		CellType ZWallCellType;
-		CellType UnderBasementBoundary;
-		int PipeCounter;
 
-		int MaxBasementXNodeIndex( -1 );
-		int MinBasementYNodeIndex( -1 );
-		int MinXIndex( -1 );
-		int YIndex( -1 );
-		int MinZIndex( -1 );
-		int XWallIndex( -1 );
-		int ZWallIndex( -1 );
-		int YFloorIndex( -1 );
-		int InsulationXIndex( -1 );
-		int InsulationYIndex( -1 );
-		int InsulationZIndex( -1 );
-
-		int CellXIndex;
-		Real64 CellXMinValue;
-		Real64 CellXMaxValue;
-		Real64 CellXCenter;
-		Real64 CellWidth;
-
-		int CellYIndex;
-		Real64 CellYMinValue;
-		Real64 CellYMaxValue;
-		Real64 CellYCenter;
-		Real64 CellHeight;
-
-		int CellZIndex;
-		Real64 CellZMinValue;
-		Real64 CellZMaxValue;
-		Real64 CellZCenter;
-		Real64 CellDepth;
-
-		int PipeIndex;
-		int NumRadialCells;
-		Real64 InsulationThickness( 0.0 );
-		int CircuitCtr;
-		int CircuitIndex;
-		int FoundOnCircuitIndex;
-
-		Real64 RadialMeshThickness;
-		bool HasInsulation;
 		int TotNumCells = 0;
 		int NumInsulationCells = 0;
 		int NumGroundSurfaceCells = 0;
@@ -4129,33 +3944,22 @@ namespace PlantPipingSystemsManager {
 
 		};
 
-		// Object Data
-		DomainRectangle BasementRectangle;
-		tCellExtents CellExtents;
-		Point3DReal Centroid;
-		Point3DInteger CellIndeces;
-		RectangleF XYRectangle;
-		RadialSizing PipeSizing;
-		PipeSegmentInfo ThisSegment;
-
 		//'subtract 2 in each dimension:
 		//'     one for zero based array
 		//'     one because the boundary points contain one entry more than the number of cells WITHIN the domain
 		this->Cells.allocate( {0,isize( XBoundaryPoints )-2}, {0,isize( YBoundaryPoints )-2}, {0,isize( ZBoundaryPoints )-2} );
 
-		YIndexMax = this->Cells.u2();
-		MaxBasementXNodeIndex = this->BasementZone.BasementWallXIndex;
-		MinBasementYNodeIndex = this->BasementZone.BasementFloorYIndex;
-		BasementRectangle = DomainRectangle( 0, MaxBasementXNodeIndex, MinBasementYNodeIndex, YIndexMax );
-		MinXIndex = this->XIndex;
-		YIndex = this->YIndex;
-		MinZIndex = this->ZIndex;
-		XWallIndex = this->XWallIndex;
-		YFloorIndex = this->YFloorIndex;
-		ZWallIndex = this->ZWallIndex;
-		InsulationXIndex = this->InsulationXIndex;
-		InsulationYIndex = this->InsulationYIndex;
-		InsulationZIndex = this->InsulationZIndex;
+		int MaxBasementXNodeIndex = this->BasementZone.BasementWallXIndex;
+		int MinBasementYNodeIndex = this->BasementZone.BasementFloorYIndex;
+		int MinXIndex = this->XIndex;
+		int YIndex = this->YIndex;
+		int MinZIndex = this->ZIndex;
+		int XWallIndex = this->XWallIndex;
+		int YFloorIndex = this->YFloorIndex;
+		int ZWallIndex = this->ZWallIndex;
+		int InsulationXIndex = this->InsulationXIndex;
+		int InsulationYIndex = this->InsulationYIndex;
+		int InsulationZIndex = this->InsulationZIndex;
 
 		auto & cells( this->Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -4164,45 +3968,44 @@ namespace PlantPipingSystemsManager {
 					auto & cell( cells( X, Y, Z ) );
 
 					//'set up x-direction variables
-					CellXIndex = X; //'zero based index
-					CellXMinValue = XBoundaryPoints( X ); //'left wall x-value
-					CellXMaxValue = XBoundaryPoints( X + 1 ); //'right wall x-value
-					CellXCenter = ( CellXMinValue + CellXMaxValue ) / 2;
-					CellWidth = CellXMaxValue - CellXMinValue;
+					int CellXIndex = X; //'zero based index
+					Real64 CellXMinValue = XBoundaryPoints( X ); //'left wall x-value
+					Real64 CellXMaxValue = XBoundaryPoints( X + 1 ); //'right wall x-value
+					Real64 CellXCenter = ( CellXMinValue + CellXMaxValue ) / 2;
+					Real64 CellWidth = CellXMaxValue - CellXMinValue;
 
 					//'set up y-direction variables
-					CellYIndex = Y; //'zero based index
-					CellYMinValue = YBoundaryPoints( Y ); //'bottom wall y-value
-					CellYMaxValue = YBoundaryPoints( Y + 1 ); //'top wall y-value
-					CellYCenter = ( CellYMinValue + CellYMaxValue ) / 2;
-					CellHeight = CellYMaxValue - CellYMinValue;
+					int CellYIndex = Y; //'zero based index
+					Real64 CellYMinValue = YBoundaryPoints( Y ); //'bottom wall y-value
+					Real64 CellYMaxValue = YBoundaryPoints( Y + 1 ); //'top wall y-value
+					Real64 CellYCenter = ( CellYMinValue + CellYMaxValue ) / 2;
+					Real64 CellHeight = CellYMaxValue - CellYMinValue;
 
 					//'set up z-direction variables
-					CellZIndex = Z; //'zero based index
-					CellZMinValue = ZBoundaryPoints( Z ); //'lower z value
-					CellZMaxValue = ZBoundaryPoints( Z + 1 ); //'higher z value
-					CellZCenter = ( CellZMinValue + CellZMaxValue ) / 2;
-					CellDepth = CellZMaxValue - CellZMinValue;
+					int CellZIndex = Z; //'zero based index
+					Real64 CellZMinValue = ZBoundaryPoints( Z ); //'lower z value
+					Real64 CellZMaxValue = ZBoundaryPoints( Z + 1 ); //'higher z value
+					Real64 CellZCenter = ( CellZMinValue + CellZMaxValue ) / 2;
 
 					//'set up an extent class for this cell
-					CellExtents = tCellExtents( MeshExtents( CellXMaxValue, CellYMaxValue, CellZMaxValue ), CellXMinValue, CellYMinValue, CellZMinValue );
+					tCellExtents CellExtents = tCellExtents( MeshExtents( CellXMaxValue, CellYMaxValue, CellZMaxValue ), CellXMinValue, CellYMinValue, CellZMinValue );
 
 					//'set up centroid, index, and overall size
-					Centroid = Point3DReal( CellXCenter, CellYCenter, CellZCenter );
-					CellIndeces = Point3DInteger( CellXIndex, CellYIndex, CellZIndex );
-					XYRectangle = RectangleF( CellXMinValue, CellYMinValue, CellWidth, CellHeight );
+					Point3DReal Centroid = Point3DReal( CellXCenter, CellYCenter, CellZCenter );
+					Point3DInteger CellIndeces = Point3DInteger( CellXIndex, CellYIndex, CellZIndex );
+					RectangleF XYRectangle = RectangleF( CellXMinValue, CellYMinValue, CellWidth, CellHeight );
 
 					//'determine cell type
-					cellType = CellType::Unknown;
+					CellType cellType = CellType::Unknown;
 
 					//'if this is a pipe node, some flags are needed
-					PipeIndex = -1;
-					NumRadialCells = -1;
-					CircuitIndex = -1;
+					int PipeIndex = -1;
+					int NumRadialCells = -1;
+					int CircuitIndex = -1;
 
 					// Adiabatic behavior is now achieved in the SetupCellNeighbors routine, these are simply farfield for now.
-					ZWallCellType = CellType::FarfieldBoundary;
-					UnderBasementBoundary = CellType::FarfieldBoundary;
+					CellType ZWallCellType = CellType::FarfieldBoundary;
+					CellType UnderBasementBoundary = CellType::FarfieldBoundary;
 
 					//'apply boundary conditions
 
@@ -4372,12 +4175,17 @@ namespace PlantPipingSystemsManager {
 					}
 
 					//'check to see if this is a pipe node...
-					for ( CircuitCtr = this->CircuitIndeces.l1(); CircuitCtr <= this->CircuitIndeces.u1(); ++CircuitCtr ) {
+					Real64 InsulationThickness( 0.0 );
+					int FoundOnCircuitIndex( 0 );
+					Real64 RadialMeshThickness( 0.0 );
+					bool HasInsulation( false );
+					RadialSizing PipeSizing;
+					for ( int CircuitCtr = this->CircuitIndeces.l1(); CircuitCtr <= this->CircuitIndeces.u1(); ++CircuitCtr ) {
 
 						FoundOnCircuitIndex = this->CircuitIndeces( CircuitCtr );
-						for ( PipeCounter = PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces.l1(); PipeCounter <= PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces.u1(); ++PipeCounter ) {
+						for ( int PipeCounter = PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces.l1(); PipeCounter <= PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces.u1(); ++PipeCounter ) {
 
-							ThisSegment = PipingSystemSegments( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces( PipeCounter ) );
+							PipeSegmentInfo const & ThisSegment = PipingSystemSegments( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces( PipeCounter ) );
 							if ( XYRectangle.contains( ThisSegment.PipeLocation ) ) {
 								//'inform the cell that it is a pipe node
 								cellType = CellType::Pipe;
@@ -4455,9 +4263,6 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 ThisCellCentroidX;
-		Real64 ThisCellCentroidY;
-		Real64 ThisCellCentroidZ;
 		Real64 CellRightCentroidX;
 		Real64 CellRightLeftWallX;
 		Real64 CellLeftCentroidX;
@@ -4484,9 +4289,9 @@ namespace PlantPipingSystemsManager {
 					auto const & cell( cells( X, Y, Z ) );
 
 					//'for convenience
-					ThisCellCentroidX = cell.Centroid.X;
-					ThisCellCentroidY = cell.Centroid.Y;
-					ThisCellCentroidZ = cell.Centroid.Z;
+					Real64 const & ThisCellCentroidX = cell.Centroid.X;
+					Real64 const & ThisCellCentroidY = cell.Centroid.Y;
+					Real64 const & ThisCellCentroidZ = cell.Centroid.Z;
 					Real64 ThisAdiabaticMultiplier = 1.0;
 					Real64 ThisAdiabaticMultiplierMirror = 1.0;
 

@@ -1393,9 +1393,6 @@ namespace PlantPipingSystemsManager {
 	}
 
 	bool
-	CellType_IsFieldCell( int const CellType ); // From Enum: CellType
-
-	bool
 	MeshPartitionArray_Contains(
 		Array1D< MeshPartition > const & meshes,
 		Real64 const value
