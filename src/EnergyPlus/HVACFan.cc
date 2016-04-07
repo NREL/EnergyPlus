@@ -370,17 +370,30 @@ namespace HVACFan {
 		std::string const routineName = "HVACFan constructor ";
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array
+		int numTotFields; // Total number of alpha and numeric fields
 		int IOStat; // IO Status when calling get input subroutine
 		bool errorsFound = false;
 		std::string locCurrentModuleObject = "Fan:SystemModel";
-
-		int objectNum = InputProcessor::GetObjectItemNum( locCurrentModuleObject, objectName );
 		Array1D_string alphaArgs;
-		Array1D< Real64 > numericArgs;
 		Array1D_string alphaFieldNames;
+		Array1D_bool isAlphaFieldBlank;
+		Array1D< Real64 > numericArgs;
 		Array1D_string numericFieldNames;
 		Array1D_bool isNumericFieldBlank;
-		Array1D_bool isAlphaFieldBlank;
+		int objectNum = InputProcessor::GetObjectItemNum( locCurrentModuleObject, objectName );
+		InputProcessor::GetObjectDefMaxArgs( locCurrentModuleObject, numTotFields, numAlphas, numNums );
+		if ( numAlphas > 0 ) {
+			alphaArgs.allocate( numAlphas );
+			alphaFieldNames.allocate( numAlphas );
+			isAlphaFieldBlank.allocate( numAlphas );
+		}
+		if ( numNums > 0 ) {
+			numericArgs.allocate( numNums );
+			numericFieldNames.allocate( numNums );
+			isNumericFieldBlank.allocate( numNums );
+		}
+
+
 		InputProcessor::GetObjectItem( locCurrentModuleObject, objectNum, alphaArgs, numAlphas, numericArgs, numNums, IOStat, isNumericFieldBlank, isAlphaFieldBlank, alphaFieldNames, numericFieldNames  );
 
 		name_ = alphaArgs( 1 );
@@ -552,8 +565,18 @@ namespace HVACFan {
 			SetupEMSActuator( "Fan",name_ , "Fan Total Efficiency", "[fraction]", eMSFanEffOverrideOn_, eMSFanEffValue_ );
 			SetupEMSActuator( "Fan", name_ , "Fan Autosized Air Flow Rate", "[m3/s]", maxAirFlowRateEMSOverrideOn_, maxAirFlowRateEMSOverrideValue_ );
 		}
+
+		alphaArgs.deallocate();
+		alphaFieldNames.deallocate();
+		isAlphaFieldBlank.deallocate();
+		numericArgs.deallocate();
+		numericFieldNames.deallocate();
+		isNumericFieldBlank.deallocate();
+
 		bool anyEMSRan = false;
 		EMSManager::ManageEMS( DataGlobals::emsCallFromComponentGetInput , anyEMSRan );
+
+
 	}
 
 	void
