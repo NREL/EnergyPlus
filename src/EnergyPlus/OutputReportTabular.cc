@@ -95,6 +95,7 @@
 #include <DataZoneEquipment.hh>
 #include <DirectAirManager.hh>
 #include <DisplayRoutines.hh>
+#include <EconomicLifeCycleCost.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -284,6 +285,9 @@ namespace OutputReportTabular {
 	bool displayAdaptiveComfort( false );
 	bool displaySourceEnergyEndUseSummary( false );
 	bool displayZoneComponentLoadSummary( false );
+	bool displayLifeCycleCostReport( false );
+	bool displayTariffReport( false );
+	bool displayEconomicResultSummary( false );
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -517,7 +521,10 @@ namespace OutputReportTabular {
 		displayAdaptiveComfort = false;
 		displaySourceEnergyEndUseSummary = false;
 		displayZoneComponentLoadSummary = false;
-		meterNumTotalsBEPS = Array1D_int ( numResourceTypes, 0 );
+		displayLifeCycleCostReport = false;
+		displayTariffReport = false;
+		displayEconomicResultSummary = false;
+		meterNumTotalsBEPS = Array1D_int( numResourceTypes, 0 );
 		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
 		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
 		ffUsed = Array1D_bool ( numResourceTypes, false );
@@ -697,7 +704,7 @@ namespace OutputReportTabular {
 			OutputReportTabularAnnual::GetInputTabularAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
-			GetInputTabularPredefined();
+			GetInputOutputTableSummaryReports();
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
 			GetInputFuelAndPollutionFactors();
@@ -1786,7 +1793,7 @@ namespace OutputReportTabular {
 	}
 
 	void
-	GetInputTabularPredefined()
+	GetInputOutputTableSummaryReports()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -1924,6 +1931,19 @@ namespace OutputReportTabular {
 					displayLEEDSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "LifeCycleCostReport" ) ) {
+					displayLifeCycleCostReport = true;
+					WriteTabularFiles = true;
+					nameFound = true;
+				}
+				else if ( SameString( AlphArray( iReport ), "TariffReport" ) ) {
+					displayTariffReport = true;
+					WriteTabularFiles = true;
+					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "EconomicResultSummary" ) ) {
+					displayEconomicResultSummary = true;
+					WriteTabularFiles = true;
+					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
@@ -1937,6 +1957,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1951,6 +1974,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1973,6 +1999,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1990,6 +2019,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -3511,6 +3543,8 @@ namespace OutputReportTabular {
 		using OutputReportPredefined::reportName;
 		using OutputReportPredefined::numReportName;
 		using DataCostEstimate::DoCostEstimate;
+		using EconomicLifeCycleCost::LCCparamPresent;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3545,6 +3579,11 @@ namespace OutputReportTabular {
 		std::string origName;
 		std::string curName;
 		int indexUnitConv;
+
+		// normally do not add to the table of contents here but the order of calls is different for the life-cycle costs
+		if ( displayLifeCycleCostReport && LCCparamPresent ) {
+			AddTOCEntry( "Life-Cycle Cost Report", "Entire Facility" );
+		}
 
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			if ( TableStyle( iStyle ) == tableStyleHTML ) {

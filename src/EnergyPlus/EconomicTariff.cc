@@ -348,6 +348,7 @@ namespace EconomicTariff {
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
 		using OutputReportTabular::AddTOCEntry;
+		using OutputReportTabular::displayEconomicResultSummary;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -372,7 +373,7 @@ namespace EconomicTariff {
 			// do rest of GetInput only if at least one tariff is defined.
 			GetInputEconomicsCurrencyType( ErrorsFound );
 			if ( numTariff >= 1 ) {
-				if ( ! ErrorsFound ) AddTOCEntry( "Economics Results Summary Report", "Entire Facility" );
+				if ( !ErrorsFound && displayEconomicResultSummary ) AddTOCEntry( "Economics Results Summary Report", "Entire Facility" );
 				CreateCategoryNativeVariables();
 				GetInputEconomicsQualify( ErrorsFound );
 				GetInputEconomicsChargeSimple( ErrorsFound );
@@ -418,6 +419,7 @@ namespace EconomicTariff {
 		// Using/Aliasing
 		using DataGlobals::NumOfTimeStepInHour;
 		using OutputReportTabular::AddTOCEntry;
+		using OutputReportTabular::displayTariffReport;
 		using OutputProcessor::EnergyMeters;
 		using DataGlobalConstants::AssignResourceTypeNum;
 		using namespace DataIPShortCuts;
@@ -700,7 +702,9 @@ namespace EconomicTariff {
 			tariff( iInObj ).isSelected = false;
 			tariff( iInObj ).totalAnnualCost = 0.0;
 			//now create the Table Of Contents entries for an HTML file
-			AddTOCEntry( "Tariff Report", tariff( iInObj ).tariffName );
+			if ( displayTariffReport ){
+				AddTOCEntry( "Tariff Report", tariff( iInObj ).tariffName );
+			}
 			//associate the resource number with each tariff
 			if ( tariff( iInObj ).reportMeterIndx >= 1 ) {
 				tariff( iInObj ).resourceNum = AssignResourceTypeNum( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType );
@@ -4799,6 +4803,8 @@ namespace EconomicTariff {
 		using OutputReportTabular::ConvertIP;
 		using OutputReportTabular::unitsStyle;
 		using OutputReportTabular::unitsStyleInchPound;
+		using OutputReportTabular::displayTariffReport;
+		using OutputReportTabular::displayEconomicResultSummary;
 
 		// Locals
 
@@ -4855,348 +4861,352 @@ namespace EconomicTariff {
 		}
 
 		if ( numTariff > 0 ) {
-			DisplayString( "Writing Tariff Reports" );
-			for ( auto & e : econVar ) e.isReported = false;
-			//CALL selectTariff moved to the end of computeTariff.
-			showWarningsBasedOnTotal();
-			//---------------------------------
-			// Economics Results Summary Report
-			//---------------------------------
-			WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", 1 );
-			elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
-			gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
-			//---- Annual Summary
-			rowHead.allocate( 3 );
-			columnHead.allocate( 4 );
-			columnWidth.allocate( 4 );
-			tableBody.allocate( 4, 3 );
-			tableBody = "";
-			columnHead( 1 ) = "Electric";
-			columnHead( 2 ) = "Gas";
-			columnHead( 3 ) = "Other";
-			columnHead( 4 ) = "Total";
-			rowHead( 1 ) = "Cost [~~$~~]";
-			rowHead( 2 ) = "Cost per Total Building Area " + perAreaUnitName;
-			rowHead( 3 ) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
-			elecTotalCost = 0.0;
-			gasTotalCost = 0.0;
-			otherTotalCost = 0.0;
-			allTotalCost = 0.0;
-			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				if ( tariff( iTariff ).isSelected ) {
-					allTotalCost += tariff( iTariff ).totalAnnualCost;
-					if ( tariff( iTariff ).kindElectricMtr >= kindMeterElecSimple ) {
-						elecTotalCost += tariff( iTariff ).totalAnnualCost;
-					} else if ( tariff( iTariff ).reportMeterIndx == gasFacilMeter ) {
-						gasTotalCost += tariff( iTariff ).totalAnnualCost;
-					} else {
-						otherTotalCost += tariff( iTariff ).totalAnnualCost;
-						// removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+			if ( displayEconomicResultSummary ) {
+				DisplayString( "Writing Tariff Reports" );
+				for ( auto & e : econVar ) e.isReported = false;
+				//CALL selectTariff moved to the end of computeTariff.
+				showWarningsBasedOnTotal();
+				//---------------------------------
+				// Economics Results Summary Report
+				//---------------------------------
+				WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", 1 );
+				elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
+				gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
+				//---- Annual Summary
+				rowHead.allocate( 3 );
+				columnHead.allocate( 4 );
+				columnWidth.allocate( 4 );
+				tableBody.allocate( 4, 3 );
+				tableBody = "";
+				columnHead( 1 ) = "Electric";
+				columnHead( 2 ) = "Gas";
+				columnHead( 3 ) = "Other";
+				columnHead( 4 ) = "Total";
+				rowHead( 1 ) = "Cost [~~$~~]";
+				rowHead( 2 ) = "Cost per Total Building Area " + perAreaUnitName;
+				rowHead( 3 ) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
+				elecTotalCost = 0.0;
+				gasTotalCost = 0.0;
+				otherTotalCost = 0.0;
+				allTotalCost = 0.0;
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					if ( tariff( iTariff ).isSelected ) {
+						allTotalCost += tariff( iTariff ).totalAnnualCost;
+						if ( tariff( iTariff ).kindElectricMtr >= kindMeterElecSimple ) {
+							elecTotalCost += tariff( iTariff ).totalAnnualCost;
+						} else if ( tariff( iTariff ).reportMeterIndx == gasFacilMeter ) {
+							gasTotalCost += tariff( iTariff ).totalAnnualCost;
+						} else {
+							otherTotalCost += tariff( iTariff ).totalAnnualCost;
+							// removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+						}
 					}
 				}
-			}
-			tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
-			tableBody( 2, 1 ) = RealToStr( gasTotalCost, 2 );
-			tableBody( 3, 1 ) = RealToStr( otherTotalCost, 2 );
-			tableBody( 4, 1 ) = RealToStr( allTotalCost, 2 );
-			if ( buildingGrossFloorArea > 0.0 ) {
-				tableBody( 1, 2 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 2 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 4, 2 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-			}
-			if ( buildingConditionedFloorArea > 0.0 ) {
-				tableBody( 1, 3 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 3 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 4, 3 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-			}
-			columnWidth = 14; //array assignment - same for all columns
-			WriteSubtitle( "Annual Cost" );
-			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
-			}
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-			//---- Tariff Summary
-			rowHead.allocate( numTariff );
-			columnHead.allocate( 6 );
-			columnWidth.allocate( 6 );
-			tableBody.allocate( 6, numTariff );
-			tableBody = "";
-			columnHead( 1 ) = "Selected";
-			columnHead( 2 ) = "Qualified";
-			columnHead( 3 ) = "Meter";
-			columnHead( 4 ) = "Buy or Sell";
-			columnHead( 5 ) = "Group";
-			columnHead( 6 ) = "Annual Cost (~~$~~)";
-			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				rowHead( iTariff ) = tariff( iTariff ).tariffName;
-				if ( tariff( iTariff ).isSelected ) {
-					tableBody( 1, iTariff ) = "Yes";
-				} else {
-					tableBody( 1, iTariff ) = "No";
+				tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
+				tableBody( 2, 1 ) = RealToStr( gasTotalCost, 2 );
+				tableBody( 3, 1 ) = RealToStr( otherTotalCost, 2 );
+				tableBody( 4, 1 ) = RealToStr( allTotalCost, 2 );
+				if ( buildingGrossFloorArea > 0.0 ) {
+					tableBody( 1, 2 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 3, 2 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 4, 2 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
 				}
-				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 2, iTariff ) = "Yes";
-				} else {
-					tableBody( 2, iTariff ) = "No";
+				if ( buildingConditionedFloorArea > 0.0 ) {
+					tableBody( 1, 3 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 2, 3 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 4, 3 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
 				}
-				tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
-				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
-				if ( SELECT_CASE_var == buyFromUtility ) {
-					tableBody( 4, iTariff ) = "Buy";
-				} else if ( SELECT_CASE_var == sellToUtility ) {
-					tableBody( 4, iTariff ) = "Sell";
-				} else if ( SELECT_CASE_var == netMetering ) {
-					tableBody( 4, iTariff ) = "Net";
-				}}
-				if ( tariff( iTariff ).groupName == "" ) {
-					tableBody( 5, iTariff ) = "(none)";
-				} else {
-					tableBody( 5, iTariff ) = tariff( iTariff ).groupName;
-				}
-				tableBody( 6, iTariff ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
-			}
-			columnWidth = 14; //array assignment - same for all columns
-			WriteSubtitle( "Tariff Summary" );
-			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
-			}
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-			//---------------------------------
-			// Tariff Report
-			//---------------------------------
-			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				WriteReportHeaders( "Tariff Report", tariff( iTariff ).tariffName, 1 );
-				rowHead.allocate( 7 );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				tableBody.allocate( 1, 7 );
-				tableBody = "";
-				columnHead( 1 ) = "Parameter";
-				rowHead( 1 ) = "Meter";
-				rowHead( 2 ) = "Selected";
-				rowHead( 3 ) = "Group";
-				rowHead( 4 ) = "Qualified";
-				rowHead( 5 ) = "Disqualifier";
-				rowHead( 6 ) = "Computation";
-				rowHead( 7 ) = "Units";
-				tableBody( 1, 1 ) = tariff( iTariff ).reportMeter;
-				if ( tariff( iTariff ).isSelected ) {
-					tableBody( 1, 2 ) = "Yes";
-				} else {
-					tableBody( 1, 2 ) = "No";
-				}
-				if ( tariff( iTariff ).groupName == "" ) {
-					tableBody( 1, 3 ) = "(none)";
-				} else {
-					tableBody( 1, 3 ) = tariff( iTariff ).groupName;
-				}
-				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 1, 4 ) = "Yes";
-				} else {
-					tableBody( 1, 4 ) = "No";
-				}
-				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 1, 5 ) = "n/a";
-				} else {
-					tableBody( 1, 5 ) = econVar( tariff( iTariff ).ptDisqualifier ).name;
-				}
-				if ( computation( iTariff ).isUserDef ) {
-					tableBody( 1, 6 ) = computation( iTariff ).computeName;
-				} else {
-					tableBody( 1, 6 ) = "automatic";
-				}
-				{ auto const SELECT_CASE_var( tariff( iTariff ).convChoice );
-				if ( SELECT_CASE_var == conversionUSERDEF ) {
-					tableBody( 1, 7 ) = "User Defined";
-				} else if ( SELECT_CASE_var == conversionKWH ) {
-					tableBody( 1, 7 ) = "kWh";
-				} else if ( SELECT_CASE_var == conversionTHERM ) {
-					tableBody( 1, 7 ) = "Therm";
-				} else if ( SELECT_CASE_var == conversionMMBTU ) {
-					tableBody( 1, 7 ) = "MMBtu";
-				} else if ( SELECT_CASE_var == conversionMJ ) {
-					tableBody( 1, 7 ) = "MJ";
-				} else if ( SELECT_CASE_var == conversionKBTU ) {
-					tableBody( 1, 7 ) = "kBtu";
-				} else if ( SELECT_CASE_var == conversionMCF ) {
-					tableBody( 1, 7 ) = "MCF";
-				} else if ( SELECT_CASE_var == conversionCCF ) {
-					tableBody( 1, 7 ) = "CCF";
-				}}
 				columnWidth = 14; //array assignment - same for all columns
-				WriteSubtitle( "General" );
+				WriteSubtitle( "Annual Cost" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
 				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
 				tableBody.deallocate();
-				//---- Categories
-				for ( auto & e : econVar ) e.activeNow = false;
-				econVar( tariff( iTariff ).ptEnergyCharges ).activeNow = true;
-				econVar( tariff( iTariff ).ptDemandCharges ).activeNow = true;
-				econVar( tariff( iTariff ).ptServiceCharges ).activeNow = true;
-				econVar( tariff( iTariff ).ptBasis ).activeNow = true;
-				econVar( tariff( iTariff ).ptAdjustment ).activeNow = true;
-				econVar( tariff( iTariff ).ptSurcharge ).activeNow = true;
-				econVar( tariff( iTariff ).ptSubtotal ).activeNow = true;
-				econVar( tariff( iTariff ).ptTaxes ).activeNow = true;
-				econVar( tariff( iTariff ).ptTotal ).activeNow = true;
-				ReportEconomicVariable( "Categories", false, true, tariff( iTariff ).tariffName );
-				//---- Charges
-				for ( auto & e : econVar ) e.activeNow = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( ( econVar( kVar ).kindOfObj == kindChargeSimple ) || ( econVar( kVar ).kindOfObj == kindChargeBlock ) ) {
-							econVar( kVar ).activeNow = true;
-						}
+				//---- Tariff Summary
+				rowHead.allocate( numTariff );
+				columnHead.allocate( 6 );
+				columnWidth.allocate( 6 );
+				tableBody.allocate( 6, numTariff );
+				tableBody = "";
+				columnHead( 1 ) = "Selected";
+				columnHead( 2 ) = "Qualified";
+				columnHead( 3 ) = "Meter";
+				columnHead( 4 ) = "Buy or Sell";
+				columnHead( 5 ) = "Group";
+				columnHead( 6 ) = "Annual Cost (~~$~~)";
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					rowHead( iTariff ) = tariff( iTariff ).tariffName;
+					if ( tariff( iTariff ).isSelected ) {
+						tableBody( 1, iTariff ) = "Yes";
+					} else {
+						tableBody( 1, iTariff ) = "No";
 					}
-				}
-				ReportEconomicVariable( "Charges", true, true, tariff( iTariff ).tariffName );
-				//---- Sources for Charges
-				for ( auto & e : econVar ) e.activeNow = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						indexInChg = econVar( kVar ).index;
-						if ( econVar( kVar ).kindOfObj == kindChargeSimple ) {
-							if ( chargeSimple( indexInChg ).sourcePt > 0 ) {
-								econVar( chargeSimple( indexInChg ).sourcePt ).activeNow = true;
-							}
-						} else if ( econVar( kVar ).kindOfObj == kindChargeBlock ) {
-							if ( chargeBlock( indexInChg ).sourcePt > 0 ) {
-								econVar( chargeBlock( indexInChg ).sourcePt ).activeNow = true;
-							}
-						}
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 2, iTariff ) = "Yes";
+					} else {
+						tableBody( 2, iTariff ) = "No";
 					}
-				}
-				ReportEconomicVariable( "Corresponding Sources for Charges", false, false, tariff( iTariff ).tariffName );
-				//---- Rachets
-				for ( auto & e : econVar ) e.activeNow = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( econVar( kVar ).kindOfObj == kindRatchet ) {
-							econVar( kVar ).activeNow = true;
-						}
-					}
-				}
-				ReportEconomicVariable( "Ratchets", false, false, tariff( iTariff ).tariffName );
-				//---- Qualifies
-				for ( auto & e : econVar ) e.activeNow = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( econVar( kVar ).kindOfObj == kindQualify ) {
-							econVar( kVar ).activeNow = true;
-						}
-					}
-				}
-				ReportEconomicVariable( "Qualifies", false, false, tariff( iTariff ).tariffName );
-				//---- Native Variables
-				for ( auto & e : econVar ) e.activeNow = false;
-				for ( kVar = tariff( iTariff ).firstNative; kVar <= tariff( iTariff ).lastNative; ++kVar ) {
-					econVar( kVar ).activeNow = true;
-				}
-				ReportEconomicVariable( "Native Variables", false, false, tariff( iTariff ).tariffName );
-				//---- Other Variables
-				for ( auto & e : econVar ) e.activeNow = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( ! econVar( kVar ).isReported ) {
-							econVar( kVar ).activeNow = true;
-						}
-					}
-				}
-				ReportEconomicVariable( "Other Variables", false, false, tariff( iTariff ).tariffName );
-				//---- Computation
-				if ( computation( iTariff ).isUserDef ) {
-					WriteTextLine( "Computation -  User Defined", true );
-				} else {
-					WriteTextLine( "Computation -  Automatic", true );
-				}
-				outString = "";
-				for ( lStep = computation( iTariff ).firstStep; lStep <= computation( iTariff ).lastStep; ++lStep ) {
-					curStep = steps( lStep );
-					{ auto const SELECT_CASE_var( curStep );
-					if ( SELECT_CASE_var == 0 ) { //end of line
-						WriteTextLine( rstrip( outString ) );
-						outString = "";
-					} else if ( ( SELECT_CASE_var >= 1 ) ) { //all positive values are a reference to an econVar
-						outString = econVar( curStep ).name + ' ' + outString;
-					} else if ( SELECT_CASE_var == opSUM ) {
-						outString = "SUM " + outString;
-					} else if ( SELECT_CASE_var == opMULTIPLY ) {
-						outString = "MULTIPLY " + outString;
-					} else if ( SELECT_CASE_var == opSUBTRACT ) {
-						outString = "SUBTRACT " + outString;
-					} else if ( SELECT_CASE_var == opDIVIDE ) {
-						outString = "DIVIDE " + outString;
-					} else if ( SELECT_CASE_var == opABSOLUTE ) {
-						outString = "ABSOLUTE " + outString;
-					} else if ( SELECT_CASE_var == opINTEGER ) {
-						outString = "INTEGER " + outString;
-					} else if ( SELECT_CASE_var == opSIGN ) {
-						outString = "SIGN " + outString;
-					} else if ( SELECT_CASE_var == opROUND ) {
-						outString = "ROUND " + outString;
-					} else if ( SELECT_CASE_var == opMAXIMUM ) {
-						outString = "MAXIMUM " + outString;
-					} else if ( SELECT_CASE_var == opMINIMUM ) {
-						outString = "MINIMUM " + outString;
-					} else if ( SELECT_CASE_var == opEXCEEDS ) {
-						outString = "EXCEEDS " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMINIMUM ) {
-						outString = "ANNUALMINIMUM " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMAXIMUM ) {
-						outString = "ANNUALMAXIMUM " + outString;
-					} else if ( SELECT_CASE_var == opANNUALSUM ) {
-						outString = "ANNUALSUM " + outString;
-					} else if ( SELECT_CASE_var == opANNUALAVERAGE ) {
-						outString = "ANNUALAVERAGE " + outString;
-					} else if ( SELECT_CASE_var == opANNUALOR ) {
-						outString = "ANNUALOR " + outString;
-					} else if ( SELECT_CASE_var == opANNUALAND ) {
-						outString = "ANNUALAND " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMAXIMUMZERO ) {
-						outString = "ANNUALMAXIMUMZERO " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMINIMUMZERO ) {
-						outString = "ANNUALMINIMUMZERO " + outString;
-					} else if ( SELECT_CASE_var == opIF ) {
-						outString = "IF " + outString;
-					} else if ( SELECT_CASE_var == opGREATERTHAN ) {
-						outString = "GREATERTHAN " + outString;
-					} else if ( SELECT_CASE_var == opGREATEREQUAL ) {
-						outString = "GREATEREQUAL " + outString;
-					} else if ( SELECT_CASE_var == opLESSTHAN ) {
-						outString = "LESSTHAN " + outString;
-					} else if ( SELECT_CASE_var == opLESSEQUAL ) {
-						outString = "LESSEQUAL " + outString;
-					} else if ( SELECT_CASE_var == opEQUAL ) {
-						outString = "EQUAL " + outString;
-					} else if ( SELECT_CASE_var == opNOTEQUAL ) {
-						outString = "NOTEQUAL " + outString;
-					} else if ( SELECT_CASE_var == opAND ) {
-						outString = "AND " + outString;
-					} else if ( SELECT_CASE_var == opOR ) {
-						outString = "OR " + outString;
-					} else if ( SELECT_CASE_var == opNOT ) {
-						outString = "NOT " + outString;
-					} else if ( SELECT_CASE_var == opADD ) {
-						outString = "ADD " + outString;
-					} else if ( SELECT_CASE_var == opNOOP ) { //should clear the outString when done debugging
-						//outString = ''
-						outString = "FROM " + outString;
+					tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
+					{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
+					if ( SELECT_CASE_var == buyFromUtility ) {
+						tableBody( 4, iTariff ) = "Buy";
+					} else if ( SELECT_CASE_var == sellToUtility ) {
+						tableBody( 4, iTariff ) = "Sell";
+					} else if ( SELECT_CASE_var == netMetering ) {
+						tableBody( 4, iTariff ) = "Net";
 					}}
+					if ( tariff( iTariff ).groupName == "" ) {
+						tableBody( 5, iTariff ) = "(none)";
+					} else {
+						tableBody( 5, iTariff ) = tariff( iTariff ).groupName;
+					}
+					tableBody( 6, iTariff ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
+				}
+				columnWidth = 14; //array assignment - same for all columns
+				WriteSubtitle( "Tariff Summary" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+				}
+				columnHead.deallocate();
+				rowHead.deallocate();
+				columnWidth.deallocate();
+				tableBody.deallocate();
+			}
+			//---------------------------------
+			// Tariff Report
+			//---------------------------------
+			if ( displayTariffReport ) {
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					WriteReportHeaders( "Tariff Report", tariff( iTariff ).tariffName, 1 );
+					rowHead.allocate( 7 );
+					columnHead.allocate( 1 );
+					columnWidth.allocate( 1 );
+					tableBody.allocate( 1, 7 );
+					tableBody = "";
+					columnHead( 1 ) = "Parameter";
+					rowHead( 1 ) = "Meter";
+					rowHead( 2 ) = "Selected";
+					rowHead( 3 ) = "Group";
+					rowHead( 4 ) = "Qualified";
+					rowHead( 5 ) = "Disqualifier";
+					rowHead( 6 ) = "Computation";
+					rowHead( 7 ) = "Units";
+					tableBody( 1, 1 ) = tariff( iTariff ).reportMeter;
+					if ( tariff( iTariff ).isSelected ) {
+						tableBody( 1, 2 ) = "Yes";
+					} else {
+						tableBody( 1, 2 ) = "No";
+					}
+					if ( tariff( iTariff ).groupName == "" ) {
+						tableBody( 1, 3 ) = "(none)";
+					} else {
+						tableBody( 1, 3 ) = tariff( iTariff ).groupName;
+					}
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 1, 4 ) = "Yes";
+					} else {
+						tableBody( 1, 4 ) = "No";
+					}
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 1, 5 ) = "n/a";
+					} else {
+						tableBody( 1, 5 ) = econVar( tariff( iTariff ).ptDisqualifier ).name;
+					}
+					if ( computation( iTariff ).isUserDef ) {
+						tableBody( 1, 6 ) = computation( iTariff ).computeName;
+					} else {
+						tableBody( 1, 6 ) = "automatic";
+					}
+					{ auto const SELECT_CASE_var( tariff( iTariff ).convChoice );
+					if ( SELECT_CASE_var == conversionUSERDEF ) {
+						tableBody( 1, 7 ) = "User Defined";
+					} else if ( SELECT_CASE_var == conversionKWH ) {
+						tableBody( 1, 7 ) = "kWh";
+					} else if ( SELECT_CASE_var == conversionTHERM ) {
+						tableBody( 1, 7 ) = "Therm";
+					} else if ( SELECT_CASE_var == conversionMMBTU ) {
+						tableBody( 1, 7 ) = "MMBtu";
+					} else if ( SELECT_CASE_var == conversionMJ ) {
+						tableBody( 1, 7 ) = "MJ";
+					} else if ( SELECT_CASE_var == conversionKBTU ) {
+						tableBody( 1, 7 ) = "kBtu";
+					} else if ( SELECT_CASE_var == conversionMCF ) {
+						tableBody( 1, 7 ) = "MCF";
+					} else if ( SELECT_CASE_var == conversionCCF ) {
+						tableBody( 1, 7 ) = "CCF";
+					}}
+					columnWidth = 14; //array assignment - same for all columns
+					WriteSubtitle( "General" );
+					WriteTable( tableBody, rowHead, columnHead, columnWidth );
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+					}
+					columnHead.deallocate();
+					rowHead.deallocate();
+					columnWidth.deallocate();
+					tableBody.deallocate();
+					//---- Categories
+					for ( auto & e : econVar ) e.activeNow = false;
+					econVar( tariff( iTariff ).ptEnergyCharges ).activeNow = true;
+					econVar( tariff( iTariff ).ptDemandCharges ).activeNow = true;
+					econVar( tariff( iTariff ).ptServiceCharges ).activeNow = true;
+					econVar( tariff( iTariff ).ptBasis ).activeNow = true;
+					econVar( tariff( iTariff ).ptAdjustment ).activeNow = true;
+					econVar( tariff( iTariff ).ptSurcharge ).activeNow = true;
+					econVar( tariff( iTariff ).ptSubtotal ).activeNow = true;
+					econVar( tariff( iTariff ).ptTaxes ).activeNow = true;
+					econVar( tariff( iTariff ).ptTotal ).activeNow = true;
+					ReportEconomicVariable( "Categories", false, true, tariff( iTariff ).tariffName );
+					//---- Charges
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( ( econVar( kVar ).kindOfObj == kindChargeSimple ) || ( econVar( kVar ).kindOfObj == kindChargeBlock ) ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Charges", true, true, tariff( iTariff ).tariffName );
+					//---- Sources for Charges
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							indexInChg = econVar( kVar ).index;
+							if ( econVar( kVar ).kindOfObj == kindChargeSimple ) {
+								if ( chargeSimple( indexInChg ).sourcePt > 0 ) {
+									econVar( chargeSimple( indexInChg ).sourcePt ).activeNow = true;
+								}
+							} else if ( econVar( kVar ).kindOfObj == kindChargeBlock ) {
+								if ( chargeBlock( indexInChg ).sourcePt > 0 ) {
+									econVar( chargeBlock( indexInChg ).sourcePt ).activeNow = true;
+								}
+							}
+						}
+					}
+					ReportEconomicVariable( "Corresponding Sources for Charges", false, false, tariff( iTariff ).tariffName );
+					//---- Rachets
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( econVar( kVar ).kindOfObj == kindRatchet ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Ratchets", false, false, tariff( iTariff ).tariffName );
+					//---- Qualifies
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( econVar( kVar ).kindOfObj == kindQualify ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Qualifies", false, false, tariff( iTariff ).tariffName );
+					//---- Native Variables
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = tariff( iTariff ).firstNative; kVar <= tariff( iTariff ).lastNative; ++kVar ) {
+						econVar( kVar ).activeNow = true;
+					}
+					ReportEconomicVariable( "Native Variables", false, false, tariff( iTariff ).tariffName );
+					//---- Other Variables
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( ! econVar( kVar ).isReported ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Other Variables", false, false, tariff( iTariff ).tariffName );
+					//---- Computation
+					if ( computation( iTariff ).isUserDef ) {
+						WriteTextLine( "Computation -  User Defined", true );
+					} else {
+						WriteTextLine( "Computation -  Automatic", true );
+					}
+					outString = "";
+					for ( lStep = computation( iTariff ).firstStep; lStep <= computation( iTariff ).lastStep; ++lStep ) {
+						curStep = steps( lStep );
+						{ auto const SELECT_CASE_var( curStep );
+						if ( SELECT_CASE_var == 0 ) { //end of line
+							WriteTextLine( rstrip( outString ) );
+							outString = "";
+						} else if ( ( SELECT_CASE_var >= 1 ) ) { //all positive values are a reference to an econVar
+							outString = econVar( curStep ).name + ' ' + outString;
+						} else if ( SELECT_CASE_var == opSUM ) {
+							outString = "SUM " + outString;
+						} else if ( SELECT_CASE_var == opMULTIPLY ) {
+							outString = "MULTIPLY " + outString;
+						} else if ( SELECT_CASE_var == opSUBTRACT ) {
+							outString = "SUBTRACT " + outString;
+						} else if ( SELECT_CASE_var == opDIVIDE ) {
+							outString = "DIVIDE " + outString;
+						} else if ( SELECT_CASE_var == opABSOLUTE ) {
+							outString = "ABSOLUTE " + outString;
+						} else if ( SELECT_CASE_var == opINTEGER ) {
+							outString = "INTEGER " + outString;
+						} else if ( SELECT_CASE_var == opSIGN ) {
+							outString = "SIGN " + outString;
+						} else if ( SELECT_CASE_var == opROUND ) {
+							outString = "ROUND " + outString;
+						} else if ( SELECT_CASE_var == opMAXIMUM ) {
+							outString = "MAXIMUM " + outString;
+						} else if ( SELECT_CASE_var == opMINIMUM ) {
+							outString = "MINIMUM " + outString;
+						} else if ( SELECT_CASE_var == opEXCEEDS ) {
+							outString = "EXCEEDS " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMINIMUM ) {
+							outString = "ANNUALMINIMUM " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMAXIMUM ) {
+							outString = "ANNUALMAXIMUM " + outString;
+						} else if ( SELECT_CASE_var == opANNUALSUM ) {
+							outString = "ANNUALSUM " + outString;
+						} else if ( SELECT_CASE_var == opANNUALAVERAGE ) {
+							outString = "ANNUALAVERAGE " + outString;
+						} else if ( SELECT_CASE_var == opANNUALOR ) {
+							outString = "ANNUALOR " + outString;
+						} else if ( SELECT_CASE_var == opANNUALAND ) {
+							outString = "ANNUALAND " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMAXIMUMZERO ) {
+							outString = "ANNUALMAXIMUMZERO " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMINIMUMZERO ) {
+							outString = "ANNUALMINIMUMZERO " + outString;
+						} else if ( SELECT_CASE_var == opIF ) {
+							outString = "IF " + outString;
+						} else if ( SELECT_CASE_var == opGREATERTHAN ) {
+							outString = "GREATERTHAN " + outString;
+						} else if ( SELECT_CASE_var == opGREATEREQUAL ) {
+							outString = "GREATEREQUAL " + outString;
+						} else if ( SELECT_CASE_var == opLESSTHAN ) {
+							outString = "LESSTHAN " + outString;
+						} else if ( SELECT_CASE_var == opLESSEQUAL ) {
+							outString = "LESSEQUAL " + outString;
+						} else if ( SELECT_CASE_var == opEQUAL ) {
+							outString = "EQUAL " + outString;
+						} else if ( SELECT_CASE_var == opNOTEQUAL ) {
+							outString = "NOTEQUAL " + outString;
+						} else if ( SELECT_CASE_var == opAND ) {
+							outString = "AND " + outString;
+						} else if ( SELECT_CASE_var == opOR ) {
+							outString = "OR " + outString;
+						} else if ( SELECT_CASE_var == opNOT ) {
+							outString = "NOT " + outString;
+						} else if ( SELECT_CASE_var == opADD ) {
+							outString = "ADD " + outString;
+						} else if ( SELECT_CASE_var == opNOOP ) { //should clear the outString when done debugging
+							//outString = ''
+							outString = "FROM " + outString;
+						}}
+					}
 				}
 			}
 		}
