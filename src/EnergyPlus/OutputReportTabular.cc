@@ -1935,8 +1935,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				}
-				else if ( SameString( AlphArray( iReport ), "TariffReport" ) ) {
+				} else if ( SameString( AlphArray( iReport ), "TariffReport" ) ) {
 					displayTariffReport = true;
 					WriteTabularFiles = true;
 					nameFound = true;
@@ -2182,7 +2181,7 @@ namespace OutputReportTabular {
 			gatherElecStorage = 0.0;
 			gatherPowerConversion = 0.0;
 
-			// get meter numbers for onsite thermal components on BEPS report
+			// get meter numbers for onsite ther\nents on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
 			meterNumAirHeatRecoveryCool = GetMeterIndex( "HeatRecoveryForCooling:EnergyTransfer" );
 			meterNumAirHeatRecoveryHeat = GetMeterIndex( "HeatRecoveryForHeating:EnergyTransfer" );

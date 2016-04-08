@@ -90,22 +90,13 @@ namespace EconomicTariff {
 	// MODULE INFORMATION:
 	//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 	//    DATE WRITTEN   May 2004
-	//    MODIFIED       na
-	//    RE-ENGINEERED  na
-	// PURPOSE OF THIS MODULE:
+
 	//    Compute utility bills for a building based on energy
 	//    use estimate.
-	// METHODOLOGY EMPLOYED:
-	// REFERENCES:
-	//    None.
-	// OTHER NOTES:
-
-	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace InputProcessor;
 	using ScheduleManager::GetScheduleIndex;
 
-	// Data
 	//ECONOMCIS:TARIFF enumerated lists
 
 	int const kindUnknown( 0 );
@@ -314,6 +305,16 @@ namespace EconomicTariff {
 	Array1D< ComputationType > computation;
 	Array1D< StackType > stack;
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool Update_GetInput( true );
+		int addOperand_prevVarMe( 0 );
+	}
+
 	//======================================================================================================================
 	//======================================================================================================================
 	//    MAIN ROUTINE CALLED EACH TIMESTEP
@@ -325,50 +326,21 @@ namespace EconomicTariff {
 	void
 	UpdateUtilityBills()
 	{
-
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   September 2003
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Single routine used to call all get input
 		//    routines for economics.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
 		using DataGlobals::DoOutputReporting;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
 		using OutputReportTabular::AddTOCEntry;
 		using OutputReportTabular::displayEconomicResultSummary;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+		bool ErrorsFound( false );
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Locals
-		static bool GetInput( true );
-		static bool ErrorsFound( false );
-
-		if ( GetInput ) {
+		if ( Update_GetInput ) {
 			GetInputEconomicsTariff( ErrorsFound );
 			// do rest of GetInput only if at least one tariff is defined.
 			GetInputEconomicsCurrencyType( ErrorsFound );
@@ -383,7 +355,7 @@ namespace EconomicTariff {
 				GetInputEconomicsComputation( ErrorsFound );
 				CreateDefaultComputation();
 			}
-			GetInput = false;
+			Update_GetInput = false;
 			if ( ErrorsFound ) ShowFatalError( "UpdateUtilityBills: Preceding errors cause termination." );
 		}
 		if ( DoOutputReporting && ( KindOfSim == ksRunPeriodWeather ) ) {
@@ -402,21 +374,11 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsTariff( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Tariff" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using DataGlobals::NumOfTimeStepInHour;
 		using OutputReportTabular::AddTOCEntry;
 		using OutputReportTabular::displayTariffReport;
@@ -425,20 +387,7 @@ namespace EconomicTariff {
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsTariff: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsTariff: " );
 		int iInObj; // loop index variable for reading in objects
 		int jObj; // loop index for objects
 		int NumAlphas; // Number of elements in the alpha array
@@ -715,36 +664,13 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsQualify( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Qualify" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsQualify: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "GetInputEconomicsQualify: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -808,37 +734,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsChargeSimple( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Charge:Simple" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsChargeSimple: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsChargeSimple: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -890,37 +793,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsChargeBlock( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Charge:Block" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsChargeBlock: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsChargeBlock: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -1001,37 +881,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsRatchet( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Ratchet" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsRatchet: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsRatchet: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -1077,36 +934,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsVariable( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Variable" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsVariable: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "GetInputEconomicsVariable: " );
 
 		int numEconVarObj;
 		int tariffPt;
@@ -1166,37 +1001,15 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsComputation( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Computation" objects.
 		//    This object is only used for very complex rates.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsComputation: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "GetInputEconomicsComputation: " );
 
 		int tariffPt;
 		int iInObj; // loop index variable for reading in objects
@@ -1261,40 +1074,18 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsCurrencyType( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Sets the type of currency (U.S. Dollar, Euro, Yen, etc.. )
 		//   This is a "unique" object.
 
-		// METHODOLOGY EMPLOYED:
-		//   Uses get input structure similar to other objects
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataCostEstimate;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		std::string const CurrentModuleObject( "CurrencyType" );
+		std::string const RoutineName( "GetInputEconomicsCurrencyType: " );
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const CurrentModuleObject( "CurrencyType" );
-		static std::string const RoutineName( "GetInputEconomicsCurrencyType: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumCurrencyType;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -1334,38 +1125,16 @@ namespace EconomicTariff {
 		int const fromTariff
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Converts a single line in the ECONOMICS:COMPUTE
 		//   command into tokens for computation
 
-		// METHODOLOGY EMPLOYED:
 		//   Scan the line from the end of the line to the front of the
 		//   line and search for operators and variables. All items
 		//   are put into the step array.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string word;
 		std::string::size_type endOfWord;
 		int token;
@@ -1405,39 +1174,16 @@ namespace EconomicTariff {
 		std::string & aWord
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Returns the last substring of the line of text to the
 		//   left of the endOfSubStrg pointer. A substring is
 		//   delimitted by spaces.  Quotes are not significant
 		//   (they are treated just like any other non-space character)
 
-		// METHODOLOGY EMPLOYED:
 		//   Scan the string from the end.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool isInWord;
 		bool isSpace;
 		std::string::size_type iString;
@@ -1502,37 +1248,18 @@ namespace EconomicTariff {
 	void
 	initializeMonetaryUnit()
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Sets the type of monetary unit array.
 
-		// METHODOLOGY EMPLOYED:
 		//   Uses get input structure similar to other objects
 		//   The monetaryUnitSymbols.xls spreadsheet helps create the code for this routine
 
-		// REFERENCES:
 		//   www.xe.com/symbols.php
 
-		// Using/Aliasing
 		using namespace DataCostEstimate;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		numMonetaryUnit = 111;
 		monetaryUnit.allocate( numMonetaryUnit );
 		monetaryUnit( 1 ).code = "USD";
@@ -1878,39 +1605,14 @@ namespace EconomicTariff {
 		std::string const & nameOfReferingObj
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Find the index for the season string provided or else
 		//    raise a warning.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int LookUpSeason;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( SameString( nameOfSeason, "Summer" ) ) {
 			LookUpSeason = seasonSummer;
 		} else if ( SameString( nameOfSeason, "Winter" ) ) {
@@ -1937,39 +1639,13 @@ namespace EconomicTariff {
 		std::string const & nameOfCurObj
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Find the index for the tariff string provided or else
 		//    raise a warning.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int FindTariffIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 		int found;
 
@@ -1999,36 +1675,12 @@ namespace EconomicTariff {
 		std::string const & curobjName
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   March 2007
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Issue a warning if the variable name (usually the object name) is
 		//   one of the names of native variables
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool throwError;
 
 		throwError = false;
@@ -2100,40 +1752,16 @@ namespace EconomicTariff {
 		int const tariffPt
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   If the string is not numeric, check if it is a valid string to use as
 		//   a variable name. Check if name has been used before and if not create
 		//   the variable using the string as its name.
 		//   Return the index of the variable.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int AssignVariablePt;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string inNoSpaces;
 		int found;
 		int iVar;
@@ -2186,35 +1814,13 @@ namespace EconomicTariff {
 	void
 	incrementEconVar()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Increment the Increase the size of the
 
-		// METHODOLOGY EMPLOYED:
+		int const sizeIncrement( 100 );
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static int sizeIncrement( 100 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( ! allocated( econVar ) ) {
 			econVar.allocate( sizeIncrement );
 			sizeEconVar = sizeIncrement;
@@ -2249,36 +1855,14 @@ namespace EconomicTariff {
 	void
 	incrementSteps()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Increment the step array counter and if
 		//   necessary increase the size of the array.
 
-		// METHODOLOGY EMPLOYED:
+		int const sizeIncrement( 100 );
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static int sizeIncrement( 100 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( ! allocated( steps ) ) {
 			steps.allocate( sizeIncrement );
 			sizeSteps = sizeIncrement;
@@ -2297,39 +1881,12 @@ namespace EconomicTariff {
 	std::string
 	RemoveSpaces( std::string const & StringIn )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Return the string with all spaces removed.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		std::string StringOut;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		bool foundSpaces = false;
 		for ( std::string::size_type iString = 0; iString < len( StringIn ); ++iString ) {
 			if ( StringIn[ iString ] != ' ' ) {
@@ -2348,37 +1905,12 @@ namespace EconomicTariff {
 	void
 	CreateCategoryNativeVariables()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    For each tariff create variables that are used for the
 		//    categories (i.e., EnergyCharges).
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
@@ -2442,38 +1974,11 @@ namespace EconomicTariff {
 	int
 	lookupOperator( std::string const & opString )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int lookupOperator;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( SameString( opString, "Sum" ) ) {
 			lookupOperator = opSUM;
 		} else if ( SameString( opString, "MULTIPLY" ) ) {
@@ -2595,11 +2100,9 @@ namespace EconomicTariff {
 	void
 	CreateDefaultComputation()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
+
 		// PURPOSE OF THIS SUBROUTINE:
 		//    For most tariffs defined in EnergyPlus no specific
 		//    ECONOMICS:COMPUTATION will be entered. In that case,
@@ -2651,26 +2154,7 @@ namespace EconomicTariff {
 		//    depends on and a list of entries that are dependant on that
 		//    line.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::IntToStr;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int iTariff;
 		int iVar;
@@ -2916,38 +2400,13 @@ namespace EconomicTariff {
 		int const varOperand
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Used by CreateDefaultComputation to create the dependancy
 		//   relationship in the EconVar array
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int sizeIncrement( 100 );
-		static int prevVarMe( 0 );
+		int const sizeIncrement( 100 );
 
 		if ( varOperand != 0 ) {
 			//increment the numOperand and allocate/reallocate the array
@@ -2968,9 +2427,9 @@ namespace EconomicTariff {
 			econVar( varMe ).lastOperand = numOperand;
 			//if it is the first time addOperand was called with the varMe value
 			//then set the first pointer as well
-			if ( varMe != prevVarMe ) {
+			if ( varMe != addOperand_prevVarMe ) {
 				econVar( varMe ).firstOperand = numOperand;
-				prevVarMe = varMe;
+				addOperand_prevVarMe = varMe;
 			}
 		}
 	}
@@ -2981,38 +2440,13 @@ namespace EconomicTariff {
 		int const curPointer
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Used by CreateDefaultComputation to create the "equation"
 		//   for the categories that are summations of ECONOMICS:CHARGES:BLOCK
 		//   and ECONOMICS:CHARGES:SIMPLE
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int kObj;
 
 		econVar( curPointer ).Operator = opSUM;
@@ -3044,45 +2478,17 @@ namespace EconomicTariff {
 	void
 	GatherForEconomics()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Gathers the data each timestep and updates the arrays
 		//   holding the data that will be used by the tariff
 		//   calculation.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
 		using DataGlobals::SecInHour;
 		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::Month;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int iTariff;
 		Real64 curInstantValue;
@@ -3189,39 +2595,14 @@ namespace EconomicTariff {
 		int const maxThreshold
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Simple function to check if an integer is equal to or between
 		//   two other values.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		bool isWithinRange;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( maxThreshold < minThreshold ) {
 			ShowWarningError( "UtilityCost: Invalid thresholds in IsWithinRange routine." );
 		}
@@ -3244,42 +2625,15 @@ namespace EconomicTariff {
 	void
 	ComputeTariff()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Perform the calculation steps to compute the monthly
 		//    utility bills for the user entered tariffs.
 		//    The list of steps for the tariff computation are in order
 		//    for stack based computation (reverse polish notation)
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
 		using OutputReportTabular::WriteTabularFiles;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 
 		// values used in specific operations
 		Array1D< Real64 > a( MaxNumMonths );
@@ -3653,13 +3007,9 @@ namespace EconomicTariff {
 		int const variablePointer
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    A stack is used in the evaluation of the tariff since
 		//    the variables and operators are in a reverse polish
 		//    notation order. The stack operates on a last-in
@@ -3667,32 +3017,12 @@ namespace EconomicTariff {
 		//    to the variable and the twelve monthly values.
 		//    This routine puts an item on the top of the stack.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::IntToStr;
 
-		// Argument array dimensioning
 		monthlyArray.dim( MaxNumMonths );
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D< Real64 > curMonthlyArray( MaxNumMonths );
-		static int sizeIncrement( 50 );
+		int const sizeIncrement( 50 );
 
 		curMonthlyArray = monthlyArray;
 		if ( ! allocated( stack ) ) {
@@ -3748,13 +3078,9 @@ namespace EconomicTariff {
 		int & variablePointer
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    A stack is used in the evaluation of the tariff since
 		//    the variables and operators are in a reverse polish
 		//    notation order. The stack operates on a last-in
@@ -3763,29 +3089,7 @@ namespace EconomicTariff {
 		//    This routine returns the item on the top of the stack
 		//    and removes it from the stack.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Argument array dimensioning
 		monthlyArray.dim( MaxNumMonths );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( topOfStack >= 1 ) {
 			variablePointer = stack( topOfStack ).varPt;
@@ -3802,34 +3106,9 @@ namespace EconomicTariff {
 	void
 	evaluateChargeSimple( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
 		int indexInChg;
 		Array1D< Real64 > sourceVals( MaxNumMonths );
@@ -3883,34 +3162,9 @@ namespace EconomicTariff {
 	void
 	evaluateChargeBlock( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
 		int indexInChg;
 		int iBlk;
@@ -4019,34 +3273,8 @@ namespace EconomicTariff {
 	void
 	evaluateRatchet( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int curTariff;
 		int indexInChg;
@@ -4169,34 +3397,8 @@ namespace EconomicTariff {
 	void
 	evaluateQualify( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int curTariff;
 		int indexInQual;
@@ -4337,38 +3539,12 @@ namespace EconomicTariff {
 	void
 	addMonthlyCharge( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Include the monthly charges in the calculations
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
-		//INTEGER :: iMonth
-		//INTEGER :: curTotalEnergy
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		//check the tariff - make sure they match
@@ -4394,35 +3570,11 @@ namespace EconomicTariff {
 	void
 	checkMinimumMonthlyCharge( int const curTariff )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   August 2008
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Check if the total is as big as the minimum monthly charge
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iMonth;
 		int totalVar;
 		int minMonVar;
@@ -4448,36 +3600,12 @@ namespace EconomicTariff {
 	void
 	setNativeVariables()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Set up the "built in" i.e. native variables that hold
 		//    the energy and demand from the simulation.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 		int jPeriod;
 		int kMonth;
@@ -4654,38 +3782,13 @@ namespace EconomicTariff {
 	void
 	LEEDtariffReporting()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   October 2012
-		//    MODIFIED
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Write the economic results for LEED reporting
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace OutputReportPredefined;
 
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int elecFacilMeter;
 		int gasFacilMeter;
 		Real64 elecTotalEne;
@@ -4776,21 +3879,11 @@ namespace EconomicTariff {
 	void
 	WriteTabularTariffReports()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
 		//    MODIFIED       January 2010, Kyle Benne
 		//                   Added SQLite output
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
@@ -4805,22 +3898,6 @@ namespace EconomicTariff {
 		using OutputReportTabular::unitsStyleInchPound;
 		using OutputReportTabular::displayTariffReport;
 		using OutputReportTabular::displayEconomicResultSummary;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
 		Array1D_string columnHead;
@@ -4840,10 +3917,10 @@ namespace EconomicTariff {
 		int iTariff;
 		int kVar;
 		int lStep;
-		static std::string SIunit;
-		static int unitConvIndex( 0 );
-		static Real64 perAreaUnitConv( 0.0 );
-		static std::string perAreaUnitName;
+		std::string SIunit;
+		int unitConvIndex( 0 );
+		Real64 perAreaUnitConv( 0.0 );
+		std::string perAreaUnitName;
 
 		// compute floor area if no ABUPS
 		if ( buildingConditionedFloorArea == 0.0 ) {
@@ -5215,35 +4292,11 @@ namespace EconomicTariff {
 	void
 	showWarningsBasedOnTotal()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Get the annual maximum and sum for the econVariable.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 
 		if ( numTariff > 0 ) {
@@ -5271,35 +4324,11 @@ namespace EconomicTariff {
 		Real64 & maxResult
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Get the annual maximum and sum for the econVariable.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 sumVal;
 		Real64 maximumVal( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
 		Real64 curVal;
@@ -5326,42 +4355,18 @@ namespace EconomicTariff {
 		std::string const & forString
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
 		//    MODIFIED       January 2010, Kyle Benne
 		//                   Added sqlite output
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Report all econVar that show as activeNow
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
 		using OutputReportTabular::RealToStr;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// The majority of the input is the econVar array
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
 		Array1D_string columnHead;
 		Array1D_int columnWidth;
@@ -5501,13 +4506,9 @@ namespace EconomicTariff {
 	void
 	selectTariff()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    To select tariffs for each combination of meter and
 		//    group.  If multipler tariffs have the same meter and
 		//    group, then select the one with the lowest cost.
@@ -5516,28 +4517,8 @@ namespace EconomicTariff {
 		//    Multiple meters are used but buy + sell might be more or
 		//    less expensive than netmeter.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputProcessor::EnergyMeters;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int totalVarPt;
 		int totEneVarPt;
 		Real64 annualTotal;
@@ -5739,41 +4720,14 @@ namespace EconomicTariff {
 		Array1A< Real64 > outMonthlyCosts
 	)
 	{
-
-		// FUNCTION INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   May 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
 		//  Return the total annual cost for a given resource number.
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 
 		// Argument array dimensioning
 		outMonthlyCosts.dim( 12 );
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 		int jMonth;
 		int totalVarPt;
@@ -5789,6 +4743,39 @@ namespace EconomicTariff {
 				}
 			}
 		}
+	}
+
+	void
+	clear_state()
+	{
+		numEconVar = 0;
+		sizeEconVar = 0;
+		operand.deallocate();
+		numOperand = 0;
+		sizeOperand = 0;
+		numTariff = 0;
+		numQualify = 0;
+		numChargeSimple = 0;
+		numChargeBlock = 0;
+		numRatchet = 0;
+		numComputation = 0;
+		steps.deallocate();
+		stepsCopy.deallocate();
+		numSteps = 0;
+		sizeSteps = 0;
+		topOfStack = 0;
+		sizeStack = 0;
+		econVar.deallocate();
+		tariff.deallocate();
+		qualify.deallocate();
+		chargeSimple.deallocate();
+		chargeBlock.deallocate();
+		ratchet.deallocate();
+		computation.deallocate();
+		stack.deallocate();
+		Update_GetInput = true;
+		addOperand_prevVarMe = 0;
+
 	}
 
 } // EconomicTariff
