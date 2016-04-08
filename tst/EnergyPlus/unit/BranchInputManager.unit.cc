@@ -224,7 +224,7 @@ namespace EnergyPlus {
 
 		BranchIndex = GetAirBranchIndex( CompType, CompName );
 
-		EXPECT_EQ( 1 , BranchIndex);
+		EXPECT_EQ( 1 , BranchIndex );
 
 		// Case 3 Find pipe
 		CompType = "PIPE:ADIABATIC";
@@ -233,7 +233,7 @@ namespace EnergyPlus {
 
 		BranchIndex = GetAirBranchIndex( CompType, CompName );
 
-		EXPECT_EQ(2, BranchIndex);
+		EXPECT_EQ( 2, BranchIndex );
 
 		// Case 4 Not found
 		CompType = "PIPE:ADIABATIC";
@@ -242,7 +242,7 @@ namespace EnergyPlus {
 
 		BranchIndex = GetAirBranchIndex( CompType, CompName );
 
-		EXPECT_EQ(0, BranchIndex);
+		EXPECT_EQ( 0, BranchIndex );
 
 	}
 }
