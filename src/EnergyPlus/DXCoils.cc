@@ -5434,7 +5434,7 @@ namespace DXCoils {
 		// na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FanElecPower;
+
 		using DataAirLoop::AirLoopInputsFilled;
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
@@ -5500,7 +5500,7 @@ namespace DXCoils {
 			HPWHInletWBTemp = DXCoil( DXCoilNum ).RatedInletWBTemp;
 			DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
 			//   get rated coil bypass factor excluding fan heat
-			FanElecPower = 0.0;
+
 			//   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
 			CalcHPWHDXCoil( DXCoilNum, 1.0 );
 			if ( MySizeFlag( DXCoilNum ) ) {
@@ -7086,7 +7086,6 @@ namespace DXCoils {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
-		using DataHVACGlobals::FanElecPower;
 		using DataHVACGlobals::HPWHInletDBTemp;
 		using DataHVACGlobals::HPWHInletWBTemp;
 		using DataHVACGlobals::DXCoilTotalCapacity;
@@ -7312,25 +7311,32 @@ namespace DXCoils {
 
 		HPRTF = min( 1.0, ( PartLoadRatio / PartLoadFraction ) );
 
+		Real64 locFanElecPower = 0.0;
+		if ( Coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ Coil.SupplyFanIndex ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( Coil.SupplyFanIndex );
+		}
+		
 		// calculate evaporator total cooling capacity
 		if ( HPRTF > 0.0 ) {
 			if ( Coil.FanPowerIncludedInCOP ) {
 				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF - Coil.HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF - Coil.HPWHCondPumpElecNomPower;
 					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
 				} else {
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF;
 					if ( ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower );
 				}
 			} else {
 				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
 					CompressorPower = OperatingHeatingPower - Coil.HPWHCondPumpElecNomPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF );
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + locFanElecPower / HPRTF );
 				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower );
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + locFanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower );
 				}
 			}
 		}

@@ -66834,15 +66834,16 @@ WaterHeater:HeatPump:PumpedCondenser,
   A22, \field Fan Object Type
        \required-field
        \type choice
+       \type Fan:SystemModel
        \key Fan:OnOff
        \default Fan:OnOff
        \note Specify the type of fan used by this heat pump water heater. The only
-       \note valid choice is Fan:OnOff.
+       \note valid choices are Fan:SystemModel or Fan:OnOff.
   A23, \field Fan Name
        \required-field
        \type object-list
        \object-list FansOnOff
-       \note Needs to match the name used in the corresponding Fan:OnOff object.
+       \note Needs to match the name used in the corresponding Fan:SystemModel or Fan:OnOff object.
   A24, \field Fan Placement
        \type choice
        \key BlowThrough
@@ -67084,14 +67085,15 @@ WaterHeater:HeatPump:WrappedCondenser,
        \required-field
        \type choice
        \key Fan:OnOff
+       \key Fan:SystemModel
        \default Fan:OnOff
        \note Specify the type of fan used by this heat pump water heater. The only
-       \note valid choice is Fan:OnOff.
+       \note valid choices are Fan:SystemModel or Fan:OnOff.
   A21, \field Fan Name
        \required-field
        \type object-list
        \object-list FansOnOff
-       \note Needs to match the name used in the corresponding Fan:OnOff object.
+       \note Needs to match the name used in the corresponding Fan:SystemModel or Fan:OnOff object.
   A22, \field Fan Placement
        \type choice
        \key BlowThrough
