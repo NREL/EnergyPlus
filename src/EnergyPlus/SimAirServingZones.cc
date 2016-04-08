@@ -850,11 +850,8 @@ namespace SimAirServingZones {
 				} // end of component loop
 
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).ControlType = "";
-//				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MinVolFlowRate = 0.0;
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNumIn = InletNodeNumbers( 1 );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNumOut = OutletNodeNumbers( NumCompsOnBranch );
-//				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MaxMassFlowRate = 0.0;
-//				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MinMassFlowRate = 0.0;
 
 				CompTypes.deallocate();
 				CompNames.deallocate();
@@ -1959,8 +1956,6 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // Start looping through all of the air loops...
 
 				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) { // loop over all branches in system
-//					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxMassFlowRate = StdRhoAir * PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate;
-//					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MinMassFlowRate = StdRhoAir * PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MinVolFlowRate;
 					for ( NodeIndex = 1; NodeIndex <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalNodes; ++NodeIndex ) { // loop over alll nodes on branch
 
 						NodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNum( NodeIndex );
@@ -3408,28 +3403,6 @@ namespace SimAirServingZones {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-//		if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate == AutoSize ) {
-//
-//			CheckSysSizing( "Branch", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Name );
-//
-//			{ auto const SELECT_CASE_var( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).DuctType );
-//			if ( SELECT_CASE_var == Main ) {
-//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-//			} else if ( SELECT_CASE_var == Cooling ) {
-//				// PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%MaxVolFlowRate = FinalSysSizing(AirLoopNum)%DesCoolVolFlow
-//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-//			} else if ( SELECT_CASE_var == Heating ) {
-//				// PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%MaxVolFlowRate = FinalSysSizing(AirLoopNum)%DesHeatVolFlow
-//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-//			} else if ( SELECT_CASE_var == Other ) {
-//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-//			} else {
-//				PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-//			}}
-//
-//			ReportSizingOutput( "Branch", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Name, "Maximum Flow Rate [m3/s]", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).MaxVolFlowRate );
-//
-//		}
 
 		if ( BranchNum == 1 ) {
 

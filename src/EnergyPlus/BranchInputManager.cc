@@ -399,7 +399,6 @@ namespace BranchInputManager {
 	GetBranchData(
 		std::string const & LoopName, // Loop Name of this Branch
 		std::string const & BranchName, // Requested Branch Name
-//		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -688,7 +687,6 @@ namespace BranchInputManager {
 	GetInternalBranchData(
 		std::string const & LoopName, // Loop Name for Branch
 		std::string const & BranchName, // Requested Branch Name
-//		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -743,12 +741,10 @@ namespace BranchInputManager {
 		if ( Found == 0 ) {
 			ShowSevereError( "GetInternalBranchData:  Branch not found=" + BranchName );
 			ErrorsFound = true;
-//			BranchMaxFlow = 0.0;
 			NumComps = 0;
 		} else {
 			if ( Branch( Found ).AssignedLoopName == BlankString ) {
 				Branch( Found ).AssignedLoopName = LoopName;
-//				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -762,10 +758,8 @@ namespace BranchInputManager {
 				ShowContinueError( "Branch already assigned to loop=" + Branch( Found ).AssignedLoopName );
 				ShowContinueError( "New attempt to assign to loop=" + LoopName );
 				ErrorsFound = true;
-//				BranchMaxFlow = 0.0;
 				NumComps = 0;
 			} else {
-//				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -982,7 +976,6 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-//		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1131,7 +1124,6 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-//		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -3099,10 +3091,6 @@ namespace BranchInputManager {
 					}
 				}
 				Branch( Found ).FluidType = BranchFluidType;
-//				if ( IsAirBranch && Branch( Found ).MaxFlowRate == 0.0 ) {
-//					ShowSevereError( "Branch=" + Branch( Found ).Name + " is an air branch with zero max flow rate." );
-//					ErrFound = true;
-//				}
 				BranchOutletNodeName = MatchNodeName;
 				if ( Branch( Found ).AssignedLoopName == BlankString ) {
 					BranchLoopName = "**Unknown**";

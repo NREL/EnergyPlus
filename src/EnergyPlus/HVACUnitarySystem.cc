@@ -2447,7 +2447,7 @@ namespace HVACUnitarySystem {
 			}
 		}
 
-//		Not sure if this may be needed for special cases
+		// Not sure if this may be needed for special cases
 		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 ) {
 			if ( ! SysSizingRunDone ) {
 				BranchNum = GetAirBranchIndex( "AirloopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name );
