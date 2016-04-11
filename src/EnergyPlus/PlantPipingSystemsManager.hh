@@ -95,7 +95,7 @@ namespace PlantPipingSystemsManager {
 	enum class RegionType { Pipe, BasementWall, BasementFloor, XDirection, YDirection, ZDirection, XSide, XSideWall, ZSide, ZSideWall, FloorInside, UnderFloor, HorizInsXSide, HorizInsZSide, VertInsLowerEdge };
 	enum class Direction { PositiveY, NegativeY, PositiveX, NegativeX, PositiveZ, NegativeZ };
 	enum class PartitionType { BasementWall, BasementFloor, Pipe, Slab, XSide, XSideWall, ZSide, ZSideWall, FloorInside, UnderFloor, HorizInsXSide, VertInsLowerEdge, HorizInsZSide };
-	enum class CellType { Unknown, Pipe, GeneralField, GroundSurface, FarfieldBoundary, BasementWall, BasementFloor, BasementCorner, BasementCutaway, Slab, HorizInsulation, VertInsulation, ZoneGroundInterface, BasementWallInsu, BasementFloorInsu, SlabOnGradeEdgeInsu };
+	enum class CellType { Unknown, Pipe, GeneralField, GroundSurface, FarfieldBoundary, BasementWall, BasementFloor, BasementCorner, BasementCutaway, Slab, HorizInsulation, VertInsulation, ZoneGroundInterface, SlabOnGradeEdgeInsu };
 
 	extern Array1D< Direction > NeighborFieldCells;
 	extern Array1D< Direction > NeighborBoundaryCells;

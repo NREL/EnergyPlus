@@ -4860,9 +4860,6 @@ namespace PlantPipingSystemsManager {
 						// it's ok to not simulate this one
 						break;
 					case CellType::Unknown:
-					case CellType::BasementWallInsu:
-					case CellType::BasementFloorInsu:
-						// these weren't handled before.......should they be?
 						assert(false);
 					}
 
