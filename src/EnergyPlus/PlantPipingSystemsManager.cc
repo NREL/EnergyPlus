@@ -2546,14 +2546,13 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
 		Real64 LocalMax( 0.0 );
-		auto const & cells( PipingSystemDomains( DomainNum ).Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
-					LocalMax = max( LocalMax, std::abs( cells( X, Y, Z ).MyBase.Temperature - cells( X, Y, Z ).MyBase.Temperature_PrevIteration ) );
+		auto const & dom( PipingSystemDomains( DomainNum ) );
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+					auto const & cell( dom.Cells( X, Y, Z ) );
+					LocalMax = max( LocalMax, std::abs( cell.MyBase.Temperature - cell.MyBase.Temperature_PrevIteration ) );
 				}
 			}
 		}
@@ -2616,11 +2615,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		auto & cells( PipingSystemDomains( DomainNum ).Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
-					auto & cell( cells( X, Y, Z ) );
+		auto & dom( PipingSystemDomains( DomainNum ) );
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+					auto & cell( dom.Cells( X, Y, Z ) );
 
 					cell.MyBase.Temperature_PrevTimeStep = cell.MyBase.Temperature;
 
@@ -2657,11 +2656,11 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 
-		auto & cells( PipingSystemDomains( DomainNum ).Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
-					auto & cell( cells( X, Y, Z ) );
+		auto & dom( PipingSystemDomains( DomainNum ) );
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+					auto & cell( dom.Cells( X, Y, Z ) );
 
 					cell.MyBase.Temperature_PrevIteration = cell.MyBase.Temperature;
 
@@ -3979,7 +3978,10 @@ namespace PlantPipingSystemsManager {
 		//'subtract 2 in each dimension:
 		//'     one for zero based array
 		//'     one because the boundary points contain one entry more than the number of cells WITHIN the domain
-		this->Cells.allocate( {0,isize( XBoundaryPoints )-2}, {0,isize( YBoundaryPoints )-2}, {0,isize( ZBoundaryPoints )-2} );
+		this->x_max_index = isize( XBoundaryPoints )-2;
+		this->y_max_index = isize( YBoundaryPoints )-2;
+		this->z_max_index = isize( ZBoundaryPoints )-2;
+		this->Cells.allocate( {0,this->x_max_index}, {0,this->y_max_index}, {0,this->z_max_index} );
 
 		int MaxBasementXNodeIndex = this->BasementZone.BasementWallXIndex;
 		int MinBasementYNodeIndex = this->BasementZone.BasementFloorYIndex;
@@ -3994,9 +3996,9 @@ namespace PlantPipingSystemsManager {
 		int InsulationZIndex = this->InsulationZIndex;
 
 		auto & cells( this->Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = this->x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
 					//if ( X == X_end ) {
@@ -4047,12 +4049,12 @@ namespace PlantPipingSystemsManager {
 
 					// For zone-coupled ground domain
 					if ( this->HasZoneCoupledSlab ) {
-						if ( CellYIndex == cells.l2() ) { // Farfield cells
+						if ( CellYIndex == 0 ) { // Farfield cells
 							cellType = CellType::FarfieldBoundary;
 						} else if ( CellXIndex > MinXIndex && CellZIndex > MinZIndex ) { // Slab cells
-							if ( CellYIndex < cells.u2() && CellYIndex > YIndex ) { // General slab cells
+							if ( CellYIndex < this->y_max_index && CellYIndex > YIndex ) { // General slab cells
 								cellType = CellType::Slab;
-							} else if ( CellYIndex == cells.u2() ) { // Surface cells
+							} else if ( CellYIndex == this->y_max_index ) { // Surface cells
 								cellType = CellType::ZoneGroundInterface;
 							} else if ( CellYIndex == YIndex ) { // Underslab insulation cells
 								// Check if horizontal insulation present
@@ -4071,11 +4073,11 @@ namespace PlantPipingSystemsManager {
 						} else if ( CellXIndex == MinXIndex &&  CellZIndex > MinZIndex ) { // X side interface
 							// Check if vertical insulation present
 							if ( this->VertInsPresentFlag ) {
-								if ( CellYIndex <= cells.u2() && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
+								if ( CellYIndex <= this->y_max_index && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
 									cellType = CellType::VertInsulation;
 									++NumInsulationCells;
 								}
-							} else if ( CellYIndex == cells.u2() ) {
+							} else if ( CellYIndex == this->y_max_index ) {
 								cellType = CellType::GroundSurface;
 								++NumGroundSurfaceCells;
 							}
@@ -4086,11 +4088,11 @@ namespace PlantPipingSystemsManager {
 							}
 						} else if ( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ) { // Z side interface
 							if ( this->VertInsPresentFlag ) { // Check if vertical insulation present
-								if ( CellYIndex <= cells.u2() && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
+								if ( CellYIndex <= this->y_max_index && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
 									cellType = CellType::VertInsulation;
 									++NumInsulationCells;
 								}
-							} else if ( CellYIndex == cells.u2() ) {
+							} else if ( CellYIndex == this->y_max_index ) {
 								cellType = CellType::GroundSurface;
 								++NumGroundSurfaceCells;
 							}
@@ -4099,18 +4101,18 @@ namespace PlantPipingSystemsManager {
 									cellType = CellType::SlabOnGradeEdgeInsu;
 								}
 							}
-						} else if ( CellYIndex == cells.u2() ) { // Surface cells
+						} else if ( CellYIndex == this->y_max_index ) { // Surface cells
 							cellType = CellType::GroundSurface;
 							++NumGroundSurfaceCells;
-						} else if ( CellYIndex == cells.l2() || CellXIndex == cells.l1() || CellZIndex == cells.l3() ) { // Farfield boundary
+						} else if ( CellYIndex == 0 || CellXIndex == 0 || CellZIndex == 0 ) { // Farfield boundary
 							cellType = CellType::FarfieldBoundary;
 						}
 					} else if ( this->HasZoneCoupledBasement ) { // basement model, zone-coupled
 						// Set the appropriate cell type
-						if ( CellYIndex == cells.l2() ) { // Farfield cells
+						if ( CellYIndex == 0 ) { // Farfield cells
 							cellType = CellType::FarfieldBoundary;
 						} else if ( CellXIndex > XWallIndex && CellZIndex > ZWallIndex ) { // Basement cutaway
-							if ( CellYIndex <= cells.u2() && CellYIndex > YFloorIndex ) { // General basement cells
+							if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) { // General basement cells
 								cellType = CellType::BasementCutaway;
 								// Not counting basement cutaway cells.
 							} else if ( CellYIndex == YFloorIndex ) { //Basement Floor cells
@@ -4130,30 +4132,30 @@ namespace PlantPipingSystemsManager {
 								}
 							}
 						} else if ( ( CellXIndex == XWallIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == ZWallIndex && CellXIndex > XWallIndex ) ) { // Basement Walls
-							if ( CellYIndex <= cells.u2() && CellYIndex > YFloorIndex ) {
+							if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) {
 								cellType = CellType::BasementWall;
 							}
 						} else if ( ( CellXIndex == MinXIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == MinZIndex && CellXIndex > XWallIndex ) ) { // Insulation cells
-							if ( CellYIndex <= cells.u2() && CellYIndex > YFloorIndex ) {
+							if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) {
 								// Check if vertical insulation present
 								if ( this->VertInsPresentFlag ) {
 									if ( InsulationYIndex != 0 ) { // Partial vertical insulation
-										if ( CellYIndex <= cells.u2() && CellYIndex > InsulationYIndex ) {
+										if ( CellYIndex <= this->y_max_index && CellYIndex > InsulationYIndex ) {
 											cellType = CellType::VertInsulation;
 											++NumInsulationCells;
 										}
 									} else { //Vertical insulation extends to depth of basement floor
-										if ( CellYIndex <= cells.u2() && CellYIndex > YFloorIndex ) {
+										if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) {
 											cellType = CellType::VertInsulation;
 											++NumInsulationCells;
 										}
 									}
 								}
 							}
-						} else if ( CellYIndex == cells.u2() ) { // Surface cells
+						} else if ( CellYIndex == this->y_max_index ) { // Surface cells
 							cellType = CellType::GroundSurface;
 							++NumGroundSurfaceCells;
-						} else if ( CellYIndex == cells.l2() || CellXIndex == cells.l1() || CellZIndex == cells.l3() ) { // Farfield boundary
+						} else if ( CellYIndex == 0 || CellXIndex == 0 || CellZIndex == 0 ) { // Farfield boundary
 							cellType = CellType::FarfieldBoundary;
 						}
 					} else if ( CellXIndex == MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex ) {
@@ -4295,9 +4297,9 @@ namespace PlantPipingSystemsManager {
 		bool DoingBESTEST = false;
 
 		auto const & cells( this->Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = this->x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z ) {
 					auto const & cell( cells( X, Y, Z ) );
 
 					//'for convenience
@@ -4320,7 +4322,7 @@ namespace PlantPipingSystemsManager {
 						}
 						this->addNeighborInformation( X, Y, Z, Direction::PositiveX, CellRightCentroidX - ThisCellCentroidX, CellRightLeftWallX - ThisCellCentroidX, CellRightCentroidX - CellRightLeftWallX, ThisAdiabaticMultiplier );
 						this->addNeighborInformation( X, Y, Z, Direction::NegativeX, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror );
-					} else if ( X == cells.u1() ) {
+					} else if ( X == this->x_max_index ) {
 						// on the X=XMAX face, the adiabatic cases are:
 						//   1) if we are doing a zone coupled slab/basement simulation where we quartered the domain
 						//   2) if we are doing a special BESTEST build where the farfield is actually adiabatic
@@ -4353,7 +4355,7 @@ namespace PlantPipingSystemsManager {
 						//   1) NONE
 						this->addNeighborInformation( X, Y, Z, Direction::PositiveY, UpperCellCentroidY - ThisCellCentroidY, UpperCellLowerWallY - ThisCellCentroidY, UpperCellCentroidY - UpperCellLowerWallY, ThisAdiabaticMultiplier );
 						this->addNeighborInformation( X, Y, Z, Direction::NegativeY, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror );
-					} else if ( Y == cells.u2() ) {
+					} else if ( Y == this->y_max_index ) {
 						LowerCellCentroidY = cells( X, Y - 1, Z ).Centroid.Y;
 						LowerCellUpperWallY = cells( X, Y - 1, Z ).Y_max;
 						// on the Y=YMAX face, the only adiabatic cases are:
@@ -4386,7 +4388,7 @@ namespace PlantPipingSystemsManager {
 						}
 						this->addNeighborInformation( X, Y, Z, Direction::PositiveZ, UpperZCellCentroidZ - ThisCellCentroidZ, UpperZCellLowerWallZ - ThisCellCentroidZ, UpperZCellCentroidZ - UpperZCellLowerWallZ, ThisAdiabaticMultiplier );
 						this->addNeighborInformation( X, Y, Z, Direction::NegativeZ, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror );
-					} else if ( Z == cells.u3() ) {
+					} else if ( Z == this->z_max_index ) {
 						LowerZCellCentroidZ = cells( X, Y, Z - 1 ).Centroid.Z;
 						LowerZCellUpperWallZ = cells( X, Y, Z - 1 ).Z_max;
 						// on the Z=ZMAX face, the only adiabatic cases are:
@@ -4531,12 +4533,12 @@ namespace PlantPipingSystemsManager {
 					SegmentInletCellZ = 0;
 					SegmentOutletCellX = Segment.PipeCellCoordinates.X;
 					SegmentOutletCellY = Segment.PipeCellCoordinates.Y;
-					SegmentOutletCellZ = cells.u3();
+					SegmentOutletCellZ = this->z_max_index;
 					break;
 				case SegmentFlow::DecreasingZ:
 					SegmentInletCellX = Segment.PipeCellCoordinates.X;
 					SegmentInletCellY = Segment.PipeCellCoordinates.Y;
-					SegmentInletCellZ = cells.u3();
+					SegmentInletCellZ = this->z_max_index;
 					SegmentOutletCellX = Segment.PipeCellCoordinates.X;
 					SegmentOutletCellY = Segment.PipeCellCoordinates.Y;
 					SegmentOutletCellZ = 0;
@@ -4820,11 +4822,11 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		auto & cells( PipingSystemDomains( DomainNum ).Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
-					auto & cell( cells( X, Y, Z ) );
+		auto & dom( PipingSystemDomains( DomainNum ) );
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+					auto & cell( dom.Cells( X, Y, Z ) );
 
 					switch ( cell.cellType ) {
 					case CellType::Pipe:
@@ -5728,9 +5730,9 @@ namespace PlantPipingSystemsManager {
 		int NumCells = 0;
 
 		auto const & cells( Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = this->x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z ) {
 					auto const & cell( cells( X, Y, Z ) );
 					if ( cell.cellType == cellType ) {
 						Real64 CellVolume = cell.volume();
@@ -5890,7 +5892,8 @@ namespace PlantPipingSystemsManager {
 		int EndingSegment = PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces.u1();
 
 		//'loop across all segments (pipes) of the circuit
-		auto & cells( PipingSystemDomains( DomainNum ).Cells );
+		auto & dom( PipingSystemDomains( DomainNum ) );
+		auto & cells( dom.Cells );
 		for ( int SegmentCtr = StartingSegment; SegmentCtr <= EndingSegment; ++SegmentCtr ) {
 
 			int SegmentIndex = PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegmentCtr );
@@ -5902,11 +5905,11 @@ namespace PlantPipingSystemsManager {
 			switch ( PipingSystemSegments( SegmentIndex ).FlowDirection ) {
 			case SegmentFlow::IncreasingZ:
 				StartingZ = 0;
-				EndingZ = cells.u3();
+				EndingZ = dom.z_max_index;
 				Increment = 1;
 				break;
 			case SegmentFlow::DecreasingZ:
-				StartingZ = cells.u3();
+				StartingZ = dom.z_max_index;
 				EndingZ = 0;
 				Increment = -1;
 				break;
@@ -6463,10 +6466,11 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		//'initialize cell properties
-		auto & cells( PipingSystemDomains( DomainNum ).Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		auto & dom( PipingSystemDomains( DomainNum ) );
+		auto & cells( dom.Cells );
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
 					{ auto const SELECT_CASE_var( cell.cellType );
@@ -6504,9 +6508,9 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'calculate one-time resistance terms for cartesian cells
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
 					auto const & cell( cells( X, Y, Z ) );
 					int NumFieldCells = 0, NumBoundaryCells = 0;
 					EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
@@ -6541,11 +6545,11 @@ namespace PlantPipingSystemsManager {
 					switch ( PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).FlowDirection ) {
 					case SegmentFlow::IncreasingZ:
 						StartingZ = 0;
-						EndingZ = cells.u3();
+						EndingZ = dom.z_max_index;
 						Increment = 1;
 						break;
 					case SegmentFlow::DecreasingZ:
-						StartingZ = cells.u3();
+						StartingZ = dom.z_max_index;
 						EndingZ = 0;
 						Increment = -1;
 						break;
@@ -6568,9 +6572,9 @@ namespace PlantPipingSystemsManager {
 		PipingSystemDomains( DomainNum ).InitializeSoilMoistureCalcs();
 
 		//'we can also initialize the domain based on the farfield temperature here
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
 					// On OneTimeInit, the cur sim time should be zero, so this will be OK
@@ -6655,10 +6659,11 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'now update cell properties
-		auto & cells( PipingSystemDomains( DomainNum ).Cells );
-		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
-			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
-				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
+		auto & dom( PipingSystemDomains( DomainNum ) );
+		auto & cells( dom.Cells );
+		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
 					{ auto const SELECT_CASE_var( cell.cellType );
@@ -7011,78 +7016,63 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int const TotalNumDimensions( 6 );
-
-		auto const & cells( PipingSystemDomains( DomainNum ).Cells );
-		int Xmax = cells.u1();
-		int Ymax = cells.u2();
-		int Zmax = cells.u3();
+		auto const & dom( PipingSystemDomains( DomainNum ) );
+		int Xmax = dom.x_max_index;
+		int Ymax = dom.y_max_index;
+		int Zmax = dom.z_max_index;
 		int Xindex = cell.X_index;
 		int Yindex = cell.Y_index;
 		int Zindex = cell.Z_index;
-		// Initialize the counters
 
 		NumFieldCells = 0;
 		NumBoundaryCells = 0;
 
-		// First get the count for each array
-		if ( Xindex < Xmax ) ++NumFieldCells;
-		if ( Xindex > 0 ) ++NumFieldCells;
-		if ( Yindex < Ymax ) ++NumFieldCells;
-		if ( Yindex > 0 ) ++NumFieldCells;
-		if ( Zindex < Zmax ) ++NumFieldCells;
-		if ( Zindex > 0 ) ++NumFieldCells;
-		NumBoundaryCells = TotalNumDimensions - NumFieldCells;
-
-		// Then add to each array appropriately
-		int FieldCellCtr = 0;
-		int BoundaryCellCtr = 0;
 		if ( Xindex < Xmax ) {
-			++FieldCellCtr;
-			NeighborFieldCells( FieldCellCtr ) = Direction::PositiveX;
+			++NumFieldCells;
+			NeighborFieldCells( NumFieldCells ) = Direction::PositiveX;
 		} else {
-			++BoundaryCellCtr;
-			NeighborBoundaryCells( BoundaryCellCtr ) = Direction::PositiveX;
+			++NumBoundaryCells;
+			NeighborBoundaryCells( NumBoundaryCells ) = Direction::PositiveX;
 		}
 
 		if ( Xindex > 0 ) {
-			++FieldCellCtr;
-			NeighborFieldCells( FieldCellCtr ) = Direction::NegativeX;
+			++NumFieldCells;
+			NeighborFieldCells( NumFieldCells ) = Direction::NegativeX;
 		} else {
-			++BoundaryCellCtr;
-			NeighborBoundaryCells( BoundaryCellCtr ) = Direction::NegativeX;
+			++NumBoundaryCells;
+			NeighborBoundaryCells( NumBoundaryCells ) = Direction::NegativeX;
 		}
 
 		if ( Yindex < Ymax ) {
-			++FieldCellCtr;
-			NeighborFieldCells( FieldCellCtr ) = Direction::PositiveY;
+			++NumFieldCells;
+			NeighborFieldCells( NumFieldCells ) = Direction::PositiveY;
 		} else {
-			++BoundaryCellCtr;
-			NeighborBoundaryCells( BoundaryCellCtr ) = Direction::PositiveY;
+			++NumBoundaryCells;
+			NeighborBoundaryCells( NumBoundaryCells ) = Direction::PositiveY;
 		}
 
 		if ( Yindex > 0 ) {
-			++FieldCellCtr;
-			NeighborFieldCells( FieldCellCtr ) = Direction::NegativeY;
+			++NumFieldCells;
+			NeighborFieldCells( NumFieldCells ) = Direction::NegativeY;
 		} else {
-			++BoundaryCellCtr;
-			NeighborBoundaryCells( BoundaryCellCtr ) = Direction::NegativeY;
+			++NumBoundaryCells;
+			NeighborBoundaryCells( NumBoundaryCells ) = Direction::NegativeY;
 		}
 
 		if ( Zindex < Zmax ) {
-			++FieldCellCtr;
-			NeighborFieldCells( FieldCellCtr ) = Direction::PositiveZ;
+			++NumFieldCells;
+			NeighborFieldCells( NumFieldCells ) = Direction::PositiveZ;
 		} else {
-			++BoundaryCellCtr;
-			NeighborBoundaryCells( BoundaryCellCtr ) = Direction::PositiveZ;
+			++NumBoundaryCells;
+			NeighborBoundaryCells( NumBoundaryCells ) = Direction::PositiveZ;
 		}
 
 		if ( Zindex > 0 ) {
-			++FieldCellCtr;
-			NeighborFieldCells( FieldCellCtr ) = Direction::NegativeZ;
+			++NumFieldCells;
+			NeighborFieldCells( NumFieldCells ) = Direction::NegativeZ;
 		} else {
-			++BoundaryCellCtr;
-			NeighborBoundaryCells( BoundaryCellCtr ) = Direction::NegativeZ;
+			++NumBoundaryCells;
+			NeighborBoundaryCells( NumBoundaryCells ) = Direction::NegativeZ;
 		}
 
 	}

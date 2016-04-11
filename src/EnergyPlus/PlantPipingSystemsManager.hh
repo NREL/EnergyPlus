@@ -976,6 +976,9 @@ namespace PlantPipingSystemsManager {
 		Real64 XIndex;
 		Real64 YIndex;
 		Real64 ZIndex;
+		int x_max_index;
+		int y_max_index;
+		int z_max_index;
 		bool HorizInsPresentFlag;
 		int HorizInsMaterialNum;
 		Real64 HorizInsThickness;
@@ -1067,6 +1070,9 @@ namespace PlantPipingSystemsManager {
 			XIndex( 0 ),
 			YIndex( 0 ),
 			ZIndex( 0 ),
+			x_max_index( 0 ),
+			y_max_index( 0 ),
+			z_max_index( 0 ),
 			HorizInsPresentFlag( false ),
 			HorizInsMaterialNum( 0 ),
 			HorizInsThickness( 0.0254 ),
