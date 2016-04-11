@@ -5733,7 +5733,11 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		// track fan power per terminal unit for calculating COP
-		VRFTU( VRFTUNum ).FanPower = FanElecPower;
+		if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			VRFTU( VRFTUNum ).FanPower = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->fanPower();
+		} else {
+			VRFTU( VRFTUNum ).FanPower = Fans::GetFanPower( VRFTU( VRFTUNum ).FanIndex );
+		}
 
 		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
 		MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
@@ -8950,7 +8954,11 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		// track fan power per terminal unit for calculating COP
-		VRFTU( VRFTUNum ).FanPower = FanElecPower;
+		if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			VRFTU( VRFTUNum ).FanPower = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->fanPower();
+		} else {
+			VRFTU( VRFTUNum ).FanPower = Fans::GetFanPower( VRFTU( VRFTUNum ).FanIndex );
+		}
 
 		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
 		MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );

@@ -140,7 +140,7 @@ namespace VentilatedSlab {
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataHeatBalFanSys::QRadSysSource;
-	using DataHVACGlobals::FanElecPower;
+//	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 
@@ -2244,7 +2244,7 @@ namespace VentilatedSlab {
 
 		// FLOW:
 
-		FanElecPower = 0.0;
+//		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -2794,7 +2794,9 @@ namespace VentilatedSlab {
 
 		// Resimulate fans if AirMassFlow is zero and FanElecPower is > 0, indicating that load or condensation controls shut off the ventilated slab in CalcVentilatedSlabRadComps
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
-		if ( ( AirMassFlow <= 0.0 ) && ( FanElecPower > 0.0 ) ) {
+		Real64 locFanElecPower = 0.0;
+		locFanElecPower = Fans::GetFanPower( VentSlab( Item ).Fan_Index );
+		if ( ( AirMassFlow <= 0.0 ) && ( locFanElecPower > 0.0 ) ) {
 			Node( MixoutNode ).MassFlowRate = 0.0;
 			Node( MixoutNode ).MassFlowRateMaxAvail = 0.0;
 			Node( MixoutNode ).MassFlowRateMinAvail = 0.0;
@@ -2998,7 +3000,7 @@ namespace VentilatedSlab {
 		VentSlab( Item ).SensCoolCoilPower = std::abs( min( 0.0, QUnitOut ) );
 		VentSlab( Item ).TotCoolCoilPower = std::abs( min( 0.0, QTotUnitOut ) );
 		VentSlab( Item ).LateCoolCoilPower = VentSlab( Item ).TotCoolCoilPower - VentSlab( Item ).SensCoolCoilPower;
-		VentSlab( Item ).ElecFanPower = FanElecPower;
+		VentSlab( Item ).ElecFanPower = Fans::GetFanPower( VentSlab( Item ).Fan_Index );
 		VentSlab( Item ).AirMassFlowRate = AirMassFlow;
 
 		SpecHumOut = Node( OutletNode ).HumRat;

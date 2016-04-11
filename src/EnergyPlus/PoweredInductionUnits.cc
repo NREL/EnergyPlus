@@ -136,7 +136,6 @@ namespace PoweredInductionUnits {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallTempDiff;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::SingleCoolingSetPoint;
@@ -1407,7 +1406,6 @@ namespace PoweredInductionUnits {
 
 		// FLOW
 
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlOffset = PIU( PIUNum ).HotControlOffset;
 		OutletNode = PIU( PIUNum ).OutAirNode;
@@ -1651,7 +1649,6 @@ namespace PoweredInductionUnits {
 
 		// FLOW
 
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlOffset = PIU( PIUNum ).HotControlOffset;
 		OutletNode = PIU( PIUNum ).OutAirNode;

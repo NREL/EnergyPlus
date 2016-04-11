@@ -11070,6 +11070,13 @@ namespace HVACUnitarySystem {
 			}
 		}
 
+		Real64 locFanElecPower = 0.0;
+		if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( UnitarySystem( UnitarySysNum ).FanIndex );
+		}
+
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num );
 
 		if ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) {
@@ -11093,7 +11100,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingAuxElecConsumption += UnitarySystem( UnitarySysNum ).AncillaryOffPower * ( 1.0 - CompPartLoadFrac ) * ReportingConstant;
 
 			}
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else if ( SELECT_CASE_var == Coil_CoolingWater || SELECT_CASE_var == Coil_CoolingWaterDetailed ) {
@@ -11103,7 +11110,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).SpeedRatio = max( UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio );
 				UnitarySystem( UnitarySysNum ).SpeedNum = max( UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).HeatingSpeedNum );
 			}
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else {
@@ -11127,14 +11134,14 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingAuxElecConsumption += UnitarySystem( UnitarySysNum ).AncillaryOffPower * ( 1.0 - CompPartLoadFrac ) * ReportingConstant;
 
 			}
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else if ( ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) || ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) ) {
 			UnitarySystem( UnitarySysNum ).CycRatio = max( UnitarySystem( UnitarySysNum ).CoolingCycRatio, UnitarySystem( UnitarySysNum ).HeatingCycRatio );
 			UnitarySystem( UnitarySysNum ).SpeedRatio = max( UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio );
 
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else {

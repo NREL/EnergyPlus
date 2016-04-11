@@ -139,7 +139,6 @@ namespace OutdoorAirUnit {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallLoad;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -1452,7 +1451,6 @@ namespace OutdoorAirUnit {
 
 		// FLOW:
 
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;

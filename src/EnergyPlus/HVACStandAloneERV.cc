@@ -1598,7 +1598,7 @@ namespace HVACStandAloneERV {
 
 		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, FirstHVACIteration, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-			StandAloneERV( StandAloneERVNum ).ElecUseRate += FanElecPower; // ugly global here
+			StandAloneERV( StandAloneERVNum ).ElecUseRate += Fans::GetFanPower( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
 		} else {
 			HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->simulate( _,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 			StandAloneERV( StandAloneERVNum ).ElecUseRate += HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->fanPower();
@@ -1606,7 +1606,7 @@ namespace HVACStandAloneERV {
 
 		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject ){
 			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, FirstHVACIteration, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ); // why no Turn on off flags here?
-			StandAloneERV( StandAloneERVNum ).ElecUseRate += FanElecPower;
+			StandAloneERV( StandAloneERVNum ).ElecUseRate += Fans::GetFanPower( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
 		} else {
 			HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->simulate( _,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 			StandAloneERV( StandAloneERVNum ).ElecUseRate += HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->fanPower();

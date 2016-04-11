@@ -1672,12 +1672,17 @@ namespace WaterThermalTanks {
 							HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( HPWH.FanName ) ); // call constructor
 							HPWH.FanNum = HVACFan::getFanObjectVectorIndex( HPWH.FanName );
 							FanVolFlow = HVACFan::fanObjs[ HPWH.FanNum ]->designAirVolFlowRate();
+
 						} else {
 							GetFanType( HPWH.FanName, HPWH.FanType_Num, errFlag, cCurrentModuleObject, HPWH.Name );
 							GetFanIndex( HPWH.FanName, HPWH.FanNum, errFlag, cCurrentModuleObject );
 							GetFanVolFlow( HPWH.FanNum, FanVolFlow );
 						}
 
+					}
+					if ( bIsVScoil == true ) {
+						VariableSpeedCoils::setVarSpeedHPWHFanTypeNum( HPWH.DXCoilNum, HPWH.FanType_Num );
+						VariableSpeedCoils::setVarSpeedHPWHFanIndex( HPWH.DXCoilNum, HPWH.FanNum );
 					}
 
 					if ( errFlag ) {

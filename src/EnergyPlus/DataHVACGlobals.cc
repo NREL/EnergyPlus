@@ -340,7 +340,6 @@ namespace DataHVACGlobals {
 	int NumElecCircuits( 0 ); // Number of electric circuits specified in simulation
 	int NumGasMeters( 0 ); // Number of gas meters specified in simulation
 	int NumPrimaryAirSys( 0 ); // Number of primary HVAC air systems
-	Real64 FanElecPower( 0.0 ); // fan power from last fan simulation
 	Real64 OnOffFanPartLoadFraction( 1.0 ); // fan part-load fraction (Fan:OnOff)
 	Real64 DXCoilTotalCapacity( 0.0 ); // DX coil total cooling capacity (eio report var for HPWHs)
 	Real64 DXElecCoolingPower( 0.0 ); // Electric power consumed by DX cooling coil last DX simulation
@@ -538,7 +537,6 @@ namespace DataHVACGlobals {
 		NumElecCircuits = 0;
 		NumGasMeters = 0;
 		NumPrimaryAirSys = 0;
-		FanElecPower = 0.0;
 		OnOffFanPartLoadFraction = 1.0;
 		DXCoilTotalCapacity = 0.0;
 		DXElecCoolingPower = 0.0;

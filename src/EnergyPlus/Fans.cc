@@ -2533,7 +2533,6 @@ namespace Fans {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::FanElecPower;
 		using DataAirLoop::LoopOnOffFanRTF;
 		using DataGlobals::SecInHour;
 
@@ -2554,7 +2553,6 @@ namespace Fans {
 
 		Fan( FanNum ).FanEnergy = Fan( FanNum ).FanPower * TimeStepSys * SecInHour;
 		Fan( FanNum ).DeltaTemp = Fan( FanNum ).OutletAirTemp - Fan( FanNum ).InletAirTemp;
-		FanElecPower = Fan( FanNum ).FanPower; // ugly global here
 
 		if ( Fan( FanNum ).FanType_Num == FanType_SimpleOnOff ) {
 			LoopOnOffFanRTF = Fan( FanNum ).FanRuntimeFraction;
