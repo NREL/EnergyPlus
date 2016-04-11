@@ -60,6 +60,7 @@
 #define PlantPipingSystemsManager_hh_INCLUDED
 
 // C++ Headers
+#include <map>
 #include <memory>
 
 // ObjexxFCL Headers
@@ -481,22 +482,11 @@ namespace PlantPipingSystemsManager {
 		Real64 ThisWallToNeighborCentroid;
 		Real64 ConductionResistance;
 		Real64 adiabaticMultiplier;
+		Direction direction;
 		Point3DInteger NeighborCellIndeces;
 
 		// Default Constructor
 		NeighborInformation() : adiabaticMultiplier( 1.0 )
-		{}
-
-	};
-
-	struct DirectionNeighbor_Dictionary
-	{
-		// Members
-		Direction direction;
-		NeighborInformation Value;
-
-		// Default Constructor
-		DirectionNeighbor_Dictionary()
 		{}
 
 	};
@@ -517,7 +507,7 @@ namespace PlantPipingSystemsManager {
 		Point3DReal Centroid;
 		CellType cellType;
 		int PipeIndex;
-		Array1D< DirectionNeighbor_Dictionary > NeighborInformation;
+		std::map< Direction, NeighborInformation > NeighborInfo;
 		CartesianPipeCellInformation PipeCellData;
 
 		// Default Constructor
@@ -1434,12 +1424,6 @@ namespace PlantPipingSystemsManager {
 	bool
 	CheckForOutOfRangeTemps( int const DomainNum );
 
-	NeighborInformation
-	NeighborInformationArray_Value(
-		Array1D< DirectionNeighbor_Dictionary > const & dict,
-		int const Direction // From Enum: Direction
-	);
-
 	int
 	CreateRegionListCount(
 		Array1D< GridRegion > const & ThesePartitionRegions,
@@ -1511,7 +1495,7 @@ namespace PlantPipingSystemsManager {
 	void
 	EvaluateFarfieldCharacteristics(
 		int const DomainNum,
-		CartesianCell const & cell,
+		CartesianCell & cell,
 		Direction const direction,
 		Real64 & neighbortemp,
 		Real64 & resistance,
@@ -1625,7 +1609,7 @@ namespace PlantPipingSystemsManager {
 	void
 	EvaluateNeighborCharacteristics(
 		int const DomainNum,
-		CartesianCell const & ThisCell,
+		CartesianCell & ThisCell,
 		Direction const CurDirection,
 		Real64 & NeighborTemp,
 		Real64 & Resistance,

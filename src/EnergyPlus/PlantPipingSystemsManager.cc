@@ -2762,28 +2762,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-	NeighborInformation
-	NeighborInformationArray_Value(
-		Array1D< DirectionNeighbor_Dictionary > const & dict,
-		Direction const direction
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		for ( int Index = dict.l1(), Index_end = dict.u1(); Index <= Index_end; ++Index ) {
-			if ( dict( Index ).direction == direction ) {
-				return dict( Index ).Value;
-			}
-		}
-		assert( false );
-
-	}
-
 	void
 	CartesianPipeCellInformation::ctor(
 		CartesianPipeCellInformation & c,
@@ -4467,30 +4445,18 @@ namespace PlantPipingSystemsManager {
 		Real64 const ThisAdiabaticMultiplier
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   Summer 2011
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PrevUBound;
-
-		auto & cell( this->Cells( X, Y, Z ) );
-		if ( ! allocated( cell.NeighborInformation ) ) {
-			cell.NeighborInformation.allocate( {0,0} );
-			PrevUBound = -1;
-		} else {
-			PrevUBound = cell.NeighborInformation.u1();
-			cell.NeighborInformation.redimension( {0,PrevUBound + 1} );
-		}
-
-		cell.NeighborInformation( PrevUBound + 1 ).direction = direction;
-		cell.NeighborInformation( PrevUBound + 1 ).Value.ThisCentroidToNeighborCentroid = ThisCentroidToNeighborCentroid;
-		cell.NeighborInformation( PrevUBound + 1 ).Value.ThisCentroidToNeighborWall = ThisCentroidToNeighborWall;
-		cell.NeighborInformation( PrevUBound + 1 ).Value.ThisWallToNeighborCentroid = ThisWallToNeighborCentroid;
-		cell.NeighborInformation( PrevUBound + 1 ).Value.adiabaticMultiplier = ThisAdiabaticMultiplier;
+		NeighborInformation newItem;
+		newItem.direction = direction;
+		newItem.ThisCentroidToNeighborCentroid = ThisCentroidToNeighborCentroid;
+		newItem.ThisCentroidToNeighborWall = ThisCentroidToNeighborWall;
+		newItem.ThisWallToNeighborCentroid = ThisWallToNeighborCentroid;
+		newItem.adiabaticMultiplier = ThisAdiabaticMultiplier;
+		this->Cells( X, Y, Z ).NeighborInfo[ direction ] = newItem;
 	}
 
 	void
@@ -5760,7 +5726,7 @@ namespace PlantPipingSystemsManager {
 	void
 	EvaluateFarfieldCharacteristics(
 		int const DomainNum,
-		CartesianCell const & cell,
+		CartesianCell & cell,
 		Direction const direction,
 		Real64 & neighbortemp,
 		Real64 & resistance,
@@ -5777,21 +5743,25 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 distance( 0.0 );
 
-		if ( ( direction == Direction::NegativeX ) || ( direction == Direction::PositiveX ) ) {
+		switch ( direction ) {
+		case Direction::NegativeX:
+		case Direction::PositiveX:
 			distance = ( cell.width() / 2.0 );
-		} else if ( ( direction == Direction::NegativeY ) || ( direction == Direction::PositiveY ) ) {
+			break;
+		case Direction::NegativeY:
+		case Direction::PositiveY:
 			distance = ( cell.height() / 2.0 );
-		} else if ( ( direction == Direction::NegativeZ ) || ( direction == Direction::PositiveZ ) ) {
+			break;
+		case Direction::NegativeZ:
+		case Direction::PositiveZ:
 			distance = ( cell.depth() / 2.0 );
-		} else {
-			assert( false );
+			break;
 		}
 
 		resistance = ( distance / 2.0 ) / ( cell.MyBase.Properties.Conductivity * cell.normalArea( direction ) );
 		neighbortemp = GetFarfieldTemp( DomainNum, cell );
 
-		auto const & TempNeighborInfo = NeighborInformationArray_Value( cell.NeighborInformation, direction );
-		adiabaticMultiplier = TempNeighborInfo.adiabaticMultiplier;
+		adiabaticMultiplier = cell.NeighborInfo[ direction ].adiabaticMultiplier;
 	}
 
 	Real64
@@ -6511,7 +6481,7 @@ namespace PlantPipingSystemsManager {
 		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
 			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
 				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
-					auto const & cell( cells( X, Y, Z ) );
+					auto & cell( cells( X, Y, Z ) );
 					int NumFieldCells = 0, NumBoundaryCells = 0;
 					EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
 					for ( int DirectionCtr = 1; DirectionCtr <= NumFieldCells; ++DirectionCtr ) {
@@ -6868,10 +6838,10 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		auto & cell( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
-		for ( int NeighborIndex = 0; NeighborIndex <= cell.NeighborInformation.u1(); ++NeighborIndex ) {
-			if ( cell.NeighborInformation( NeighborIndex ).direction == direction ) {
-				cell.NeighborInformation( NeighborIndex ).Value.ConductionResistance = Resistance;
-				cell.NeighborInformation( NeighborIndex ).Value.NeighborCellIndeces = Point3DInteger( NeighborCell.X_index, NeighborCell.Y_index, NeighborCell.Z_index );
+		for( auto & neighborInfo : cell.NeighborInfo ) {
+			if ( neighborInfo.first == direction ) {
+				neighborInfo.second.ConductionResistance = Resistance;
+				neighborInfo.second.NeighborCellIndeces = Point3DInteger( NeighborCell.X_index, NeighborCell.Y_index, NeighborCell.Z_index );
 			}
 		}
 
@@ -6938,7 +6908,7 @@ namespace PlantPipingSystemsManager {
 	void
 	EvaluateNeighborCharacteristics(
 		int const DomainNum,
-		CartesianCell const & ThisCell,
+		CartesianCell & ThisCell,
 		Direction const CurDirection,
 		Real64 & NeighborTemp,
 		Real64 & Resistance,
@@ -6955,8 +6925,6 @@ namespace PlantPipingSystemsManager {
 		int NX = 0, NY = 0, NZ = 0;
 		EvaluateNeighborCoordinates( ThisCell, CurDirection, NX, NY, NZ );
 
-		NeighborInformation TempNeighborInfo;
-
 		//'split effects between the two cells so we can carefully calculate resistance values
 		Real64 ThisCellLength = 0.0;
 		Real64 NeighborCellLength = 0.0;
@@ -6970,7 +6938,7 @@ namespace PlantPipingSystemsManager {
 		Real64 ThisNormalArea = ThisCell.normalArea( CurDirection );
 
 		//'set distance based on cell types
-		TempNeighborInfo = NeighborInformationArray_Value( ThisCell.NeighborInformation, CurDirection );
+		auto & TempNeighborInfo = ThisCell.NeighborInfo[ CurDirection ];
 		if ( ThisCell.cellType == CellType::Pipe ) {
 			//'we need to be a bit careful with pipes, as they are full centroid to centroid in the z direction,
 			//' but only centroid to wall in the x and y directions
