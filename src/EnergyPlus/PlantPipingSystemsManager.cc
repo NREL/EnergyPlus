@@ -4826,28 +4826,44 @@ namespace PlantPipingSystemsManager {
 				for ( int Z = cells.l3(), Z_end = cells.u3(); Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
-					//if ( X==0 && Y==10 && Z==10 ) {
-					//	int j = 23;
-					//}
-
-					{ auto const SELECT_CASE_var( cell.cellType );
-					if ( SELECT_CASE_var == CellType::Pipe ) {
+					switch ( cell.cellType ) {
+					case CellType::Pipe:
 						//'pipes are simulated separately
-					} else if ( ( SELECT_CASE_var == CellType::GeneralField ) || ( SELECT_CASE_var == CellType::Slab ) || ( SELECT_CASE_var == CellType::HorizInsulation ) || ( SELECT_CASE_var == CellType::VertInsulation ) || ( SELECT_CASE_var == CellType::SlabOnGradeEdgeInsu ) ) {
+						break;
+					case CellType::GeneralField:
+					case CellType::Slab:
+					case CellType::HorizInsulation:
+					case CellType::VertInsulation:
+					case CellType::SlabOnGradeEdgeInsu:
 						cell.MyBase.Temperature = EvaluateFieldCellTemperature( DomainNum, cell );
-					} else if ( SELECT_CASE_var == CellType::GroundSurface ) {
+						break;
+					case CellType::GroundSurface:
 						cell.MyBase.Temperature = EvaluateGroundSurfaceTemperature( DomainNum, cell );
-					} else if ( SELECT_CASE_var == CellType::FarfieldBoundary ) {
+						break;
+					case CellType::FarfieldBoundary:
 						cell.MyBase.Temperature = EvaluateFarfieldBoundaryTemperature( DomainNum, cell );
-					} else if ( ( SELECT_CASE_var == CellType::BasementWall ) || ( SELECT_CASE_var == CellType::BasementCorner ) || ( SELECT_CASE_var == CellType::BasementFloor ) ) {
+						break;
+					case CellType::BasementWall:
+					case CellType::BasementCorner:
+					case CellType::BasementFloor:
 						// basement model, zone-coupled. Call EvaluateZoneInterfaceTemperature routine to handle timestep/hourly simulation.
 						if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 							cell.MyBase.Temperature = EvaluateZoneInterfaceTemperature( DomainNum, cell );
 						} else { // FHX model
 							cell.MyBase.Temperature = EvaluateBasementCellTemperature( DomainNum, cell );
 						}
-					} else if ( SELECT_CASE_var == CellType::ZoneGroundInterface ) {
+						break;
+					case CellType::ZoneGroundInterface:
 						cell.MyBase.Temperature = EvaluateZoneInterfaceTemperature( DomainNum, cell );
+						break;
+					case CellType::BasementCutaway:
+						// it's ok to not simulate this one
+						break;
+					case CellType::Unknown:
+					case CellType::BasementWallInsu:
+					case CellType::BasementFloorInsu:
+						// these weren't handled before.......should they be?
+						assert(false);
 					}
 
 #ifdef CalcEnergyBalance
@@ -4858,7 +4874,7 @@ namespace PlantPipingSystemsManager {
 						cell.MyBase.tempDiffDueToImbalance = cell.MyBase.energyImbalance / massCp;
 					}
 #endif
-					}
+
 				}
 			}
 		}
@@ -4925,177 +4941,6 @@ namespace PlantPipingSystemsManager {
 
 	}
 
-//	Real64
-	//EvaluateGroundSurfaceTemperature(
-		//int const DomainNum,
-		//CartesianCell & cell
-	//)
-	//{
-
-		//// FUNCTION INFORMATION:
-		////       AUTHOR         Edwin Lee
-		////       DATE WRITTEN   Summer 2011
-		////       MODIFIED       na
-		////       RE-ENGINEERED  na
-
-		//// retrieve any information from input data structure
-		////Real64 GroundCoverCoefficient = PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient;
-		//Real64 const AirDensity( 1.22521 ); // '[kg/m3]
-		//Real64 const AirSpecificHeat( 1003 ); // '[J/kg-K]
-		//Real64 const Absor_Corrected( 0.77 );
-
-		//// initialize values
-		//Real64 Numerator = 0.0;
-		//Real64 Denominator = 0.0;
-		//Real64 Resistance = 0.0;
-		//Real64 AdiabaticMultiplier = 1.0;
-		//Real64 Beta = cell.MyBase.Beta;
-		//Real64 ThisNormalArea = cell.normalArea( Direction::PositiveY );
-
-//#ifdef CalcEnergyBalance
-		//Real64 energyFromThisSide = 0.0;
-		//cell.MyBase.sumEnergyFromAllSides = 0.0;
-		//cell.MyBase.numberOfSidesCalculated = 0;
-//#endif
-
-		////'add effect from previous time step
-		//Numerator += cell.MyBase.Temperature_PrevTimeStep;
-		//++Denominator;
-
-		//// now that we aren't infinitesimal, we need to determine the neighbor types based on cell location
-		//int NumFieldCells = 0, NumBoundaryCells = 0;
-		//EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
-
-		//// loop over all regular neighbor cells, check if we have adiabatic on opposite surface
-		//for ( int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
-			//Real64 NeighborTemp = 0.0;
-			//Direction CurDirection = NeighborFieldCells( DirectionCounter );
-			//EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-			//Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-			//Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-
-//#ifdef CalcEnergyBalance
-			//if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				//energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-				//cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-				//cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
-			//}
-//#endif
-
-		//}
-
-		//// do all non-adiabatic boundary types here
-		//for ( int DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter ) {
-			//Real64 NeighborTemp = 0.0;
-			//Direction CurDirection = NeighborBoundaryCells( DirectionCounter );
-
-			//// reset the adiabatic multiplier for each direction, it will be 1 unless overridden somehow
-			//AdiabaticMultiplier = 1.0;
-			//// For Zone-coupled slab or basement configuration
-			//if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
-				////-x-direction will always be a farfield boundary
-				////-z will also be a farfield boundary
-				////+x and +z will be handled above
-				////-y will always be a neighbor cell, so it is handled above
-				////+y will always be the outdoor air
-				//switch ( CurDirection ) {
-				//case Direction::NegativeX:
-				//case Direction::NegativeZ:
-					//// always farfield
-					//EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					//break;
-				//case Direction::PositiveY:
-					//// convection at the surface
-					//if ( DataEnvironment::WindSpeed > 0.1 ) {
-						//if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
-							//Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
-							//NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
-						//} else {
-							//Resistance = 208.0 / ( AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea );
-							//NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
-						//}
-					//} else {
-						//// Need to incorporate natural convection effects here
-						//if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
-							//Resistance = 1.0 / ( PipingSystemDomains( DomainNum ).BESTESTSurfaceConvCoefficient *  ThisNormalArea );
-							//NeighborTemp = PipingSystemDomains( DomainNum ).BESTESTGroundSurfTemp;
-						//}
-					//}
-					//break;
-				//case Direction::PositiveZ:
-				//case Direction::PositiveX:
-					//AdiabaticMultiplier = 0.0;
-					//break;
-				//case Direction::NegativeY:
-					//assert( false ); // debug error, can't get here!
-				//}
-			//} else { // FHX model
-				////x-direction will always be a farfield boundary, z boundaries will be adiabatic, but can be included here
-				////-y we don't handle here because -y will always be a neighbor cell, so handled above
-				////+y will always be the outdoor air
-				//switch ( CurDirection ) {
-				//case Direction::PositiveX:
-				//case Direction::NegativeX:
-				//case Direction::PositiveZ:
-				//case Direction::NegativeZ:
-					//// always farfield
-					//EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
-					//break;
-				//case Direction::PositiveY:
-					//// convection at the surface
-					//if ( DataEnvironment::WindSpeed > 0.1 ) {
-						//Resistance = 208.0 / ( AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea );
-						//NeighborTemp = PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
-					//} else {
-						//// Future development should include additional natural convection effects here
-					//}
-					//break;
-				//case Direction::NegativeY:
-					//assert( false ); // debug error, can't get here!
-				//}
-			//}
-
-			//Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-			//Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-
-//#ifdef CalcEnergyBalance
-			//if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-				//energyFromThisSide = AdiabaticMultiplier * ( NeighborTemp - cell.MyBase.Temperature ) / ( Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-				//cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-				//cell.MyBase.numberOfSidesCalculated += int( AdiabaticMultiplier );
-			//}
-//#endif
-		//}
-
-		//// Calculate another Q term, [MJ/hr-min]
-		//Real64 AbsorbedIncidentSolar = PipingSystemDomains( DomainNum ).Cur.CurIncidentSolar * Absor_Corrected;
-
-		//// Calculate overall net heat ?gain? into the cell, [W]
-		//Real64 IncidentHeatGain;
-		//if ( PipingSystemDomains( DomainNum ).BESTESTConstConvCoeff ) {
-			//IncidentHeatGain = 0.0;
-		//} else {
-			//IncidentHeatGain = AbsorbedIncidentSolar * ThisNormalArea;
-		//}
-
-		//// Add any solar/evapotranspiration heat gain here
-		//Numerator += Beta * IncidentHeatGain;
-
-//#ifdef CalcEnergyBalance
-		//if ( PipingSystemDomains( DomainNum ).finalIteration ) {
-			//energyFromThisSide = IncidentHeatGain * PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
-			//cell.MyBase.sumEnergyFromAllSides += energyFromThisSide;
-			//// Don't add one here because we already accounted for this side
-			//// when we calculated the surface convective resistance above
-			//cell.MyBase.numberOfSidesCalculated += 0;
-		//}
-//#endif
-
-		//// Calculate the return temperature and leave
-		//return Numerator / Denominator;
-
-	//}
-
 	Real64
 	EvaluateGroundSurfaceTemperature(
 		int const DomainNum,
@@ -5109,27 +4954,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataEnvironment::Latitude;
-		using DataEnvironment::Longitude;
-		using DataEnvironment::Elevation;
-		using DataEnvironment::TimeZoneMeridian;
-		using DataEnvironment::WindSpeed;
-		using DataGlobals::SecsInDay;
-		using DataGlobals::SecInHour;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const AirDensity( 1.22521 ); // '[kg/m3]
 		Real64 const AirSpecificHeat( 1003 ); // '[J/kg-K]
@@ -5142,24 +4966,9 @@ namespace PlantPipingSystemsManager {
 		Real64 const Convert_MJhrmin_To_Wm2( 1.0 / Convert_Wm2_To_MJhrmin );
 		Real64 const Rho_water( 998.0 ); // [kg/m3]
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// declare some variables
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 Resistance;
 		Real64 NeighborTemp;
-		Real64 ThisNormalArea;
 		Real64 IncidentHeatGain;
-		int DirectionCounter;
-		Direction CurDirection;
-		Real64 AdiabaticMultiplier;
-		Real64 Beta;
 		Real64 Latitude_Degrees; // Latitude, degrees N
 		Real64 StMeridian_Degrees; // Standard meridian, degrees W -- note it is degrees E in DataEnvironment
 		Real64 Longitude_Degrees; // Longitude, degrees W -- note it is degrees E in DataEnvironment
@@ -5203,20 +5012,20 @@ namespace PlantPipingSystemsManager {
 		Real64 GroundCoverCoefficient;
 
 		// retrieve information from E+ globals
-		Latitude_Degrees = Latitude;
-		StMeridian_Degrees = -TimeZoneMeridian; // Standard meridian, degrees W
-		Longitude_Degrees = -Longitude; // Longitude, degrees W
+		Latitude_Degrees = DataEnvironment::Latitude;
+		StMeridian_Degrees = -DataEnvironment::TimeZoneMeridian; // Standard meridian, degrees W
+		Longitude_Degrees = -DataEnvironment::Longitude; // Longitude, degrees W
 
 		// retrieve any information from input data structure
 		GroundCoverCoefficient = PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient;
 
 		// initialize values
-		AdiabaticMultiplier = 1.0;
-		Numerator = 0.0;
-		Denominator = 0.0;
-		Resistance = 0.0;
-		Beta = cell.MyBase.Beta;
-		ThisNormalArea = cell.normalArea( Direction::PositiveY );
+		Real64 AdiabaticMultiplier = 1.0;
+		Real64 Numerator = 0.0;
+		Real64 Denominator = 0.0;
+		Real64 Resistance = 0.0;
+		Real64 Beta = cell.MyBase.Beta;
+		Real64 ThisNormalArea = cell.normalArea( Direction::PositiveY );
 
 #ifdef CalcEnergyBalance
 		int index = 0;
@@ -5224,7 +5033,6 @@ namespace PlantPipingSystemsManager {
 		cell.MyBase.sumEnergyFromAllSides = 0.0;
 		cell.MyBase.energyFromEachSide = 0.0;
 #endif
-		Real64 DummyVar = 0.0;
 
 		//'add effect from previous time step
 		Numerator += cell.MyBase.Temperature_PrevTimeStep;
@@ -5235,22 +5043,11 @@ namespace PlantPipingSystemsManager {
 		EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
 
 		// loop over all regular neighbor cells, check if we have adiabatic on opposite surface
-		for ( DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
-			CurDirection = NeighborFieldCells( DirectionCounter );
-
-			if ( PipingSystemDomains( DomainNum ).HasBasement ) {
-				// We have adiabatic z-faces, check if we are adjacent to one in the opposite direction
-				if ( ( CurDirection == Direction::NegativeZ ) && ( cell.Z_index == PipingSystemDomains( DomainNum ).Cells.u3() ) ) {
-					AdiabaticMultiplier = 2.0;
-				} else if ( ( CurDirection == Direction::PositiveZ ) && ( cell.Z_index == 0 ) ) {
-					AdiabaticMultiplier = 2.0;
-				} else {
-					AdiabaticMultiplier = 1.0;
-				}
-			}
+		for ( int DirectionCounter = 1; DirectionCounter <= NumFieldCells; ++DirectionCounter ) {
+			Direction CurDirection = NeighborFieldCells( DirectionCounter );
 
 			// Use the multiplier ( either 1 or 2 ) to calculate the neighbor cell effects
-			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, DummyVar );
+			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
 			Numerator = AdiabaticMultiplier * Numerator + ( Beta / Resistance ) * NeighborTemp;
 			Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
 
@@ -5265,8 +5062,8 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// do all non-adiabatic boundary types here
-		for ( DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter ) {
-			CurDirection = NeighborBoundaryCells( DirectionCounter );
+		for ( int DirectionCounter = 1; DirectionCounter <= NumBoundaryCells; ++DirectionCounter ) {
+			Direction CurDirection = NeighborBoundaryCells( DirectionCounter );
 
 			// For Zone-coupled slab or basement configuration
 			if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
@@ -5277,13 +5074,13 @@ namespace PlantPipingSystemsManager {
 				//+y will always be the outdoor air
 				if ( CurDirection == Direction::NegativeX || CurDirection == Direction::NegativeZ ) {
 					// always farfield
-					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, DummyVar );
+					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
 					Numerator += ( Beta / Resistance ) * NeighborTemp;
 					Denominator += ( Beta / Resistance );
 				} else if ( CurDirection == Direction::PositiveY ) {
 					// convection at the surface
-					if ( WindSpeed > 0.1 ) {
-						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
+					if ( DataEnvironment::WindSpeed > 0.1 ) {
+						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea );
 						Numerator += ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 						Denominator += ( Beta / Resistance );
 					}
@@ -5297,15 +5094,15 @@ namespace PlantPipingSystemsManager {
 				//+y will always be the outdoor air
 				if ( ( CurDirection == Direction::PositiveX ) || ( CurDirection == Direction::NegativeX ) ) {
 					// always farfield
-					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, DummyVar );
+					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance, AdiabaticMultiplier );
 					Numerator += ( Beta / Resistance ) * NeighborTemp;
 					Denominator += ( Beta / Resistance );
 				} else if ( ( CurDirection == Direction::PositiveZ ) || ( CurDirection == Direction::NegativeZ ) ) {
 					// debug error, can't get here
 				} else if ( CurDirection == Direction::PositiveY ) {
 					// convection at the surface
-					if ( WindSpeed > 0.1 ) {
-						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
+					if ( DataEnvironment::WindSpeed > 0.1 ) {
+						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea );
 						Numerator += ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 						Denominator += ( Beta / Resistance );
 					} else {
@@ -5332,13 +5129,13 @@ namespace PlantPipingSystemsManager {
 		Latitude_Radians = Pi / 180.0 * Latitude_Degrees;
 
 		// The day of year at this point in the simulation
-		DayOfYear = int( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds / SecsInDay );
+		DayOfYear = int( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds / DataGlobals::SecsInDay );
 
 		// The number of seconds into the current day
-		CurSecondsIntoToday = int( mod( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds, SecsInDay ) );
+		CurSecondsIntoToday = int( mod( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds, DataGlobals::SecsInDay ) );
 
 		// The number of hours into today
-		HourOfDay = int( CurSecondsIntoToday / SecInHour );
+		HourOfDay = int( CurSecondsIntoToday / DataGlobals::SecInHour );
 
 		// For convenience convert to Kelvin once
 		CurAirTempK = PipingSystemDomains( DomainNum ).Cur.CurAirTemp + 273.15;
@@ -5378,7 +5175,7 @@ namespace PlantPipingSystemsManager {
 		QRAD_A = 12.0 * 60.0 / Pi * MeanSolarConstant * dr * ( ( Solar_Angle_2 - Solar_Angle_1 ) * std::sin( Latitude_Radians ) * std::sin( Declination ) + std::cos( Latitude_Radians ) * std::cos( Declination ) * ( std::sin( Solar_Angle_2 ) - std::sin( Solar_Angle_1 ) ) );
 
 		// Calculate another Q term...
-		QRAD_SO = ( A_s + B_s + 0.00002 * Elevation ) * QRAD_A;
+		QRAD_SO = ( A_s + B_s + 0.00002 * DataEnvironment::Elevation ) * QRAD_A;
 
 		// Correct the Qrad term ... better way??
 		if ( IncidentSolar_MJhrmin < 0.01 ) {
