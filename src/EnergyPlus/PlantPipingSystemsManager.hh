@@ -130,10 +130,9 @@ namespace PlantPipingSystemsManager {
 
 	};
 
-	struct ExtendedFluidProperties // : Inherits BaseThermalPropertySet
+	struct ExtendedFluidProperties : BaseThermalPropertySet
 	{
 		// Members
-		BaseThermalPropertySet MyBase;
 		Real64 Viscosity; // kg/m-s
 		Real64 Prandtl; // -
 
@@ -143,11 +142,13 @@ namespace PlantPipingSystemsManager {
 
 		// Member Constructor
 		ExtendedFluidProperties(
-			BaseThermalPropertySet const & MyBase,
+			Real64 const Conductivity, // W/mK
+			Real64 const Density, // kg/m3
+			Real64 const SpecificHeat, // J/kgK
 			Real64 const Viscosity, // kg/m-s
 			Real64 const Prandtl // -
 		) :
-			MyBase( MyBase ),
+			BaseThermalPropertySet( Conductivity, Density, SpecificHeat ),
 			Viscosity( Viscosity ),
 			Prandtl( Prandtl )
 		{}
@@ -193,10 +194,9 @@ namespace PlantPipingSystemsManager {
 		Real64 inline thickness(){return ( this->OuterDia - this->InnerDia ) / 2.0;}
 	};
 
-	struct RadialCellInformation // : Inherits BaseCell
+	struct RadialCellInformation : BaseCell
 	{
 		// Members
-		BaseCell MyBase;
 		Real64 RadialCentroid;
 		Real64 InnerRadius;
 		Real64 OuterRadius;
@@ -205,23 +205,25 @@ namespace PlantPipingSystemsManager {
 		RadialCellInformation()
 		{}
 
-		// Eventually this should be the real constructor
-		static void ctor(
-			RadialCellInformation & c,
+		// Member Constructor
+		RadialCellInformation(
 			Real64 const m_RadialCentroid,
 			Real64 const m_MinRadius,
 			Real64 const m_MaxRadius
-		);
+		) {
+			RadialCentroid = m_RadialCentroid;
+			InnerRadius = m_MinRadius;
+			OuterRadius = m_MaxRadius;
+		}
 
 		// Get the XY cross sectional area of the radial cell
 		Real64 inline XY_CrossSectArea(){return DataGlobals::Pi * ( pow_2( this->OuterRadius ) - pow_2( this->InnerRadius ) );}
 
 	};
 
-	struct FluidCellInformation // : Inherits BaseCell
+	struct FluidCellInformation : BaseCell
 	{
 		// Members
-		BaseCell MyBase;
 		Real64 PipeInnerRadius;
 		Real64 Volume;
 		ExtendedFluidProperties Properties;
@@ -230,12 +232,14 @@ namespace PlantPipingSystemsManager {
 		FluidCellInformation()
 		{}
 
-		// Eventually this should be the real constructor
-		static void ctor(
-			FluidCellInformation & c,
+		// Member Constructor
+		FluidCellInformation(
 			Real64 const m_PipeInnerRadius,
 			Real64 const m_CellDepth
-		);
+		) {
+			this->PipeInnerRadius = m_PipeInnerRadius;
+			this->Volume = DataGlobals::Pi * pow_2( m_PipeInnerRadius ) * m_CellDepth;
+		}
 	};
 
 	struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
@@ -491,10 +495,9 @@ namespace PlantPipingSystemsManager {
 
 	};
 
-	struct CartesianCell
+	struct CartesianCell : BaseCell
 	{
 		// Members
-		BaseCell MyBase;
 		int X_index;
 		int Y_index;
 		int Z_index;
@@ -1201,6 +1204,18 @@ namespace PlantPipingSystemsManager {
 			Real64 & rhoCp
 		);
 
+		void
+		ShiftTemperaturesForNewTimeStep();
+
+		void
+		ShiftTemperaturesForNewIteration();
+
+		bool
+		IsConverged_CurrentToPrevIteration();
+
+		bool
+		CheckForOutOfRangeTemps();
+
 	};
 
 	// Object Data
@@ -1404,25 +1419,13 @@ namespace PlantPipingSystemsManager {
 	MeshPartition_SelectionSort( Array1< MeshPartition > & X );
 
 	bool
-	IsConverged_CurrentToPrevIteration( int const DomainNum );
-
-	bool
 	IsConverged_PipeCurrentToPrevIteration(
 		int const CircuitNum,
 		CartesianCell const & CellToCheck
 	);
 
 	void
-	ShiftTemperaturesForNewTimeStep( int const DomainNum );
-
-	void
-	ShiftTemperaturesForNewIteration( int const DomainNum );
-
-	void
 	ShiftPipeTemperaturesForNewIteration( CartesianCell & ThisPipeCell );
-
-	bool
-	CheckForOutOfRangeTemps( int const DomainNum );
 
 	int
 	CreateRegionListCount(
