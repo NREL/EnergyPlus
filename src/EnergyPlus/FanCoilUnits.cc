@@ -1195,7 +1195,6 @@ namespace FanCoilUnits {
 		using namespace InputProcessor;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
-		using Fans::SimulateFanComponents;
 		using Fans::GetFanDesignVolumeFlowRate;
 		using General::TrimSigDigits;
 		using WaterCoils::SetCoilDesFlow;
@@ -1430,7 +1429,7 @@ namespace FanCoilUnits {
 				//     If fan is autosized, get fan volumetric flow rate
 				if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
 					if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
-						SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
+						Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 					} else {
 						HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate(_,_,_,_);
@@ -1467,7 +1466,7 @@ namespace FanCoilUnits {
 			}
 		} else if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
-				SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
+				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 				FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			} else {
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate(_,_,_,_);
@@ -3104,7 +3103,6 @@ namespace FanCoilUnits {
 		// Using/Aliasing
 		using MixedAir::SimOAMixer;
 		using SingleDuct::SimATMixer;
-		using Fans::SimulateFanComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -3197,20 +3195,20 @@ namespace FanCoilUnits {
 			// cycling fan coil unit calculation
 			if ( FanCoil( FanCoilNum ).SpeedFanSel == 1 ) {
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 				} else {
 					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				}
 			} else if ( FanCoil( FanCoilNum ).SpeedFanSel == 2 ) {
 
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 				} else {
 					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanCoil( FanCoilNum ).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 				}
 			} else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 				} else {
 					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 				}
@@ -3230,7 +3228,7 @@ namespace FanCoilUnits {
 
 		} else if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				// FanFlowRatio needs to be accurate here for new fan model
 				Real64 ActFanFlowRatio = FanFlowRatio * PartLoad;
@@ -3251,7 +3249,7 @@ namespace FanCoilUnits {
 			// Constant fan and variable flow calculation AND variable fan
 
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 			}

@@ -2942,7 +2942,7 @@ namespace SimAirServingZones {
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
 			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
-		} else if ( SELECT_CASE_var == Fan_System_Object ) { // "Fan:SystemModel" new for V8.5
+		} else if ( SELECT_CASE_var == Fan_System_Object ) { // "Fan:SystemModel" new for V8.6
 			if ( CompIndex == 0 ) { // 0 means has not been filled because of 1-based arrays in old fortran
 				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
 			}

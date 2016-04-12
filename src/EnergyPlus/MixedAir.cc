@@ -627,7 +627,6 @@ namespace MixedAir {
 
 		// USE Statements
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using DataAirLoop::AirLoopInputsFilled;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -673,11 +672,11 @@ namespace MixedAir {
 			// Fan Types
 		} else if ( SELECT_CASE_var == Fan_Simple_CV ) { // 'Fan:ConstantVolume'
 			if ( Sim ) {
-				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
 			if ( Sim ) {
-				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 
 		} else if ( SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
@@ -690,7 +689,7 @@ namespace MixedAir {
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
 			if ( Sim ) {
-				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 
 			// Coil Types

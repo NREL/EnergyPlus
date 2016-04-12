@@ -5641,7 +5641,6 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using MixedAir::SimOAMixer;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -5695,7 +5694,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
-				SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
 		}
 
@@ -5728,7 +5727,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
-				SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
 		}
 
@@ -6967,8 +6966,6 @@ namespace HVACVariableRefrigerantFlow {
 		using namespace DataZoneEnergyDemands;
 		using DataEnvironment::OutBaroPress;
 		using DXCoils::DXCoil;
-		using Fans::Fan;
-		using Fans::SimulateFanComponents;
 		using InputProcessor::FindItemInList;
 		using MixedAir::SimOAMixer;
 		using MixedAir::OAMixer;
@@ -7086,8 +7083,8 @@ namespace HVACVariableRefrigerantFlow {
 				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				FanOutletNode = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->outletNodeNum();
 			} else {
-				SimulateFanComponents( "", false, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-				FanOutletNode = Fan( VRFTU( VRFTUNum ).FanIndex ).OutletNodeNum;
+				Fans::SimulateFanComponents( "", false, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				FanOutletNode = Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).OutletNodeNum;
 			}
 			T_coil_in = Node( FanOutletNode ).Temp;
 			W_coil_in = Node( FanOutletNode ).HumRat;
@@ -8849,7 +8846,6 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using MixedAir::SimOAMixer;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -8916,7 +8912,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
-				SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
 		}
 
@@ -8949,7 +8945,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
-				SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
 		}
 
@@ -9109,8 +9105,6 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using DXCoils::ControlVRFIUCoil;
 		using DXCoils::DXCoil;
-		using Fans::Fan;
-		using Fans::SimulateFanComponents;
 		using InputProcessor::FindItemInList;
 		using MixedAir::SimOAMixer;
 		using MixedAir::OAMixer;
@@ -9213,8 +9207,8 @@ namespace HVACVariableRefrigerantFlow {
 				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				FanOutletNode = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->outletNodeNum();
 			} else {
-				SimulateFanComponents( "", false, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-				FanOutletNode = Fan( VRFTU( VRFTUNum ).FanIndex ).OutletNodeNum;
+				Fans::SimulateFanComponents( "", false, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				FanOutletNode = Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).OutletNodeNum;
 			}
 			Tin = Node( FanOutletNode ).Temp;
 			Win = Node( FanOutletNode ).HumRat;
