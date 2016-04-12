@@ -255,7 +255,6 @@ namespace EconomicLifeCycleCost {
 
 		// Using/Aliasing
 		using OutputReportTabular::AddTOCEntry;
-		using OutputReportTabular::displayLifeCycleCostReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
