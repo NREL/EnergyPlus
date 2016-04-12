@@ -594,6 +594,7 @@ namespace PoweredInductionUnits {
 			//test if Fan:SystemModel fan of this name exists
 			if ( HVACFan::checkIfFanNameIsAFanSystem( PIU( PIUNum ).FanName ) ) {
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PIU( PIUNum ).FanName ) ); // call constructor
 				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
 			} else {
 				bool isNotOkay( false );
