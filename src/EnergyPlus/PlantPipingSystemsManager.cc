@@ -2965,16 +2965,6 @@ namespace PlantPipingSystemsManager {
 		//'** SET UP PIPE CIRCUIT CELLS **'
 		this->setupPipeCircuitInOutCells();
 
-		//if ( allocated( XPartitionRegions ) ) XPartitionRegions.deallocate();
-		//if ( allocated( YPartitionRegions ) ) YPartitionRegions.deallocate();
-		//if ( allocated( ZPartitionRegions ) ) ZPartitionRegions.deallocate();
-		//if ( allocated( XRegions ) ) XRegions.deallocate();
-		//if ( allocated( YRegions ) ) YRegions.deallocate();
-		//if ( allocated( ZRegions ) ) ZRegions.deallocate();
-		//if ( allocated( XBoundaryPoints ) ) XBoundaryPoints.deallocate();
-		//if ( allocated( YBoundaryPoints ) ) YBoundaryPoints.deallocate();
-		//if ( allocated( ZBoundaryPoints ) ) ZBoundaryPoints.deallocate();
-
 	}
 
 	void
@@ -2998,7 +2988,6 @@ namespace PlantPipingSystemsManager {
 		int CircuitCtr;
 		int CircuitIndex;
 		int PipeCtr;
-		int PreviousUbound;
 		Real64 PipeCellWidth;
 		Real64 SurfCellWidth; // Basement surface...
 		Real64 SideXLocation;
@@ -3039,28 +3028,14 @@ namespace PlantPipingSystemsManager {
 					this->Partitions.X.allocate( {0,0} );
 					this->Partitions.X( 0 ) = MeshPartition( ThisSegment.PipeLocation.X, PartitionType::Pipe, PipeCellWidth );
 				} else if ( ! MeshPartitionArray_Contains( this->Partitions.X, ThisSegment.PipeLocation.X ) ) {
-					PreviousUbound = this->Partitions.X.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( {0,PreviousUbound} );
-					PreviousEntries = this->Partitions.X;
-					this->Partitions.X.deallocate();
-					this->Partitions.X.allocate( {0,PreviousUbound + 1} );
-					this->Partitions.X( {0,PreviousUbound} ) = PreviousEntries;
-					this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( ThisSegment.PipeLocation.X, PartitionType::Pipe, PipeCellWidth );
+					this->Partitions.X.push_back( MeshPartition( ThisSegment.PipeLocation.X, PartitionType::Pipe, PipeCellWidth ) );
 				}
 
 				if ( ! allocated( this->Partitions.Y ) ) {
 					this->Partitions.Y.allocate( {0,0} );
 					this->Partitions.Y( 0 ) = MeshPartition( ThisSegment.PipeLocation.Y, PartitionType::Pipe, PipeCellWidth );
 				} else if ( ! MeshPartitionArray_Contains( this->Partitions.Y, ThisSegment.PipeLocation.Y ) ) {
-					PreviousUbound = this->Partitions.Y.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( {0,PreviousUbound} );
-					PreviousEntries = this->Partitions.Y;
-					this->Partitions.Y.deallocate();
-					this->Partitions.Y.allocate( {0,PreviousUbound + 1} );
-					this->Partitions.Y( {0,PreviousUbound} ) = PreviousEntries;
-					this->Partitions.Y( PreviousUbound + 1 ) = MeshPartition( ThisSegment.PipeLocation.Y, PartitionType::Pipe, PipeCellWidth );
+					this->Partitions.Y.push_back( MeshPartition( ThisSegment.PipeLocation.Y, PartitionType::Pipe, PipeCellWidth ) );
 				}
 
 			}
@@ -3077,14 +3052,7 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.X.allocate( { 0, 0 } );
 						this->Partitions.X( 0 ) = MeshPartition( this->BasementZone.Width, PartitionType::BasementWall, SurfCellWidth );
 					} else if ( !MeshPartitionArray_Contains( this->Partitions.X, this->BasementZone.Width ) ) {
-						PreviousUbound = this->Partitions.X.u1();
-						if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-						PreviousEntries.allocate( { 0, PreviousUbound } );
-						PreviousEntries = this->Partitions.X;
-						this->Partitions.X.deallocate();
-						this->Partitions.X.allocate( { 0, PreviousUbound + 1 } );
-						this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
-						this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( this->BasementZone.Width, PartitionType::BasementWall, SurfCellWidth );
+						this->Partitions.X.push_back( MeshPartition( this->BasementZone.Width, PartitionType::BasementWall, SurfCellWidth ) );
 					}
 				}
 
@@ -3095,14 +3063,7 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.Y.allocate( { 0, 0 } );
 						this->Partitions.Y( 0 ) = MeshPartition( BasementDistFromBottom, PartitionType::BasementFloor, SurfCellWidth );
 					} else if ( !MeshPartitionArray_Contains( this->Partitions.Y, BasementDistFromBottom ) ) {
-						PreviousUbound = this->Partitions.Y.u1();
-						if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-						PreviousEntries.allocate( { 0, PreviousUbound } );
-						PreviousEntries = this->Partitions.Y;
-						this->Partitions.Y.deallocate();
-						this->Partitions.Y.allocate( { 0, PreviousUbound + 1 } );
-						this->Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
-						this->Partitions.Y( PreviousUbound + 1 ) = MeshPartition( BasementDistFromBottom, PartitionType::BasementFloor, SurfCellWidth );
+						this->Partitions.Y.push_back( MeshPartition( BasementDistFromBottom, PartitionType::BasementFloor, SurfCellWidth ) );
 					}
 				}
 			}
@@ -3145,37 +3106,26 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.X( 1 ) = MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth );
 					}
 				} else if ( !MeshPartitionArray_Contains( this->Partitions.X, this->BasementZone.Width ) ) {
-					PreviousUbound = this->Partitions.X.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( { 0, PreviousUbound } );
-					PreviousEntries = this->Partitions.X;
-					this->Partitions.X.deallocate();
 					// Partition at insulation edges in the X direction, if horizontal insulation present
 					if ( this->HorizInsPresentFlag ) {
 						if ( !this->FullHorizInsPresent ) {
-							this->Partitions.X.allocate( { 0, PreviousUbound + 3 } );
-							this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side X direction - Insulation layer
-							this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXLocation, PartitionType::XSide, CellWidth ) );
 							// Side X direction - Basement Wall interface
-							this->Partitions.X( PreviousUbound + 2 ) = MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth ) );
 							// Insulation Edge X direction
-							this->Partitions.X( PreviousUbound + 3 ) = MeshPartition( SideXInsulationLocation, PartitionType::HorizInsXSide, InterfaceCellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXInsulationLocation, PartitionType::HorizInsXSide, InterfaceCellWidth ) );
 						} else {
-							this->Partitions.X.allocate( { 0, PreviousUbound + 2 } );
-							this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side X direction - Insulation layer
-							this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXLocation, PartitionType::XSide, CellWidth ) );
 							// Side X direction -Basement Wall interface
-							this->Partitions.X( PreviousUbound + 2 ) = MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth ) );
 						}
 					} else {
-						this->Partitions.X.allocate( { 0, PreviousUbound + 2 } );
-						this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 						// Side X direction - Insulation layer
-						this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
+						this->Partitions.X.push_back( MeshPartition( SideXLocation, PartitionType::XSide, CellWidth ) );
 						// Side X direction - Basement Wall interface
-						this->Partitions.X( PreviousUbound + 2 ) = MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth );
+						this->Partitions.X.push_back( MeshPartition( SideXWallLocation, PartitionType::XSideWall, InterfaceCellWidth ) );
 					}
 				}
 			}
@@ -3205,26 +3155,17 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.Y( 1 ) = MeshPartition( UnderFloorLocation, PartitionType::UnderFloor, CellWidth );
 					}
 				} else if ( !MeshPartitionArray_Contains( this->Partitions.Y, FloorLocation ) ) {
-					PreviousUbound = this->Partitions.Y.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( {0,PreviousUbound} );
-					PreviousEntries = this->Partitions.Y;
-					this->Partitions.Y.deallocate();
 					// Partition at bottom edge of vertical insulation, if vertical insulation is present
 					if ( this->VertInsPresentFlag && YInsulationLocation > FloorLocation + CellWidth ) {
-						this->Partitions.Y.allocate( { 0, PreviousUbound + 3 } );
-						this->Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
 						// Partition at basement floor interface
-						this->Partitions.Y( PreviousUbound + 1 ) = MeshPartition( FloorLocation, PartitionType::FloorInside, InterfaceCellWidth );
+						this->Partitions.Y.push_back( MeshPartition( FloorLocation, PartitionType::FloorInside, InterfaceCellWidth ) );
 						// Partition under the basement floor for insulation layer
-						this->Partitions.Y( PreviousUbound + 2 ) = MeshPartition( UnderFloorLocation, PartitionType::UnderFloor, CellWidth );
+						this->Partitions.Y.push_back( MeshPartition( UnderFloorLocation, PartitionType::UnderFloor, CellWidth ) );
 						// Vertical-Insulation edge partition
-						this->Partitions.Y( PreviousUbound + 3 ) = MeshPartition( YInsulationLocation, PartitionType::VertInsLowerEdge, InterfaceCellWidth );
+						this->Partitions.Y.push_back( MeshPartition( YInsulationLocation, PartitionType::VertInsLowerEdge, InterfaceCellWidth ) );
 					} else {
-						this->Partitions.Y.allocate( { 0, PreviousUbound + 2 } );
-						this->Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
-						this->Partitions.Y( PreviousUbound + 1 ) = MeshPartition( FloorLocation, PartitionType::FloorInside, InterfaceCellWidth );
-						this->Partitions.Y( PreviousUbound + 2 ) = MeshPartition( UnderFloorLocation, PartitionType::UnderFloor, CellWidth );
+						this->Partitions.Y.push_back( MeshPartition( FloorLocation, PartitionType::FloorInside, InterfaceCellWidth ) );
+						this->Partitions.Y.push_back( MeshPartition( UnderFloorLocation, PartitionType::UnderFloor, CellWidth ) );
 					}
 				}
 			}
@@ -3265,37 +3206,26 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.Z( 1 ) = MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth );
 					}
 				} else if ( !MeshPartitionArray_Contains( this->Partitions.Z, this->BasementZone.Width ) ) {
-					PreviousUbound = this->Partitions.Z.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( { 0, PreviousUbound } );
-					PreviousEntries = this->Partitions.Z;
-					this->Partitions.Z.deallocate();
 					// Partition at insulation edges in the Z direction, if horizontal insulation present
 					if ( this->HorizInsPresentFlag ) {
 						if ( !this->FullHorizInsPresent ) {
-							this->Partitions.Z.allocate( { 0, PreviousUbound + 3 } );
-							this->Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side Z direction - Insulation layer
-							this->Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth ) );
 							// Side Z direction - Basement Wall interface
-							this->Partitions.Z( PreviousUbound + 2 ) = MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth ) );
 							// Insulation Edge Z direction
-							this->Partitions.Z( PreviousUbound + 3 ) = MeshPartition( SideZInsulationLocation, PartitionType::HorizInsZSide, InterfaceCellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZInsulationLocation, PartitionType::HorizInsZSide, InterfaceCellWidth ) );
 						} else {
-							this->Partitions.Z.allocate( { 0, PreviousUbound + 2 } );
-							this->Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side Z direction - Insulation layer
-							this->Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth ) );
 							// Side Z direction -Basement Wall interface
-							this->Partitions.Z( PreviousUbound + 2 ) = MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth ) );
 						}
 					} else {
-						this->Partitions.Z.allocate( { 0, PreviousUbound + 2 } );
-						this->Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 						// Side Z direction - Insulation layer
-						this->Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
+						this->Partitions.Z.push_back( MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth ) );
 						// Side Z direction -Basement Wall interface
-						this->Partitions.Z( PreviousUbound + 2 ) = MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth );
+						this->Partitions.Z.push_back( MeshPartition( SideZWallLocation, PartitionType::ZSideWall, InterfaceCellWidth ) );
 					}
 				}
 			}
@@ -3333,32 +3263,21 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.X( 0 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
 					}
 				} else if ( !MeshPartitionArray_Contains( this->Partitions.X, this->SlabWidth ) ) {
-					PreviousUbound = this->Partitions.X.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( { 0, PreviousUbound } );
-					PreviousEntries = this->Partitions.X;
-					this->Partitions.X.deallocate();
 
 					// Partition at insulation edges in the X direction, if horizontal insulation present
 					if ( this->HorizInsPresentFlag ) {
 						if ( !this->FullHorizInsPresent ) {
-							this->Partitions.X.allocate( { 0, PreviousUbound + 4 } );
-							this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side X direction
-							this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXLocation, PartitionType::XSide, CellWidth ) );
 							// Insulation Edge X direction
-							this->Partitions.X( PreviousUbound + 2 ) = MeshPartition( SideXInsulationLocation, PartitionType::HorizInsXSide, CellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXInsulationLocation, PartitionType::HorizInsXSide, CellWidth ) );
 						} else {
-							this->Partitions.X.allocate( { 0, PreviousUbound + 1 } );
-							this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side X direction
-							this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
+							this->Partitions.X.push_back( MeshPartition( SideXLocation, PartitionType::XSide, CellWidth ) );
 						}
 					} else {
-						this->Partitions.X.allocate( { 0, PreviousUbound + 1 } );
-						this->Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 						// Side X direction
-						this->Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideXLocation, PartitionType::XSide, CellWidth );
+						this->Partitions.X.push_back( MeshPartition( SideXLocation, PartitionType::XSide, CellWidth ) );
 					}
 				}
 			}
@@ -3385,26 +3304,16 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.Y( 0 ) = MeshPartition( SlabDistFromBottom, PartitionType::UnderFloor, CellWidth );
 					}
 				} else if ( !MeshPartitionArray_Contains( this->Partitions.Y, SlabDistFromBottom ) ) {
-					PreviousUbound = this->Partitions.Y.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( { 0, PreviousUbound } );
-					PreviousEntries = this->Partitions.Y;
-					this->Partitions.Y.deallocate();
 
 					// Partition at bottom edge of vertical insulation, if vertical insulation present
 					if ( this->VertInsPresentFlag ) {
-						this->Partitions.Y.allocate( { 0, PreviousUbound + 2 } );
-						this->Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
-
 						// Underslab partition
-						this->Partitions.Y( PreviousUbound + 1 ) = MeshPartition( SlabDistFromBottom, PartitionType::UnderFloor, CellWidth );
+						this->Partitions.Y.push_back( MeshPartition( SlabDistFromBottom, PartitionType::UnderFloor, CellWidth ) );
 						// Vertical-Insulation edge partition
-						this->Partitions.Y( PreviousUbound + 2 ) = MeshPartition( YInsulationLocation, PartitionType::VertInsLowerEdge, CellWidth );
+						this->Partitions.Y.push_back( MeshPartition( YInsulationLocation, PartitionType::VertInsLowerEdge, CellWidth ) );
 					} else {
-						this->Partitions.Y.allocate( { 0, PreviousUbound + 1 } );
-						this->Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
 						// Underslab partition
-						this->Partitions.Y( PreviousUbound + 1 ) = MeshPartition( SlabDistFromBottom, PartitionType::UnderFloor, CellWidth );
+						this->Partitions.Y.push_back( MeshPartition( SlabDistFromBottom, PartitionType::UnderFloor, CellWidth ) );
 					}
 				}
 			}
@@ -3437,32 +3346,21 @@ namespace PlantPipingSystemsManager {
 						this->Partitions.Z( 0 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
 					}
 				} else if ( !MeshPartitionArray_Contains( this->Partitions.Z, this->SlabWidth ) ) {
-					PreviousUbound = this->Partitions.Z.u1();
-					if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-					PreviousEntries.allocate( { 0, PreviousUbound } );
-					PreviousEntries = this->Partitions.Z;
-					this->Partitions.Z.deallocate();
 
 					// Partition at insulation edges in the Z direction, if horizontal insulation present
 					if ( this->HorizInsPresentFlag ) {
 						if ( !this->FullHorizInsPresent ) {
-							this->Partitions.Z.allocate( { 0, PreviousUbound + 2 } );
-							this->Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side Z direction
-							this->Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth ) );
 							// Insulation Edge Z direction
-							this->Partitions.Z( PreviousUbound + 2 ) = MeshPartition( SideZInsulationLocation, PartitionType::HorizInsZSide, CellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZInsulationLocation, PartitionType::HorizInsZSide, CellWidth ) );
 						} else {
-							this->Partitions.Z.allocate( { 0, PreviousUbound + 1 } );
-							this->Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side Z direction
-							this->Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
+							this->Partitions.Z.push_back( MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth ) );
 						}
 					} else {
-						this->Partitions.Z.allocate( { 0, PreviousUbound + 1 } );
-						this->Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 						// Side Z direction
-						this->Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth );
+						this->Partitions.Z.push_back( MeshPartition( SideZLocation, PartitionType::ZSide, CellWidth ) );
 					}
 				}
 			}
@@ -3759,7 +3657,6 @@ namespace PlantPipingSystemsManager {
 			NumCellWidths = this->getCellWidthsCount( TempRegions( Index ).thisRegionType, Index );
 			if ( allocated( RetVal( Index ).CellWidths ) ) RetVal( Index ).CellWidths.deallocate();
 			RetVal( Index ).CellWidths.allocate( {0,NumCellWidths - 1} );
-
 			this->getCellWidths( RetVal( Index ), TempRegions( Index ).thisRegionType );
 		}
 
