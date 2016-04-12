@@ -367,7 +367,6 @@ namespace HVACUnitaryBypassVAV {
 		Real64 MinOutletHumRat; // Minimum of inlet and outlet air humidity ratio [kg/kg]
 
 		// zero the fan and DX coils electricity consumption
-//		FanElecPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		DXElecHeatingPower = 0.0;
 		ElecHeatingCoilPower = 0.0;

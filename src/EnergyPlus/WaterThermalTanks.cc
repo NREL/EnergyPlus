@@ -1683,6 +1683,10 @@ namespace WaterThermalTanks {
 					if ( bIsVScoil == true ) {
 						VariableSpeedCoils::setVarSpeedHPWHFanTypeNum( HPWH.DXCoilNum, HPWH.FanType_Num );
 						VariableSpeedCoils::setVarSpeedHPWHFanIndex( HPWH.DXCoilNum, HPWH.FanNum );
+					} else {
+						DXCoils::SetDXCoolingCoilData( HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName );
+						DXCoils::SetDXCoolingCoilData( HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum );
+						DXCoils::SetDXCoolingCoilData( HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,_, HPWH.FanType_Num );
 					}
 
 					if ( errFlag ) {
