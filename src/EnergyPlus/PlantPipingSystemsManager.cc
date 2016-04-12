@@ -195,10 +195,6 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int CircuitNum;
-		int DomainNum;
-
-		//Autodesk:Uninit Initialize variables used uninitialized
-		DomainNum = 0; //Autodesk:Uninit Force default initialization
 
 		// Read input if necessary
 		if ( GetInputFlag ) {
@@ -218,7 +214,7 @@ namespace PlantPipingSystemsManager {
 			CircuitNum = EqNum;
 			int const NumOfPipeCircuits = isize( PipingSystemCircuits );
 			if ( CircuitNum > NumOfPipeCircuits || CircuitNum < 1 ) {
-				ShowFatalError( RoutineName + ":  Invalid component index passed=" + TrimSigDigits( DomainNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeCircuits ) + ", Entered Unit name=" + EquipName ); //Autodesk:Uninit DomainNum was uninitialized
+				ShowFatalError( RoutineName + ":  Invalid component index passed=" + TrimSigDigits( CircuitNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeCircuits ) + ", Entered Unit name=" + EquipName ); //Autodesk:Uninit DomainNum was uninitialized
 			}
 			if ( PipingSystemCircuits( CircuitNum ).CheckEquipName ) {
 				if ( EquipName != PipingSystemCircuits( CircuitNum ).Name ) {
@@ -232,7 +228,7 @@ namespace PlantPipingSystemsManager {
 		if ( InitLoopEquip ) return;
 
 		// Retrieve the parent domain index for this pipe circuit
-		DomainNum = PipingSystemCircuits( CircuitNum ).ParentDomainIndex;
+		int DomainNum = PipingSystemCircuits( CircuitNum ).ParentDomainIndex;
 
 		// Do any initialization here
 		InitPipingSystems( DomainNum, CircuitNum );
@@ -6293,9 +6289,8 @@ namespace PlantPipingSystemsManager {
 			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
 				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
-
-					{ auto const SELECT_CASE_var( cell.cellType );
-					if ( SELECT_CASE_var == CellType::Pipe ) {
+					switch ( cell.cellType ) {
+					case CellType::Pipe:
 						cell.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 						for ( int rCtr = 0; rCtr <= cell.PipeCellData.Soil.u1(); ++rCtr ) {
 							cell.PipeCellData.Soil( rCtr ).Properties = PipingSystemDomains( DomainNum ).GroundProperties;
@@ -6304,26 +6299,42 @@ namespace PlantPipingSystemsManager {
 						if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
 							cell.PipeCellData.Insulation.Properties = PipingSystemCircuits( CircuitNum ).InsulationProperties;
 						}
-					} else if ( ( SELECT_CASE_var == CellType::GeneralField ) || ( SELECT_CASE_var == CellType::GroundSurface ) || ( SELECT_CASE_var == CellType::FarfieldBoundary ) ) {
+						break;
+					case CellType::GeneralField:
+					case CellType::GroundSurface:
+					case CellType::FarfieldBoundary:
 						cell.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-					} else if ( ( SELECT_CASE_var == CellType::BasementWall ) || ( SELECT_CASE_var == CellType::BasementFloor ) || ( SELECT_CASE_var == CellType::BasementCorner ) ) {
+						break;
+					case CellType::BasementWall:
+					case CellType::BasementFloor:
+					case CellType::BasementCorner:
 						if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) { // Basement interface layer
 							cell.Properties = PipingSystemDomains( DomainNum ).BasementInterfaceProperties;
 						} else { // Basement cells are partially ground, give them some props
 							cell.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 						}
-					} else if ( SELECT_CASE_var == CellType::Slab ) {
+						break;
+					case CellType::Slab:
 						cell.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
-					} else if ( SELECT_CASE_var == CellType::HorizInsulation ) {
+						break;
+					case CellType::HorizInsulation:
 						cell.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
-					} else if ( SELECT_CASE_var == CellType::VertInsulation ) {
+						break;
+					case CellType::VertInsulation:
 						cell.Properties = PipingSystemDomains( DomainNum ).VertInsProperties;
-					} else if ( SELECT_CASE_var == CellType::SlabOnGradeEdgeInsu ) {//These cells insulate the slab sides. Give them some properties
+						break;
+					case CellType::SlabOnGradeEdgeInsu://These cells insulate the slab sides. Give them some properties
 						cell.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 						cell.Properties.Conductivity = 0.000001; //Assign low conductivity
-					} else if ( SELECT_CASE_var == CellType::ZoneGroundInterface ) {
-							cell.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
-					}}
+						break;
+					case CellType::ZoneGroundInterface:
+						cell.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
+						break;
+					case CellType::BasementCutaway:
+						break;
+					case CellType::Unknown:
+						assert( false );
+					}
 				}
 			}
 		}
@@ -6486,26 +6497,32 @@ namespace PlantPipingSystemsManager {
 			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
 				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
-
-					{ auto const SELECT_CASE_var( cell.cellType );
-					if ( ( SELECT_CASE_var == CellType::GeneralField ) || ( SELECT_CASE_var == CellType::FarfieldBoundary ) || ( SELECT_CASE_var == CellType::GroundSurface ) || ( SELECT_CASE_var == CellType::BasementCorner ) || ( SELECT_CASE_var == CellType::BasementFloor ) || ( SELECT_CASE_var == CellType::BasementWall ) ) {
-							// UPDATE CELL PROPERTY SETS
-							//'main ground cells, update with soil properties
-							CellTemp = cell.Temperature;
-							PipingSystemDomains( DomainNum ).EvaluateSoilRhoCp( CellTemp, CellRhoCp );
-							cell.Properties.SpecificHeat = CellRhoCp / cell.Properties.Density;
-
-							// UPDATE BETA VALUE
-							//'these are basic cartesian calculation cells
-							Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat );
-							cell.Beta = Beta;
-
-					} else if ( ( SELECT_CASE_var == CellType::HorizInsulation ) || ( SELECT_CASE_var == CellType::VertInsulation ) || ( SELECT_CASE_var == CellType::Slab ) || ( SELECT_CASE_var == CellType::ZoneGroundInterface ) || ( SELECT_CASE_var == CellType::SlabOnGradeEdgeInsu ) ) {
-
+					switch ( cell.cellType ) {
+					case CellType::GeneralField:
+					case CellType::FarfieldBoundary:
+					case CellType::GroundSurface:
+					case CellType::BasementCorner:
+					case CellType::BasementFloor:
+					case CellType::BasementWall:
+						// UPDATE CELL PROPERTY SETS
+						//'main ground cells, update with soil properties
+						CellTemp = cell.Temperature;
+						PipingSystemDomains( DomainNum ).EvaluateSoilRhoCp( CellTemp, CellRhoCp );
+						cell.Properties.SpecificHeat = CellRhoCp / cell.Properties.Density;
+						// UPDATE BETA VALUE
+						//'these are basic cartesian calculation cells
+						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat );
+						cell.Beta = Beta;
+						break;
+					case CellType::HorizInsulation:
+					case CellType::VertInsulation:
+					case CellType::Slab:
+					case CellType::ZoneGroundInterface:
+					case CellType::SlabOnGradeEdgeInsu:
 						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.Properties.Density * cell.volume() * cell.Properties.SpecificHeat );
 						PipingSystemDomains ( DomainNum ).Cells ( X, Y, Z ).Beta = Beta;
-
-					} else if ( SELECT_CASE_var == CellType::Pipe ) {
+						break;
+					case CellType::Pipe:
 						// If pipe circuit present
 						if ( present( CircuitNum ) ) {
 							// UPDATE CELL PROPERTY SETS
@@ -6545,7 +6562,12 @@ namespace PlantPipingSystemsManager {
 							cell.PipeCellData.Fluid.Properties = PipingSystemCircuits( CircuitNum ).CurFluidPropertySet;
 							cell.PipeCellData.Fluid.Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( cell.PipeCellData.Fluid.Properties.Density * cell.PipeCellData.Fluid.Volume * cell.PipeCellData.Fluid.Properties.SpecificHeat );
 						}
-					}}
+						break;
+					case CellType::BasementCutaway:
+						break;
+					case CellType::Unknown:
+						assert( false );
+					}
 				}
 			}
 		}
