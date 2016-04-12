@@ -2965,15 +2965,15 @@ namespace PlantPipingSystemsManager {
 		//'** SET UP PIPE CIRCUIT CELLS **'
 		this->setupPipeCircuitInOutCells();
 
-		if ( allocated( XPartitionRegions ) ) XPartitionRegions.deallocate();
-		if ( allocated( YPartitionRegions ) ) YPartitionRegions.deallocate();
-		if ( allocated( ZPartitionRegions ) ) ZPartitionRegions.deallocate();
-		if ( allocated( XRegions ) ) XRegions.deallocate();
-		if ( allocated( YRegions ) ) YRegions.deallocate();
-		if ( allocated( ZRegions ) ) ZRegions.deallocate();
-		if ( allocated( XBoundaryPoints ) ) XBoundaryPoints.deallocate();
-		if ( allocated( YBoundaryPoints ) ) YBoundaryPoints.deallocate();
-		if ( allocated( ZBoundaryPoints ) ) ZBoundaryPoints.deallocate();
+		//if ( allocated( XPartitionRegions ) ) XPartitionRegions.deallocate();
+		//if ( allocated( YPartitionRegions ) ) YPartitionRegions.deallocate();
+		//if ( allocated( ZPartitionRegions ) ) ZPartitionRegions.deallocate();
+		//if ( allocated( XRegions ) ) XRegions.deallocate();
+		//if ( allocated( YRegions ) ) YRegions.deallocate();
+		//if ( allocated( ZRegions ) ) ZRegions.deallocate();
+		//if ( allocated( XBoundaryPoints ) ) XBoundaryPoints.deallocate();
+		//if ( allocated( YBoundaryPoints ) ) YBoundaryPoints.deallocate();
+		//if ( allocated( ZBoundaryPoints ) ) ZBoundaryPoints.deallocate();
 
 	}
 
@@ -3885,26 +3885,23 @@ namespace PlantPipingSystemsManager {
 		std::ofstream static outFile( "Cells.csv", std::ofstream::out );
 #endif
 
-		struct tCellExtents
+		struct tCellExtents : MeshExtents
 		{
 			// Members
-			MeshExtents MyBase;
 			Real64 Xmin;
 			Real64 Ymin;
 			Real64 Zmin;
 
-			// Default Constructor
-			tCellExtents()
-			{}
-
 			// Member Constructor
 			tCellExtents(
-				MeshExtents const & MyBase,
+				Real64 const Xmax,
+				Real64 const Ymax,
+				Real64 const Zmax,
 				Real64 const Xmin,
 				Real64 const Ymin,
 				Real64 const Zmin
 			) :
-				MyBase( MyBase ),
+				MeshExtents( Xmax, Ymax, Zmax ),
 				Xmin( Xmin ),
 				Ymin( Ymin ),
 				Zmin( Zmin )
@@ -3938,10 +3935,6 @@ namespace PlantPipingSystemsManager {
 				for ( int Z = 0, Z_end = this->z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
-					//if ( X == X_end ) {
-				//		int adsf = 23;
-			//		}
-
 					//'set up x-direction variables
 					int CellXIndex = X; //'zero based index
 					Real64 CellXMinValue = XBoundaryPoints( X ); //'left wall x-value
@@ -3963,7 +3956,7 @@ namespace PlantPipingSystemsManager {
 					Real64 CellZCenter = ( CellZMinValue + CellZMaxValue ) / 2;
 
 					//'set up an extent class for this cell
-					tCellExtents CellExtents = tCellExtents( MeshExtents( CellXMaxValue, CellYMaxValue, CellZMaxValue ), CellXMinValue, CellYMinValue, CellZMinValue );
+					tCellExtents CellExtents = tCellExtents( CellXMaxValue, CellYMaxValue, CellZMaxValue, CellXMinValue, CellYMinValue, CellZMinValue );
 
 					//'set up centroid, index, and overall size
 					Point3DReal Centroid = Point3DReal( CellXCenter, CellYCenter, CellZCenter );
@@ -4174,11 +4167,11 @@ namespace PlantPipingSystemsManager {
 
 					//'instantiate the cell class
 					cell.X_min = CellExtents.Xmin;
-					cell.X_max = CellExtents.MyBase.Xmax;
+					cell.X_max = CellExtents.Xmax;
 					cell.Y_min = CellExtents.Ymin;
-					cell.Y_max = CellExtents.MyBase.Ymax;
+					cell.Y_max = CellExtents.Ymax;
 					cell.Z_min = CellExtents.Zmin;
-					cell.Z_max = CellExtents.MyBase.Zmax;
+					cell.Z_max = CellExtents.Zmax;
 					cell.X_index = CellIndeces.X;
 					cell.Y_index = CellIndeces.Y;
 					cell.Z_index = CellIndeces.Z;
