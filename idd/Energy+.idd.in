@@ -38352,7 +38352,7 @@ ZoneHVAC:VentilatedSlab,
        \type node
   A25, \field Fan Name
        \required-field
-       \note Allowable fan type is Fan:ConstantVolume
+       \note Allowable fan types are Fan:SystemModel and Fan:ConstantVolume
        \type object-list
        \object-list FansCV
   A26, \field Coil Option Type
