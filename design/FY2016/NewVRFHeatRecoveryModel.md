@@ -6,13 +6,14 @@ A New VRF Heat Recovery System Model
 
  - Original Date: Jan. 16, 2016
  - Revision Date: Apr. 7, 2016
+ - Revision Date: Apr. 12, 2016
  
 
 ## Justification for New Feature ##
 
 The proposed new feature introduces an innovative model to simulate the energy performance of Variable Refrigerant Flow (VRF) systems with heat recovery (HR) configurations, which is capable of achieving heat recovery from cooling zones to heating zones and providing cooling and heating operation simultaneously. This feature is a continuation of the new VRF heat pump (HP) system model implemented in EnergyPlus V8.4.
 
-The proposed model is developed for the 3-pipe VRF-HR systems, the dominant system configuration in the current VRF-HR market. Compared with the VRF-HP system, VRF-HR is more complicated in terms of system configuration and operational controls. To enable simultaneous cooling and heating, complex refrigerant management loop and more system components are implemented, including one more heat exchanger in the outdoor unit (OU) and multiple Branch Selector (BS) Units. The two outdoor heat exchangers can work at different combinations of evaporator/condenser mode to handle diverse and changing indoor heating/cooling load requirements. This leads to varying refrigerant flow directions and different control logics for various operational modes, and therefore specific algorithm is needed for separate major operational modes.
+The proposed model is developed for the 3-pipe VRF-HR systems, the dominant system configuration in the current VRF-HR products. Compared with the VRF-HP system, VRF-HR is more complicated in terms of system configuration and operational controls. To enable simultaneous cooling and heating, complex refrigerant management loop and more system components are implemented, including one more heat exchanger in the outdoor unit (OU) and multiple Branch Selector (BS) Units. The two outdoor heat exchangers can work at different combinations of evaporator/condenser mode to handle diverse and changing indoor heating/cooling load requirements. This leads to varying refrigerant flow directions and different control logics for various operational modes, and therefore specific algorithm is needed for separate major operational modes.
 
 The proposed new VRF-HR model inherits many key features of the recently implemented VRF-HP model. Compared with the existing system curve based VRF-HR model, the new model is more physics-based by simulating the refrigerant loop performance. It is able to consider the dynamics of more operational parameters, which is essential for the representation of the complex control logics (e.g., the adjustment of superheating degrees during low load operations). Furthermore, the proposed model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. These features considerably extend the modeling capabilities of the new VRF-HR model, including:
 
@@ -28,6 +29,24 @@ The proposed new VRF-HR model inherits many key features of the recently impleme
 
 
 ## E-mail and  Conference Call Conclusions ##
+
+•	Mike, Apr. 12. 2016
+-	Comments:
+1)	How different is the proposed new HR object from the existing AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object?
+2)	Any particular reason why the non-HR object allows a loading index up to 9 and the HR one goes to 11? Should these both be extensible? What's a typical number for loading index?
+3)	Field A1 should just be "Name" not "Heat Pump Name",  same for the old ones and the VRF terminal units and the VRF list, so do we continue the pattern or fix them all? And why did we call all of these AirConditioner:VariableRefrigerantFlow:* instead of HeatPump:VariableRefrigerantFlow:? If we decide to rename these - that should be a separate pull request with transitions etc.  But this new object could come in with the HeatPump name right from the start.
+-	Reply: 
+1) The difference between the proposed VRF-FluidTCtrl-HR object and the existing VRF-FluidTCtrl-HP object lies in the fields about thermostat priority control, main pipe information, mode transition, and outdoor unit evaporator/condenser descriptions.
+2) Yes, we agree that they should be extensible. They are now put at the end of the object and thus requires little modification of the existing design. The number of compressor loading index depends on the experiment data from manufacturer, usually between 3 and 11.
+3) AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR will be used as a temporary design in the Interim Release, to be consistent with existing ones and to avoid transition issues. A poll will be held to select better names, and the selected design will be used for the next official release which will involve transition issues. This will be handled by setting a separate issue. (TBD: Renaming of the HP object (AirConditioner or HeatPump, VariableRefrigerantFlow or VRF, etc; Set up a new field to specify the system configuration: 2pipe or 3Pipe; etc. )
+
+-	Comments:
+1)	From a code organization perspective, it seems the VRF coils should be pulled out of DXCoils.cc into a separate file or into HVACVariableRefrigerantFlow.cc  Does the  VRF-FluidTCtrl model rely on any other functions in DXCoils.cc?  The DXCoils::DXCoilData struct is very ugly with some common fields across the various flavors of DX coils, but lots of fields that only apply to one coil type and are unused for others.  Seems we should be splitting this up.  
+2)	Is any of this new code going to follow the new OO design guidelines?
+-	Reply: 
+1) Currently Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl object for the VRF-FluidTCtrl model is handled in DXCoils.cc, to be consistent with Coil:Cooling:DX:VariableRefrigerantFlow object for the VRF-SysCurve model. A separate issue can be set up if we decide to move them out of DXCoils.cc. 
+2) Rongpeng will first focus on the HR algorithm implementations to ensure its functionality. Then Edwin will work with Rongpeng to implement more OO design for the VRF part. Very possibly this requires the modification of the codes for VRF-SysCurve model and VRF-FluidTCtrl-HP model, in addition to the proposed VRF-FluidTCtrl-HR model.
+
 
 •	Brent, Jan. 20. 2016
 
@@ -291,8 +310,9 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \memo This is a key object in the new physics based VRF Heat Recovery (HR) model applicable for Fluid
        \memo Temperature Control. It describes the VRF HR system excluding the performance of indoor units.
        \memo Indoor units are modeled separately in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+       \extensible:3 Just duplicate last three fields and comments (changing numbering, please)
        \min-fields 9
-  A1 , \field Heat Pump Name
+  A1 , \field Name
        \required-field
        \type alpha
        \note Enter a unique name for this variable refrigerant flow heat pump
@@ -438,7 +458,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \default 4.25E-3
        \type real
   N20, \field Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
-       \note This field is only used if the previous is set to autocalculate and performance input method is NominalCapacity
+       \note Enter the outdoor unit fan flow rate per Watt of rated evaporative capacity [W/W]
        \units m3/s-W
        \minimum> 0.0
        \default 7.50E-5
@@ -663,6 +683,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
   N47, \field Compressor Speed at Loading Index 1
        \type real
        \note Minimum compressor speed
+       \begin-extensible
        \units rev/min
        \minimum> 0
   A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
