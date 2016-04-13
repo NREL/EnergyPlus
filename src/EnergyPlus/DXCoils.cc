@@ -12073,10 +12073,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
-		using Fans::GetFanPower;
-		using Fans::GetFanInletNode;
-		using Fans::GetFanOutletNode;
-		using Fans::SimulateFanComponents;
 		using DataEnvironment::OutBaroPress;
 		using General::SolveRegulaFalsi;
 		using General::RoundSigDigits;
@@ -12209,19 +12205,30 @@ Label50: ;
 					ExternalStatic = 190.0;
 				}
 				FanStaticPressureRise = ExternalStatic + DXCoil( DXCoilNum ).InternalStaticPressureDrop;
+				if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+					FanInletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->inletNodeNum();
+					FanOutletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->outletNodeNum();
+				} else {
+					FanInletNode = Fans::GetFanInletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
+					FanOutletNode = Fans::GetFanOutletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
+				}
 
-				FanInletNode = GetFanInletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
-				FanOutletNode = GetFanOutletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
 				// set node state variables in preparation for fan model.
 				Node( FanInletNode ).MassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 				Node( FanOutletNode ).MassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 				Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 				Node( FanInletNode ).HumRat = PsyWFnTdbTwbPb( CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, RoutineName );
 				Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, Node( FanInletNode ).HumRat );
+				if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+					HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->simulate( _, true, false, FanStaticPressureRise );
+					FanPowerCorrection = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->fanPower();
+				} else {
+					Fans::SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+					FanPowerCorrection = Fans::GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
+				}
 
-				SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-				FanPowerCorrection = GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
+				
 
 				NetCoolingCapRated = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 			}
@@ -12343,9 +12350,16 @@ Label50: ;
 					Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 					Node( FanInletNode ).HumRat = SupplyAirHumRat;
 					Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat );
-					SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+
+					if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+						HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->simulate( _, true, false, FanStaticPressureRise );
+						FanPowerCorrection = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->fanPower();
+					} else {
+						Fans::SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+						FanPowerCorrection = Fans::GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
+					}
+
 					FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-					FanPowerCorrection = GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex );
 
 				} else {
 					FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -12521,7 +12535,6 @@ Label50: ;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using DataAirSystems::PrimaryAirSystem;
-		using Fans::GetFanIndex;
 
 		using DataHVACGlobals::NumPrimaryAirSys;
 
@@ -12574,7 +12587,7 @@ Label50: ;
 					for ( CompNum = 1; CompNum <= PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).TotalComponents; ++CompNum ) {
 						if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == SimAirServingZones::Fan_Simple_VAV ) {
 							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
-							GetFanIndex( SupplyFanName, SupplyFanIndex, ErrorsFound );
+							Fans::GetFanIndex( SupplyFanName, SupplyFanIndex, ErrorsFound );
 							SupplyFan_TypeNum = SimAirServingZones::Fan_Simple_VAV;
 							break;
 							// these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
@@ -12619,7 +12632,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using Fans::SimulateFanComponents;
 		using CurveManager::CurveValue;
 
 		// Return value
@@ -12702,7 +12714,12 @@ Label50: ;
 			Node( FanInletNodeNum ).Temp = IndoorUnitInletDryBulb;
 			Node( FanInletNodeNum ).HumRat = PsyWFnTdbTwbPb( IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, RoutineName );
 			Node( FanInletNodeNum ).Enthalpy = PsyHFnTdbW( IndoorUnitInletDryBulb, Node( FanInletNodeNum ).HumRat );
-			SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+			if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->simulate( _, true, false, FanStaticPressureRise );
+			} else {
+				Fans::SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+			}
+
 			FanHeatCorrection = Node( FanOutletNodeNum ).Enthalpy - Node( FanInletNodeNum ).Enthalpy;
 
 		} else {
