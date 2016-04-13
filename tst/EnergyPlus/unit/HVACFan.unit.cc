@@ -63,14 +63,55 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-//#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-//#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/HVACFan.hh>
-//#include <EnergyPlus/UtilityRoutines.hh>
-//#include <ObjexxFCL/gio.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 namespace EnergyPlus {
+
+TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
+{
+	// this unit test mimics "EnergyPlusFixture.Fans_FanSizing" 
+	// the idea is to set up a fan and run its sizing routine 
+	// the size is filled by the value in DataSizing::DataNonZoneNonAirloopValue
+	std::string const idf_objects = delimited_string( {
+	
+		"  Fan:SystemModel,",
+		"    Test Fan ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFanAirInletNode,         !- Air Inlet Node Name",
+		"    TestFanOutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	std::string fanName = "TEST FAN";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataSizing::CurZoneEqNum = 0;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); // triggers sizing call
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	EXPECT_NEAR( 1.0000, locFanSizeVdot, 0.00000001 );
+	Real64 locDesignTempRise = HVACFan::fanObjs[ 0 ]->getFanDesignTemperatureRise();
+	EXPECT_NEAR( locDesignTempRise, 0.166, 0.001 );
+	Real64 locDesignHeatGain = HVACFan::fanObjs[ 0 ]->getFanDesignHeatGain( locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain, 200.0, 0.1 );
+	EXPECT_FALSE( HVACFan::fanObjs[ 0 ]->getIfContinuousSpeedControl() );
+}
+
 
 TEST_F( EnergyPlusFixture, SystemFanObj_FanSizing1 )
 {
@@ -107,7 +148,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_FanSizing1 )
 	DataSizing::DataNonZoneNonAirloopValue = 1.00635;
 	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); // triggers sizing call
 	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
-	EXPECT_DOUBLE_EQ( 1.00635, locFanSizeVdot );
+	EXPECT_NEAR( 1.00635, locFanSizeVdot, 0.00001 );
 	DataSizing::DataNonZoneNonAirloopValue = 0.0;
 }
 
