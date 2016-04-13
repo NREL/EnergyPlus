@@ -299,8 +299,9 @@ namespace ChillerGasAbsorption {
 			CalcGasAbsorberHeaterModel( ChillNum, MyLoad, RunFlag );
 			UpdateGasAbsorberHeatRecords( MyLoad, RunFlag, ChillNum );
 		} else if ( BranchInletNodeNum == GasAbsorber( ChillNum ).CondReturnNodeNum ) { // called from condenser loop
-			UpdateChillerComponentCondenserSide( GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorberReport( ChillNum ).TowerLoad, GasAbsorberReport( ChillNum ).CondReturnTemp, GasAbsorberReport( ChillNum ).CondSupplyTemp, GasAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
-
+			if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ){
+				UpdateChillerComponentCondenserSide( GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorberReport( ChillNum ).TowerLoad, GasAbsorberReport( ChillNum ).CondReturnTemp, GasAbsorberReport( ChillNum ).CondSupplyTemp, GasAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
+			}
 		} else { // Error, nodes do not match
 			ShowSevereError( "Invalid call to Gas Absorber Chiller " + AbsorberName );
 			ShowContinueError( "Node connections in branch are not consistent with object nodes." );
@@ -821,7 +822,9 @@ namespace ChillerGasAbsorption {
 
 		} else {
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+			if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ){
+				SetComponentFlowRate( mdot, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+			}
 		}
 
 	}
@@ -1343,8 +1346,10 @@ namespace ChillerGasAbsorption {
 
 		rhoCW = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		Cp_CW = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-		Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ){
+			rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+			Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		}
 
 		//If no loop demand or Absorber OFF, return
 		// will need to modify when absorber can act as a boiler
@@ -1381,9 +1386,12 @@ namespace ChillerGasAbsorption {
 			} else {
 				// air cooled
 				Node( lCondReturnNodeNum ).Temp = Node( lCondReturnNodeNum ).OutAirDryBulb;
+				calcCondTemp = Node( lCondReturnNodeNum ).OutAirDryBulb;
 				lCondReturnTemp = Node( lCondReturnNodeNum ).Temp;
 				lCondWaterMassFlowRate = 0.0;
-				SetComponentFlowRate( lCondWaterMassFlowRate, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+				if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ) {
+					SetComponentFlowRate( lCondWaterMassFlowRate, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+				}
 			}
 
 			//Determine available cooling capacity using the setpoint temperature

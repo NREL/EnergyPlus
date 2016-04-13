@@ -306,7 +306,9 @@ namespace ChillerExhaustAbsorption {
 			CalcExhaustAbsorberHeaterModel( ChillNum, MyLoad, RunFlag );
 			UpdateExhaustAbsorberHeatRecords( MyLoad, RunFlag, ChillNum );
 		} else if ( BranchInletNodeNum == ExhaustAbsorber( ChillNum ).CondReturnNodeNum ) { // called from condenser loop
-			UpdateChillerComponentCondenserSide( ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_ExhFiredAbsorption, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorberReport( ChillNum ).TowerLoad, ExhaustAbsorberReport( ChillNum ).CondReturnTemp, ExhaustAbsorberReport( ChillNum ).CondSupplyTemp, ExhaustAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
+			if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ){
+				UpdateChillerComponentCondenserSide( ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_ExhFiredAbsorption, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorberReport( ChillNum ).TowerLoad, ExhaustAbsorberReport( ChillNum ).CondReturnTemp, ExhaustAbsorberReport( ChillNum ).CondSupplyTemp, ExhaustAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
+			}
 
 		} else { // Error, nodes do not match
 			ShowSevereError( "Invalid call to Exhaust Absorber Chiller " + AbsorberName );
@@ -805,7 +807,9 @@ namespace ChillerExhaustAbsorption {
 
 		} else {
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, ExhaustAbsorber( ChillNum ).CDBranchNum, ExhaustAbsorber( ChillNum ).CDCompNum );
+			if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ){
+				SetComponentFlowRate( mdot, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, ExhaustAbsorber( ChillNum ).CDBranchNum, ExhaustAbsorber( ChillNum ).CDCompNum );
+			}
 		}
 
 	}
@@ -1336,8 +1340,10 @@ namespace ChillerExhaustAbsorption {
 
 		rhoCW = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		Cp_CW = GetSpecificHeatGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		rhoCD = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-		Cp_CD = GetSpecificHeatGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ){
+			rhoCD = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+			Cp_CD = GetSpecificHeatGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		}
 
 		//If no loop demand or Absorber OFF, return
 		// will need to modify when absorber can act as a boiler
@@ -1374,9 +1380,12 @@ namespace ChillerExhaustAbsorption {
 			} else {
 				// air cooled
 				Node( lCondReturnNodeNum ).Temp = Node( lCondReturnNodeNum ).OutAirDryBulb;
+				calcCondTemp = Node( lCondReturnNodeNum ).OutAirDryBulb;
 				lCondReturnTemp = Node( lCondReturnNodeNum ).Temp;
 				lCondWaterMassFlowRate = 0.0;
-				SetComponentFlowRate( lCondWaterMassFlowRate, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, ExhaustAbsorber( ChillNum ).CDBranchNum, ExhaustAbsorber( ChillNum ).CDCompNum );
+				if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ){
+					SetComponentFlowRate( lCondWaterMassFlowRate, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, ExhaustAbsorber( ChillNum ).CondSupplyNodeNum, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, ExhaustAbsorber( ChillNum ).CDBranchNum, ExhaustAbsorber( ChillNum ).CDCompNum );
+				}
 			}
 
 			//Determine available cooling capacity using the setpoint temperature
