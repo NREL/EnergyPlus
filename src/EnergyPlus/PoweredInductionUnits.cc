@@ -1354,7 +1354,6 @@ namespace PoweredInductionUnits {
 		using namespace DataZoneEnergyDemands;
 		using MixerComponent::SimAirMixer;
 		using HeatingCoils::SimulateHeatingCoilComponents;
-		using Fans::SimulateFanComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using DataPlant::PlantLoop;
@@ -1460,7 +1459,7 @@ namespace PoweredInductionUnits {
 				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
 				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-					SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
 				}
 
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
@@ -1494,7 +1493,7 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
 		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-			SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
 		}
 		// check if heating coil is off
 		QActualHeating = QToHeatSetPt - Node( HCoilInAirNode ).MassFlowRate * CpAirZn * ( Node( HCoilInAirNode ).Temp - Node( ZoneNode ).Temp );
@@ -1602,7 +1601,6 @@ namespace PoweredInductionUnits {
 		using namespace DataZoneEnergyDemands;
 		using MixerComponent::SimAirMixer;
 		using HeatingCoils::SimulateHeatingCoilComponents;
-		using Fans::SimulateFanComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1698,7 +1696,7 @@ namespace PoweredInductionUnits {
 				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
 				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-					SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
 				}
 				SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num ); // fire the mixer
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
@@ -1732,7 +1730,7 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
 		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-			SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
 		}
 		// fire the mixer
 		SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num );

@@ -3776,7 +3776,6 @@ namespace SingleDuct {
 		// Using/Aliasing
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
-		using Fans::SimulateFanComponents;
 		using DataHVACGlobals::TurnFansOff;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
@@ -3812,14 +3811,14 @@ namespace SingleDuct {
 		Node( FanInNode ).MassFlowRate = AirMassFlow;
 		CpAirZn = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 		if ( FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1 ) {
-			SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
+			Fans::SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
 		} else if ( FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1 ) {
 			HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->simulate( _,_,_,_ );
 
 		} else { // pass through conditions
 			TurnFansOff = true;
 			if ( FanType == DataHVACGlobals::FanType_SimpleVAV ) {
-				SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
+				Fans::SimulateFanComponents( Sys( SysNum ).FanName, FirstHVACIteration, Sys( SysNum ).Fan_Index );
 			} else if ( FanType == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->simulate( _,_,TurnFansOff,_ );
 			}

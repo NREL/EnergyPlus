@@ -2892,7 +2892,6 @@ namespace SimAirServingZones {
 
 		// USE Statements
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using MixedAir::ManageOutsideAirSystem;
 		using Furnaces::SimFurnace;
 		using HVACDuct::SimDuct;
@@ -2937,10 +2936,10 @@ namespace SimAirServingZones {
 
 			// Fan Types for the air sys simulation
 		} else if ( SELECT_CASE_var == Fan_Simple_CV ) { // 'Fan:ConstantVolume'
-			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
-			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
 		} else if ( SELECT_CASE_var == Fan_System_Object ) { // "Fan:SystemModel" new for V8.6
 			if ( CompIndex == 0 ) { // 0 means has not been filled because of 1-based arrays in old fortran
@@ -2950,7 +2949,7 @@ namespace SimAirServingZones {
 
 			// cpw22Aug2010 Add Fan:ComponentModel (new)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
-			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
 			// Coil Types for the air sys simulation
 			//  Currently no control for HX Assisted coils

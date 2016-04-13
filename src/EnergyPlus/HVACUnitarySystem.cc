@@ -6191,7 +6191,6 @@ namespace HVACUnitarySystem {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6216,9 +6215,10 @@ namespace HVACUnitarySystem {
 		//CALL the series of components that simulate a Unitary System
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				
 				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 			} else {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
 		}
 
@@ -6265,7 +6265,7 @@ namespace HVACUnitarySystem {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 			} else {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
 		}
 
@@ -7464,7 +7464,6 @@ namespace HVACUnitarySystem {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 
@@ -7532,7 +7531,7 @@ namespace HVACUnitarySystem {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 			} else {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
 		}
 
@@ -7561,7 +7560,7 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 				} else {
-					SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+					Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 				}
 				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
@@ -7603,7 +7602,7 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 				} else {
-					SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+					Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 				}
 				if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 					CalcUnitaryHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad );
@@ -7628,7 +7627,7 @@ namespace HVACUnitarySystem {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 			} else {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
 		}
 
@@ -7704,7 +7703,6 @@ namespace HVACUnitarySystem {
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::SimDXCoilMultiMode;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-		using Fans::SimulateFanComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
@@ -10315,7 +10313,6 @@ namespace HVACUnitarySystem {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10344,7 +10341,7 @@ namespace HVACUnitarySystem {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 			} else {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
 		}
 
@@ -10386,7 +10383,7 @@ namespace HVACUnitarySystem {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
 			} else {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
 		}
 

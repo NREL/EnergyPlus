@@ -1551,7 +1551,6 @@ namespace UnitHeater {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -1601,7 +1600,7 @@ namespace UnitHeater {
 		}
 		if ( FanOpMode != CycFanCycCoil ) {
 			if ( UnitHeat( UnitHeatNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
 			}
@@ -1650,7 +1649,7 @@ namespace UnitHeater {
 
 			if ( QCoilReq < 0.0 ) QCoilReq = 0.0; // a heating coil can only heat, not cool
 			if ( UnitHeat( UnitHeatNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
 			}

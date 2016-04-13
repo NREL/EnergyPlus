@@ -2700,7 +2700,6 @@ namespace UnitVentilator {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -2754,7 +2753,7 @@ namespace UnitVentilator {
 
 			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
-				SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
 			}
@@ -2815,7 +2814,7 @@ namespace UnitVentilator {
 
 			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
-				SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
 			}
