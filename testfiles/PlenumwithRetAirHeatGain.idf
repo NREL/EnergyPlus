@@ -9,7 +9,7 @@
 ! plenum zone back to the system air loop.  The cooling coil is water with a chilled water plant loop and the
 ! reheat coil is a gas fired coil.  The surfaces between the main zone and the plenum are interzone.
 
-  Version,8.4;
+  Version,8.5;
 
   Timestep,4;
 
@@ -1492,7 +1492,6 @@
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     1.5,                     !- Maximum Air Flow Rate {m3/s}
-    ,                        !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Gas,        !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}

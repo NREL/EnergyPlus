@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -35,20 +35,17 @@ public: // Types
 public: // Creation
 
 	// Constructor (Implicit): Clips Exponent to Valid Range
-	inline
 	ChunkExponent( T const exponent ) :
 	 exponent_( std::min( exponent, static_cast< T >( std::numeric_limits< T >::digits - 1 ) ) )
 	{}
 
 	// Destructor
-	inline
 	~ChunkExponent()
 	{}
 
 public: // Conversion
 
 	// Exponent Value Conversion
-	inline
 	operator T() const
 	{
 		return exponent_;

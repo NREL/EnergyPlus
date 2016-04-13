@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef WaterCoils_hh_INCLUDED
 #define WaterCoils_hh_INCLUDED
 
@@ -213,6 +271,8 @@ namespace WaterCoils {
 		//COIL:Water:SimpleHeating Coil Performance Input Method
 		int CoilPerfInpMeth; // 1 = UA and Design Water Flow Rate; 2 = Nominal Capacity
 		Real64 FoulingFactor; // Coil fouling factor [m2K/W]
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -321,234 +381,9 @@ namespace WaterCoils {
 			CondensateVdot( 0.0 ),
 			CondensateVol( 0.0 ),
 			CoilPerfInpMeth( 0 ),
-			FoulingFactor( 0.0 )
-		{}
-
-		// Member Constructor
-		WaterCoilEquipConditions(
-			std::string const & Name, // Name of the WaterCoil
-			std::string const & WaterCoilTypeA, // Type of WaterCoil ie. Heating or Cooling
-			std::string const & WaterCoilModelA, // Type of WaterCoil ie. Simple, Detailed, etc.
-			int const WaterCoilType, // Type of WaterCoil ie. Heating or Cooling
-			int const WaterCoilModel, // Type of WaterCoil ie. Simple, Detailed, etc.
-			int const WaterCoilType_Num,
-			std::string const & Schedule, // WaterCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			bool const RequestingAutoSize, // True if this coil has appropriate autosize fields
-			Real64 const InletAirMassFlowRate, // MassFlow through the WaterCoil being Simulated [kg/s]
-			Real64 const OutletAirMassFlowRate, // MassFlow throught the WaterCoil being Simulated[kg/s]
-			Real64 const InletAirTemp, // Inlet Air Temperature Operating Condition [C]
-			Real64 const OutletAirTemp, // Outlet Air Temperature Operating Condition [C]
-			Real64 const InletAirHumRat, // Inlet Air Humidity Ratio Operating Condition
-			Real64 const OutletAirHumRat, // Outlet Air Humidity Ratio Calculated Condition
-			Real64 const InletAirEnthalpy, // Inlet Air enthalpy [J/kg]
-			Real64 const OutletAirEnthalpy, // Outlet Air enthalpy [J/kg]
-			Real64 const TotWaterCoilLoad, // Total Load on the Coil [W]
-			Real64 const SenWaterCoilLoad, // Sensible Load on the Coil [W]
-			Real64 const TotWaterHeatingCoilEnergy, // Total Heating Coil energy of the Coil [J]
-			Real64 const TotWaterCoolingCoilEnergy, // Total Cooling Coil energy of the Coil [J]
-			Real64 const SenWaterCoolingCoilEnergy, // Sensible Cooling Coil energy of the Coil [J]
-			Real64 const DesWaterHeatingCoilRate, // Design Heating Coil Rate used for sizing [W]
-			Real64 const TotWaterHeatingCoilRate, // Total Heating Coil Rate on the Coil [W]
-			Real64 const DesWaterCoolingCoilRate, // Design Cooling Coil Rate used for sizing [W]
-			Real64 const TotWaterCoolingCoilRate, // Total Cooling Coil Rate on the Coil [W]
-			Real64 const SenWaterCoolingCoilRate, // Sensible Cooling Coil Rate on the Coil [W]
-			Real64 const UACoil, // WaterCoil UA Value
-			Real64 const LeavingRelHum, // Simple Coil Latent Model requires User input for leaving RH
-			Real64 const DesiredOutletTemp,
-			Real64 const DesiredOutletHumRat,
-			Real64 const InletWaterTemp, // Inlet Water Temperature [C]
-			Real64 const OutletWaterTemp, // Outlet Water Temperature [C]
-			Real64 const InletWaterMassFlowRate, // Inlet Water Mass Flow Rate [Kg/s]
-			Real64 const OutletWaterMassFlowRate, // Outlet Water Mass Flow Rate [Kg/s]
-			Real64 const MaxWaterVolFlowRate, // Maximum water Volume flow rate [m3/s]
-			Real64 const MaxWaterMassFlowRate, // Maximum water mass flow rate [Kg/s]
-			Real64 const InletWaterEnthalpy, // Inlet Water Enthalpy
-			Real64 const OutletWaterEnthalpy, // Outlet Water Enthalpy
-			Real64 const TubeOutsideSurfArea, // Tube Primary Surface Area
-			Real64 const TotTubeInsideArea, // Total Tube inside Surface Area
-			Real64 const FinSurfArea, // Fin Surface Area
-			Real64 const MinAirFlowArea,
-			Real64 const CoilDepth,
-			Real64 const FinDiam, // Fin Diameter or the Coil Height
-			Real64 const FinThickness,
-			Real64 const TubeInsideDiam, // Inner diameter of Tubes
-			Real64 const TubeOutsideDiam, // Outer Diameter of the Tubes
-			Real64 const TubeThermConductivity,
-			Real64 const FinThermConductivity,
-			Real64 const FinSpacing, // Fin Spacing or Distance
-			Real64 const TubeDepthSpacing,
-			int const NumOfTubeRows,
-			int const NumOfTubesPerRow,
-			Real64 const EffectiveFinDiam,
-			Real64 const TotCoilOutsideSurfArea,
-			Real64 const CoilEffectiveInsideDiam,
-			Real64 const GeometryCoef1,
-			Real64 const GeometryCoef2,
-			Array1< Real64 > const & DryFinEfficncyCoef,
-			Real64 const SatEnthlCurveConstCoef,
-			Real64 const SatEnthlCurveSlope,
-			Real64 const EnthVsTempCurveAppxSlope,
-			Real64 const EnthVsTempCurveConst,
-			Real64 const MeanWaterTempSaved,
-			Real64 const InWaterTempSaved,
-			Real64 const OutWaterTempSaved,
-			Real64 const SurfAreaWetSaved,
-			Real64 const SurfAreaWetFraction,
-			Real64 const DesInletWaterTemp, // Entering water temperature at Design(C)
-			Real64 const DesAirVolFlowRate, // Entering Air Volume Flow Rate Design( m3/s)
-			Real64 const DesInletAirTemp, // Entering air dry bulb temperature at Design(C)
-			Real64 const DesInletAirHumRat, // Entering air humidity ratio at design conditions
-			Real64 const DesTotWaterCoilLoad, // Total heat transfer rate at Design(Watt)
-			Real64 const DesSenWaterCoilLoad, // Sensible heat transfer rate at Design(Watt)
-			Real64 const DesAirMassFlowRate, // Design Air MassFlow through the WaterCoil [kg/Sec]
-			Real64 const UACoilTotal, // Overall external dry UA (W/C)
-			Real64 const UACoilInternal, // Overall internal UA(W/C)
-			Real64 const UACoilExternal, // Overall external heat transfer coefficient(W/C)
-			Real64 const UACoilInternalDes, // Overall design internal UA(W/C)
-			Real64 const UACoilExternalDes, // Overall design external heat transfer coefficient(W/C)
-			Real64 const DesOutletAirTemp, // Leaving air temperature at rating(C)
-			Real64 const DesOutletAirHumRat, // Humidity ratio of air leaving at design capacity.
-			Real64 const DesOutletWaterTemp, // Temp of Liquid Leaving the Coil at design Capacity
-			int const HeatExchType, // Heat exchanger configuration, default to Cross Flow
-			int const CoolingCoilAnalysisMode, // Mode Of analysis, Simple=1 and Detailed =2
-			Real64 const UACoilInternalPerUnitArea, // Internal overall heat transfer coefficient(W/m2 C)
-			Real64 const UAWetExtPerUnitArea, // External overall heat transfer coefficient(W/m2 C)
-			Real64 const UADryExtPerUnitArea, // External overall heat transfer coefficient(W/m2 C)
-			Real64 const SurfAreaWetFractionSaved, // Previous saved value, for numerical efficiency.
-			Real64 const UACoilVariable, // WaterCoil UA value when variable (simple heating coil only)
-			Real64 const RatioAirSideToWaterSideConvect, // "r" value for coil,
-			Real64 const AirSideNominalConvect, // nominal rating point air side convection term (fin_effic*(hc*A))
-			Real64 const LiquidSideNominalConvect, // nominal rating point water side convection term (hc*A)
-			int const Control, // Const Vol =1;  Variable Vol = 2
-			int const AirInletNodeNum,
-			int const AirOutletNodeNum,
-			int const WaterInletNodeNum,
-			int const WaterOutletNodeNum,
-			int const WaterLoopNum, // Plant loop index
-			int const WaterLoopSide, // Plant loop side index
-			int const WaterLoopBranchNum, // Plant loop branch index
-			int const WaterLoopCompNum, // Plant loop Comp index
-			int const CondensateCollectMode, // where does water come from
-			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
-			int const CondensateTankID, // index "pointer" to Storage TAnk array WaterStorage
-			int const CondensateTankSupplyARRID, // index pointe to supply Vdot array in WaterStorage
-			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
-			Real64 const CondensateVol, // amount of water condensed from air stream [m3]
-			int const CoilPerfInpMeth, // 1 = UA and Design Water Flow Rate; 2 = Nominal Capacity
-			Real64 const FoulingFactor // Coil fouling factor [m2K/W]
-		) :
-			Name( Name ),
-			WaterCoilTypeA( WaterCoilTypeA ),
-			WaterCoilModelA( WaterCoilModelA ),
-			WaterCoilType( WaterCoilType ),
-			WaterCoilModel( WaterCoilModel ),
-			WaterCoilType_Num( WaterCoilType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			RequestingAutoSize( RequestingAutoSize ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			OutletAirMassFlowRate( OutletAirMassFlowRate ),
-			InletAirTemp( InletAirTemp ),
-			OutletAirTemp( OutletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			OutletAirHumRat( OutletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			TotWaterCoilLoad( TotWaterCoilLoad ),
-			SenWaterCoilLoad( SenWaterCoilLoad ),
-			TotWaterHeatingCoilEnergy( TotWaterHeatingCoilEnergy ),
-			TotWaterCoolingCoilEnergy( TotWaterCoolingCoilEnergy ),
-			SenWaterCoolingCoilEnergy( SenWaterCoolingCoilEnergy ),
-			DesWaterHeatingCoilRate( DesWaterHeatingCoilRate ),
-			TotWaterHeatingCoilRate( TotWaterHeatingCoilRate ),
-			DesWaterCoolingCoilRate( DesWaterCoolingCoilRate ),
-			TotWaterCoolingCoilRate( TotWaterCoolingCoilRate ),
-			SenWaterCoolingCoilRate( SenWaterCoolingCoilRate ),
-			UACoil( UACoil ),
-			LeavingRelHum( LeavingRelHum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			InletWaterMassFlowRate( InletWaterMassFlowRate ),
-			OutletWaterMassFlowRate( OutletWaterMassFlowRate ),
-			MaxWaterVolFlowRate( MaxWaterVolFlowRate ),
-			MaxWaterMassFlowRate( MaxWaterMassFlowRate ),
-			InletWaterEnthalpy( InletWaterEnthalpy ),
-			OutletWaterEnthalpy( OutletWaterEnthalpy ),
-			TubeOutsideSurfArea( TubeOutsideSurfArea ),
-			TotTubeInsideArea( TotTubeInsideArea ),
-			FinSurfArea( FinSurfArea ),
-			MinAirFlowArea( MinAirFlowArea ),
-			CoilDepth( CoilDepth ),
-			FinDiam( FinDiam ),
-			FinThickness( FinThickness ),
-			TubeInsideDiam( TubeInsideDiam ),
-			TubeOutsideDiam( TubeOutsideDiam ),
-			TubeThermConductivity( TubeThermConductivity ),
-			FinThermConductivity( FinThermConductivity ),
-			FinSpacing( FinSpacing ),
-			TubeDepthSpacing( TubeDepthSpacing ),
-			NumOfTubeRows( NumOfTubeRows ),
-			NumOfTubesPerRow( NumOfTubesPerRow ),
-			EffectiveFinDiam( EffectiveFinDiam ),
-			TotCoilOutsideSurfArea( TotCoilOutsideSurfArea ),
-			CoilEffectiveInsideDiam( CoilEffectiveInsideDiam ),
-			GeometryCoef1( GeometryCoef1 ),
-			GeometryCoef2( GeometryCoef2 ),
-			DryFinEfficncyCoef( 5, DryFinEfficncyCoef ),
-			SatEnthlCurveConstCoef( SatEnthlCurveConstCoef ),
-			SatEnthlCurveSlope( SatEnthlCurveSlope ),
-			EnthVsTempCurveAppxSlope( EnthVsTempCurveAppxSlope ),
-			EnthVsTempCurveConst( EnthVsTempCurveConst ),
-			MeanWaterTempSaved( MeanWaterTempSaved ),
-			InWaterTempSaved( InWaterTempSaved ),
-			OutWaterTempSaved( OutWaterTempSaved ),
-			SurfAreaWetSaved( SurfAreaWetSaved ),
-			SurfAreaWetFraction( SurfAreaWetFraction ),
-			DesInletWaterTemp( DesInletWaterTemp ),
-			DesAirVolFlowRate( DesAirVolFlowRate ),
-			DesInletAirTemp( DesInletAirTemp ),
-			DesInletAirHumRat( DesInletAirHumRat ),
-			DesTotWaterCoilLoad( DesTotWaterCoilLoad ),
-			DesSenWaterCoilLoad( DesSenWaterCoilLoad ),
-			DesAirMassFlowRate( DesAirMassFlowRate ),
-			UACoilTotal( UACoilTotal ),
-			UACoilInternal( UACoilInternal ),
-			UACoilExternal( UACoilExternal ),
-			UACoilInternalDes( UACoilInternalDes ),
-			UACoilExternalDes( UACoilExternalDes ),
-			DesOutletAirTemp( DesOutletAirTemp ),
-			DesOutletAirHumRat( DesOutletAirHumRat ),
-			DesOutletWaterTemp( DesOutletWaterTemp ),
-			HeatExchType( HeatExchType ),
-			CoolingCoilAnalysisMode( CoolingCoilAnalysisMode ),
-			UACoilInternalPerUnitArea( UACoilInternalPerUnitArea ),
-			UAWetExtPerUnitArea( UAWetExtPerUnitArea ),
-			UADryExtPerUnitArea( UADryExtPerUnitArea ),
-			SurfAreaWetFractionSaved( SurfAreaWetFractionSaved ),
-			UACoilVariable( UACoilVariable ),
-			RatioAirSideToWaterSideConvect( RatioAirSideToWaterSideConvect ),
-			AirSideNominalConvect( AirSideNominalConvect ),
-			LiquidSideNominalConvect( LiquidSideNominalConvect ),
-			Control( Control ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			WaterLoopNum( WaterLoopNum ),
-			WaterLoopSide( WaterLoopSide ),
-			WaterLoopBranchNum( WaterLoopBranchNum ),
-			WaterLoopCompNum( WaterLoopCompNum ),
-			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( CondensateCollectName ),
-			CondensateTankID( CondensateTankID ),
-			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
-			CondensateVdot( CondensateVdot ),
-			CondensateVol( CondensateVol ),
-			CoilPerfInpMeth( CoilPerfInpMeth ),
-			FoulingFactor( FoulingFactor )
+			FoulingFactor( 0.0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -561,12 +396,6 @@ namespace WaterCoils {
 		WaterCoilNumericFieldData()
 		{}
 
-		// Member Constructor
-		WaterCoilNumericFieldData(
-			Array1_string const & FieldNames // Name of the WaterCoil numeric field descriptions
-		) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	// Object Data
@@ -934,31 +763,18 @@ namespace WaterCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	// sets data to a coil that is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetWaterCoilData(
+		int const CoilNum, // index of hot water heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
+	);
+
 	// End of Coil Utility subroutines
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WaterCoils
 

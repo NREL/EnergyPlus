@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -93,17 +151,14 @@ namespace loc {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// utility variables initialized once
-	int NumOfSurfaceGHEs( 0 ); // Number of surface GHE ground heat exchangers
 	bool NoSurfaceGroundTempObjWarning( true ); // This will cause a warning to be issued if no "surface" ground
 	// temperature object was input.
 	// Utility variables - initialized for each instance of a surface GHE
-	int InletNodeNum( 0 ); // inlet node number
-	int OutletNodeNum( 0 ); // oulet node number
-	int ConstructionNum( 0 ); // construction index number
-	int TopRoughness( 0 ); // roughness of top layer
-	int BtmRoughness( 0 ); // roughness of bottom layer
-	Real64 InletTemp( 0.0 ); // water inlet temperature
-	Real64 OutletTemp( 0.0 ); // water outlet temperature
+	//int ConstructionNum( 0 ); // construction index number
+	//int TopRoughness( 0 ); // roughness of top layer
+	//int BtmRoughness( 0 ); // roughness of bottom layer
+	Real64 nsvInletTemp( 0.0 ); // water inlet temperature
+	Real64 nsvOutletTemp( 0.0 ); // water outlet temperature
 	Real64 FlowRate( 0.0 ); // water mass flow rate
 	Real64 TopSurfTemp( 0.0 ); // Top  surface temperature
 	Real64 BtmSurfTemp( 0.0 ); // Bottom  surface temperature
@@ -111,7 +166,7 @@ namespace loc {
 	Real64 BtmSurfFlux( 0.0 ); // Bottom  surface heat flux
 	Real64 SourceFlux( 0.0 ); // total heat transfer rate, Watts
 	Real64 SourceTemp( 0.0 ); // total heat transfer rate, Watts
-	Real64 SurfaceArea( 0.0 ); // surface GHE surface area
+	Real64 nsvSurfaceArea( 0.0 ); // surface GHE surface area
 	Real64 TopThermAbs( 0.0 ); // Thermal absortivity of top layer
 	Real64 BtmThermAbs( 0.0 ); // Thermal absortivity of bottom layer
 	Real64 TopSolarAbs( 0.0 ); // Solar absortivity of top layer
@@ -134,6 +189,9 @@ namespace loc {
 	Real64 PastWindSpeed( 0.0 ); // Previous outdoor air wind speed
 	Real64 PastCloudFraction( 0.0 ); // Previous Fraction of sky covered by clouds
 
+	// getinput flag
+	bool GetInputFlag( true );
+
 	// time keeping variables used for keeping track of average flux over each time step
 	Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step
 	Array1D< Real64 > LastSysTimeElapsed; // record of system time
@@ -143,102 +201,30 @@ namespace loc {
 
 	// Object Data
 	Array1D< SurfaceGroundHeatExchangerData > SurfaceGHE;
-	Array1D< SurfaceGroundHeatExchangerQTF > SurfaceGHEQTF;
-	Array1D< SurfaceGroundHeatExchngrReport > SurfaceGHEReport;
 
-	//==============================================================================
-
-	// Functions
-
-	void
-	SimSurfaceGroundHeatExchanger(
-		std::string const & CompName, // name of the surface GHE
-		int & CompIndex,
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		bool const RunFlag, // TRUE if equipment is operating
-		bool & InitLoopEquip
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Rees
-		//       DATE WRITTEN   August 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is the public routine that is used to simulate
-		// the operation of surface ground heat exchangers at each system
-		// time step.
-
-		// METHODOLOGY EMPLOYED:
-		// Several private routines are called to get data, make the calculations
-		// and update stuff. This is called for each instance of surface GHE components.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER,          INTENT(IN)  :: FlowLock            ! flow initialization/condition flag    !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Flag first time, input is fetched
-		int SurfaceGHENum( 0 ); // index in local derived types
-
-		// check for input
+	PlantComponent * SurfaceGroundHeatExchangerData::factory( int const EP_UNUSED(objectType), std::string const objectName ) {
 		if ( GetInputFlag ) {
 			GetSurfaceGroundHeatExchanger();
 			GetInputFlag = false;
 		}
-
-		if ( InitLoopEquip ) {
-			SurfaceGHENum = FindItemInList( CompName, SurfaceGHE );
-			CompIndex = SurfaceGHENum;
-			return;
-		}
-
-		// Find the correct Surface Ground Heat Exchanger
-		if ( CompIndex <= 0 ) {
-			ShowFatalError( "SimSurfaceGroundHeatExchanger: Unit not found=" + CompName );
-		} else {
-			SurfaceGHENum = CompIndex;
-			if ( SurfaceGHENum > NumOfSurfaceGHEs || SurfaceGHENum < 1 ) {
-				ShowFatalError( "SimSurfaceGroundHeatExchanger:  Invalid CompIndex passed=" + TrimSigDigits( SurfaceGHENum ) + ", Number of Units=" + TrimSigDigits( NumOfSurfaceGHEs ) + ", Entered Unit name=" + CompName );
-			}
-			if ( CheckEquipName( SurfaceGHENum ) ) {
-				if ( CompName != SurfaceGHE( SurfaceGHENum ).Name ) {
-					ShowFatalError( "SimSurfaceGroundHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( SurfaceGHENum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + SurfaceGHE( SurfaceGHENum ).Name );
-				}
-				CheckEquipName( SurfaceGHENum ) = false;
+		// Now look for this particular pipe in the list
+		for ( auto & ghx : SurfaceGHE ) {
+			if ( ghx.Name == objectName ) {
+				return &ghx;
 			}
 		}
-
-		// initialize
-		InitSurfaceGroundHeatExchanger( SurfaceGHENum, RunFlag ); //DSU
-		// make the calculations
-		CalcSurfaceGroundHeatExchanger( SurfaceGHENum, FirstHVACIteration ); //DSU
-		// update vaiables
-		UpdateSurfaceGroundHeatExchngr( SurfaceGHENum ); //DSU
-		// update report variables
-		ReportSurfaceGroundHeatExchngr( SurfaceGHENum );
-
+		// If we didn't find it, fatal
+		ShowFatalError( "Surface Ground Heat Exchanger: Error getting inputs for pipe named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
 	}
 
-	//==============================================================================
+	void SurfaceGroundHeatExchangerData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
+		this->InitSurfaceGroundHeatExchanger();
+		this->CalcSurfaceGroundHeatExchanger( FirstHVACIteration );
+		this->UpdateSurfaceGroundHeatExchngr();
+		this->ReportSurfaceGroundHeatExchngr();
+	}
 
 	void
 	GetSurfaceGroundHeatExchanger()
@@ -302,15 +288,11 @@ namespace loc {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Surface";
-		NumOfSurfaceGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		int NumOfSurfaceGHEs = GetNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( SurfaceGHE ) ) SurfaceGHE.deallocate();
-		if ( allocated( SurfaceGHEQTF ) ) SurfaceGHEQTF.deallocate();
-		if ( allocated( SurfaceGHEReport ) ) SurfaceGHEReport.deallocate();
 
 		SurfaceGHE.allocate( NumOfSurfaceGHEs );
-		SurfaceGHEQTF.allocate( NumOfSurfaceGHEs );
-		SurfaceGHEReport.allocate( NumOfSurfaceGHEs );
 		CheckEquipName.dimension( NumOfSurfaceGHEs, true );
 
 		// initialize data structures
@@ -415,18 +397,18 @@ namespace loc {
 
 		// Set up the output variables
 		for ( Item = 1; Item <= NumOfSurfaceGHEs; ++Item ) {
-			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", SurfaceGHEReport( Item ).HeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Rate [W]", SurfaceGHEReport( Item ).SurfHeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Energy [J]", SurfaceGHEReport( Item ).Energy, "Plant", "Sum", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", SurfaceGHEReport( Item ).MassFlowRate, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", SurfaceGHEReport( Item ).InletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", SurfaceGHEReport( Item ).OutletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Top Surface Temperature [C]", SurfaceGHEReport( Item ).TopSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Temperature [C]", SurfaceGHEReport( Item ).BtmSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Top Surface Heat Transfer Energy per Area [J/m2]", SurfaceGHEReport( Item ).TopSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area [J/m2]", SurfaceGHEReport( Item ).BtmSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Energy [J]", SurfaceGHEReport( Item ).SurfEnergy, "Plant", "Sum", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Source Temperature [C]", SurfaceGHEReport( Item ).SourceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", SurfaceGHE( Item ).HeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Rate [W]", SurfaceGHE( Item ).SurfHeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Energy [J]", SurfaceGHE( Item ).Energy, "Plant", "Sum", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", SurfaceGHE( Item ).MassFlowRate, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", SurfaceGHE( Item ).InletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", SurfaceGHE( Item ).OutletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Top Surface Temperature [C]", SurfaceGHE( Item ).TopSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Temperature [C]", SurfaceGHE( Item ).BtmSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Top Surface Heat Transfer Energy per Area [J/m2]", SurfaceGHE( Item ).TopSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area [J/m2]", SurfaceGHE( Item ).BtmSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Energy [J]", SurfaceGHE( Item ).SurfEnergy, "Plant", "Sum", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Source Temperature [C]", SurfaceGHE( Item ).SourceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
 
 		}
 
@@ -440,13 +422,8 @@ namespace loc {
 
 	}
 
-	//==============================================================================
-
 	void
-	InitSurfaceGroundHeatExchanger(
-		int const SurfaceGHENum, // component number
-		bool const EP_UNUSED( RunFlag ) // TRUE if equipment is operating
-	)
+	SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -503,106 +480,80 @@ namespace loc {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Real64 DesignFlow; // Hypothetical design flow rate
-		static bool InitQTF( true ); // one time flag
-		static bool MyEnvrnFlag( true );
 		int Cons; // construction counter
-		int Surface; // Surface number counter
 		int LayerNum; // material layer number for bottom
 		Real64 OutDryBulb; // Height Dependent dry bulb.
-		static Array1D_bool MyFlag;
-		static bool MyOneTimeFlag( true );
-		int LoopNum;
-		int LoopSideNum;
 		Real64 rho; // local fluid density
 		bool errFlag;
 
-		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumOfSurfaceGHEs );
-			MyOneTimeFlag = false;
-			MyFlag = true;
-		}
-
 		// Init more variables
-		if ( MyFlag( SurfaceGHENum ) ) {
+		if ( this->MyFlag ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( SurfaceGHE( SurfaceGHENum ).Name, TypeOf_GrndHtExchgSurface, SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgSurface, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 
 			if ( errFlag ) {
 				ShowFatalError( "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s)." );
 			}
-			rho = GetDensityGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
-			SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate = Pi / 4.0 * pow_2( SurfaceGHE( SurfaceGHENum ).TubeDiameter ) * DesignVelocity * rho * SurfaceGHE( SurfaceGHENum ).TubeCircuits;
-			InitComponentNodes( 0.0, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate, SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum, SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum );
-			RegisterPlantCompDesignFlow( SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate / rho );
+			rho = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, constant_zero, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+			this->DesignMassFlowRate = Pi / 4.0 * pow_2( this->TubeDiameter ) * DesignVelocity * rho * this->TubeCircuits;
+			InitComponentNodes( 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
+			RegisterPlantCompDesignFlow( this->InletNodeNum, this->DesignMassFlowRate / rho );
 
-			MyFlag( SurfaceGHENum ) = false;
+			this->MyFlag = false;
 		}
 
 		// get QTF data - only once
-		if ( InitQTF ) {
-			for ( Surface = 1; Surface <= NumOfSurfaceGHEs; ++Surface ) {
-				for ( Cons = 1; Cons <= TotConstructs; ++Cons ) {
-					if ( SameString( Construct( Cons ).Name, SurfaceGHE( Surface ).ConstructionName ) ) {
-						// some error checking ??
-						// CTF stuff
-						LayerNum = Construct( Cons ).TotLayers;
-						SurfaceGHEQTF( Surface ).NumCTFTerms = Construct( Cons ).NumCTFTerms;
-						SurfaceGHEQTF( Surface ).CTFin = Construct( Cons ).CTFInside; // Z coefficents
-						SurfaceGHEQTF( Surface ).CTFout = Construct( Cons ).CTFOutside; // X coefficents
-						SurfaceGHEQTF( Surface ).CTFcross = Construct( Cons ).CTFCross; // Y coefficents
-						SurfaceGHEQTF( Surface ).CTFflux( {1,_} ) = Construct( Cons ).CTFFlux; // F & f coefficents
-						// QTF stuff
-						SurfaceGHEQTF( Surface ).CTFSourceIn = Construct( Cons ).CTFSourceIn; // Wi coefficents
-						SurfaceGHEQTF( Surface ).CTFSourceOut = Construct( Cons ).CTFSourceOut; // Wo coefficents
-						SurfaceGHEQTF( Surface ).CTFTSourceOut = Construct( Cons ).CTFTSourceOut; // y coefficents
-						SurfaceGHEQTF( Surface ).CTFTSourceIn = Construct( Cons ).CTFTSourceIn; // x coefficents
-						SurfaceGHEQTF( Surface ).CTFTSourceQ = Construct( Cons ).CTFTSourceQ; // w coefficents
-						SurfaceGHE( Surface ).ConstructionNum = Cons;
-						// set the initial history
-						//          SurfaceGHEQTF(Surface)%CTFflux(0)    = 0.0D0
-						//          SurfaceGHEQTF(Surface)%TbtmHistory    = OutDryBulbTemp
-						//          SurfaceGHEQTF(Surface)%TtopHistory   = OutDryBulbTemp
-						//          SurfaceGHEQTF(Surface)%TsrcHistory   = OutDryBulbTemp
-						//          SurfaceGHEQTF(Surface)%QbtmHistory    = 0.0D0
-						//          SurfaceGHEQTF(Surface)%QtopHistory   = 0.0D0
-						//          SurfaceGHEQTF(Surface)%QsrcHistory   = 0.0D0
-						// surface properties
-						SurfaceGHE( Surface ).BtmRoughness = Material( Construct( Cons ).LayerPoint( LayerNum ) ).Roughness;
-						SurfaceGHE( Surface ).TopThermAbs = Material( Construct( Cons ).LayerPoint( LayerNum ) ).AbsorpThermal;
-						SurfaceGHE( Surface ).TopRoughness = Material( Construct( Cons ).LayerPoint( 1 ) ).Roughness;
-						SurfaceGHE( Surface ).TopThermAbs = Material( Construct( Cons ).LayerPoint( 1 ) ).AbsorpThermal;
-						SurfaceGHE( Surface ).TopSolarAbs = Material( Construct( Cons ).LayerPoint( 1 ) ).AbsorpSolar;
-					}
+		if ( this->InitQTF ) {
+			for ( Cons = 1; Cons <= TotConstructs; ++Cons ) {
+				if ( SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
+					// some error checking ??
+					// CTF stuff
+					LayerNum = Construct( Cons ).TotLayers;
+					this->NumCTFTerms = Construct( Cons ).NumCTFTerms;
+					this->CTFin = Construct( Cons ).CTFInside; // Z coefficents
+					this->CTFout = Construct( Cons ).CTFOutside; // X coefficents
+					this->CTFcross = Construct( Cons ).CTFCross; // Y coefficents
+					this->CTFflux( {1,_} ) = Construct( Cons ).CTFFlux; // F & f coefficents
+					// QTF stuff
+					this->CTFSourceIn = Construct( Cons ).CTFSourceIn; // Wi coefficents
+					this->CTFSourceOut = Construct( Cons ).CTFSourceOut; // Wo coefficents
+					this->CTFTSourceOut = Construct( Cons ).CTFTSourceOut; // y coefficents
+					this->CTFTSourceIn = Construct( Cons ).CTFTSourceIn; // x coefficents
+					this->CTFTSourceQ = Construct( Cons ).CTFTSourceQ; // w coefficents
+					this->ConstructionNum = Cons;
+					// surface properties
+					this->BtmRoughness = Material( Construct( Cons ).LayerPoint( LayerNum ) ).Roughness;
+					this->TopThermAbs = Material( Construct( Cons ).LayerPoint( LayerNum ) ).AbsorpThermal;
+					this->TopRoughness = Material( Construct( Cons ).LayerPoint( 1 ) ).Roughness;
+					this->TopThermAbs = Material( Construct( Cons ).LayerPoint( 1 ) ).AbsorpThermal;
+					this->TopSolarAbs = Material( Construct( Cons ).LayerPoint( 1 ) ).AbsorpSolar;
 				}
 			}
 			// set one-time flag
-			InitQTF = false;
+			this->InitQTF = false;
 		}
 
-		if ( MyEnvrnFlag && BeginEnvrnFlag ) {
+		if ( this->MyEnvrnFlag && BeginEnvrnFlag ) {
 			OutDryBulb = OutDryBulbTempAt( SurfaceHXHeight );
-			for ( Surface = 1; Surface <= NumOfSurfaceGHEs; ++Surface ) {
-				SurfaceGHEQTF( Surface ).CTFflux( 0 ) = 0.0;
-				SurfaceGHEQTF( Surface ).TbtmHistory = OutDryBulb;
-				SurfaceGHEQTF( Surface ).TtopHistory = OutDryBulb;
-				SurfaceGHEQTF( Surface ).TsrcHistory = OutDryBulb;
-				SurfaceGHEQTF( Surface ).QbtmHistory = 0.0;
-				SurfaceGHEQTF( Surface ).QtopHistory = 0.0;
-				SurfaceGHEQTF( Surface ).QsrcHistory = 0.0;
-				SurfaceGHEQTF( Surface ).TsrcConstCoef = 0.0;
-				SurfaceGHEQTF( Surface ).TsrcVarCoef = 0.0;
-				SurfaceGHEQTF( Surface ).QbtmConstCoef = 0.0;
-				SurfaceGHEQTF( Surface ).QbtmVarCoef = 0.0;
-				SurfaceGHEQTF( Surface ).QtopConstCoef = 0.0;
-				SurfaceGHEQTF( Surface ).QtopVarCoef = 0.0;
-				SurfaceGHEQTF( Surface ).QSrc = 0.0;
-				SurfaceGHEQTF( Surface ).QSrcAvg = 0.0;
-				SurfaceGHEQTF( Surface ).LastQSrc = 0.0;
-				SurfaceGHEQTF( Surface ).LastSysTimeElapsed = 0.0;
-				SurfaceGHEQTF( Surface ).LastTimeStepSys = 0.0;
-
-			}
+			this->CTFflux( 0 ) = 0.0;
+			this->TbtmHistory = OutDryBulb;
+			this->TtopHistory = OutDryBulb;
+			this->TsrcHistory = OutDryBulb;
+			this->QbtmHistory = 0.0;
+			this->QtopHistory = 0.0;
+			this->QsrcHistory = 0.0;
+			this->TsrcConstCoef = 0.0;
+			this->TsrcVarCoef = 0.0;
+			this->QbtmConstCoef = 0.0;
+			this->QbtmVarCoef = 0.0;
+			this->QtopConstCoef = 0.0;
+			this->QtopVarCoef = 0.0;
+			this->QSrc = 0.0;
+			this->QSrcAvg = 0.0;
+			this->LastQSrc = 0.0;
+			this->LastSysTimeElapsed = 0.0;
+			this->LastTimeStepSys = 0.0;
 			// initialize past weather variables
 			PastBeamSolarRad = BeamSolarRad;
 			PastSolarDirCosVert = SOLCOS( 3 );
@@ -619,42 +570,29 @@ namespace loc {
 			PastSkyTemp = SkyTemp;
 			PastWindSpeed = WindSpeedAt( SurfaceHXHeight );
 			PastCloudFraction = CloudFraction;
-			MyEnvrnFlag = false;
+			this->MyEnvrnFlag = false;
 		}
 
-		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
+		if ( ! BeginEnvrnFlag ) this->MyEnvrnFlag = true;
 
 		// always initialize - module variables
-		InletNodeNum = SurfaceGHE( SurfaceGHENum ).InletNodeNum;
-		OutletNodeNum = SurfaceGHE( SurfaceGHENum ).OutletNodeNum;
-		ConstructionNum = SurfaceGHE( SurfaceGHENum ).ConstructionNum;
-		SurfaceArea = SurfaceGHE( SurfaceGHENum ).SurfaceLength * SurfaceGHE( SurfaceGHENum ).SurfaceWidth;
-		InletTemp = Node( InletNodeNum ).Temp;
-		OutletTemp = Node( OutletNodeNum ).Temp;
-		TopThermAbs = SurfaceGHE( SurfaceGHENum ).TopThermAbs;
-		TopRoughness = SurfaceGHE( SurfaceGHENum ).TopRoughness;
-		BtmRoughness = SurfaceGHE( SurfaceGHENum ).BtmRoughness;
-		BtmThermAbs = SurfaceGHE( SurfaceGHENum ).BtmThermAbs;
-		TopSolarAbs = SurfaceGHE( SurfaceGHENum ).TopSolarAbs;
-		LoopNum = SurfaceGHE( SurfaceGHENum ).LoopNum;
-		LoopSideNum = SurfaceGHE( SurfaceGHENum ).LoopSideNum;
+		this->SurfaceArea = this->SurfaceLength * this->SurfaceWidth;
+		nsvInletTemp = Node( this->InletNodeNum ).Temp;
+		nsvOutletTemp = Node( this->OutletNodeNum ).Temp;
 
 		// If loop operation is controlled by an environmental variable (DBtemp, WBtemp, etc)
 		// then shut branch down when equipment is not scheduled to run.
-		DesignFlow = RegulateCondenserCompFlowReqOp( SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate );
+		DesignFlow = RegulateCondenserCompFlowReqOp( this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate );
 
-		SetComponentFlowRate( DesignFlow, SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum, SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum );
+		SetComponentFlowRate( DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
 		// get the current flow rate - module variable
-		FlowRate = Node( InletNodeNum ).MassFlowRate;
+		FlowRate = Node( this->InletNodeNum ).MassFlowRate;
 
 	}
 
-	//==============================================================================
-
 	void
-	CalcSurfaceGroundHeatExchanger(
-		int const SurfaceGHENum, // component number
+	SurfaceGroundHeatExchangerData::CalcSurfaceGroundHeatExchanger(
 		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
 	)
 	{
@@ -747,16 +685,16 @@ namespace loc {
 		int LoopNum;
 		int LoopSideNum;
 
-		LoopNum = SurfaceGHE( SurfaceGHENum ).LoopNum;
-		LoopSideNum = SurfaceGHE( SurfaceGHENum ).LoopSideNum;
+		LoopNum = this->LoopNum;
+		LoopSideNum = this->LoopSideNum;
 
 		// check if we are in very first call for this zone time step
 		if ( BeginTimeStepFlag && FirstHVACIteration && PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 1 ) { //DSU
 			// calc temps and fluxes with past env. conditions and average source flux
-			SourceFlux = SurfaceGHEQTF( SurfaceGHENum ).QSrcAvg;
+			SourceFlux = this->QSrcAvg;
 			// starting values for the surface temps
-			PastTempBtm = SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 1 );
-			PastTempTop = SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( 1 );
+			PastTempBtm = this->TbtmHistory( 1 );
+			PastTempTop = this->TtopHistory( 1 );
 			OldPastFluxTop = 1.0e+30;
 			OldPastFluxBtm = 1.0e+30;
 			OldSourceFlux = 1.0e+30;
@@ -767,23 +705,23 @@ namespace loc {
 				// update coefficients
 
 				++iter;
-				CalcTopFluxCoefficents( SurfaceGHENum, PastTempBtm, PastTempTop );
+				CalcTopFluxCoefficents( PastTempBtm, PastTempTop );
 				// calc top surface flux
-				PastFluxTop = SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef + SurfaceGHEQTF( SurfaceGHENum ).QtopVarCoef * SourceFlux;
+				PastFluxTop = this->QtopConstCoef + this->QtopVarCoef * SourceFlux;
 
 				//calc new top surface temp
-				CalcTopSurfTemp( SurfaceGHENum, -PastFluxTop, TempT, PastOutDryBulbTemp, PastOutWetBulbTemp, PastSkyTemp, PastBeamSolarRad, PastDifSolarRad, PastSolarDirCosVert, PastWindSpeed, PastIsRain, PastIsSnow );
+				CalcTopSurfTemp( -PastFluxTop, TempT, PastOutDryBulbTemp, PastOutWetBulbTemp, PastSkyTemp, PastBeamSolarRad, PastDifSolarRad, PastSolarDirCosVert, PastWindSpeed, PastIsRain, PastIsSnow );
 				// under relax
 				PastTempTop = PastTempTop * ( 1.0 - RelaxT ) + RelaxT * TempT;
 
 				// update coefficients
-				CalcBottomFluxCoefficents( SurfaceGHENum, PastTempBtm, PastTempTop );
-				PastFluxBtm = SurfaceGHEQTF( SurfaceGHENum ).QbtmConstCoef + SurfaceGHEQTF( SurfaceGHENum ).QbtmVarCoef * SourceFlux;
+				CalcBottomFluxCoefficents( PastTempBtm, PastTempTop );
+				PastFluxBtm = this->QbtmConstCoef + this->QbtmVarCoef * SourceFlux;
 
 				if ( std::abs( ( OldPastFluxTop - PastFluxTop ) / OldPastFluxTop ) <= SurfFluxTol && std::abs( ( OldPastFluxBtm - PastFluxBtm ) / OldPastFluxBtm ) <= SurfFluxTol ) break;
 
 				//calc new surface temps
-				CalcBottomSurfTemp( SurfaceGHENum, PastFluxBtm, TempB, PastOutDryBulbTemp, PastWindSpeed, PastGroundTemp );
+				CalcBottomSurfTemp( PastFluxBtm, TempB, PastOutDryBulbTemp, PastWindSpeed, PastGroundTemp );
 				// underrelax
 				PastTempBtm = PastTempBtm * ( 1.0 - RelaxT ) + RelaxT * TempB;
 				// update flux record
@@ -792,11 +730,11 @@ namespace loc {
 
 				//Check for non-convergence
 				if ( iter > Maxiter ) {
-					if ( SurfaceGHE( SurfaceGHENum ).ConvErrIndex1 == 0 ) {
-						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 1), Iterations=" + TrimSigDigits( Maxiter ) );
+					if ( this->ConvErrIndex1 == 0 ) {
+						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1), Iterations=" + TrimSigDigits( Maxiter ) );
 						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 1)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex1 );
+					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)", this->ConvErrIndex1 );
 					break;
 				}
 			}
@@ -816,15 +754,15 @@ namespace loc {
 			BtmSurfFlux = FluxBtm;
 
 			// get source temp for output
-			CalcSourceTempCoefficents( SurfaceGHENum, PastTempBtm, PastTempTop );
-			SourceTemp = SurfaceGHEQTF( SurfaceGHENum ).TsrcConstCoef + SurfaceGHEQTF( SurfaceGHENum ).TsrcVarCoef * SourceFlux;
+			CalcSourceTempCoefficents( PastTempBtm, PastTempTop );
+			this->SourceTemp = this->TsrcConstCoef + this->TsrcVarCoef * SourceFlux;
 			// update histories
-			UpdateHistories( SurfaceGHENum, PastFluxTop, PastFluxBtm, SourceFlux, SourceTemp );
+			UpdateHistories( PastFluxTop, PastFluxBtm, SourceFlux, SourceTemp );
 
 			// At the beginning of a time step, reset to zero so average calculation can start again
-			SurfaceGHEQTF( SurfaceGHENum ).QSrcAvg = 0.0;
-			SurfaceGHEQTF( SurfaceGHENum ).LastSysTimeElapsed = 0.0;
-			SurfaceGHEQTF( SurfaceGHENum ).LastTimeStepSys = 0.0;
+			this->QSrcAvg = 0.0;
+			this->LastSysTimeElapsed = 0.0;
+			this->LastTimeStepSys = 0.0;
 
 			// get current env. conditions
 			PastBeamSolarRad = BeamSolarRad;
@@ -843,12 +781,12 @@ namespace loc {
 			PastWindSpeed = WindSpeedAt( SurfaceHXHeight );
 			PastCloudFraction = CloudFraction;
 
-			TempBtm = SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 1 );
-			TempTop = SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( 1 );
+			TempBtm = this->TbtmHistory( 1 );
+			TempTop = this->TtopHistory( 1 );
 			OldFluxTop = 1.0e+30;
 			OldFluxBtm = 1.0e+30;
 			OldSourceFlux = 1.0e+30;
-			SourceFlux = CalcSourceFlux( SurfaceGHENum );
+			SourceFlux = CalcSourceFlux();
 			iter = 0;
 			while ( true ) { // iterate to find source flux
 				++iter;
@@ -856,21 +794,21 @@ namespace loc {
 				while ( true ) { // iterate to find surface heat balances
 					++iter1;
 					// update top coefficients
-					CalcTopFluxCoefficents( SurfaceGHENum, TempBtm, TempTop );
+					CalcTopFluxCoefficents( TempBtm, TempTop );
 					// calc top surface fluxe
-					FluxTop = SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef + SurfaceGHEQTF( SurfaceGHENum ).QtopVarCoef * SourceFlux;
+					FluxTop = this->QtopConstCoef + this->QtopVarCoef * SourceFlux;
 					//calc new surface temps
-					CalcTopSurfTemp( SurfaceGHENum, -FluxTop, TempT, PastOutDryBulbTemp, PastOutWetBulbTemp, PastSkyTemp, PastBeamSolarRad, PastDifSolarRad, PastSolarDirCosVert, PastWindSpeed, PastIsRain, PastIsSnow );
+					CalcTopSurfTemp( -FluxTop, TempT, PastOutDryBulbTemp, PastOutWetBulbTemp, PastSkyTemp, PastBeamSolarRad, PastDifSolarRad, PastSolarDirCosVert, PastWindSpeed, PastIsRain, PastIsSnow );
 					// under-relax
 					TempTop = TempTop * ( 1.0 - RelaxT ) + RelaxT * TempT;
 					// update bottom coefficients
-					CalcBottomFluxCoefficents( SurfaceGHENum, TempBtm, TempTop );
-					FluxBtm = SurfaceGHEQTF( SurfaceGHENum ).QbtmConstCoef + SurfaceGHEQTF( SurfaceGHENum ).QbtmVarCoef * SourceFlux;
+					CalcBottomFluxCoefficents( TempBtm, TempTop );
+					FluxBtm = this->QbtmConstCoef + this->QbtmVarCoef * SourceFlux;
 					// convergence test on surface fluxes
 					if ( std::abs( ( OldFluxTop - FluxTop ) / OldFluxTop ) <= SurfFluxTol && std::abs( ( OldFluxBtm - FluxBtm ) / OldFluxBtm ) <= SurfFluxTol ) break;
 
 					//calc new surface temps
-					CalcBottomSurfTemp( SurfaceGHENum, FluxBtm, TempB, PastOutDryBulbTemp, PastOutDryBulbTemp, GroundTemp_Surface );
+					CalcBottomSurfTemp( FluxBtm, TempB, PastOutDryBulbTemp, PastOutDryBulbTemp, GroundTemp_Surface );
 					// under-relax
 					TempBtm = TempBtm * ( 1.0 - RelaxT ) + RelaxT * TempB;
 					// update flux record
@@ -879,28 +817,28 @@ namespace loc {
 
 					//Check for non-convergence
 					if ( iter1 > Maxiter1 ) {
-						if ( SurfaceGHE( SurfaceGHENum ).ConvErrIndex2 == 0 ) {
-							ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 2), Iterations=" + TrimSigDigits( Maxiter ) );
+						if ( this->ConvErrIndex2 == 0 ) {
+							ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2), Iterations=" + TrimSigDigits( Maxiter ) );
 							ShowContinueErrorTimeStamp( "" );
 						}
-						ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 2)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex2 );
+						ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)", this->ConvErrIndex2 );
 						break;
 					}
 				}
 				// update the source temp coefficients and update the source flux
-				CalcSourceTempCoefficents( SurfaceGHENum, TempBtm, TempTop );
-				SourceFlux = CalcSourceFlux( SurfaceGHENum );
+				CalcSourceTempCoefficents( TempBtm, TempTop );
+				SourceFlux = CalcSourceFlux();
 				// check source flux convergence
 				if ( std::abs( ( OldSourceFlux - SourceFlux ) / ( 1.0e-20 + OldSourceFlux ) ) <= SrcFluxTol ) break;
 				OldSourceFlux = SourceFlux;
 
 				//Check for non-convergence
 				if ( iter > Maxiter ) {
-					if ( SurfaceGHE( SurfaceGHENum ).ConvErrIndex3 == 0 ) {
-						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 3), Iterations=" + TrimSigDigits( Maxiter ) );
+					if ( this->ConvErrIndex3 == 0 ) {
+						ShowWarningMessage( "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3), Iterations=" + TrimSigDigits( Maxiter ) );
 						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", Did not converge (part 3)", SurfaceGHE( SurfaceGHENum ).ConvErrIndex3 );
+					ShowRecurringWarningErrorAtEnd( "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)", this->ConvErrIndex3 );
 					break;
 				}
 			} // end surface heat balance iteration
@@ -909,17 +847,14 @@ namespace loc {
 
 			// For the rest of the system time steps ...
 			// update source flux from Twi
-			SourceFlux = CalcSourceFlux( SurfaceGHENum );
+			SourceFlux = this->CalcSourceFlux();
 
 		}
 
 	}
 
-	//==============================================================================
-
 	void
-	CalcBottomFluxCoefficents(
-		int const SurfaceGHENum, // component number
+	SurfaceGroundHeatExchangerData::CalcBottomFluxCoefficents(
 		Real64 const Tbottom, // current bottom (lower) surface temperature
 		Real64 const Ttop // current top (upper) surface temperature
 	)
@@ -962,37 +897,34 @@ namespace loc {
 		int Term;
 
 		// add current surface temperatures to history data
-		SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 0 ) = Tbottom;
-		SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( 0 ) = Ttop;
+		this->TbtmHistory( 0 ) = Tbottom;
+		this->TtopHistory( 0 ) = Ttop;
 
 		// Bottom Surface Coefficients
-		SurfaceGHEQTF( SurfaceGHENum ).QbtmConstCoef = 0.0;
-		for ( Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
+		this->QbtmConstCoef = 0.0;
+		for ( Term = 0; Term <= this->NumCTFTerms - 1; ++Term ) {
 
-			SurfaceGHEQTF( SurfaceGHENum ).QbtmConstCoef += ( -SurfaceGHEQTF( SurfaceGHENum ).CTFin( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFcross( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFflux( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QbtmHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFSourceIn( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( Term ) );
+			this->QbtmConstCoef += ( -this->CTFin( Term ) * this->TbtmHistory( Term ) ) + ( this->CTFcross( Term ) * this->TtopHistory( Term ) ) + ( this->CTFflux( Term ) * this->QbtmHistory( Term ) ) + ( this->CTFSourceIn( Term ) * this->QsrcHistory( Term ) );
 
 		}
 
-		//     SurfaceGHEQTF(SurfaceGHENum)%QbtmConstCoef =  SUM(-SurfaceGHEQTF(SurfaceGHENum)%CTFin * &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%TbtmHistory + &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%CTFcross * &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%TtopHistory + &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%CTFflux * &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%QbtmHistory + &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%CTFSourceIn * &
-		//                                                  SurfaceGHEQTF(SurfaceGHENum)%QsrcHistory)
+		//     SurfaceGHE(SurfaceGHENum)%QbtmConstCoef =  SUM(-SurfaceGHE(SurfaceGHENum)%CTFin * &
+		//                                                  SurfaceGHE(SurfaceGHENum)%TbtmHistory + &
+		//                                                  SurfaceGHE(SurfaceGHENum)%CTFcross * &
+		//                                                  SurfaceGHE(SurfaceGHENum)%TtopHistory + &
+		//                                                  SurfaceGHE(SurfaceGHENum)%CTFflux * &
+		//                                                  SurfaceGHE(SurfaceGHENum)%QbtmHistory + &
+		//                                                  SurfaceGHE(SurfaceGHENum)%CTFSourceIn * &
+		//                                                  SurfaceGHE(SurfaceGHENum)%QsrcHistory)
 		// correct for extra bottom surface flux term
-		SurfaceGHEQTF( SurfaceGHENum ).QbtmConstCoef -= SurfaceGHEQTF( SurfaceGHENum ).CTFSourceIn( 0 ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( 0 );
+		this->QbtmConstCoef -= this->CTFSourceIn( 0 ) * this->QsrcHistory( 0 );
 		// source flux current coefficient
-		SurfaceGHEQTF( SurfaceGHENum ).QbtmVarCoef = SurfaceGHEQTF( SurfaceGHENum ).CTFSourceIn( 0 );
+		this->QbtmVarCoef = this->CTFSourceIn( 0 );
 
 	}
 
-	//==============================================================================
-
 	void
-	CalcTopFluxCoefficents(
-		int const SurfaceGHENum, // component number
+	SurfaceGroundHeatExchangerData::CalcTopFluxCoefficents(
 		Real64 const Tbottom, // current bottom (lower) surface temperature
 		Real64 const Ttop // current top (upper) surface temperature
 	)
@@ -1034,39 +966,36 @@ namespace loc {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// add current surface temperatures to history data
-		SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 0 ) = Tbottom;
-		SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( 0 ) = Ttop;
+		this->TbtmHistory( 0 ) = Tbottom;
+		this->TtopHistory( 0 ) = Ttop;
 
 		// Top Surface Coefficients
-		SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef = 0.0;
-		for ( int Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
+		this->QtopConstCoef = 0.0;
+		for ( int Term = 0; Term <= this->NumCTFTerms - 1; ++Term ) {
 
-			SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef += ( SurfaceGHEQTF( SurfaceGHENum ).CTFout( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( Term ) ) - ( SurfaceGHEQTF( SurfaceGHENum ).CTFcross( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFflux( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QtopHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFSourceOut( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( Term ) );
+			this->QtopConstCoef += ( this->CTFout( Term ) * this->TtopHistory( Term ) ) - ( this->CTFcross( Term ) * this->TbtmHistory( Term ) ) + ( this->CTFflux( Term ) * this->QtopHistory( Term ) ) + ( this->CTFSourceOut( Term ) * this->QsrcHistory( Term ) );
 
 		}
 
 		//     ! Top Surface Coefficients
-		//     SurfaceGHEQTF(SurfaceGHENum)%QtopConstCoef = SUM(SurfaceGHEQTF(SurfaceGHENum)%CTFout * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%TtopHistory - &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%CTFcross * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%TbtmHistory + &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%CTFflux * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%QtopHistory + &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%CTFSourceOut * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%QsrcHistory)
+		//     SurfaceGHE(SurfaceGHENum)%QtopConstCoef = SUM(SurfaceGHE(SurfaceGHENum)%CTFout * &
+		//                                              SurfaceGHE(SurfaceGHENum)%TtopHistory - &
+		//                                              SurfaceGHE(SurfaceGHENum)%CTFcross * &
+		//                                              SurfaceGHE(SurfaceGHENum)%TbtmHistory + &
+		//                                              SurfaceGHE(SurfaceGHENum)%CTFflux * &
+		//                                              SurfaceGHE(SurfaceGHENum)%QtopHistory + &
+		//                                              SurfaceGHE(SurfaceGHENum)%CTFSourceOut * &
+		//                                              SurfaceGHE(SurfaceGHENum)%QsrcHistory)
 
 		// correct for extra top surface flux term
-		SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef -= ( SurfaceGHEQTF( SurfaceGHENum ).CTFSourceOut( 0 ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( 0 ) );
+		this->QtopConstCoef -= ( this->CTFSourceOut( 0 ) * this->QsrcHistory( 0 ) );
 		// surface flux current coefficient
-		SurfaceGHEQTF( SurfaceGHENum ).QtopVarCoef = SurfaceGHEQTF( SurfaceGHENum ).CTFSourceOut( 0 );
+		this->QtopVarCoef = this->CTFSourceOut( 0 );
 
 	}
 
-	//==============================================================================
-
 	void
-	CalcSourceTempCoefficents(
-		int const SurfaceGHENum, // component number
+	SurfaceGroundHeatExchangerData::CalcSourceTempCoefficents(
 		Real64 const Tbottom, // current bottom (lower) surface temperature
 		Real64 const Ttop // current top (upper) surface temperature
 	)
@@ -1109,36 +1038,34 @@ namespace loc {
 		int Term;
 
 		// add current surface temperatures to history data
-		SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 0 ) = Tbottom;
-		SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( 0 ) = Ttop;
+		this->TbtmHistory( 0 ) = Tbottom;
+		this->TtopHistory( 0 ) = Ttop;
 
-		SurfaceGHEQTF( SurfaceGHENum ).TsrcConstCoef = 0.0;
-		for ( Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
+		this->TsrcConstCoef = 0.0;
+		for ( Term = 0; Term <= this->NumCTFTerms - 1; ++Term ) {
 
-			SurfaceGHEQTF( SurfaceGHENum ).TsrcConstCoef += ( SurfaceGHEQTF( SurfaceGHENum ).CTFTSourceIn( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFTSourceOut( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFflux( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TsrcHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFTSourceQ( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( Term ) );
+			this->TsrcConstCoef += ( this->CTFTSourceIn( Term ) * this->TbtmHistory( Term ) ) + ( this->CTFTSourceOut( Term ) * this->TtopHistory( Term ) ) + ( this->CTFflux( Term ) * this->TsrcHistory( Term ) ) + ( this->CTFTSourceQ( Term ) * this->QsrcHistory( Term ) );
 
 		}
 
 		// Source Temperature terms
-		//     SurfaceGHEQTF(SurfaceGHENum)%TsrcConstCoef = SUM(SurfaceGHEQTF(SurfaceGHENum)%CTFTSourceIn * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%TbtmHistory + &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%CTFTSourceOut * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%TtopHistory + &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%CTFflux * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%TsrcHistory + &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%CTFTSourceQ * &
-		//                                              SurfaceGHEQTF(SurfaceGHENum)%QsrcHistory)
+		//     SurfaceGHE(SurfaceGHENum)%TsrcConstCoef = SUM(SurfaceGHE(SurfaceGHENum)%CTFTSourceIn * &
+		//                                              SurfaceGHE(SurfaceGHENum)%TbtmHistory + &
+		//                                              SurfaceGHE(SurfaceGHENum)%CTFTSourceOut * &
+		//                                              SurfaceGHE(SurfaceGHENum)%TtopHistory + &
+		//                                              SurfaceGHE(SurfaceGHENum)%CTFflux * &
+		//                                              SurfaceGHE(SurfaceGHENum)%TsrcHistory + &
+		//                                              SurfaceGHE(SurfaceGHENum)%CTFTSourceQ * &
+		//                                              SurfaceGHE(SurfaceGHENum)%QsrcHistory)
 		// correct for extra source flux term
-		SurfaceGHEQTF( SurfaceGHENum ).TsrcConstCoef -= SurfaceGHEQTF( SurfaceGHENum ).CTFTSourceQ( 0 ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( 0 );
+		this->TsrcConstCoef -= this->CTFTSourceQ( 0 ) * this->QsrcHistory( 0 );
 		// source flux current coefficient
-		SurfaceGHEQTF( SurfaceGHENum ).TsrcVarCoef = SurfaceGHEQTF( SurfaceGHENum ).CTFTSourceQ( 0 );
+		this->TsrcVarCoef = this->CTFTSourceQ( 0 );
 
 	}
 
-	//==============================================================================
-
 	Real64
-	CalcSourceFlux( int const SurfaceGHENum ) // component number
+	SurfaceGroundHeatExchangerData::CalcSourceFlux() // component number
 	{
 
 		//       AUTHOR         Simon Rees
@@ -1179,9 +1106,9 @@ namespace loc {
 
 		// Effectiveness * Modot * specific heat
 		if ( FlowRate > 0.0 ) {
-			EpsMdotCp = CalcHXEffectTerm( SurfaceGHENum, InletTemp, FlowRate );
+			EpsMdotCp = CalcHXEffectTerm( InletTemp, FlowRate );
 			// calc flux
-			CalcSourceFlux = ( InletTemp - SurfaceGHEQTF( SurfaceGHENum ).TsrcConstCoef ) / ( SurfaceArea / EpsMdotCp + SurfaceGHEQTF( SurfaceGHENum ).TsrcVarCoef );
+			CalcSourceFlux = ( InletTemp - this->TsrcConstCoef ) / ( this->SurfaceArea / EpsMdotCp + this->TsrcVarCoef );
 		} else {
 			EpsMdotCp = 0.0;
 			CalcSourceFlux = 0.0;
@@ -1190,11 +1117,8 @@ namespace loc {
 		return CalcSourceFlux;
 	}
 
-	//==============================================================================
-
 	void
-	UpdateHistories(
-		int const SurfaceGHENum, // component number
+	SurfaceGroundHeatExchangerData::UpdateHistories(
 		Real64 const TopFlux, // current top (top) surface flux
 		Real64 const BottomFlux, // current bottom (bottom) surface flux
 		Real64 const SourceFlux, // current source surface flux
@@ -1233,34 +1157,31 @@ namespace loc {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// update top surface temps
-		SurfaceGHEQTF( SurfaceGHENum ).TtopHistory = eoshift( SurfaceGHEQTF( SurfaceGHENum ).TtopHistory, -1 );
+		this->TtopHistory = eoshift( this->TtopHistory, -1 );
 
 		// update bottom surface temps
-		SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory = eoshift( SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory, -1 );
+		this->TbtmHistory = eoshift( this->TbtmHistory, -1 );
 
 		// update bottom surface temps
-		SurfaceGHEQTF( SurfaceGHENum ).TsrcHistory = eoshift( SurfaceGHEQTF( SurfaceGHENum ).TsrcHistory, -1 );
-		SurfaceGHEQTF( SurfaceGHENum ).TsrcHistory( 1 ) = SourceTemp;
+		this->TsrcHistory = eoshift( this->TsrcHistory, -1 );
+		this->TsrcHistory( 1 ) = SourceTemp;
 
 		// update bottom surface fluxes
-		SurfaceGHEQTF( SurfaceGHENum ).QbtmHistory = eoshift( SurfaceGHEQTF( SurfaceGHENum ).QbtmHistory, -1 );
-		SurfaceGHEQTF( SurfaceGHENum ).QbtmHistory( 1 ) = BottomFlux;
+		this->QbtmHistory = eoshift( this->QbtmHistory, -1 );
+		this->QbtmHistory( 1 ) = BottomFlux;
 
 		// update bottom surface fluxes
-		SurfaceGHEQTF( SurfaceGHENum ).QtopHistory = eoshift( SurfaceGHEQTF( SurfaceGHENum ).QtopHistory, -1 );
-		SurfaceGHEQTF( SurfaceGHENum ).QtopHistory( 1 ) = TopFlux;
+		this->QtopHistory = eoshift( this->QtopHistory, -1 );
+		this->QtopHistory( 1 ) = TopFlux;
 
 		// update bottom surface fluxes
-		SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory = eoshift( SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory, -1 );
-		SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( 1 ) = SourceFlux;
+		this->QsrcHistory = eoshift( this->QsrcHistory, -1 );
+		this->QsrcHistory( 1 ) = SourceFlux;
 
 	}
 
-	//==============================================================================
-
 	Real64
-	CalcHXEffectTerm(
-		int const SurfaceGHENum, // Index number of surface under consideration
+	SurfaceGroundHeatExchangerData::CalcHXEffectTerm(
 		Real64 const Temperature, // Temperature of water entering the surface, in C
 		Real64 const WaterMassFlow // Mass flow rate, in kg/s
 	)
@@ -1360,19 +1281,19 @@ namespace loc {
 		}
 		// arguments are glycol name, temperature, and concentration
 		if ( Temperature < 0.0 ) { // check if fluid is water and would be freezing
-			if ( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex == WaterIndex ) {
-				if ( SurfaceGHE( SurfaceGHENum ).FrozenErrIndex1 == 0 ) {
-					ShowWarningMessage( "GroundHeatExchanger:Surface=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits( InletTemp, 2 ) + "] C" );
+			if ( PlantLoop( this->LoopNum ).FluidIndex == WaterIndex ) {
+				if ( this->FrozenErrIndex1 == 0 ) {
+					ShowWarningMessage( "GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits( InletTemp, 2 ) + "] C" );
 					ShowContinueErrorTimeStamp( "" );
 				}
-				ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Surface=\"" + SurfaceGHE( SurfaceGHENum ).Name + "\", water is frozen", SurfaceGHE( SurfaceGHENum ).FrozenErrIndex1, InletTemp, InletTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen", this->FrozenErrIndex1, InletTemp, InletTemp, _, "[C]", "[C]" );
 				InletTemp = max( InletTemp, 0.0 );
 			}
 		}
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, Temperature, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, Temperature, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
 		// Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-		ReD = 4.0 * WaterMassFlow / ( Pi * MUactual * SurfaceGHE( SurfaceGHENum ).TubeDiameter * SurfaceGHE( SurfaceGHENum ).TubeCircuits );
+		ReD = 4.0 * WaterMassFlow / ( Pi * MUactual * this->TubeDiameter * this->TubeCircuits );
 
 		// Calculate the Nusselt number based on what flow regime one is in
 		if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
@@ -1386,7 +1307,7 @@ namespace loc {
 		//        A = Pi*D*TubeLength
 		//  NTU = PI * Kactual * NuD * SurfaceGHE(SurfaceGHENum)%TubeLength / (WaterMassFlow * CpWater)
 
-		PipeLength = SurfaceGHE( SurfaceGHENum ).SurfaceLength * SurfaceGHE( SurfaceGHENum ).SurfaceWidth / SurfaceGHE( SurfaceGHENum ).TubeSpacing;
+		PipeLength = this->SurfaceLength * this->SurfaceWidth / this->TubeSpacing;
 
 		NTU = Pi * Kactual * NuD * PipeLength / ( WaterMassFlow * CpWater );
 		// Calculate Epsilon*MassFlowRate*Cp
@@ -1400,11 +1321,8 @@ namespace loc {
 
 	}
 
-	//==============================================================================
-
 	void
-	CalcTopSurfTemp(
-		int const SurfaceNum, // surface index number
+	SurfaceGroundHeatExchangerData::CalcTopSurfTemp(
 		Real64 const FluxTop, // top surface flux
 		Real64 & TempTop, // top surface temperature
 		Real64 const ThisDryBulb, // dry bulb temperature
@@ -1469,7 +1387,7 @@ namespace loc {
 		}
 
 		// set previous surface temp
-		OldSurfTemp = SurfaceGHEQTF( SurfaceNum ).TtopHistory( 1 );
+		OldSurfTemp = this->TtopHistory( 1 );
 		// absolute temperatures
 		SurfTempAbs = OldSurfTemp + KelvinConv;
 		SkyTempAbs = ThisSkyTemp + KelvinConv;
@@ -1491,11 +1409,8 @@ namespace loc {
 
 	}
 
-	//==============================================================================
-
 	void
-	CalcBottomSurfTemp(
-		int const SurfaceNum, // surface index number
+	SurfaceGroundHeatExchangerData::CalcBottomSurfTemp(
 		Real64 const FluxBtm, // bottom surface flux
 		Real64 & TempBtm, // bottom surface temperature
 		Real64 const ThisDryBulb, // dry bulb temperature
@@ -1541,10 +1456,10 @@ namespace loc {
 		Real64 SurfTempAbs; // absolute value of surface temp
 		Real64 ExtTempAbs; // absolute value of sky temp
 
-		if ( SurfaceGHE( SurfaceNum ).LowerSurfCond == SurfCond_Exposed ) {
+		if ( this->LowerSurfCond == SurfCond_Exposed ) {
 
 			// make a surface heat balance and solve for temperature
-			OldSurfTemp = SurfaceGHEQTF( SurfaceNum ).TbtmHistory( 1 );
+			OldSurfTemp = this->TbtmHistory( 1 );
 			// absolute temperatures
 			SurfTempAbs = OldSurfTemp + KelvinConv;
 			ExtTempAbs = ThisDryBulb + KelvinConv;
@@ -1569,10 +1484,8 @@ namespace loc {
 
 	}
 
-	//==============================================================================
-
 	void
-	UpdateSurfaceGroundHeatExchngr( int const SurfaceGHENum ) // Index for the surface
+	SurfaceGroundHeatExchangerData::UpdateSurfaceGroundHeatExchngr() // Index for the surface
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1628,50 +1541,48 @@ namespace loc {
 		int LoopSideNum;
 
 		// update flux
-		SurfaceGHEQTF( SurfaceGHENum ).QSrc = SourceFlux;
+		this->QSrc = SourceFlux;
 
-		LoopNum = SurfaceGHE( SurfaceGHENum ).LoopNum;
-		LoopSideNum = SurfaceGHE( SurfaceGHENum ).LoopSideNum;
+		LoopNum = this->LoopNum;
+		LoopSideNum = this->LoopSideNum;
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock > 0 ) { // only update in normal mode !DSU
-			if ( SurfaceGHEQTF( SurfaceGHENum ).LastSysTimeElapsed == SysTimeElapsed ) {
+			if ( this->LastSysTimeElapsed == SysTimeElapsed ) {
 				// Still iterating or reducing system time step, so subtract old values which were
 				// not valid
-				SurfaceGHEQTF( SurfaceGHENum ).QSrcAvg -= SurfaceGHEQTF( SurfaceGHENum ).LastQSrc * SurfaceGHEQTF( SurfaceGHENum ).LastTimeStepSys / TimeStepZone;
+				this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
 			}
 
 			// Update the running average and the "last" values with the current values of the appropriate variables
-			SurfaceGHEQTF( SurfaceGHENum ).QSrcAvg += SurfaceGHEQTF( SurfaceGHENum ).QSrc * TimeStepSys / TimeStepZone;
+			this->QSrcAvg += this->QSrc * TimeStepSys / TimeStepZone;
 
-			SurfaceGHEQTF( SurfaceGHENum ).LastQSrc = SourceFlux;
-			SurfaceGHEQTF( SurfaceGHENum ).LastSysTimeElapsed = SysTimeElapsed;
-			SurfaceGHEQTF( SurfaceGHENum ).LastTimeStepSys = TimeStepSys;
+			this->LastQSrc = SourceFlux;
+			this->LastSysTimeElapsed = SysTimeElapsed;
+			this->LastTimeStepSys = TimeStepSys;
 
 		}
 
 		// Calculate the water side outlet conditions and set the
 		// appropriate conditions on the correct HVAC node.
-		if ( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName == "WATER" ) {
+		if ( PlantLoop( this->LoopNum ).FluidName == "WATER" ) {
 			if ( InletTemp < 0.0 ) {
-				ShowRecurringWarningErrorAtEnd( "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + SurfaceGHE( SurfaceGHENum ).Name, SurfaceGHE( SurfaceGHENum ).FrozenErrIndex2, InletTemp, InletTemp );
+				ShowRecurringWarningErrorAtEnd( "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name, this->FrozenErrIndex2, InletTemp, InletTemp );
 			}
 			InletTemp = max( InletTemp, 0.0 );
 		}
 
-		CpFluid = GetSpecificHeatGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, InletTemp, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
+		CpFluid = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, InletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
-		SafeCopyPlantNode( SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum );
+		SafeCopyPlantNode( this->InletNodeNum, this->OutletNodeNum );
 		// check for flow
 		if ( ( CpFluid > 0.0 ) && ( FlowRate > 0.0 ) ) {
-			Node( SurfaceGHE( SurfaceGHENum ).OutletNodeNum ).Temp = InletTemp - SurfaceArea * SourceFlux / ( FlowRate * CpFluid );
-			Node( SurfaceGHE( SurfaceGHENum ).OutletNodeNum ).Enthalpy = Node( SurfaceGHE( SurfaceGHENum ).OutletNodeNum ).Temp * CpFluid;
+			Node( this->OutletNodeNum ).Temp = InletTemp - this->SurfaceArea * SourceFlux / ( FlowRate * CpFluid );
+			Node( this->OutletNodeNum ).Enthalpy = Node( this->OutletNodeNum ).Temp * CpFluid;
 		}
 
 	}
 
-	//==============================================================================
-
 	void
-	ReportSurfaceGroundHeatExchngr( int const SurfaceGHENum ) // Index for the surface under consideration
+	SurfaceGroundHeatExchangerData::ReportSurfaceGroundHeatExchngr() // Index for the surface under consideration
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1711,45 +1622,21 @@ namespace loc {
 		// FLOW:
 
 		// update flows and temps from node data
-		SurfaceGHEReport( SurfaceGHENum ).InletTemp = Node( SurfaceGHE( SurfaceGHENum ).InletNodeNum ).Temp;
-		SurfaceGHEReport( SurfaceGHENum ).OutletTemp = Node( SurfaceGHE( SurfaceGHENum ).OutletNodeNum ).Temp;
-		SurfaceGHEReport( SurfaceGHENum ).MassFlowRate = Node( SurfaceGHE( SurfaceGHENum ).InletNodeNum ).MassFlowRate;
+		this->InletTemp = Node( this->InletNodeNum ).Temp;
+		this->OutletTemp = Node( this->OutletNodeNum ).Temp;
+		this->MassFlowRate = Node( this->InletNodeNum ).MassFlowRate;
 
 		// update other variables from module variables
-		SurfaceGHEReport( SurfaceGHENum ).HeatTransferRate = SourceFlux * SurfaceArea;
-		SurfaceGHEReport( SurfaceGHENum ).SurfHeatTransferRate = SurfaceArea * ( TopSurfFlux + BtmSurfFlux );
-		SurfaceGHEReport( SurfaceGHENum ).Energy = SourceFlux * SurfaceArea * TimeStepSys * SecInHour;
-		SurfaceGHEReport( SurfaceGHENum ).TopSurfaceTemp = TopSurfTemp;
-		SurfaceGHEReport( SurfaceGHENum ).BtmSurfaceTemp = BtmSurfTemp;
-		SurfaceGHEReport( SurfaceGHENum ).TopSurfaceFlux = TopSurfFlux;
-		SurfaceGHEReport( SurfaceGHENum ).BtmSurfaceFlux = BtmSurfFlux;
-		SurfaceGHEReport( SurfaceGHENum ).SurfEnergy = SurfaceArea * ( TopSurfFlux + BtmSurfFlux ) * TimeStepSys * SecInHour;
-		SurfaceGHEReport( SurfaceGHENum ).SourceTemp = SourceTemp;
+		this->HeatTransferRate = SourceFlux * this->SurfaceArea;
+		this->SurfHeatTransferRate = this->SurfaceArea * ( TopSurfFlux + BtmSurfFlux );
+		this->Energy = SourceFlux * this->SurfaceArea * TimeStepSys * SecInHour;
+		this->TopSurfaceTemp = TopSurfTemp;
+		this->BtmSurfaceTemp = BtmSurfTemp;
+		this->TopSurfaceFlux = TopSurfFlux;
+		this->BtmSurfaceFlux = BtmSurfFlux;
+		this->SurfEnergy = SurfaceArea * ( TopSurfFlux + BtmSurfFlux ) * TimeStepSys * SecInHour;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SurfaceGroundHeatExchanger
 

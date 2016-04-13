@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 
-  Version,8.4;
+  Version,8.5;
 
   Timestep,4;
 
@@ -1635,7 +1635,6 @@
     ZN_1_FLR_1_SEC_1 VAV Box Reheat Coil,  !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Outlet Node,  !- Hot Water or Steam Inlet Node Name
     0.0001;                  !- Convergence Tolerance
 
   Coil:Heating:Water,

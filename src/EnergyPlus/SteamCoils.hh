@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef SteamCoils_hh_INCLUDED
 #define SteamCoils_hh_INCLUDED
 
@@ -105,6 +163,8 @@ namespace SteamCoils {
 		int CompNum; // index for plant component for steam coil
 		int Coil_PlantTypeNum; // plant level index for coil type
 		Real64 OperatingCapacity; // capacity of steam coil at operating conditions (W)
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
@@ -157,118 +217,9 @@ namespace SteamCoils {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			Coil_PlantTypeNum( 0 ),
-			OperatingCapacity( 0.0 )
-		{}
-
-		// Member Constructor
-		SteamCoilEquipConditions(
-			std::string const & Name, // Name of the SteamCoil
-			std::string const & SteamCoilTypeA, // Type of SteamCoil ie. Heating or Cooling
-			int const SteamCoilType, // Type of SteamCoil ie. Heating or Cooling
-			int const SteamCoilModel, // Type of SteamCoil ie. Simple, Detailed, etc.
-			int const SteamCoilType_Num,
-			std::string const & Schedule, // SteamCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			Real64 const InletAirMassFlowRate, // MassFlow through the SteamCoil being Simulated [kg/s]
-			Real64 const OutletAirMassFlowRate, // MassFlow throught the SteamCoil being Simulated[kg/s]
-			Real64 const InletAirTemp, // Inlet Air Temperature Operating Condition [C]
-			Real64 const OutletAirTemp, // Outlet Air Temperature Operating Condition [C]
-			Real64 const InletAirHumRat, // Inlet Air Humidity Ratio Operating Condition
-			Real64 const OutletAirHumRat, // Outlet Air Humidity Ratio Calculated Condition
-			Real64 const InletAirEnthalpy, // Inlet Air enthalpy [J/kg]
-			Real64 const OutletAirEnthalpy, // Outlet Air enthalpy [J/kg]
-			Real64 const TotSteamCoilLoad, // Total Load on the Coil [W]
-			Real64 const SenSteamCoilLoad, // Sensible Load on the Coil [W]
-			Real64 const TotSteamHeatingCoilEnergy, // Total Heating Coil energy of the Coil [J]
-			Real64 const TotSteamCoolingCoilEnergy, // Total Cooling Coil energy of the Coil [J]
-			Real64 const SenSteamCoolingCoilEnergy, // Sensible Cooling Coil energy of the Coil [J]
-			Real64 const TotSteamHeatingCoilRate, // Total Heating Coil Rate on the Coil [W]
-			Real64 const LoopLoss, // Loss in loop due to cond return to atm pressure
-			Real64 const TotSteamCoolingCoilRate, // Total Cooling Coil Rate on the Coil [W]
-			Real64 const SenSteamCoolingCoilRate, // Sensible Cooling Coil Rate on the Coil [W]
-			Real64 const LeavingRelHum, // Simple Coil Latent Model requires User input for leaving RH
-			Real64 const DesiredOutletTemp, // Temp desired at the outlet (C)
-			Real64 const DesiredOutletHumRat, // Humudity Ratio desired at outlet (C)
-			Real64 const InletSteamTemp, // Inlet Steam Temperature [C]
-			Real64 const OutletSteamTemp, // Outlet Steam Temperature [C]
-			Real64 const InletSteamMassFlowRate, // Inlet Steam Mass Flow Rate [Kg/s]
-			Real64 const OutletSteamMassFlowRate, // Outlet Steam Mass Flow Rate [Kg/s]
-			Real64 const MaxSteamVolFlowRate, // Maximum water Volume flow rate [m3/s]
-			Real64 const MaxSteamMassFlowRate, // Maximum water mass flow rate [Kg/s]
-			Real64 const InletSteamEnthalpy, // Inlet Water Enthalpy (J/Kg)
-			Real64 const OutletWaterEnthalpy, // Outlet Water Enthalpy (J/kg)
-			Real64 const InletSteamPress, // Pressure at steam inlet (Pa)
-			Real64 const InletSteamQuality, // Quality of steam at inlet
-			Real64 const OutletSteamQuality, // Quality of steam at outlet
-			Real64 const DegOfSubcooling,
-			Real64 const LoopSubcoolReturn,
-			int const AirInletNodeNum, // Inlet node number at air side
-			int const AirOutletNodeNum, // Outlet node number at air side
-			int const SteamInletNodeNum, // SteamInletNodeNum
-			int const SteamOutletNodeNum, // SteamOutletNodeNum
-			int const TempSetPointNodeNum, // If applicable : node number that the temp setpoint exists.
-			int const TypeOfCoil, // Control of Coil , temperature or Zone load
-			int const FluidIndex, // Fluid index for FluidProperties (Steam)
-			int const LoopNum, // index for plant loop with steam coil
-			int const LoopSide, // index for plant loop side for steam coil
-			int const BranchNum, // index for plant branch for steam coil
-			int const CompNum, // index for plant component for steam coil
-			int const Coil_PlantTypeNum, // plant level index for coil type
-			Real64 const OperatingCapacity // capacity of steam coil at operating conditions (W)
-		) :
-			Name( Name ),
-			SteamCoilTypeA( SteamCoilTypeA ),
-			SteamCoilType( SteamCoilType ),
-			SteamCoilModel( SteamCoilModel ),
-			SteamCoilType_Num( SteamCoilType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			OutletAirMassFlowRate( OutletAirMassFlowRate ),
-			InletAirTemp( InletAirTemp ),
-			OutletAirTemp( OutletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			OutletAirHumRat( OutletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			TotSteamCoilLoad( TotSteamCoilLoad ),
-			SenSteamCoilLoad( SenSteamCoilLoad ),
-			TotSteamHeatingCoilEnergy( TotSteamHeatingCoilEnergy ),
-			TotSteamCoolingCoilEnergy( TotSteamCoolingCoilEnergy ),
-			SenSteamCoolingCoilEnergy( SenSteamCoolingCoilEnergy ),
-			TotSteamHeatingCoilRate( TotSteamHeatingCoilRate ),
-			LoopLoss( LoopLoss ),
-			TotSteamCoolingCoilRate( TotSteamCoolingCoilRate ),
-			SenSteamCoolingCoilRate( SenSteamCoolingCoilRate ),
-			LeavingRelHum( LeavingRelHum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			InletSteamTemp( InletSteamTemp ),
-			OutletSteamTemp( OutletSteamTemp ),
-			InletSteamMassFlowRate( InletSteamMassFlowRate ),
-			OutletSteamMassFlowRate( OutletSteamMassFlowRate ),
-			MaxSteamVolFlowRate( MaxSteamVolFlowRate ),
-			MaxSteamMassFlowRate( MaxSteamMassFlowRate ),
-			InletSteamEnthalpy( InletSteamEnthalpy ),
-			OutletWaterEnthalpy( OutletWaterEnthalpy ),
-			InletSteamPress( InletSteamPress ),
-			InletSteamQuality( InletSteamQuality ),
-			OutletSteamQuality( OutletSteamQuality ),
-			DegOfSubcooling( DegOfSubcooling ),
-			LoopSubcoolReturn( LoopSubcoolReturn ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			SteamInletNodeNum( SteamInletNodeNum ),
-			SteamOutletNodeNum( SteamOutletNodeNum ),
-			TempSetPointNodeNum( TempSetPointNodeNum ),
-			TypeOfCoil( TypeOfCoil ),
-			FluidIndex( FluidIndex ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			Coil_PlantTypeNum( Coil_PlantTypeNum ),
-			OperatingCapacity( OperatingCapacity )
+			OperatingCapacity( 0.0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -441,31 +392,27 @@ namespace SteamCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	//// register that a coil is used as a regeneration air heating coil in
+	//// desiccant dehumidification system
+	//void
+	//SetSteamCoilAsDesicRegenCoil(
+	//	std::string const & CoilType, // must match coil types in this module
+	//	std::string const & CoilName, // must match coil names for the coil type
+	//	int & DesiccantDehumIndex, // index of desiccant dehumidifier
+	//	bool & ErrorsFound // set to true if problem
+	//);
+
+	// sets data to a coil that is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetSteamCoilData(
+		int const CoilNum, // index of hot steam heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
+	);
+
 	// End of Utility subroutines for the SteamCoil Module
-
-	// *****************************************************************************
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SteamCoils
 

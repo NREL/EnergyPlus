@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -152,6 +210,7 @@ namespace Furnaces {
 	// Last mode of operation
 	int const CoolingMode( 1 ); // last compressor operating mode was in cooling
 	int const HeatingMode( 2 ); // last compressor operating mode was in heating
+	int const NoCoolHeat( 3 ); // last operating mode was coil off
 	// Airflow control for contant fan mode
 	int const UseCompressorOnFlow( 1 ); // set compressor OFF air flow rate equal to compressor ON air flow rate
 	int const UseCompressorOffFlow( 2 ); // set compressor OFF air flow rate equal to user defined value
@@ -218,6 +277,32 @@ namespace Furnaces {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumFurnaces = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		ModifiedHeatCoilLoad = 0.0;
+		OnOffAirFlowRatioSave = 0.0;
+		OnOffFanPartLoadFractionSave = 0.0;
+		CompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		CoolHeatPLRRat = 1.0;
+		HeatingLoad = false;
+		CoolingLoad = false;
+		EconomizerFlag = false;
+		AirLoopPass = 0;
+		HPDehumidificationLoadFlag = false;
+		TempSteamIn = 100.0;
+		SaveCompressorPLR = 0.0;
+		CurrentModuleObject = "";
+		Furnace.deallocate();
+	}
 
 	void
 	SimFurnace(
@@ -296,6 +381,7 @@ namespace Furnaces {
 
 		Real64 QActual; // actual heating coil output (W)
 		bool SuppHeatingCoilFlag; // true if supplemental heating coil
+		Real64 TempMassFlowRateMaxAvail;
 
 		// Obtains and Allocates Furnace related parameters from input file
 		if ( GetInputFlag ) { //First time subroutine has been entered
@@ -355,6 +441,12 @@ namespace Furnaces {
 		InitFurnace( FurnaceNum, AirLoopNum, OnOffAirFlowRatio, FanOpMode, ZoneLoad, MoistureLoad, FirstHVACIteration );
 
 		FurnaceInletNode = Furnace( FurnaceNum ).FurnaceInletNodeNum;
+
+		// MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
+		// temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
+		TempMassFlowRateMaxAvail = Node( FurnaceInletNode ).MassFlowRateMaxAvail;
+		Node( FurnaceInletNode ).MassFlowRateMaxAvail = Furnace( FurnaceNum ).DesignMassFlowRate;
+
 		FurnaceSavMdot = Node( FurnaceInletNode ).MassFlowRate;
 		CompOp = On;
 		CoolHeatPLRRat = 1.0;
@@ -574,6 +666,8 @@ namespace Furnaces {
 
 		// Reset OnOffFanPartLoadFraction to 1 in case another on/off fan is called without a part-load curve
 		OnOffFanPartLoadFraction = 1.0;
+
+		Node( FurnaceInletNode ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
 
 	}
 
@@ -850,6 +944,7 @@ namespace Furnaces {
 
 			FurnaceNum = HeatOnlyNum;
 			Furnace( FurnaceNum ).FurnaceType_Num = FurnaceType_Num;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -1367,6 +1462,7 @@ namespace Furnaces {
 
 			FurnaceNum = HeatCoolNum + NumHeatOnly + NumUnitaryHeatOnly;
 			Furnace( FurnaceNum ).FurnaceType_Num = FurnaceType_Num;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -2451,6 +2547,7 @@ namespace Furnaces {
 			SupHeatCoilOutletNode = 0;
 
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -3276,6 +3373,7 @@ namespace Furnaces {
 			SupHeatCoilOutletNode = 0;
 
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -4100,8 +4198,8 @@ namespace Furnaces {
 
 			}
 		}
-
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyRan;
+		ManageEMS( emsCallFromComponentGetInput, anyRan );
 
 	}
 
@@ -4244,6 +4342,10 @@ namespace Furnaces {
 		int OutNode; // Outlet node number in MSHP loop
 		Real64 RhoAir; // Air density at InNode
 		static bool MyAirLoopPass( true ); // one time allocation flag
+		int OperatingMode; // track cooling, heating, and no cooling or heating modes
+		int OperatingModeMinusOne;
+		int OperatingModeMinusTwo;
+		bool Oscillate; // detection of oscillating operating modes
 
 		InNode = Furnace( FurnaceNum ).FurnaceInletNodeNum;
 		OutNode = Furnace( FurnaceNum ).FurnaceOutletNodeNum;
@@ -4948,6 +5050,47 @@ namespace Furnaces {
 			ZoneLoad = QZnReq;
 		} // OpMode .EQ. ContFanCycCoil
 
+		if( FirstHVACIteration ) {
+			Furnace( FurnaceNum ).iterationCounter = 0;
+			Furnace( FurnaceNum ).iterationMode = 0;
+		}
+		Furnace( FurnaceNum ).iterationCounter += 1;
+
+		if ( CoolingLoad && Furnace( FurnaceNum ).iterationCounter  <= 20 ) {
+			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = CoolingMode;
+		} else if ( HeatingLoad && Furnace( FurnaceNum ).iterationCounter <= 20 ) {
+			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = HeatingMode;
+		} else if ( Furnace( FurnaceNum ).iterationCounter <= 20 ) {
+			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = NoCoolHeat;
+		}
+		// IF small loads to meet or not converging, just shut down unit
+		if ( std::abs( ZoneLoad ) < Small5WLoad ) {
+			ZoneLoad = 0.0;
+			CoolingLoad = false;
+			HeatingLoad = false;
+		} else if ( Furnace( FurnaceNum ).iterationCounter > 4 )  { // attempt to lock output (air flow) if oscillations are detected
+			OperatingMode = Furnace( FurnaceNum ).iterationMode( 5 );
+			OperatingModeMinusOne = Furnace( FurnaceNum ).iterationMode( 4 );
+			OperatingModeMinusTwo = Furnace( FurnaceNum ).iterationMode( 3 );
+			Oscillate = true;
+			if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
+			if ( Oscillate ) {
+				if ( QToCoolSetPt < 0.0 ) {
+					HeatingLoad = false;
+					CoolingLoad = true;
+					ZoneLoad = QToCoolSetPt;
+				} else if ( QToHeatSetPt > 0.0 ) {
+					HeatingLoad = true;
+					CoolingLoad = false;
+					ZoneLoad = QToHeatSetPt;
+				} else {
+					HeatingLoad = false;
+					CoolingLoad = false;
+					ZoneLoad = 0.0;
+				}
+			}
+		}
+
 		// EMS override point
 		if ( Furnace( FurnaceNum ).EMSOverrideSensZoneLoadRequest ) ZoneLoad = Furnace( FurnaceNum ).EMSSensibleZoneLoadValue;
 		if ( Furnace( FurnaceNum ).EMSOverrideMoistZoneLoadRequest ) MoistureLoad = Furnace( FurnaceNum ).EMSMoistureZoneLoadValue;
@@ -5189,7 +5332,8 @@ namespace Furnaces {
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		bool ErrFound; // flag returned from mining functions
 		Real64 BranchFlow; // branch volumetric flow rate [m3/s]
-		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
+		bool anyRan;
+		ManageEMS( emsCallFromUnitarySystemSizing, anyRan ); // calling point
 		ThisCtrlZoneNum = 0;
 		DXCoolCap = 0.0;
 		UnitaryHeatCap = 0.0;
@@ -5702,6 +5846,7 @@ namespace Furnaces {
 		using General::TrimSigDigits;
 		using DXCoils::DXCoilPartLoadRatio;
 		using DXCoils::DXCoil;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5771,11 +5916,11 @@ namespace Furnaces {
 
 		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ) {
 			if ( DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulbTemp = Node( DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).SecZoneAirNodeNum ).Temp;
-				Furnace( FurnaceNum ).CondenserNodeNum = DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).SecZoneAirNodeNum;
+				OutdoorDryBulbTemp = ZT( DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).SecZonePtr );
+				Furnace( FurnaceNum ).CondenserNodeNum = 0;
 			} else if ( DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulbTemp = Node( DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).SecZoneAirNodeNum ).Temp;
-				Furnace( FurnaceNum ).CondenserNodeNum = DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).SecZoneAirNodeNum;
+				OutdoorDryBulbTemp = ZT( DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).SecZonePtr );
+				Furnace( FurnaceNum ).CondenserNodeNum = 0;
 			} else {
 				OutdoorDryBulbTemp = OutDryBulbTemp;
 			}
@@ -8029,7 +8174,7 @@ namespace Furnaces {
 
 		{ auto const SELECT_CASE_var( CoilTypeNum );
 		if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
-			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, _, SuppHeatingCoilFlag, FanMode );
+			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode );
 		} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 			if ( QCoilLoad > SmallLoad ) {
 				SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
@@ -9511,31 +9656,6 @@ namespace Furnaces {
 		SetVSHPAirFlow( FurnaceNum, PartLoadRatio, OnOffAirFlowRatio );
 
 	}
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Furnaces
 

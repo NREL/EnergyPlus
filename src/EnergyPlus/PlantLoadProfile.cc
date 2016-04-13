@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -24,7 +82,6 @@
 namespace EnergyPlus {
 
 namespace PlantLoadProfile {
-
 	// MODULE INFORMATION:
 	//       AUTHOR         Peter Graham Ellis
 	//       DATE WRITTEN   January 2004
@@ -57,35 +114,41 @@ namespace PlantLoadProfile {
 	// MODULE VARIABLE TYPE DECLARATIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
+	bool GetPlantLoadProfileInputFlag( true );
 	int NumOfPlantProfile;
-
-	namespace {
-		bool GetInput( true );
-	}
-	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
 	Array1D< PlantProfileData > PlantProfile;
 
-	// MODULE SUBROUTINES:
-
-	// Functions
-	void
-	clear_state(){
-		NumOfPlantProfile = 0;
-		GetInput= true;
-		PlantProfile.deallocate();
+	PlantComponent *
+	PlantProfileData::factory( std::string objectName ) {
+		if ( GetPlantLoadProfileInputFlag ) {
+			GetPlantProfileInput();
+			GetPlantLoadProfileInputFlag = false;
+		}
+		// Now look for this particular pipe in the list
+		for ( auto & plp : PlantProfile ) {
+			if ( plp.Name == objectName ) {
+				return &plp;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError( "PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
 	}
 
 	void
-	SimulatePlantProfile(
-		std::string const & EP_UNUSED( EquipTypeName ), // description of model (not used until different types of profiles)
-		std::string const & EquipName, // the user-defined name
-		int const EP_UNUSED( EquipTypeNum ), // the plant parameter ID for equipment model
-		int & ProfileNum, // the index for specific load profile
-		bool const EP_UNUSED( FirstHVACIteration ),
-		bool const InitLoopEquip // flag indicating if called in special initialization mode.
-	)
+	PlantProfileData::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) )
+	{
+		this->InitPlantProfile( );
+	}
+
+	void
+	PlantProfileData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ),
+				    bool const EP_UNUSED( FirstHVACIteration ),
+				    Real64 & EP_UNUSED( CurLoad ),
+		       		    bool const EP_UNUSED( RunFlag ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -114,49 +177,192 @@ namespace PlantLoadProfile {
 		static std::string const RoutineName( "SimulatePlantProfile" );
 		Real64 DeltaTemp;
 
-		Real64 Cp; // local fluid specific heat
+		this->InitPlantProfile( );
+
+		if ( this->MassFlowRate > 0.0 ) {
+			Real64 Cp = GetSpecificHeatGlycol( PlantLoop( this->WLoopNum ).FluidName, this->InletTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
+			DeltaTemp = this->Power / ( this->MassFlowRate * Cp );
+		} else {
+			this->Power = 0.0;
+			DeltaTemp = 0.0;
+		}
+
+		this->OutletTemp = this->InletTemp - DeltaTemp;
+
+		this->UpdatePlantProfile( );
+		this->ReportPlantProfile( );
+
+	} // simulate()
+
+	void
+	PlantProfileData::InitPlantProfile()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Peter Graham Ellis
+		//       DATE WRITTEN   January 2004
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Initializes the plant load profile object during the plant simulation.
+
+		// METHODOLOGY EMPLOYED:
+		// Inlet and outlet nodes are initialized.  The scheduled load and flow rate is obtained, flow is requested, and the
+		// actual available flow is set.
+
+		// Using/Aliasing
+		using DataGlobals::SysSizingCalc;
+		using PlantUtilities::RegisterPlantCompDesignFlow;
+		using DataLoopNode::Node;
+		using ScheduleManager::GetCurrentScheduleValue;
+		using ScheduleManager::GetScheduleMaxValue;
+		using FluidProperties::GetDensityGlycol;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "InitPlantProfile" );
+		Real64 FluidDensityInit;
+		bool errFlag;
 
 		// FLOW:
-		if ( GetInput ) {
-			GetPlantProfileInput();
-			GetInput = false;
+
+		// Do the one time initializations
+		if ( this->SetLoopIndexFlag ) {
+			if ( allocated( PlantLoop ) ) {
+				errFlag = false;
+				ScanPlantLoopsForObject( this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _, _, _, _, errFlag );
+				if ( errFlag ) {
+					ShowFatalError( "InitPlantProfile: Program terminated for previous conditions." );
+				}
+
+				this->SetLoopIndexFlag = false;
+			}
 		}
 
-		if ( InitLoopEquip ) {
-			ProfileNum = FindItemInList( EquipName, PlantProfile );
-			if ( ProfileNum != 0 ) {
-				InitPlantProfile( ProfileNum );
-				return;
-			}
+		if ( ! SysSizingCalc && this->InitSizing ) {
+			RegisterPlantCompDesignFlow( InletNode, this->PeakVolFlowRate );
+			this->InitSizing = false;
+		}
+
+		if ( BeginEnvrnFlag && this->Init ) {
+			// Clear node initial conditions
+			//DSU? can we centralize these temperature inits
+			//    Node(InletNode)%Temp = 0.0
+			Node( OutletNode ).Temp = 0.0;
+
+			FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, InitConvTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
+
+			Real64 MaxFlowMultiplier = GetScheduleMaxValue( this->FlowRateFracSchedule );
+
+			InitComponentNodes( 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum );
+
+			this->EMSOverrideMassFlow = false;
+			this->EMSMassFlowValue = 0.0;
+			this->EMSOverridePower = false;
+			this->EMSPowerValue = 0.0;
+			this->Init = false;
 
 		}
 
-		if ( ProfileNum != 0 ) {
+		if ( ! BeginEnvrnFlag ) this->Init = true;
 
-			InitPlantProfile( ProfileNum );
+		this->InletTemp = Node( InletNode ).Temp;
+		this->Power = GetCurrentScheduleValue( this->LoadSchedule );
 
-			if ( PlantProfile( ProfileNum ).MassFlowRate > 0.0 ) {
+		if ( this->EMSOverridePower ) this->Power = this->EMSPowerValue;
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, PlantProfile( ProfileNum ).InletTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, RoutineName );
+		FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, this->InletTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
 
-				DeltaTemp = PlantProfile( ProfileNum ).Power / ( PlantProfile( ProfileNum ).MassFlowRate * Cp );
-			} else {
-				PlantProfile( ProfileNum ).Power = 0.0;
-				DeltaTemp = 0.0;
-			}
+		// Get the scheduled mass flow rate
+		this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue( this->FlowRateFracSchedule );
 
-			PlantProfile( ProfileNum ).OutletTemp = PlantProfile( ProfileNum ).InletTemp - DeltaTemp;
+		this->MassFlowRate = this->VolFlowRate * FluidDensityInit;
 
-			UpdatePlantProfile( ProfileNum );
-			ReportPlantProfile( ProfileNum );
+		if ( this->EMSOverrideMassFlow ) this->MassFlowRate = this->EMSMassFlowValue;
 
+		// Request the mass flow rate from the plant component flow utility routine
+		SetComponentFlowRate( this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum );
+
+		this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
+
+	} // InitPlantProfile()
+
+	void
+	PlantProfileData::UpdatePlantProfile()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Peter Graham Ellis
+		//       DATE WRITTEN   January 2004
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Updates the node variables with local variables.
+
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology.
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int OutletNode;
+
+		// FLOW:
+
+		OutletNode = this->OutletNode;
+
+		// Set outlet node variables that are possibly changed
+		Node( OutletNode ).Temp = this->OutletTemp;
+
+		//DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
+
+	}
+
+	void
+	PlantProfileData::ReportPlantProfile()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Peter Graham Ellis
+		//       DATE WRITTEN   January 2004
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates report variables.
+
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology.
+
+		// Using/Aliasing
+		using DataGlobals::SecInHour;
+		using DataHVACGlobals::TimeStepSys;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// FLOW:
+		this->Energy = this->Power * TimeStepSys * SecInHour;
+
+		if ( this->Energy >= 0.0 ) {
+			this->HeatingEnergy = this->Energy;
+			this->CoolingEnergy = 0.0;
 		} else {
-			ShowFatalError( "SimulatePlantProfile: plant load profile not found =" + EquipName );
-
+			this->HeatingEnergy = 0.0;
+			this->CoolingEnergy = std::abs( this->Energy );
 		}
 
 	}
 
+	// Functions
 	void
 	GetPlantProfileInput()
 	{
@@ -265,203 +471,13 @@ namespace PlantLoadProfile {
 	}
 
 	void
-	InitPlantProfile( int const ProfileNum )
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Initializes the plant load profile object during the plant simulation.
-
-		// METHODOLOGY EMPLOYED:
-		// Inlet and outlet nodes are initialized.  The scheduled load and flow rate is obtained, flow is requested, and the
-		// actual available flow is set.
-
-		// Using/Aliasing
-		using DataGlobals::SysSizingCalc;
-		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataLoopNode::Node;
-		using ScheduleManager::GetCurrentScheduleValue;
-		using ScheduleManager::GetScheduleMaxValue;
-		using FluidProperties::GetDensityGlycol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static std::string const RoutineName( "InitPlantProfile" );
-		int InletNode;
-		int OutletNode;
-		Real64 MaxFlowMultiplier;
-		Real64 FluidDensityInit;
-		bool errFlag;
-
-		// FLOW:
-
-		// Do the one time initializations
-		if ( PlantProfile( ProfileNum ).SetLoopIndexFlag ) {
-			if ( allocated( PlantLoop ) ) {
-				errFlag = false;
-				ScanPlantLoopsForObject( PlantProfile( ProfileNum ).Name, PlantProfile( ProfileNum ).TypeNum, PlantProfile( ProfileNum ).WLoopNum, PlantProfile( ProfileNum ).WLoopSideNum, PlantProfile( ProfileNum ).WLoopBranchNum, PlantProfile( ProfileNum ).WLoopCompNum, _, _, _, _, _, errFlag );
-				if ( errFlag ) {
-					ShowFatalError( "InitPlantProfile: Program terminated for previous conditions." );
-				}
-
-				PlantProfile( ProfileNum ).SetLoopIndexFlag = false;
-			}
-		}
-
-		// FLOW:
-		InletNode = PlantProfile( ProfileNum ).InletNode;
-		OutletNode = PlantProfile( ProfileNum ).OutletNode;
-
-		if ( ! SysSizingCalc && PlantProfile( ProfileNum ).InitSizing ) {
-			RegisterPlantCompDesignFlow( InletNode, PlantProfile( ProfileNum ).PeakVolFlowRate );
-			PlantProfile( ProfileNum ).InitSizing = false;
-		}
-
-		if ( BeginEnvrnFlag && PlantProfile( ProfileNum ).Init ) {
-			// Clear node initial conditions
-			//DSU? can we centralize these temperature inits
-			//    Node(InletNode)%Temp = 0.0
-			Node( OutletNode ).Temp = 0.0;
-
-			FluidDensityInit = GetDensityGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, RoutineName );
-
-			MaxFlowMultiplier = GetScheduleMaxValue( PlantProfile( ProfileNum ).FlowRateFracSchedule );
-
-			InitComponentNodes( 0.0, PlantProfile( ProfileNum ).PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, InletNode, OutletNode, PlantProfile( ProfileNum ).WLoopNum, PlantProfile( ProfileNum ).WLoopSideNum, PlantProfile( ProfileNum ).WLoopBranchNum, PlantProfile( ProfileNum ).WLoopCompNum );
-
-			PlantProfile( ProfileNum ).EMSOverrideMassFlow = false;
-			PlantProfile( ProfileNum ).EMSMassFlowValue = 0.0;
-			PlantProfile( ProfileNum ).EMSOverridePower = false;
-			PlantProfile( ProfileNum ).EMSPowerValue = 0.0;
-			PlantProfile( ProfileNum ).Init = false;
-
-		}
-
-		if ( ! BeginEnvrnFlag ) PlantProfile( ProfileNum ).Init = true;
-
-		PlantProfile( ProfileNum ).InletTemp = Node( InletNode ).Temp;
-		PlantProfile( ProfileNum ).Power = GetCurrentScheduleValue( PlantProfile( ProfileNum ).LoadSchedule );
-
-		if ( PlantProfile( ProfileNum ).EMSOverridePower ) PlantProfile( ProfileNum ).Power = PlantProfile( ProfileNum ).EMSPowerValue;
-
-		FluidDensityInit = GetDensityGlycol( PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidName, PlantProfile( ProfileNum ).InletTemp, PlantLoop( PlantProfile( ProfileNum ).WLoopNum ).FluidIndex, RoutineName );
-
-		// Get the scheduled mass flow rate
-		PlantProfile( ProfileNum ).VolFlowRate = PlantProfile( ProfileNum ).PeakVolFlowRate * GetCurrentScheduleValue( PlantProfile( ProfileNum ).FlowRateFracSchedule );
-
-		PlantProfile( ProfileNum ).MassFlowRate = PlantProfile( ProfileNum ).VolFlowRate * FluidDensityInit;
-
-		if ( PlantProfile( ProfileNum ).EMSOverrideMassFlow ) PlantProfile( ProfileNum ).MassFlowRate = PlantProfile( ProfileNum ).EMSMassFlowValue;
-
-		// Request the mass flow rate from the plant component flow utility routine
-		SetComponentFlowRate( PlantProfile( ProfileNum ).MassFlowRate, InletNode, OutletNode, PlantProfile( ProfileNum ).WLoopNum, PlantProfile( ProfileNum ).WLoopSideNum, PlantProfile( ProfileNum ).WLoopBranchNum, PlantProfile( ProfileNum ).WLoopCompNum );
-
-		PlantProfile( ProfileNum ).VolFlowRate = PlantProfile( ProfileNum ).MassFlowRate / FluidDensityInit;
-
+	clear_state(){
+		NumOfPlantProfile = 0;
+		GetPlantLoadProfileInputFlag = true;
+		PlantProfile.deallocate();
 	}
 
-	void
-	UpdatePlantProfile( int const ProfileNum )
-	{
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+} // namespace PlantLoadProfile
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Updates the node variables with local variables.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus methodology.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int OutletNode;
-
-		// FLOW:
-
-		OutletNode = PlantProfile( ProfileNum ).OutletNode;
-
-		// Set outlet node variables that are possibly changed
-		Node( OutletNode ).Temp = PlantProfile( ProfileNum ).OutletTemp;
-
-		//DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
-
-	}
-
-	void
-	ReportPlantProfile( int const ProfileNum )
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates report variables.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus methodology.
-
-		// Using/Aliasing
-		using DataGlobals::SecInHour;
-		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// FLOW:
-		PlantProfile( ProfileNum ).Energy = PlantProfile( ProfileNum ).Power * TimeStepSys * SecInHour;
-
-		if ( PlantProfile( ProfileNum ).Energy >= 0.0 ) {
-			PlantProfile( ProfileNum ).HeatingEnergy = PlantProfile( ProfileNum ).Energy;
-			PlantProfile( ProfileNum ).CoolingEnergy = 0.0;
-		} else {
-			PlantProfile( ProfileNum ).HeatingEnergy = 0.0;
-			PlantProfile( ProfileNum ).CoolingEnergy = std::abs( PlantProfile( ProfileNum ).Energy );
-		}
-
-	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-} // PlantLoadProfile
-
-} // EnergyPlus
+} // namespace EnergyPlus

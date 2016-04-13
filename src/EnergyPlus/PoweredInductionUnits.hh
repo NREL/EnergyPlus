@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef PoweredInductionUnits_hh_INCLUDED
 #define PoweredInductionUnits_hh_INCLUDED
 
@@ -149,117 +207,6 @@ namespace PoweredInductionUnits {
 			SensCoolEnergy( 0.0 )
 		{}
 
-		// Member Constructor
-		PowIndUnitData(
-			std::string const & Name, // name of unit
-			std::string const & UnitType, // type of unit
-			int const UnitType_Num, // index for type of unit
-			std::string const & Sched, // availability schedule
-			int const SchedPtr, // index to schedule
-			Real64 const MaxTotAirVolFlow, // m3/s  (series)
-			Real64 const MaxTotAirMassFlow, // kg/s  (series)
-			Real64 const MaxPriAirVolFlow, // m3/s
-			Real64 const MaxPriAirMassFlow, // kg/s
-			Real64 const MinPriAirFlowFrac, // minimum primary air flow fraction
-			Real64 const MinPriAirMassFlow, // kg/s
-			Real64 const MaxSecAirVolFlow, // m3/s (parallel)
-			Real64 const MaxSecAirMassFlow, // kg/s (parallel)
-			Real64 const FanOnFlowFrac, // frac of primary air flow at which fan turns on (parallel)
-			Real64 const FanOnAirMassFlow, // primary air mass flow rate at which fan turns on (parallel)
-			int const PriAirInNode, // unit primary air inlet node number
-			int const SecAirInNode, // unit secondary air inlet node number
-			int const OutAirNode, // unit air outlet node number
-			int const HCoilInAirNode, // unit mixed air node number
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			std::string const & MixerName, // name of air mixer component
-			int const Mixer_Num, // index for type of mixer
-			std::string const & FanName, // name of fan component
-			int const Fan_Num, // index for fan type
-			int const Fan_Index, // store index for this fan
-			std::string const & HCoilType, // type of heating coil component
-			int const HCoilType_Num, // index for heating coil type
-			int const HCoil_PlantTypeNum,
-			std::string const & HCoil, // name of heating coil component
-			int const HCoil_Index, // index to this heating coil
-			int const HCoil_FluidIndex,
-			Real64 const MaxVolHotWaterFlow, // m3/s
-			Real64 const MaxVolHotSteamFlow, // m3/s
-			Real64 const MaxHotWaterFlow, // kg/s
-			Real64 const MaxHotSteamFlow, // kg/s
-			Real64 const MinVolHotWaterFlow, // m3/s
-			Real64 const MinHotSteamFlow, // kg/s
-			Real64 const MinVolHotSteamFlow, // m3/s
-			Real64 const MinHotWaterFlow, // kg/s
-			int const HotControlNode, // hot water control node
-			int const HotCoilOutNodeNum, // outlet of coil
-			Real64 const HotControlOffset, // control tolerance
-			int const HWLoopNum, // index for plant loop with hot plant coil
-			int const HWLoopSide, // index for plant loop side for hot plant coil
-			int const HWBranchNum, // index for plant branch for hot plant coil
-			int const HWCompNum, // index for plant component for hot plant coil
-			int const ADUNum, // index of corresponding air distribution unit
-			bool const InducesPlenumAir, // True if secondary air comes from the plenum
-			Real64 const HeatingRate, // unit heat addition rate to zone [W]
-			Real64 const HeatingEnergy, // unit heat addition to zone [J]
-			Real64 const SensCoolRate, // unit sensible heat removal rate from zone [W]
-			Real64 const SensCoolEnergy // unit sensible heat removal from zone [J]
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			MaxTotAirVolFlow( MaxTotAirVolFlow ),
-			MaxTotAirMassFlow( MaxTotAirMassFlow ),
-			MaxPriAirVolFlow( MaxPriAirVolFlow ),
-			MaxPriAirMassFlow( MaxPriAirMassFlow ),
-			MinPriAirFlowFrac( MinPriAirFlowFrac ),
-			MinPriAirMassFlow( MinPriAirMassFlow ),
-			MaxSecAirVolFlow( MaxSecAirVolFlow ),
-			MaxSecAirMassFlow( MaxSecAirMassFlow ),
-			FanOnFlowFrac( FanOnFlowFrac ),
-			FanOnAirMassFlow( FanOnAirMassFlow ),
-			PriAirInNode( PriAirInNode ),
-			SecAirInNode( SecAirInNode ),
-			OutAirNode( OutAirNode ),
-			HCoilInAirNode( HCoilInAirNode ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			MixerName( MixerName ),
-			Mixer_Num( Mixer_Num ),
-			FanName( FanName ),
-			Fan_Num( Fan_Num ),
-			Fan_Index( Fan_Index ),
-			HCoilType( HCoilType ),
-			HCoilType_Num( HCoilType_Num ),
-			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
-			HCoil( HCoil ),
-			HCoil_Index( HCoil_Index ),
-			HCoil_FluidIndex( HCoil_FluidIndex ),
-			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
-			MaxVolHotSteamFlow( MaxVolHotSteamFlow ),
-			MaxHotWaterFlow( MaxHotWaterFlow ),
-			MaxHotSteamFlow( MaxHotSteamFlow ),
-			MinVolHotWaterFlow( MinVolHotWaterFlow ),
-			MinHotSteamFlow( MinHotSteamFlow ),
-			MinVolHotSteamFlow( MinVolHotSteamFlow ),
-			MinHotWaterFlow( MinHotWaterFlow ),
-			HotControlNode( HotControlNode ),
-			HotCoilOutNodeNum( HotCoilOutNodeNum ),
-			HotControlOffset( HotControlOffset ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			ADUNum( ADUNum ),
-			InducesPlenumAir( InducesPlenumAir ),
-			HeatingRate( HeatingRate ),
-			HeatingEnergy( HeatingEnergy ),
-			SensCoolRate( SensCoolRate ),
-			SensCoolEnergy( SensCoolEnergy )
-		{}
-
 	};
 
 	// Object Data
@@ -314,29 +261,6 @@ namespace PoweredInductionUnits {
 
 	void
 	PIUInducesPlenumAir( int const NodeNum ); // induced air node number
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PoweredInductionUnits
 

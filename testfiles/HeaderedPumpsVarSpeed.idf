@@ -94,7 +94,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -3220,8 +3220,13 @@
     0,                       !- Coefficient 4 of the Part Load Performance Curve
     0.1,                     !- Minimum Flow Rate Fraction
     INTERMITTENT,            !- Pump Control Type
-    CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
-
+    CoolingPumpAvailSched,   !- Pump Flow Rate Schedule Name
+    ,                        !- Zone Name
+    ,                        !- Skin Loss Radiative Fraction
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    ,                        !- Design Electric Power per Unit Flow Rate
+    ;                        !- Design Shaft Power per Unit Flow Rate per Unit Head
+    
   Chiller:Electric,
     Central Chiller 1,       !- Name
     AirCooled,               !- Condenser Type

@@ -1,0 +1,3 @@
+\section{Begin Timestep Before Predictor}\label{begin-timestep-before-predictor}
+
+The calling point called ``BeginTimestepBeforePredictor'' occurs near the beginning of each timestep but before the predictor executes. ``Predictor'' refers to the step in EnergyPlus modeling when the zone loads are calculated. This calling point is useful for controlling components that affect the thermal loads the HVAC systems will then attempt to meet. Programs called from this point might actuate the building envelope or internal gains based on current weather or on the results from the previous timestep. Demand management routines might use this calling point to reduce lighting or process loads, change thermostat settings, operate window shades, etc.

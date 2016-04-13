@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::Evaporative Cooler Unit Tests
 
 // Google Test Headers
@@ -221,7 +279,7 @@ namespace EnergyPlus {
 		DataSizing::NumSysSizInput = 1;
 		DataSizing::SysSizInput.allocate( 1 );
 		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
-		
+
 		// allocate
 		DataSizing::CurSysNum = 1;
 		FinalSysSizing.allocate( CurSysNum );
@@ -279,7 +337,7 @@ namespace EnergyPlus {
 		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 		SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
 
-		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop 
+		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
 		SizeEvapCooler( EvapCoolNum );
 		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
 		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
@@ -305,16 +363,16 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest ) {
-		
+
 		int const EvapCoolNum( 1 );
 		Real64 PrimaryAirDesignFlow( 0.0 );
 		Real64 RecirWaterPumpDesignPower( 0.0 );
-		
+
 		DataSizing::SysSizingRunDone = true;
 		DataSizing::NumSysSizInput = 1;
 		DataSizing::SysSizInput.allocate( 1 );
 		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
-		
+
 
 		DataSizing::CurSysNum = 1;
 		FinalSysSizing.allocate( CurSysNum );
@@ -371,10 +429,8 @@ namespace EnergyPlus {
 		FinalSysSizing.deallocate();
 	}
 
-	TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition )
 	{
-
-		ShowMessage( "Begin Test: EvaporativeCoolers, CalcSecondaryAirOutletCondition" );
 
 		EvaporativeCoolers::EvapCond.allocate( 1 );
 		int const EvapCoolNum( 1 );
@@ -456,10 +512,8 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp )
 	{
-
-		ShowMessage( "Begin Test: EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp" );
 
 		OutBaroPress = 101325.0;
 		EvaporativeCoolers::EvapCond.allocate( 1 );
@@ -505,7 +559,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( EvaporativeCoolers, IndEvapCoolerPower )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower )
 	{
 
 		ShowMessage( "Begin Test: EvaporativeCoolers, IndEvapCoolerPower" );
@@ -569,7 +623,7 @@ namespace EnergyPlus {
 		PerfCurve.deallocate();
 	}
 
-	TEST( EvaporativeCoolers, SizeEvapCooler )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler )
 	{
 
 		// one-time setup of evap cooler instance
@@ -648,6 +702,163 @@ namespace EnergyPlus {
 		DataAirSystems::PrimaryAirSystem.deallocate();
 		DataSizing::SysSizInput.deallocate();
 
+	}
+
+	TEST_F( EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest ) {
+
+		int const EvapCoolNum( 1 );
+		Real64 PrimaryAirDesignFlow( 0.0 );
+		Real64 SecondaryAirDesignFlow( 0.0 );
+		Real64 SecondaryFanPower( 0.0 );
+		Real64 RecirculatingWaterPumpPower( 0.0 );
+
+		DataSizing::SysSizingRunDone = true;
+		DataSizing::NumSysSizInput = 1;
+		DataSizing::SysSizInput.allocate( 1 );
+		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
+
+		// allocate
+		DataSizing::CurSysNum = 1;
+		FinalSysSizing.allocate( CurSysNum );
+		DataSizing::FinalSysSizing( 1 ).DesMainVolFlow = 1.0;
+		DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow = 0.4;
+		PrimaryAirSystem.allocate( CurSysNum );
+		PrimaryAirSystem( CurSysNum ).Branch.allocate( 1 );
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "INDRDD EVAP COOLER";
+
+		// Set Primary Air Data
+		PrimaryAirSystem( CurSysNum ).NumBranches = 1;
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).TotalComponents = 1;
+
+		std::string const idf_objects = delimited_string( {
+			"	Version,8.4;",
+			"	EvaporativeCooler:Indirect:ResearchSpecial,",
+			"	IndRDD Evap Cooler,  !- Name",
+			"	ALWAYS_ON,			 !- Availability Schedule Name",
+			"	0.750,				 !- Cooler Wetbulb Design Effectiveness",
+			"	,					 !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name",
+			"	,					 !- Cooler Drybulb Design Effectiveness",
+			"	,					 !- Drybulb Effectiveness Flow Ratio Modifier Curve Name",
+			"	,   				 !- Recirculating Water Pump Design Power { W }",
+			"	,					 !- Water Pump Power Sizing Factor",
+			"	,					 !- Water Pump Power Modifier Curve Name",
+			"	,        			 !- Secondary Air Design Flow Rate { m3 / s }",
+			"	1.2,				 !- Secondary Air Flow Sizing Factor",
+			"	,        			 !- Secondary Air Fan Design Power",
+			"	207.6,				 !- Secondary Air Fan Sizing Specific Power",
+			"	,					 !- Secondary Fan Power Modifier Curve Name",
+			"	PriAir Inlet Node,	 !- Primary Air Inlet Node Name",
+			"	PriAir Outlet Node,	 !- Primary Air Outlet Node Name",
+			"	,       			 !- Primary Air Design Air Flow Rate",
+			"	0.90,				 !- Dewpoint Effectiveness Factor",
+			"	SecAir Inlet Node,   !- Secondary Air Inlet Node Name",
+			"	SecAir Outlet Node,  !- Secondary Air Outlet Node Name",
+			"	PriAir Outlet Node,	 !- Sensor Node Name",
+			"	,					 !- Relief Air Inlet Node Name",
+			"	,					 !- Water Supply Storage Tank Name",
+			"	0.0,				 !- Drift Loss Fraction",
+			"	3;                   !- Blowdown Concentration Ratio",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetEvapInput();
+
+		// check blank autosizable input fields default to autosize
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectFanPower );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
+
+		// Set Parameters for Evap Cooler on Main Air Loop System
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvapCond( EvapCoolNum ).EvapCoolerName;
+		FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+		FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+		SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
+
+		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
+		SizeEvapCooler( EvapCoolNum );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+		// Test Secondary Fan Power and reciculating water pump power
+		SecondaryFanPower = SecondaryAirDesignFlow * EvapCond( EvapCoolNum ).FanSizingSpecificPower;
+		RecirculatingWaterPumpPower = SecondaryAirDesignFlow * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+
+		//SizeEvapCooler( EvapCoolNum );
+		EXPECT_EQ( SecondaryFanPower, EvapCond( EvapCoolNum ).IndirectFanPower );
+		EXPECT_EQ( RecirculatingWaterPumpPower, EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
+
+		EvapCond.deallocate();
+		PrimaryAirSystem.deallocate();
+		FinalSysSizing.deallocate();
+	}
+
+	TEST_F( EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest ) {
+
+		int const EvapCoolNum( 1 );
+		Real64 PrimaryAirDesignFlow( 0.0 );
+		Real64 RecirWaterPumpDesignPower( 0.0 );
+
+		DataSizing::SysSizingRunDone = true;
+		DataSizing::NumSysSizInput = 1;
+		DataSizing::SysSizInput.allocate( 1 );
+		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
+
+		DataSizing::CurSysNum = 1;
+		FinalSysSizing.allocate( CurSysNum );
+		DataSizing::FinalSysSizing( 1 ).DesMainVolFlow = 1.0;
+		DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow = 0.4;
+		PrimaryAirSystem.allocate( CurSysNum );
+		PrimaryAirSystem( CurSysNum ).Branch.allocate( 1 );
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "DIRECTEVAPCOOLER";
+
+		// Set Primary Air Data
+		PrimaryAirSystem( CurSysNum ).NumBranches = 1;
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).TotalComponents = 1;
+
+		std::string const idf_objects = delimited_string( {
+			"	Version,8.4;",
+			"	EvaporativeCooler:Direct:ResearchSpecial,",
+			"	DirectEvapCooler,    !- Name",
+			"	ALWAYS_ON,			 !- Availability Schedule Name",
+			"	0.7,				 !- Cooler Design Effectiveness",
+			"	,					 !- Effectiveness Flow Ratio Modifier Curve Name",
+			"	,          			 !- Primary Air Design Flow Rate",
+			"	,               	 !- Recirculating Water Pump Power Consumption { W }",
+			"	55.0,				 !- Water Pump Power Sizing Factor",
+			"	,					 !- Water Pump Power Modifier Curve Name",
+			"	Fan Outlet Node,     !- Air Inlet Node Name",
+			"	Zone Inlet Node,	 !- Air Outlet Node Name",
+			"	Zone Inlet Node,	 !- Sensor Node Name",
+			"	,					 !- Water Supply Storage Tank Name",
+			"	0.0,				 !- Drift Loss Fraction",
+			"	3;                   !- Blowdown Concentration Ratio",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetEvapInput();
+		// check blank autosizable input fields default to autosize
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).RecircPumpPower );
+
+		// do local sizing calculations
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvapCond( EvapCoolNum ).EvapCoolerName;
+		FinalSysSizing( CurSysNum ).DesMainVolFlow = 0.50;
+		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+		RecirWaterPumpDesignPower = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+
+		// Test Direct Evaporative Cooler Primary Air Design Flow Rate sizing
+		SizeEvapCooler( 1 );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( RecirWaterPumpDesignPower, EvapCond( EvapCoolNum ).RecircPumpPower );
+
+		EvapCond.deallocate();
+		PrimaryAirSystem.deallocate();
+		FinalSysSizing.deallocate();
 	}
 
 }

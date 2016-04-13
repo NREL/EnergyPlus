@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -1191,31 +1249,31 @@ namespace ChillerGasAbsorption {
 		Real64 lCHWLowLimitTemp; // Chilled Water Lower Limit Temperature
 		Real64 lFuelHeatingValue;
 		// Local copies of GasAbsorberReportVars Type
-		Real64 lCoolingLoad; // cooling load on the chiller (previously called QEvap)
-		Real64 lCoolingEnergy; // variable to track total cooling load for period (was EvapEnergy)
-		Real64 lTowerLoad; // load on the cooling tower/condenser (previously called QCond)
-		Real64 lTowerEnergy; // variable to track total tower load for a period (was CondEnergy)
-		Real64 lFuelUseRate; // instantaneous use of gas for period
-		Real64 lFuelEnergy; // variable to track total fuel used for a period
-		Real64 lCoolFuelUseRate; // instantaneous use of gas for period for cooling
-		Real64 lCoolFuelEnergy; // variable to track total fuel used for a period for cooling
-		Real64 lHeatFuelUseRate; // instantaneous use of gas for period for heating
-		Real64 lElectricPower; // parasitic electric power used (was PumpingPower)
-		Real64 lElectricEnergy; // track the total electricity used for a period (was PumpingEnergy)
-		Real64 lCoolElectricPower; // parasitic electric power used  for cooling
-		Real64 lCoolElectricEnergy; // track the total electricity used for a period for cooling
-		Real64 lHeatElectricPower; // parasitic electric power used  for heating
-		Real64 lChillReturnTemp; // reporting: evaporator inlet temperature (was EvapInletTemp)
-		Real64 lChillSupplyTemp; // reporting: evaporator outlet temperature (was EvapOutletTemp)
-		Real64 lChillWaterMassFlowRate; // reporting: evaporator mass flow rate (was Evapmdot)
-		Real64 lCondReturnTemp; // reporting: condenser inlet temperature (was CondInletTemp)
-		Real64 lCondSupplyTemp; // reporting: condenser outlet temperature (was CondOutletTemp)
-		Real64 lCondWaterMassFlowRate; // reporting: condenser mass flow rate (was Condmdot)
-		Real64 lCoolPartLoadRatio; // operating part load ratio (load/capacity for cooling)
-		Real64 lHeatPartLoadRatio; // operating part load ratio (load/capacity for heating)
-		Real64 lAvailableCoolingCapacity; // current capacity after temperature adjustment
-		Real64 lFractionOfPeriodRunning;
-		Real64 PartLoadRat; // actual operating part load ratio of unit (ranges from minplr to 1)
+		Real64 lCoolingLoad( 0.0 ); // cooling load on the chiller (previously called QEvap)
+		// Real64 lCoolingEnergy( 0.0 ); // variable to track total cooling load for period (was EvapEnergy)
+		Real64 lTowerLoad( 0.0 ); // load on the cooling tower/condenser (previously called QCond)
+		// Real64 lTowerEnergy( 0.0 ); // variable to track total tower load for a period (was CondEnergy)
+		// Real64 lFuelUseRate( 0.0 ); // instantaneous use of gas for period
+		// Real64 lFuelEnergy( 0.0 ); // variable to track total fuel used for a period
+		Real64 lCoolFuelUseRate( 0.0 ); // instantaneous use of gas for period for cooling
+		// Real64 lCoolFuelEnergy( 0.0 ); // variable to track total fuel used for a period for cooling
+		Real64 lHeatFuelUseRate( 0.0 ); // instantaneous use of gas for period for heating
+		// Real64 lElectricPower( 0.0 ); // parasitic electric power used (was PumpingPower)
+		// Real64 lElectricEnergy( 0.0 ); // track the total electricity used for a period (was PumpingEnergy)
+		Real64 lCoolElectricPower( 0.0 ); // parasitic electric power used  for cooling
+		// Real64 lCoolElectricEnergy( 0.0 ); // track the total electricity used for a period for cooling
+		Real64 lHeatElectricPower( 0.0 ); // parasitic electric power used  for heating
+		Real64 lChillReturnTemp( 0.0 ); // reporting: evaporator inlet temperature (was EvapInletTemp)
+		Real64 lChillSupplyTemp( 0.0 ); // reporting: evaporator outlet temperature (was EvapOutletTemp)
+		Real64 lChillWaterMassFlowRate( 0.0 ); // reporting: evaporator mass flow rate (was Evapmdot)
+		Real64 lCondReturnTemp( 0.0 ); // reporting: condenser inlet temperature (was CondInletTemp)
+		Real64 lCondSupplyTemp( 0.0 ); // reporting: condenser outlet temperature (was CondOutletTemp)
+		Real64 lCondWaterMassFlowRate( 0.0 ); // reporting: condenser mass flow rate (was Condmdot)
+		Real64 lCoolPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for cooling)
+		Real64 lHeatPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for heating)
+		Real64 lAvailableCoolingCapacity( 0.0 ); // current capacity after temperature adjustment
+		Real64 lFractionOfPeriodRunning( 0.0 );
+		Real64 PartLoadRat( 0.0 ); // actual operating part load ratio of unit (ranges from minplr to 1)
 		Real64 lChillWaterMassflowratemax; // Maximum flow rate through the evaporator
 
 		// other local variables
@@ -1234,34 +1292,6 @@ namespace ChillerGasAbsorption {
 		Real64 Cp_CW; // local fluid specific heat for chilled water
 		Real64 rhoCD; // local fluid density for condenser water
 		Real64 Cp_CD; // local fluid specific heat for condenser water
-
-		//initialize all output variables to zero
-
-		lCoolingLoad = 0.0;
-		lCoolingEnergy = 0.0;
-		lTowerLoad = 0.0;
-		lTowerEnergy = 0.0;
-		lFuelUseRate = 0.0;
-		lFuelEnergy = 0.0;
-		lCoolFuelUseRate = 0.0;
-		lCoolFuelEnergy = 0.0;
-		lHeatFuelUseRate = 0.0;
-		lElectricPower = 0.0;
-		lElectricEnergy = 0.0;
-		lCoolElectricPower = 0.0;
-		lCoolElectricEnergy = 0.0;
-		lHeatElectricPower = 0.0;
-		lChillReturnTemp = 0.0;
-		lChillSupplyTemp = 0.0;
-		lChillWaterMassFlowRate = 0.0;
-		lCondReturnTemp = 0.0;
-		lCondSupplyTemp = 0.0;
-		lCondWaterMassFlowRate = 0.0;
-		lCoolPartLoadRatio = 0.0;
-		lHeatPartLoadRatio = 0.0;
-		lAvailableCoolingCapacity = 0.0;
-		lFractionOfPeriodRunning = 0.0;
-		PartLoadRat = 0.0;
 
 		// set node values to data structure values for nodes
 
@@ -1550,7 +1580,6 @@ namespace ChillerGasAbsorption {
 		// 2.  CoolTools GasMod work
 
 		// Using/Aliasing
-		using DataEnvironment::OutDryBulbTemp;
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1591,59 +1620,35 @@ namespace ChillerGasAbsorption {
 		Real64 lOptPartLoadRat; // optimal operating frac full load
 		int lHeatCapFCoolCurve; // Heating Capacity Function of Cooling Capacity Curve
 		int lFuelHeatFHPLRCurve; // Fuel Input to heat output ratio during heating only function
-		Real64 lFuelHeatingValue;
+		Real64 lFuelHeatingValue( 0.0 );
 		// Local copies of GasAbsorberReportVars Type
-		Real64 lHeatingLoad; // heating load on the chiller
-		Real64 lHeatingEnergy; // heating energy
-		Real64 lFuelUseRate; // instantaneous use of gas for period
-		Real64 lFuelEnergy; // variable to track total fuel used for a period
-		Real64 lCoolFuelUseRate; // instantaneous use of gas for period for cooling
-		Real64 lHeatFuelUseRate; // instantaneous use of gas for period for heating
-		Real64 lHeatFuelEnergy; // variable to track total fuel used for a period for heating
-		Real64 lElectricPower; // parasitic electric power used (was PumpingPower)
-		Real64 lElectricEnergy; // track the total electricity used for a period (was PumpingEnergy)
-		Real64 lCoolElectricPower; // parasitic electric power used  for cooling
-		Real64 lHeatElectricPower; // parasitic electric power used  for heating
-		Real64 lHeatElectricEnergy; // track the total electricity used for a period for heating
-		Real64 lHotWaterReturnTemp; // reporting: hot water return (inlet) temperature
-		Real64 lHotWaterSupplyTemp; // reporting: hot water supply (outlet) temperature
-		Real64 lHotWaterMassFlowRate; // reporting: hot water mass flow rate
-		Real64 lCoolPartLoadRatio; // operating part load ratio (load/capacity for cooling)
-		Real64 lHeatPartLoadRatio; // operating part load ratio (load/capacity for heating)
-		Real64 lAvailableHeatingCapacity; // current heating capacity
-		Real64 lFractionOfPeriodRunning;
-		Real64 lHotWaterMassFlowRateMax; // Maximum flow rate through the evaporator
+		Real64 lHeatingLoad( 0.0 ); // heating load on the chiller
+		// Real64 lHeatingEnergy( 0.0 ); // heating energy
+		// Real64 lFuelUseRate( 0.0 ); // instantaneous use of gas for period
+		// Real64 lFuelEnergy( 0.0 ); // variable to track total fuel used for a period
+		Real64 lCoolFuelUseRate( 0.0 ); // instantaneous use of gas for period for cooling
+		Real64 lHeatFuelUseRate( 0.0 ); // instantaneous use of gas for period for heating
+		// Real64 lHeatFuelEnergy( 0.0 ); // variable to track total fuel used for a period for heating
+		// Real64 lElectricPower( 0.0 ); // parasitic electric power used (was PumpingPower)
+		// Real64 lElectricEnergy( 0.0 ); // track the total electricity used for a period (was PumpingEnergy)
+		Real64 lCoolElectricPower( 0.0 ); // parasitic electric power used  for cooling
+		Real64 lHeatElectricPower( 0.0 ); // parasitic electric power used  for heating
+		// Real64 lHeatElectricEnergy( 0.0 ); // track the total electricity used for a period for heating
+		Real64 lHotWaterReturnTemp( 0.0 ); // reporting: hot water return (inlet) temperature
+		Real64 lHotWaterSupplyTemp( 0.0 ); // reporting: hot water supply (outlet) temperature
+		Real64 lHotWaterMassFlowRate( 0.0 ); // reporting: hot water mass flow rate
+		Real64 lCoolPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for cooling)
+		Real64 lHeatPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for heating)
+		Real64 lAvailableHeatingCapacity( 0.0 ); // current heating capacity
+		Real64 lFractionOfPeriodRunning( 0.0 );
+		Real64 lHotWaterMassFlowRateMax( 0.0 ); // Maximum flow rate through the evaporator
 		// other local variables
-		Real64 HeatDeltaTemp; // hot water temperature difference
+		Real64 HeatDeltaTemp( 0.0 ); // hot water temperature difference
 		Real64 HeatSupplySetPointTemp( 0.0 );
 		int LoopNum;
 		int LoopSideNum;
 		Real64 Cp_HW; // local fluid specific heat for hot water
 		Real64 rhoHW; // local fluid density for hot water
-
-		//  INTEGER, SAVE          :: ErrCount            ! error counter
-
-		//initialize all output variables to zero
-
-		lHeatingLoad = 0.0;
-		lHeatingEnergy = 0.0;
-		lFuelUseRate = 0.0;
-		lFuelEnergy = 0.0;
-		lCoolFuelUseRate = 0.0;
-		lHeatFuelUseRate = 0.0;
-		lHeatFuelEnergy = 0.0;
-		lElectricPower = 0.0;
-		lElectricEnergy = 0.0;
-		lCoolElectricPower = 0.0;
-		lHeatElectricPower = 0.0;
-		lHeatElectricEnergy = 0.0;
-		lHotWaterReturnTemp = 0.0;
-		lHotWaterSupplyTemp = 0.0;
-		lHotWaterMassFlowRate = 0.0;
-		lCoolPartLoadRatio = 0.0;
-		lHeatPartLoadRatio = 0.0;
-		lAvailableHeatingCapacity = 0.0;
-		lFractionOfPeriodRunning = 0.0;
 
 		// set node values to data structure values for nodes
 
@@ -1972,7 +1977,7 @@ namespace ChillerGasAbsorption {
 
 	//                                 COPYRIGHT NOTICE
 
-	//     Portions Copyright © Gas Research Institute 2001.  All rights reserved.
+	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
 
 	//     GRI LEGAL NOTICE
 	//     Neither GRI, members of GRI nor any person or organization acting on behalf
@@ -1988,29 +1993,6 @@ namespace ChillerGasAbsorption {
 	//     B.  Assumes any liability with respoct to the use of, or for any and all
 	//         damages resulting from the use of the program or any portion thereof or
 	//         any information disclosed therein.
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ChillerGasAbsorption
 

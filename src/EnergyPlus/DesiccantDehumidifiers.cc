@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -132,6 +190,15 @@ namespace DesiccantDehumidifiers {
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetInputDesiccantDehumidifier( true ); // First time, input is "gotten"
+		bool InitDesiccantDehumidifierOneTimeFlag( true );
+	}
 
 	// Name Public routines, optionally name Private routines within this module
 
@@ -181,12 +248,11 @@ namespace DesiccantDehumidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumNum; // index of solid desiccant unit being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 HumRatNeeded; // process air leaving humidity ratio set by controller [kg water/kg air]
 
-		if ( GetInputFlag ) {
+		if ( GetInputDesiccantDehumidifier ) {
 			GetDesiccantDehumidifierInput();
-			GetInputFlag = false;
+			GetInputDesiccantDehumidifier = false;
 		}
 
 		// Get the desiccant dehumidifier unit index
@@ -296,6 +362,8 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::GetSteamCoilControlNodeNum;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
+		using WaterCoils::SetWaterCoilData;
+		using SteamCoils::SetSteamCoilData;
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -353,6 +421,7 @@ namespace DesiccantDehumidifiers {
 		std::string RegenCoilName; // Regen heating coil name
 		static Real64 SteamDensity( 0.0 ); // density of steam at 100C
 		int SteamIndex; // steam coil Index
+		bool RegairHeatingCoilFlag( false ); // local error flag
 
 		NumSolidDesicDehums = GetNumObjectsFound( dehumidifierDesiccantNoFans );
 		NumGenericDesicDehums = GetNumObjectsFound( "Dehumidifier:Desiccant:System" );
@@ -629,10 +698,12 @@ namespace DesiccantDehumidifiers {
 			} else {
 				// If DEFAULT performance model, set operating limits curves.  Unit is off outside this range
 				DesicDehum( DesicDehumNum ).PerformanceModel_Num = PM_Default;
-				DesicDehum.MinProcAirInTemp() = 1.67; //  35 F
-				DesicDehum.MaxProcAirInTemp() = 48.89; // 120 F
-				DesicDehum.MinProcAirInHumRat() = 0.002857; //  20 gr/lb
-				DesicDehum.MaxProcAirInHumRat() = 0.02857; // 200 gr/lb
+				for ( auto & e : DesicDehum ) {
+					e.MinProcAirInTemp = 1.67; //  35 F
+					e.MaxProcAirInTemp = 48.89; // 120 F
+					e.MinProcAirInHumRat = 0.002857; //  20 gr/lb
+					e.MaxProcAirInHumRat = 0.02857; // 200 gr/lb
+				}
 				//  If DEFAULT performance model, warn if curve names and nominal regen temp have values
 				if ( ( ! lAlphaBlanks( 13 ) ) || ( ! lAlphaBlanks( 14 ) ) || ( ! lAlphaBlanks( 15 ) ) || ( ! lAlphaBlanks( 16 ) ) || ( ! lAlphaBlanks( 17 ) ) || ( ! lAlphaBlanks( 18 ) ) || ( ! lAlphaBlanks( 19 ) ) || ( ! lAlphaBlanks( 20 ) ) ) {
 					ShowWarningError( CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -859,6 +930,13 @@ namespace DesiccantDehumidifiers {
 						ErrorsFoundGeneric = true;
 					}
 
+					RegairHeatingCoilFlag = true;
+					SetHeatingCoilData( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum );
+					if ( ErrorsFound2 ) {
+						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
+						ErrorsFoundGeneric = true;
+					}
+
 				} else if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Water" ) ) {
 					DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingWater;
 					ValidateComponent( RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject );
@@ -912,6 +990,13 @@ namespace DesiccantDehumidifiers {
 						if ( errFlag ) {
 							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + DesicDehum( DesicDehumNum ).Name );
 							ErrorsFound = true;
+						}
+
+						RegairHeatingCoilFlag = true;
+						SetWaterCoilData( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum );
+						if ( ErrorsFound2 ) {
+							ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
+							ErrorsFoundGeneric = true;
 						}
 
 					}
@@ -987,6 +1072,13 @@ namespace DesiccantDehumidifiers {
 						ShowContinueError( "..." + cAlphaFields( 10 ) + " = " + DesicDehum( DesicDehumNum ).RegenCoilName );
 						ShowContinueError( "...heating coil temperature setpoint node = " + NodeID( RegenCoilControlNodeNum ) );
 						ShowContinueError( "...leave the heating coil temperature setpoint node name blank in the regen heater object." );
+						ErrorsFoundGeneric = true;
+					}
+
+					RegairHeatingCoilFlag = true;
+					SetSteamCoilData( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum );
+					if ( ErrorsFound2 ) {
+						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 						ErrorsFoundGeneric = true;
 					}
 
@@ -1361,7 +1453,6 @@ namespace DesiccantDehumidifiers {
 		int RegenInNode; // inlet node number
 		int ControlNode; // control node number
 		static bool MySetPointCheckFlag( true );
-		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
 
@@ -1374,14 +1465,14 @@ namespace DesiccantDehumidifiers {
 		//unused  REAL(r64)                      :: mdot                 ! heating coil fluid mass flow rate, kg/s
 		//unused  REAL(r64)                      :: QDelivered           ! regen heat actually delivered by regen coil [W]
 
-		if ( MyOneTimeFlag ) {
+		if ( InitDesiccantDehumidifierOneTimeFlag ) {
 
 			// initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumDesicDehums );
 			MyPlantScanFlag.allocate( NumDesicDehums );
 			MyEnvrnFlag = true;
 
-			MyOneTimeFlag = false;
+			InitDesiccantDehumidifierOneTimeFlag = false;
 			MyPlantScanFlag = true;
 
 		}
@@ -2803,12 +2894,24 @@ namespace DesiccantDehumidifiers {
 		return Residuum;
 	}
 
+	// Clears the global data in HeatingCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state() {
+		NumDesicDehums = 0;
+		NumSolidDesicDehums = 0;
+		NumGenericDesicDehums = 0;
+		GetInputDesiccantDehumidifier = true;
+		InitDesiccantDehumidifierOneTimeFlag = true;	
+		DesicDehum.deallocate();
+	}
+
 	//        End of Reporting subroutines for the SimAir Module
 	// *****************************************************************************
 
 	//                                 COPYRIGHT NOTICE
 
-	//     Portions Copyright © Gas Research Institute 2001.  All rights reserved.
+	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
 
 	//     GRI LEGAL NOTICE
 	//     Neither GRI, members of GRI nor any person or organization acting on behalf
@@ -2824,29 +2927,6 @@ namespace DesiccantDehumidifiers {
 	//     B.  Assumes any liability with respoct to the use of, or for any and all
 	//         damages resulting from the use of the program or any portion thereof or
 	//         any information disclosed therein.
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DesiccantDehumidifiers
 

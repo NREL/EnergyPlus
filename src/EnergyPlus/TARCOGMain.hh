@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef TARCOGMain_hh_INCLUDED
 #define TARCOGMain_hh_INCLUDED
 
@@ -50,7 +108,7 @@ namespace TARCOGMain {
 		Real64 const heightt, // Window height
 		Real64 const width, // Window width
 		Array1A< Real64 > const presure, // Vector of gas pressures in gaps [N/m2]
-		Array2A_int const iprop, // Matrix of gas codes – see mgas definition
+		Array2A_int const iprop, // Matrix of gas codes - see mgas definition
 		Array2A< Real64 > const frct, // Matrix of mass percentages in gap mixtures
 		Array2A< Real64 > const xgcon, // Matrix of constants for gas conductivity calc
 		Array2A< Real64 > const xgvis, // Matrix of constants for gas dynamic viscosity calc
@@ -76,17 +134,17 @@ namespace TARCOGMain {
 		Real64 & hout, // Outdoor combined film coefficient (if non-zero) [W/m2K]
 		Array1A< Real64 > hcgas, // Convective part of gap effective conductivity (including in and out)
 		Array1A< Real64 > hrgas, // Radiative part of gap effective conductivity (including in and out)
-		Real64 & shgc, // Solar heat gain coefficient – per ISO 15099
+		Real64 & shgc, // Solar heat gain coefficient - per ISO 15099
 		int & nperr, // Error code
 		std::string & ErrorMessage, // To store error message from tarcog execution
-		Real64 & shgct, // Solar heat gain coefficient – per old procedure
+		Real64 & shgct, // Solar heat gain coefficient - per old procedure
 		Real64 & tamb, // Outdoor environmental temperature [K]
 		Real64 & troom, // Indoor environmental temperature [K]
 		Array1A_int const ibc, // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor
-		Array1A< Real64 > const Atop, // Vector with areas of top openings – between SD layers and top of
-		Array1A< Real64 > const Abot, // Vector with areas of bottom openings – between SD layers and
-		Array1A< Real64 > const Al, // Vector with areas of left-hand side openings – between SD layers and
-		Array1A< Real64 > const Ar, // Vector of areas of right-hand side openings – between SD layers and
+		Array1A< Real64 > const Atop, // Vector with areas of top openings - between SD layers and top of
+		Array1A< Real64 > const Abot, // Vector with areas of bottom openings - between SD layers and
+		Array1A< Real64 > const Al, // Vector with areas of left-hand side openings - between SD layers and
+		Array1A< Real64 > const Ar, // Vector of areas of right-hand side openings - between SD layers and
 		Array1A< Real64 > const Ah, // Vector of total areas of holes for each SD [m2]
 		Array1A< Real64 > const SlatThick, // Thickness of the slat material [m]
 		Array1A< Real64 > const SlatWidth, // Slat width [m]
@@ -104,8 +162,8 @@ namespace TARCOGMain {
 		Array1A< Real64 > hg, // Gas conductance of the glazing cavity [W/m2 K]
 		Array1A< Real64 > hr, // Radiation conductance of the glazing cavity [W/m2 K]
 		Array1A< Real64 > hs, // Thermal conductance of the glazing cavity [W/m2 K]
-		Real64 & he, // External heat transfer coefficient [W/m2 K] – EN673 and ISO 10292 procedure
-		Real64 & hi, // Internal heat transfer coefficient [W/m2 K] – EN673 and ISO 10292 procedure
+		Real64 & he, // External heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
+		Real64 & hi, // Internal heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
 		Array1A< Real64 > Ra, // Vector of Rayleigh numbers, for each gap
 		Array1A< Real64 > Nu, // Vector of Nusselt numbers, for each gap
 		int const standard, // Calculation standard switch:
@@ -127,29 +185,6 @@ namespace TARCOGMain {
 		int const SHGCCalc, // SHGC calculation switch:
 		int & NumOfIterations // Number of iterations for reacing solution
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // TARCOGMain
 
