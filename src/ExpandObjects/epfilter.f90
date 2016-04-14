@@ -31450,7 +31450,7 @@ DO iSys = 1, numCompactDedOutAir
   END IF
 
   ! Cooling coil setpoint manager (If there is no cooling coil and no heating coil but there is heat recovery, then need this)
-  IF ((coolCoilKind .NE. ccNone) .OR. ((heatRecovery .NE. htrecNone) .AND. heatCoilType .EQ. ctNone)) THEN
+  IF ((coolCoilKind .NE. ccNone) .OR. (heatRecovery .NE. htrecNone)) THEN
     CALL CreateNewObj('NodeList')
     CALL AddToObjFld('Name', base + doasNameOff,' Cooling Setpoint Nodes')
     IF (dehumidCtrlKind .EQ. dehumidCoolRhtDesuper) THEN
