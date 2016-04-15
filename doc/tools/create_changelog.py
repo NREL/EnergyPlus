@@ -98,11 +98,13 @@ for pr_num in pr_numbers:
     # mine the data
     title = j['title']
     labels = j['labels']
+    if len(labels) == 0:
+        print("No labels on PR #" + pr_num)
     for label in labels:
-		key = 'Unknown'
-		label_name = label['name']
-		if label_name in ValidPRTypes:
-			PRS[label_name].append([pr_num, title])
+        key = 'Unknown'
+        label_name = label['name']
+        if label_name in ValidPRTypes:
+            PRS[label_name].append([pr_num, title])
 
 # Now write the nice markdown output file
 with io.open(md_file, 'w') as f:

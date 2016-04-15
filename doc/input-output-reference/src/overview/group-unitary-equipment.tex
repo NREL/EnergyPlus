@@ -1206,15 +1206,17 @@ This output variable is the ratio of the sensible cooling load to the steady-sta
 
 The unitary air-to-air heat pump is a ``virtual'' component that consists of a fan component (OnOff or ConstantVolume), a DX cooling coil component, a DX heating coil component, and a Gas or Electric supplementary heating coil component as shown in the Figure below.
 
-~\includegraphics{media/image300.png}
-
-Figure 118. Schematic of EnergyPlus Unitary Air-to-Air Heat Pump (Blow Through Configuration)
+\begin{figure}[hbtp] % fig 118
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image300.png}
+\caption{Schematic of EnergyPlus Unitary Air-to-Air Heat Pump (Blow Through Configuration) \label{fig:schematic-of-energyplus-unitary-air-to-air-heat-pump-blow-through-configuration}}
+\end{figure}
 
 Links to the fan, DX cooling coil, DX heating coil, and supplementary heating coil specifications are provided in the heat pump's input data syntax. In addition the control zone name and the system design operating conditions are specified by the heat pump inputs.
 
 \subsubsection{Inputs}\label{inputs-3-039}
 
-\paragraph{~Field: Name}\label{field-name-4-031}
+\paragraph{Field: Name}\label{field-name-4-031}
 
 This alpha field contains the identifying name for the unitary system heat pump.
 
