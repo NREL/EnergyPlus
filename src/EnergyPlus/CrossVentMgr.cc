@@ -147,12 +147,6 @@ namespace CrossVentMgr {
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool InitUCSDCV_MyOneTimeFlag( true );
 		Array1D_bool InitUCSDCV_MyEnvrnFlag;
-		Real64 EvolveParaUCSDCV_Aroom; // Room area cross section
-		Real64 EvolveParaUCSDCV_Wroom; // Room width
-		int EvolveParaUCSDCV_CompNum( 0 ); // AirflowNetwork Component number
-		int EvolveParaUCSDCV_TypeNum( 0 ); // Airflownetwork Type Number within a component
-		int EvolveParaUCSDCV_NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
-		int EvolveParaUCSDCV_NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 	}
 
 
@@ -515,6 +509,10 @@ namespace CrossVentMgr {
 		Real64 ZZ_Wall;
 		Real64 ActiveSurfNum;
 		int NSides; // Number of sides in surface
+		Real64 Wroom; // Room width
+		Real64 Aroom; // Room area cross section
+		int NodeNum1(0); // The first node number in an AirflowNetwork linkage data
+		int NodeNum2(0); // The Second node number in an AirflowNetwork linkage data
 
 		RecInflowRatio( ZoneNum ) = 0.0;
 
@@ -577,11 +575,10 @@ namespace CrossVentMgr {
 
 		// Calculate the opening area for all apertures
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
-			EvolveParaUCSDCV_CompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
-			EvolveParaUCSDCV_TypeNum = AirflowNetworkCompData( EvolveParaUCSDCV_CompNum ).TypeNum;
-			if ( AirflowNetworkCompData( EvolveParaUCSDCV_CompNum ).CompTypeNum == CompTypeNum_DOP ) {
+			int cCompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
+			if (AirflowNetworkCompData(cCompNum).CompTypeNum == CompTypeNum_DOP) {
 				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height * MultizoneSurfaceData( Ctd ).OpenFactor;
-			} else if ( AirflowNetworkCompData( EvolveParaUCSDCV_CompNum ).CompTypeNum == CompTypeNum_SCR ) {
+			} else if (AirflowNetworkCompData(cCompNum).CompTypeNum == CompTypeNum_SCR) {
 				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height;
 			} else {
 				ShowSevereError( "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model" );
@@ -596,7 +593,7 @@ namespace CrossVentMgr {
 		// Droom the distance between the average point of the base surface of the airflow network Surface (if the base surface
 		// is a Window or Door it looks for the second base surface).
 		// Dstar is Droom corrected for wind angle
-		EvolveParaUCSDCV_Wroom = Zone( ZoneNum ).Volume / Zone( ZoneNum ).FloorArea;
+		Wroom = Zone( ZoneNum ).Volume / Zone( ZoneNum ).FloorArea;
 		auto const & baseSurface( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ) );
 		if ( ( baseSurface.Sides == 3 ) || ( baseSurface.Sides == 4 ) ) {
 			XX = baseSurface.Centroid.x;
@@ -618,7 +615,7 @@ namespace CrossVentMgr {
 			ZZ /= double( NSides );
 		}
 
-		Real64 const Wroom_2( pow_2( EvolveParaUCSDCV_Wroom ) );
+		Real64 const Wroom_2( pow_2( Wroom ) );
 		for ( Ctd = PosZ_Wall( 2 * ZoneNum - 1 ); Ctd <= PosZ_Wall( 2 * ZoneNum ); ++Ctd ) {
 			if ( ( Surface( APos_Wall( Ctd ) ).Sides == 3 ) || ( Surface( APos_Wall( Ctd ) ).Sides == 4 ) ) {
 				XX_Wall = Surface( APos_Wall( Ctd ) ).Centroid.x;
@@ -646,7 +643,7 @@ namespace CrossVentMgr {
 		}
 
 		// Room area
-		EvolveParaUCSDCV_Aroom = Zone( ZoneNum ).Volume / Droom( ZoneNum );
+		Aroom = Zone( ZoneNum ).Volume / Droom( ZoneNum );
 
 		//Populate an array of inflow volume fluxes (Fin) for all apertures in the zone
 		//Calculate inflow velocity (%Uin) for each aperture in the zone
@@ -747,10 +744,10 @@ namespace CrossVentMgr {
 		// Evaluate parameter that determines whether recirculations are present
 		for ( Ctd = 1; Ctd <= TotUCSDCV; ++Ctd ) {
 			if ( ZoneNum == ZoneUCSDCV( Ctd ).ZonePtr ) {
-				if ( Ain( ZoneNum ) / EvolveParaUCSDCV_Aroom > 1.0 / 2.0 ) {
+				if ( Ain( ZoneNum ) / Aroom > 1.0 / 2.0 ) {
 					JetRecAreaRatio( ZoneNum ) = 1.0;
 				} else {
-					JetRecAreaRatio( ZoneNum ) = std::sqrt( Ain( ZoneNum ) / EvolveParaUCSDCV_Aroom );
+					JetRecAreaRatio( ZoneNum ) = std::sqrt( Ain( ZoneNum ) / Aroom );
 				}
 			}
 		}
@@ -768,14 +765,11 @@ namespace CrossVentMgr {
 			}
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin != 0 ) {
-				Real64 dstarexp = Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) );
-				if ( dstarexp < 1.0 ) {
-					dstarexp = 1.0;
-				}
+				Real64 dstarexp = max(Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ),1.0);
 				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( dstarexp ) / Dstar( ZoneNum );
-				CVJetRecFlows( Ctd, ZoneNum ).Yjet = Cjet1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / EvolveParaUCSDCV_Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Cjet2;
-				CVJetRecFlows( Ctd, ZoneNum ).Yrec = Crec1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / EvolveParaUCSDCV_Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Crec2;
-				CVJetRecFlows( Ctd, ZoneNum ).YQrec = CrecFlow1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area * EvolveParaUCSDCV_Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + CrecFlow2;
+				CVJetRecFlows( Ctd, ZoneNum ).Yjet = Cjet1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Cjet2;
+				CVJetRecFlows( Ctd, ZoneNum ).Yrec = Crec1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Crec2;
+				CVJetRecFlows( Ctd, ZoneNum ).YQrec = CrecFlow1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area * Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + CrecFlow2;
 				CVJetRecFlows( Ctd, ZoneNum ).Ujet = CVJetRecFlows( Ctd, ZoneNum ).FlowFlag * CVJetRecFlows( Ctd, ZoneNum ).Yjet / CVJetRecFlows( Ctd, ZoneNum ).Uin;
 				CVJetRecFlows( Ctd, ZoneNum ).Urec = CVJetRecFlows( Ctd, ZoneNum ).FlowFlag * CVJetRecFlows( Ctd, ZoneNum ).Yrec / CVJetRecFlows( Ctd, ZoneNum ).Uin;
 				CVJetRecFlows( Ctd, ZoneNum ).Qrec = CVJetRecFlows( Ctd, ZoneNum ).FlowFlag * CVJetRecFlows( Ctd, ZoneNum ).YQrec / CVJetRecFlows( Ctd, ZoneNum ).Uin;
@@ -810,25 +804,25 @@ namespace CrossVentMgr {
 		} else {
 			// adiabatic surface
 			if ( MultizoneSurfaceData( MaxSurf ).SurfNum == Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond ) {
-				EvolveParaUCSDCV_NodeNum1 = AirflowNetworkLinkageData( MaxSurf ).NodeNums( 1 );
-				EvolveParaUCSDCV_NodeNum2 = AirflowNetworkLinkageData( MaxSurf ).NodeNums( 2 );
+				NodeNum1 = AirflowNetworkLinkageData( MaxSurf ).NodeNums( 1 );
+				NodeNum2 = AirflowNetworkLinkageData( MaxSurf ).NodeNums( 2 );
 				if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).Zone == ZoneNum ) {
-					if ( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum1 ).EPlusZoneNum <= 0 ) {
+					if ( AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum <= 0 ) {
 						Tin( ZoneNum ) = Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).OutDryBulbTemp;
-					} else if ( AirModel( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum1 ).EPlusZoneNum ).AirModelType == RoomAirModel_UCSDCV ) {
-						Tin( ZoneNum ) = RoomOutflowTemp( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum1 ).EPlusZoneNum );
+					} else if ( AirModel( AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum ).AirModelType == RoomAirModel_UCSDCV ) {
+						Tin( ZoneNum ) = RoomOutflowTemp( AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum );
 					} else {
-						Tin( ZoneNum ) = MAT( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum1 ).EPlusZoneNum );
+						Tin( ZoneNum ) = MAT( AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum );
 					}
 
 				} else {
 
-					if ( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum2 ).EPlusZoneNum <= 0 ) {
+					if ( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum <= 0 ) {
 						Tin( ZoneNum ) = Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).OutDryBulbTemp;
-					} else if ( AirModel( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum2 ).EPlusZoneNum ).AirModelType == RoomAirModel_UCSDCV ) {
-						Tin( ZoneNum ) = RoomOutflowTemp( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum2 ).EPlusZoneNum );
+					} else if ( AirModel( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum ).AirModelType == RoomAirModel_UCSDCV ) {
+						Tin( ZoneNum ) = RoomOutflowTemp( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum );
 					} else {
-						Tin( ZoneNum ) = MAT( AirflowNetworkNodeData( EvolveParaUCSDCV_NodeNum2 ).EPlusZoneNum );
+						Tin( ZoneNum ) = MAT( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum );
 					}
 				}
 			} else if ( ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).Zone == ZoneNum ) && ( AirModel( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond ).Zone ).AirModelType == RoomAirModel_UCSDCV ) ) {
@@ -1038,12 +1032,6 @@ namespace CrossVentMgr {
 		HA_R = 0.0 ;
 		InitUCSDCV_MyOneTimeFlag =  true ;
 		InitUCSDCV_MyEnvrnFlag.deallocate();
-		EvolveParaUCSDCV_Aroom = 0.0;
-		EvolveParaUCSDCV_Wroom = 0.0;
-		EvolveParaUCSDCV_CompNum = 0 ;
-		EvolveParaUCSDCV_TypeNum = 0 ;
-		EvolveParaUCSDCV_NodeNum1 = 0 ;
-		EvolveParaUCSDCV_NodeNum2 = 0 ;
 	}
 
 } // CrossVentMgr
