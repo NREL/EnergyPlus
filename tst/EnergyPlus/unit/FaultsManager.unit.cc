@@ -130,10 +130,10 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFi
 
 	// Run and Check
 	// (1)The rated operational point of Fan_1 falls on the fan curve
-	TestRestult = CheckFaultyAirFilterFanCurve( "Fan_1", CurveNum );
+	TestRestult = CheckFaultyAirFilterFanCurve( 1, CurveNum, DataHVACGlobals::FanType_SimpleVAV );
 	EXPECT_TRUE( TestRestult );
 	// (2)The rated operational point of Fan_2 does not fall on the fan curve
-	TestRestult = CheckFaultyAirFilterFanCurve( "Fan_2", CurveNum );
+	TestRestult = CheckFaultyAirFilterFanCurve( 2, CurveNum, DataHVACGlobals::FanType_SimpleVAV );
 	EXPECT_FALSE( TestRestult );
 
 	// Clean up

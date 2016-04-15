@@ -393,13 +393,13 @@ This object defines the fault of fouling air filter that leads to inappropriate 
 
 This is the user-defined name of the fault.
 
-\paragraph{Field: Fan Name}\label{field-fan-name-002}
-
-This field defines the name of a fan object associated with the fault. It should be the name of a fan object (Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume).
-
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type-000}
 
-This choice field defines the type of fan. The valid choices are Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume. Both cycling and continuous fan operating modes are allowed for Fan:OnOff. Only the continuous fan operating mode is allowed for Fan:ConstantVolume. The variable airflow rate is allowed for Fan:VariableVolume.
+This choice field defines the type of fan. The valid choices are Fan:SystemModel, Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume. Both cycling and continuous fan operating modes are allowed for Fan:OnOff and Fan:SystemModel. Only the continuous fan operating mode is allowed for Fan:ConstantVolume. The variable airflow rate is allowed for Fan:VariableVolume and Fan:SystemModel.
+
+\paragraph{Field: Fan Name}\label{field-fan-name-002}
+
+This field defines the name of a fan object associated with the fault. It should be the name of a fan object (Fan:SystemModel, Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume).
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-8-002}
 

@@ -79155,6 +79155,7 @@ FaultModel:Fouling:AirFilter,
        \note Choose the type of the fan
        \required-field
        \type choice
+       \key Fan:SystemModel
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume

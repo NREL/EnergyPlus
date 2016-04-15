@@ -83,7 +83,6 @@ The following equations define the model for this fan:
 {T_{out}} = PsyTdbFnHW({h_{out}},{w_{out}})
 \end{equation}
 
-\\
 Fan Model for Changing Flow Rates
 
 The fan will operate at a flow fraction that is determined by other HVAC equipment in the air system.  A parent object will control the air flow rates and the fan flow fraction is defined as the ratio of the current mass flow rate divided by the design mass flow rate.
@@ -94,7 +93,6 @@ The fan will operate at a flow fraction that is determined by other HVAC equipme
 
 The determination of electric power consumed at a flow fraction depends on if the speed control method is discrete or continuous.
 
-\\
 Discrete Speed Control 
 
 For the \emph{Fan:SystemModel} using discrete speed control, with the number of fan speeds set at 1, and the flow fraction is less than one, then the fan will be modeled as cycling between "off" and "on" over the timestep.  The time fraction is equal to the flow fraction so that:
@@ -131,7 +129,6 @@ The electric power consumption is calculated using the design mass flow rates an
 
 The temperature of the air stream leaving the fan is calculated as above using this result for total power. 
 
-\\
 Continuous Speed Control
 
 For the \emph{Fan:SystemModel} using Continuous speed control the flow fraction is used to evaluate the power performance modification factor which is defined in a separate curve or table.  
@@ -143,7 +140,8 @@ For the \emph{Fan:SystemModel} using Continuous speed control the flow fraction 
 \begin{equation}
 {e_{tot,cur}} = \frac {( { \dot m_{cur} \cdot \Delta P  } )}{( {f_{power,cur}} \cdot { \dot Q_{tot, design} \cdot \rho_{air}})}
 \end{equation}
-//
+
+
 Fan:OnOff Fan Model
 
 

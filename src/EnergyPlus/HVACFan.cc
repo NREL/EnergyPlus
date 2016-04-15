@@ -62,7 +62,6 @@
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <InputProcessor.hh>
-//#include <DataIPShortCuts.hh>
 #include <ScheduleManager.hh>
 #include <NodeInputManager.hh>
 #include <DataLoopNode.hh>
@@ -82,6 +81,8 @@
 #include <DataContaminantBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <BranchNodeConnections.hh>
+#include <FaultsManager.hh>
+#include <Fans.hh>  // used for fault model routine CalFaultyFanAirFlowReduction
 
 namespace EnergyPlus {
 
@@ -227,7 +228,7 @@ namespace HVACFan {
 	void
 	FanSystem::set_size()
 	{
-		std::string const routineName = "HVACFan::set_size ";
+		std::string const routineName = "FanSystem::set_size ";
 	
 		Real64 tempFlow = designAirVolFlowRate_;
 		bool bPRINT = true;
@@ -358,8 +359,8 @@ namespace HVACFan {
 		eMSFanEffValue_( 0.0 ),
 		eMSMaxMassFlowOverrideOn_( false ),
 		eMSAirMassFlowValue_( 0.0 ),
-		//faultyFilterFlag_( false ),
-		//faultyFilterIndex_( 0 ),
+		faultyFilterFlag_( false ),
+		faultyFilterIndex_( 0 ),
 		fanIsSecondaryDriver_( false ),
 		massFlowRateMaxAvail_( 0.0 ),
 		massFlowRateMinAvail_( 0.0 ),
@@ -619,7 +620,22 @@ namespace HVACFan {
 		}
 
 // TODO Faulty fan operation
+		Real64 localFaultMaxAirMassFlow = 0.0;
+		bool faultActive = false;
+		Real64 localFaultPressureRise = 0.0;
+		if ( faultyFilterFlag_ && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( !DataGlobals::WarmupFlag ) && ( ! DataGlobals::DoingSizing ) && DataGlobals::DoWeathSim && ( ! eMSMaxMassFlowOverrideOn_ ) && ( ! eMSFanPressureOverrideOn_ )) {
+			if ( ScheduleManager::GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( faultyFilterIndex_ ).AvaiSchedPtr ) > 0 ) {
+				faultActive = true;
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
+				FanDesignFlowRateDec = Fans::CalFaultyFanAirFlowReduction( name_, designAirVolFlowRate_, deltaPress_,
+					( ScheduleManager::GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( faultyFilterIndex_ ).FaultyAirFilterPressFracSchePtr ) - 1 ) * deltaPress_,
+					FaultsManager::FaultsFouledAirFilters( faultyFilterIndex_ ).FaultyAirFilterFanCurvePtr );
 
+				localFaultMaxAirMassFlow = maxAirMassFlowRate_ - FanDesignFlowRateDec * rhoAirStdInit_;
+
+				localFaultPressureRise = ScheduleManager::GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( faultyFilterIndex_ ).FaultyAirFilterPressFracSchePtr ) * deltaPress_;
+			}
+		}
 
 		//EMS override MassFlow, DeltaPress, and FanEff
 		if ( eMSFanPressureOverrideOn_ ) localPressureRise = eMSFanPressureValue_;
@@ -629,6 +645,10 @@ namespace HVACFan {
 		}
 
 		localAirMassFlow = min( localAirMassFlow, maxAirMassFlowRate_ );
+		if ( faultActive ) {
+			localAirMassFlow = min( localAirMassFlow, localFaultMaxAirMassFlow );
+			localPressureRise = localFaultPressureRise;
+		}
 		localFlowFraction = localAirMassFlow / maxAirMassFlowRate_;
 
 		if ( ( ScheduleManager::GetCurrentScheduleValue( availSchedIndex_ ) > 0.0 || objTurnFansOn_ ) && ! objTurnFansOff_ && localAirMassFlow > 0.0 ) {
@@ -833,6 +853,12 @@ namespace HVACFan {
 		return availSchedIndex_;
 	}
 
+	Real64
+	FanSystem::deltaPress() const
+	{
+		return deltaPress_;
+	}
+
 	int
 	FanSystem::getFanPowerCurveIndex() const
 	{
@@ -884,7 +910,24 @@ namespace HVACFan {
 	void
 	FanSystem::fanIsSecondaryDriver() 
 	{
+		// this concept is used when the fan may be operating in a situation where there is airflow without it running at all
+		// call this when some other fan is feeding the device containing this fan, making it a secondary fan.
+		// example is the fan in a VS VAV air terminal used for UFAD.
 		fanIsSecondaryDriver_ = true;
+	}
+
+	void
+	FanSystem::setFaultyFilterOn()
+	{
+		// call this to set flag to direct model to use fault for filter
+		faultyFilterFlag_ = true;
+	}
+
+	void
+	FanSystem::setFaultyFilterIndex( int const faultyAirFilterIndex  )
+	{
+		// this is the index in the FaultsFouledAirFilters structure array in FaultsManager
+		faultyFilterIndex_ = faultyAirFilterIndex;
 	}
 
 } //HVACFan namespace

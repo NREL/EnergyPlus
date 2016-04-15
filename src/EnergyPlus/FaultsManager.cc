@@ -63,6 +63,8 @@
 #include <ScheduleManager.hh>
 #include <CurveManager.hh>
 #include <Fans.hh>
+#include <GeneralRoutines.hh>
+#include <HVACFan.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -290,17 +292,29 @@ namespace FaultsManager {
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
 					// Check whether the specified fan exsits in the fan list
-					if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					bool IsNotOk = false;
+					ValidateComponent(FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType, FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName, IsNotOk, cFault1 );
+					if ( IsNotOk ) {
+						ShowContinueError( "In " + cFault1 + " = " + FaultsFouledAirFilters( jFaultyAirFilter ).Name );
 						ErrorsFound = true;
 					}
-
-					// Assign fault index to the fan object
-					for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
-						if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
-							Fans::Fan( FanNum ).FaultyFilterFlag = true;
-							Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
-							break;
+					if ( InputProcessor::SameString( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType, "Fan:SystemModel" )) {
+						FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+						FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex = HVACFan::getFanObjectVectorIndex( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName );
+						if ( FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex >= 0 && HVACFan::fanObjs[ FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex ] != nullptr ) {
+							HVACFan::fanObjs[ FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex ]->setFaultyFilterOn();
+							HVACFan::fanObjs[ FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex ]->setFaultyFilterIndex( jFaultyAirFilter );
+						}
+					} else {
+						// Assign fault index to the fan object
+						for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
+							if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
+								Fans::Fan( FanNum ).FaultyFilterFlag = true;
+								Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
+								FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanType_Num = Fans::Fan( FanNum ).FanType_Num;
+								FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex = FanNum;
+								break;
+							}
 						}
 					}
 
@@ -338,7 +352,7 @@ namespace FaultsManager {
 					}
 
 					// Check whether the specified fan curve covers the design operational point of the fan
-					if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName, FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr ) ) {
+					if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanIndex, FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr, FaultsFouledAirFilters( jFaultyAirFilter ).faultyAirFilterFanType_Num ) ) {
 						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not cover "  );
 						ShowContinueError( "the operational point of Fan " + FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName  );
@@ -563,8 +577,9 @@ namespace FaultsManager {
 
 	bool
 	CheckFaultyAirFilterFanCurve(
-		std::string const & FanName, // name of the fan
-		int const FanCurvePtr      // pointer of the fan curve
+		int const fanIndex, // index of the fan
+		int const fanCurvePtr,       // pointer of the fan curve
+		int const fanType_Num        // integer type of fan      // pointer of the fan curve
 	)
 	{
 
@@ -610,21 +625,24 @@ namespace FaultsManager {
 		// FLOW
 
 		FanFound = false;
-
-		for ( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
-			if ( SameString( Fan( FanNum ).FanName, FanName ) ) {
-				FanMaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
-				FanDeltaPress = Fan( FanNum ).DeltaPress;
-				FanFound = true;
-				break;
+		
+		if ( fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			if ( HVACFan::fanObjs[ fanIndex ] != nullptr ) {
+				FanMaxAirFlowRate = HVACFan::fanObjs[ fanIndex ]->designAirVolFlowRate();
+				FanDeltaPress = HVACFan::fanObjs[ fanIndex ]->deltaPress();
+			} else {
+				return false;
+			}
+		} else {
+			if ( fanIndex > 0 && fanIndex <= Fans::NumFans) {
+				FanMaxAirFlowRate = Fan( fanIndex ).MaxAirFlowRate;
+				FanDeltaPress = Fan( fanIndex ).DeltaPress;
+			} else {
+				return false;
 			}
 		}
 
-		if ( !FanFound ) {
-			return false;
-		}
-
-		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );
+		FanDeltaPressCal = CurveValue( fanCurvePtr, FanMaxAirFlowRate );
 
 		return ( ( FanDeltaPressCal > 0.95*FanDeltaPress ) && ( FanDeltaPressCal < 1.05*FanDeltaPress ) );
 	}
