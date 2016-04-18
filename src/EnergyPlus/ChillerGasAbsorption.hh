@@ -395,6 +395,9 @@ namespace ChillerGasAbsorption {
 	// End of Record Keeping subroutines for the Absorption Chiller Module
 	// *****************************************************************************
 
+	void
+	clear_state();
+
 	//                                 COPYRIGHT NOTICE
 
 	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
@@ -413,6 +416,7 @@ namespace ChillerGasAbsorption {
 	//     B.  Assumes any liability with respoct to the use of, or for any and all
 	//         damages resulting from the use of the program or any portion thereof or
 	//         any information disclosed therein.
+
 
 } // ChillerGasAbsorption
 

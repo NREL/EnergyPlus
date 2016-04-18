@@ -17,6 +17,8 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc
+  ChillerExhaustAbsorption.unit.cc
+  ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
