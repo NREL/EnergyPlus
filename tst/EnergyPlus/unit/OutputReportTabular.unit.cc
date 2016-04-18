@@ -230,7 +230,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
 	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
-	EXPECT_EQ( 94, indexUnitConv );
+	EXPECT_EQ( 95, indexUnitConv );
 	EXPECT_EQ( "Invalid/Undefined", curUnits );
 	EXPECT_EQ( 1.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
