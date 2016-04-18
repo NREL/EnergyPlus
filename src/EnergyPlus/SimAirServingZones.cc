@@ -6549,10 +6549,15 @@ namespace SimAirServingZones {
 		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]
 
 		if ( SystemCoolingEv < FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff ) {
+			// reset ZoneOAFrac
 			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+			// reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
 			AvailSAFlow = Voz/ZoneOAFrac;
+			// save ZoneOAFrac 
 			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+			// save new (increased) minimum flow rate
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			// set the system ventilation efficiency to the user specified minimum
 			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
 		}
 	}
