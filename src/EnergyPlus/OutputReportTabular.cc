@@ -10286,6 +10286,9 @@ namespace OutputReportTabular {
 								if ( unitsStyle == unitsStyleInchPound ) {
 									LookupSItoIP( colTagWithSI, indexUnitConv, curColTag );
 									colUnitConv( countColumn ) = indexUnitConv;
+								} else if (unitsStyle == unitsStyleJtoKWH){
+									LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
+									colUnitConv(countColumn) = indexUnitConv;
 								} else {
 									curColTag = colTagWithSI;
 									colUnitConv( countColumn ) = 0;
@@ -10315,7 +10318,7 @@ namespace OutputReportTabular {
 									}
 								}
 								//finally assign the entry to the place in the table body
-								if ( unitsStyle == unitsStyleInchPound ) {
+								if ( unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH ) {
 									columnUnitConv = colUnitConv( colCurrent );
 									if ( SameString( subTable( jSubTable ).name, "SizingPeriod:DesignDay" ) ) {
 										if ( SameString( columnHead( colCurrent ), "Humidity Value" ) ) {
@@ -14189,7 +14192,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 94;
+		UnitConvSize = 95;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14284,7 +14287,8 @@ Label900: ;
 		UnitConv( 91 ).siName = "MJ/m2";
 		UnitConv( 92 ).siName = "MJ/m2";
 		UnitConv( 93 ).siName = "MJ/m2";
-		UnitConv( 94 ).siName = "Invalid/Undefined";
+		UnitConv( 94 ).siName = "MJ/m2";
+		UnitConv( 95 ).siName = "Invalid/Undefined";
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14379,7 +14383,8 @@ Label900: ;
 		UnitConv( 91 ).ipName = "kWh/ft2";
 		UnitConv( 92 ).ipName = "kBtu/ft2";
 		UnitConv( 93 ).ipName = "kBtu/ft2";
-		UnitConv( 94 ).ipName = "Invalid/Undefined";
+		UnitConv( 94 ).ipName = "kWh/m2";
+		UnitConv( 95 ).ipName = "Invalid/Undefined";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14474,7 +14479,8 @@ Label900: ;
 		UnitConv( 91 ).mult = 0.277777777777778 / 10.764961;
 		UnitConv( 92 ).mult = 0.94708628903179 / 10.764961;
 		UnitConv( 93 ).mult = 0.94708628903179 / 10.764961;
-		UnitConv( 94 ).mult = 1.0;
+		UnitConv( 94 ).mult = 0.27777777777778;
+		UnitConv( 95 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14542,6 +14548,8 @@ Label900: ;
 		UnitConv( 90 ).several = true;
 		UnitConv( 91 ).several = true;
 		UnitConv( 92 ).several = true;
+		UnitConv( 93 ).several = true;
+		UnitConv( 94 ).several = true;
 	}
 
 	std::string
@@ -14597,8 +14605,6 @@ Label900: ;
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   February 12, 2009
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   The input string to this subroutine can either contain
@@ -14613,28 +14619,6 @@ Label900: ;
 		//   which can be used with the convertIP function. Also the
 		//   string with the IP units substituted is returned.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		//    na
-
-		// USE STATEMENTS:
-		//    na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//    na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//    na
-
-		// DERIVED TYPE DEFINITIONS:
-		//    na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//    na
 		std::string unitSIOnly;
 		int modeInString;
 		int const misBrac( 1 );
@@ -14715,6 +14699,35 @@ Label900: ;
 		//CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
 		//IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // IntToStr(foundConv) )
 		unitConvIndex = selectedConv;
+	}
+
+
+	void
+	LookupJtokWH(
+		std::string const & stringInWithJ,
+		int & unitConvIndex,
+		std::string & stringOutWithKWH
+	)
+	{
+		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+		//    DATE WRITTEN   April 15, 2016
+
+		// For the given unit expressed in J find the unit conversion
+		// using kWh instead. This is used when unitsStyle == unitsStyleJtoKWH
+		// return zero if no unit conversion should be done
+
+		stringOutWithKWH = stringInWithJ;
+		std::string::size_type gjPos = stringOutWithKWH.find( "[GJ]" );
+		std::string::size_type mjm2Pos = stringOutWithKWH.find( "[MJ/m2]");
+		if ( gjPos != std::string::npos ){
+			stringOutWithKWH.replace( gjPos, 4, "[kWh]" );
+			unitConvIndex = getSpecificUnitIndex( "GJ", "kWh" );
+		} else if ( mjm2Pos != std::string::npos ){
+			stringOutWithKWH.replace( mjm2Pos, 7, "[kWh/m2]" );
+			unitConvIndex = getSpecificUnitIndex( "MJ/m2", "kWh/m2" );
+		} else{
+			unitConvIndex = 0;
+		}
 	}
 
 	Real64
