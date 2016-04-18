@@ -105,6 +105,7 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -294,6 +295,7 @@ namespace EnergyPlus {
 		DataSizing::clear_state();
 		DataSurfaceLists::clear_state();
 		DataSurfaces::clear_state();
+		DataUCSDSharedData::clear_state();
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
