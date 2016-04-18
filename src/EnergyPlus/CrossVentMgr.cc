@@ -511,8 +511,8 @@ namespace CrossVentMgr {
 		int NSides; // Number of sides in surface
 		Real64 Wroom; // Room width
 		Real64 Aroom; // Room area cross section
-		int NodeNum1(0); // The first node number in an AirflowNetwork linkage data
-		int NodeNum2(0); // The Second node number in an AirflowNetwork linkage data
+		int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
+		int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
 		RecInflowRatio( ZoneNum ) = 0.0;
 
@@ -576,9 +576,9 @@ namespace CrossVentMgr {
 		// Calculate the opening area for all apertures
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			int cCompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
-			if (AirflowNetworkCompData(cCompNum).CompTypeNum == CompTypeNum_DOP) {
+			if ( AirflowNetworkCompData( cCompNum ).CompTypeNum == CompTypeNum_DOP ) {
 				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height * MultizoneSurfaceData( Ctd ).OpenFactor;
-			} else if (AirflowNetworkCompData(cCompNum).CompTypeNum == CompTypeNum_SCR) {
+			} else if ( AirflowNetworkCompData( cCompNum ).CompTypeNum == CompTypeNum_SCR ) {
 				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height;
 			} else {
 				ShowSevereError( "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model" );
@@ -765,7 +765,7 @@ namespace CrossVentMgr {
 			}
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin != 0 ) {
-				Real64 dstarexp = max(Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ),1.0);
+				Real64 dstarexp = max( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ), 1.0 );
 				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( dstarexp ) / Dstar( ZoneNum );
 				CVJetRecFlows( Ctd, ZoneNum ).Yjet = Cjet1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Cjet2;
 				CVJetRecFlows( Ctd, ZoneNum ).Yrec = Crec1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Crec2;
