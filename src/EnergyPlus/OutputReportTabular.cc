@@ -9443,8 +9443,8 @@ namespace OutputReportTabular {
 		static Array1D< Real64 > zstArea( 4 );
 		static Array1D< Real64 > zstVolume( 4 );
 		static Array1D< Real64 > zstWallArea( 4 );
-		static Array1D< Real64 > zstUndWallArea(4);
-		static Array1D< Real64 > zstWindowArea(4);
+		static Array1D< Real64 > zstUndWallArea( 4 );
+		static Array1D< Real64 > zstWindowArea( 4 );
 		static Array1D< Real64 > zstLight( 4 );
 		static Array1D< Real64 > zstPeople( 4 );
 		static Array1D< Real64 > zstPlug( 4 );
