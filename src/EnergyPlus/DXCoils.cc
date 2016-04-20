@@ -12167,10 +12167,10 @@ Label50: ;
 		static gio::Fmt Format_891( "(' VAV DX Cooling Coil Standard Rating Information, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 
 		// Get fan index and name if not already available
-		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName, DXCoil( DXCoilNum ).SupplyFan_TypeNum );
-		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) { // didn't find VAV fan, do not rate this coil
+		if ( DXCoil( DXCoilNum ).SupplyFanIndex == -1 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName, DXCoil( DXCoilNum ).SupplyFan_TypeNum );
+		if ( DXCoil( DXCoilNum ).SupplyFanIndex == -1 ) { // didn't find VAV fan, do not rate this coil
 			DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject = false;
-			ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: Did not find an appropirate fan associated with DX coil named = \"" + DXCoil( DXCoilNum ).Name + "\". Standard Ratings will not be calculated." );
+			ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" + DXCoil( DXCoilNum ).Name + "\". Standard Ratings will not be calculated." );
 			return;
 		}
 
@@ -12588,13 +12588,13 @@ Label50: ;
 						if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == SimAirServingZones::Fan_Simple_VAV ) {
 							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
 							Fans::GetFanIndex( SupplyFanName, SupplyFanIndex, ErrorsFound );
-							SupplyFan_TypeNum = SimAirServingZones::Fan_Simple_VAV;
+							SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
 							break;
 							// these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
-						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == SimAirServingZones::Fan_System_Object ) {
 							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
 							SupplyFanIndex =  HVACFan::getFanObjectVectorIndex( SupplyFanName );
-							SupplyFan_TypeNum = SimAirServingZones::Fan_System_Object;
+							SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
 
 						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == UnitarySystem ) {
 							// fan may not be specified in a unitary system object, keep looking

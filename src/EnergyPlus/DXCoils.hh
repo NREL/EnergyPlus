@@ -581,7 +581,7 @@ namespace DXCoils {
 			RatedEIR2( 0.0 ),
 			InternalStaticPressureDrop( 0.0 ),
 			RateWithInternalStaticAndFanObject( false ),
-			SupplyFanIndex( 0 ),
+			SupplyFanIndex( -1 ),
 			SupplyFan_TypeNum( 0 ),
 			RatedEIR( MaxModes, 0.0 ),
 			InletAirMassFlowRate( 0.0 ),
