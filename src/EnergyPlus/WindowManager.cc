@@ -5516,13 +5516,13 @@ namespace WindowManager {
 				tpb1 = 1 - rpf1;
 				tpb2 = 1 - rpf2;
 				tmp7 = -abf;
-				if ( tmp7 != 0.0 ) {
+				if ( cgf != 0.0 ) {
 					expmabfdivcgf = std::exp( tmp7 / cgf );
 				} else {
 					expmabfdivcgf = 0.0;
 				}
 				tmp8 = -2.0 * abf;
-				if ( tmp8 != 0.0 ) {
+				if ( cgf != 0.0 ) {
 					expm2abfdivcgf = std::exp( tmp8 / cgf );
 				} else {
 					expm2abfdivcgf = 0.0;
