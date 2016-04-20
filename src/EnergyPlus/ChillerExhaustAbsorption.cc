@@ -2050,18 +2050,18 @@ namespace ChillerExhaustAbsorption {
 	void
 	clear_state()
 	{
-		int NumExhaustAbsorbers = 0 ;
+		NumExhaustAbsorbers = 0 ;
 		CheckEquipName.deallocate();
 		ExhaustAbsorber.deallocate();
 		ExhaustAbsorberReport.deallocate();
 
-		Real64 Sim_HeatCap( 0.0 ); // W - nominal heating capacity
-		bool Sim_GetInput( true ); // then TRUE, calls subroutine to read input file.
-		bool Init_MyOneTimeFlag( true );
-		Array1D_bool Init_MyEnvrnFlag;
-		Array1D_bool Init_MyPlantScanFlag;
-		Real64 Calc_oldCondSupplyTemp( 0.0 ); // save the last iteration value of leaving condenser water temperature
-		bool Get_ErrorsFound( false );
+		Sim_HeatCap = 0.0;
+		Sim_GetInput = true;
+		Init_MyOneTimeFlag = true;
+		Init_MyEnvrnFlag.deallocate();
+		Init_MyPlantScanFlag.deallocate();
+		Calc_oldCondSupplyTemp = 0.0; // save the last iteration value of leaving condenser water temperature
+		Get_ErrorsFound = false;
 	}
 
 	//                                 COPYRIGHT NOTICE
