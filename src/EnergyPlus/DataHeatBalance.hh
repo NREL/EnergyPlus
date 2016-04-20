@@ -269,6 +269,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_ElectricLoadCenterInverterLookUpTable;
 	extern int const IntGainTypeOf_ElectricLoadCenterStorageBattery;
 	extern int const IntGainTypeOf_ElectricLoadCenterStorageSimple;
+	extern int const IntGainTypeOf_ElectricLoadCenterConverter;
 	extern int const IntGainTypeOf_PipeIndoor;
 	extern int const IntGainTypeOf_RefrigerationCase;
 	extern int const IntGainTypeOf_RefrigerationCompressorRack;

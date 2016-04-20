@@ -108,15 +108,17 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -128,19 +130,17 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -298,13 +298,15 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
+		clearFacilityElectricPowerServiceObject();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
-		FluidProperties::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		FluidProperties::clear_state();
 		Furnaces::clear_state();
 		GlobalNames::clear_state();
 		GroundHeatExchangers::clear_state();
@@ -328,7 +330,6 @@ namespace EnergyPlus {
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
-		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
 		MoistureBalanceEMPDManager::clear_state();

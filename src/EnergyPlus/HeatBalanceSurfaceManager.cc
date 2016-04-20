@@ -1129,8 +1129,23 @@ namespace HeatBalanceSurfaceManager {
 				if ( isExterior ) {
 					++numExtSurfaces( Surface( iSurf ).Class );
 				}
+				if ( Surface( iSurf ).Class == SurfaceClass_Window ){
+					if ( SurfaceWindow( iSurf ).OriginalClass == SurfaceClass_GlassDoor || SurfaceWindow( iSurf ).OriginalClass == SurfaceClass_TDD_Diffuser ){
+						++numSurfaces( SurfaceWindow( iSurf ).OriginalClass );
+						if ( isExterior ) {
+							++numExtSurfaces( SurfaceWindow( iSurf ).OriginalClass );
+						}
+					}
+				}
 			}
 		}
+		// for fins and overhangs just add them explicitly since not otherwise classified
+		int totOverhangs = GetNumObjectsFound( "Shading:Overhang" ) + GetNumObjectsFound( "Shading:Overhang:Projection" );
+		numSurfaces( SurfaceClass_Overhang ) = totOverhangs;
+		numExtSurfaces( SurfaceClass_Overhang ) = totOverhangs;
+		int totFins = GetNumObjectsFound( "Shading:Fin" ) + GetNumObjectsFound( "Shading:Fin:Projection" );
+		numSurfaces( SurfaceClass_Fin ) = totFins;
+		numExtSurfaces( SurfaceClass_Fin ) = totFins;
 		// go through all the surfaces again and this time insert the net area results
 		for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
 			zonePt = Surface( iSurf ).Zone;

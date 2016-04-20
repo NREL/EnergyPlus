@@ -99,7 +99,7 @@
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <LowTempRadiantSystem.hh>
-#include <ManageElectricPower.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabularAnnual.hh>
@@ -252,6 +252,9 @@ namespace OutputReportTabular {
 	int UnitConvSize( 0 );
 
 	bool WriteTabularFiles( false );
+	bool GetInput( true );
+	bool firstTimeGatherHGReport( true );
+
 
 	// Allow up to five output files to be created
 	int const maxNumStyles( 5 );
@@ -336,6 +339,8 @@ namespace OutputReportTabular {
 	Real64 gatherElecSurplusSold( 0.0 );
 	int meterNumElecStorage = ( 0 );
 	Real64 gatherElecStorage = ( 0.0 );
+	int meterNumPowerConversion = ( 0 );
+	Real64 gatherPowerConversion = ( 0.0 );
 	// for on site thermal source components on BEPS report
 	int meterNumWaterHeatRecovery( 0 );
 	Real64 gatherWaterHeatRecovery( 0.0 );
@@ -2123,6 +2128,7 @@ namespace OutputReportTabular {
 			meterNumPowerWind = GetMeterIndex( "WindTurbine:ElectricityProduced" );
 			meterNumPowerHTGeothermal = GetMeterIndex( "HTGeothermal:ElectricityProduced" );
 			meterNumElecStorage = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
+			meterNumPowerConversion = GetMeterIndex( "PowerConversion:ElectricityProduced");
 			meterNumElecProduced = GetMeterIndex( "ElectricityProduced:Facility" );
 			meterNumElecPurchased = GetMeterIndex( "ElectricityPurchased:Facility" );
 			meterNumElecSurplusSold = GetMeterIndex( "ElectricitySurplusSold:Facility" );
@@ -2142,6 +2148,7 @@ namespace OutputReportTabular {
 			gatherElecPurchased = 0.0;
 			gatherElecSurplusSold = 0.0;
 			gatherElecStorage = 0.0;
+			gatherPowerConversion = 0.0;
 
 			// get meter numbers for onsite thermal components on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
@@ -4236,6 +4243,7 @@ namespace OutputReportTabular {
 			gatherElecPurchased += GetCurrentMeterValue( meterNumElecPurchased );
 			gatherElecSurplusSold += GetCurrentMeterValue( meterNumElecSurplusSold );
 			gatherElecStorage += GetCurrentMeterValue( meterNumElecStorage );
+			gatherPowerConversion += GetCurrentMeterValue( meterNumPowerConversion );
 			// gather the onsite thermal components
 			gatherWaterHeatRecovery += GetCurrentMeterValue( meterNumWaterHeatRecovery );
 			gatherAirHeatRecoveryCool += GetCurrentMeterValue( meterNumAirHeatRecoveryCool );
@@ -6862,7 +6870,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
 		using DataWater::StorageTankDataStruct;
-		using ManageElectricPower::NumElecStorageDevices;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
 		using ScheduleManager::GetScheduleName;
@@ -7042,12 +7049,13 @@ namespace OutputReportTabular {
 			gatherPowerPV /= largeConversionFactor;
 			gatherPowerWind /= largeConversionFactor;
 			gatherPowerHTGeothermal /= largeConversionFactor;
+			gatherPowerConversion /= largeConversionFactor;
 			gatherElecProduced /= largeConversionFactor;
 			gatherElecPurchased /= largeConversionFactor;
 			gatherElecSurplusSold /= largeConversionFactor;
 
 			// get change in overall state of charge for electrical storage devices.
-			if ( NumElecStorageDevices > 0 ) {
+			if ( facilityElectricServiceObj->numElecStorageDevices > 0 ) {
 				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
 				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
 				OverallNetEnergyFromStorage = gatherElecStorage;
@@ -7935,11 +7943,11 @@ namespace OutputReportTabular {
 			}
 
 			//---- Electric Loads Satisfied Sub-Table
-			rowHead.allocate( 13 );
+			rowHead.allocate( 14 );
 			columnHead.allocate( 2 );
 			columnWidth.allocate( 2 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 2, 13 );
+			tableBody.allocate( 2, 14 );
 
 			{ auto const SELECT_CASE_var( unitsStyle );
 			if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
@@ -7955,34 +7963,36 @@ namespace OutputReportTabular {
 			rowHead( 2 ) = "High Temperature Geothermal*";
 			rowHead( 3 ) = "Photovoltaic Power";
 			rowHead( 4 ) = "Wind Power";
-			rowHead( 5 ) = "Net Decrease in On-Site Storage";
-			rowHead( 6 ) = "Total On-Site Electric Sources";
-			rowHead( 7 ) = "";
-			rowHead( 8 ) = "Electricity Coming From Utility";
-			rowHead( 9 ) = "Surplus Electricity Going To Utility";
-			rowHead( 10 ) = "Net Electricity From Utility";
-			rowHead( 11 ) = "";
-			rowHead( 12 ) = "Total On-Site and Utility Electric Sources";
-			rowHead( 13 ) = "Total Electricity End Uses";
+			rowHead( 5 ) = "Power Conversion";
+			rowHead( 6 ) = "Net Decrease in On-Site Storage";
+			rowHead( 7 ) = "Total On-Site Electric Sources";
+			rowHead( 8 ) = "";
+			rowHead( 9 ) = "Electricity Coming From Utility";
+			rowHead( 10 ) = "Surplus Electricity Going To Utility";
+			rowHead( 11 ) = "Net Electricity From Utility";
+			rowHead( 12 ) = "";
+			rowHead( 13 ) = "Total On-Site and Utility Electric Sources";
+			rowHead( 14 ) = "Total Electricity End Uses";
 
 			tableBody = "";
 
 			// show annual values
 			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 
-			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 2 );
-			tableBody( 1, 2 ) = RealToStr( gatherPowerHTGeothermal, 2 );
-			tableBody( 1, 3 ) = RealToStr( gatherPowerPV, 2 );
+			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 3 );
+			tableBody( 1, 2 ) = RealToStr( gatherPowerHTGeothermal, 3 );
+			tableBody( 1, 3 ) = RealToStr( gatherPowerPV, 3 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2 );
-			tableBody( 1, 4 ) = RealToStr( gatherPowerWind, 2 );
+			tableBody( 1, 4 ) = RealToStr( gatherPowerWind, 3 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2 );
-			tableBody( 1, 5 ) = RealToStr( OverallNetEnergyFromStorage, 2 );
-			tableBody( 1, 6 ) = RealToStr( gatherElecProduced, 2 );
-			tableBody( 1, 8 ) = RealToStr( gatherElecPurchased, 2 );
-			tableBody( 1, 9 ) = RealToStr( gatherElecSurplusSold, 2 );
-			tableBody( 1, 10 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 2 );
-			tableBody( 1, 12 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 2 );
-			tableBody( 1, 13 ) = RealToStr( collapsedTotal( 1 ), 2 );
+			tableBody( 1, 5 ) = RealToStr( gatherPowerConversion, 3 );
+			tableBody( 1, 6 ) = RealToStr( OverallNetEnergyFromStorage, 3 );
+			tableBody( 1, 7 ) = RealToStr( gatherElecProduced, 3 );
+			tableBody( 1, 9 ) = RealToStr( gatherElecPurchased, 3 );
+			tableBody( 1, 10 ) = RealToStr( gatherElecSurplusSold, 3 );
+			tableBody( 1, 11 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 3 );
+			tableBody( 1, 13 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 3 );
+			tableBody( 1, 14 ) = RealToStr( collapsedTotal( 1 ), 3 );
 
 			// show annual percentages
 			if ( collapsedTotal( 1 ) > 0 ) {
@@ -7990,13 +8000,14 @@ namespace OutputReportTabular {
 				tableBody( 2, 2 ) = RealToStr( 100.0 * gatherPowerHTGeothermal / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 3 ) = RealToStr( 100.0 * gatherPowerPV / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 4 ) = RealToStr( 100.0 * gatherPowerWind / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 5 ) = RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 6 ) = RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 8 ) = RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 9 ) = RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 10 ) = RealToStr( 100.0 * ( gatherElecPurchased - gatherElecSurplusSold ) / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 12 ) = RealToStr( 100.0 * ( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ) ) / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 13 ) = RealToStr( 100.0, 2 );
+				tableBody( 2, 5 ) = RealToStr( 100.0 * gatherPowerConversion / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 6 ) = RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 7 ) = RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 9 ) = RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 10 ) = RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 11 ) = RealToStr( 100.0 * ( gatherElecPurchased - gatherElecSurplusSold ) / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 13 ) = RealToStr( 100.0 * ( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ) ) / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 14 ) = RealToStr( 100.0, 2 );
 			}
 
 			// heading for the entire sub-table
@@ -8530,7 +8541,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::NumElecStorageDevices;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9430,13 +9440,21 @@ namespace OutputReportTabular {
 		static std::string Wm2_unitName;
 
 		//zone summary total
-		static Array1D< Real64 > zstArea( 4, 0.0 );
-		static Array1D< Real64 > zstVolume( 4, 0.0 );
-		static Array1D< Real64 > zstWallArea( 4, 0.0 );
-		static Array1D< Real64 > zstWindowArea( 4, 0.0 );
-		static Array1D< Real64 > zstLight( 4, 0.0 );
-		static Array1D< Real64 > zstPeople( 4, 0.0 );
-		static Array1D< Real64 > zstPlug( 4, 0.0 );
+		static Array1D< Real64 > zstArea( 4 );
+		static Array1D< Real64 > zstVolume( 4 );
+		static Array1D< Real64 > zstWallArea( 4 );
+		static Array1D< Real64 > zstWindowArea( 4 );
+		static Array1D< Real64 > zstLight( 4 );
+		static Array1D< Real64 > zstPeople( 4 );
+		static Array1D< Real64 > zstPlug( 4 );
+
+		zstArea = 0.0;
+		zstVolume = 0.0;
+		zstWallArea = 0.0;
+		zstWindowArea = 0.0;
+		zstLight = 0.0;
+		zstPeople  = 0.0;
+		zstPlug = 0.0;
 
 		// misc
 		Real64 pdiff;
@@ -13546,6 +13564,7 @@ namespace OutputReportTabular {
 		gatherElecPurchased = 0.0;
 		gatherElecSurplusSold = 0.0;
 		gatherElecStorage = 0.0;
+		gatherPowerConversion = 0.0;
 		gatherWaterHeatRecovery = 0.0;
 		gatherAirHeatRecoveryCool = 0.0;
 		gatherAirHeatRecoveryHeat = 0.0;

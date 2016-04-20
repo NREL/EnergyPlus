@@ -7309,9 +7309,9 @@ What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rathe
 
 The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
-Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
+Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans are typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
-EnergyPlus provides 5 capacity control methods for this unit:
+EnergyPlus provides 6 capacity control methods for this unit:
 
   1. multi-speed cycling fan with constant water flow rate
 
@@ -7323,9 +7323,11 @@ EnergyPlus provides 5 capacity control methods for this unit:
 
   5. multi-speed fan with cycling between speeds and  constant water flow.
 
+  6. fan speed control based on ASHRAE 90.1
+
 In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot (for hydronic heating coil only) and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop through its hot water coil or with no hot water loop when using an electric coil (demand side) and to a chilled water loop (demand side) through its cooling coil.
 
-Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiSpeedFan* a *Fan:OnOff* should be chosen.
+Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, for *MultiSpeedFan* a *Fan:OnOff* should be used, and for *ASHRAE90VariableFan*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen.
 
 Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. EnergyPlus models 4-pipe units, but the 4-pipe model can be used to model 2-pipe units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
 
@@ -7337,11 +7339,13 @@ A unique user assigned name for an instance of a Fan Coil unit. Any reference to
 
 The name of the schedule (ref: Schedule) that denotes whether the fan coil unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-***Field: Capacity Control  Method***
+***Field: Capacity Control Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load.
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, ***MultiSpeedFan***, or ***ASHRAE90VariableFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90VariableFan*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
-***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load.
+***Note: when ASHRAE90VariableFan is selected, if the the Minimum Supply Air Temperature in Cooling/Heating Mode inputs are not specified, the simulation must include zone sizing to calculate the zone design sensible cooling and heating load used to modulate the fan speed and, for water coils, the water flow rate or for electric heating coils, the part load ratio.***
+
+***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schedule type. The model selects at what fan speed to run depending on cooling or heating load.
 
 #### Field: Maximum Supply Air Flow Rate
 
@@ -7349,11 +7353,11 @@ The maximum volumetric airflow rate (m<sup>3</sup>/sec) through the fan coil uni
 
 #### Field: Low Speed Supply Air Flow Ratio
 
-This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. Its value should be less than *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave it blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. This value should be less than the *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave this field blank if the capacity control method selected is not *CyclingFan* or *ASHRAE90VariableFan*. The suggested value is 0.5 when using the ASHRAE90VariableFan capacity control method.
 
 #### Field: Medium Speed Supply Air  Flow Ratio
 
-This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1.If left blank, the default value is 0.66.Leave it blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1. If left blank, the default value is 0.66. Leave this field blank if the capacity control method selected is not *CyclingFan* or *MultiSpeedFan*.
 
 #### Field: Maximum Outdoor Air Flow Rate
 
@@ -7393,9 +7397,10 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 #### Field: Supply Air Fan Name
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. And for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*  should be chosen. The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. For *MultiSpeedFan* a *Fan:OnOff* should be used. And for *ASHRAE90VariableFan*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
 
-The fan’s outlet node should be the same as the cooling coil’s air inlet node.
+    The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+    The fan’s outlet node should be the same as the cooling coil’s air inlet node.
 
 #### Field: Cooling Coil Object Type
 
@@ -7478,6 +7483,12 @@ This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing o
 #### Field: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
 denote cycling fan operation (fan cycles with heating or cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
+
+#### Field: Minimum Supply Air Temperature in Cooling Mode
+This optional input is used only when *Capacity Control Method = ASHRAE90VariableFan*. Specify the minimum supply air temperature in cooling mode. When the fan coil capacity is greater than the zone load, the fan speed will modulate down to the minimum fan speed, based on the Low Speed Supply Air Flow Ratio input field, and the water flow rate will also be reduced to maintain the zone thermostat set point temperature. When the zone load is one-half the fan coil capacity, the fan will operate at the minimum speed. When these fields are not entered, a zone sizing simulation must be performed. Both the cooling and heating supply air temperature must be entered or blank in unison. Values must be greater than 0 or this field is autosizable. A value of 0 (in both fields) will disregard these fields.
+
+#### Field: Maximum Supply Air Temperature in Heating Mode
+This optional input is used only when *Capacity Control Method = ASHRAE90VariableFan*. Specify the maximum supply air temperature in heating mode. When the fan coil capacity is greater than the zone load, the fan speed will modulate down to the minimum fan speed, based on the Low Speed Supply Air Flow Ratio input field, and the water flow rate will also be reduced to maintain the zone thermostat set point temperature. When the zone load is one-half the fan coil capacity, the fan will operate at the minimum speed. When these fields are not entered, a zone sizing simulation must be performed. Both the cooling and heating supply air temperature must be entered or blank in unison. Values must be greater than 0 or this field is autosizable. A value of 0 (in both fields) will disregard these fields.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
@@ -8338,7 +8349,7 @@ This output is the availability status of the zone evaporative cooler unit’s f
 
 The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to model dedicated outdoor air systems (DOAS) and other similar systems which aim to provide either additional outside air or some limited amount of sensible and/or latent conditioning.  The zone outdoor air unit is a piece of zone equipment that can consist of a supply fan, an exhaust fan (optional), heating and cooling coils, and heat recovery.  The outdoor air unit input simply requires information about flow rates, schedules, node names, and a list of component that are part of the unit.  These components require additional input as per the requirements for these components.  In addition, the input includes information about controls for the unit.  It should be noted that the components that make up the zone outdoor air unit do not require additional controls or setpoints.  The unit input defines how the unit outlet temperature is controlled as described below.
 
-![](media/image7466.png)
+![](media/image282.png)
 
 Figure 110. Zone Outdoor Air Unit Schematic
 
@@ -11131,6 +11142,7 @@ UnitarySystemPerformance:Multispeed,
    MyMultispeedHPSpec,      !- Name
    4,                       !- Number of Speeds for Heating
    4,                       !- Number of Speeds for Cooling
+   No,                      !- Single Mode Operation
    0.235294118,             !- Heating Speed 1 Supply Air Flow Rate {m3/s}
    0.235294118,             !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
    0.470588235,             !- Heating Speed 2 Supply Air Flow Rate {m3/s}
@@ -11221,11 +11233,15 @@ This output variable is the ratio of the sensible load (heating or cooling) to t
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system’s DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the unitary system is cycling on and off its lowest speed (Speed 1) and 1.0 when the unitary system operates at speeds above 1.
 
+When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed. 
+
 #### Unitary System DX Coil Speed Ratio []
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( [Compressor Speed - Compressor speed at Speed i-1] / [Compressor speed at Speed i - Compressor speed at Speed i-1]). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
 The physical meaning of the speed ratio is dependent on the compressor configuration defined in the field of child coil object: Apply Part Load Fraction to Speeds greater than 1. The allowed choice is either Yes or No. When No is entered, one compressor is assumed for all speeds.  The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. When Yes is entered, multiple compressors are assumed, and each compressor has associated speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the low speed runs in a whole system timestep.
+
+When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1 and 1 at Speed > 1.
 
 #### Unitary System DX Coil Speed Level []
 
@@ -11323,6 +11339,10 @@ This field defines the number of heating speeds for the heat pump, and must matc
 #### Field: Number of Speeds for Cooling
 
 This field defines the number of cooling speeds for the heat pump, and must match the number of cooling speeds defined in the associated DX cooling coil. The value for this input field defines the number of airflow rate ratios that must be defined for cooling in the fields below. The minimum value for this field is one and the maximum value is the number specified in the coil object. If the cooling coil type used in the unitary system object is not a multispeed coil type, then this field should be 1.
+
+#### Field: Single Mode Operation
+
+This field specifies the coil operation mode for multiple speed DX cooling and heating coils during each HVAC timestep. The allowed choice is Yes or No. The No choice allows a coil works between two adjacent speeds when a system load is greater than the coil capacity at speed 1. The Yes choice allows a coil works with a single capacity at a different speed. The speed number is determined by a system load.  
 
 #### Field: Heating Speed 1 Supply Air Flow Ratio
 
@@ -12527,11 +12547,15 @@ This output variable is the ratio of the sensible load (heating or cooling) to t
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump’s DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the multispeed heat pump operates at speeds above 1.
 
+When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed. 
+
 #### Unitary System DX Coil Speed Ratio []
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( [Compressor Speed - Compressor speed at Speed i-1] / [Compressor speed at Speed i - Compressor speed at Speed i-1]). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
 The physical meaning of the speed ratio is dependent on the compressor configuration defined in the field of child coil object: Apply Part Load Fraction to Speeds greater than 1. The allowed choice is either Yes or No. When No is entered, one compressor is assumed for all speeds.  The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. When Yes is entered, multiple compressors are assumed, and each compressor has associated speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the low speed runs in a whole system timestep.
+
+When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1, and 1 at Speed > 1
 
 #### Unitary System DX Coil Speed Level []
 
@@ -13804,11 +13828,11 @@ This numeric field defines the cooling coefficient of performance at rated condi
 
 #### Field: Minimum Outdoor Temperature in Cooling Mode
 
-This numeric field defines the minimum outdoor dry-bulb temperature allowed for cooling operation. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+This numeric field defines the minimum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
 
 #### Field: Maximum Outdoor Temperature in Cooling Mode
 
-This numeric field defines the maximum outdoor dry-bulb temperature allowed for cooling operation. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum source temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
 
 #### Field: Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
 
@@ -13864,11 +13888,11 @@ This numeric field defines the heating coefficient of performance at rated condi
 
 #### Field: Minimum Outdoor Temperature in Heating Mode
 
-This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum source temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
 
 #### Field: Maximum Outdoor Temperature in Heating Mode
 
-This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum source temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
 
 #### Field: Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
 

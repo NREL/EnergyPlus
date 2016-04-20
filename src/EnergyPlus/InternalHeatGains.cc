@@ -87,7 +87,6 @@
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -104,6 +103,7 @@
 #include <NodeInputManager.hh>
 #include <CurveManager.hh>
 #include <DataHVACGlobals.hh>
+#include <ElectricPowerServiceManager.hh>
 
 namespace EnergyPlus {
 
@@ -3273,13 +3273,9 @@ namespace InternalHeatGains {
 		using DataRoomAirModel::TCMF;
 		using DataRoomAirModel::IsZoneUI;
 		using WaterThermalTanks::CalcWaterThermalTankZoneGains;
-		using PipeHeatTransfer::CalcZonePipesHeatGain;
 		using WaterUse::CalcWaterUseZoneGains;
 		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
 		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
-		using ManageElectricPower::FigureInverterZoneGains;
-		using ManageElectricPower::FigureElectricalStorageZoneGains;
-		using ManageElectricPower::FigureTransformerZoneGains;
 		using DaylightingDevices::FigureTDDZoneGains;
 		using RefrigeratedCase::FigureRefrigerationZoneGains;
 		using OutputReportTabular::radiantPulseUsed;
@@ -3415,7 +3411,7 @@ namespace InternalHeatGains {
 
 				//For predefined tabular reports related to outside air ventilation
 				ZonePreDefRep( NZ ).isOccupied = true; //set flag to occupied to be used in tabular reporting for ventilation
-				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants *  Zone( NZ ).Multiplier * Zone( NZ ).ListMultiplier * TimeStepZone;
+				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants * TimeStepZone;
 				ZonePreDefRep( NZ ).NumOccAccumTime += TimeStepZone;
 			} else {
 				ZonePreDefRep( NZ ).isOccupied = false; //set flag to occupied to be used in tabular reporting for ventilation
@@ -3634,13 +3630,11 @@ namespace InternalHeatGains {
 		if ( NumZoneITEqStatements > 0 ) CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
-		CalcZonePipesHeatGain();
+		PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
 		CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
-		FigureInverterZoneGains();
-		FigureElectricalStorageZoneGains();
-		FigureTransformerZoneGains();
+		initializeElectricPowerServiceZoneGains();
 		FigureTDDZoneGains();
 		FigureRefrigerationZoneGains();
 

@@ -1,0 +1,5 @@
+8.5.0,8.6.0,Transition notes
+2,2,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+EMPD Surface Inside Face Humidity Ratio,<DELETE>,
+EMPD Surface Inside Face Relative Humidity,<DELETE>,
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

@@ -294,6 +294,8 @@ namespace DataSizing {
 	Array1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
 	Array1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	char SizingFileColSep; // Character to separate columns in sizing outputs
+	int DataDesicDehumNum( 0 ); // index to desiccant dehumidifier
+	bool DataDesicRegCoil( false ); // TRUE if heating coil desiccant regeneration coil
 
 	// Object Data
 	Array1D< OARequirementsData > OARequirements;
@@ -427,6 +429,8 @@ namespace DataSizing {
 		DesDayWeath.deallocate();
 		CompDesWaterFlow.deallocate();
 		ZoneHVACSizing.deallocate();
+		DataDesicDehumNum = 0;
+		DataDesicRegCoil = false;
 	}
 
 } // DataSizing

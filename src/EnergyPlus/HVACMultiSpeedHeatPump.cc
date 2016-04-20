@@ -1265,12 +1265,12 @@ namespace HVACMultiSpeedHeatPump {
 			if ( MSHeatPump( MSHPNum ).DesignHeatRecFlowRate > 0.0 ) {
 				MSHeatPump( MSHPNum ).HeatRecActive = true;
 				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( InitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
-				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, "MSHP Heat receovery", Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecInletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 16 ) + '.' );
 					ErrorsFound = true;
 				}
-				MSHeatPump( MSHPNum ).HeatRecOutletNodeNum = GetOnlySingleNode( Alphas( 17 ), ErrorsFound, "MSHP Heat receovery", Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+				MSHeatPump( MSHPNum ).HeatRecOutletNodeNum = GetOnlySingleNode( Alphas( 17 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecOutletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 17 ) + '.' );
 					ErrorsFound = true;
@@ -2163,8 +2163,7 @@ namespace HVACMultiSpeedHeatPump {
 
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
-		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
-		for ( auto & e : MSHeatPump ) {
+		auto & e = MSHeatPump( MSHeatPumpNum ); {
 			e.TotHeatEnergyRate = 0.0;
 			e.SensHeatEnergyRate = 0.0;
 			e.LatHeatEnergyRate = 0.0;
@@ -2172,7 +2171,7 @@ namespace HVACMultiSpeedHeatPump {
 			e.SensCoolEnergyRate = 0.0;
 			e.LatCoolEnergyRate = 0.0;
 		}
-
+		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
 		//!!LKL Discrepancy with < 0
 		if ( GetCurrentScheduleValue( MSHeatPump( MSHeatPumpNum ).AvaiSchedPtr ) == 0.0 ) {
 			Node( OutNode ).Temp = Node( InNode ).Temp;
