@@ -28,12 +28,17 @@ on the time interval \emph{t} \emph{∈ {[}0, 1{]}}, the following sequence:
 
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
-Step 0: & Initialize counter k = 0 and number of steps $N \in \mathbf{N}$ . \tabularnewline \midrule
+Step 0: & Initialize counter k=0 and number of steps \(N \in \mathbf{N}\). \tabularnewline
+\endfirsthead
+
+\toprule 
+Step 0: & Initialize counter k=0 and number of steps \(N \in \mathbf{N}\). \tabularnewline
 \endhead
-~ & Set initial state x(k) = x   and set time step Dt = 1/N. \tabularnewline
+
+~ & Set initial state x(k) = x and set time step Dt = 1/N. \tabularnewline
 Step 1: & Compute new state x(k+1) = x(k) + h(x(k)) Dt. \tabularnewline
 ~ & Replace k by k+1. \tabularnewline
-Step 2: & If k = N stop, else go to Step 1. \tabularnewline
+Step 2: & If k=N stop, else go to Step 1. \tabularnewline
 \bottomrule
 \end{longtable}
 
