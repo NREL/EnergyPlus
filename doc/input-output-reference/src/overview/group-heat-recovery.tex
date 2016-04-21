@@ -335,7 +335,7 @@ This numeric field defines the dry-bulb temperature of air which is used to init
 The appropriate threshold temperature varies with exhaust (inlet) air temperature and humidity, frost control type, heat exchanger type, and whether the heat exchanger transfers sensible energy alone or both sensible and latent energy (enthalpy). Typical threshold temperatures are provided in Table~\ref{table:typical-threshold-temperatures} below. However, it is recommended that the user consult manufacturer s information for the specific air-to-air heat exchanger being modeled.
 
 % table 31
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
 \caption{Typical threshold temperatures \label{table:typical-threshold-temperatures}} \tabularnewline
 \toprule 
 Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperature \tabularnewline
@@ -349,21 +349,24 @@ Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperatu
 \endhead
 
 Exhaust Air Recirculation & Plate & Sensible-only & -1.1°C (30°F) \tabularnewline
-Sensible + latent & -12.2°C (10°F) \tabularnewline
-Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
-Sensible + latent & -12.2°C (10°F) \tabularnewline
-Exhaust Only & Plate & Sensible-only & -23.3°C (-10°F) \tabularnewline
-Sensible + latent & -1.1°C (30°F) \tabularnewline
-Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
-Sensible + latent & -12.2°C (10°F) \tabularnewline
-Minimum Exhaust Temperature & Plate & Sensible-only & -23.3°C (-10°F) \tabularnewline
-Sensible + latent & 1.7°C (35°F) \tabularnewline
-Rotary & Sensible-only & 1.7°C (35°F) \tabularnewline
-Sensible + latent & 1.7°C (35°F) \tabularnewline
-Preheat ** & Plate & Sensible-only & 1.7°C (35°F) \tabularnewline
-Sensible + latent & -1.1°C (30°F) \tabularnewline
-Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
-Sensible + latent & -23.3°C (-10°F) \tabularnewline
+Exhaust Air Recirculation & Plate & Sensible + latent & -12.2°C (10°F) \tabularnewline
+Exhaust Air Recirculation & Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
+Exhaust Air Recirculation & Rotary & Sensible + latent & -23.3°C (-10°F) \tabularnewline
+
+Exhaust only & Plate & Sensible-only & -1.1°C (30°F) \tabularnewline
+Exhaust only & Plate & Sensible + latent & -12.2°C (10°F) \tabularnewline
+Exhaust only & Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
+Exhaust only & Rotary & Sensible + latent & -23.3°C (-10°F) \tabularnewline
+
+Minimum exhaust temperature & Plate & Sensible-only & 1.7°C (35°F) \tabularnewline
+Minimum exhaust temperature & Plate & Sensible + latent & 1.7°C (35°F) \tabularnewline
+Minimum exhaust temperature & Rotary & Sensible-only & 1.7°C (35°F) \tabularnewline
+Minimum exhaust temperature & Rotary & Sensible + latent & 1.7°C (35°F) \tabularnewline
+
+Preheat** & Plate & Sensible-only & -1.1°C (30°F) \tabularnewline
+Preheat** & Plate & Sensible + latent & -12.2°C (10°F) \tabularnewline
+Preheat** & Rotary & Sensible-only & -12.2°C (10°F) \tabularnewline
+Preheat** & Rotary & Sensible + latent & -23.3°C (-10°F) \tabularnewline
 \bottomrule
 \end{longtable}
 
