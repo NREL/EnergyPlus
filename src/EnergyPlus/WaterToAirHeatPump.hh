@@ -179,12 +179,6 @@ namespace WaterToAirHeatPump {
 		int LoopSide; // plant loop side index
 		int BranchNum; // plant branch index
 		int CompNum; // plant component index
-		int CoolingNumIteration2; // model loop interation counter
-		int CoolingNumIteration3; // model loop interation counter
-		int CoolingNumIteration4; // model loop interation counter
-		int HeatingNumIteration2; // model loop interation counter
-		int HeatingNumIteration3; // model loop interation counter
-		int HeatingNumIteration4; // model loop interation counter
 
 		// Default Constructor
 		WatertoAirHPEquipConditions() :
@@ -253,12 +247,7 @@ namespace WaterToAirHeatPump {
 			LoopNum( 0 ),
 			LoopSide( 0 ),
 			BranchNum( 0 ),
-			CompNum( 0 ),
-			CoolingNumIteration2( 0 ),
-			CoolingNumIteration3( 0 ),
-			CoolingNumIteration4( 0 ),
-			HeatingNumIteration2( 0 ),
-			HeatingNumIteration3( 0 )
+			CompNum( 0 )
 		{}
 
 	};
