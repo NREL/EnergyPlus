@@ -290,6 +290,8 @@ namespace Furnaces {
 		// end of the additional variables for variable speed water source heat pump
 		int WaterCyclingMode; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
 		// 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
+		int iterationCounter; // track time step iterations
+		Array1D< int > iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
 
 		// Default Constructor
 		FurnaceEquipConditions() :
@@ -427,7 +429,9 @@ namespace Furnaces {
 			CompSpeedRatio( 0.0 ),
 			ErrIndexCyc( 0 ),
 			ErrIndexVar( 0 ),
-			WaterCyclingMode( 0 )
+			WaterCyclingMode( 0 ),
+			iterationCounter( 0 ),
+			iterationMode( 0 )
 		{}
 
 	};

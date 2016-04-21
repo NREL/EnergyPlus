@@ -214,6 +214,7 @@ namespace HVACUnitarySystem {
 	// Last mode of operation
 	int const CoolingMode( 1 ); // last compressor operating mode was in cooling
 	int const HeatingMode( 2 ); // last compressor operating mode was in heating
+	int const NoCoolHeat( 3 ); // last operating mode was no cooling or heating
 
 	// Compressor operation
 	int const On( 1 ); // normal compressor operation
@@ -379,6 +380,7 @@ namespace HVACUnitarySystem {
 		int UnitarySysNum; // Index to AirloopHVAC:UnitarySystem object
 		bool HXUnitOn; // Flag to control HX for HXAssisted Cooling Coil
 		int CompOn; // Determines if compressor is on or off
+		Real64 TempMassFlowRateMaxAvail;
 		//////////// hoisted into namespace ////////////////////////////////////////////////
 		// static bool MyZoneEquipTestFlag( true ); // SimUnitarySystemZoneEquipTestFlag
 		////////////////////////////////////////////////////////////////////////////////////
@@ -431,6 +433,11 @@ namespace HVACUnitarySystem {
 			InitUnitarySystems( UnitarySysNum, AirLoopNum, FirstHVACIteration, OAUnitNum, OAUCoilOutTemp );
 		}
 
+		// MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
+		// temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
+		TempMassFlowRateMaxAvail = Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail;
+		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = UnitarySystem( UnitarySysNum ).DesignMassFlowRate;
+
 		HXUnitOn = false;
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).ControlType );
 		if ( SELECT_CASE_var == SetPointBased ) {
@@ -472,8 +479,12 @@ namespace HVACUnitarySystem {
 				AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithCompressor = false;
 			}
 
-			if ( ( HeatActive ) && ( AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithCompressor || AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithHeating ) ) {
-				AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = true;
+			if ( present (HeatActive) ) {
+				if ( ( HeatActive ) && ( AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithCompressor || AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithHeating ) ) {
+					AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = true;
+				} else {
+					AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = false;
+				}
 			} else {
 				AirLoopControlInfo( AirLoopNum ).ReqstEconoLockoutWithHeating = false;
 			}
@@ -488,6 +499,8 @@ namespace HVACUnitarySystem {
 		// Coils should have been sized by now. Set this flag to false in case other equipment is downstream of Unitary System.
 		// can't do this since there are other checks that need this flag (e.g., HVACManager, line 3577)
 		//  AirLoopControlInfo(AirLoopNum)%UnitarySys = .FALSE.
+
+		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
 
 	}
 
@@ -860,6 +873,10 @@ namespace HVACUnitarySystem {
 
 		// get operating capacity of water and steam coil
 		if ( FirstHVACIteration || UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_CoolReheat ) {
+			if ( FirstHVACIteration ) {
+				UnitarySystem( UnitarySysNum ).iterationCounter = 0;
+				UnitarySystem( UnitarySysNum ).iterationMode = 0;
+			}
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				//     set air-side and steam-side mass flow rates
 				mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow );
@@ -922,6 +939,7 @@ namespace HVACUnitarySystem {
 
 			} // from IF(UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingSteam) THEN
 		} // from IF( FirstHVACIteration ) THEN
+		UnitarySystem( UnitarySysNum ).iterationCounter += 1;
 
 		if ( MySetPointCheckFlag( UnitarySysNum ) ) {
 			if ( ! SysSizingCalc && DoSetPointTest ) {
@@ -1319,6 +1337,10 @@ namespace HVACUnitarySystem {
 		Real64 SensOutputOff;
 		Real64 LatOutputOff;
 		bool HXUnitOn;
+		int OperatingMode; // track cooling, heating, and no cooling or heating modes
+		int OperatingModeMinusOne;
+		int OperatingModeMinusTwo;
+		bool Oscillate; // detection of oscillating operating modes
 
 		if ( InitLoadBasedControlOneTimeFlag ) {
 
@@ -1689,11 +1711,39 @@ namespace HVACUnitarySystem {
 			} else {
 			}}
 
-			// IF small loads to meet, just shut down unit
+			if ( CoolingLoad && UnitarySystem( UnitarySysNum ).iterationCounter <= 20 ) {
+				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = CoolingMode;
+			} else if ( HeatingLoad && UnitarySystem( UnitarySysNum ).iterationCounter <= 20 ) {
+				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = HeatingMode;
+			} else if( UnitarySystem( UnitarySysNum ).iterationCounter <= 20 ) {
+				UnitarySystem( UnitarySysNum ).iterationMode( UnitarySystem( UnitarySysNum ).iterationCounter ) = NoCoolHeat;
+			}
+			// IF small loads to meet or not converging, just shut down unit
 			if ( std::abs( ZoneLoad ) < Small5WLoad ) {
 				ZoneLoad = 0.0;
 				CoolingLoad = false;
 				HeatingLoad = false;
+			} else if ( UnitarySystem( UnitarySysNum ).iterationCounter > 4 )  { // attempt to lock output (air flow) if oscillations are detected
+				OperatingMode = UnitarySystem( UnitarySysNum ).iterationMode( 5 );
+				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 4 );
+				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 3 );
+				Oscillate = true;
+				if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
+				if ( Oscillate ) {
+					if ( QToCoolSetPt < 0.0 ) {
+						HeatingLoad = false;
+						CoolingLoad = true;
+						ZoneLoad = QToCoolSetPt;
+					} else if ( QToHeatSetPt > 0.0 ) {
+						HeatingLoad = true;
+						CoolingLoad = false;
+						ZoneLoad = QToHeatSetPt;
+					} else {
+						HeatingLoad = false;
+						CoolingLoad = false;
+						ZoneLoad = 0.0;
+					}
+				}
 			}
 
 		}
@@ -3073,6 +3123,7 @@ namespace HVACUnitarySystem {
 			CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 			UnitarySystem( UnitarySysNum ).UnitarySystemType = CurrentModuleObject;
 			UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
+			UnitarySystem( UnitarySysNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, UnitarySysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -5923,20 +5974,23 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
+			if ( ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ||
+				( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
 				Index = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
-				if ( DesignSpecMSHP( Index ).SingleModeFlag ) {
-					UnitarySystem( UnitarySysNum ).SingleMode = 1;
+				if ( Index > 0 ) {
+					if ( DesignSpecMSHP( Index ).SingleModeFlag ) {
+						UnitarySystem( UnitarySysNum ).SingleMode = 1;
+					}
 				}
-			}
-			// Check fan operation mode to ensure cycling fan mode
-			if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
-				if ( !CheckScheduleValueMinMax( UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0 ) ) {
-					ShowSevereError( CurrentModuleObject + ": " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "The schedule values in " + cAlphaFields( iFanSchedAlphaNum ) + " must be 0 when Single Mode Operation is applied." );
-					ShowContinueError( "A value of 0 represents cycling fan mode, any other value up to 1 represents constant fan mode." );
-					ErrorsFound = true;
+			} else {
+				if ( UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex > 0 ) {
+					if ( DesignSpecMSHP( UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex ).SingleModeFlag ) {
+						ShowSevereError( CurrentModuleObject + ": " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Gas." );
+						ShowContinueError( "The input cooliing coil type = " + Alphas( iCoolingCoilTypeAlphaNum ) + " and the input heating coil type = " + Alphas( iHeatingCoilTypeAlphaNum ) );
+					}
 				}
+
 			}
 
 			// set global logicals that denote coil type
@@ -10756,11 +10810,15 @@ namespace HVACUnitarySystem {
 			FanSpeedRatio = CompOnFlowRatio;
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
-			AverageUnitMassFlow = PartLoadRatio * CompOnMassFlow;
-			FanSpeedRatio = PartLoadRatio * CompOnFlowRatio;
-			if ( !HeatingLoad && !CoolingLoad ) {
-				AverageUnitMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow;
+		if ( !( HeatingLoad && UnitarySystem( UnitarySysNum ).NumOfSpeedHeating == 0 ) ) {
+			if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
+				if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+					AverageUnitMassFlow = CompOnMassFlow;
+					FanSpeedRatio = CompOnFlowRatio;
+				} else {
+					AverageUnitMassFlow = PartLoadRatio * CompOnMassFlow;
+					FanSpeedRatio = PartLoadRatio * CompOnFlowRatio;
+				}
 			}
 		}
 
@@ -10777,7 +10835,7 @@ namespace HVACUnitarySystem {
 				// zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
 				if ( !UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
 					Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow; // #5531 zone equipment needs MaxAvail set or fan will not turn ON
 				}
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = 1.0;
@@ -10786,7 +10844,9 @@ namespace HVACUnitarySystem {
 				}
 			} else {
 				Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-				Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+				if ( !UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
+					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow; // #5531 zone equipment needs MaxAvail set or fan will not turn ON
+				}
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
 				} else {
