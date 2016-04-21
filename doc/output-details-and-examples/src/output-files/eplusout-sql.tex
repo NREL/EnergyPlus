@@ -55,7 +55,8 @@ Data in the following four tables are also found in EnergyPlus’ standard outpu
 
 The ReportDataDictionary table provides the equivalent of the dictionary portion of the ESO file (i.e., the first section of the .eso file) or eplusout.mtr. Please see the Report Variable section of the Input-Output Reference for more information.  Like in the eplusout.mtr file (see the eplusout.mtr section), only data requested by "Report Meter" commands will set isMeter to 1 or True.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
 \caption{SQL ReportDataDictionary Contents \label{table:table-7.-sql-reportdatadictionary-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description & Enumeration \tabularnewline
@@ -68,7 +69,7 @@ Field Name & Field Type & Description & Enumeration \tabularnewline
 \midrule
 \endhead
 
-ReportDataDictionaryIndex & INTEGER PRIMARY KEY & The ReportDataDictionaryIndex links the dictionary data to the variable data (see ReportData table) & ~ \tabularnewline
+Report\-Data\-Dictionary\-Index & INTEGER PRIMARY KEY & The ReportDataDictionaryIndex links the dictionary data to the variable data (see ReportData table) & ~ \tabularnewline
 IsMeter & INTEGER & Boolean flag whether dictionary data is report of meter data & 0, 1 \tabularnewline
 Type & TEXT & Nature of data type with respect to state, (e.g. average or sum type of data). & “Sum” “Avg” \tabularnewline
 IndexGroup & TEXT & The reporting group (e.g., Zone, Plant, etc.) & ~ \tabularnewline
@@ -80,13 +81,14 @@ ReportingFrequency & TEXT & The reporting frequency of the variable, e.g. & “H
 ScheduleName & TEXT & The name of the schedule that controls reporting frequency & ~ \tabularnewline
 Units & TEXT & The data units & ~ \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \subsubsection{ReportData Table}
 
 The ReportData table contains the report or meter variable data (e.g., the hourly, daily, and monthly report variable data). Please see the Report Variable section of the Input-Output Reference for more information.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL ReportData Table Contents \label{table:table-8.-sql-reportdata-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -101,16 +103,17 @@ Field Name & Field Type & Description \tabularnewline
 
 ReportDataIndex & INTEGER PRIMARY KEY &  \tabularnewline
 TimeIndex & INTEGER & This index links the record to its time record (see the Time table below) \tabularnewline
-ReportDataDictionaryIndex & INTEGER & The ReportDataDictionaryIndex links the data to the respective data dictionary record (see ReportDataDictionary table above) \tabularnewline
+ReportData\-Dictionary\-Index & INTEGER & The ReportDataDictionaryIndex links the data to the respective data dictionary record (see ReportDataDictionary table above) \tabularnewline
 Value & REAL & The data value \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \subsubsection{ReportExtendedData Table}
 
 The ReportExtendedData table contains additional data (e.g., monthly maximums and minimums) that is available for certain report or meter variables.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL ReportExtendedData Table Contents \label{table:table-9.-sql-reportextendeddata-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -123,7 +126,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ReportExtendedDataIndex & INTEGER PRIMARY KEY &  \tabularnewline
+ReportExtended\-Data\-Index & INTEGER PRIMARY KEY &  \tabularnewline
 ReportDataIndex & INTEGER & Associates ReportData record with ReportExtendedData record \tabularnewline
 MaxValue & REAL & The maximum value during the reporting interval \tabularnewline
 MaxMonth & INTEGER & The month in which the maximum value occurred \tabularnewline
@@ -138,13 +141,13 @@ MinHour & INTEGER & The hour in which the minimum value occurred \tabularnewline
 MinStartMinute & INTEGER & The starting minute of the interval in which the minimum value occurred \tabularnewline
 MinMinute & INTEGER & The minute that the minimum value occurred \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \subsubsection{Time Table}
 
 The Time table provides the time information for both the “report variable” and “report meter” variables (the ReportData table).
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{Time Table Contents \label{table:table-10.-time-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -167,7 +170,7 @@ Interval & INTEGER & Length of the reporting interval \tabularnewline
 IntervalType & INTEGER & The index for the type of reporting interval. (enum: -1=detailed HVAC system timestep; 0=zone timestep, 1=hourly, 2=daily, 3=monthly, 4=runperiod) \tabularnewline
 SimulationDays & INTEGER & Day of simulation.~ This number resets after warmup and at the beginning of an environment period \tabularnewline
 DayType & TEXT & The type of day. (enum: “Sunday”, “Monday”, “Tuesday”, Wednesday”, “Thursday”, “Friday”, “Saturday”, “Holiday”, “SummerDesignDay”, “WinterDesignDay”, “CustomDay1”, “CustomDay2”) \tabularnewline
-EnvironmentPeriodIndex & INTEGER & Foreign Key to the EnvironmentPeriods table \tabularnewline
+Environment\-Period\-Index & INTEGER & Foreign Key to the EnvironmentPeriods table \tabularnewline
 WarmupFlag & INTEGER & 1 during warmup, 0 otherwise \tabularnewline
 \bottomrule
 \end{longtable}
@@ -180,7 +183,7 @@ Data in the tables below can also be found in EnergyPlus input output file (i.e.
 
 The Zones table provides a variety of information about the zones specified within EnergyPlus. One of its most common uses is to provide zone name and area information for the other tables within the SQL database (e.g., use the ZoneIndex to look up the ZoneName).
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL Zones Table Contents \label{table:table-14.-sql-zones-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -213,10 +216,10 @@ MinimumZ & REAL & Minimum Z value, in meters \tabularnewline
 MaximumZ & REAL & Maximum Z value, in meters \tabularnewline
 CeilingHeight & REAL & Ceiling height, in meters \tabularnewline
 Volume & REAL & Zone volume, in cubic meters \tabularnewline
-InsideConvectionAlgo & INTEGER & Inside convection algorithm (enum: 1=simple, 2=detailed, 3=Ceiling diffuser, 4=TrombeWall) \tabularnewline
-OutsideConvectionAlgo & INTEGER & Outside convection algorithm (enum: 1=simple, 2=detailed, 6=MoWitt, 7=DOE-2) \tabularnewline
+Inside\-Convection\-Algo & INTEGER & Inside convection algorithm (enum: 1=simple, 2=detailed, 3=Ceiling diffuser, 4=TrombeWall) \tabularnewline
+Outside\-Convection\-Algo & INTEGER & Outside convection algorithm (enum: 1=simple, 2=detailed, 6=MoWitt, 7=DOE-2) \tabularnewline
 FloorArea & REAL & Zone floor area, in square meters \tabularnewline
-ExtGrossWallArea & REAL & Zone external gross wall area (includes windows and doors), in square meters \tabularnewline
+ExtGrossWall\-Area & REAL & Zone external gross wall area (includes windows and doors), in square meters \tabularnewline
 ExtNetWallArea & REAL & Zone net wall area (excludes windows and doors), and square meters \tabularnewline
 ExtWindowArea & REAL & Zone window area (includes glass doors), and square meters \tabularnewline
 IsPartOfTotalArea & INTEGER & See Zone input object documentation \tabularnewline
@@ -229,7 +232,8 @@ Please see the Zone object in the Group-Thermal Zone Description/Geometry sectio
 
 An overview of the NominalPeople SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL NominalPeople Table Contents \label{table:table-15.-sql-nominalpeople-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -246,22 +250,22 @@ NominalPeopleIndex & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The name of the People object \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalPeople table to the Zones table \tabularnewline
 NumberOfPeople & INTEGER & Nominal number of people in the zone \tabularnewline
-NumberOfPeopleScheduleIndex & INTEGER & Number of people schedule number (see Schedule table) \tabularnewline
-ActivityScheduleIndex & INTEGER & Activity level schedule (see People object documentation) \tabularnewline
+NumberOfPeople\-Schedule\-Index & INTEGER & Number of people schedule number (see Schedule table) \tabularnewline
+ActivitySchedule\-Index & INTEGER & Activity level schedule (see People object documentation) \tabularnewline
 FractionRadiant & REAL & see People object documentation \tabularnewline
 FractionConvected & REAL & see People object documentation \tabularnewline
-WorkEfficiencyScheduleIndex & INTEGER & Work efficiency schedule number (see schedule table and people object documentation) \tabularnewline
-ClothingEfficiencyScheduleIndex & INTEGER & Clothing efficiency schedule number (see schedule table and people object documentation) \tabularnewline
-AirVelocityScheduleIndex & INTEGER & Air velocity schedule number (see schedule table and people object documentation) \tabularnewline
+WorkEfficiency\-Schedule\-Index & INTEGER & Work efficiency schedule number (see schedule table and people object documentation) \tabularnewline
+ClothingEfficiency\-Schedule\-Index & INTEGER & Clothing efficiency schedule number (see schedule table and people object documentation) \tabularnewline
+AirVelocitySchedule\-Index & INTEGER & Air velocity schedule number (see schedule table and people object documentation) \tabularnewline
 Fanger & INTEGER & Flag indicating whether Fanger calculations are active \tabularnewline
 Pierce & INTEGER & Flag indicating whether Pierce calculations are active \tabularnewline
 KSU & INTEGER & Flag indicating whether KSU calculations are active \tabularnewline
 MRTCalcType & INTEGER & see People object documentation \tabularnewline
 SurfaceIndex & INTEGER & see Surfaces table and People object documentation \tabularnewline
-UserSpecifeidSensibleFraction & REAL & see People object documentation \tabularnewline
+UserSpecifeid\-Sensible\-Fraction & REAL & see People object documentation \tabularnewline
 Show55Warning & INTEGER & see People object documentation \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Please see the People object in the Group-Internal Gains section of the Input-Output Reference for more information.
 
@@ -269,7 +273,7 @@ Please see the People object in the Group-Internal Gains section of the Input-Ou
 
 An overview of the NominalLighting SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL NominalLighting Table Contents \label{table:table-16.-sql-nominallighting-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -300,7 +304,8 @@ Please see the LIGHTS object in the Group-Internal Gains section of the Input-Ou
 
 An overview of the NominalElectricEquipment SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{2.99in}}
 \caption{SQL NominalElectricEquipment Table Contents \label{table:table-17.-sql-nominalelectricequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -313,7 +318,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalElectricEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+Nominal\-Electric\-Equipment\-Index & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The Electric Equipment object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalElectricEquipment table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Electric equipment schedule number (see Schedule table) \tabularnewline
@@ -324,7 +329,7 @@ FractionLost & REAL & User-specified lost heat fraction \tabularnewline
 FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
 EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Please see the Electric Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.
 
@@ -332,7 +337,8 @@ Please see the Electric Equipment object in the Group-Internal Gains section of 
 
 An overview of the NominalGasEquipment SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL NominalGasEquipment Table Contents \label{table:table-18.-sql-nominalgasequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -345,7 +351,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalGasEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+Nominal\-Gas\-Equipment\-Index & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The Gas Equipment object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalGasEquipment table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Gas equipment schedule number (see Schedule table) \tabularnewline
@@ -356,7 +362,7 @@ FractionLost & REAL & User-specified lost heat fraction \tabularnewline
 FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
 EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Please see the Gas Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.
 
@@ -364,7 +370,8 @@ Please see the Gas Equipment object in the Group-Internal Gains section of the I
 
 An overview of the NominalSteamEquipment SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{2.99in}}
 \caption{SQL NominalSteamEquipment Table Contents \label{table:table-19.-sql-nominalsteamequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -377,7 +384,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalSteamEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+Nominal\-Steam\-Equipment\-Index & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The Steam Equipment object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalSteamEquipment table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Steam equipment schedule number (see Schedule table) \tabularnewline
@@ -388,7 +395,7 @@ FractionLost & REAL & User-specified lost heat fraction \tabularnewline
 FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
 EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Please see the Steam Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.
 
@@ -396,7 +403,8 @@ Please see the Steam Equipment object in the Group-Internal Gains section of the
 
 An overview of the NominalHotWaterEquipment SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{2.99in}}
 \caption{SQL NominalHotWaterEquipment Table Contents \label{table:table-20.-sql-nominalhotwaterequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -409,7 +417,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalHotWaterEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+Nominal\-Hot\-Water\-Equipment\-Index & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The Hot Water Equipment object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalHotWaterEquipment table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Hot water equipment schedule number (see Schedule table) \tabularnewline
@@ -420,7 +428,7 @@ FractionLost & REAL & User-specified lost heat fraction \tabularnewline
 FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
 EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Please see the Hot Water Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.
 
@@ -428,7 +436,8 @@ Please see the Hot Water Equipment object in the Group-Internal Gains section of
 
 An overview of the NominalOtherEquipment SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{2.99in}}
 \caption{SQL NominalOtherEquipment Table Contents \label{table:table-21.-sql-nominalotherequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -441,7 +450,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalOtherEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+Nominal\-Other\-Equipment\-Index & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The Other Equipment object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalOtherEquipment table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Other equipment schedule number (see Schedule table) \tabularnewline
@@ -452,7 +461,7 @@ FractionLost & REAL & User-specified lost heat fraction \tabularnewline
 FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
 EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Please see the Other Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.
 
@@ -460,7 +469,7 @@ Please see the Other Equipment object in the Group-Internal Gains section of the
 
 An overview of the NominalBaseboardHeaters SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{2.99in}}
 \caption{SQL NominalBaseboardHeaters Table Contents \label{table:table-22.-sql-nominalbaseboardheaters-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -473,13 +482,13 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalBaseboardHeaterIndex & INTEGER & The internal statement number \tabularnewline
+Nominal\-Baseboard\-Heater\-Index & INTEGER & The internal statement number \tabularnewline
 ObjectName & TEXT & The Baseboard Heat object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalBaseboardHeat table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Baseboard heat schedule number (see Schedules table) \tabularnewline
-CapatLowTemperature & REAL & Capacity at low temperature, in Watts \tabularnewline
+Capat\-Low\-Temperature & REAL & Capacity at low temperature, in Watts \tabularnewline
 LowTemperature & REAL & Low temperature capacity setpoint \tabularnewline
-CapatHighTemperature & REAL & Capacity at high temperature, in Watts \tabularnewline
+Capat\-High\-Temperature & REAL & Capacity at high temperature, in Watts \tabularnewline
 HighTemperature & REAL & High temperature capacity setpoint \tabularnewline
 FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
 FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
@@ -493,7 +502,7 @@ Please see the Baseboard Heat object in the Group-Internal Gains section of the 
 
 An overview of the NominalInfiltration SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL NominalInfiltration Table Contents \label{table:table-23.-sql-nominalinfiltration-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -506,7 +515,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalInfiltrationIndex & INTEGER PRIMARY KEY & The internal statement number \tabularnewline
+Nominal\-Infiltration\-Index & INTEGER PRIMARY KEY & The internal statement number \tabularnewline
 ObjectName & TEXT & The Infiltration object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalInfiltration table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Infiltration schedule number (see Schedule table) \tabularnewline
@@ -520,7 +529,7 @@ Please see the Infiltration object in the Group-Airflow section of the Input-Out
 
 An overview of the NominalVentilation SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL NominalVentilation Table Contents \label{table:table-24.-sql-nominalventilation-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -533,7 +542,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-NominalVentilationIndex & INTEGER PRIMARY KEY & The internal statement number \tabularnewline
+Nominal\-Ventilation\-Index & INTEGER PRIMARY KEY & The internal statement number \tabularnewline
 ObjectName & TEXT & The Ventilation object name \tabularnewline
 ZoneIndex & INTEGER & Connects the NominalVentilation table to the Zones table \tabularnewline
 ScheduleIndex & INTEGER & Ventilation schedule number (see Schedule table) \tabularnewline
@@ -547,7 +556,7 @@ Please see the Ventilation object in the Group-Airflow section of the Input-Outp
 
 An overview of the Surfaces SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL Surfaces Table Contents \label{table:table-25.-sql-surfaces-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -589,7 +598,7 @@ Please see the Surface(s) object in the Group-Thermal Zone Description/Geometry 
 
 An overview of the Constructions SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL Constructions Table Contents \label{table:table-26.-sql-constructions-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -602,7 +611,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ConstructionIndex & INTEGER PRIMARY KEY & Construction Index \tabularnewline
+Construction\-Index & INTEGER PRIMARY KEY & Construction Index \tabularnewline
 Name & TEXT & Construction name \tabularnewline
 TotalLayers & INTEGER & Total number of layers \tabularnewline
 TotalSolidLayers & INTEGER & Total number of solid layers \tabularnewline
@@ -611,8 +620,8 @@ InsideAbsorpVis & REAL & The visible absorptance of the inside layer (see Materi
 OutsideAbsorpVis & REAL & The visible absorptance of the outside layer (see Materials table) \tabularnewline
 InsideAbsorpSolar & REAL & The solar absorptance of the inside layer (see Materials table) \tabularnewline
 OutsideAbsorpSolar & REAL & The solar absorptance of the outside layer (see Materials table) \tabularnewline
-InsideAbsorpThermal & REAL & The thermal absorptance of the inside layer (see Materials table) \tabularnewline
-OutsideAbsorpThermal & REAL & The thermal absorptance of the outside layer (see Materials table) \tabularnewline
+InsideAbsorp\-Thermal & REAL & The thermal absorptance of the inside layer (see Materials table) \tabularnewline
+OutsideAbsorp\-Thermal & REAL & The thermal absorptance of the outside layer (see Materials table) \tabularnewline
 OutsideRoughness & INTEGER & The roughness of the outside layer \tabularnewline
 TypeIsWindow & INTEGER & Flag indicating whether the construction is a window or glass door \tabularnewline
 Uvalue & REAL & Nominal U-value for the construction \tabularnewline
@@ -625,7 +634,7 @@ Please see the Construction object in the Group-Surface Construction Elements se
 
 An overview of the ConstructionLayers SQL table is shown below.
 
-\begin{longtable}[c]{p{1.52in}p{1.5in}p{2.98in}}
+\begin{longtable}[c]{>{\raggedright}p{1.52in}>{\raggedright}p{1.5in}>{\raggedright}p{2.98in}}
 \caption{SQL ConstructionLayers Table Contents \label{table:table-27.-sql-constructionlayers-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -638,8 +647,8 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ConstructionLayersIndex & INTEGER PRIMARY KEY & Construction Layers Index \tabularnewline
-ConstructionIndex & INTEGER & Construction Index (see Constructions table) \tabularnewline
+Construction\-Layers\-Index & INTEGER PRIMARY KEY & Construction Layers Index \tabularnewline
+Construction\-Index & INTEGER & Construction Index (see Constructions table) \tabularnewline
 LayerIndex & INTEGER & Layer number (layer 1 is the outside layer) \tabularnewline
 MaterialIndex & INTEGER & Material index (see Materials table) \tabularnewline
 \bottomrule
@@ -651,7 +660,7 @@ Please see the Construction object in the Group-Surface Construction Elements se
 
 An overview of the Materials SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL Materials Table Contents \label{table:table-28.-sql-materials-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -674,7 +683,7 @@ Porosity & REAL & Porosity \tabularnewline
 Resistance & REAL & Resistance \tabularnewline
 Ronly & INTEGER & Flag that indicates the material definition is of type Material:Regular-R \tabularnewline
 SpecHeat & REAL & Specific heat \tabularnewline
-ThermGradCoef & REAL & Thermal gradient coefficient \tabularnewline
+ThermGrad\-Coef & REAL & Thermal gradient coefficient \tabularnewline
 Thickness & REAL & Thickness, in meters \tabularnewline
 VaporDiffus & REAL & Vapor diffusivity \tabularnewline
 \bottomrule
@@ -702,7 +711,7 @@ Field Name & Field Type & Description \tabularnewline
 ZoneIndex & INTEGER PRIMARY KEY & Zone index \tabularnewline
 AirModelName & TEXT & Air model name \tabularnewline
 AirModelType & INTEGER & Air model index \tabularnewline
-TempCoupleScheme & INTEGER & Temperature coupling index \tabularnewline
+TempCouple\-Scheme & INTEGER & Temperature coupling index \tabularnewline
 SimAirModel & INTEGER & Simulation air model index \tabularnewline
 \bottomrule
 \end{longtable}
@@ -724,7 +733,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ComponentSizesIndex & INTEGER PRIMARY KEY & Component Sizes Index \tabularnewline
+Component\-Sizes\-Index & INTEGER PRIMARY KEY & Component Sizes Index \tabularnewline
 CompType & TEXT & Component type \tabularnewline
 CompName & TEXT & Component name \tabularnewline
 Description & TEXT & Component description \tabularnewline
@@ -752,7 +761,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-SystemSizesIndex & INTEGER PRIMARY KEY & System Sizes Index \tabularnewline
+SystemSizes\-Index & INTEGER PRIMARY KEY & System Sizes Index \tabularnewline
 SystemName & TEXT & System name \tabularnewline
 Description & TEXT & System description \tabularnewline
 Value & REAL & Sizing value \tabularnewline
@@ -764,7 +773,7 @@ Units & TEXT & Sizing units \tabularnewline
 
 An overview of the ZoneSizes SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3in}}
 \caption{SQL ZoneSizes Table Contents \label{table:table-32.-sql-zonesizes-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -777,7 +786,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ZoneSizesIndex & INTEGER PRIMARY KEY & Zone Sizes Index \tabularnewline
+ZoneSizes\-Index & INTEGER PRIMARY KEY & Zone Sizes Index \tabularnewline
 ZoneName & TEXT & Zone name \tabularnewline
 LoadType & TEXT & Load type \tabularnewline
 DesLoad & REAL & Design load \tabularnewline
@@ -787,7 +796,7 @@ DesDayName & TEXT & Design day name \tabularnewline
 PeakHrMin & TEXT & Time of the peak temperature \tabularnewline
 PeakTemp & REAL & Peak temperature \tabularnewline
 PeakHumRat & REAL & Peak humidity ratio \tabularnewline
-CalcOutsideAirFlow & REAL & Calculated outside air flow rate, in m3/s \tabularnewline
+CalcOutside\-Air\-Flow & REAL & Calculated outside air flow rate, in m3/s \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -797,7 +806,7 @@ Please see the Zone Sizing object in the Group-Design Objects section of the Inp
 
 An overview of the ZoneGroups SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL ZoneGroups Table Contents \label{table:table-33.-sql-zonegroups-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -810,10 +819,10 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ZoneGroupIndex & INTEGER PRIMARY KEY & Zone group index \tabularnewline
+ZoneGroup\-Index & INTEGER PRIMARY KEY & Zone group index \tabularnewline
 ZoneGroupName & TEXT & Zone list name \tabularnewline
 ZoneListIndex & INTEGER & The ZoneListIndex links this record to the respective zone list record (see ZoneLists table below) \tabularnewline
-ZoneListMultiplier & INTEGER & Zone list multiplier \tabularnewline
+ZoneList\-Multiplier & INTEGER & Zone list multiplier \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -900,7 +909,7 @@ Please see the Group-Schedules section of the Input-Output Reference for more in
 
 An overview of the Simulations SQL table is shown below.  Currently there will only be one record in the table, because the SQLite database is relevant to only one simulation. In the future this might change if multiple simulations are aggregated into a larger database.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL Simulations Table Contents \label{table:table-36.-sql-simulations-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -914,11 +923,11 @@ Field Name & Field Type & Description \tabularnewline
 \endhead
 
 SimulationIndex & INTEGER PRIMARY KEY & Simulation index, currently there will be only one record in this table. \tabularnewline
-EnergyPlusVersion & TEXT & The version of EnergyPlus that was used to run the simulation. \tabularnewline
+EnergyPlus\-Version & TEXT & The version of EnergyPlus that was used to run the simulation. \tabularnewline
 TimeStamp & TEXT & A text string containing the timestamp when the simulation was run. \tabularnewline
-NumTimestepsPerHour & INTEGER & The number of timesteps per hour used for the simulation.~ See the Timestep object for more information. \tabularnewline
+NumTimesteps\-Per\-Hour & INTEGER & The number of timesteps per hour used for the simulation.~ See the Timestep object for more information. \tabularnewline
 Completed & BOOL & True if the simulation completed without crashing. \tabularnewline
-CompletedSuccessfully & BOOL & True if the simulation completed without any severe or fatal errors. \tabularnewline
+Completed\-Successfully & BOOL & True if the simulation completed without any severe or fatal errors. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -926,7 +935,7 @@ CompletedSuccessfully & BOOL & True if the simulation completed without any seve
 
 An overview of the EnvironmentPeriods SQL table is shown below.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL EnvironmentPeriods Table Contents \label{table:table-37.-sql-environmentperiods-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -939,7 +948,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-EnvironmentPeriodIndex & INTEGER PRIMARY KEY & Environment period index \tabularnewline
+Environment\-Period\-Index & INTEGER PRIMARY KEY & Environment period index \tabularnewline
 SimulationIndex & INTEGER & A foreign key to a record in the Simulations table. \tabularnewline
 EnvironmentName & TEXT & A text string identifying the environment. \tabularnewline
 EnvironmentType & INTEGER & An enumeration of the environment type.~ (1 = Design Day, 2 =~ Design Run Period, 3 = Weather Run Period)~ See the various SizingPeriod objects and the RunPeriod object for details. \tabularnewline
@@ -950,7 +959,7 @@ EnvironmentType & INTEGER & An enumeration of the environment type.~ (1 = Design
 
 An overview of the TabularData SQL table is shown below. The TabularData table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object. The TabularData table contains all of the tabular report information that is typically output to one of the formats controlled by the OutputControl:Table:Style object.  This is a generic way of dumping all of the existing tabular reports to the SQLite database.  This table has many references to the companion Strings table. The Strings table simply associates strings to an integer value for space efficiency of the database. Tabular data is easier to query from the TabularDataWithStrings table, which is implemented as a database view that joins this table with the Strings table.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
 \caption{SQL TabularData Table Contents \label{table:table-38.-sql-tabulardata-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -965,13 +974,13 @@ Field Name & Field Type & Description \tabularnewline
 
 TabularDataIndex & INTEGER PRIMARY KEY & Tabular Data Index \tabularnewline
 ReportNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the report the record belongs to. \tabularnewline
-ReportForStringIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the “For” text that is associated with the record.~ An example is the Space Loads report where the “For” text identifies which zone the record pertains to. \tabularnewline
+ReportFor\-String\-Index & INTEGER & A foreign key to an entry in the Strings table, which indicates the “For” text that is associated with the record.~ An example is the Space Loads report where the “For” text identifies which zone the record pertains to. \tabularnewline
 TableNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the table the record belongs to.~ This is typically the text that immediately precedes the tables in html format. \tabularnewline
-SimulationIndex & INTEGER & A foreign key to the Simulations table. \tabularnewline
+Simulation\-Index & INTEGER & A foreign key to the Simulations table. \tabularnewline
 RowNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the row the record belongs to. \tabularnewline
-ColumnNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the column the record belongs to. \tabularnewline
+ColumnName\-Index & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the column the record belongs to. \tabularnewline
 UnitsIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the units associated with the record. \tabularnewline
-SimulationIndex & INTEGER & A foreign key to the Simulations table. \tabularnewline
+Simulation\-Index & INTEGER & A foreign key to the Simulations table. \tabularnewline
 RowId & INTEGER & The index of the row associated with the record.~ Data in the first row of a tabular report would have the Id 1. \tabularnewline
 ColumnId & INTEGER & The index of the column associated with the record.~ Data in the first column of a tabular report would have the Id 1. \tabularnewline
 Value & REAL & The value of the record.~ Most data is numeric, thus the type for this column is REAL.~ The SQLite engine will first try to store the value as a REAL, however if this fails the value will be stored as text. \tabularnewline
@@ -982,7 +991,7 @@ Value & REAL & The value of the record.~ Most data is numeric, thus the type for
 
 An overview of the Strings SQL table is shown below. The Strings table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The Strings table simply associates strings with integers to save space in the database.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3in}}
 \caption{SQL Strings Table Contents \label{table:table-39.-sql-strings-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -996,7 +1005,7 @@ Field Name & Field Type & Description \tabularnewline
 \endhead
 
 StringIndex & INTEGER PRIMARY KEY & The integer primary key that uniquely identifies the string record. \tabularnewline
-StringTypeIndex & INTEGER & A foreign key to the StringTypes table. \tabularnewline
+StringType\-Index & INTEGER & A foreign key to the StringTypes table. \tabularnewline
 Value & TEXT & The record’s string value. \tabularnewline
 \bottomrule
 \end{longtable}
@@ -1005,7 +1014,7 @@ Value & TEXT & The record’s string value. \tabularnewline
 
 An overview of the StringTypes SQL table is shown below. The StringTypes table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3in}}
 \caption{SQL StringTypes Table Contents \label{table:table-40.-sql-stringtypes-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -1018,7 +1027,7 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-StringTypeIndex & INTEGER PRIMARY KEY & The integer primary key. \tabularnewline
+StringType\-Index & INTEGER PRIMARY KEY & The integer primary key. \tabularnewline
 Value & TEXT & The record’s string value.~ Currently there are 6 possible values; ReportName, ReportForString, TableName, RowName, ColumnName, and Units.~ That is, entries in the Strings table are one of these types. \tabularnewline
 \bottomrule
 \end{longtable}
@@ -1035,7 +1044,7 @@ select * FROM TabularDataWithStrings WHERE
   TableName = `Site and Source Energy';
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3in}}
 \caption{SQL TabularDataWithStrings Table Contents \label{table:table-41.-sql-tabulardatawithstrings-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
@@ -1048,10 +1057,10 @@ Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-TabularDataIndex & INTEGER PRIMARY KEY & The index of the record \tabularnewline
+TabularData\-Index & INTEGER PRIMARY KEY & The index of the record \tabularnewline
 Value & REAL & The value of the record \tabularnewline
 ReportName & TEXT & The name of the report the record belongs to. \tabularnewline
-ReportForString & TEXT & The “For” string. \tabularnewline
+ReportFor\-String & TEXT & The “For” string. \tabularnewline
 TableName & TEXT & The name of the table the record belongs to. \tabularnewline
 RowName & TEXT & The name of the row associated with the record. \tabularnewline
 ColumnName & TEXT & The name of the column associated with the record. \tabularnewline
@@ -1061,9 +1070,9 @@ Units & TEXT & The units associated with the record. \tabularnewline
 
 \subsubsection{Errors Table}\label{errors-table}
 
-The Errors SQL table reports errors and warnings for the simulation.~ The content of this table includes most of the content of the error file.~ However, it does not contain purely informational messages (e.g.~not warnings or errors) and some of the error summary statistics which may be readily computed. Users should be aware that errors experienced while processing input cause EnergyPlus to exit before the SQLite output database has been initialized.~ This is because the Output:SQLite object must be parsed from the input to request the database.~ Therefore, failures in input processing are indicated by the absence of a SQLite output file.~ The regular error or audit files must be used to identify the erroneous input objects in this case.~ Because each error or warning message is expected to be unique these messages are stored directly in the Errors table and not in the Strings table.
+The Errors SQL table reports errors and warnings for the simulation.~ The content of this table includes most of the content of the error file. However, it does not contain purely informational messages (e.g.~not warnings or errors) and some of the error summary statistics which may be readily computed. Users should be aware that errors experienced while processing input cause EnergyPlus to exit before the SQLite output database has been initialized. This is because the Output:SQLite object must be parsed from the input to request the database. Therefore, failures in input processing are indicated by the absence of a SQLite output file. The regular error or audit files must be used to identify the erroneous input objects in this case. Because each error or warning message is expected to be unique these messages are stored directly in the Errors table and not in the Strings table.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3in}}
 \caption{SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
