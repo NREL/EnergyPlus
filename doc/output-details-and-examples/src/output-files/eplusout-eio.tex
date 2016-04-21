@@ -1821,24 +1821,21 @@ A nominal thermal conductance for the surface is calculated for the surface, inc
 
 For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:~ The SI values are the exact values used inside EnergyPlus.
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Surface Class & Interior Film Coefficient & Exterior Film Coefficient \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Surface Class & Interior Film Coefficient & Exterior Film Coefficient \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ & (ft2-F-hr/BTU) & (m2-K/W) & (ft2-F-hr/BTU) & (m2-K/W) \tabularnewline
+WALL & 0.68 & 0.1197548 & 0.17 & 0.0299387 \tabularnewline
+FLOOR & 0.92 & 0.1620212 & 0.46 & 0.0810106 \tabularnewline
+CEILING/ROOF & 0.61 & 0.1074271 & 0.46 & 0.0810106 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1961,24 +1958,25 @@ Surface Convection Parameters,PERIMETER\_ZN\_1\_WALL\_SOUTH,0,84.45,61.48,3.05,0
 
 This is an integer code for the type of model assigned to the outside face, if a specific model has been assigned. Surface(SurfLoop)\%ExtConvCoeff
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Code value & meaning \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Code value & meaning \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+0 & Not set special for this surface \tabularnewline
++/-1 & Simplest ASHRAE model \tabularnewline
++/-2 & TARP, ASHRAE-Walton model \tabularnewline
++/-5 & TARP, ASHRAE-Walton model \tabularnewline
++/- 6 & MoWITT model \tabularnewline
++/- 7 & DOE-2 model \tabularnewline
++/- 9 & Adaptive Convection Algorithm \tabularnewline
+> 9 & Key values are indexes that are associated with the input order of SurfaceProperty:ConvectionCoefficients ( and MultipleSurface) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4667,24 +4665,20 @@ This shows not only the current version of the program but the “version” of 
 Table 3. EnergyPlus Errors
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Error Level & Action \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Error Level & Action \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+Warning & Take note \tabularnewline
+Severe & Should Fix \tabularnewline
+Fatal & Program will abort \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6188,45 +6182,33 @@ Current resource types are shown in the table below:
 Table 4. Table of Metered Resource  Types
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}p{0.5in}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Utility/Fuel Types \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Utility/Fuel Types \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+Electricity & Gas & Gasoline & Diesel & Coal & FuelOil\#1 & FuelOil\#2 & Propane & Water & Steam & DistrictCooling & DistrictHeating \tabularnewline
 \bottomrule
 \end{longtable}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}l@{}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Other Resource Types \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Other Resource Types \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+EnergyTransfer \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6242,45 +6224,33 @@ The end use types are shown in the following table:
 Table 5. End Use Category Types
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}p{0.4in}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+End Use Types \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+End Use Types \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+InteriorLights & ExteriorLights & InteriorEquipment & ExteriorEquipment & Fans & Pumps & Heating & Cooling & HeatRejection & Humidifier & HeatRecovery & DHW & Cogeneration & Refrigeration & Miscellaneous \tabularnewline
 \bottomrule
 \end{longtable}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Additional End Use Types Only Used for EnergyTransfer \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Additional End Use Types Only Used for EnergyTransfer \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+HeatingCoils & CoolingCoils & Chillers & Boilers & Baseboard & HeatRecoveryForCooling & HeatReoveryFor Heating \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6292,24 +6262,22 @@ Specific meter types are then used for grouping the fuel type meters:
 Table 6. Overall Meter Types
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}l@{}}
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Meters \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Meters \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+Facility \tabularnewline
+Building \tabularnewline
+Zone \tabularnewline
+System \tabularnewline
+Plant \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6848,24 +6816,30 @@ Data in the following four tables are also found in EnergyPlus’ standard outpu
 The ReportDataDictionary table provides the equivalent of the dictionary portion of the ESO file (i.e., the first section of the .eso file) or eplusout.mtr. Please see the Report Variable section of the Input-Output Reference for more information.  Like in the eplusout.mtr file (see the eplusout.mtr section), only data requested by "Report Meter" commands will set isMeter to 1 or True.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\caption{Table 7. SQL ReportDataDictionary Contents \label{table:table-7.-sql-reportdatadictionary-contents}} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Field Name & Field Type & Description & Enumeration \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 7. SQL ReportDataDictionary Contents} \tabularnewline
 \toprule 
-Field Name & Field Type & Description \tabularnewline
+Field Name & Field Type & Description & Enumeration \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ReportDataDictionaryIndex & INTEGER PRIMARY KEY & The ReportDataDictionaryIndex links the dictionary data to the variable data (see ReportData table) & ~ \tabularnewline
+IsMeter & INTEGER & Boolean flag whether dictionary data is report of meter data & 0, 1 \tabularnewline
+Type & TEXT & Nature of data type with respect to state, (e.g. average or sum type of data). & “Sum” “Avg” \tabularnewline
+IndexGroup & TEXT & The reporting group (e.g., Zone, Plant, etc.) & ~ \tabularnewline
+TimestepType & TEXT & Type of timestep for data & “Zone”
+    “HVAC System” \tabularnewline
+KeyValue & TEXT & The identifying “key name” for the data & ~ \tabularnewline
+Name & TEXT & The actual report data name & ~ \tabularnewline
+ReportingFrequency & TEXT & The reporting frequency of the variable, e.g. & “HVAC System Timestep”,~ “Zone Timestep”,~ “Hourly”, “Daily”, “Monthly”, “Run Period”. \tabularnewline
+ScheduleName & TEXT & The name of the schedule that controls reporting frequency & ~ \tabularnewline
+Units & TEXT & The data units & ~ \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6877,24 +6851,23 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 The ReportData table contains the report or meter variable data (e.g., the hourly, daily, and monthly report variable data). Please see the Report Variable section of the Input-Output Reference for more information.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 8. SQL ReportData Table Contents \label{table:table-8.-sql-reportdata-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 8. SQL ReportData Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ReportDataIndex & INTEGER PRIMARY KEY &  \tabularnewline
+TimeIndex & INTEGER & This index links the record to its time record (see the Time table below) \tabularnewline
+ReportDataDictionaryIndex & INTEGER & The ReportDataDictionaryIndex links the data to the respective data dictionary record (see ReportDataDictionary table above) \tabularnewline
+Value & REAL & The data value \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6906,24 +6879,33 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 The ReportExtendedData table contains additional data (e.g., monthly maximums and minimums) that is available for certain report or meter variables.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 9. SQL ReportExtendedData Table Contents \label{table:table-9.-sql-reportextendeddata-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 9. SQL ReportExtendedData Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ReportExtendedDataIndex & INTEGER PRIMARY KEY &  \tabularnewline
+ReportDataIndex & INTEGER & Associates ReportData record with ReportExtendedData record \tabularnewline
+MaxValue & REAL & The maximum value during the reporting interval \tabularnewline
+MaxMonth & INTEGER & The month in which the maximum value occurred \tabularnewline
+MaxDay & INTEGER & The day on which the maximum value occurred \tabularnewline
+MaxHour & INTEGER & The hour in which the maximum value occurred \tabularnewline
+MaxStartMinute & INTEGER & The starting minute of the interval in which the maximum value occurred \tabularnewline
+MaxMinute & INTEGER & The minute that the maximum value occurred \tabularnewline
+MinValue & REAL & The minimum value \tabularnewline
+MinMonth & INTEGER & The month in which the minimum value occurred \tabularnewline
+MinDay & INTEGER & The day on which the minimum value occurred \tabularnewline
+MinHour & INTEGER & The hour in which the minimum value occurred \tabularnewline
+MinStartMinute & INTEGER & The starting minute of the interval in which the minimum value occurred \tabularnewline
+MinMinute & INTEGER & The minute that the minimum value occurred \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6935,24 +6917,31 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 The Time table provides the time information for both the “report variable” and “report meter” variables (the ReportData table).
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 10. Time Table Contents \label{table:table-10.-time-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 10. Time Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+TimeIndex & INTEGER PRIMARY KEY & Connects the time information with the report variables and meter variables (see the ReportData table) \tabularnewline
+Month & INTEGER & Month \tabularnewline
+Day & INTEGER & Day \tabularnewline
+Hour & INTEGER & Hour \tabularnewline
+Minute & INTEGER & Minute \tabularnewline
+DST & INTEGER & Daylight saving time indicator \tabularnewline
+Interval & INTEGER & Length of the reporting interval \tabularnewline
+IntervalType & INTEGER & The index for the type of reporting interval. (enum: -1=detailed HVAC system timestep; 0=zone timestep, 1=hourly, 2=daily, 3=monthly, 4=runperiod) \tabularnewline
+SimulationDays & INTEGER & Day of simulation.~ This number resets after warmup and at the beginning of an environment period \tabularnewline
+DayType & TEXT & The type of day. (enum: “Sunday”, “Monday”, “Tuesday”, Wednesday”, “Thursday”, “Friday”, “Saturday”, “Holiday”, “SummerDesignDay”, “WinterDesignDay”, “CustomDay1”, “CustomDay2”) \tabularnewline
+EnvironmentPeriodIndex & INTEGER & Foreign Key to the EnvironmentPeriods table \tabularnewline
+WarmupFlag & INTEGER & 1 during warmup, 0 otherwise \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6972,24 +6961,46 @@ Data in the tables below can also be found in EnergyPlus input output file (i.e.
 The Zones table provides a variety of information about the zones specified within EnergyPlus. One of its most common uses is to provide zone name and area information for the other tables within the SQL database (e.g., use the ZoneIndex to look up the ZoneName).
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 14. SQL Zones Table Contents \label{table:table-14.-sql-zones-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 14. SQL Zones Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ZoneIndex & INTEGER PRIMARY KEY & The ZoneIndex is used to link this table to related tables \tabularnewline
+ZoneName & TEXT & Zone Name \tabularnewline
+RelNorth & REAL & Relative North, in degrees \tabularnewline
+OriginX & REAL & X origin, in meters \tabularnewline
+OriginY & REAL & Y origin, in meters \tabularnewline
+OriginZ & REAL & Z origin, in meters \tabularnewline
+CentroidX & REAL & X position of zone Centroid, in meters \tabularnewline
+CentroidY & REAL & Y position of zone Centroid, in meters \tabularnewline
+CentroidZ & REAL & Z position of zone Centroid, in meters \tabularnewline
+OfType & INTEGER & (not used yet) \tabularnewline
+Multiplier & REAL & Zone multiplier \tabularnewline
+ListMultiplier & REAL & Zone Group multiplier \tabularnewline
+MinimumX & REAL & Minimum X value, in meters \tabularnewline
+MaximumX & REAL & Maximum X value, in meters \tabularnewline
+MinimumY & REAL & Minimum Y value, in meters \tabularnewline
+MaximumY & REAL & Maximum Y value, in meters \tabularnewline
+MinimumZ & REAL & Minimum Z value, in meters \tabularnewline
+MaximumZ & REAL & Maximum Z value, in meters \tabularnewline
+CeilingHeight & REAL & Ceiling height, in meters \tabularnewline
+Volume & REAL & Zone volume, in cubic meters \tabularnewline
+InsideConvectionAlgo & INTEGER & Inside convection algorithm (enum: 1=simple, 2=detailed, 3=Ceiling diffuser, 4=TrombeWall) \tabularnewline
+OutsideConvectionAlgo & INTEGER & Outside convection algorithm (enum: 1=simple, 2=detailed, 6=MoWitt, 7=DOE-2) \tabularnewline
+FloorArea & REAL & Zone floor area, in square meters \tabularnewline
+ExtGrossWallArea & REAL & Zone external gross wall area (includes windows and doors), in square meters \tabularnewline
+ExtNetWallArea & REAL & Zone net wall area (excludes windows and doors), and square meters \tabularnewline
+ExtWindowArea & REAL & Zone window area (includes glass doors), and square meters \tabularnewline
+IsPartOfTotalArea & INTEGER & See Zone input object documentation \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7005,24 +7016,37 @@ Please see the Zone object in the Group-Thermal Zone Description/Geometry sectio
 An overview of the NominalPeople SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 15. SQL NominalPeople Table Contents \label{table:table-15.-sql-nominalpeople-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 15. SQL NominalPeople Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalPeopleIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The name of the People object \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalPeople table to the Zones table \tabularnewline
+NumberOfPeople & INTEGER & Nominal number of people in the zone \tabularnewline
+NumberOfPeopleScheduleIndex & INTEGER & Number of people schedule number (see Schedule table) \tabularnewline
+ActivityScheduleIndex & INTEGER & Activity level schedule (see People object documentation) \tabularnewline
+FractionRadiant & REAL & see People object documentation \tabularnewline
+FractionConvected & REAL & see People object documentation \tabularnewline
+WorkEfficiencyScheduleIndex & INTEGER & Work efficiency schedule number (see schedule table and people object documentation) \tabularnewline
+ClothingEfficiencyScheduleIndex & INTEGER & Clothing efficiency schedule number (see schedule table and people object documentation) \tabularnewline
+AirVelocityScheduleIndex & INTEGER & Air velocity schedule number (see schedule table and people object documentation) \tabularnewline
+Fanger & INTEGER & Flag indicating whether Fanger calculations are active \tabularnewline
+Pierce & INTEGER & Flag indicating whether Pierce calculations are active \tabularnewline
+KSU & INTEGER & Flag indicating whether KSU calculations are active \tabularnewline
+MRTCalcType & INTEGER & see People object documentation \tabularnewline
+SurfaceIndex & INTEGER & see Surfaces table and People object documentation \tabularnewline
+UserSpecifeidSensibleFraction & REAL & see People object documentation \tabularnewline
+Show55Warning & INTEGER & see People object documentation \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7038,24 +7062,28 @@ Please see the People object in the Group-Internal Gains section of the Input-Ou
 An overview of the NominalLighting SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 16. SQL NominalLighting Table Contents \label{table:table-16.-sql-nominallighting-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 16. SQL NominalLighting Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalLightingIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The LIGHTS object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalLighting table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Lighting schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in Watts \tabularnewline
+FractionReturnAir & REAL & User-specified return air fraction \tabularnewline
+FractionRadiant & REAL & User-specified radiant fraction \tabularnewline
+FractionReplaceable & REAL & Defines the daylighting control for the LIGHTS object \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7072,23 +7100,28 @@ An overview of the NominalElectricEquipment SQL table is shown below.
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 17. SQL NominalElectricEquipment Table Contents \label{table:table-17.-sql-nominalelectricequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 17. SQL NominalElectricEquipment Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalElectricEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The Electric Equipment object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalElectricEquipment table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Electric equipment schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in Watts \tabularnewline
+FractionLatent & REAL & User-specified latent heat fraction \tabularnewline
+FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
+FractionLost & REAL & User-specified lost heat fraction \tabularnewline
+FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7104,24 +7137,29 @@ Please see the Electric Equipment object in the Group-Internal Gains section of 
 An overview of the NominalGasEquipment SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 18. SQL NominalGasEquipment Table Contents \label{table:table-18.-sql-nominalgasequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 18. SQL NominalGasEquipment Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalGasEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The Gas Equipment object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalGasEquipment table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Gas equipment schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in Watts \tabularnewline
+FractionLatent & REAL & User-specified latent heat fraction \tabularnewline
+FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
+FractionLost & REAL & User-specified lost heat fraction \tabularnewline
+FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7138,23 +7176,28 @@ An overview of the NominalSteamEquipment SQL table is shown below.
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 19. SQL NominalSteamEquipment Table Contents \label{table:table-19.-sql-nominalsteamequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 19. SQL NominalSteamEquipment Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalSteamEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The Steam Equipment object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalSteamEquipment table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Steam equipment schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in Watts \tabularnewline
+FractionLatent & REAL & User-specified latent heat fraction \tabularnewline
+FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
+FractionLost & REAL & User-specified lost heat fraction \tabularnewline
+FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7171,23 +7214,28 @@ An overview of the NominalHotWaterEquipment SQL table is shown below.
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 20. SQL NominalHotWaterEquipment Table Contents \label{table:table-20.-sql-nominalhotwaterequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 20. SQL NominalHotWaterEquipment Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalHotWaterEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The Hot Water Equipment object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalHotWaterEquipment table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Hot water equipment schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in Watts \tabularnewline
+FractionLatent & REAL & User-specified latent heat fraction \tabularnewline
+FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
+FractionLost & REAL & User-specified lost heat fraction \tabularnewline
+FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7204,23 +7252,28 @@ An overview of the NominalOtherEquipment SQL table is shown below.
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 21. SQL NominalOtherEquipment Table Contents \label{table:table-21.-sql-nominalotherequipment-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 21. SQL NominalOtherEquipment Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalOtherEquipmentIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The Other Equipment object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalOtherEquipment table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Other equipment schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in Watts \tabularnewline
+FractionLatent & REAL & User-specified latent heat fraction \tabularnewline
+FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
+FractionLost & REAL & User-specified lost heat fraction \tabularnewline
+FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7237,23 +7290,29 @@ An overview of the NominalBaseboardHeaters SQL table is shown below.
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 22. SQL NominalBaseboardHeaters Table Contents \label{table:table-22.-sql-nominalbaseboardheaters-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 22. SQL NominalBaseboardHeaters Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalBaseboardHeaterIndex & INTEGER & The internal statement number \tabularnewline
+ObjectName & TEXT & The Baseboard Heat object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalBaseboardHeat table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Baseboard heat schedule number (see Schedules table) \tabularnewline
+CapatLowTemperature & REAL & Capacity at low temperature, in Watts \tabularnewline
+LowTemperature & REAL & Low temperature capacity setpoint \tabularnewline
+CapatHighTemperature & REAL & Capacity at high temperature, in Watts \tabularnewline
+HighTemperature & REAL & High temperature capacity setpoint \tabularnewline
+FractionRadiant & REAL & User-specified radiant heat fraction \tabularnewline
+FractionConvected & REAL & User-specified convicted heat fraction \tabularnewline
+EndUseSubcategory & TEXT & User-specified end-use subcategory \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7269,24 +7328,24 @@ Please see the Baseboard Heat object in the Group-Internal Gains section of the 
 An overview of the NominalInfiltration SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 23. SQL NominalInfiltration Table Contents \label{table:table-23.-sql-nominalinfiltration-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 23. SQL NominalInfiltration Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalInfiltrationIndex & INTEGER PRIMARY KEY & The internal statement number \tabularnewline
+ObjectName & TEXT & The Infiltration object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalInfiltration table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Infiltration schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in m3/s \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7302,24 +7361,24 @@ Please see the Infiltration object in the Group-Airflow section of the Input-Out
 An overview of the NominalVentilation SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 24. SQL NominalVentilation Table Contents \label{table:table-24.-sql-nominalventilation-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 24. SQL NominalVentilation Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+NominalVentilationIndex & INTEGER PRIMARY KEY & The internal statement number \tabularnewline
+ObjectName & TEXT & The Ventilation object name \tabularnewline
+ZoneIndex & INTEGER & Connects the NominalVentilation table to the Zones table \tabularnewline
+ScheduleIndex & INTEGER & Ventilation schedule number (see Schedule table) \tabularnewline
+DesignLevel & REAL & Nominal design level, in m3/s \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7335,24 +7394,39 @@ Please see the Ventilation object in the Group-Airflow section of the Input-Outp
 An overview of the Surfaces SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 25. SQL Surfaces Table Contents \label{table:table-25.-sql-surfaces-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 25. SQL Surfaces Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+SurfaceIndex & INTEGER PRIMARY KEY & Surface number (used for cross-referencing) \tabularnewline
+SurfaceName & TEXT & Surface name \tabularnewline
+ConstructionIndex & INTEGER & Construction Index \tabularnewline
+ClassName & TEXT & Surface class name (e.g., shading, wall) \tabularnewline
+Area & REAL & Surface area (excluding cutouts) \tabularnewline
+GrossArea & REAL & Surface area (including cutouts) \tabularnewline
+Perimeter & REAL & Surface perimeter, in meters \tabularnewline
+Azimuth & REAL & As news angle, in degrees \tabularnewline
+Height & REAL & Surface height, in meters \tabularnewline
+Reveal & REAL & Reveal depth, in meters \tabularnewline
+Shape & INTEGER & Shape index \tabularnewline
+Sides & INTEGER & Number of sides \tabularnewline
+Tilt & REAL & Tilt angle, in degrees \tabularnewline
+Width & REAL & Surface width, in meters \tabularnewline
+HeatTransferSurf & INTEGER & Flag indicating whether the surface is a heat transfer surface \tabularnewline
+BaseSurfaceIndex & INTEGER & Based surface index \tabularnewline
+ZoneIndex & INTEGER & Zone index \tabularnewline
+ExtBoundCond & INTEGER & External boundary condition index. For interzone surface, this is the adjacent surface number. For an internal/adiabatic surface this is the current surface number. 0=external environment, -1=ground, -2=other side coefficients, -3=other side conditions model. \tabularnewline
+ExtSolar & INTEGER & Flag indicating whether the surface is exposed to solar \tabularnewline
+ExtWind & INTEGER & Flag indicating whether the surface is exposed to wind \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7368,24 +7442,33 @@ Please see the Surface(s) object in the Group-Thermal Zone Description/Geometry 
 An overview of the Constructions SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 26. SQL Constructions Table Contents \label{table:table-26.-sql-constructions-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 26. SQL Constructions Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ConstructionIndex & INTEGER PRIMARY KEY & Construction Index \tabularnewline
+Name & TEXT & Construction name \tabularnewline
+TotalLayers & INTEGER & Total number of layers \tabularnewline
+TotalSolidLayers & INTEGER & Total number of solid layers \tabularnewline
+TotalGlassLayers & INTEGER & Total number of glass layers \tabularnewline
+InsideAbsorpVis & REAL & The visible absorptance of the inside layer (see Materials table) \tabularnewline
+OutsideAbsorpVis & REAL & The visible absorptance of the outside layer (see Materials table) \tabularnewline
+InsideAbsorpSolar & REAL & The solar absorptance of the inside layer (see Materials table) \tabularnewline
+OutsideAbsorpSolar & REAL & The solar absorptance of the outside layer (see Materials table) \tabularnewline
+InsideAbsorpThermal & REAL & The thermal absorptance of the inside layer (see Materials table) \tabularnewline
+OutsideAbsorpThermal & REAL & The thermal absorptance of the outside layer (see Materials table) \tabularnewline
+OutsideRoughness & INTEGER & The roughness of the outside layer \tabularnewline
+TypeIsWindow & INTEGER & Flag indicating whether the construction is a window or glass door \tabularnewline
+Uvalue & REAL & Nominal U-value for the construction \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7401,24 +7484,23 @@ Please see the Construction object in the Group-Surface Construction Elements se
 An overview of the ConstructionLayers SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.52in}p{1.5in}p{2.98in}}
+\caption{Table 27. SQL ConstructionLayers Table Contents \label{table:table-27.-sql-constructionlayers-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 27. SQL ConstructionLayers Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ConstructionLayersIndex & INTEGER PRIMARY KEY & Construction Layers Index \tabularnewline
+ConstructionIndex & INTEGER & Construction Index (see Constructions table) \tabularnewline
+LayerIndex & INTEGER & Layer number (layer 1 is the outside layer) \tabularnewline
+MaterialIndex & INTEGER & Material index (see Materials table) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7434,24 +7516,32 @@ Please see the Construction object in the Group-Surface Construction Elements se
 An overview of the Materials SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 28. SQL Materials Table Contents \label{table:table-28.-sql-materials-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 28. SQL Materials Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+MaterialIndex & INTEGER PRIMARY KEY & Material Index (links the Materials table with the ConstructionLayers and Constructions tables) \tabularnewline
+Name & TEXT & Material name \tabularnewline
+MaterialType & INTEGER & Material type \tabularnewline
+Roughness & INTEGER & Roughness index \tabularnewline
+Conductivity & REAL & Conductivity, in W/(m-K) \tabularnewline
+Density & REAL & Density, in kg/m3 \tabularnewline
+Porosity & REAL & Porosity \tabularnewline
+Resistance & REAL & Resistance \tabularnewline
+Ronly & INTEGER & Flag that indicates the material definition is of type Material:Regular-R \tabularnewline
+SpecHeat & REAL & Specific heat \tabularnewline
+ThermGradCoef & REAL & Thermal gradient coefficient \tabularnewline
+Thickness & REAL & Thickness, in meters \tabularnewline
+VaporDiffus & REAL & Vapor diffusivity \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7467,24 +7557,24 @@ Please see the Materials object in the Group-Surface Construction Elements secti
 An overview of the RoomAirModels SQL table is shown below. Please see the Group-RoomAir Models section of the Input-Output Reference for more information.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Table 29. SQL RoomAirModels Table Contents \label{table:table-29.-sql-roomairmodels-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 29. SQL RoomAirModels Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ZoneIndex & INTEGER PRIMARY KEY & Zone index \tabularnewline
+AirModelName & TEXT & Air model name \tabularnewline
+AirModelType & INTEGER & Air model index \tabularnewline
+TempCoupleScheme & INTEGER & Temperature coupling index \tabularnewline
+SimAirModel & INTEGER & Simulation air model index \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7496,24 +7586,25 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 An overview of the ComponentSizes SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Table 30. SQL ComponentSizes Table Contents \label{table:table-30.-sql-componentsizes-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 30. SQL ComponentSizes Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ComponentSizesIndex & INTEGER PRIMARY KEY & Component Sizes Index \tabularnewline
+CompType & TEXT & Component type \tabularnewline
+CompName & TEXT & Component name \tabularnewline
+Description & TEXT & Component description \tabularnewline
+Value & REAL & Sizing value \tabularnewline
+Units & TEXT & Sizing units \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7529,24 +7620,24 @@ Please see the Sizing object in the Group-Design Objects section of the Input-Ou
 An overview of the SystemSizes SQL table is shown below. Please see the System Sizing object in the Group-Design Objects section of the Input-Output Reference for more information.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Table 31. SQL SystemSizes Table Contents \label{table:table-31.-sql-systemsizes-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 31. SQL SystemSizes Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+SystemSizesIndex & INTEGER PRIMARY KEY & System Sizes Index \tabularnewline
+SystemName & TEXT & System name \tabularnewline
+Description & TEXT & System description \tabularnewline
+Value & REAL & Sizing value \tabularnewline
+Units & TEXT & Sizing units \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7559,23 +7650,29 @@ An overview of the ZoneSizes SQL table is shown below.
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 32. SQL ZoneSizes Table Contents \label{table:table-32.-sql-zonesizes-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 32. SQL ZoneSizes Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ZoneSizesIndex & INTEGER PRIMARY KEY & Zone Sizes Index \tabularnewline
+ZoneName & TEXT & Zone name \tabularnewline
+LoadType & TEXT & Load type \tabularnewline
+DesLoad & REAL & Design load \tabularnewline
+CalcDesFlow & REAL & Calculated design flow \tabularnewline
+UserDesFlow & REAL & User-specified design flow \tabularnewline
+DesDayName & TEXT & Design day name \tabularnewline
+PeakHrMin & TEXT & Time of the peak temperature \tabularnewline
+PeakTemp & REAL & Peak temperature \tabularnewline
+PeakHumRat & REAL & Peak humidity ratio \tabularnewline
+CalcOutsideAirFlow & REAL & Calculated outside air flow rate, in m3/s \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7591,24 +7688,23 @@ Please see the Zone Sizing object in the Group-Design Objects section of the Inp
 An overview of the ZoneGroups SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 33. SQL ZoneGroups Table Contents \label{table:table-33.-sql-zonegroups-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 33. SQL ZoneGroups Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ZoneGroupIndex & INTEGER PRIMARY KEY & Zone group index \tabularnewline
+ZoneGroupName & TEXT & Zone list name \tabularnewline
+ZoneListIndex & INTEGER & The ZoneListIndex links this record to the respective zone list record (see ZoneLists table below) \tabularnewline
+ZoneListMultiplier & INTEGER & Zone list multiplier \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7624,24 +7720,21 @@ Please see the Zone Group object in the Group-Thermal Zone Description/Geometry 
 An overview of the ZoneLists SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Table 34. SQL ZoneLists Table Contents \label{table:table-34.-sql-zonelists-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 34. SQL ZoneLists Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ZoneListIndex & INTEGER PRIMARY KEY & Zone list index \tabularnewline
+Name & TEXT & Zone list name \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7657,24 +7750,21 @@ Please see the Zone List object in the Group-Thermal Zone Description/Geometry s
 An overview of the ZoneInfoZoneLists SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}lll@{}}
+\caption{SQL ZoneLists Table Contents \label{table:sql-zonelists-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{SQL ZoneLists Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ZoneListIndex & INTEGER & Zone list index \tabularnewline
+ZoneIndex & INTEGER & Zone index \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7694,24 +7784,24 @@ This is a join table to represent the many-to-many relationship of zones and zon
 An overview of the Schedules SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Table 35. SQL Schedules Table Contents \label{table:table-35.-sql-schedules-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 35. SQL Schedules Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+ScheduleIndex & INTEGER PRIMARY KEY & Schedule index \tabularnewline
+ScheduleName & TEXT & Schedule name \tabularnewline
+ScheduleType & TEXT & Schedule Type \tabularnewline
+ScheduleMinimum & REAL & ScheduleMinimum \tabularnewline
+ScheduleMaximum & REAL & ScheduleMaximum \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7727,24 +7817,25 @@ Please see the Group-Schedules section of the Input-Output Reference for more in
 An overview of the Simulations SQL table is shown below.  Currently there will only be one record in the table, because the SQLite database is relevant to only one simulation.  In the future this might change if multiple simulations are aggregated into a larger database.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 36. SQL Simulations Table Contents \label{table:table-36.-sql-simulations-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 36. SQL Simulations Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+SimulationIndex & INTEGER PRIMARY KEY & Simulation index, currently there will be only one record in this table. \tabularnewline
+EnergyPlusVersion & TEXT & The version of EnergyPlus that was used to run the simulation. \tabularnewline
+TimeStamp & TEXT & A text string containing the timestamp when the simulation was run. \tabularnewline
+NumTimestepsPerHour & INTEGER & The number of timesteps per hour used for the simulation.~ See the Timestep object for more information. \tabularnewline
+Completed & BOOL & True if the simulation completed without crashing. \tabularnewline
+CompletedSuccessfully & BOOL & True if the simulation completed without any severe or fatal errors. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7756,24 +7847,23 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 An overview of the EnvironmentPeriods SQL table is shown below.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 37. SQL EnvironmentPeriods Table Contents \label{table:table-37.-sql-environmentperiods-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 37. SQL EnvironmentPeriods Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+EnvironmentPeriodIndex & INTEGER PRIMARY KEY & Environment period index \tabularnewline
+SimulationIndex & INTEGER & A foreign key to a record in the Simulations table. \tabularnewline
+EnvironmentName & TEXT & A text string identifying the environment. \tabularnewline
+EnvironmentType & INTEGER & An enumeration of the environment type.~ (1 = Design Day, 2 =~ Design Run Period, 3 = Weather Run Period)~ See the various SizingPeriod objects and the RunPeriod object for details. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7785,24 +7875,31 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 An overview of the TabularData SQL table is shown below.   The TabularData table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The TabularData table contains all of the tabular report information that is typically output to one of the formats controlled by the OutputControl:Table:Style object.  This is a generic way of dumping all of the existing tabular reports to the SQLite database.  This table has many references to the companion Strings table.  The Strings table simply associates strings to an integer value for space efficiency of the database.  Tabular data is easier to query from the TabularDataWithStrings table, which is implemented as a database view that joins this table with the Strings table.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 38. SQL TabularData Table Contents \label{table:table-38.-sql-tabulardata-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 38. SQL TabularData Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+TabularDataIndex & INTEGER PRIMARY KEY & Tabular Data Index \tabularnewline
+ReportNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the report the record belongs to. \tabularnewline
+ReportForStringIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the “For” text that is associated with the record.~ An example is the Space Loads report where the “For” text identifies which zone the record pertains to. \tabularnewline
+TableNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the table the record belongs to.~ This is typically the text that immediately precedes the tables in html format. \tabularnewline
+SimulationIndex & INTEGER & A foreign key to the Simulations table. \tabularnewline
+RowNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the row the record belongs to. \tabularnewline
+ColumnNameIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the name of the column the record belongs to. \tabularnewline
+UnitsIndex & INTEGER & A foreign key to an entry in the Strings table, which indicates the units associated with the record. \tabularnewline
+SimulationIndex & INTEGER & A foreign key to the Simulations table. \tabularnewline
+RowId & INTEGER & The index of the row associated with the record.~ Data in the first row of a tabular report would have the Id 1. \tabularnewline
+ColumnId & INTEGER & The index of the column associated with the record.~ Data in the first column of a tabular report would have the Id 1. \tabularnewline
+Value & REAL & The value of the record.~ Most data is numeric, thus the type for this column is REAL.~ The SQLite engine will first try to store the value as a REAL, however if this fails the value will be stored as text. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7815,23 +7912,21 @@ An overview of the Strings SQL table is shown below. The Strings table is only o
 \end{lstlisting}
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\caption{Table 39. SQL Strings Table Contents \label{table:table-39.-sql-strings-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 39. SQL Strings Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+StringIndex & INTEGER PRIMARY KEY & The integer primary key that uniquely identifies the string record. \tabularnewline
+StringTypeIndex & INTEGER & A foreign key to the StringTypes table. \tabularnewline
+Value & TEXT & The record’s string value. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7843,24 +7938,21 @@ Count & INTEGER & Number of times that the error was repeated.~ This will be 1 f
 An overview of the StringTypes SQL table is shown below. The StringTypes table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.
 \end{lstlisting}
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 40. SQL StringTypes Table Contents \label{table:table-40.-sql-stringtypes-table-contents}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 40. SQL StringTypes Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+StringTypeIndex & INTEGER PRIMARY KEY & The integer primary key. \tabularnewline
+Value & TEXT & The record’s string value.~ Currently there are 6 possible values; ReportName, ReportForString, TableName, RowName, ColumnName, and Units.~ That is, entries in the Strings table are one of these types. \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7878,24 +7970,27 @@ An example of a SQL query to get a table out of the AnnualBuildingUtilityPerform
 
 select * FROM TabularDataWithStrings WHERE ReportName = `AnnualBuildingUtilityPerformanceSummary' and TableName = `Site and Source Energy'; ````
 
-\begin{longtable}[c]{p{1.5in}p{1.5in}p{2.99in}}
-\caption{Table 42. SQL Errors Table Contents \label{table:table-42.-sql-errors-table-contents}} \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{3.0in}}
+\caption{Table 41. SQL TabularDataWithStrings Table Contents \label{table:table-41.-sql-tabulardatawithstrings-table}} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Table 42. SQL Errors Table Contents} \tabularnewline
+\caption[]{Table 41. SQL TabularDataWithStrings Table Contents} \tabularnewline
 \toprule 
 Field Name & Field Type & Description \tabularnewline
 \midrule
 \endhead
 
-ErrorIndex & INTEGER PRIMARY KEY & The index of the error or warning message. \tabularnewline
-SimulationIndex & INTEGER FOREIGN KEY & The simulation the error or warning pertains to. \tabularnewline
-ErrorType & INTEGER & Type of error or warning 0=Warning, 1=Severe, 2=Fatal. \tabularnewline
-ErrorMessage & TEXT & The text of the error message. \tabularnewline
-Count & INTEGER & Number of times that the error was repeated.~ This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated. \tabularnewline
+TabularDataIndex & INTEGER PRIMARY KEY & The index of the record \tabularnewline
+Value & REAL & The value of the record \tabularnewline
+ReportName & TEXT & The name of the report the record belongs to. \tabularnewline
+ReportForString & TEXT & The “For” string. \tabularnewline
+TableName & TEXT & The name of the table the record belongs to. \tabularnewline
+RowName & TEXT & The name of the row associated with the record. \tabularnewline
+ColumnName & TEXT & The name of the column associated with the record. \tabularnewline
+Units & TEXT & The units associated with the record. \tabularnewline
 \bottomrule
 \end{longtable}
 
