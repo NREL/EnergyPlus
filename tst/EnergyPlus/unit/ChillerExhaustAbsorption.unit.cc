@@ -331,8 +331,8 @@ TEST_F( EnergyPlusFixture, ExhAbsorption_GetInput_Test )
 	EXPECT_EQ( 0.0011, ExhaustAbsorber( 1 ).EvapVolFlowRate );
 	EXPECT_EQ( 0.0043, ExhaustAbsorber( 1 ).HeatVolFlowRate );
 
-	EXPECT_EQ( true, ExhaustAbsorber( 1 ).isEnterCondensTemp );
-	EXPECT_EQ( false, ExhaustAbsorber( 1 ).isWaterCooled );
+	EXPECT_TRUE( ExhaustAbsorber( 1 ).isEnterCondensTemp );
+	EXPECT_FALSE( ExhaustAbsorber( 1 ).isWaterCooled );
 	EXPECT_EQ( 2., ExhaustAbsorber( 1 ).CHWLowLimitTemp );
 
 }

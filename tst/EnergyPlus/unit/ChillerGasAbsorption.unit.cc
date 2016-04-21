@@ -173,8 +173,8 @@ TEST_F( EnergyPlusFixture, GasAbsorption_GetInput_Test )
 	EXPECT_EQ( 0.0011, GasAbsorber( 1 ).EvapVolFlowRate );
 	EXPECT_EQ( 0.0043, GasAbsorber( 1 ).HeatVolFlowRate );
 
-	EXPECT_EQ( true, GasAbsorber( 1 ).isEnterCondensTemp );
-	EXPECT_EQ( false, GasAbsorber( 1 ).isWaterCooled );
+	EXPECT_TRUE( GasAbsorber( 1 ).isEnterCondensTemp );
+	EXPECT_FALSE( GasAbsorber( 1 ).isWaterCooled );
 
 	EXPECT_EQ( 2., GasAbsorber( 1 ).CHWLowLimitTemp );
 	EXPECT_EQ( "Gas", GasAbsorber( 1 ).FuelType );
