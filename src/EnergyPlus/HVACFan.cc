@@ -768,6 +768,8 @@ namespace HVACFan {
 				}
 			} else {
 				outletAirMassFlowRate_ = 0.0;
+				massFlowRateMaxAvail_ = 0.0;
+				massFlowRateMinAvail_ = 0.0;
 			}
 			
 		}

@@ -99,10 +99,10 @@ public: // Methods
 	void
 	simulate(
 //		bool const firstHVACIteration,
-		Optional< Real64 const > flowFraction,
-		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
-		Optional_bool_const zoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress
+		Optional< Real64 const > flowFraction = _,
+		Optional_bool_const zoneCompTurnFansOn = _, // Turn fans ON signal from ZoneHVAC component
+		Optional_bool_const zoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
+		Optional< Real64 const > pressureRise = _ // Pressure difference to use for DeltaPress
 	);
 
 	std::string const &
