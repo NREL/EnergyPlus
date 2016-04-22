@@ -122,6 +122,32 @@ namespace DataUCSDSharedData {
 	Array1D< Real64 > HWindow;
 	Array1D< Real64 > HDoor;
 
+	// Clears the global data in DataAirLoop.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		APos_Wall.deallocate();
+		APos_Floor.deallocate();
+		APos_Ceiling.deallocate();
+		PosZ_Wall.deallocate();
+		PosZ_Floor.deallocate();
+		PosZ_Ceiling.deallocate();
+		APos_Window.deallocate();
+		APos_Door.deallocate();
+		APos_Internal.deallocate();
+		PosZ_Window.deallocate();
+		PosZ_Door.deallocate();
+		PosZ_Internal.deallocate();
+		HCeiling.deallocate();
+		HWall.deallocate();
+		HFloor.deallocate();
+		HInternal.deallocate();
+		HWindow.deallocate();
+		HDoor.deallocate();
+	}
+
+
 } // DataUCSDSharedData
 
 } // EnergyPlus

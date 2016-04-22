@@ -21,6 +21,7 @@ set( test_src
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
+  CrossVentMgr.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc

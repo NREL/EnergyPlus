@@ -76,6 +76,7 @@
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -105,6 +106,7 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -268,6 +270,7 @@ namespace EnergyPlus {
 		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CoolTower::clear_state();
+		CrossVentMgr::clear_state();
 		CurveManager::clear_state();
 		DataAirflowNetwork::clear_state();
 		DataAirLoop::clear_state();
@@ -295,6 +298,7 @@ namespace EnergyPlus {
 		DataSizing::clear_state();
 		DataSurfaceLists::clear_state();
 		DataSurfaces::clear_state();
+		DataUCSDSharedData::clear_state();
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
