@@ -450,6 +450,7 @@ namespace SolarShading {
 			WinDifSolar = 0.0;
 			WinDirSolTransAtIncAngle = 0.0;
 			WinHeatGain = 0.0;
+			WinHeatTransfer = 0.0;
 			WinHeatGainRep = 0.0;
 			WinHeatLossRep = 0.0;
 			WinGainConvGlazToZoneRep = 0.0;
@@ -514,6 +515,7 @@ namespace SolarShading {
 			WinHeatGainRepEnergy = 0.0;
 			WinHeatLossRepEnergy = 0.0;
 			WinGapConvHtFlowRepEnergy = 0.0;
+			WinHeatTransferRepEnergy = 0.0;
 			WinShadingAbsorbedSolarEnergy = 0.0;
 			ZoneTransSolarEnergy = 0.0;
 			ZoneBmSolFrExtWinsRepEnergy = 0.0;
@@ -779,6 +781,7 @@ namespace SolarShading {
 		WinDifSolar.dimension( TotSurfaces, 0.0 );
 		WinDirSolTransAtIncAngle.dimension( TotSurfaces, 0.0 );
 		WinHeatGain.dimension( TotSurfaces, 0.0 );
+		WinHeatTransfer.dimension( TotSurfaces, 0.0 );
 		WinHeatGainRep.dimension( TotSurfaces, 0.0 );
 		WinHeatLossRep.dimension( TotSurfaces, 0.0 );
 		WinGainConvGlazToZoneRep.dimension( TotSurfaces, 0.0 );
@@ -880,6 +883,7 @@ namespace SolarShading {
 		WinHeatGainRepEnergy.dimension( TotSurfaces, 0.0 );
 		WinHeatLossRepEnergy.dimension( TotSurfaces, 0.0 );
 		WinGapConvHtFlowRepEnergy.dimension( TotSurfaces, 0.0 );
+		WinHeatTransferRepEnergy.dimension( TotSurfaces, 0.0 );
 		ZoneTransSolarEnergy.dimension( NumOfZones, 0.0 );
 		ZoneBmSolFrExtWinsRepEnergy.dimension( NumOfZones, 0.0 );
 		ZoneBmSolFrIntWinsRepEnergy.dimension( NumOfZones, 0.0 );
@@ -1001,6 +1005,7 @@ namespace SolarShading {
 					SetupOutputVariable( "Surface Window Heat Loss Rate [W]", WinHeatLossRep( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Gap Convective Heat Transfer Rate [W]", WinGapConvHtFlowRep( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Shading Device Absorbed Solar Radiation Rate [W]", WinShadingAbsorbedSolar( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
+					SetupOutputVariable( "Surface Window Net Heat Transfer Rate [W]", WinHeatTransfer( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 
 					if ( DisplayAdvancedReportVariables ) {
 						// CurrentModuleObject='Windows/GlassDoors(Advanced)'
@@ -1063,6 +1068,7 @@ namespace SolarShading {
 					SetupOutputVariable( "Surface Window Heat Loss Energy [J]", WinHeatLossRepEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Gap Convective Heat Transfer Energy [J]", WinGapConvHtFlowRepEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Shading Device Absorbed Solar Radiation Energy [J]", WinShadingAbsorbedSolarEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
+					SetupOutputVariable( "Surface Window Net Heat Transfer Energy [J]", WinHeatTransferRepEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
 
 					SetupOutputVariable( "Surface Window System Solar Transmittance []", WinSysSolTransmittance( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window System Solar Reflectance []", WinSysSolReflectance( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
@@ -7194,6 +7200,10 @@ namespace SolarShading {
 			} else {
 				SUN3( DayOfYear, AvgSinSolarDeclin, AvgEqOfTime );
 				AvgCosSolarDeclin = std::sqrt( 1.0 - pow_2( AvgSinSolarDeclin ) );
+				// trigger display of progress in the simulation every two weeks
+				if ( !WarmupFlag && BeginDayFlag && ( DayOfSim % 14 == 0 ) ) {
+					DisplayPerfSimulationFlag = true;
+				}
 			}
 
 			CalcPerSolarBeam( AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );

@@ -1,0 +1,32 @@
+\section{Use of Set Point Managers}\label{use-of-set-point-managers}
+
+A coil will check its inlet air temperature compared to the set point temperature. For cooling, if the inlet air temperature is above the set point temp, the coil turns on. It's opposite that for heating. In the 5ZoneAutoDXVAV example file, a schedule temperature set point is placed at the system outlet node. This is the temperture the designer wants at the outlet. The mixed air SP manager is used to account for fan heat and places the required SP at the outlet of the cooling coil so the coil slightly overcools the air to overcome fan heat and meet the system outlet node set point.
+
+You don't blindly place the SP's at the coil outlet node, but this is a likely starting point in most cases. If there is a fan after the coil's, the ``actual'' SP will need to be placed on a different node (other than the coils). Then a mixed air manager will be used to reference that SP and the fan's inlet/outlet node to calculate the correct SP to place wherever you want (at the coil outlet, the mixed air node, etc.). Place it at the mixed air node if you want the outside air system to try and meet that setpoint through mixing. Place it at the cooling coil outlet if you want the coil control to account for fan heat. Place it at both locations if you want the outside air system to try and meet the load with the coil picking up the remainder of the load.
+
+See if the coils are fully on when the SP is not met. If they are the coils are too small. If they are at part-load, the control SP is calculated incorrectly.
+
+\subsection{Relationship of Set Point Managers and Controllers}\label{relationship-of-set-point-managers-and-controllers}
+
+\emph{Could you elaborate further on the relation between SetPoint managers and Controllers?}
+
+SetpointManager objects place a setpoint on a node, for example, one might place a setpoint of 12C on the node named ``Main Cooling Coil Air Outlet Node''.
+
+In the case of Controler:WaterCoil which controls a hot water or chilled water coil, the controller reads the setpoint and tries to adjust the water flow so that the air temperature at the controlled node matches the current setpoint.~ Continuing the example above:
+
+\begin{lstlisting}
+
+  Controller:WaterCoil,
+      Main Cooling Coil Controller,  !- Name
+      Temperature,                   !- Control variable
+      Reverse,                       !- Action
+      Flow,                          !- Actuator variable
+      Main Cooling Coil Air Outlet Node,   !- Control_Node
+      Main Cooling Coil Water Inlet Node,  !- Actuator_Node
+      0.002,                         !- Controller Convergence Tolerance:
+                                     !- delta temp from setpoint temp {deltaC}
+      autosize,                      !- Max Actuated Flow {m3/s}
+      0.0;                           !- Min Actuated Flow {m3/s}
+\end{lstlisting}
+
+It is possible to place the control node downstream of the actual object being controlled, for example after other coils and the supply fan, but I recommend using the coil leaving air node as the control node for tighter control.

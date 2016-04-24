@@ -210,6 +210,7 @@ namespace Furnaces {
 	// Last mode of operation
 	int const CoolingMode( 1 ); // last compressor operating mode was in cooling
 	int const HeatingMode( 2 ); // last compressor operating mode was in heating
+	int const NoCoolHeat( 3 ); // last operating mode was coil off
 	// Airflow control for contant fan mode
 	int const UseCompressorOnFlow( 1 ); // set compressor OFF air flow rate equal to compressor ON air flow rate
 	int const UseCompressorOffFlow( 2 ); // set compressor OFF air flow rate equal to user defined value
@@ -380,6 +381,7 @@ namespace Furnaces {
 
 		Real64 QActual; // actual heating coil output (W)
 		bool SuppHeatingCoilFlag; // true if supplemental heating coil
+		Real64 TempMassFlowRateMaxAvail;
 
 		// Obtains and Allocates Furnace related parameters from input file
 		if ( GetInputFlag ) { //First time subroutine has been entered
@@ -439,6 +441,12 @@ namespace Furnaces {
 		InitFurnace( FurnaceNum, AirLoopNum, OnOffAirFlowRatio, FanOpMode, ZoneLoad, MoistureLoad, FirstHVACIteration );
 
 		FurnaceInletNode = Furnace( FurnaceNum ).FurnaceInletNodeNum;
+
+		// MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
+		// temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
+		TempMassFlowRateMaxAvail = Node( FurnaceInletNode ).MassFlowRateMaxAvail;
+		Node( FurnaceInletNode ).MassFlowRateMaxAvail = Furnace( FurnaceNum ).DesignMassFlowRate;
+
 		FurnaceSavMdot = Node( FurnaceInletNode ).MassFlowRate;
 		CompOp = On;
 		CoolHeatPLRRat = 1.0;
@@ -658,6 +666,8 @@ namespace Furnaces {
 
 		// Reset OnOffFanPartLoadFraction to 1 in case another on/off fan is called without a part-load curve
 		OnOffFanPartLoadFraction = 1.0;
+
+		Node( FurnaceInletNode ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
 
 	}
 
@@ -934,6 +944,7 @@ namespace Furnaces {
 
 			FurnaceNum = HeatOnlyNum;
 			Furnace( FurnaceNum ).FurnaceType_Num = FurnaceType_Num;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -1451,6 +1462,7 @@ namespace Furnaces {
 
 			FurnaceNum = HeatCoolNum + NumHeatOnly + NumUnitaryHeatOnly;
 			Furnace( FurnaceNum ).FurnaceType_Num = FurnaceType_Num;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -2535,6 +2547,7 @@ namespace Furnaces {
 			SupHeatCoilOutletNode = 0;
 
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -3360,6 +3373,7 @@ namespace Furnaces {
 			SupHeatCoilOutletNode = 0;
 
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
+			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
 			GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -4184,8 +4198,8 @@ namespace Furnaces {
 
 			}
 		}
-
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyRan;
+		ManageEMS( emsCallFromComponentGetInput, anyRan );
 
 	}
 
@@ -4328,6 +4342,10 @@ namespace Furnaces {
 		int OutNode; // Outlet node number in MSHP loop
 		Real64 RhoAir; // Air density at InNode
 		static bool MyAirLoopPass( true ); // one time allocation flag
+		int OperatingMode; // track cooling, heating, and no cooling or heating modes
+		int OperatingModeMinusOne;
+		int OperatingModeMinusTwo;
+		bool Oscillate; // detection of oscillating operating modes
 
 		InNode = Furnace( FurnaceNum ).FurnaceInletNodeNum;
 		OutNode = Furnace( FurnaceNum ).FurnaceOutletNodeNum;
@@ -5032,6 +5050,47 @@ namespace Furnaces {
 			ZoneLoad = QZnReq;
 		} // OpMode .EQ. ContFanCycCoil
 
+		if( FirstHVACIteration ) {
+			Furnace( FurnaceNum ).iterationCounter = 0;
+			Furnace( FurnaceNum ).iterationMode = 0;
+		}
+		Furnace( FurnaceNum ).iterationCounter += 1;
+
+		if ( CoolingLoad && Furnace( FurnaceNum ).iterationCounter  <= 20 ) {
+			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = CoolingMode;
+		} else if ( HeatingLoad && Furnace( FurnaceNum ).iterationCounter <= 20 ) {
+			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = HeatingMode;
+		} else if ( Furnace( FurnaceNum ).iterationCounter <= 20 ) {
+			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = NoCoolHeat;
+		}
+		// IF small loads to meet or not converging, just shut down unit
+		if ( std::abs( ZoneLoad ) < Small5WLoad ) {
+			ZoneLoad = 0.0;
+			CoolingLoad = false;
+			HeatingLoad = false;
+		} else if ( Furnace( FurnaceNum ).iterationCounter > 4 )  { // attempt to lock output (air flow) if oscillations are detected
+			OperatingMode = Furnace( FurnaceNum ).iterationMode( 5 );
+			OperatingModeMinusOne = Furnace( FurnaceNum ).iterationMode( 4 );
+			OperatingModeMinusTwo = Furnace( FurnaceNum ).iterationMode( 3 );
+			Oscillate = true;
+			if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
+			if ( Oscillate ) {
+				if ( QToCoolSetPt < 0.0 ) {
+					HeatingLoad = false;
+					CoolingLoad = true;
+					ZoneLoad = QToCoolSetPt;
+				} else if ( QToHeatSetPt > 0.0 ) {
+					HeatingLoad = true;
+					CoolingLoad = false;
+					ZoneLoad = QToHeatSetPt;
+				} else {
+					HeatingLoad = false;
+					CoolingLoad = false;
+					ZoneLoad = 0.0;
+				}
+			}
+		}
+
 		// EMS override point
 		if ( Furnace( FurnaceNum ).EMSOverrideSensZoneLoadRequest ) ZoneLoad = Furnace( FurnaceNum ).EMSSensibleZoneLoadValue;
 		if ( Furnace( FurnaceNum ).EMSOverrideMoistZoneLoadRequest ) MoistureLoad = Furnace( FurnaceNum ).EMSMoistureZoneLoadValue;
@@ -5273,7 +5332,8 @@ namespace Furnaces {
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		bool ErrFound; // flag returned from mining functions
 		Real64 BranchFlow; // branch volumetric flow rate [m3/s]
-		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
+		bool anyRan;
+		ManageEMS( emsCallFromUnitarySystemSizing, anyRan ); // calling point
 		ThisCtrlZoneNum = 0;
 		DXCoolCap = 0.0;
 		UnitaryHeatCap = 0.0;
@@ -8114,7 +8174,7 @@ namespace Furnaces {
 
 		{ auto const SELECT_CASE_var( CoilTypeNum );
 		if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
-			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, _, SuppHeatingCoilFlag, FanMode );
+			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode );
 		} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 			if ( QCoilLoad > SmallLoad ) {
 				SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );

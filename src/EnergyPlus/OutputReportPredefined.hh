@@ -853,6 +853,13 @@ namespace OutputReportPredefined {
 		int const tableEntryInt
 	);
 
+	std::string
+		RetrievePreDefTableEntry(
+		int const columnIndex,
+		std::string const & objName
+	);
+
+
 	void
 	incrementTableEntry();
 

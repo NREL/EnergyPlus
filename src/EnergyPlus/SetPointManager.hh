@@ -492,6 +492,10 @@ namespace SetPointManager {
 		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 		bool MySetPointCheckFlag; // used for mixed air SPM test for missing SP
+		bool FreezeCheckEnable; // Enable freezing check
+		int CoolCoilInNode; // Cooling coil inlet node number
+		int CoolCoilOutNode; // Cooling coil outlet node number
+		Real64 MinCoolCoilOutTemp; // The minimum temperature at cooling coil outlet node
 
 		// Default Constructor
 		DefineMixedAirSetPointManager() :
@@ -501,7 +505,12 @@ namespace SetPointManager {
 			FanOutNode( 0 ),
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 ),
-			MySetPointCheckFlag( true )
+			MySetPointCheckFlag( true ),
+			FreezeCheckEnable( false ),
+			CoolCoilInNode( 0 ),
+			CoolCoilOutNode( 0 ),
+		    MinCoolCoilOutTemp( 7.2 )
+
 		{}
 
 		void calculate();
@@ -1332,6 +1341,13 @@ namespace SetPointManager {
 								 int const CompOpType,
 								 int const ControlNodeNum
 								 );
+
+	bool
+	GetCoilFreezingCheckFlag( int const MixedAirSPMNum );
+
+	int
+	GetMixedAirNumWithCoilFreezingCheck( int const MixedAirNode );
+	
 
 } // SetPointManager
 

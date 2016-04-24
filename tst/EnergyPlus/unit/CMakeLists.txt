@@ -21,12 +21,16 @@ set( test_src
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
+  CrossVentMgr.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
+  ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
@@ -35,6 +39,7 @@ set( test_src
   FaultsManager.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
+  FluidProperties.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc
@@ -45,6 +50,7 @@ set( test_src
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
+  HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitarySystem.unit.cc
@@ -55,11 +61,11 @@ set( test_src
   InputProcessor.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
-  ManageElectricPower.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
@@ -68,6 +74,8 @@ set( test_src
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  Photovoltaics.unit.cc
+  PierceSurface.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -75,6 +83,7 @@ set( test_src
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
+  SingleDuct.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
   SiteFCFactorMethodGroundTemperatures.unit.cc
@@ -86,8 +95,10 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   SurfaceGeometry.unit.cc
+  SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
+  UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
@@ -96,6 +107,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
