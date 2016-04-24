@@ -81,6 +81,7 @@ namespace SimAirServingZones {
 	extern int const OAMixer_Num;
 	extern int const Fan_Simple_CV;
 	extern int const Fan_Simple_VAV;
+	extern int const Fan_System_Object;
 	extern int const WaterCoil_SimpleCool;
 	extern int const WaterCoil_Cooling;
 	extern int const WaterCoil_SimpleHeat;

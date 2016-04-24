@@ -49,6 +49,7 @@ set( test_src
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
+  HVACFan.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc

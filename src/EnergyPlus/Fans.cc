@@ -932,7 +932,7 @@ namespace Fans {
 			SetupOutputVariable( "Fan Electric Power [W]", Fan( FanNum ).FanPower, "System", "Average", Fan( FanNum ).FanName );
 			SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", Fan( FanNum ).DeltaTemp, "System", "Average", Fan( FanNum ).FanName );
 			SetupOutputVariable( "Fan Electric Energy [J]", Fan( FanNum ).FanEnergy, "System", "Sum", Fan( FanNum ).FanName, _, "Electric", "Fans", Fan( FanNum ).EndUseSubcategoryName, "System" );
-
+			SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", Fan( FanNum ).OutletAirMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 			if ( ( Fan( FanNum ).FanType_Num == FanType_ZoneExhaust ) && ( Fan( FanNum ).BalancedFractSchedNum > 0 ) ) {
 				SetupOutputVariable( "Fan Unbalanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).UnbalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 				SetupOutputVariable( "Fan Balanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).BalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
@@ -2533,7 +2533,6 @@ namespace Fans {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::FanElecPower;
 		using DataAirLoop::LoopOnOffFanRTF;
 		using DataGlobals::SecInHour;
 
@@ -2554,7 +2553,6 @@ namespace Fans {
 
 		Fan( FanNum ).FanEnergy = Fan( FanNum ).FanPower * TimeStepSys * SecInHour;
 		Fan( FanNum ).DeltaTemp = Fan( FanNum ).OutletAirTemp - Fan( FanNum ).InletAirTemp;
-		FanElecPower = Fan( FanNum ).FanPower;
 
 		if ( Fan( FanNum ).FanType_Num == FanType_SimpleOnOff ) {
 			LoopOnOffFanRTF = Fan( FanNum ).FanRuntimeFraction;
@@ -2676,11 +2674,8 @@ namespace Fans {
 
 	}
 
-	void
-	GetFanPower(
-		int const FanIndex,
-		Real64 & FanPower
-	)
+	Real64
+	GetFanPower( int const FanIndex )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2717,9 +2712,9 @@ namespace Fans {
 		// na
 
 		if ( FanIndex == 0 ) {
-			FanPower = 0.0;
+			return 0.0;
 		} else {
-			FanPower = Fan( FanIndex ).FanPower;
+			return Fan( FanIndex ).FanPower;
 		}
 
 	}
@@ -3311,6 +3306,7 @@ namespace Fans {
 		// Check whether the fan curve covers the design operational point of the fan
 		FanCalDeltaPress = CurveValue( FanCurvePtr, FanDesignAirFlowRate );
 		if ( ( FanCalDeltaPress < 0.9 * FanDesignDeltaPress ) || ( FanCalDeltaPress > 1.1 * FanDesignDeltaPress ) ) {
+		// this needs to be a recurring warning, filled up a huge error file with this once
 			ShowWarningError( "The design operatinal point of the fan " + FanName + " does not fall " );
 			ShowContinueError( "on the fan curve provided in the FaultModel:Fouling:AirFilter object. " );
 			return 0.0;
@@ -3322,11 +3318,14 @@ namespace Fans {
 		FanCalDeltaPress = FanCalDeltaPresstemp;
 
 		while ( FanCalDeltaPress < ( FanDesignDeltaPress + FanFaultyDeltaPressInc ) ) {
+			// this seems very inefficent solver, should use regula falsi, or scale 0.005 value off of design flow rate
+
 			FanFaultyAirFlowRate = FanFaultyAirFlowRate - 0.005;
 			FanCalDeltaPresstemp = CurveValue( FanCurvePtr, FanFaultyAirFlowRate );
 
 			if ( ( FanCalDeltaPresstemp <= FanCalDeltaPress ) || ( FanFaultyAirFlowRate <= PerfCurve( FanCurvePtr ).Var1Min ) ) {
 			// The new operatinal point of the fan go beyond the fan selection range
+			// this needs to be a recurring warning
 				ShowWarningError( "The operatinal point of the fan " + FanName + " may go beyond the fan selection " );
 				ShowContinueError( "range in the faulty fouling air filter cases" );
 				break;

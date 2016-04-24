@@ -174,6 +174,8 @@ namespace FaultsManager {
 
 		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
 		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
+		int faultyAirFilterFanType_Num;              // the integer type num for the type of fan
+		int faultyAirFilterFanIndex;                 // the integer index into array or vector
 		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
 		int         FaultyAirFilterFanCurvePtr;      // The index to the curve
 		std::string FaultyAirFilterPressFracSche;    // Schedule describing variations of the fan pressure rise
@@ -209,6 +211,8 @@ namespace FaultsManager {
 			FaultyHumidistatType( "" ),
 			FaultyAirFilterFanName( "" ),
 			FaultyAirFilterFanType( "" ),
+			faultyAirFilterFanType_Num( 0 ),
+			faultyAirFilterFanIndex( 0 ),
 			FaultyAirFilterFanCurve( "" ),
 			FaultyAirFilterFanCurvePtr( 0 ),
 			FaultyAirFilterPressFracSche( "" ),
@@ -233,8 +237,9 @@ namespace FaultsManager {
 
 	bool
 	CheckFaultyAirFilterFanCurve(
-		std::string const & CompName, // name of the fan
-		int const FanCurvePtr       // pointer of the fan curve
+		int const fanIndex,   // index of the fan in array or vector
+		int const fanCurvePtr,       // pointer of the fan curve
+		int const fanType_Num        // integer type of fan
 	);
 
 } // FaultsManager

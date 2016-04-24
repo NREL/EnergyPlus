@@ -32533,11 +32533,13 @@ ZoneHVAC:FourPipeFanCoil,
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
+        \key Fan:SystemModel
         \note Fan type must be according to capacity control method (see I/O)
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
         \note For CyclingFan a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
         \note For ASHRAE90.1 a Fan:OnOff or Fan:VariableVolume is valid.
+        \note Fan:SystemModel is valid for all capacity control methods.
         \note The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
@@ -32660,11 +32662,12 @@ ZoneHVAC:WindowAirConditioner,
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \note Fan:ConstantVolume only works when continuous fan operation is used the entire
         \note simulation (all supply air fan operating mode schedule values are greater than 0).
-        \note If any fan operating mode schedule values are 0 a Fan:OnOff object must be used.
+        \note If any fan operating mode schedule values are 0 a Fan:SystemModel or Fan:OnOff object must be used.
    A8 , \field Supply Air Fan Name
         \required-field
         \note Fan type Fan:ConstantVolume is used with continuous fan
@@ -32790,11 +32793,12 @@ ZoneHVAC:PackagedTerminalAirConditioner,
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \note Fan:ConstantVolume only works when continuous fan operation is used the entire
         \note simulation (all supply air fan operating mode schedule values are greater than 0).
-        \note If any fan operating mode schedule values are 0 a Fan:OnOff object must be used.
+        \note If any fan operating mode schedule values are 0 a Fan:SystemModel or Fan:OnOff object must be used.
    A8 , \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -32934,6 +32938,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \note Fan:ConstantVolume only works with fan operating mode is continuous.
@@ -33115,13 +33120,13 @@ ZoneHVAC:WaterToAirHeatPump,
    A7,  \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
-        \note  Only works with On/Off Fan
    A8,  \field Supply Air Fan Name
         \required-field
         \type object-list
         \object-list FansOnOff
-        \note Needs to match Fan:OnOff object
+        \note Needs to match Fan:SystemModel or Fan:OnOff object
    A9,  \field Heating Coil Object Type
         \required-field
         \type choice
@@ -33369,12 +33374,12 @@ ZoneHVAC:EnergyRecoveryVentilator,
         \note This flow rate must match the supply fan air flow rate.
   A4 ,  \field Supply Air Fan Name
         \required-field
-        \note Fan type must be Fan:OnOff
+        \note Fan type must be Fan:OnOff or Fan:SystemModel
         \type object-list
         \object-list FansOnOff
   A5 ,  \field Exhaust Air Fan Name
         \required-field
-        \note Fan type must be Fan:OnOff
+        \note Fan type must be Fan:OnOff or Fan:SystemModel
         \type object-list
         \object-list FansOnOff
   A6 ,  \field Controller Name
@@ -33541,8 +33546,8 @@ ZoneHVAC:UnitVentilator,
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
-        \note Fan:VariableVolume
+        \key Fan:SystemModel
+        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, and Fan:SystemModel
    A12, \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -33618,8 +33623,8 @@ ZoneHVAC:UnitHeater,
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
-        \note Fan:VariableVolume
+        \key Fan:SystemModel
+        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume and Fan:SystemModel
    A6 , \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -33715,10 +33720,11 @@ ZoneHVAC:EvaporativeCoolerUnit,
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
+        \key Fan:ComponentModel        
         \key Fan:ConstantVolume
         \key Fan:OnOff
         \key Fan:VariableVolume
-        \key Fan:ComponentModel
    A8 , \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -33809,8 +33815,7 @@ ZoneHVAC:OutdoorAirUnit,
        \object-list ScheduleNames
    A5, \field Supply Fan Name
        \required-field
-       \note Allowable fan types are Fan:ConstantVolume and
-       \note Fan:VariableVolume
+       \note Allowable fan types are Fan:SystemModel and Fan:ConstantVolume and Fan:VariableVolume
        \type object-list
        \object-list FansCVandVAV
   A6, \field Supply Fan Placement
@@ -34069,14 +34074,13 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note Select fan placement as either blow through or draw through.
   A7 ,  \field Supply Air Fan Object Type
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Supply Air Fan Object Type must be
-        \note Fan:OnOff or Fan:ConstantVolume
-        \note if AirConditioner:VariableRefrigerantFlow
-        \note is used to model VRF outdoor unit
-        \note Supply Air Fan Object Type must be Fan:VariableVolume if
+        \note Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume
+        \note if AirConditioner:VariableRefrigerantFlow is used to model VRF outdoor unit
+        \note Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if
         \note AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
         \note is used to model VRF outdoor unit
         \default Fan:ConstantVolume
@@ -38348,7 +38352,7 @@ ZoneHVAC:VentilatedSlab,
        \type node
   A25, \field Fan Name
        \required-field
-       \note Allowable fan type is Fan:ConstantVolume
+       \note Allowable fan types are Fan:SystemModel and Fan:ConstantVolume
        \type object-list
        \object-list FansCV
   A26, \field Coil Option Type
@@ -38911,6 +38915,7 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
   A5,  \field Fan Object Type
        \required-field
        \type choice
+       \key Fan:SystemModel
        \key Fan:VariableVolume
   A6,  \field Fan Name
        \required-field
@@ -39085,7 +39090,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \type object-list
        \object-list ZoneMixers
   A8,  \field Fan Name
-       \note Fan type must be Fan:ConstantVolume
+       \note Fan type must be Fan:SystemModel or Fan:ConstantVolume
        \type object-list
        \object-list FansCV
   A9,  \field Reheat Coil Object Type
@@ -39166,7 +39171,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \type object-list
        \object-list ZoneMixers
   A8,  \field Fan Name
-       \note Fan type must be Fan:ConstantVolume
+       \note Fan type must be Fan:SystemModel or Fan:ConstantVolume
        \type object-list
        \object-list FansCV
   A9,  \field Reheat Coil Object Type
@@ -40590,6 +40595,160 @@ ZoneHVAC:EquipmentConnections,
 
 \group Fans
 !*****************AIR LOOP COMPONENTS*********************
+Fan:SystemModel,
+       \memo Versatile simple fan that can be used in variable air volume, constant volume, on-off cycling, two-speed or multi-speed applications.
+       \memo Performance at different flow rates, or speed levels, is determined using separate performance curve or table
+       \memo or prescribed power fractions at discrete speed levels for two-speed or multi-speed fans.
+       \min-fields 14
+       \extensible:2
+  A1 , \field Name
+       \required-field
+       \reference Fans
+       \reference FansCV
+       \reference FansCVandOnOff
+       \reference FansCVandOnOffandVAV
+  A2 , \field Availability Schedule Name
+       \note Availability schedule name for this fan. Schedule value > 0 means the fan is available.
+       \note If this field is blank, the fan is always available.
+       \type object-list
+       \object-list ScheduleNames
+  A3 , \field Air Inlet Node Name
+       \type node
+       \required-field
+  A4 , \field Air Outlet Node Name
+       \type node
+       \required-field
+  N1 , \field Design Maximum Air Flow Rate
+       \required-field
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+  A5 , \field Speed Control Method
+       \type choice
+       \key Continuous
+       \key Discrete
+       \default Discrete
+  N2 , \field Electric Power Minimum Flow Rate Fraction
+       \type real
+       \default 0.2
+       \minimum 0.0
+       \maximum 1.0
+  N3 , \field Design Pressure Rise
+       \type real
+       \units Pa
+       \ip-units inH2O
+       \required-field
+  N4 , \field Motor Efficiency
+       \type real
+       \default 0.9
+       \minimum> 0.0
+       \maximum 1.0
+  N5 , \field Motor In Air Stream Fraction
+       \note 0.0 means fan motor outside of air stream, 1.0 means motor inside of air stream
+       \type real
+       \default 1.0
+       \minimum 0.0
+       \maximum 1.0
+  N6 , \field Design Electric Power Consumption
+       \type real
+       \units W
+       \autosizable
+       \note Fan power consumption at maximum air flow rate.  
+       \note If autosized the method used to scale power is chosen in the following field
+  A6 , \field Design Power Sizing Method
+       \type choice
+       \key PowerPerFlow
+       \key PowerPerFlowPerPressure
+       \key TotalEfficiencyAndPressure
+       \default PowerPerFlowPerPressure
+  N7 , \field Electric Power Per Unit Flow Rate
+       \type real
+       \units W/(m3/s)
+       \ip-units W/(ft3/min)
+       \default ???
+  N8 , \field Electric Power Per Unit Flow Rate Per Unit Pressure
+       \type real
+       \units W/((m3/s) -Pa)
+       \ip-units W/((ft3/min)-inH2O)
+       \default 1.66667
+  N9,  \field Fan Total Efficiency
+       \type real
+       \default 0.7
+       \minimum>0.0
+       \maximum 1.0
+  A7 , \field Electric Power Function of Flow Fraction Curve Name
+       \note independent variable is normalized flow rate, current flow divided by Design Maximum Air Flow Rate.
+       \note dependent variable is modification factor multiplied by Design Power Consumption.
+       \note This field is required if Speed Control Method is set to Continuous or if the Number of Speeds is greater than 1 and Speed Electric Power Fraction fields are not used.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+  N10, \field Night Ventilation Mode Pressure Rise
+       \note Total system fan pressure rise at the fan when in night mode using AvailabilityManager:NightVentilation
+       \type real
+       \units Pa
+       \ip-units inH2O
+  N11, \field Night Ventilation Mode Flow Fraction
+       \note Fraction of Design Maximum Air Flow Rate to use when in night mode using AvailabilityManager:NightVentilation
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A8 , \field Motor Loss Zone Name
+        \note optional, if used fan motor heat losses that not added to air stream are transferred to zone as internal gains
+        \type object-list
+        \object-list ZoneNames
+  N12, \field Motor Loss Radiative Fraction 
+        \note optional. If zone identified in previous field then this determines
+        \note the split between convection and radiation for the fan motor's skin losses
+        \type real
+        \minimum 0.0
+        \maximum 1.0
+  A9 , \field End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default General
+  N13, \field Number of Speeds
+       \note number of different speed levels available when Speed Control Method is set to Discrete
+       \note Speed need to be arranged in increasing order in remaining field sets.
+       \note If set to 1, or omitted, and Speed Control Method is Discrete then constant fan speed is the design maximum.
+       \type integer
+       \default 1
+  N14, \field Speed 1 Flow Fraction
+       \begin-extensible
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N15, \field Speed 1 Electric Power Fraction
+       \note if left blank then use Electric Power Function of Flow Fraction Curve
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N16, \field Speed 2 Flow Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N17, \field Speed 2 Electric Power Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N18, \field Speed 3 Flow Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N19, \field Speed 3 Electric Power Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N20, \field Speed n Flow Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N21; \field Speed n Electric Power Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+
 Fan:ConstantVolume,
        \memo Constant volume fan that is intended to operate continuously based on a time schedule.
        \memo This fan will not cycle on and off based on cooling/heating load or other control
@@ -51045,8 +51204,9 @@ Dehumidifier:Desiccant:NoFans,
        \object-list HeatingCoilName
   A10, \field Regeneration Fan Object Type
        \note Type of fan object for regeneration air.  When using the Default
-       \note Performance Model Type (see below), only Fan:VariableVolume is valid.
+       \note Performance Model Type (see below), only Fan:VariableVolume or Fan:SystemModel are valid.
        \type choice
+       \key Fan:SystemModel
        \key Fan:VariableVolume
        \key Fan:ConstantVolume
   A11, \field Regeneration Fan Name
@@ -51179,6 +51339,7 @@ Dehumidifier:Desiccant:System,
   A6,  \field Regeneration Air Fan Object Type
        \required-field
        \type choice
+       \key Fan:SystemModel
        \key Fan:OnOff
        \key Fan:ConstantVolume
   A7,  \field Regeneration Air Fan Name
@@ -51815,6 +51976,7 @@ AirLoopHVAC:UnitarySystem,
        \note Enter the node name used as the outlet air node for the unitary system.
   A8, \field Supply Fan Object Type
        \type choice
+       \key Fan:SystemModel
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume
@@ -51822,9 +51984,9 @@ AirLoopHVAC:UnitarySystem,
        \note Enter the type of supply air fan if included in the unitary system.
        \note Fan:ConstantVolume only works with continuous fan operating mode (i.e. supply
        \note air fan operating mode schedule values greater than 0).
-       \note Specify a Fan:OnOff object when the Supply Air Fan Operating Mode Schedule Name
+       \note Specify a Fan:SystemModel or a Fan:OnOff object when the Supply Air Fan Operating Mode Schedule Name
        \note input field above is left blank.
-       \note Specify a Fan:VariableVolume when modeling VAV systems which used setpoint based control
+       \note Specify a Fan:SystemModel or a Fan:VariableVolume when modeling VAV systems which used setpoint based control
        \note if the fan is included in the unitary system object.
        \note The ComponentModel fan type may be substituted for the ConstantVolume or VariableVolume
        \note fan types when more detailed fan modeling is required.
@@ -66672,15 +66834,16 @@ WaterHeater:HeatPump:PumpedCondenser,
   A22, \field Fan Object Type
        \required-field
        \type choice
+       \type Fan:SystemModel
        \key Fan:OnOff
        \default Fan:OnOff
        \note Specify the type of fan used by this heat pump water heater. The only
-       \note valid choice is Fan:OnOff.
+       \note valid choices are Fan:SystemModel or Fan:OnOff.
   A23, \field Fan Name
        \required-field
        \type object-list
        \object-list FansOnOff
-       \note Needs to match the name used in the corresponding Fan:OnOff object.
+       \note Needs to match the name used in the corresponding Fan:SystemModel or Fan:OnOff object.
   A24, \field Fan Placement
        \type choice
        \key BlowThrough
@@ -66922,14 +67085,15 @@ WaterHeater:HeatPump:WrappedCondenser,
        \required-field
        \type choice
        \key Fan:OnOff
+       \key Fan:SystemModel
        \default Fan:OnOff
        \note Specify the type of fan used by this heat pump water heater. The only
-       \note valid choice is Fan:OnOff.
+       \note valid choices are Fan:SystemModel or Fan:OnOff.
   A21, \field Fan Name
        \required-field
        \type object-list
        \object-list FansOnOff
-       \note Needs to match the name used in the corresponding Fan:OnOff object.
+       \note Needs to match the name used in the corresponding Fan:SystemModel or Fan:OnOff object.
   A22, \field Fan Placement
        \type choice
        \key BlowThrough
@@ -78991,6 +79155,7 @@ FaultModel:Fouling:AirFilter,
        \note Choose the type of the fan
        \required-field
        \type choice
+       \key Fan:SystemModel
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume

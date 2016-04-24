@@ -146,7 +146,6 @@ namespace HVACUnitaryBypassVAV {
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::DXElecHeatingPower;
 	using DataHVACGlobals::OnOffFanPartLoadFraction;
@@ -368,7 +367,6 @@ namespace HVACUnitaryBypassVAV {
 		Real64 MinOutletHumRat; // Minimum of inlet and outlet air humidity ratio [kg/kg]
 
 		// zero the fan and DX coils electricity consumption
-		FanElecPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		DXElecHeatingPower = 0.0;
 		ElecHeatingCoilPower = 0.0;
@@ -435,7 +433,9 @@ namespace HVACUnitaryBypassVAV {
 			HeatingPower = 0.0;
 		}
 
-		CBVAV( CBVAVNum ).ElecPower = FanElecPower + DXElecCoolingPower + HeatingPower;
+		Real64 locFanElecPower = 0.0;
+		locFanElecPower = Fans::GetFanPower( CBVAV( CBVAVNum ).FanIndex );
+		CBVAV( CBVAVNum ).ElecPower = locFanElecPower + DXElecCoolingPower + HeatingPower;
 
 	}
 

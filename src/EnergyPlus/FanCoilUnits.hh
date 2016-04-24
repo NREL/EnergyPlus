@@ -59,6 +59,10 @@
 #ifndef FanCoilUnits_hh_INCLUDED
 #define FanCoilUnits_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+#include <string>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -66,6 +70,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -132,6 +137,7 @@ namespace FanCoilUnits {
 		std::string SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
 		int SchedOutAirPtr; // index to outside air schedule
 		int FanType_Num; // index to fan type
+
 		std::string CapCtrlMeth; // type of capacity control method
 		// 'ConstantFanVariableFlow' or
 		// 'CyclingFan' or
@@ -166,6 +172,7 @@ namespace FanCoilUnits {
 		std::string FanName; // name of fan
 		std::string FanType; // type of fan
 		int FanIndex; // index for fan
+		HVACFan::FanSystem fanObj( std::string const n );
 		std::string CCoilName; // name of cooling coil
 		int CCoilName_Index; // Index for this Cooling Coil in SimWaterComp
 		std::string CCoilType; // type of cooling coil:
