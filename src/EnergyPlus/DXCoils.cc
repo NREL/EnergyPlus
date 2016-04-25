@@ -12560,7 +12560,7 @@ Label50: ;
 
 		FoundBranch = 0;
 		FoundAirSysNum = 0;
-		SupplyFanIndex = 0;
+		SupplyFanIndex = -1;
 		SupplyFanName = "n/a";
 		for ( AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum ) {
 
@@ -12599,7 +12599,7 @@ Label50: ;
 						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == UnitarySystem ) {
 							// fan may not be specified in a unitary system object, keep looking
 							// Unitary System will "set" the fan index to the DX coil if contained within the HVAC system
-							if ( DXCoil( CoolingCoilIndex ).SupplyFanIndex > 0 ) break;
+							if ( DXCoil( CoolingCoilIndex ).SupplyFanIndex > -1 ) break;
 						}
 					}
 				}
