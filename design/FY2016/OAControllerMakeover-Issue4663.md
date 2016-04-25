@@ -8,7 +8,7 @@ Outdoor Air Controller Makeover - Issue #4663
 
 ## Background ##
 
-The current combination of Controller:OutdoorAir plus Controller:MechanicalVentilation an be confusing. Common frustrations that users encounter with these objects include:
+The current combination of Controller:OutdoorAir plus Controller:MechanicalVentilation can be confusing. Common frustrations that users encounter with these objects include:
 
   
 1. Trying to set the OA flow to zero at night when using Controller:MechanicalVentilation
@@ -114,7 +114,7 @@ The current combination of Controller:OutdoorAir plus Controller:MechanicalVenti
 
 4. Make the Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
 
-5. Change the advanced methods (VRP, DCV, IAQ) to use the `DesignSpecification:OutdoorAir` Outdoor Air Flow Rate Fraction Schedule.  Currently it is ignored.
+5. Change the advanced methods (ZoneSum, VentilationRateProcedure,IndoorAirQualityProcedure, ProportionalControlBasedOnDesignOccupancy,ProportionalControlBasedonOccupancySchedule,IndoorAirQualityProcedureGenericContaminant) to use the `DesignSpecification:OutdoorAir` Outdoor Air Flow Rate Fraction Schedule.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
 
 6. Add a new outdoor air control type = "100PercentOA" which always delivers 100% OA.
 
