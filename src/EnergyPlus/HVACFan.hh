@@ -211,6 +211,8 @@ private: // data
 	int zoneNum_; // zone index for motor heat losses as internal gains
 	Real64 zoneRadFract_; // thermal radiation split for motor losses
 	ThermalLossDestination heatLossesDestination_; //enum for where motor loss go
+	Real64 qdotConvZone_; // fan power lost to surrounding zone by convection to air (W)
+	Real64 qdotRadZone_;  // fan power lost to surrounding zone by radiation to zone surfaces(W)
 	std::string endUseSubcategoryName_;
 	int numSpeeds_; // input for how many speed levels for discrete fan
 	std::vector< Real64 > flowFractionAtSpeed_; //array of flow fractions for speed levels

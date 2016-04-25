@@ -83,6 +83,7 @@
 #include <BranchNodeConnections.hh>
 #include <FaultsManager.hh>
 #include <Fans.hh>  // used for fault model routine CalFaultyFanAirFlowReduction
+#include <HeatBalanceInternalHeatGains.hh>
 
 namespace EnergyPlus {
 
@@ -333,6 +334,8 @@ namespace HVACFan {
 		zoneNum_( 0 ),
 		zoneRadFract_( 0.0 ),
 		heatLossesDestination_( ThermalLossDestination::heatLossNotDetermined ),
+		qdotConvZone_( 0.0 ),
+		qdotRadZone_( 0.0 ),
 		numSpeeds_( 0 ),
 		inletAirMassFlowRate_( 0.0 ),
 		outletAirMassFlowRate_( 0.0 ),
@@ -567,6 +570,10 @@ namespace HVACFan {
 			SetupEMSActuator( "Fan", name_ , "Fan Autosized Air Flow Rate", "[m3/s]", maxAirFlowRateEMSOverrideOn_, maxAirFlowRateEMSOverrideValue_ );
 		}
 
+		if ( heatLossesDestination_ == ThermalLossDestination::zoneGains ) {
+			SetupZoneInternalGain( zoneNum_, "Fan:SystemModel", name_, DataHeatBalance::IntGainTypeOf_FanSystemModel, qdotConvZone_, _, qdotRadZone_ );
+		}
+
 		alphaArgs.deallocate();
 		alphaFieldNames.deallocate();
 		isAlphaFieldBlank.deallocate();
@@ -619,7 +626,6 @@ namespace HVACFan {
 			}
 		}
 
-// TODO Faulty fan operation
 		Real64 localFaultMaxAirMassFlow = 0.0;
 		bool faultActive = false;
 		Real64 localFaultPressureRise = 0.0;
@@ -651,6 +657,8 @@ namespace HVACFan {
 		}
 		localFlowFraction = localAirMassFlow / maxAirMassFlowRate_;
 
+		Real64 powerLossToAir = 0.0;
+
 		if ( ( ScheduleManager::GetCurrentScheduleValue( availSchedIndex_ ) > 0.0 || objTurnFansOn_ ) && ! objTurnFansOff_ && localAirMassFlow > 0.0 ) {
 			//fan is running
 
@@ -662,7 +670,7 @@ namespace HVACFan {
 					fanRunTimeFractionAtSpeed_[ 0 ] = localFlowFraction;
 					fanPower_ = fanRunTimeFractionAtSpeed_[ 0 ] * maxAirMassFlowRate_ * localPressureRise / ( localFanTotEff * rhoAirStdInit_ );
 					Real64 fanShaftPower = motorEff_ * fanPower_;
-					Real64 powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
+					powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
 					outletAirEnthalpy_ = inletAirEnthalpy_ + powerLossToAir / localAirMassFlow;
 					outletAirHumRat_ = inletAirHumRat_;
 					outletAirMassFlowRate_ =  localAirMassFlow;
@@ -697,7 +705,7 @@ namespace HVACFan {
 					}
 					
 					Real64 fanShaftPower = motorEff_ * fanPower_;
-					Real64 powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
+					powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
 					outletAirEnthalpy_ = inletAirEnthalpy_ + powerLossToAir / localAirMassFlow;
 					outletAirHumRat_ = inletAirHumRat_;
 					outletAirMassFlowRate_ =  localAirMassFlow;
@@ -713,7 +721,7 @@ namespace HVACFan {
 				Real64 localPowerFraction = CurveManager::CurveValue( powerModFuncFlowFractionCurveIndex_, localFlowFractionForPower );
 				fanPower_ = localPowerFraction * maxAirMassFlowRate_ * localPressureRise / ( localFanTotEff * rhoAirStdInit_ );
 				Real64 fanShaftPower = motorEff_ * fanPower_;
-				Real64 powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
+				powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
 				outletAirEnthalpy_ = inletAirEnthalpy_ + powerLossToAir / localAirMassFlow;
 				outletAirHumRat_ = inletAirHumRat_;
 				outletAirMassFlowRate_ =  localAirMassFlow;
@@ -756,6 +764,7 @@ namespace HVACFan {
 		} else { // fan is off
 			//Fan is off and not operating no power consumed and mass flow rate.
 			fanPower_ = 0.0;
+			powerLossToAir = 0.0;
 			outletAirHumRat_ = inletAirHumRat_;
 			outletAirEnthalpy_ = inletAirEnthalpy_;
 			outletAirTemp_ = inletAirTemp_;
@@ -772,6 +781,12 @@ namespace HVACFan {
 				massFlowRateMinAvail_ = 0.0;
 			}
 			
+		}
+
+		if ( heatLossesDestination_ == ThermalLossDestination::zoneGains ) {
+			Real64 powerLossToZone = fanPower_ - powerLossToAir;
+			qdotConvZone_ = powerLossToZone * ( 1.0 - zoneRadFract_ );
+			qdotRadZone_ = powerLossToZone * zoneRadFract_;
 		}
 	}
 
@@ -801,13 +816,7 @@ namespace HVACFan {
 			DataLoopNode::Node( outletNodeNum_ ).GenContam = DataLoopNode::Node( inletNodeNum_ ).GenContam;
 		}
 
-		if ( heatLossesDestination_ == ThermalLossDestination::zoneGains ) {
-	//TODO	
-		
-		}
-
-		//oold fan had ugly use of globals here, use getter now
-	//	DataHVACGlobals::FanElecPower = fanPower_;
+		// would like to get rid of this global
 		DataAirLoop::LoopOnOffFanRTF  = fanRunTimeFractionAtSpeed_[ numSpeeds_ - 1 ]; //fill with RTF from highest speed level
 
 	}
