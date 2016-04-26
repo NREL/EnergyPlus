@@ -113,6 +113,12 @@ namespace CrossVentMgr {
 	void
 	CalcUCSDCV( int const ZoneNum ); // Which Zonenum
 
+	// Clears the global data.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
+
 } // CrossVentMgr
 
 } // EnergyPlus
