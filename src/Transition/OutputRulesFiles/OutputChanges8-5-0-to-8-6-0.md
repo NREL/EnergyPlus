@@ -12,6 +12,8 @@ This will eventually become a more structured file, but currently it isn't clear
 
 The Zone Summary table in the Input Verification and Results Summary Report always had a column labeled "Gross Wall Area" which was the above ground wall area for each zone. This change relabeled that column to be called "Above Ground Gross Wall Area" and added an entirely new column called "Underground Gross Wall Area" that shows the amount of underground wall area for each zone.
 
+See [5588](https://github.com/NREL/EnergyPlus/pull/5588 "5588"). 
+
 
 ### Life-Cycle Cost Report Updated for Water
 
