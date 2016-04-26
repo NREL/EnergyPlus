@@ -2787,7 +2787,16 @@ namespace RuntimeLanguageProcessor {
 
 					// loop over each alpha and register variable named as global Erl variable
 					for ( ErlVarLoop = 1; ErlVarLoop <= NumAlphas; ++ErlVarLoop ) {
-						ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( ErlVarLoop ), cAlphaFieldNames( ErlVarLoop ), errFlag, ErrorsFound );
+						if ((cCurrentModuleObject.compare("ExternalInterface:FunctionalMockupUnitImport:To:Variable") == 0)){
+							if (ErlVarLoop == 1){
+								// Only validate first field of object ExternalInterface:FunctionalMockupUnitExport:To:Variable.
+								// This object is allowed to contain fields that do not need to be valid EMS fields (e.g. path to the FMU).
+								ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+							}
+						}
+						else{
+							ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+						}
 						if ( lAlphaFieldBlanks( ErlVarLoop ) ) {
 							ShowWarningError( RoutineName + cCurrentModuleObject );
 							ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );
