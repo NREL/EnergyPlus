@@ -245,6 +245,37 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 
 }
 
+
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, OutputReportTabularTest_LookupJtokWH" );
+
+	int indexUnitConv;
+	std::string curUnits;
+	Real64 curConversionFactor;
+	Real64 curConversionOffset;
+	std::string varNameWithUnits;
+
+	SetupUnitConversions();
+
+	varNameWithUnits = "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]";
+	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
+	EXPECT_EQ( 0, indexUnitConv );
+	EXPECT_EQ( "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]", curUnits );
+
+	varNameWithUnits = "Electric Energy Use [GJ]";
+	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
+	EXPECT_EQ( 85, indexUnitConv );
+	EXPECT_EQ( "Electric Energy Use [kWh]", curUnits );
+
+	varNameWithUnits = "Electricty [MJ/m2]";
+	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
+	EXPECT_EQ( 94, indexUnitConv );
+	EXPECT_EQ( "Electricty [kWh/m2]", curUnits );
+
+}
+
+
 TEST( OutputReportTabularTest, GetColumnUsingTabs )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetColumnUsingTabs" );
