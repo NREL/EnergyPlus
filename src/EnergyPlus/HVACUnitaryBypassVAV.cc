@@ -84,6 +84,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
+#include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessor.hh>
 #include <MixedAir.hh>
@@ -544,7 +545,7 @@ namespace HVACUnitaryBypassVAV {
 		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions
 		int FanIndex; // Index to CBVAV's supply air fan
-		Real64 FanVolFlow; // Maximum air volumetric flow rate of fan
+//		Real64 FanVolFlow; // Maximum air volumetric flow rate of fan
 		int AirLoopNum; // Index to air loop served by this system
 		int AirLoopZoneNum; // Index to controlled zone
 		int BranchNum; // Index to branch containing this system
@@ -729,6 +730,33 @@ namespace HVACUnitaryBypassVAV {
 
 			CBVAV( CBVAVNum ).FanType = Alphas( 10 );
 			CBVAV( CBVAVNum ).FanName = Alphas( 11 );
+			int fanOutletNode( 0 );
+
+			// check that the fan exists
+			bool errFlag = false;
+			ValidateComponent( CBVAV( CBVAVNum ).FanType, CBVAV( CBVAVNum ).FanName, errFlag, CurrentModuleObject );
+			if ( errFlag ) {
+				ShowContinueError( "...occurs in " + CurrentModuleObject + ", unit=\"" + CBVAV( CBVAVNum ).Name + "\"." );
+				ShowContinueError( "check " + cAlphaFields( 10 ) + " and " + cAlphaFields( 11 ) );
+				ErrorsFound = true;
+				CBVAV( CBVAVNum ).FanVolFlow = 9999.0;
+			} else {
+				if ( SameString(  CBVAV( CBVAVNum ).FanType, "Fan:SystemModel" ) ) {
+					CBVAV( CBVAVNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( CBVAV( CBVAVNum ).FanName ) ); // call constructor
+					CBVAV( CBVAVNum ).FanIndex = HVACFan::getFanObjectVectorIndex( CBVAV( CBVAVNum ).FanName );
+					CBVAV( CBVAVNum ).FanInletNodeNum = HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->inletNodeNum();
+					fanOutletNode = HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->outletNodeNum();
+					CBVAV( CBVAVNum ).FanVolFlow = HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->designAirVolFlowRate();
+				} else {
+					GetFanType( CBVAV( CBVAVNum ).FanName, CBVAV( CBVAVNum ).FanType_Num, FanErrFlag, CurrentModuleObject, CBVAV( CBVAVNum ).Name );
+					CBVAV( CBVAVNum ).FanInletNodeNum = GetFanInletNode( CBVAV( CBVAVNum ).FanType, CBVAV( CBVAVNum ).FanName, FanErrFlag );
+					fanOutletNode = GetFanOutletNode( CBVAV( CBVAVNum ).FanType, CBVAV( CBVAVNum ).FanName, ErrorsFound );
+					GetFanIndex( CBVAV( CBVAVNum ).FanName, CBVAV( CBVAVNum ).FanIndex, FanErrFlag );
+					GetFanVolFlow( CBVAV( CBVAVNum ).FanIndex, CBVAV( CBVAVNum ).FanVolFlow );
+				}
+			}
+
 
 			if ( SameString( Alphas( 12 ), "BlowThrough" ) ) {
 				CBVAV( CBVAVNum ).FanPlace = BlowThru;
@@ -741,7 +769,7 @@ namespace HVACUnitaryBypassVAV {
 			}
 
 			if ( CBVAV( CBVAVNum ).FanPlace == DrawThru ) {
-				if ( CBVAV( CBVAVNum ).SplitterOutletAirNode != GetFanOutletNode( CBVAV( CBVAVNum ).FanType, CBVAV( CBVAVNum ).FanName, ErrorsFound ) ) {
+				if ( CBVAV( CBVAVNum ).SplitterOutletAirNode != fanOutletNode ) {
 					ShowSevereError( CurrentModuleObject + ": " + CBVAV( CBVAVNum ).Name );
 					ShowContinueError( "Illegal " + cAlphaFields( 6 ) + " = " + SplitterOutletNodeName + '.' );
 					ShowContinueError( cAlphaFields( 6 ) + " must be the same as the fan outlet node specified in " + cAlphaFields( 10 ) + " = " + CBVAV( CBVAVNum ).FanType + ": " + CBVAV( CBVAVNum ).FanName + " when draw through " + cAlphaFields( 11 ) + " is selected." );
@@ -749,30 +777,18 @@ namespace HVACUnitaryBypassVAV {
 				}
 			}
 
-			GetFanType( CBVAV( CBVAVNum ).FanName, CBVAV( CBVAVNum ).FanType_Num, FanErrFlag, CurrentModuleObject, CBVAV( CBVAVNum ).Name );
-			if ( FanErrFlag ) {
-				ShowContinueError( " illegal " + cAlphaFields( 11 ) + "=\"" + Alphas( 11 ) + "\"." );
-				ErrorsFound = true;
-				FanVolFlow = 9999.0;
-			} else {
-				CBVAV( CBVAVNum ).FanInletNodeNum = GetFanInletNode( CBVAV( CBVAVNum ).FanType, CBVAV( CBVAVNum ).FanName, FanErrFlag );
-				GetFanIndex( CBVAV( CBVAVNum ).FanName, FanIndex, FanErrFlag );
-				GetFanVolFlow( FanIndex, CBVAV( CBVAVNum ).FanVolFlow );
-				FanVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
-			}
-
-			if ( FanVolFlow != AutoSize ) {
-				if ( FanVolFlow < CBVAV( CBVAVNum ).MaxCoolAirVolFlow && CBVAV( CBVAVNum ).MaxCoolAirVolFlow != AutoSize ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than the " + cNumericFields( 1 ) );
+			if ( CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
+				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxCoolAirVolFlow && CBVAV( CBVAVNum ).MaxCoolAirVolFlow != AutoSize ) {
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than the " + cNumericFields( 1 ) );
 					ShowContinueError( ' ' + cNumericFields( 1 ) + " is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-					CBVAV( CBVAVNum ).MaxCoolAirVolFlow = FanVolFlow;
+					CBVAV( CBVAVNum ).MaxCoolAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
-				if ( FanVolFlow < CBVAV( CBVAVNum ).MaxHeatAirVolFlow && CBVAV( CBVAVNum ).MaxHeatAirVolFlow != AutoSize ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than the " + cNumericFields( 2 ) );
+				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxHeatAirVolFlow && CBVAV( CBVAVNum ).MaxHeatAirVolFlow != AutoSize ) {
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than the " + cNumericFields( 2 ) );
 					ShowContinueError( ' ' + cNumericFields( 2 ) + " is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-					CBVAV( CBVAVNum ).MaxHeatAirVolFlow = FanVolFlow;
+					CBVAV( CBVAVNum ).MaxHeatAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 			}
 
@@ -781,7 +797,7 @@ namespace HVACUnitaryBypassVAV {
 				ShowWarningError( CurrentModuleObject + ": " + cNumericFields( 4 ) + " cannot be greater than " + cNumericFields( 1 ) );
 				ShowContinueError( ' ' + cNumericFields( 4 ) + " is reset to the fan flow rate and the simulation continues." );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-				CBVAV( CBVAVNum ).CoolOutAirVolFlow = FanVolFlow;
+				CBVAV( CBVAVNum ).CoolOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 			}
 
 			//   only check that SA flow in heating is >= OA flow in heating when they are not autosized
@@ -789,7 +805,7 @@ namespace HVACUnitaryBypassVAV {
 				ShowWarningError( CurrentModuleObject + ": " + cNumericFields( 5 ) + " cannot be greater than " + cNumericFields( 2 ) );
 				ShowContinueError( ' ' + cNumericFields( 5 ) + " is reset to the fan flow rate and the simulation continues." );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-				CBVAV( CBVAVNum ).HeatOutAirVolFlow = FanVolFlow;
+				CBVAV( CBVAVNum ).HeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 			}
 
 			if ( SameString( Alphas( 14 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 14 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( Alphas( 14 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
@@ -899,12 +915,12 @@ namespace HVACUnitaryBypassVAV {
 			}
 
 			//   Check FanVolFlow, must be >= CBVAV flow
-			if ( FanVolFlow != AutoSize ) {
-				if ( FanVolFlow < CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than " + cNumericFields( 3 ) );
+			if ( CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
+				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than " + cNumericFields( 3 ) );
 					ShowContinueError( ' ' + cNumericFields( 3 ) + " is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-					CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow = FanVolFlow;
+					CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 			}
 			//   only check that OA flow when compressor is OFF is >= SA flow when compressor is OFF when both are not autosized and
@@ -913,7 +929,7 @@ namespace HVACUnitaryBypassVAV {
 				ShowWarningError( CurrentModuleObject + ": " + cNumericFields( 6 ) + " cannot be greater than " + cNumericFields( 3 ) );
 				ShowContinueError( ' ' + cNumericFields( 6 ) + " is reset to the fan flow rate and the simulation continues." );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = FanVolFlow;
+				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 			}
 
 			if ( SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || SameString( Alphas( 16 ), "Coil:Heating:Gas" ) || SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || SameString( Alphas( 16 ), "Coil:Heating:Water" ) || SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
@@ -1075,10 +1091,10 @@ namespace HVACUnitaryBypassVAV {
 			//   Initialize last mode of compressor operation
 			CBVAV( CBVAVNum ).LastMode = HeatingMode;
 
-			if ( CBVAV( CBVAVNum ).FanType_Num != FanType_SimpleOnOff && CBVAV( CBVAVNum ).FanType_Num != FanType_SimpleConstVolume ) {
+			if ( CBVAV( CBVAVNum ).FanType_Num != DataHVACGlobals::FanType_SimpleOnOff && CBVAV( CBVAVNum ).FanType_Num != DataHVACGlobals::FanType_SimpleConstVolume && CBVAV( CBVAVNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				ShowSevereError( CurrentModuleObject + " illegal " + cAlphaFields( 10 ) + " in fan object = " + CBVAV( CBVAVNum ).FanName );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
-				ShowContinueError( " The fan object type must be Fan:OnOff or Fan:ConstantVolume." );
+				ShowContinueError( " The fan object type must be Fan:SystemModel, Fan:OnOff or Fan:ConstantVolume." );
 				ErrorsFound = true;
 			} else if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleOnOff || CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleConstVolume ) {
 				if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleOnOff && ! SameString( CBVAV( CBVAVNum ).FanType, "Fan:OnOff" ) ) {
@@ -1442,15 +1458,7 @@ namespace HVACUnitaryBypassVAV {
 		// IF CBVAV system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than CBVAV flow rates
 		if ( ! DoingSizing && CBVAV( CBVAVNum ).CheckFanFlow ) {
 			CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
-			FanErrFlag = false;
-			GetFanIndex( CBVAV( CBVAVNum ).FanName, FanIndex, FanErrFlag );
-			if ( FanErrFlag ) {
-				ShowContinueError( "...Fan occurs in " + CurrentModuleObject + " =" + CBVAV( CBVAVNum ).Name );
-			} else {
-				//     Only get the fan volumetric flow rate if the fan is valid, otherwise GetFanVolFlow returns a 0 and
-				//     the following warnings are written to the error file.
-				GetFanVolFlow( FanIndex, CBVAV( CBVAVNum ).FanVolFlow );
-			}
+
 			if ( CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 				//     Check fan versus system supply air flow rates
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxCoolAirVolFlow ) {
@@ -1969,7 +1977,6 @@ namespace HVACUnitaryBypassVAV {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using DXCoils::SimDXCoilMultiMode;
 		using General::SolveRegulaFalsi;
@@ -2031,8 +2038,13 @@ namespace HVACUnitaryBypassVAV {
 		Node( CBVAV( CBVAVNum ).MixerInletAirNode ).Enthalpy = PsyHFnTdbW( Node( CBVAV( CBVAVNum ).MixerInletAirNode ).Temp, Node( CBVAV( CBVAVNum ).MixerInletAirNode ).HumRat );
 		SimOAMixer( CBVAV( CBVAVNum ).OAMixName, FirstHVACIteration, CBVAV( CBVAVNum ).OAMixIndex );
 
-		if ( CBVAV( CBVAVNum ).FanPlace == BlowThru ) SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
-
+		if ( CBVAV( CBVAVNum ).FanPlace == BlowThru ) {
+			if ( CBVAV( CBVAVNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->simulate( PartLoadFrac*FanSpeedRatio, _,_,_ );
+			} else {
+				Fans::SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
+			}
+		}
 		// Simulate cooling coil if zone load is negative (cooling load)
 		if ( CBVAV( CBVAVNum ).HeatCoolMode == CoolingMode ) {
 			if ( OutdoorDryBulbTemp >= CBVAV( CBVAVNum ).MinOATCompressor ) {
@@ -2342,8 +2354,13 @@ namespace HVACUnitaryBypassVAV {
 
 		}}
 
-		if ( CBVAV( CBVAVNum ).FanPlace == DrawThru ) SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
-
+		if ( CBVAV( CBVAVNum ).FanPlace == DrawThru ) {
+			if ( CBVAV( CBVAVNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->simulate( PartLoadFrac*FanSpeedRatio, _,_,_ );
+			} else {
+				Fans::SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
+			}
+		}
 		Node( OutletNode ).MassFlowRate = ( 1.0 - BypassDuctFlowFraction ) * Node( CBVAV( CBVAVNum ).MixerInletAirNode ).MassFlowRate;
 		Node( OutletNode ).Temp = Node( CBVAV( CBVAVNum ).SplitterOutletAirNode ).Temp;
 		Node( OutletNode ).HumRat = Node( CBVAV( CBVAVNum ).SplitterOutletAirNode ).HumRat;

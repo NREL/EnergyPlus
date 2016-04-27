@@ -53300,6 +53300,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
    A10, \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \note Specify the type of supply air fan used in this unitary system.

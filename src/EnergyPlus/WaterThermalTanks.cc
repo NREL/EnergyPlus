@@ -1680,6 +1680,7 @@ namespace WaterThermalTanks {
 						}
 
 					}
+					// issue #5630, set fan info in coils. 
 					if ( bIsVScoil == true ) {
 						VariableSpeedCoils::setVarSpeedHPWHFanTypeNum( HPWH.DXCoilNum, HPWH.FanType_Num );
 						VariableSpeedCoils::setVarSpeedHPWHFanIndex( HPWH.DXCoilNum, HPWH.FanNum );
