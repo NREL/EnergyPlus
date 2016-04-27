@@ -252,8 +252,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH )
 
 	int indexUnitConv;
 	std::string curUnits;
-	Real64 curConversionFactor;
-	Real64 curConversionOffset;
 	std::string varNameWithUnits;
 
 	SetupUnitConversions();
