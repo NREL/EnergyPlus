@@ -20105,6 +20105,10 @@ Lights,
        \maximum 1.0
        \default 1.0
   A5 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20190,6 +20194,10 @@ ElectricEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20269,6 +20277,10 @@ GasEquipment,
        \note converted from a natural gas CO2 emission rate of 117 lbs CO2 per million Btu.
        \note The maximum value assumes to be 10 times of the recommended value.
   A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20336,6 +20348,10 @@ HotWaterEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20402,6 +20418,10 @@ SteamEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24270,6 +24290,10 @@ Exterior:Lights,
        \key ScheduleNameOnly
        \key AstronomicalClock
   A4 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24307,6 +24331,10 @@ Exterior:FuelEquipment,
        \minimum 0
        \ip-units W
   A4 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24332,6 +24360,10 @@ Exterior:WaterEquipment,
        \type real
        \minimum 0
   A4 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General

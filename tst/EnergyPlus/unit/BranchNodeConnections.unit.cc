@@ -101,6 +101,17 @@ using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
+	TEST_F( EnergyPlusFixture, BranchNodeErrorCheck_SingleNode ) {
+		bool errFlag = false;
+		RegisterNodeConnection( 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag );
+		bool ErrorsFound = false;
+
+		CheckNodeConnections( ErrorsFound );
+
+		EXPECT_FALSE( errFlag ); //Node should register without error
+		EXPECT_FALSE( ErrorsFound ); //Node check should not fail on Check 10 -- zone node name must be unique
+	}
+
 	TEST_F( EnergyPlusFixture, BranchNodeErrorCheck11Test ) {
 		bool errFlag = false;
 		RegisterNodeConnection(1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
