@@ -659,35 +659,24 @@ Number of iterations \textgreater{} 3\textbackslash{}
 
 The Micro CHP model has a number of different operating modes.~ The operating mode for a given system timestep is determined from the mode during the previous timestep, user inputs, and high-level controls from elsewhere in EnergyPlus.~ The operating mode is reported for the state at the end of each timestep.~ The following table summarizes the various operating modes and the criteria for switching to a new mode for any given timestep.~ The EnergyPlus implementation adds the ``Off'' mode to the modes specified by Annex 42 which corresponds to the unit being scheduled to be unavailable.~ The difference between OFF and Standby modes determines whether or not standby power is consumed.
 
-{\scriptsize
-\begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+\begin{longtable}[c]{p{1.5in}p{2.05in}p{2.44in}}
 \toprule 
-Constituent & A & B & C & D & E & F & H & Source \tabularnewline
+Operating mode & Main Criteria & Notes \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Constituent & A & B & C & D & E & F & H & Source \tabularnewline
+Operating mode & Main Criteria & Notes \tabularnewline
 \midrule
 \endhead
 
-N\(_{2}\) & 26.092 & 8.218801 & -1.976141 & 0.159274 & 0.044434 & -7.98923 & 0.0 & NIST \tabularnewline
-O\(_{2}\) & 29.659 & 6.137261 & -1.186521 & 0.09578 & -0.219663 & -9.861391 & 0.0 & NIST \tabularnewline
-Ar & 20.786 & 2.8259E-7 & -1.4642E-7 & 1.0921E-8 & -3.6614E-8 & -6.19735 & 0.0 & NIST \tabularnewline
-CO\(_{2}\) & 24.99735 & 55.18696 & -33.69137 & 7.948387 & -0.136638 & -403.6075 & -393.5224 & NIST \tabularnewline
-H\(_{2}\)O(gas) & 29.0373 & 10.2573 & 2.81048 & -0.95914 & 0.11725 & -250.569 & -241.8264 & CHEMKIN \tabularnewline
-H\(_{2}\)O(liq) & -203.606 & 1523.29 & -3196.413 & 2474.455 & 3.85533 & -256.5478 & -285.8304 & NIST \tabularnewline
-H\(_{2}\) & 33.066178 & -11.363417 & 11.432816 & -2.772874 & -0.158558 & -9.9808 & 0.0 & NIST \tabularnewline
-CH\(_{4}\) & -0.703029 & 108.4773 & -42.52157 & 5.862788 & 0.678565 & -76.84376 & -74.8731 & NIST \tabularnewline
-C\(_{2}\)H\(_{6}\) & -3.03849 & 199.202 & -84.9812 & 11.0348 & 0.30348 & -90.0633 & -83.8605 & CHEMKIN \tabularnewline
-C\(_{3}\)H\(_{8}\) & -23.1747 & 363.742 & -222.981 & 56.253 & 0.61164 & -109.206 & -103.855 & CHEMKIN \tabularnewline
-C\(_{4}\)H\(_{10}\) & -5.24343 & 426.442 & -257.955 & 66.535 & -0.26994 & -149.365 & -133.218 & CHEMKIN \tabularnewline
-C\(_{5}\)H\(_{12}\) & -34.9431 & 576.777 & -338.353 & 76.8232 & 1.00948 & -155.348 & -146.348 & CHEMKIN \tabularnewline
-C\(_{6}\)H\(_{14}\) & -46.7786 & 711.187 & -438.39 & 103.784 & 1.23887 & -176.813 & -166.966 & CHEMKIN \tabularnewline
-CH\(_{3}\)OH & 14.1952 & 97.7218 & -9.73279 & -12.8461 & 0.15819 & -209.037 & -201.102 & CHEMKIN \tabularnewline
-C\(_{2}\)H\(_{5}\)OH & -8.87256 & 282.389 & -178.85 & 46.3528 & 0.48364 & -241.239 & -234.441 & CHEMKIN \tabularnewline
+Off & Availability schedule value = 0 & No consumption of power or fuel. \tabularnewline
+Stand By & Availability schedule value  \&neq;  0 & Consumes stand by power but no fuel \tabularnewline
+Warm Up & Load (thermal or electric)  >  0.0 Availability schedule value  \&neq;  0 Time Delay  <  elapsed time since entering warm up mode Engine temp  <  nominal engine temp & Two alternate sub-modes:~ Stirling Engines use warm up by “nominal engine temperature” while Internal Combustion Engines use “time delay” Fuel is consumed but no power is produced \tabularnewline
+Normal Operation & Load (thermal or electric)  >  0.0 Availability schedule value  \&neq;  0 Time Delay  >  elapsed time since entering warm up mode Engine temp  > = nominal temp & Fuel is consumed and power is produced \tabularnewline
+Cool Down & Load (thermal or electric) = 0.0 Availability schedule value  \&neq;  0 & Two alternate sub-modes where engine can be forced to go thru a complete cool down cycle before allowed to go back into warm up or normal mode. No fuel is consumed and no power is produced. \tabularnewline
 \bottomrule
-\end{longtable}}
+\end{longtable}
 
 For timesteps where the generator switches from warm up mode to normal mode in the middle of the timestep, part load ration values are calculated for the portion of the time step that the generator is in normal operation.
 

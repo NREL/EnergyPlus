@@ -14,6 +14,7 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // C++ Headers
+#include <cctype>
 #include <string>
 
 namespace ObjexxFCL {
@@ -59,7 +60,15 @@ equal( char const c, char const d, bool const exact_case = true )
 	return ( exact_case ? c == d : to_lower( c ) == to_lower( d ) );
 }
 
-// Character is Blank?
+// char < char Case-Insensitively?
+inline
+bool
+lessthani( char const c, char const d )
+{
+	return ( to_lower( c ) < to_lower( d ) );
+}
+
+// char is Blank?
 inline
 bool
 is_blank( char const c )
@@ -67,7 +76,7 @@ is_blank( char const c )
 	return ( c == ' ' );
 }
 
-// Character is Not Blank?
+// char is Not Blank?
 inline
 bool
 not_blank( char const c )
@@ -75,7 +84,82 @@ not_blank( char const c )
 	return ( c != ' ' );
 }
 
-// Character is in a string?
+// char is Whitespace?
+inline
+bool
+is_whitespace( char const c )
+{
+	static std::string const whitespace( " \t\000" );
+	return ( whitespace.find( c ) != std::string::npos );
+}
+
+// char is Not Whitespace?
+inline
+bool
+not_whitespace( char const c )
+{
+	return ! is_whitespace( c );
+}
+
+// char is Alphabetic?
+inline
+bool
+is_alpha( char const c )
+{
+	return ( std::isalpha( c ) != 0 );
+}
+
+// char is a Consonant?
+inline
+bool
+is_consonant( char const c )
+{
+	static std::string const vowels( "aeiou" );
+	return ( ( std::isalpha( c ) != 0 ) && ( vowels.find( std::tolower( c ) ) == std::string::npos ) );
+}
+
+// char is a Vowel?
+inline
+bool
+is_vowel( char const c )
+{
+	static std::string const vowels( "aeiou" );
+	return ( vowels.find( std::tolower( c ) ) != std::string::npos );
+}
+
+// char is Lowercase Alphabetic?
+inline
+bool
+is_lower( char const c )
+{
+	return ( std::islower( c ) != 0 );
+}
+
+// char is Uppercase Alphabetic?
+inline
+bool
+is_upper( char const c )
+{
+	return ( std::isupper( c ) != 0 );
+}
+
+// char is Alphanumeric?
+inline
+bool
+is_alpha_numeric( char const c )
+{
+	return ( std::isalnum( c ) != 0 );
+}
+
+// char is Digits?
+inline
+bool
+is_digit( char const c )
+{
+	return ( std::isdigit( c ) != 0 );
+}
+
+// char is in a string?
 inline
 bool
 is_any_of( char const c, std::string const & s )
@@ -83,11 +167,11 @@ is_any_of( char const c, std::string const & s )
 	return ( s.find( c ) != std::string::npos );
 }
 
-// Character is in a cstring?
+// char is in a cstring?
 bool
 is_any_of( char const c, c_cstring const s );
 
-// Character is in a string?
+// char is in a string?
 inline
 bool
 has_any_of( char const c, std::string const & s )
@@ -95,7 +179,7 @@ has_any_of( char const c, std::string const & s )
 	return ( s.find( c ) != std::string::npos );
 }
 
-// Character is in a cstring?
+// char is in a cstring?
 inline
 bool
 has_any_of( char const c, c_cstring const s )
@@ -103,7 +187,7 @@ has_any_of( char const c, c_cstring const s )
 	return is_any_of( c, s );
 }
 
-// Character is not in a string?
+// char is not in a string?
 inline
 bool
 not_any_of( char const c, std::string const & s )
@@ -111,7 +195,7 @@ not_any_of( char const c, std::string const & s )
 	return ( s.find( c ) == std::string::npos );
 }
 
-// Character is not in a cstring?
+// char is not in a cstring?
 bool
 not_any_of( char const c, c_cstring const s );
 
@@ -149,7 +233,7 @@ llt( char const c, char const d )
 
 // Integer Conversion
 
-// Integer Value of a Character
+// Integer Value of a char
 inline
 int
 ICHAR( char const c )
@@ -157,7 +241,7 @@ ICHAR( char const c )
 	return static_cast< int >( c );
 }
 
-// ASCII Integer Value of a Character
+// ASCII Integer Value of a char
 inline
 int
 IACHAR( char const c )
@@ -167,7 +251,7 @@ IACHAR( char const c )
 
 // Modifier
 
-// Lowercase a Character
+// Lowercase a char
 inline
 char &
 lowercase( char & c )
@@ -176,7 +260,7 @@ lowercase( char & c )
 	return c;
 }
 
-// Uppercase a Character
+// Uppercase a char
 inline
 char &
 uppercase( char & c )
@@ -187,7 +271,7 @@ uppercase( char & c )
 
 // Generator
 
-// Lowercased Copy of a Character
+// Lowercased Copy of a char
 inline
 char
 lowercased( char const c )
@@ -195,7 +279,7 @@ lowercased( char const c )
 	return to_lower( c );
 }
 
-// Uppercased Copy of a Character
+// Uppercased Copy of a char
 inline
 char
 uppercased( char const c )

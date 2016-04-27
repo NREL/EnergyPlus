@@ -28,20 +28,20 @@ The control type schedule and the list of control type/name pairs are directly r
 
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \toprule 
-Control Type & Control Type Name/Object \tabularnewline
+Control Type Value & Control Type Name \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Control Type & Control Type Name/Object \tabularnewline
+Control Type Value & Control Type Name \tabularnewline
 \midrule
 \endhead
 
-0 & No thermal comfort control \tabularnewline
-1 & ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating \tabularnewline
-2 & ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling \tabularnewline
-3 & ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling \tabularnewline
-4 & ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint \tabularnewline
+0 & Uncontrolled (No specification or default) \tabularnewline
+1 & Single Heating Setpoint (input object ThermostatSetpoint:SingleHeating) \tabularnewline
+2 & Single Cooling SetPoint (input object ThermostatSetpoint:SingleCooling) \tabularnewline
+3 & Single Heating/Cooling Setpoint (input object ThermostatSetpoint:SingleHeatingOrCooling) \tabularnewline
+4 & Dual Setpoint (Heating and Cooling) with deadband (input object ThermostatSetpoint:DualSetpoint) \tabularnewline
 \bottomrule
 \end{longtable}
 
