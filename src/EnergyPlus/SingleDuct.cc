@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -162,10 +220,27 @@ namespace SingleDuct {
 	Array1D< SysFlowConditions > SysOutlet;
 	Array1D< AirTerminalMixerData > SysATMixer;
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitSysFlag( true ); // Flag set to make sure you do begin simulation initializaztions once
+	}
+
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		GetATMixerFlag = true;
+		InitSysFlag = true;
+	}
 
 	void
 	SimulateSingleDuct(
@@ -365,6 +440,8 @@ namespace SingleDuct {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
+		std::string AirTermSysInletNodeName; // air terminal single duct system inlet node name
+		std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
 		// Flow
 		NumVAVSys = GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat" );
@@ -623,7 +700,7 @@ namespace SingleDuct {
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
-			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFrac, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
 			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
@@ -645,7 +722,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVReheat;
-			Sys( SysNum ).ReheatComp = Alphas( 6 );
+			Sys( SysNum ).ReheatComp = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
@@ -657,11 +734,11 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 6 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).ReheatName = Alphas( 7 );
+			Sys( SysNum ).ReheatName = Alphas( 6 );
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -730,7 +807,7 @@ namespace SingleDuct {
 				}
 				//  END IF
 			}
-			Sys( SysNum ).ReheatAirOutletNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 8 ) );
+			Sys( SysNum ).ReheatAirOutletNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 7 ) );
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SteamAirHeating ) {
 				Sys( SysNum ).MaxReheatSteamVolFlow = Numbers( 3 );
 				Sys( SysNum ).MinReheatSteamVolFlow = Numbers( 4 );
@@ -777,14 +854,14 @@ namespace SingleDuct {
 				Sys( SysNum ).MaxReheatTempSetByUser = false;
 			}
 
-			ValidateComponent( Alphas( 6 ), Alphas( 7 ), IsNotOK, Sys( SysNum ).SysType );
+			ValidateComponent( Alphas( 5 ), Alphas( 6 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 6 ), Alphas( 7 ), Alphas( 3 ), Alphas( 8 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), Alphas( 3 ), Alphas( 7 ) );
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
@@ -808,7 +885,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctConstVolReheat;
-			Sys( SysNum ).ReheatComp = Alphas( 6 );
+			Sys( SysNum ).ReheatComp = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
@@ -820,11 +897,11 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else {
-				ShowSevereError( "Illegal " + cAlphaFields( 6 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).ReheatName = Alphas( 7 );
+			Sys( SysNum ).ReheatName = Alphas( 6 );
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -924,14 +1001,14 @@ namespace SingleDuct {
 				}
 			}
 
-			ValidateComponent( Alphas( 6 ), Alphas( 7 ), IsNotOK, Sys( SysNum ).SysType );
+			ValidateComponent( Alphas( 5 ), Alphas( 6 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 6 ), Alphas( 7 ), Alphas( 4 ), Alphas( 3 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), Alphas( 4 ), Alphas( 3 ) );
 
 			//Setup the Average damper Position output variable
 			// BG removed 9-10-2009 during work on CR 7770, constant volume has no damper
@@ -1063,6 +1140,7 @@ namespace SingleDuct {
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
 			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
@@ -1166,8 +1244,8 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheatVSFan;
-			Sys( SysNum ).ReheatComp = Alphas( 9 );
-			Sys( SysNum ).ReheatName = Alphas( 10 );
+			Sys( SysNum ).ReheatComp = Alphas( 7 );
+			Sys( SysNum ).ReheatName = Alphas( 8 );
 			IsNotOK = false;
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
@@ -1186,7 +1264,7 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 9 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
@@ -1195,15 +1273,15 @@ namespace SingleDuct {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).FanType = Alphas( 7 );
+			Sys( SysNum ).FanType = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
 				Sys( SysNum ).Fan_Num = FanType_VS;
 			} else if ( Sys( SysNum ).FanType != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Sys( SysNum ).FanType + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).FanType + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).FanName = Alphas( 8 );
+			Sys( SysNum ).FanName = Alphas( 6 );
 			ValidateComponent( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -1246,6 +1324,14 @@ namespace SingleDuct {
 			}
 			//               GetOnlySingleNode(Alphas(3),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
 			//                           NodeType_Air,NodeConnectionType_Inlet,1,ObjectIsParent)
+			AirTermSysInletNodeName = NodeID( Sys( SysNum ).InletNodeNum );
+			if ( ! SameString( Alphas( 3 ), AirTermSysInletNodeName ) ) {
+				ShowWarningError( RoutineName + "Invalid air terminal object air inlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				ShowContinueError( " Specified air inlet node name is = " + Alphas( 3 ) + "." );
+				ShowContinueError( " Expected air inlet node name is = " + AirTermSysInletNodeName + "." );
+				//ErrorsFound = true;
+			}
+
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 			Sys( SysNum ).MaxHeatAirVolFlowRate = Numbers( 2 );
 			Sys( SysNum ).ZoneMinAirFrac = Numbers( 3 );
@@ -1312,6 +1398,14 @@ namespace SingleDuct {
 			//        Sys(SysNum)%ReheatAirOutletNode  = &
 			//               GetOnlySingleNode(Alphas(4),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
 			//                            NodeType_Air,NodeConnectionType_Outlet,1,ObjectIsParent)
+			AirTermSysOutletNodeName = NodeID( Sys( SysNum ).ReheatAirOutletNode );
+			if ( ! SameString( Alphas( 4 ), AirTermSysOutletNodeName ) ) {
+				ShowWarningError( RoutineName + "Invalid air terminal object air outlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				ShowContinueError( " Specified air outlet node name is = " + Alphas( 4 ) + "." );
+				ShowContinueError( " Expected air outlet node name is = " + AirTermSysOutletNodeName + "." );
+				//ErrorsFound = true;
+			}
+
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SteamAirHeating ) {
 				Sys( SysNum ).MaxReheatSteamVolFlow = Numbers( 4 );
 				Sys( SysNum ).MinReheatSteamVolFlow = Numbers( 5 );
@@ -1356,9 +1450,9 @@ namespace SingleDuct {
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 9 ), Alphas( 10 ), Alphas( 5 ), Alphas( 4 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 7 ), Alphas( 8 ), NodeID( Sys( SysNum ).OutletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 			// Add fan to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 7 ), Alphas( 8 ), Alphas( 3 ), Alphas( 5 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ) );
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
@@ -1479,7 +1573,6 @@ namespace SingleDuct {
 		int OutletNode;
 		int ADUNum;
 		int SysIndex;
-		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
@@ -1494,7 +1587,7 @@ namespace SingleDuct {
 		// FLOW:
 
 		// Do the Begin Simulation initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitSysFlag ) {
 
 			MyEnvrnFlag.allocate( NumSys );
 			MySizeFlag.allocate( NumSys );
@@ -1504,7 +1597,7 @@ namespace SingleDuct {
 			MySizeFlag = true;
 			PlantLoopScanFlag = true;
 			GetGasElecHeatCoilCap = true;
-			MyOneTimeFlag = false;
+			InitSysFlag = false;
 		}
 
 		if ( PlantLoopScanFlag( SysNum ) && allocated( PlantLoop ) ) {
@@ -1907,8 +2000,13 @@ namespace SingleDuct {
 		// apply limit based on min stop
 		MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac ) );
 		if ( IsAutoSize ) {
-			Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
-			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
+			if( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
+			} else {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = 0.0;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", 0.0 );
+			}
 		} else { // Hard size with sizing data
 			if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 0.0 && MaxAirVolFlowRateDuringReheatDes > 0.0 ) {
 				MaxAirVolFlowRateDuringReheatUser = Sys( SysNum ).MaxAirVolFlowRateDuringReheat;
@@ -2059,6 +2157,8 @@ namespace SingleDuct {
 						Sys( SysNum ).MaxReheatWaterVolFlow = MaxReheatWaterVolFlowDes;
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes );
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Air Volume Flow Rate [m3/s]", TermUnitSizing( CurZoneEqNum ).AirVolFlow );
+						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );						
 					} else { // Hard-size with sizing data
 						if ( Sys( SysNum ).MaxReheatWaterVolFlow > 0.0 && MaxReheatWaterVolFlowDes > 0.0 ) {
 							MaxReheatWaterVolFlowUser = Sys( SysNum ).MaxReheatWaterVolFlow;
@@ -2304,7 +2404,7 @@ namespace SingleDuct {
 		// the massflow rate for cooling is determined to meet the entire load.  Then
 		// if the massflow is below the minimum or greater than the Max it is set to either the Min
 		// or the Max as specified for the VAV model.
-		if ( ( QTotLoad < 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( TempControlType( ZoneNum ) != SingleHeatingSetPoint ) ) {
+		if ( ( QTotLoad < 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( TempControlType( ZoneNum ) != SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			// Calculate the flow required for cooling
 			CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
 			DeltaTemp = CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp;
@@ -2342,7 +2442,7 @@ namespace SingleDuct {
 				}
 			}
 
-		} else if ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( QTotLoad >= 0.0 || TempControlType( ZoneNum ) == SingleHeatingSetPoint ) ) {
+		} else if ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( QTotLoad >= 0.0 || TempControlType( ZoneNum ) == SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			//     IF (Sys(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. SysInlet(SysNum)%AirMassFlowRateMinAvail <= SmallMassFlow) THEN
 			// special case for heating: reverse action and damper allowed to close - set the minimum flow rate to a small but nonzero value
 			//       MassFlow = 0.01d0*SysInlet(SysNum)%AirMassFlowRateMaxAvail
@@ -2408,10 +2508,13 @@ namespace SingleDuct {
 
 		if ( MassFlow == 0.0 ) {
 			Sys( SysNum ).DamperPosition = 0.0;
+			Sys( SysNum ).ZoneMinAirFracReport = 0.0;
 		} else if ( ( MassFlow > 0.0 ) && ( MassFlow < Sys( SysNum ).AirMassFlowRateMax ) ) {
 			Sys( SysNum ).DamperPosition = MassFlow / Sys( SysNum ).AirMassFlowRateMax;
+			Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 		} else if ( MassFlow == Sys( SysNum ).AirMassFlowRateMax ) {
 			Sys( SysNum ).DamperPosition = 1.0;
+			Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 		}
 
 		//Need to make sure that the damper outlets are passed to the coil inlet
@@ -2554,10 +2657,13 @@ namespace SingleDuct {
 				// Recalculate the Damper Position.
 				if ( MassFlow == 0.0 ) {
 					Sys( SysNum ).DamperPosition = 0.0;
+					Sys( SysNum ).ZoneMinAirFracReport = 0.0;
 				} else if ( ( MassFlow > 0.0 ) && ( MassFlow < Sys( SysNum ).AirMassFlowRateMax ) ) {
 					Sys( SysNum ).DamperPosition = MassFlow / Sys( SysNum ).AirMassFlowRateMax;
+					Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 				} else if ( MassFlow == Sys( SysNum ).AirMassFlowRateMax ) {
 					Sys( SysNum ).DamperPosition = 1.0;
+					Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 				}
 
 			} else if ( SELECT_CASE_var == HCoilType_SteamAirHeating ) { // ! COIL:STEAM:AIRHEATING
@@ -5027,29 +5133,6 @@ namespace SingleDuct {
 
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SingleDuct
 

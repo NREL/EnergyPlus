@@ -1,8 +1,68 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef InputProcessor_hh_INCLUDED
 #define InputProcessor_hh_INCLUDED
 
 // C++ Headers
 #include <iosfwd>
+#include <type_traits>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -112,6 +172,9 @@ namespace InputProcessor {
 
 	// Types
 
+	template <class T> struct is_shared_ptr : std::false_type {};
+	template <class T> struct is_shared_ptr<std::shared_ptr<T> > : std::true_type {};
+
 	struct RangeCheckDef
 	{
 		// Members
@@ -144,39 +207,6 @@ namespace InputProcessor {
 			DefAutoCalculate( false ),
 			AutoCalculatable( false ),
 			AutoCalculateValue( 0.0 )
-		{}
-
-		// Member Constructor
-		RangeCheckDef(
-			bool const MinMaxChk, // true when Min/Max has been added
-			int const FieldNumber, // which field number this is
-			std::string const & FieldName, // Name of the field
-			Vector2_string const & MinMaxString, // appropriate Min/Max Strings
-			Vector2< Real64 > const & MinMaxValue, // appropriate Min/Max Values
-			Vector2_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-			bool const DefaultChk, // true when default has been entered
-			Real64 const Default, // Default value
-			bool const DefAutoSize, // Default value is "autosize"
-			bool const AutoSizable, // True if this field can be autosized
-			Real64 const AutoSizeValue, // Value to return for autosize field
-			bool const DefAutoCalculate, // Default value is "autocalculate"
-			bool const AutoCalculatable, // True if this field can be autocalculated
-			Real64 const AutoCalculateValue // Value to return for autocalculate field
-		) :
-			MinMaxChk( MinMaxChk ),
-			FieldNumber( FieldNumber ),
-			FieldName( FieldName ),
-			MinMaxString( MinMaxString ),
-			MinMaxValue( MinMaxValue ),
-			WhichMinMax( WhichMinMax ),
-			DefaultChk( DefaultChk ),
-			Default( Default ),
-			DefAutoSize( DefAutoSize ),
-			AutoSizable( AutoSizable ),
-			AutoSizeValue( AutoSizeValue ),
-			DefAutoCalculate( DefAutoCalculate ),
-			AutoCalculatable( AutoCalculatable ),
-			AutoCalculateValue( AutoCalculateValue )
 		{}
 
 	};
@@ -224,50 +254,6 @@ namespace InputProcessor {
 			NumFound( 0 )
 		{}
 
-		// Member Constructor
-		ObjectsDefinition(
-			std::string const & EP_UNUSED( Name ), // Name of the Object
-			int const NumParams, // Number of parameters to be processed for each object
-			int const NumAlpha, // Number of Alpha elements in the object
-			int const NumNumeric, // Number of Numeric elements in the object
-			int const MinNumFields, // Minimum number of fields to be passed to the Get routines
-			bool const NameAlpha1, // True if the first alpha appears to "name" the object for error messages
-			bool const UniqueObject, // True if this object has been designated \unique-object
-			bool const RequiredObject, // True if this object has been designated \required-object
-			bool const ExtensibleObject, // True if this object has been designated \extensible
-			int const ExtensibleNum, // how many fields to extend
-			int const LastExtendAlpha, // Count for extended alpha fields
-			int const LastExtendNum, // Count for extended numeric fields
-			int const ObsPtr, // If > 0, object is obsolete and this is the
-			Array1_bool const & AlphaOrNumeric, // Positionally, whether the argument
-			Array1_bool const & ReqField, // True for required fields
-			Array1_bool const & AlphRetainCase, // true if retaincase is set for this field (alpha fields only)
-			Array1_string const & AlphFieldChks, // Field names for alphas
-			Array1_string const & AlphFieldDefs, // Defaults for alphas
-			Array1< RangeCheckDef > const & NumRangeChks, // Used to range check and default numeric fields
-			int const NumFound // Number of this object found in IDF
-		) :
-			NumParams( NumParams ),
-			NumAlpha( NumAlpha ),
-			NumNumeric( NumNumeric ),
-			MinNumFields( MinNumFields ),
-			NameAlpha1( NameAlpha1 ),
-			UniqueObject( UniqueObject ),
-			RequiredObject( RequiredObject ),
-			ExtensibleObject( ExtensibleObject ),
-			ExtensibleNum( ExtensibleNum ),
-			LastExtendAlpha( LastExtendAlpha ),
-			LastExtendNum( LastExtendNum ),
-			ObsPtr( ObsPtr ),
-			AlphaOrNumeric( AlphaOrNumeric ),
-			ReqField( ReqField ),
-			AlphRetainCase( AlphRetainCase ),
-			AlphFieldChks( AlphFieldChks ),
-			AlphFieldDefs( AlphFieldDefs ),
-			NumRangeChks( NumRangeChks ),
-			NumFound( NumFound )
-		{}
-
 	};
 
 	struct SectionsDefinition
@@ -279,15 +265,6 @@ namespace InputProcessor {
 		// Default Constructor
 		SectionsDefinition() :
 			NumFound( 0 )
-		{}
-
-		// Member Constructor
-		SectionsDefinition(
-			std::string const & Name, // Name of the Section
-			int const NumFound // Number of this object found in IDF
-		) :
-			Name( Name ),
-			NumFound( NumFound )
 		{}
 
 	};
@@ -305,19 +282,6 @@ namespace InputProcessor {
 			FirstRecord( 0 ),
 			FirstLineNo( 0 ),
 			LastRecord( 0 )
-		{}
-
-		// Member Constructor
-		FileSectionsDefinition(
-			std::string const & Name, // Name of this section
-			int const FirstRecord, // Record number of first object in section
-			int const FirstLineNo, // Record number of first object in section
-			int const LastRecord // Record number of last object in section
-		) :
-			Name( Name ),
-			FirstRecord( FirstRecord ),
-			FirstLineNo( FirstLineNo ),
-			LastRecord( LastRecord )
 		{}
 
 	};
@@ -343,26 +307,6 @@ namespace InputProcessor {
 			ObjectDefPtr( 0 )
 		{}
 
-		// Member Constructor
-		LineDefinition(
-			std::string const & EP_UNUSED( Name ), // Object name for this record
-			int const NumAlphas, // Number of alphas on this record
-			int const NumNumbers, // Number of numbers on this record
-			int const ObjectDefPtr, // Which Object Def is this
-			Array1_string const & Alphas, // Storage for the alphas
-			Array1_bool const & AlphBlank, // Set to true if this field was blank on input
-			Array1< Real64 > const & Numbers, // Storage for the numbers
-			Array1_bool const & NumBlank // Set to true if this field was blank on input
-		) :
-			NumAlphas( NumAlphas ),
-			NumNumbers( NumNumbers ),
-			ObjectDefPtr( ObjectDefPtr ),
-			Alphas( Alphas ),
-			AlphBlank( AlphBlank ),
-			Numbers( Numbers ),
-			NumBlank( NumBlank )
-		{}
-
 	};
 
 	struct SecretObjects
@@ -381,23 +325,6 @@ namespace InputProcessor {
 			Used( false ),
 			Transitioned( false ),
 			TransitionDefer( false )
-		{}
-
-		// Member Constructor
-		SecretObjects(
-			std::string const & OldName, // Old Object Name
-			std::string const & NewName, // New Object Name if applicable
-			bool const Deleted, // true if this (old name) was deleted
-			bool const Used, // true when used (and reported) in this input file
-			bool const Transitioned, // true if old name will be transitioned to new object within IP
-			bool const TransitionDefer // true if old name will be transitioned to new object within IP
-		) :
-			OldName( OldName ),
-			NewName( NewName ),
-			Deleted( Deleted ),
-			Used( Used ),
-			Transitioned( Transitioned ),
-			TransitionDefer( TransitionDefer )
 		{}
 
 	};
@@ -578,7 +505,7 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		Array1D_string const & ListOfItems,
+		Array1_string const & ListOfItems,
 		int const NumItems
 	);
 
@@ -586,7 +513,7 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		Array1D_string const & ListOfItems
+		Array1_string const & ListOfItems
 	)
 	{
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
@@ -635,7 +562,7 @@ namespace InputProcessor {
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs and operator[i] and elements need Name
 	inline
 	int
 	FindItemInList(
@@ -650,7 +577,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and elements need Name
 	inline
 	int
 	FindItemInList(
@@ -661,7 +588,7 @@ namespace InputProcessor {
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs operator[i] and value_type
 	inline
 	int
 	FindItemInList(
@@ -677,7 +604,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and value_type
 	inline
 	int
 	FindItemInList(
@@ -746,6 +673,62 @@ namespace InputProcessor {
 		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
 	}
 
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::false_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s.name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::true_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s->name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str
+	)
+	{
+		return FindItem( first, last, str, is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{} );
+	}
+
 	int
 	FindItem(
 		std::string const & String,
@@ -808,7 +791,7 @@ namespace InputProcessor {
 		return FindItem( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
 	inline
 	int
 	FindItem(
@@ -825,7 +808,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
 	inline
 	int
 	FindItem(
@@ -836,7 +819,7 @@ namespace InputProcessor {
 		return FindItem( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
 	inline
 	int
 	FindItem(
@@ -854,7 +837,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
 	inline
 	int
 	FindItem(
@@ -907,6 +890,33 @@ namespace InputProcessor {
 		return equali( s, t );
 	}
 
+	template < typename InputIterator >
+	inline
+	void
+	VerifyName(
+		InputIterator first,
+		InputIterator last,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		IsBlank = false;
+		ErrorFound = false;
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+			return;
+		}
+		int Found = FindItem( first, last, NameToVerify );
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			ErrorFound = true;
+		}
+	}
+
 	void
 	VerifyName(
 		std::string const & NameToVerify,
@@ -957,7 +967,7 @@ namespace InputProcessor {
 		}
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
 	inline
 	void
 	VerifyName(
@@ -987,7 +997,7 @@ namespace InputProcessor {
 		}
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
 	inline
 	void
 	VerifyName(
@@ -1156,29 +1166,6 @@ namespace InputProcessor {
 
 	std::string
 	IPTrimSigDigits( int const IntegerValue );
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // InputProcessor
 

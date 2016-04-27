@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::HVACVariableRefrigerantFlow unit tests
 
 // Google test headers
@@ -9,7 +67,6 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -22,6 +79,7 @@
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
@@ -49,6 +107,7 @@ using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
@@ -114,8 +173,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( DXCoil( 1 ).SH, 3 );
 
 	}
-	
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
+
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CompResidual )
 	{
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
@@ -161,12 +220,12 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 1.652, CompResidual, 0.005 );
 
 		// Clean up
-		PerfCurve.deallocate( );
-		Par.deallocate( );
+		PerfCurve.deallocate();
+		Par.deallocate();
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_FanSpdResidualCool )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method FanSpdResidualCool.
@@ -186,7 +245,7 @@ namespace EnergyPlus {
 		NumPar = 6;
 		Par.allocate( 6 );
 
-		// Inputs: 
+		// Inputs:
 		FanSpdRto = 0.5;
 		ZnSenLoad = 2716.62;
 		Th2 = 17.41212;
@@ -204,11 +263,11 @@ namespace EnergyPlus {
 		EXPECT_NEAR( -0.707, FanSpdResidual, 0.0005 );
 
 		// Clean up
-		Par.deallocate( );
+		Par.deallocate();
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualHeat )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_FanSpdResidualHeat )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method FanSpdResidualHeat.
@@ -228,7 +287,7 @@ namespace EnergyPlus {
 		NumPar = 6;
 		Par.allocate( 6 );
 
-		// Inputs: 
+		// Inputs:
 		FanSpdRto = 0.5;
 		ZnSenLoad = 4241.66;
 		Th2 = 41.221;
@@ -242,27 +301,27 @@ namespace EnergyPlus {
 		Par( 5 ) = BF;
 
 		// Run and Check
-		double FanSpdResidual = FanSpdResidualHeat( FanSpdRto, Par ); 
+		double FanSpdResidual = FanSpdResidualHeat( FanSpdRto, Par );
 		EXPECT_NEAR( -0.5459, FanSpdResidual, 0.0005 );
 
 		// Clean up
-		Par.deallocate( );
+		Par.deallocate();
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_ControlVRFIUCoil )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUAirFlow )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
-		//   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
+		//   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions
 
 		using namespace DXCoils;
 		using namespace DataZoneEnergyDemands;
 		using namespace EnergyPlus::Psychrometrics;
 		using DataEnvironment::OutBaroPress;
 
-		int ZoneIndex;  // index to zone where the VRF Terminal Unit resides 
-		int CoolCoilIndex;  // index to VRFTU cooling coil 
+		int ZoneIndex;  // index to zone where the VRF Terminal Unit resides
+		int CoolCoilIndex;  // index to VRFTU cooling coil
 		int HeatCoilIndex;  // index to VRFTU heating coil
 		int Mode;       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
 		Real64 Temp;    // evaporating or condensing temperature
@@ -285,7 +344,7 @@ namespace EnergyPlus {
 		FanSpdRatio = 0;
 		Wout = 1;
 		OutBaroPress = 101570;
-		InitializePsychRoutines( );
+		InitializePsychRoutines();
 
 		DXCoil( CoolCoilIndex ).C1Te = 0;
 		DXCoil( CoolCoilIndex ).C2Te = 0.804;
@@ -310,12 +369,12 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirTemp = 25.5553;
 		DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
-		
+
 		ControlVRFIUCoil( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, 25.5553, 8.4682e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
 		EXPECT_NEAR( SHact, 3.00, 0.01 );
-		
+
 		// Run and Check for Heating Mode
 		Mode = 1;
 		Temp = 42;
@@ -335,13 +394,13 @@ namespace EnergyPlus {
 		EXPECT_NEAR( SCact, 5.00, 0.01 );
 
 		// Clean up
-		ZoneSysEnergyDemand.deallocate( );
+		ZoneSysEnergyDemand.deallocate();
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUTeTc )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUTeTc )
 	{
 		// PURPOSE OF THIS TEST:
-		//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at 
+		//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at
 		//   cooling mode and the condensing temperature at heating mode.
 
 		using namespace HVACVariableRefrigerantFlow;
@@ -363,15 +422,15 @@ namespace EnergyPlus {
 		VRF( IndexVRFCondenser ).EvapTempFixed = 3;
 		VRF( IndexVRFCondenser ).CondTempFixed = 5;
 
-		// Run and Check 
+		// Run and Check
 		CalcVRFIUTeTc_FluidTCtrl( IndexVRFCondenser );
 
 		EXPECT_EQ( VRF( IndexVRFCondenser ).IUEvaporatingTemp, 3 );
 		EXPECT_EQ( VRF( IndexVRFCondenser ).IUCondensingTemp, 5 );
 
 		// Clean up
-		VRF.deallocate( );
-		TerminalUnitList.deallocate( );
+		VRF.deallocate();
+		TerminalUnitList.deallocate();
 	}
 
 	TEST_F( EnergyPlusFixture, VRFTest_SysCurve ) {
@@ -386,7 +445,7 @@ namespace EnergyPlus {
 		Real64 DefrostWatts( 0.0 );       // calculation of VRF defrost power [W]
 		Real64 SysOutputProvided( 0.0 );  // function returns sensible capacity [W]
 		Real64 LatOutputProvided( 0.0 );  // function returns latent capacity [W]
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 			" ",
@@ -975,7 +1034,7 @@ namespace EnergyPlus {
 		ProcessScheduleInput(); // read schedules
 		GetCurveInput(); // read curves
 		GetZoneData( ErrorsFound ); // read zone data
-		EXPECT_FALSE( ErrorsFound ); 
+		EXPECT_FALSE( ErrorsFound );
 
 		DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
 		GlobalNames::NumCoils = 0; // remove this when clear_state gets added to GlobalNames
@@ -1016,7 +1075,7 @@ namespace EnergyPlus {
 		ASSERT_EQ( 1.0, VRF( VRFCond ).CoolingCombinationRatio );
 		ASSERT_EQ( 10749.071979211991, VRF( VRFCond ).CoolingCapacity );
 		ASSERT_EQ( 10749.071979211991, VRF( VRFCond ).HeatingCapacity );
-		EXPECT_EQ( 0.0, VRF( VRFCond ).DefrostPower ); 
+		EXPECT_EQ( 0.0, VRF( VRFCond ).DefrostPower );
 
 		// test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
 
@@ -1037,17 +1096,39 @@ namespace EnergyPlus {
 		DefrostWatts = VRF( VRFCond ).VRFCondRTF * ( VRF( VRFCond ).HeatingCapacity / 1.01667 ) * VRF( VRFCond ).DefrostFraction;
 		ASSERT_EQ( DefrostWatts, VRF( VRFCond ).DefrostPower ); // defrost power calculation check
 
-		// clean up
-		ZoneSysEnergyDemand.deallocate();
+		// test other ThermostatPriority control types
+		ZoneThermostatSetPointHi.allocate( 1 );
+		ZoneThermostatSetPointHi = 24.0;
+		ZoneThermostatSetPointLo.allocate( 1 );
+		ZoneThermostatSetPointLo = 21.0;
+		TempControlType.allocate( 1 );
+		TempControlType = 4;
+		ZT.allocate( 1 );
+		ZT = 25.0;
+
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = -VRF( VRFCond ).CoolingCapacity; // set load equal to the VRF cooling capacity
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = -VRF( VRFCond ).CoolingCapacity;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -VRF( VRFCond ).CoolingCapacity - 1000.0;
+
+		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 35.0; // AHRI condition at 95 F db
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 25.0;
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 35.0; // AHRI condition at 95 F db
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).HumRat = 0.01; // don't care
+
+		VRF( VRFCond ).MasterZonePtr = 0;
+		VRF( VRFCond ).MasterZoneTUIndex = 0;
+		VRF( VRFCond ).ThermostatPriority = ThermostatOffsetPriority;
+		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system output should be less than 0
 
 	}
 
 	TEST_F( EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers ) {
 		// Author: R. Raustad, FSEC
-		
+
 		bool ErrorsFound( false );        // function returns true on error
 		int VRFTUNum( 1 );                // index to VRF terminal unit
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 			" ",
@@ -1636,11 +1717,11 @@ namespace EnergyPlus {
 		ProcessScheduleInput(); // read schedules
 		GetCurveInput(); // read curves
 		GetZoneData( ErrorsFound ); // read zone data
-		EXPECT_FALSE( ErrorsFound ); 
+		EXPECT_FALSE( ErrorsFound );
 
 		GetZoneEquipmentData(); // read equipment list and connections
 		GetVRFInputData( ErrorsFound );
-		EXPECT_TRUE( ErrorsFound ); 
+		EXPECT_TRUE( ErrorsFound );
 		EXPECT_EQ( 0, VRFTU( VRFTUNum ).VRFSysNum );
 		EXPECT_EQ( 0, VRFTU( VRFTUNum ).ZoneNum );
 		EXPECT_EQ( 0, VRFTU( VRFTUNum ).TUListIndex );
@@ -1675,6 +1756,7 @@ namespace EnergyPlus {
 
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
+			" BUILDING, VRFTest_SysCurve_WaterCooled, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
 			" ",
 			"AirConditioner:VariableRefrigerantFlow,",
 			"  VRF Water Cooled HP,     !- Heat Pump Name",
@@ -2599,6 +2681,711 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.deallocate();
 	}
 
+
+	TEST_F( EnergyPlusFixture, VRFTest_NoLoad_OAMassFlowRateTest ) {
+
+		//static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );
+		bool ErrorsFound( false );        // function returns true on error
+		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration
+		int VRFTUNum( 1 );                // index to VRF terminal unit
+		int CurZoneNum( 1 );              // index to zone
+		int ZoneInletAirNode( 0 );        // zone inlet node number
+		int OutsideAirNode( 0 );          // VRFTU Outside air inlet node
+		Real64 AverageOAMassFlow( 0.0 );  // VRFTU Outside air mass flow rate 
+		int ZoneNum( 1 );                 // current zone index
+		Real64 QZnReq( 0.0 );             // current zone load to set point
+		Real64 PartLoadRatio( 0.0 );      // unit part load ratio
+		Real64 OnOffAirFlowRatio( 1.0 );  // ratio of compressor ON airflow to average airflow over timestep
+
+		std::string const idf_objects = delimited_string( {
+
+			"  Version,8.4;",
+
+			"  ScheduleTypeLimits,",
+			"    Fraction,                !- Name",
+			"    0.0,                     !- Lower Limit Value",
+			"    1.0,                     !- Upper Limit Value",
+			"    CONTINUOUS;              !- Numeric Type",
+
+			"  Schedule:Compact,",
+			"    AlwaysOn,                !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,1;          !- Field 3",
+
+			"  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+			"    Level1:Office1 VRF Indoor Unit,  !- Zone Terminal Unit Name",
+			"    AlwaysOn,                !- Terminal Unit Availability Schedule",
+			"    Level1:Office1 VRF Indoor Unit Return,  !- Terminal Unit Air Inlet Node Name",
+			"    Level1:Office1 VRF Indoor Unit Supply Inlet,  !- Terminal Unit Air Outlet Node Name",
+			"    0.111000,                !- Cooling Supply Air Flow Rate {m3/s}",
+			"    0.056000,                !- No Cooling Supply Air Flow Rate {m3/s}",
+			"    0.111000,                !- Heating Supply Air Flow Rate {m3/s}",
+			"    0.056000,                !- No Heating Supply Air Flow Rate {m3/s}",
+			"    0.028000,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+			"    0.028000,                !- Heating Outdoor Air Flow Rate {m3/s}",
+			"    0.014000,                !- No Load Outdoor Air Flow Rate {m3/s}",
+			"    AlwaysOn,                !- Supply Air Fan Operating Mode Schedule Name",
+			"    BlowThrough,             !- Supply Air Fan Placement",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    Level1:Office1 VRF Indoor Unit Supply Fan,  !- Supply Air Fan Object Name",
+			"    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+			"    Level1:Office1 VRF Indoor Unit Outdoor Air Mixer,  !- Outside Air Mixer Object Name",
+			"    Coil:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+			"    Level1:Office1 VRF Indoor Unit DX Cooling Coil,  !- Cooling Coil Object Name",
+			"    Coil:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+			"    Level1:Office1 VRF Indoor Unit DX Heating Coil,  !- Heating Coil Object Name",
+			"    30.0000,                 !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+			"    20.0000;                 !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+
+			"  ZoneHVAC:EquipmentList,",
+			"    Level1:Office1 Equipment,!- Name",
+			"    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+			"    Level1:Office1 VRF Indoor Unit,  !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+			"  ZoneHVAC:EquipmentConnections,",
+			"    Level1:Office1,          !- Zone Name",
+			"    Level1:Office1 Equipment,!- Zone Conditioning Equipment List Name",
+			"    Level1:Office1 Air Inlet Node List,  !- Zone Air Inlet Node or NodeList Name",
+			"    Level1:Office1 Air Exhaust Node List,  !- Zone Air Exhaust Node or NodeList Name",
+			"    Level1:Office1 Zone Air Node,  !- Zone Air Node Name",
+			"    Level1:Office1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"  Zone,",
+			"    Level1:Office1,          !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    68.2413,                 !- Volume {m3}",
+			"    19.4975,                 !- Floor Area {m2}",
+			"    TARP;                    !- Zone Inside Convection Algorithm",
+
+			"  Fan:ConstantVolume,",
+			"    Level1:Office1 VRF Indoor Unit Supply Fan,  !- Name",
+			"    AlwaysOn,                 !- Availability Schedule Name",
+			"    0.70,                    !- Fan Total Efficiency",
+			"    100.00,                  !- Pressure Rise {Pa}",
+			"    0.111000,                !- Maximum Flow Rate {m3/s}",
+			"    0.90,                    !- Motor Efficiency",
+			"    1.00,                    !- Motor In Airstream Fraction",
+			"    Level1:Office1 VRF Indoor Unit Mixed Air Outlet,  !- Air Inlet Node Name",
+			"    Level1:Office1 VRF Indoor Unit Supply Fan Outlet,  !- Air Outlet Node Name",
+			"    General;                 !- End-Use Subcategory",
+
+			"  Coil:Cooling:DX:VariableRefrigerantFlow,",
+			"    Level1:Office1 VRF Indoor Unit DX Cooling Coil,  !- Name",
+			"    AlwaysOn,                 !- Availability Schedule Name",
+			"    4000.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    0.111000,                !- Rated Air Flow Rate {m3/s}",
+			"    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+			"    Level1:Office1 VRF Indoor Unit Supply Fan Outlet,  !- Coil Air Inlet Node",
+			"    Level1:Office1 VRF Indoor Unit DX Cooling Coil Outlet;  !- Coil Air Outlet Node",
+
+			"  Coil:Heating:DX:VariableRefrigerantFlow,",
+			"    Level1:Office1 VRF Indoor Unit DX Heating Coil,  !- Name",
+			"    AlwaysOn,                !- Availability Schedule",
+			"    4000.0,                  !- Gross Rated Heating Capacity {W}",
+			"    0.111000,                !- Rated Air Flow Rate {m3/s}",
+			"    Level1:Office1 VRF Indoor Unit DX Cooling Coil Outlet,  !- Coil Air Inlet Node",
+			"    Level1:Office1 VRF Indoor Unit Supply Inlet,  !- Coil Air Outlet Node",
+			"    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+			"  AirConditioner:VariableRefrigerantFlow,",
+			"    VRF Outdoor Unit,        !- Heat Pump Name",
+			"    AlwaysOn,                !- Availability Schedule Name",
+			"    7040.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    3.3,                     !- Gross Rated Cooling COP {W/W}",
+			"    -6,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+			"    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+			"    VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+			"    VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+			"    VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+			"    VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+			"    CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+			"    CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+			"    CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+			"    VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+			"    autosize,                !- Gross Rated Heating Capacity {W}",
+			"    1,                       !- Rated Heating Capacity Sizing Ratio {W/W}",
+			"    3.4,                     !- Gross Rated Heating COP {W/W}",
+			"    -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+			"    40,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+			"    VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+			"    VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+			"    VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+			"    VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+			"    WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+			"    HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+			"    HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+			"    HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+			"    VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+			"    0.15,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+			"    <Select zone>,           !- Zone Name for Master Thermostat Location",
+			"    LoadPriority,            !- Master Thermostat Priority Control Type",
+			"    ,                        !- Thermostat Priority Schedule Name",
+			"    VRF Outdoor Unit Zone List,  !- Zone Terminal Unit List Name",
+			"    No,                      !- Heat Pump Waste Heat Recovery",
+			"    50,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+			"    15,                      !- Vertical Height used for Piping Correction Factor {m}",
+			"    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+			"    -.000386,                !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+			"    50,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+			"    VRF Piping Correction Factor for Length in Heating Mode,  !- Piping Correction Factor for Length in Heating Mode Curve Name",
+			"    0,                       !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+			"    15,                      !- Crankcase Heater Power per Compressor {W}",
+			"    2,                       !- Number of Compressors {dimensionless}",
+			"    0.5,                     !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+			"    5,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+			"    Resistive,               !- Defrost Strategy",
+			"    Timed,                   !- Defrost Control",
+			"    DXHtgCoilDefrostEIRFT,   !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+			"    0.058333,                !- Defrost Time Period Fraction {dimensionless}",
+			"    autosize,                !- Resistive Defrost Heater Capacity {W}",
+			"    5,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+			"    AirCooled,               !- Condenser Type",
+			"    VRF Outdoor Unit Outdoor Air Node,  !- Condenser Inlet Node Name",
+			"    ,                        !- Condenser Outlet Node Name",
+			"    autosize,                !- Water Condenser Volume Flow Rate {m3/s}",
+			"    0.9,                     !- Evaporative Condenser Effectiveness {dimensionless}",
+			"    autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
+			"    autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}",
+			"    ,                        !- Supply Water Storage Tank Name",
+			"    0,                       !- Basin Heater Capacity {W/K}",
+			"    2,                       !- Basin Heater Setpoint Temperature {C}",
+			"    AlwaysOn,                 !- Basin Heater Operating Schedule Name",
+			"    Electricity,             !- Fuel Type",
+			"    -10,                     !- Minimum Outdoor Temperature in Heat Recovery Mode {C}",
+			"    40,                      !- Maximum Outdoor Temperature in Heat Recovery Mode {C}",
+			"    VRF Heat Recovery Cooling Capacity Modifier,  !- Heat Recovery Cooling Capacity Modifier Curve Name",
+			"    0.5,                     !- Initial Heat Recovery Cooling Capacity Fraction {W/W}",
+			"    0.15,                    !- Heat Recovery Cooling Capacity Time Constant {hr}",
+			"    VRF Heat Recovery Cooling Energy Modifier,  !- Heat Recovery Cooling Energy Modifier Curve Name",
+			"    1,                       !- Initial Heat Recovery Cooling Energy Fraction {W/W}",
+			"    0,                       !- Heat Recovery Cooling Energy Time Constant {hr}",
+			"    VRF Heat Recovery Heating Capacity Modifier,  !- Heat Recovery Heating Capacity Modifier Curve Name",
+			"    1,                       !- Initial Heat Recovery Heating Capacity Fraction {W/W}",
+			"    0.15,                    !- Heat Recovery Heating Capacity Time Constant {hr}",
+			"    VRF Heat Recovery Heating Energy Modifier,  !- Heat Recovery Heating Energy Modifier Curve Name",
+			"    1,                       !- Initial Heat Recovery Heating Energy Fraction {W/W}",
+			"    0;                       !- Heat Recovery Heating Energy Time Constant {hr}",
+
+			"  ZoneTerminalUnitList,",
+			"    VRF Outdoor Unit Zone List,  !- Zone Terminal Unit List Name",
+			"    Level1:Office1 VRF Indoor Unit;  !- Zone Terminal Unit Name 1",
+
+			"  OutdoorAir:Mixer,",
+			"    Level1:Office1 VRF Indoor Unit Outdoor Air Mixer,  !- Name",
+			"    Level1:Office1 VRF Indoor Unit Mixed Air Outlet,  !- Mixed Air Node Name",
+			"    Level1:Office1 VRF Indoor Unit Outdoor Air Node Name,  !- Outdoor Air Stream Node Name",
+			"    Level1:Office1 VRF Indoor Unit Air Relief Node Name,  !- Relief Air Stream Node Name",
+			"    Level1:Office1 VRF Indoor Unit Return;  !- Return Air Stream Node Name",
+
+			"  NodeList,",
+			"    Level1:Office1 Air Inlet Node List,  !- Name",
+			"    Level1:Office1 VRF Indoor Unit Supply Inlet;  !- Node 1 Name",
+
+			"  NodeList,",
+			"    Level1:Office1 Air Exhaust Node List,  !- Name",
+			"    Level1:Office1 VRF Indoor Unit Return;  !- Node 1 Name",
+
+			"  OutdoorAir:NodeList,",
+			"    VRF Outdoor Unit Outdoor Air Node;  !- Node or NodeList Name 1",
+
+			"  OutdoorAir:NodeList,",
+			"    Level1:Office1 VRF Indoor Unit Outdoor Air Node Name;  !- Node or NodeList Name 1",
+
+			"  Curve:Linear,",
+			"    CoolingCombRatio,        !- Name",
+			"    0.618055,                !- Coefficient1 Constant",
+			"    0.381945,                !- Coefficient2 x",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Linear,",
+			"    HeatingCombRatio,        !- Name",
+			"    0.96034,                 !- Coefficient1 Constant",
+			"    0.03966,                 !- Coefficient2 x",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    VRFACCoolCapFFF,         !- Name",
+			"    0.8,                     !- Coefficient1 Constant",
+			"    0.2,                     !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.5,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    CoolingEIRHiPLR,         !- Name",
+			"    1.0,                     !- Coefficient1 Constant",
+			"    0.0,                     !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    VRFCPLFFPLR,             !- Name",
+			"    0.85,                    !- Coefficient1 Constant",
+			"    0.15,                    !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.0,                     !- Minimum Value of x",
+			"    1.0;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    HeatingEIRHiPLR,         !- Name",
+			"    2.4294355,               !- Coefficient1 Constant",
+			"    -2.235887,               !- Coefficient2 x",
+			"    0.8064516,               !- Coefficient3 x**2",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Cubic,",
+			"    DefaultFanEffRatioCurve, !- Name",
+			"    0.33856828,              !- Coefficient1 Constant",
+			"    1.72644131,              !- Coefficient2 x",
+			"    -1.49280132,             !- Coefficient3 x**2",
+			"    0.42776208,              !- Coefficient4 x**3",
+			"    0.5,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    0.3,                     !- Minimum Curve Output",
+			"    1.0;                     !- Maximum Curve Output",
+
+			"  Curve:Cubic,",
+			"    VRFTUCoolCapFT,          !- Name",
+			"    0.504547273506488,       !- Coefficient1 Constant",
+			"    0.0288891279198444,      !- Coefficient2 x",
+			"    -0.000010819418650677,   !- Coefficient3 x**2",
+			"    0.0000101359395177008,   !- Coefficient4 x**3",
+			"    0.0,                     !- Minimum Value of x",
+			"    50.0,                    !- Maximum Value of x",
+			"    0.5,                     !- Minimum Curve Output",
+			"    1.5,                     !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFTUHeatCapFT,          !- Name",
+			"    -0.390708928227928,      !- Coefficient1 Constant",
+			"    0.261815023760162,       !- Coefficient2 x",
+			"    -0.0130431603151873,     !- Coefficient3 x**2",
+			"    0.000178131745997821,    !- Coefficient4 x**3",
+			"    0.0,                     !- Minimum Value of x",
+			"    50.0,                    !- Maximum Value of x",
+			"    0.5,                     !- Minimum Curve Output",
+			"    1.5,                     !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFCoolCapFTBoundary,    !- Name",
+			"    25.73473775,             !- Coefficient1 Constant",
+			"    -0.03150043,             !- Coefficient2 x",
+			"    -0.01416595,             !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 x**3",
+			"    11,                      !- Minimum Value of x",
+			"    30,                      !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFCoolEIRFTBoundary,    !- Name",
+			"    25.73473775,             !- Coefficient1 Constant",
+			"    -0.03150043,             !- Coefficient2 x",
+			"    -0.01416595,             !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 x**3",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    CoolingEIRLowPLR,        !- Name",
+			"    0.4628123,               !- Coefficient1 Constant",
+			"    -1.0402406,              !- Coefficient2 x",
+			"    2.17490997,              !- Coefficient3 x**2",
+			"    -0.5974817,              !- Coefficient4 x**3",
+			"    0,                       !- Minimum Value of x",
+			"    1,                       !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFHeatCapFTBoundary,    !- Name",
+			"    -7.6000882,              !- Coefficient1 Constant",
+			"    3.05090016,              !- Coefficient2 x",
+			"    -0.1162844,              !- Coefficient3 x**2",
+			"    0.0,                     !- Coefficient4 x**3",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFHeatEIRFTBoundary,    !- Name",
+			"    -7.6000882,              !- Coefficient1 Constant",
+			"    3.05090016,              !- Coefficient2 x",
+			"    -0.1162844,              !- Coefficient3 x**2",
+			"    0.0,                     !- Coefficient4 x**3",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -20,                     !- Minimum Curve Output",
+			"    15,                      !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    HeatingEIRLowPLR,        !- Name",
+			"    0.1400093,               !- Coefficient1 Constant",
+			"    0.6415002,               !- Coefficient2 x",
+			"    0.1339047,               !- Coefficient3 x**2",
+			"    0.0845859,               !- Coefficient4 x**3",
+			"    0,                       !- Minimum Value of x",
+			"    1,                       !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Exponent,",
+			"    DefaultFanPowerRatioCurve,  !- Name",
+			"    0,                       !- Coefficient1 Constant",
+			"    1,                       !- Coefficient2 Constant",
+			"    3,                       !- Coefficient3 Constant",
+			"    0,                       !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    0.01,                    !- Minimum Curve Output",
+			"    1.5;                     !- Maximum Curve Output",
+
+			"  Curve:Biquadratic,",
+			"    DXHtgCoilDefrostEIRFT,   !- Name",
+			"    1.0,                     !- Coefficient1 Constant",
+			"    0.0,                     !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.0,                     !- Coefficient4 y",
+			"    0,                       !- Coefficient5 y**2",
+			"    0,                       !- Coefficient6 x*y",
+			"    0.0,                     !- Minimum Value of x",
+			"    50.0,                    !- Maximum Value of x",
+			"    0.0,                     !- Minimum Value of y",
+			"    50.0,                    !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolCapFT,            !- Name",
+			"    0.576882692,             !- Coefficient1 Constant",
+			"    0.017447952,             !- Coefficient2 x",
+			"    0.000583269,             !- Coefficient3 x**2",
+			"    -1.76324E-06,            !- Coefficient4 y",
+			"    -7.474E-09,              !- Coefficient5 y**2",
+			"    -1.30413E-07,            !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    -5,                      !- Minimum Value of y",
+			"    23,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolCapFTHi,          !- Name",
+			"    0.6867358,               !- Coefficient1 Constant",
+			"    0.0207631,               !- Coefficient2 x",
+			"    0.0005447,               !- Coefficient3 x**2",
+			"    -0.0016218,              !- Coefficient4 y",
+			"    -4.259E-07,              !- Coefficient5 y**2",
+			"    -0.0003392,              !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    16,                      !- Minimum Value of y",
+			"    43,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolEIRFT,            !- Name",
+			"    0.989010541,             !- Coefficient1 Constant",
+			"    -0.02347967,             !- Coefficient2 x",
+			"    0.000199711,             !- Coefficient3 x**2",
+			"    0.005968336,             !- Coefficient4 y",
+			"    -1.0289E-07,             !- Coefficient5 y**2",
+			"    -0.00015686,             !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    -5,                      !- Minimum Value of y",
+			"    23,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolEIRFTHi,          !- Name",
+			"    0.14351470,              !- Coefficient1 Constant",
+			"    0.01860035,              !- Coefficient2 x",
+			"    -0.0003954,              !- Coefficient3 x**2",
+			"    0.02485219,              !- Coefficient4 y",
+			"    0.00016329,              !- Coefficient5 y**2",
+			"    -0.0006244,              !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    16,                      !- Minimum Value of y",
+			"    43,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatCapFT,            !- Name",
+			"    1.014599599,             !- Coefficient1 Constant",
+			"    -0.002506703,            !- Coefficient2 x",
+			"    -0.000141599,            !- Coefficient3 x**2",
+			"    0.026931595,             !- Coefficient4 y",
+			"    1.83538E-06,             !- Coefficient5 y**2",
+			"    -0.000358147,            !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -20,                     !- Minimum Value of y",
+			"    15,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatCapFTHi,          !- Name",
+			"    1.161134821,             !- Coefficient1 Constant",
+			"    0.027478868,             !- Coefficient2 x",
+			"    -0.00168795,             !- Coefficient3 x**2",
+			"    0.001783378,             !- Coefficient4 y",
+			"    2.03208E-06,             !- Coefficient5 y**2",
+			"    -6.8969E-05,             !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -10,                     !- Minimum Value of y",
+			"    15,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatEIRFT,            !- Name",
+			"    0.87465501,              !- Coefficient1 Constant",
+			"    -0.01319754,             !- Coefficient2 x",
+			"    0.00110307,              !- Coefficient3 x**2",
+			"    -0.0133118,              !- Coefficient4 y",
+			"    0.00089017,              !- Coefficient5 y**2",
+			"    -0.00012766,             !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -20,                     !- Minimum Value of y",
+			"    12,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatEIRFTHi,          !- Name",
+			"    2.504005146,             !- Coefficient1 Constant",
+			"    -0.05736767,             !- Coefficient2 x",
+			"    4.07336E-05,             !- Coefficient3 x**2",
+			"    -0.12959669,             !- Coefficient4 y",
+			"    0.00135839,              !- Coefficient5 y**2",
+			"    0.00317047,              !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -10,                     !- Minimum Value of y",
+			"    15,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    CoolingLengthCorrectionFactor,  !- Name",
+			"    1.0693794,               !- Coefficient1 Constant",
+			"    -0.0014951,              !- Coefficient2 x",
+			"    2.56E-06,                !- Coefficient3 x**2",
+			"    -0.1151104,              !- Coefficient4 y",
+			"    0.0511169,               !- Coefficient5 y**2",
+			"    -0.0004369,              !- Coefficient6 x*y",
+			"    8,                       !- Minimum Value of x",
+			"    175,                     !- Maximum Value of x",
+			"    0.5,                     !- Minimum Value of y",
+			"    1.5,                     !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRF Piping Correction Factor for Length in Heating Mode,  !- Name",
+			"    0.989916,                !- Coefficient1 Constant",
+			"    0.001961,                !- Coefficient2 x",
+			"    -.000036,                !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 y",
+			"    0,                       !- Coefficient5 y**2",
+			"    0,                       !- Coefficient6 x*y",
+			"    7,                       !- Minimum Value of x",
+			"    106.5,                   !- Maximum Value of x",
+			"    1,                       !- Minimum Value of y",
+			"    1,                       !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Distance,                !- Input Unit Type for X",
+			"    Dimensionless,           !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRF Heat Recovery Cooling Capacity Modifier,  !- Name",
+			"    0.9,                     !- Coefficient1 Constant",
+			"    0,                       !- Coefficient2 x",
+			"    0,                       !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 y",
+			"    0,                       !- Coefficient5 y**2",
+			"    0,                       !- Coefficient6 x*y",
+			"    -100,                    !- Minimum Value of x",
+			"    100,                     !- Maximum Value of x",
+			"    -100,                    !- Minimum Value of y",
+			"    100,                     !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRF Heat Recovery Cooling Energy Modifier,  !- Name",
+			"    1.1,                     !- Coefficient1 Constant",
+			"    0,                       !- Coefficient2 x",
+			"    0,                       !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 y",
+			"    0,                       !- Coefficient5 y**2",
+			"    0,                       !- Coefficient6 x*y",
+			"    -100,                    !- Minimum Value of x",
+			"    100,                     !- Maximum Value of x",
+			"    -100,                    !- Minimum Value of y",
+			"    100,                     !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRF Heat Recovery Heating Capacity Modifier,  !- Name",
+			"    0.9,                     !- Coefficient1 Constant",
+			"    0,                       !- Coefficient2 x",
+			"    0,                       !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 y",
+			"    0,                       !- Coefficient5 y**2",
+			"    0,                       !- Coefficient6 x*y",
+			"    -100,                    !- Minimum Value of x",
+			"    100,                     !- Maximum Value of x",
+			"    -100,                    !- Minimum Value of y",
+			"    100,                     !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRF Heat Recovery Heating Energy Modifier,  !- Name",
+			"    1.1,                     !- Coefficient1 Constant",
+			"    0,                       !- Coefficient2 x",
+			"    0,                       !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 y",
+			"    0,                       !- Coefficient5 y**2",
+			"    0,                       !- Coefficient6 x*y",
+			"    -100,                    !- Minimum Value of x",
+			"    100,                     !- Maximum Value of x",
+			"    -100,                    !- Minimum Value of y",
+			"    100,                     !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::BeginEnvrnFlag = true;
+		DataSizing::CurZoneEqNum = 1;
+		DataEnvironment::OutBaroPress = 101325; // sea level
+		DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+		DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, 20.0, 0.0 );
+		DataGlobals::SysSizingCalc = true;
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+
+		CurveManager::GetCurveInput(); // read curves
+		HeatBalanceManager::GetZoneData( ErrorsFound ); // read zone data
+		EXPECT_FALSE( ErrorsFound );
+
+		DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
+		HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
+		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function
+		OutsideAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum; // outside air air inlet node num
+		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate( 1 );
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 0.0;  // No load 
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 0.0;  // No load 
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 0.0;  // No load 
+		QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired;  // No load 
+		// Initialize terminal unit
+		Schedule( VRFTU( VRFTUNum ).FanOpModeSchedPtr ).CurrentValue = 1.0; // set continuous fan operating mode
+		InitVRF( VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq ); // Initialize all VRFTU related parameters
+		ASSERT_EQ( VRFTU( VRFTUNum ).OpMode, DataHVACGlobals::ContFanCycCoil ); // continuous fan cycling coil operating mode
+		// Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
+		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
+		AverageOAMassFlow = DataEnvironment::StdRhoAir * VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+		EXPECT_EQ( AverageOAMassFlow, Node( OutsideAirNode ).MassFlowRate );
+
+		// clean up
+		ZoneSysEnergyDemand.deallocate();
+	}
+
 }
-
-

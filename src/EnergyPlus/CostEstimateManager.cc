@@ -1,7 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <CostEstimateManager.hh>
@@ -161,8 +219,8 @@ namespace CostEstimateManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
-		int NumCostAdjust;
-		int NumRefAdjust;
+		int NumCostAdjust( 0 );
+		int NumRefAdjust( 0 );
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
@@ -209,9 +267,6 @@ namespace CostEstimateManager {
 		}
 
 		//most input error checking to be performed later within Case construct in Calc routine.
-		// do inits that aren't in a derived type
-		NumCostAdjust = 0;
-		NumRefAdjust = 0;
 
 		cCurrentModuleObject = "ComponentCost:Adjustments";
 		NumCostAdjust = GetNumObjectsFound( cCurrentModuleObject );
@@ -628,8 +683,13 @@ namespace CostEstimateManager {
 
 					}
 				}
-				//determine which surfaces have the construction type  and if any are duplicates..
-				CostLineItem( Item ).Qty = sum( Surface.Area() * SurfMultipleARR, ( uniqueSurfMask && ( Surface.Construction() == ThisConstructID ) ) );
+				// determine which surfaces have the construction type  and if any are duplicates..
+				Real64 Qty( 0.0 );
+				for ( int i = 1; i <= TotSurfaces; ++i ) {
+					auto const & s( Surface( i ) );
+					if ( uniqueSurfMask( i ) && ( s.Construction == ThisConstructID ) ) Qty += s.Area * SurfMultipleARR( i );
+				}
+				CostLineItem( Item ).Qty = Qty;
 				CostLineItem( Item ).Units = "m2";
 				CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerSquareMeter;
 				CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -649,7 +709,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
 					if ( WildcardObjNames ) {
-						CostLineItem( Item ).Qty = sum_col( DXCoil.RatedTotCap(), 1 ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : DXCoil ) Qty += e.RatedTotCap( 1 );
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW (tot cool cap.)";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -672,7 +733,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) {
 					if ( WildcardObjNames ) {
-						CostLineItem( Item ).Qty = sum_product_col( DXCoil.RatedCOP(), DXCoil.RatedTotCap(), 1 ) / 1000.0; //Autodesk:F2C++ Was sum( DXCoil.RatedCOP( 1 ) * DXCoil.RatedTotCap( 1 ) ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : DXCoil ) Qty += e.RatedCOP( 1 ) * e.RatedTotCap( 1 );
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW*COP (total, rated) ";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKWCapPerCOP;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -697,8 +759,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
 					if ( WildcardObjNames ) {
-
-						CostLineItem( Item ).Qty = sum( HeatingCoil.NominalCapacity(), ( HeatingCoil.HCoilType_Num() == 1 ) ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : HeatingCoil ) if ( e.HCoilType_Num == 1 ) Qty += e.NominalCapacity;
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW (tot heat cap.)";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -721,7 +783,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) {
 					if ( WildcardObjNames ) {
-						CostLineItem( Item ).Qty = sum( HeatingCoil.Efficiency() * HeatingCoil.NominalCapacity(), ( HeatingCoil.HCoilType_Num() == 1 ) ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : HeatingCoil ) if ( e.HCoilType_Num == 1 ) Qty += e.Efficiency * e.NominalCapacity;
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW*Eff (total, rated) ";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKWCapPerCOP;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -760,7 +823,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
-					CostLineItem( Item ).Qty = sum( ZoneDaylight.TotalDaylRefPoints() );
+					CostLineItem( Item ).Qty = sum( ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints );
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
 					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
@@ -799,7 +862,8 @@ namespace CostEstimateManager {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
 						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID > 0 ) {
-							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * sum( Lights.DesignLevel(), Lights.ZonePtr() == ThisZoneID ); //this handles more than one light object per zone.
+							Real64 Qty( 0.0 ); for ( auto const & e : Lights ) if ( e.ZonePtr == ThisZoneID ) Qty += e.DesignLevel;
+							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * Qty; // this handles more than one light object per zone.
 							CostLineItem( Item ).Units = "kW";
 							CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 							CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -836,32 +900,9 @@ namespace CostEstimateManager {
 
 		//now sum up the line items, result for the current building
 
-		CurntBldg.LineItemTot = sum( CostLineItem.LineSubTotal() );
+		CurntBldg.LineItemTot = sum( CostLineItem, &CostLineItemStruct::LineSubTotal );
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // CostEstimateManager
 

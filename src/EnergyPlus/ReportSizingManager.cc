@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <string>
 
@@ -27,6 +85,7 @@
 #include <DataPlant.hh>
 #include <WaterCoils.hh>
 #include <Fans.hh>
+#include <DesiccantDehumidifiers.hh>
 
 namespace EnergyPlus {
 
@@ -314,6 +373,7 @@ namespace ReportSizingManager {
 		using WaterCoils::SimpleHeatingCoilUAResidual;
 		using Fans::FanDesDT;
 		using Fans::FanDesHeatGain;
+		using DesiccantDehumidifiers::DesicDehum;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -1048,7 +1108,7 @@ namespace ReportSizingManager {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						NominalCapacityDes = DesMassFlow * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
-					} else if ( ZoneEqFanCoil ) {
+					} else if ( ZoneEqFanCoil || ZoneEqUnitHeater ) {
 						DesMassFlow = ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow;
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
@@ -1080,7 +1140,7 @@ namespace ReportSizingManager {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataWaterFlowUsedForSizing * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho * TermUnitSizing( CurZoneEqNum ).ReheatLoadMult;
-					} else if ( ZoneEqFanCoil ) {
+					} else if ( ZoneEqFanCoil || ZoneEqUnitHeater ) {
 						DesMassFlow = StdRhoAir * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
@@ -1180,6 +1240,26 @@ namespace ReportSizingManager {
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
 					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+				} else if( SizingType == ZoneCoolingLoadSizing ) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
+				} else if( SizingType == ZoneHeatingLoadSizing ) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
+				} else if( SizingType == MinSATempCoolingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp - ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
+				} else if( SizingType == MaxSATempHeatingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp + ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat, FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
 				} else {
 					// should never happen
 				}
@@ -1252,7 +1332,7 @@ namespace ReportSizingManager {
 						} else {
 							if ( CurDuctType == Main ) {
 								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
-									if (FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0) {
+									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && ! DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
 									} else {
 										AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
@@ -1260,9 +1340,9 @@ namespace ReportSizingManager {
 								} else {
 									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
-								} else if ( CurDuctType == Cooling ) {
+							} else if ( CurDuctType == Cooling ) {
 								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
-									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
+									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 									} else {
 										AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
@@ -1450,6 +1530,31 @@ namespace ReportSizingManager {
 						}
 					}
 					bCheckForZero = false;
+				} else if ( SizingType == HeatingCoilDesAirInletTempSizing ) {
+					if ( DataDesicRegCoil ) {
+						if ( DesicDehum( DataDesicDehumNum ).RegenInletIsOutsideAirNode ) {
+							AutosizeDes = FinalSysSizing( CurSysNum ).HeatOutTemp;
+						} else {
+							AutosizeDes = FinalSysSizing( CurSysNum ).HeatRetTemp;
+						}
+					}
+					bCheckForZero = false;
+				} else if ( SizingType == HeatingCoilDesAirOutletTempSizing ) {
+					if ( DataDesicRegCoil ) {
+						AutosizeDes = DesicDehum( DataDesicDehumNum ).RegenSetPointTemp;
+					}
+
+					bCheckForZero = false;
+				} else if ( SizingType == HeatingCoilDesAirInletHumRatSizing ) {
+					if ( DataDesicRegCoil ) {
+						if ( DesicDehum( DataDesicDehumNum ).RegenInletIsOutsideAirNode ) {
+							AutosizeDes = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+						} else {
+							AutosizeDes = FinalSysSizing( CurSysNum ).HeatRetHumRat;
+						}
+					}
+
+					bCheckForZero = false;
 				} else if ( SizingType == CoolingSHRSizing ) {
 					if ( DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0 ) {
 						// For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
@@ -1590,7 +1695,7 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingCapacitySizing ) {
 					DataFracOfAutosizedHeatingCapacity = 1.0;
 					if (CurOASysNum > 0) {
-						if (OASysEqSizing(CurOASysNum).AirFlow) {
+						if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
 						} else if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).HeatingAirVolFlow;
@@ -1609,13 +1714,13 @@ namespace ReportSizingManager {
 							DesVolFlow = UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
+								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
 							} else if ( CurDuctType == Cooling ) {
-								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
+								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
@@ -1654,6 +1759,9 @@ namespace ReportSizingManager {
 						if ( OASysEqSizing( CurOASysNum ).HeatingCapacity ) {
 							DesCoilLoad = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
 							CoilOutTemp = -999.0;
+						} else if ( DataDesicRegCoil ) {
+							DesCoilLoad = CpAirStd * DesMassFlow * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+							CoilOutTemp = DataDesOutletAirTemp;
 						} else {
 							DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
 							CoilOutTemp = FinalSysSizing( CurSysNum ).PreheatTemp;
@@ -1662,6 +1770,9 @@ namespace ReportSizingManager {
 						if ( UnitarySysEqSizing( CurSysNum ).HeatingCapacity ) {
 							DesCoilLoad = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
 							CoilOutTemp = -999.0;
+						} else if ( DataDesicRegCoil ) {
+							DesCoilLoad = CpAirStd * DesMassFlow * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+							CoilOutTemp = DataDesOutletAirTemp;
 						} else {
 							DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
 							CoilOutTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
@@ -1738,9 +1849,17 @@ namespace ReportSizingManager {
 					// coil load
 					CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 					if ( CurOASysNum > 0 ) {
-						AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
+						if ( DataDesicRegCoil ) {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+						} else {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
+						}
 					} else {
-						AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+						if ( DataDesicRegCoil ) {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+						} else {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+						}
 					}
 				} else if ( SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing ) {
 					AutosizeDes = DataWaterFlowUsedForSizing;
@@ -2137,29 +2256,6 @@ namespace ReportSizingManager {
 			}
 		}
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ReportSizingManager
 

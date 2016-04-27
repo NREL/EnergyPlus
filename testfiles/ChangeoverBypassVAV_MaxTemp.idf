@@ -103,7 +103,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.4;
+  Version,8.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1267,7 +1267,6 @@
     Zone 1 VAV Inlet Node,   !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     0.05,                    !- Zone Minimum Air Flow Fraction
-    ,                        !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -1283,7 +1282,6 @@
     Zone 2 VAV Inlet Node,   !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     0.25,                    !- Zone Minimum Air Flow Fraction
-    ,                        !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}

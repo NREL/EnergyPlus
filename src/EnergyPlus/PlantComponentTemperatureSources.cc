@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -53,7 +111,6 @@ namespace PlantComponentTemperatureSources {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using DataPlant::TypeOf_WaterSource;
-	using DataPlant::PlantLocation;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
@@ -353,7 +410,7 @@ namespace PlantComponentTemperatureSources {
 		if ( WaterSource( SourceNum ).MyFlag ) {
 			// Locate the component on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
+			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
 			}
@@ -363,9 +420,9 @@ namespace PlantComponentTemperatureSources {
 		//Initialize critical Demand Side Variables at the beginning of each environment
 		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).MassFlowRateMax = WaterSource( SourceNum ).DesVolFlowRate * rho;
-			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
+			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 
 			WaterSource( SourceNum ).MyEnvironFlag = false;
 		}
@@ -381,7 +438,7 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		// Calculate specific heat
-		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 
 		// Calculate deltaT
 		Real64 delta_temp = WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp;
@@ -420,7 +477,7 @@ namespace PlantComponentTemperatureSources {
 			}
 		}
 
-		SetComponentFlowRate( WaterSource( SourceNum ).MassFlowRate, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
+		SetComponentFlowRate( WaterSource( SourceNum ).MassFlowRate, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 
 		// at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
 		// the calc routine will update the outlet temp and heat transfer rate/energies
@@ -471,17 +528,14 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 tmpVolFlowRate; // local design volume flow rate
-		Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
+		Real64 DesVolFlowRateUser( 0.0 ); // Hardsized design volume flow rate for reporting
 
-		PltSizNum = 0;
-		ErrorsFound = false;
 		tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-		DesVolFlowRateUser = 0.0;
 
-		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).PlantSizNum;
+		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.loopNum ).PlantSizNum;
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -592,7 +646,7 @@ namespace PlantComponentTemperatureSources {
 
 		if ( WaterSource( SourceNum ).MassFlowRate > 0.0 ) {
 			WaterSource( SourceNum ).OutletTemp = WaterSource( SourceNum ).BoundaryTemp;
-			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).HeatRate = WaterSource( SourceNum ).MassFlowRate * Cp * ( WaterSource( SourceNum ).OutletTemp - WaterSource( SourceNum ).InletTemp );
 			WaterSource( SourceNum ).HeatEnergy = WaterSource( SourceNum ).HeatRate * TimeStepSys * SecInHour;
 		} else {

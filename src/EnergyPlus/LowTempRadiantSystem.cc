@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -185,6 +243,37 @@ namespace LowTempRadiantSystem {
 	Array1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		LowTempHeating = -200.0;
+		HighTempCooling = 200.0;
+		NumOfHydrLowTempRadSys = 0;
+		NumOfCFloLowTempRadSys = 0;
+		NumOfElecLowTempRadSys = 0;
+		CFloCondIterNum = 0;
+		TotalNumOfRadSystems = 0;
+		OperatingMode = 0;
+		MaxCloNumOfSurfaces = 0;
+		VarOffCond = false;
+		LoopReqTemp = 0.0;
+		QRadSysSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQRadSysSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlagHydr.deallocate();
+		MySizeFlagCFlo.deallocate();
+		MySizeFlagElec.deallocate();
+		CheckEquipName.deallocate();
+		HydrRadSys.deallocate();
+		CFloRadSys.deallocate();
+		ElecRadSys.deallocate();
+		RadSysTypes.deallocate();
+		ElecRadSysNumericFields.deallocate();
+		HydronicRadiantSysNumericFields.deallocate();
+	}
 
 	void
 	SimLowTempRadiantSystem(
@@ -443,25 +532,25 @@ namespace LowTempRadiantSystem {
 		HydrRadSys.allocate( NumOfHydrLowTempRadSys );
 		if ( NumOfHydrLowTempRadSys > 0 ) {
 			GlycolIndex = FindGlycol( fluidNameWater );
-			HydrRadSys.GlycolIndex() = GlycolIndex;
+			for ( auto & e : HydrRadSys ) e.GlycolIndex = GlycolIndex;
 			if ( GlycolIndex == 0 ) {
 				ShowSevereError( "Hydronic radiant systems: no water property data found in input" );
 				ErrorsFound = true;
 			}
 		} else {
-			HydrRadSys.GlycolIndex() = 0;
+			for ( auto & e : HydrRadSys ) e.GlycolIndex = 0;
 		}
 
 		CFloRadSys.allocate( NumOfCFloLowTempRadSys );
 		if ( NumOfCFloLowTempRadSys > 0 ) {
 			GlycolIndex = FindGlycol( fluidNameWater );
-			CFloRadSys.GlycolIndex() = GlycolIndex;
+			for ( auto & e : CFloRadSys ) e.GlycolIndex = GlycolIndex;
 			if ( GlycolIndex == 0 ) {
 				ShowSevereError( "Constant flow radiant systems: no water property data found in input" );
 				ErrorsFound = true;
 			}
 		} else {
-			CFloRadSys.GlycolIndex() = 0;
+			for ( auto & e : CFloRadSys ) e.GlycolIndex = 0;
 		}
 
 		ElecRadSys.allocate( NumOfElecLowTempRadSys );
@@ -469,7 +558,7 @@ namespace LowTempRadiantSystem {
 		HydronicRadiantSysNumericFields.allocate( NumOfHydrLowTempRadSys );
 
 		// make sure data is gotten for surface lists
-		BaseNum = GetNumberOfSurfaceLists();
+		GetNumberOfSurfaceLists();
 
 		// Obtain all of the user data related to hydronic low temperature radiant systems...
 		BaseNum = 0;
@@ -615,10 +704,12 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
-					ShowContinueError( "Input for " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFields( 3 ) );
-					ErrorsFound = true;
+					if( ( !lAlphaBlanks( 7 ) ) || ( !lAlphaBlanks( 8 ) ) ) {
+						ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFields( 3 ) );
+						ErrorsFound = true;
+					}
 				}
 			} else if ( SameString( Alphas( 6 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
@@ -705,10 +796,12 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
-					ShowContinueError( "Input for " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFields( 8 ) );
-					ErrorsFound = true;
+					if( ( !lAlphaBlanks( 11 ) ) || ( !lAlphaBlanks( 12 ) ) ) {
+						ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFields( 8 ) );
+						ErrorsFound = true;
+					}
 				}
 			} else if ( SameString( Alphas( 10 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).CoolingCapMethod = CapacityPerFloorArea;
@@ -1937,20 +2030,20 @@ namespace LowTempRadiantSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
+		int PltSizHeatNum( 0 ); // index of plant sizing object for 1st heating loop
+		int PltSizCoolNum( 0 ); // index of plant sizing object for 1st cooling loop
 		int SurfNum; // surface index in radiant system data structure
-		bool ErrorsFound; // If errors detected in input
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 rho;
 		Real64 Cp;
-		bool IsAutoSize; // Indicator to autosize
-		Real64 MaxElecPowerDes; // Design electric power for reproting
-		Real64 WaterVolFlowMaxHeatDes; // Design hot water flow for reproting
-		Real64 WaterVolFlowMaxHeatUser; // User hard-sized hot water flow for
-		Real64 WaterVolFlowMaxCoolDes; // Design chilled water flow for reproting
-		Real64 WaterVolFlowMaxCoolUser; // User hard-sized chilled water flow for reproting
-		Real64 TubeLengthDes; // Design tube length for reproting
-		Real64 TubeLengthUser; // User hard-sized tube length for reproting
+		bool IsAutoSize( false ); // Indicator to autosize
+		// Real64 MaxElecPowerDes( 0.0 ); // Design electric power for reproting
+		Real64 WaterVolFlowMaxHeatDes( 0.0 ); // Design hot water flow for reproting
+		Real64 WaterVolFlowMaxHeatUser( 0.0 ); // User hard-sized hot water flow for
+		Real64 WaterVolFlowMaxCoolDes( 0.0 ); // Design chilled water flow for reproting
+		Real64 WaterVolFlowMaxCoolUser( 0.0 ); // User hard-sized chilled water flow for reproting
+		Real64 TubeLengthDes( 0.0 ); // Design tube length for reproting
+		Real64 TubeLengthUser( 0.0 ); // User hard-sized tube length for reproting
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -1960,28 +2053,15 @@ namespace LowTempRadiantSystem {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 DesCoilLoad; // design autosized or user specified capacity
-		int OpMode;				// System operating mode
+		int OpMode( 1 );				// System operating mode
 		int HeatNode;			// Hot water inlet node to determine system operating mode
 		int CoolNode;			// Chilled water inlet node to determine system operating mode
 		Real64 WaterVolFlowMaxDes;		// Design water volume flow rate for reproting
 		Real64 WaterVolFlowMaxUser;		// User hard-sized water volume flow rate for reproting
 
-		ErrorsFound = false;
-		IsAutoSize = false;
 		DesCoilLoad = 0.0;
-		MaxElecPowerDes = 0.0;
-		MaxElecPowerDes = 0.0;
-		WaterVolFlowMaxHeatDes = 0.0;
-		WaterVolFlowMaxHeatUser = 0.0;
-		WaterVolFlowMaxCoolDes = 0.0;
-		WaterVolFlowMaxCoolUser = 0.0;
-		TubeLengthDes = 0.0;
-		TubeLengthUser = 0.0;
 		DataScalableCapSizingON = false;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
-		OpMode = 1;
-		PltSizHeatNum = 0;
-		PltSizCoolNum = 0;
 
 		if ( SystemType == ElectricSystem ) {
 
@@ -2012,6 +2092,10 @@ namespace LowTempRadiantSystem {
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
 						ElecRadSys( RadSysNum ).MaxElecPower = TempSize;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ElecRadSys( RadSysNum ).Name + "\"." );
+						ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\"." );
+						ErrorsFound = true;
 					}
 				} else {
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2086,6 +2170,12 @@ namespace LowTempRadiantSystem {
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat == AutoSize ) {
+							ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys( RadSysNum ).Name + "\"." );
+							ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\"." );
+							ErrorsFound = true;
+						}
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2206,6 +2296,12 @@ namespace LowTempRadiantSystem {
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool == AutoSize ) {
+							ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys( RadSysNum ).Name + "\"." );
+							ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\"." );
+							ErrorsFound = true;
+						}
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
@@ -5111,29 +5207,6 @@ namespace LowTempRadiantSystem {
 		}}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // LowTempRadiantSystem
 

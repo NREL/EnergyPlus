@@ -1,0 +1,39 @@
+\section{Internal Zone Gains Services}\label{internal-zone-gains-services}
+
+Services are available to help with modeling internal gains.~ Internal gains include the usual sources such as people, lights, plug loads, etc., but in EnergyPlus there can also be zone gains from the skin losses from certain equipment such as thermal tanks, electric load center equipment and refrigeration case credits.~ Developers adding new device models, or adding skin loss modeling to exisiting device models, need to use a call to SetupZoneInternalGains.~ This call is defined in DataInterfaces.f90 and contains a number of optional arguments depending on the type of internal gains involved.~ The types of gains that can be added with this call include convection, radiation, and latent gains to the zone, convection and latent gains to the return air, carbon dioxide gains to the zone and generic air contaminant gains to the zone.~ For example, the call to register gains for the People object includes convection(sensible), thermal radiation, latent, and CO2 and is:
+
+\textbf{CALL} SetupZoneInternalGain(People(Loop)\%ZonePtr, \&
+
+~~~~ \textbf{`People'}, \&
+
+~~~~ People(Loop)\%Name, \&
+
+~~~~ IntGainTypeOf\_People, \&
+
+~~~~ ConvectionGainRate~~~~~~ = People(Loop)\%ConGainRate,\&
+
+~~~~ ThermalRadiationGainRate = People(Loop)\%RadGainRate, \&
+
+~~~~ LatentGainRate~~~~~~~~~~ = People(Loop)\%LatGainRate, \&
+
+~~~~ CarbonDioxideGainRate~~~ = People(Loop)\%CO2GainRate)
+
+The refrigerated case model includes terms for sensible and latent gains to both the zone and the return air.~ These are really negative gains, or sinks, and the call to register them is:
+
+\textbf{CALL} SetupZoneInternalGain(RefrigCase(CaseNum)\%ActualZoneNum, \&
+
+~~~~ \textbf{`Refrigeration:Case'},~ \&
+
+~~~~ RefrigCase(CaseNum)\%Name , \&
+
+~~~~ IntGainTypeOf\_RefrigerationCase,~~~~~~~~ \&
+
+~~~~ ConvectionGainRate~~~~~~~~~ = RefrigCase(CaseNum)\%SensZoneCreditRate , \&
+
+~~~~ ReturnAirConvectionGainRate = RefrigCase(CaseNum)\%SensHVACCreditRate , \&
+
+~~~~ LatentGainRate~~~~~~~~~~~~~ = RefrigCase(CaseNum)\%LatZoneCreditRate~ , \&
+
+~~~~ ReturnAirLatentGainRate~~~~ = RefrigCase(CaseNum)\%LatHVACCreditRate )
+
+The module developer needs to program the model to update the variable in their module, the one being registered by the call, and central routines use pointers to include the term in the appropriate energy balances elsewhere in the model.~ When adding a new type of internal gain, the new device needs to be added to arrays in \textbf{DataHeatBalance.f90} called \textbf{ZoneIntGainDeviceTypes} and \textbf{ccZoneIntGainDeviceTypes} and a new unique \textbf{``IntGainTypeOf\_''} parameter.

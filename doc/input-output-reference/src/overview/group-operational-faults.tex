@@ -1,0 +1,463 @@
+\section{Group - Operational Faults}\label{group---operational-faults}
+
+\subsection{Introduction to Operational Faults Modeling}\label{introduction-to-operational-faults-modeling}
+
+Most of the buildings, either new or old, have operational faults in the sensors, controllers, meters, equipment and systems. Being able to model and simulate these faults and their impact on energy performance of buildings is crucial to improve accuracy of building simulations and to support the retrofit of buildings.
+
+To date, the main practitioner use of EnergyPlus has been for new construction design. With the new high priority attached by USDOE to retrofit and improved operation of existing buildings, there is a need to extend the capabilities of EnergyPlus to model existing buildings, including faulty operation:
+
+\begin{itemize}
+\item
+  Retrofit analysis: starts with calibrated simulation; the ability to estimate the severity of common faults is expected to improve the accuracy and transparency of the calibrated model and hence the increase accuracy of the analysis of different retrofit measures.
+\item
+  Commissioning providers can use the fault models to demonstrate the saving to be expected from fixing faults found in retro-commissioning
+\item
+  Support for building operation by using the calibrated model, including unfixed faults, as a real-time reference model to detect, and verify the diagnosis of, newly occurring faults.
+\end{itemize}
+
+The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.
+
+\subsection{Operational Fault Objects}\label{operational-fault-objects}
+
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults.
+
+The objects used by EnergyPlus to model the faults are as follows:
+
+\begin{itemize}
+\item
+  FaultModel:TemperatureSensorOffset:OutdoorAir
+\item
+  FaultModel:HumiditySensorOffset:OutdoorAir
+\item
+  FaultModel:EnthalpySensorOffset:OutdoorAir
+\item
+  FaultModel:TemperatureSensorOffset:ReturnAir
+\item
+  FaultModel:EnthalpySensorOffset:ReturnAir
+\item
+  FaultModel:Fouling:Coil
+\item
+  FaultModel:ThermostatOffset
+\item
+  FaultModel:HumidistatOffset
+\end{itemize}
+
+\subsection{FaultModel:TemperatureSensorOffset:OutdoorAir}\label{faultmodeltemperaturesensoroffsetoutdoorair}
+
+This object defines the offset of an outdoor air dry-bulb temperature sensor that is used to determine applicability of an air economizer.
+
+\subsubsection{Inputs}\label{inputs-029}
+
+\paragraph{Field: Name}\label{field-name-028}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-011}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Controller Object Type}\label{field-controller-object-type}
+
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+
+\paragraph{Field: Controller Object Name}\label{field-controller-object-name}
+
+This field defines the name of the controller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Temperature Sensor Offset}\label{field-temperature-sensor-offset}
+
+This field defines the offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\subsection{FaultModel:HumiditySensorOffset:OutdoorAir}\label{faultmodelhumiditysensoroffsetoutdoorair}
+
+This object defines the offset of an outdoor air humidity sensor that is used to determine applicability of an air economizer.
+
+\subsubsection{Inputs}\label{inputs-1-026}
+
+\paragraph{Field: Name}\label{field-name-1-025}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-1-009}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-1}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Controller Object Type}\label{field-controller-object-type-1}
+
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+
+\paragraph{Field: Controller Object Name}\label{field-controller-object-name-1}
+
+This field defines the name of the controller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Humidity Sensor Offset}\label{field-humidity-sensor-offset}
+
+This field defines the offset of the humidity ratio sensor. A positive value means the sensor reads a humidity ratio that is higher than the real value. A negative value means the sensor reads a humidity ratio that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in kgWater/kgDryAir.
+
+\subsection{FaultModel:EnthalpySensorOffset:OutdoorAir}\label{faultmodelenthalpysensoroffsetoutdoorair}
+
+This object defines the offset of an outdoor enthalpy sensor that is used to determine applicability of an air economizer.
+
+\subsubsection{Inputs}\label{inputs-2-024}
+
+\paragraph{Field: Name}\label{field-name-2-023}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-2-005}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-2}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Controller Object Type}\label{field-controller-object-type-2}
+
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+
+\paragraph{Field: Controller Object Name}\label{field-controller-object-name-2}
+
+This field defines the name of the controller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Enthalpy Sensor Offset}\label{field-enthalpy-sensor-offset}
+
+This field defines the offset of the enthalpy sensor. A positive value means the sensor reads an enthalpy that is higher than the real value. A negative value means the sensor reads an enthalpy that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in J/kg.
+
+\subsection{FaultModel:TemperatureSensorOffset:ReturnAir}\label{faultmodeltemperaturesensoroffsetreturnair}
+
+This object defines the offset of a return air dry-bulb temperature sensor that is used to determine applicability of an air economizer.
+
+\subsubsection{Inputs}\label{inputs-3-022}
+
+\paragraph{Field: Name}\label{field-name-3-020}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-3-004}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-3}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Controller Object Type}\label{field-controller-object-type-3}
+
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+
+\paragraph{Field: Controller Object Name}\label{field-controller-object-name-3}
+
+This field defines the name of the controller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Temperature Sensor Offset}\label{field-temperature-sensor-offset-1}
+
+This field defines the offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\subsection{FaultModel:EnthalpySensorOffset:ReturnAir}\label{faultmodelenthalpysensoroffsetreturnair}
+
+This object defines the offset of a return air enthalpy sensor that is used to determine applicability of an air economizer.
+
+\subsubsection{Inputs}\label{inputs-4-020}
+
+\paragraph{Field: Name}\label{field-name-4-017}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-4-004}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-4}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Controller Object Type}\label{field-controller-object-type-4}
+
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+
+\paragraph{Field: Controller Object Name}\label{field-controller-object-name-4}
+
+This field defines the name of the controller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Enthalpy Sensor Offset}\label{field-enthalpy-sensor-offset-1}
+
+This field defines the offset of the enthalpy sensor. A positive value means the sensor reads an enthalpy that is higher than the real value. A negative value means the sensor reads an enthalpy that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in J/kg.
+
+\subsection{FaultModel:Fouling:Coil}\label{faultmodelfoulingcoil}
+
+This object defines the fouling for a simple water cooling coil or simple water heating coil.
+
+\subsubsection{Inputs}\label{inputs-5-018}
+
+\paragraph{Field: Name}\label{field-name-5-014}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Coil Name}\label{field-coil-name-001}
+
+This field defines the name of the simple cooling coil or simple heating coil that has the fouling fault.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-5-002}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then user-defined fouling and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-5}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined fouling. If this field is blank, the schedule has values of 1 (no changes to fouling) for all time periods.
+
+\paragraph{Field: Fouling Input Method}\label{field-fouling-input-method}
+
+There are two methods to input the fouling, i.e.~FouledUARated and FoulingFactor. User chooses the appropriate method to determine the coil fouling.
+
+\paragraph{Field: UAFouled}\label{field-uafouled}
+
+This is the overall coil UA value including the coil fouling when the ``FouledUARated'' method is used. The unit is W/K.
+
+\paragraph{Field: Water Side Fouling Factor}\label{field-water-side-fouling-factor}
+
+The following four fields specify the required inputs when the ``FoulingFactor'' method is used. This field defines the fouling factor for the water side. The units are in m\(^{2}\)-K/W.
+
+\paragraph{Field: Air Side Fouling Factor}\label{field-air-side-fouling-factor}
+
+This field defines the fouling factor for the air side. The units are in m\(^{2}\)-K/W.
+
+\paragraph{Field: Outside Coil Surface Area}\label{field-outside-coil-surface-area}
+
+This field defines outside surface area of the cooling or heating coil. The units are in m\(^{2}\).
+
+\paragraph{Field: Inside to Outside Coil Surface Area Ratio}\label{field-inside-to-outside-coil-surface-area-ratio}
+
+This field specifies the inside to outside surface area ratio of the cooling or heating coil.
+
+IDF examples:
+
+\begin{lstlisting}
+
+! example faults for an air economizer
+
+  Schedule:Compact,
+  OATSeveritySch,                   !- Name
+  On/Off,                                   !- Schedule Type Limits Name
+  Through: 6/30,                     !- Field 1
+  For: AllDays,                       !- Field 2
+  Until: 24:00,0,                   !- Field 3
+  Through: 12/31,                   !- Field 4
+  For: AllDays,                       !- Field 5
+  Until: 24:00,1;                   !- Field 6
+
+  FaultModel:TemperatureSensorOffset:OutdoorAir,
+  OATFault,                                 !- Name
+  ALWAYS_ON,                               !- Availability Schedule Name
+  OATSeveritySch,                     !- Severity Schedule Name
+  Controller:OutdoorAir,       !- Controller Object Type
+  VAV_1_OA_Controller,           !- Controller Object Name
+  -2.0;                                           !- Temperature Sensor Offset, deg C
+
+  FaultModel:TemperatureSensorOffset:ReturnAir,
+  RATFault,                                 !- Name
+  ,                                                 !- Availability Schedule Name
+  ,                                                 !- Severity Schedule Name
+  Controller:OutdoorAir,       !- Controller Object Type
+  VAV_2_OA_Controller,           !- Controller Object Name
+  -2.0;                                         !- Temperature Sensor Offset, deg C
+
+  FaultModel:EnthalpySensorOffset:ReturnAir,
+  RAHFault,                                 !- Name
+  ,                                                 !- Availability Schedule Name
+  ,                                                 !- Severity Schedule Name
+  Controller:OutdoorAir,       !- Controller Object Type
+  VAV_2_OA_Controller,           !- Controller Object Name
+  -2000;                                       !- Enthalpy Sensor Offset, J/Kg
+
+  ! example faults for a fouling coil
+
+  FaultModel:Fouling:Coil,
+  CoolingCoilFault,               !- Name
+  VAV_2_CoolC,                         !- Heating or Cooling Coil Name
+  ALWAYS_ON,                             !- Availability Schedule Name
+  ,                                               !- Severity Schedule Name
+  FouledUARated,                     !- Fouling Input Method
+  3000,                                       !- UAFouled, W/K
+  ,                                               !- Water Side Fouling Factor, m2-K/W
+  ,                                               !- Air Side Fouling Factor, m2-K/W
+  ,                                               !- Outside Coil Surface Area, m2
+  ;                                               !- Inside to Outside Coil Surface Area Ratio
+\end{lstlisting}
+
+\subsection{FaultModel:ThermostatOffset}\label{faultmodelthermostatoffset}
+
+This object defines the offset fault of a thermostat that leads to inappropriate operations of the HVAC system.
+
+\subsubsection{Inputs}\label{inputs-6-015}
+
+\paragraph{Field: Name}\label{field-name-6-012}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Thermostat Name}\label{field-thermostat-name}
+
+This field defines the name of the thermostat object associated with the fault. It should be the name of a ZoneControl:Thermostat object.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-6-002}
+
+This field provides the name of a schedule that will determine whether this fault is applicable or not. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to ``1.0'' when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-6}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the reference thermostat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+\paragraph{Field: Reference Thermostat Offset}\label{field-reference-thermostat-offset}
+
+This field defines the reference offset value of the thermostat. A positive value means the zone air temperature reading is higher than the actual value. A negative value means the reading is lower than the actual value. A ``0.0'' value means no offset. Default is 2.0. The units are in degrees Celsius.
+
+\subsection{FaultModel:HumidistatOffset}\label{faultmodelhumidistatoffset}
+
+This object defines the offset fault of a humidistat that leads to inappropriate operations of the HVAC system.
+
+\subsubsection{Inputs}\label{inputs-7-015}
+
+\paragraph{Field: Name}\label{field-name-7-011}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Humidistat Name}\label{field-humidistat-name}
+
+This field defines the name of the humidistat object associated with the fault. It should be the name of a ZoneControl:Humidistat object.
+
+\paragraph{Field: Humidistat Offset Type}\label{field-humidistat-offset-type}
+
+This choice field determines the humidistat offset fault type. Two fault types are available: (1) Type ThermostatOffsetIndependent: humidistat offset is not related with thermostat offset. For this type, user needs to specify the Reference Humidistat Offset, Availability Schedule, and Severity Schedule (2) Type ThermostatOffsetDependent: humidistat offset is caused by thermostat offset fault. For this type, user only needs to specify the Related Thermostat Offset Fault Name.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-7-002}
+
+This field provides the name of a schedule that will determine if this fault is applicable. This field is applicable for the Type ThermostatOffsetIndependent. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to ``1.0'' when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name-7}
+
+This field provides the name of a schedule that represents severity of a fault. This field is applicable for the Type ThermostatOffsetIndependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+\paragraph{Field: Reference Humidistat Offset}\label{field-reference-humidistat-offset}
+
+This field defines the reference offset value of the humidistat. This field is required for the Type ThermostatOffsetIndependent. A positive value means the zone air temperature reading is higher than the actual value. A negative value means the reading is lower than the actual value. A ``0.0'' value means no offset. Default is 5.0. The units are in percentage.
+
+\paragraph{Field: Related Thermostat Offset Fault Name}\label{field-related-thermostat-offset-fault-name}
+
+This field provides the name of a Thermostat Offset Fault object that causes the humidistat offset fault. It should be the name of a FaultModel:ThermostatOffset object. This field is required for the Type ThermostatOffsetDependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+\subsection{An example of IDF codes for the thermostat/humidistat offset fault models:}\label{an-example-of-idf-codes-for-the-thermostathumidistat-offset-fault-models}
+
+\begin{lstlisting}
+
+FaultModel:ThermostatOffset,
+  Ther_Offset_Zone1,   !- Name
+  Zone 1 Thermostat,   !- Thermostat Name
+  AlwaysOn,            !- Availability Schedule Name
+  AlwaysOne,           !- Severity Schedule Name
+  2.0;                 !- Reference Thermostat Offset
+
+  FaultModel:HumidistatOffset, 
+  Humi_Offset_Zone1,   !- Name
+  Zone 1 Humidistat,   !- Humidistat Name
+  ThermostatOffsetDependent, !- Humidistat Offset Type
+  ,                    !- Availability Schedule Name
+  ,                    !- Severity Schedule Name
+  ,                    !- Reference Humidistat Offset
+  Ther_Offset_Zone1;   !- Related Thermostat Offset Fault Name
+
+  FaultModel:HumidistatOffset, 
+  Humi_Offset_Zone2,   !- Name
+  Zone 2 Humidistat,   !- Humidistat Name
+  ThermostatOffsetIndependent, !- Humidistat Offset Type
+  AlwaysOn,            !- Availability Schedule Name
+  AlwaysOne,           !- Severity Schedule Name
+  10,                  !- Reference Humidistat Offset
+  ;                    !- Related Thermostat Offset Fault Name
+\end{lstlisting}
+
+\subsection{FaultModel:Fouling:AirFilter}\label{faultmodelfoulingairfilter}
+
+This object defines the fault of fouling air filter that leads to inappropriate operations of the corresponding fan.
+
+\subsubsection{Inputs}\label{inputs-8-013}
+
+\paragraph{Field: Name}\label{field-name-8-011}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Fan Name}\label{field-fan-name-002}
+
+This field defines the name of a fan object associated with the fault. It should be the name of a fan object (Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume).
+
+\paragraph{Field: Fan Object Type}\label{field-fan-object-type-000}
+
+This choice field defines the type of fan. The valid choices are Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume. Both cycling and continuous fan operating modes are allowed for Fan:OnOff. Only the continuous fan operating mode is allowed for Fan:ConstantVolume. The variable airflow rate is allowed for Fan:VariableVolume.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-8-002}
+
+This field provides the name of a schedule that will determine if this fault is applicable. This field is applicable for the Type ThermostatOffsetIndependent. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined Pressure Fraction Schedule will be applied. This schedule should be set to ``1.0'' when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+\paragraph{Field: Pressure Fraction Schedule Name}\label{field-pressure-fraction-schedule-name}
+
+This field provides the name of a schedule that describes the pressure rise variations of the fan associated with the fouling air filter. This is used as a multiplier to the fan design pressure rise. Because the fan pressure rise in the faulty case is higher than that in the design case, this schedule should be set to a value that is greater than 1.0 when a fault is applicable. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+\paragraph{Field: Fan Curve Name}\label{field-fan-curve-name}
+
+This field provides the name of a fan curve for the fan associated with the fault. The curve describes the relationship between the fan pressure rise and air flow rate. This is used to estimate the variations of the fan air flow rate in the faulty cases, given the Pressure Rise Variation Schedule. For variable speed fans, the curve should be the one corresponding to the maximum fan speed. The fan curve should cover the design operational point specified in the corresponding fan object. It is also required that the faulty fan operatinal state point falls within the fan selection range that is monotonically decreasing.
+
+\subsection{An example of IDF codes for the fouling air filter fault models:}\label{an-example-of-idf-codes-for-the-fouling-air-filter-fault-models}
+
+\begin{lstlisting}
+
+FaultModel:Fouling:AirFilter,
+  DF_VAV_1_Fan,             !- Name
+  VAV_1_Fan,                !- Fan Name
+  Fan:VariableVolume,       !- Fan Object Type
+  ALWAYS_ON,                !- Availability Schedule Name
+  Pressure_Inc_Sch,         !- Pressure Fraction Schedule Name
+  VAV_1_Fan_Curve;          !- Fan Curve Name
+
+  Schedule:Compact,
+  Pressure_Inc_Sch,        !- Name
+  Any Number,              !- Schedule Type Limits Name
+  Through: 12/31,          !- Field 1
+  For: AllDays,            !- Field 2
+  Until: 24:00,1.1;        !- Field 3
+
+  Curve:Cubic,        
+  VAV_1_Fan_Curve,         ! name     
+  1263.1,                  ! Coefficient1 Constant        
+  33.773,                  ! Coefficient2 x       
+  -5.6906,                  ! Coefficient3 x**2        
+  -0.2023,                  ! Coefficient4 x**3        
+  4.0,                     ! Minimum Value of x       
+  15.0;                    ! Maximum Value of x       
+
+  Fan:VariableVolume,
+  VAV_1_Fan,               !- Name
+  HVACOperationSchd,       !- Availability Schedule Name
+  0.5915,                  !- Fan Total Efficiency
+  1109.648,                !- Pressure Rise {Pa}
+  7.5202,                  !- Maximum Flow Rate {m3/s}
+  FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
+  ,                        !- Fan Power Minimum Flow Fraction
+  0.0000,                  !- Fan Power Minimum Air Flow Rate {m3/s}
+  0.91,                    !- Motor Efficiency
+  1.0,                     !- Motor In Airstream Fraction
+  0.0407598940,            !- Fan Power Coefficient 1
+  0.08804497,              !- Fan Power Coefficient 2
+  -0.072926120,            !- Fan Power Coefficient 3
+  0.9437398230,            !- Fan Power Coefficient 4
+  0,                       !- Fan Power Coefficient 5
+  VAV_1_HeatC-VAV_1_FanNode,  !- Air Inlet Node Name
+  VAV_1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
+  Fan Energy;              !- End-Use Subcategory
+\end{lstlisting}

@@ -1,0 +1,103 @@
+\section{Condenser Loop - Cooling Tower}\label{condenser-loop---cooling-tower}
+
+The Condenser Loop is constructed by using a \emph{PlantLoop} object. It uses a cooling tower (modeled by using a \emph{CoolingTower:SingleSpeed} object class) and a variable speed pump (modeled by using a \emph{Pump:VariableSpeed)} to supply cooling water to the chillers in the primary cooling loop. Therefore, the supply side of the loop contains the Cooling Tower and the demand side contains the chillers. The loop is operated by using plant equipment operation schemes, and schedules. ~Refer to Figure~\ref{fig:simple-line-diagram-for-the-condenser-loop-001} for a simple diagram of the Condenser Loop.
+
+\begin{figure}[hbtp] % fig 116
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image116.png}
+\caption{Simple line diagram for the condenser loop \protect \label{fig:simple-line-diagram-for-the-condenser-loop-001}}
+\end{figure}
+
+\subsection{Flowcharts for the Condenser Loop Input Process}\label{flowcharts-for-the-condenser-loop-input-process-000}
+
+This series of flowcharts serve as a guide for identifying and inputting the Condenser Loop and its components into the input file. The EnergyPlus line diagram for this loop is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-condenser-001}. A simple flowchart for the separation of the half loops is provided in Figure~\ref{fig:simple-flow-chart-for-separation-on-half-001}.
+
+\begin{figure}[hbtp] % fig 117
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image117.png}
+\caption{EnergyPlus line diagram for the condenser loop \protect \label{fig:energyplus-line-diagram-for-the-condenser-001}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 118
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image118.png}
+\caption{Simple flow chart for separation on half loops in the condenser loop \protect \label{fig:simple-flow-chart-for-separation-on-half-001}}
+\end{figure}
+
+\subsubsection{Condenser Loop Supply Side Construction}\label{condenser-loop-supply-side-construction-000}
+
+The main components on the supply side half loop for the Condenser Loop are the Cooling Tower that supplies the cooling water and the variable speed pump that circulates the cooling water through the loop. This half loop supplies cooling water to the chillers on the demand side half loop. The supply side half loop contains four components, four branches, eight nodes, and one splitter-mixer pair. The EnergyPlus line diagram for the Condenser loop supply side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-supply-side-002}. The flowchart for supply side branches and components is provided in Figure~\ref{fig:flowchart-for-condenser-loop-supply-side-002}. The flowchart for supply side connectors is provided in Figure~\ref{fig:flowchart-for-condenser-loop-supply-side-connectors-002}.
+
+\begin{figure}[hbtp] % fig 119
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image119.png}
+\caption{EnergyPlus line diagram for the supply side of the Condenser Loop \protect \label{fig:energyplus-line-diagram-for-the-supply-side-002}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 120
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image120.png}
+\caption{Flowchart for Condenser Loop supply side branches and components \protect \label{fig:flowchart-for-condenser-loop-supply-side-002}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 121
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image121.png}
+\caption{Flowchart for Condenser Loop supply side connectors \protect \label{fig:flowchart-for-condenser-loop-supply-side-connectors-002}}
+\end{figure}
+
+\subsubsection{Condenser Loop Demand Side Construction}\label{condenser-loop-demand-side-construction-000}
+
+The main components on the demand side half loop are the small constant COP chiller and the bigger electric chiller that use the cooling water supplied by the cooling tower. The chillers are in turn used to supply chilled water in the Primary Cooling loop. ~This side of the loop also has ten nodes, five components, five branches and one splitter-mixer pair. An EnergyPlus schematic for the demand side is provided in Figure~\ref{fig:energyplus-line-diagram-for-the-demand-side-002}. The flowchart for demand side branch definition is provided in Figure~\ref{fig:flowchart-for-condenser-loop-demand-side-002}. The flowchart for the demand side connectors is provided in Figure~\ref{fig:flowchart-for-condenser-loop-demand-side-connectors-002}.
+
+\begin{figure}[hbtp] % fig 122
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image122.png}
+\caption{EnergyPlus line diagram for the demand side of the Condenser Loop \protect \label{fig:energyplus-line-diagram-for-the-demand-side-002}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 123
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image123.png}
+\caption{Flowchart for Condenser Loop demand side branches and components \protect \label{fig:flowchart-for-condenser-loop-demand-side-002}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 124
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image124.png}
+\caption{Flowchart for Condenser Loop demand side connectors \protect \label{fig:flowchart-for-condenser-loop-demand-side-connectors-002}}
+\end{figure}
+
+\subsection{Flowcharts for Condenser Loop Controls}\label{flowcharts-for-condenser-loop-controls-000}
+
+The Condenser loop is operated by using set-points, plant equipment operation schemes and schedules.
+
+\subsubsection{Condenser Loop Schedules}\label{condenser-loop-schedules-000}
+
+The flowchart for condenser loop schedule definition is provided in Figure~\ref{fig:flowchart-for-condenser-loop-schedules-002}. The Condenser loop uses one schedule to operate properly. \emph{ON} is a compact schedule that keeps the Cooling Tower On at all times of the day, this compact schedule uses a continuous \emph{ScheduleTypeLimit} (\emph{Fraction)} which defines that the value of On is 1 and that of Off is 0.
+
+\begin{figure}[hbtp] % fig 125
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image125.png}
+\caption{Flowchart for condenser loop schedules \protect \label{fig:flowchart-for-condenser-loop-schedules-002}}
+\end{figure}
+
+\subsubsection{Condenser Loop Plant Equipment Operation Schemes}\label{condenser-loop-plant-equipment-operation-schemes-000}
+
+The \emph{PlantEquipmentOperationschemes} object uses the \emph{ON} schedule and the \emph{Tower Operation} objects to set the range of demand loads for which the cooling tower is operated during the simulation period. A flowchart detailing the Condenser Loop plant equipment operation schemes is provided in Figure~\ref{fig:flowchart-for-condenser-loop-plant-equipment-operation-002}.
+
+\begin{figure}[hbtp] % fig 126
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image126.png}
+\caption{Flowchart for Condenser Loop plant equipment operation schemes \protect \label{fig:flowchart-for-condenser-loop-plant-equipment-operation-002}}
+\end{figure}
+
+\subsubsection{Condenser Loop Setpoints}\label{condenser-loop-setpoints-000}
+
+The \emph{MyCondenserControl} setpoint manager places a temperature setpoint at the \emph{Condenser Supply Outlet Node.} The temperature at this point is controlled with respect to the outdoor air wet bulb temperature at that point in the simulation. The outdoor air wet bulb temperature is obtained from the weather data at the location of the simulation. A flowchart for Secondary Cooling loop setpoints is provided in Figure~\ref{fig:flowchart-for-condenser-loop-setpoints-002}.
+
+\begin{figure}[hbtp] % fig 127
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image127.png}
+\caption{Flowchart for Condenser Loop setpoints \protect \label{fig:flowchart-for-condenser-loop-setpoints-002}}
+\end{figure}

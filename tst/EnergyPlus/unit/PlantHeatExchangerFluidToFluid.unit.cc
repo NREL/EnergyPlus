@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::PlantHeatExchangerFluidToFluid Unit Tests
 
 // Google Test Headers
@@ -11,6 +69,7 @@
 #include <SetPointManager.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
@@ -20,10 +79,14 @@
 #include <DataHVACGlobals.hh>
 #include <PlantUtilities.hh>
 #include <DataEnvironment.hh>
+#include <General.hh>
 
 namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi ) {
+		// this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be met
+		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks that the HX will attempt to meet setpoint of 19 when the conditioniong fluid is 20 and cannot really make it to 19.  The HX still cools to down to 20. 
+
 		std::string const idf_objects = delimited_string( { 
 		"Version,8.4;",
 
@@ -1052,7 +1115,7 @@ namespace EnergyPlus {
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
 		PlantManager::CheckIfAnyPlant();
-
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;
@@ -1150,6 +1213,10 @@ namespace EnergyPlus {
 	}
 	
 	TEST_F( EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo ) {
+
+		// this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be met
+		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX still heats up to 20.
+
 		std::string const idf_objects = delimited_string( { 
 		"Version,8.4;",
 
@@ -2178,7 +2245,7 @@ namespace EnergyPlus {
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
 		PlantManager::CheckIfAnyPlant();
-
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;
@@ -2273,6 +2340,105 @@ namespace EnergyPlus {
 
 		EXPECT_NEAR(DataLoopNode::Node(3).Temp, 20.0 , 0.01);
 
+	}
+
+	TEST_F( EnergyPlusFixture, PlantHXControlWithFirstHVACIteration ) {
+		// this unit test is for issue #4959.  Added FirstHVACIteration to simulate and control routines
+		// unit test checks that the change to logic for #4959 does work to affect node mass flow rate.  The conditions are set up such that the demand side inlet is too warm to cool the supply side, so previous behavior would shut down flow.  Now if firstHVACIteration is true is should set flow request at the design max and if it is false set the flow request to 0.0.  The intent is setup enough structures to be able to call the routine ControlFluidHeatExchanger and check its behavior with FirstHVACIteration. 
+
+		PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
+
+		// get availability schedule to work
+		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+		ScheduleManager::ProcessScheduleInput(); // read schedules
+		ScheduleManager::ScheduleInputProcessed = true;
+		DataEnvironment::Month = 1;
+		DataEnvironment::DayOfMonth = 21;
+		DataGlobals::HourOfDay = 1;
+		DataGlobals::TimeStep = 1;
+		DataEnvironment::DSTIndicator = 0;
+		DataEnvironment::DayOfWeek = 2;
+		DataEnvironment::HolidayIndex = 0;
+		DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
+		ScheduleManager::UpdateScheduleValues();
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).AvailSchedNum = -1;
+
+		// setup four plant nodes for HX 
+		DataLoopNode::Node.allocate( 4 );
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletNodeNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.OutletNodeNum = 3;
+		DataLoopNode::Node( 1 ).Temp = 18.0;
+		DataLoopNode::Node( 1 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 1 ).MassFlowRateMax = 2.0;
+		DataLoopNode::Node( 3 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 3 ).MassFlowRateMax = 2.0;
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletTemp = 18.0;
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletNodeNum = 2;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.OutletNodeNum = 4;
+		DataLoopNode::Node( 2 ).Temp = 19.0;
+		DataLoopNode::Node( 2 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 2 ).MassFlowRateMax = 2.0;
+		DataLoopNode::Node( 4 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 4 ).MassFlowRateMax = 2.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletTemp = 19.0;
+
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).ControlMode = PlantHeatExchangerFluidToFluid::CoolingDifferentialOnOff;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).MinOperationTemp = 10.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).MaxOperationTemp = 30.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).Name = "Test HX";
+
+		//setup two plant loops, need for SetComponenetFlowRate
+		DataPlant::TotNumLoops = 2;
+		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
+
+		for ( int l = 1; l <= DataPlant::TotNumLoops; ++l ) {
+			auto & loop( DataPlant::PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( DataPlant::PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( DataPlant::PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+
+		DataPlant::PlantLoop( 1 ).Name = "HX supply side loop ";
+		DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+		DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).Name;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletNodeNum;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.LoopNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.LoopSideNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.BranchNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.CompNum = 1;
+
+		DataPlant::PlantLoop( 2 ).Name = "HX demand side loop ";
+		DataPlant::PlantLoop( 2 ).FluidIndex = 1;
+		DataPlant::PlantLoop( 2 ).FluidName = "WATER";
+		DataPlant::PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).Name;
+		DataPlant::PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+		DataPlant::PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletNodeNum;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.LoopNum = 2;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.LoopSideNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.BranchNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.CompNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.MassFlowRateMax = 2.0;
+
+		// when FirstHVACIteration is true, mass flow should match design max
+		bool testFirstHVACIteration = true;
+		PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger( 1, 1, -1000.0, testFirstHVACIteration );
+
+		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.MassFlowRateMax, 0.001 );
+
+		//when FirstHVACIteration is false, mass flow should be zero
+		testFirstHVACIteration = false;
+		PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger( 1, 1, -1000.0, testFirstHVACIteration );
+		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.0, 0.001 );
 	}
 	
 }

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DXCoils_hh_INCLUDED
 #define DXCoils_hh_INCLUDED
 
@@ -89,7 +147,7 @@ namespace DXCoils {
 	extern Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
-	
+
 	extern int CurDXCoilNum;
 
 	extern int NumDXCoils; // Total number of DX coils
@@ -446,7 +504,7 @@ namespace DXCoils {
 		int MSSpeedNumHS; // current high speed number of multspeed HP
 		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
 		Real64 MSCycRatio; // current cycling ratio of multspeed HP
-		
+
 		//The following members are for VRF Coils (FluidTCtrl Model)
 		int VRFIUPtr; // index to the VRF Indoor Unit where the coil is placed
 		int VRFOUPtr; // index to the VRF Outdoor Unit that the coil serves
@@ -686,567 +744,18 @@ namespace DXCoils {
 			MSCycRatio( 0.0 ),
 			VRFIUPtr( 0 ),
 			VRFOUPtr( 0 ),
-			EvaporatingTemp( 4.0 ),  
-			CondensingTemp( 40.0 ), 
-			C1Te( 0.0 ),	                
-			C2Te( 0.0 ),                 
-			C3Te( 0.0 ),                 
-			C1Tc( 0.0 ),	                
-			C2Tc( 0.0 ),                 
-			C3Tc( 0.0 ),                 
-			SH( 0.0 ),                   
-			SC( 0.0 ),                   
-			ActualSH( 0.0 ),             
-			ActualSC( 0.0 ) 
-		{}
-
-		// Member Constructor
-		DXCoilData(
-			std::string const & Name, // Name of the DX Coil
-			std::string const & DXCoilType, // type of coil
-			int const DXCoilType_Num, // Integer equivalent to DXCoilType
-			std::string const & Schedule, // WaterCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			Array1< Real64 > const & RatedTotCap, // Gross total cooling capacity at rated conditions [watts]
-			Real64 const HeatSizeRatio, // heat pump heating to cooling sizing ratio when autosized
-			Array1_bool const & RatedTotCapEMSOverrideOn, // if true, then EMS is calling to override rated total capacity
-			Array1< Real64 > const & RatedTotCapEMSOverrideValue, // value to use for EMS override
-			Array1< Real64 > const & RatedSHR, // Sensible heat ratio (sens cap/total cap) at rated conditions
-			Array1_bool const & RatedSHREMSOverrideOn, // if true, then EMS is calling to override Sensible heat ratio
-			Array1< Real64 > const & RatedSHREMSOverrideValue, // value to use for EMS override forSensible heat ratio
-			Array1< Real64 > const & RatedCOP, // Coefficient of performance at rated conditions
-			Array1< Real64 > const & RatedAirVolFlowRate, // Air volume flow rate through coil at rated conditions [m3/s]
-			Array1_bool const & RatedAirVolFlowRateEMSOverrideON, // if true, then EMS is calling to override Air volume flow rate
-			Array1< Real64 > const & RatedAirVolFlowRateEMSOverrideValue, // value to use for EMS override Air volume flow rate
-			Array1< Real64 > const & FanPowerPerEvapAirFlowRate, // Fan Power Per Air volume flow rate through the
-			Array1< Real64 > const & RatedAirMassFlowRate, // Air mass flow rate through coil at rated conditions [kg/s]
-			Array1< Real64 > const & BypassedFlowFrac, // Fraction of air flow bypassed around coil
-			Array1< Real64 > const & RatedCBF, // rated coil bypass factor, determined using RatedTotCap and RatedSHR
-			int const AirInNode, // Air inlet node number
-			int const AirOutNode, // Air outlet node number
-			Array1_int const & CCapFTemp, // index of total cooling capacity modifier curve
-			int const CCapFTempErrorIndex, // Used for warning messages when output of CCapFTemp is negative
-			Array1_int const & TotCapTempModFacCurveType, // type of curve for CCapFTemp (cubic,quadratic,bi-quadratic)
-			Array1_int const & CCapFFlow, // index of total cooling capacity modifier curve
-			int const CCapFFlowErrorIndex, // Used for warning messages when output of CCapFFlow is negative
-			Array1_int const & EIRFTemp, // index of energy input ratio modifier curve
-			int const EIRFTempErrorIndex, // Used for warning messages when output of EIRFTemp is negative
-			Array1_int const & EIRTempModFacCurveType, // type of curve for EIRFTemp (cubic,quadratic,bi-quadratic)
-			Array1_int const & EIRFFlow, // index of energy input ratio modifier curve
-			int const EIRFFlowErrorIndex, // Used for warning messages when output of EIRFFlow is negative
-			Array1_int const & PLFFPLR, // index of part-load factor vs part-load ratio curve
-			bool const ReportCoolingCoilCrankcasePower, // logical determines if the cooling coil crankcase heater power is reported
-			Real64 const CrankcaseHeaterCapacity, // total crankcase heater capacity [W]
-			Real64 const CrankcaseHeaterPower, // report variable for average crankcase heater power [W]
-			Real64 const MaxOATCrankcaseHeater, // maximum OAT for crankcase heater operation [C]
-			Real64 const CrankcaseHeaterConsumption, // report variable for total crankcase heater energy consumption [J]
-			Real64 const BasinHeaterPowerFTempDiff, // Basin heater capacity per degree C below setpoint (W/C)
-			Real64 const BasinHeaterSetPointTemp, // setpoint temperature for basin heater operation (C)
-			int const CompanionUpstreamDXCoil, // index number of the DX coil that is "upstream" of this DX coil. Currently used for
-			bool const FindCompanionUpStreamCoil, // Flag to get the companion coil in Init.
-			Array1_int const & CondenserInletNodeNum, // Node number of outdoor condenser(s) (actually an evaporator for heating coils)
-			int const LowOutletTempIndex, // used for low outlet temperature warnings
-			Real64 const FullLoadOutAirTempLast, // used for low outlet temperature warnings
-			Real64 const FullLoadInletAirTempLast, // used for low outlet temperature warnings
-			bool const PrintLowOutTempMessage, // used to print warning message for low outlet air dry-bulb conditions
-			std::string const & LowOutTempBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
-			std::string const & LowOutTempBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
-			int const HeatingCoilPLFCurvePTR, // PLF curve index to gas or electric heating coil (used in latent degradation model)
-			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
-			Real64 const RatedTotCap2, // Gross total cooling capacity at rated conditions, low speed [watts]
-			Real64 const RatedSHR2, // Sensible heat ratio (sens cap/total cap) at rated conditions, low speed
-			Real64 const RatedCOP2, // Coefficient of performance at rated conditions, low speed
-			Real64 const RatedAirVolFlowRate2, // Air volume flow rate through unit at rated conditions, low speed [m3/s]
-			Real64 const RatedAirMassFlowRate2, // Air mass flow rate through unit at rated conditions, low speed [kg/s]
-			Real64 const RatedCBF2, // rated coil bypass factor (low speed), determined using RatedTotCap2 and RatedSHR2
-			int const CCapFTemp2, // index of total cooling capacity modifier curve (low speed)
-			int const EIRFTemp2, // index of energy input ratio modifier curve (low speed)
-			Real64 const RatedEIR2, // rated energy input ratio (low speed, inverse of COP2)
-			Real64 const InternalStaticPressureDrop, // for rating VAV system
-			bool const RateWithInternalStaticAndFanObject,
-			int const SupplyFanIndex,
-			std::string const & SupplyFanName,
-			std::string const & CoilSystemName,
-			Array1< Real64 > const & RatedEIR, // rated energy input ratio (inverse of COP)
-			Real64 const InletAirMassFlowRate,
-			Real64 const InletAirMassFlowRateMax,
-			Real64 const InletAirTemp,
-			Real64 const InletAirHumRat,
-			Real64 const InletAirEnthalpy,
-			Real64 const OutletAirTemp,
-			Real64 const OutletAirHumRat,
-			Real64 const OutletAirEnthalpy,
-			Real64 const PartLoadRatio, // Ratio of actual sensible cooling load to steady-state sensible cooling capacity
-			Real64 const TotalCoolingEnergy,
-			Real64 const SensCoolingEnergy,
-			Real64 const LatCoolingEnergy,
-			Real64 const TotalCoolingEnergyRate,
-			Real64 const SensCoolingEnergyRate,
-			Real64 const LatCoolingEnergyRate,
-			Real64 const ElecCoolingConsumption,
-			Real64 const ElecCoolingPower,
-			Real64 const CoolingCoilRuntimeFraction, // Run time fraction of the DX cooling unit
-			Real64 const TotalHeatingEnergy,
-			Real64 const TotalHeatingEnergyRate,
-			Real64 const ElecHeatingConsumption,
-			Real64 const ElecHeatingPower,
-			Real64 const HeatingCoilRuntimeFraction, // Run time fraction of the DX heating unit
-			int const DefrostStrategy, // defrost strategy; 1=reverse-cycle, 2=resistive
-			int const DefrostControl, // defrost control; 1=timed, 2=on-demand
-			int const EIRFPLR, // index of energy input ratio vs part-load ratio curve
-			int const DefrostEIRFT, // index of defrost mode total cooling capacity for reverse cycle heat pump
-			int const RegionNum, // Region number for calculating HSPF of single speed DX heating coil
-			Real64 const MinOATCompressor, // Minimum OAT for heat pump compressor operation
-			Real64 const OATempCompressorOn, // The outdoor tempearture when the compressor is automatically turned back on,
-			Real64 const MaxOATCompressor, // Maximum OAT for VRF heat pump compressor operation
-			Real64 const MaxOATDefrost, // Maximum OAT for defrost operation
-			Real64 const DefrostTime, // Defrost time period in hours
-			Real64 const DefrostCapacity, // Resistive defrost to nominal capacity (at 21.11C/8.33C) ratio
-			Real64 const HPCompressorRuntime, // keep track of compressor runtime
-			Real64 const HPCompressorRuntimeLast, // keep track of last time step compressor runtime (if simulation downshifts)
-			Real64 const TimeLeftToDefrost, // keep track of time left to defrost heat pump
-			Real64 const DefrostPower, // power used during defrost
-			Real64 const DefrostConsumption, // energy used during defrost
-			int const HeatingPerformanceOATType, // Heating performance curve OAT type (1-wetbulb, 2-drybulb)
-			bool const HPCoilIsInCoilSystemHeatingDX,
-			bool const OATempCompressorOnOffBlank,
-			Array1< Real64 > const & Twet_Rated, // Nominal time for condensate to begin leaving the coil's
-			Array1< Real64 > const & Gamma_Rated, // Initial moisture evaporation rate divided by steady-state
-			Array1< Real64 > const & MaxONOFFCyclesperHour, // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
-			Array1< Real64 > const & LatentCapacityTimeConstant, // Time constant for latent capacity to reach steady state
-			Array1_int const & CondenserType, // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
-			bool const ReportEvapCondVars, // true if any performance mode includes an evap condenser
-			Array1< Real64 > const & EvapCondEffect, // effectiveness of the evaporatively cooled condenser
-			Real64 const CondInletTemp, // Evap condenser inlet temperature [C], report variable
-			Array1< Real64 > const & EvapCondAirFlow, // Air flow rate through the evap condenser at high speed,
-			Array1< Real64 > const & EvapCondPumpElecNomPower, // Nominal power input to the evap condenser water circulation pump
-			Real64 const EvapCondPumpElecPower, // Average power consumed by the evap condenser water circulation pump over
-			Real64 const EvapCondPumpElecConsumption, // Electric energy consumed by the evap condenser water circulation pump [J]
-			Real64 const EvapWaterConsumpRate, // Evap condenser water consumption rate [m3/s]
-			Real64 const EvapWaterConsump, // Evap condenser water consumption [m3]
-			Real64 const EvapCondAirFlow2, // Air flow rate through the evap condenser at low speed, for water use calcs [m3/s]
-			Real64 const EvapCondEffect2, // effectiveness of the evaporatively cooled condenser at low speed (-)
-			Real64 const EvapCondPumpElecNomPower2, // Nominal power input to the evap condenser water circulation pump at low speed [W]
-			Real64 const BasinHeaterPower, // Basin heater power (W)
-			Real64 const BasinHeaterConsumption, // Basin heater energy consumption (J)
-			int const NumCapacityStages, // number of capacity stages, up to MaxCapacityStages for Multimode DX coil,
-			int const NumDehumidModes, // number of enhanced dehumidification modes, up to MaxDehumidModes for Multimode DX coil,
-			Array1_string const & CoilPerformanceType, // Coil Performance object type
-			Array1_int const & CoilPerformanceType_Num, // Coil Performance object type number
-			Array1_string const & CoilPerformanceName, // Coil Performance object names
-			Real64 const CoolingCoilStg2RuntimeFrac, // Run time fraction of stage 2
-			int const DehumidificationMode, // Dehumidification mode for multimode coil,
-			int const WaterInNode, // Condenser water inlet node number for HPWH DX coil
-			int const WaterOutNode, // Condenser water outlet node number for HPWH DX coil
-			int const HCOPFTemp, // COP as a function of temperature curve index
-			int const HCOPFTempErrorIndex, // Used for warning messages when output of HCOPFTemp is negative
-			int const HCOPFTempCurveType, // COP as a function of temperature curve type
-			int const HCOPFAirFlow, // COP as a function of air flow rate ratio curve index
-			int const HCOPFAirFlowErrorIndex, // Used for warning messages when output of HCOPFAirFlow is negative
-			int const HCOPFWaterFlow, // COP as a function of water flow rate ratio curve index
-			int const HCOPFWaterFlowErrorIndex, // Used for warning messages when output of HCOPFWaterFlow is negative
-			int const HCapFTemp, // Heating capacity as a function of temperature curve index
-			int const HCapFTempErrorIndex, // Used for warning messages when output of HCapFTemp is negative
-			int const HCapFTempCurveType, // Heating capacity as a function of temperature curve type
-			int const HCapFAirFlow, // Heating capacity as a function of air flow rate ratio curve index
-			int const HCapFAirFlowErrorIndex, // Used for warning messages when output of HCapFAirFlow is negative
-			int const HCapFWaterFlow, // Heating capacity as a function of water flow rate ratio curve index
-			int const HCapFWaterFlowErrorIndex, // Used for warning messages when output of HCapFWaterFlow is negative
-			int const InletAirTemperatureType, // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-			Real64 const RatedInletDBTemp, // Rated inlet air dry-bulb temperature [C]
-			Real64 const RatedInletWBTemp, // Rated inlet air wet-bulb temperature [C]
-			Real64 const RatedInletWaterTemp, // Rated condenser water inlet temperature [C]
-			Real64 const HPWHCondPumpElecNomPower, // Nominal power input to the condenser water circulation pump [W]
-			Real64 const HPWHCondPumpFracToWater, // Nominal power fraction to water for the condenser water circulation pump
-			Real64 const RatedHPWHCondWaterFlow, // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-			Real64 const ElecWaterHeatingPower, // Total electric power consumed by compressor and condenser pump [W]
-			Real64 const ElecWaterHeatingConsumption, // Total electric consumption by compressor and condenser pump [J]
-			bool const FanPowerIncludedInCOP, // Indicates that fan heat is included in heating capacity and COP
-			bool const CondPumpHeatInCapacity, // Indicates that condenser pump heat is included in heating capacity
-			bool const CondPumpPowerInCOP, // Indicates that condenser pump power is included in heating COP
-			Real64 const LowTempLast, // low ambient temp entering condenser when warning message occurred
-			Real64 const HighTempLast, // high ambient temp entering condenser when warning message occurred
-			int const ErrIndex1, // index/pointer to recurring error structure for Air volume flow rate per watt of
-			int const ErrIndex2, // index/pointer to recurring error structure for PLF curve values must be >= 0.7. error
-			int const ErrIndex3, // index/pointer to recurring error structure for DX cooling coil runtime fraction > 1.0 warning
-			int const ErrIndex4, // index/pointer to recurring error structure for DX heating coil runtime fraction > 1.0 warning
-			int const LowAmbErrIndex, // index/pointer to recurring error structure for low ambient temp entering condenser
-			int const HighAmbErrIndex, // index/pointer to recurring error structure for high ambient temp entering condenser
-			int const PLFErrIndex, // index/pointer to recurring error structure for PLF <> 1 at speed 1 for a multiple speed coil
-			int const PLRErrIndex, // index/pointer to recurring error structure for PLR < .7
-			bool const PrintLowAmbMessage, // used to print warning message for low ambient conditions
-			std::string const & LowAmbBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
-			std::string const & LowAmbBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
-			bool const PrintHighAmbMessage, // used to print warning message for high ambient conditions
-			std::string const & HighAmbBuffer1, // holds warning message until next iteration (only prints 1 message/iteration)
-			std::string const & HighAmbBuffer2, // holds warning message until next iteration (only prints 1 message/iteration)
-			int const EvapWaterSupplyMode, // where does water come from
-			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
-			int const EvapWaterSupTankID,
-			int const EvapWaterTankDemandARRID,
-			int const CondensateCollectMode, // where does water come from
-			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
-			int const CondensateTankID,
-			int const CondensateTankSupplyARRID,
-			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
-			Real64 const CondensateVol, // amount of water condensed from air stream [m3]
-			Real64 const CurrentEndTimeLast, // end time of time step for last simulation time step
-			Real64 const TimeStepSysLast, // last system time step (used to check for downshifting)
-			int const FuelType, // Fuel type
-			int const NumOfSpeeds, // Number of speeds
-			bool const PLRImpact, // Part load fraction applied to Speed Number > 1
-			bool const LatentImpact, // Latent degradation applied to Speed Number > 1
-			Array1_int const & MSErrIndex, // index flag for num speeds/recurring messages
-			Array1< Real64 > const & MSRatedTotCap, // Rated cooling capacity for MS heat pump [W]
-			Array1< Real64 > const & MSRatedSHR, // Rated SHR for MS heat pump [dimensionless]
-			Array1< Real64 > const & MSRatedCOP, // Rated COP for MS heat pump [dimensionless]
-			Array1< Real64 > const & MSRatedAirVolFlowRate, // Air volume flow rate through unit at rated conditions [m3/s]
-			Array1< Real64 > const & MSRatedAirMassFlowRate, // Air mass flow rate through unit at rated conditions [m3/s]
-			Array1< Real64 > const & MSRatedCBF, // rated coil bypass factor
-			Array1_int const & MSCCapFTemp, // index of total cooling capacity modifier curve
-			Array1_int const & MSCCapFFlow, // index of total cooling capacity modifier curve
-			Array1_int const & MSEIRFTemp, // index of energy input ratio modifier curve as a function of temperature
-			Array1_int const & MSEIRFFlow, // index of energy input ratio modifier curve as a function of flow fraction
-			Array1_int const & MSPLFFPLR, // index of part load factor as a function of part load ratio
-			Array1_int const & MSWasteHeat, // index of waste heat as a function of temperature
-			Array1< Real64 > const & MSWasteHeatFrac, // Waste heat fraction
-			Array1< Real64 > const & MSEvapCondEffect, // effectiveness of the evaporatively cooled condenser
-			Array1< Real64 > const & MSEvapCondAirFlow, // Air flow rate through the evap condenser for water use calcs [m3/s]
-			Array1< Real64 > const & MSEvapCondPumpElecNomPower, // Nominal power input to the evap condenser
-			Array1_int const & MSTotCapTempModFacCurveType, // type of curve for CCapFTemp (cubic,quadratic,bi-quadratic)
-			Array1_int const & MSEIRTempModFacCurveType, // type of curve for EIRFTemp (cubic,quadratic,bi-quadratic)
-			Array1< Real64 > const & MSTwet_Rated, // Nominal time for condensate to begin leaving the coil's
-			Array1< Real64 > const & MSGamma_Rated, // Initial moisture evaporation rate divided by steady-state
-			Array1< Real64 > const & MSMaxONOFFCyclesperHour, // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
-			Array1< Real64 > const & MSLatentCapacityTimeConstant, // Time constant for latent capacity to reach steady state
-			Array1< Real64 > const & MSFanPowerPerEvapAirFlowRate,
-			Real64 const FuelUsed, // Energy used, in addition to electricity [W]
-			Real64 const FuelConsumed, // Energy consumed, in addition to electricity [J]
-			bool const MSHPHeatRecActive, // True when entered Heat Rec Vol Flow Rate > 0
-			bool const CoolingCoilPresent, // FALSE if coil not present
-			bool const HeatingCoilPresent, // FALSE if coil not present
-			bool const ISHundredPercentDOASDXCoil, // FALSE if coil is regular dx coil
-			Array1_int const & SHRFTemp, // index of sensible heat ratio modifier curve
-			int const SHRFTempErrorIndex, // Used for warning messages when output of SHRFTemp is negative
-			Array1_int const & SHRFTempCurveType, // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
-			Array1_int const & SHRFFlow, // index of sensible heat ratio modifier curve
-			int const SHRFFlowErrorIndex, // Used for warning messages when output of SHRFFlow is negative
-			int const SHRFTemp2, // index of sensible heat ratio modifier curve
-			int const SHRFFlow2, // index of sensible heat ratio modifier curve
-			int const SHRFTempCurveType2, // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
-			bool const UserSHRCurveExists, // TRUE if user specified SHR modifier curve exists
-			bool const ASHRAE127StdRprt, // TRUE if user wishes to report ASHRAE 127 standard ratings
-			int const SecZonePtr, // index to the zone where the secondary coil is placed
-			int const SecCoilSHRFT, // index to the secondary coil sensible heat ratio temperature modifier curve
-			int const SecCoilSHRFF, // index to the secondary coil sensible heat ratio flor fraction modifier curve
-			Real64 const SecCoilAirFlow, // secondary coil air flow rate
-			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor
-			Real64 const SecCoilRatedSHR, // secondary coil nominal or rated sensible heat ratio
-			Real64 const SecCoilSHR, // secondary coil current sensible heat ratio
-			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
-			Real64 const SecCoilSensibleHeatGainRate, // secondary zone sensible heat gain rate [W]
-			Real64 const SecCoilTotalHeatRemovalRate, // secondary zone total heat removal rate [W]
-			Real64 const SecCoilSensibleHeatRemovalRate, // secondary zone sensible heat removal rate [W]
-			Real64 const SecCoilLatentHeatRemovalRate, // secondary zone latent heat removal rate [W]
-			bool const IsSecondaryDXCoilInZone, // true means secondary dx coil is zone instead of outside
-			bool const IsDXCoilInZone, // true means dx coil is in zone instead of outside
-			Real64 const CompressorPartLoadRatio, // compressor part load ratio of the primary DX coil
-			Array1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
-			Array1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
-			Array1< Real64 > const & MSSecCoilAirFlow, // multispeed secondary coil air flow rate
-			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor
-			Array1< Real64 > const & MSSecCoilRatedSHR, // multispeed secondary coil nominal or rated sensible heat ratio
-			int const MSSpeedNumLS, // current low speed number of multspeed HP
-			int const MSSpeedNumHS, // current high speed number of multspeed HP
-			Real64 const MSSpeedRatio, // current speed ratio of multspeed HP
-			Real64 const MSCycRatio, // current cycling ratio of multspeed HP
-			int const VRFIUPtr,  // index to the VRF Indoor Unit where the coil is placed
-			int const VRFOUPtr,  // index to the VRF Outdoor Unit that the coil serves
-			Real64 const EvaporatingTemp, // indoor unit evaporating temperature [C]
-			Real64 const CondensingTemp, // indoor unit condensing temperature [C]
-			Real64 const C1Te, // Indoor Unit Coefficient 1 to calculate Te,req [--]
-			Real64 const C2Te, // Indoor Unit Coefficient 2 to calculate Te,req [--]
-			Real64 const C3Te, // Indoor Unit Coefficient 3 to calculate Te,req [--]
-			Real64 const C1Tc, // Indoor Unit Coefficient 1 to calculate Tc,req [--]
-			Real64 const C2Tc, // Indoor Unit Coefficient 2 to calculate Tc,req [--]
-			Real64 const C3Tc, // Indoor Unit Coefficient 3 to calculate Tc,req [--]
-			Real64 const SH  , // Superheating degrees [C]
-			Real64 const SC  , // Subcooling degrees [C]
-			Real64 const ActualSH, // Actual superheating [C]
-			Real64 const ActualSC // Actual subcooling [C]
-		) :
-			Name( Name ),
-			DXCoilType( DXCoilType ),
-			DXCoilType_Num( DXCoilType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			RatedTotCap( MaxModes, RatedTotCap ),
-			HeatSizeRatio( HeatSizeRatio ),
-			RatedTotCapEMSOverrideOn( MaxModes, RatedTotCapEMSOverrideOn ),
-			RatedTotCapEMSOverrideValue( MaxModes, RatedTotCapEMSOverrideValue ),
-			RatedSHR( MaxModes, RatedSHR ),
-			RatedSHREMSOverrideOn( MaxModes, RatedSHREMSOverrideOn ),
-			RatedSHREMSOverrideValue( MaxModes, RatedSHREMSOverrideValue ),
-			RatedCOP( MaxModes, RatedCOP ),
-			RatedAirVolFlowRate( MaxModes, RatedAirVolFlowRate ),
-			RatedAirVolFlowRateEMSOverrideON( MaxModes, RatedAirVolFlowRateEMSOverrideON ),
-			RatedAirVolFlowRateEMSOverrideValue( MaxModes, RatedAirVolFlowRateEMSOverrideValue ),
-			FanPowerPerEvapAirFlowRate( MaxModes, FanPowerPerEvapAirFlowRate ),
-			RatedAirMassFlowRate( MaxModes, RatedAirMassFlowRate ),
-			BypassedFlowFrac( MaxModes, BypassedFlowFrac ),
-			RatedCBF( MaxModes, RatedCBF ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			CCapFTemp( MaxModes, CCapFTemp ),
-			CCapFTempErrorIndex( CCapFTempErrorIndex ),
-			TotCapTempModFacCurveType( MaxModes, TotCapTempModFacCurveType ),
-			CCapFFlow( MaxModes, CCapFFlow ),
-			CCapFFlowErrorIndex( CCapFFlowErrorIndex ),
-			EIRFTemp( MaxModes, EIRFTemp ),
-			EIRFTempErrorIndex( EIRFTempErrorIndex ),
-			EIRTempModFacCurveType( MaxModes, EIRTempModFacCurveType ),
-			EIRFFlow( MaxModes, EIRFFlow ),
-			EIRFFlowErrorIndex( EIRFFlowErrorIndex ),
-			PLFFPLR( MaxModes, PLFFPLR ),
-			ReportCoolingCoilCrankcasePower( ReportCoolingCoilCrankcasePower ),
-			CrankcaseHeaterCapacity( CrankcaseHeaterCapacity ),
-			CrankcaseHeaterPower( CrankcaseHeaterPower ),
-			MaxOATCrankcaseHeater( MaxOATCrankcaseHeater ),
-			CrankcaseHeaterConsumption( CrankcaseHeaterConsumption ),
-			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
-			BasinHeaterSetPointTemp( BasinHeaterSetPointTemp ),
-			CompanionUpstreamDXCoil( CompanionUpstreamDXCoil ),
-			FindCompanionUpStreamCoil( FindCompanionUpStreamCoil ),
-			CondenserInletNodeNum( MaxModes, CondenserInletNodeNum ),
-			LowOutletTempIndex( LowOutletTempIndex ),
-			FullLoadOutAirTempLast( FullLoadOutAirTempLast ),
-			FullLoadInletAirTempLast( FullLoadInletAirTempLast ),
-			PrintLowOutTempMessage( PrintLowOutTempMessage ),
-			LowOutTempBuffer1( LowOutTempBuffer1 ),
-			LowOutTempBuffer2( LowOutTempBuffer2 ),
-			HeatingCoilPLFCurvePTR( HeatingCoilPLFCurvePTR ),
-			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
-			RatedTotCap2( RatedTotCap2 ),
-			RatedSHR2( RatedSHR2 ),
-			RatedCOP2( RatedCOP2 ),
-			RatedAirVolFlowRate2( RatedAirVolFlowRate2 ),
-			RatedAirMassFlowRate2( RatedAirMassFlowRate2 ),
-			RatedCBF2( RatedCBF2 ),
-			CCapFTemp2( CCapFTemp2 ),
-			EIRFTemp2( EIRFTemp2 ),
-			RatedEIR2( RatedEIR2 ),
-			InternalStaticPressureDrop( InternalStaticPressureDrop ),
-			RateWithInternalStaticAndFanObject( RateWithInternalStaticAndFanObject ),
-			SupplyFanIndex( SupplyFanIndex ),
-			SupplyFanName( SupplyFanName ),
-			CoilSystemName( CoilSystemName ),
-			RatedEIR( MaxModes, RatedEIR ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			InletAirMassFlowRateMax( InletAirMassFlowRateMax ),
-			InletAirTemp( InletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirTemp( OutletAirTemp ),
-			OutletAirHumRat( OutletAirHumRat ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			PartLoadRatio( PartLoadRatio ),
-			TotalCoolingEnergy( TotalCoolingEnergy ),
-			SensCoolingEnergy( SensCoolingEnergy ),
-			LatCoolingEnergy( LatCoolingEnergy ),
-			TotalCoolingEnergyRate( TotalCoolingEnergyRate ),
-			SensCoolingEnergyRate( SensCoolingEnergyRate ),
-			LatCoolingEnergyRate( LatCoolingEnergyRate ),
-			ElecCoolingConsumption( ElecCoolingConsumption ),
-			ElecCoolingPower( ElecCoolingPower ),
-			CoolingCoilRuntimeFraction( CoolingCoilRuntimeFraction ),
-			TotalHeatingEnergy( TotalHeatingEnergy ),
-			TotalHeatingEnergyRate( TotalHeatingEnergyRate ),
-			ElecHeatingConsumption( ElecHeatingConsumption ),
-			ElecHeatingPower( ElecHeatingPower ),
-			HeatingCoilRuntimeFraction( HeatingCoilRuntimeFraction ),
-			DefrostStrategy( DefrostStrategy ),
-			DefrostControl( DefrostControl ),
-			EIRFPLR( EIRFPLR ),
-			DefrostEIRFT( DefrostEIRFT ),
-			RegionNum( RegionNum ),
-			MinOATCompressor( MinOATCompressor ),
-			OATempCompressorOn( OATempCompressorOn ),
-			MaxOATCompressor( MaxOATCompressor ),
-			MaxOATDefrost( MaxOATDefrost ),
-			DefrostTime( DefrostTime ),
-			DefrostCapacity( DefrostCapacity ),
-			HPCompressorRuntime( HPCompressorRuntime ),
-			HPCompressorRuntimeLast( HPCompressorRuntimeLast ),
-			TimeLeftToDefrost( TimeLeftToDefrost ),
-			DefrostPower( DefrostPower ),
-			DefrostConsumption( DefrostConsumption ),
-			HeatingPerformanceOATType( HeatingPerformanceOATType ),
-			HPCoilIsInCoilSystemHeatingDX( HPCoilIsInCoilSystemHeatingDX ),
-			OATempCompressorOnOffBlank( OATempCompressorOnOffBlank ),
-			Twet_Rated( MaxModes, Twet_Rated ),
-			Gamma_Rated( MaxModes, Gamma_Rated ),
-			MaxONOFFCyclesperHour( MaxModes, MaxONOFFCyclesperHour ),
-			LatentCapacityTimeConstant( MaxModes, LatentCapacityTimeConstant ),
-			CondenserType( MaxModes, CondenserType ),
-			ReportEvapCondVars( ReportEvapCondVars ),
-			EvapCondEffect( MaxModes, EvapCondEffect ),
-			CondInletTemp( CondInletTemp ),
-			EvapCondAirFlow( MaxModes, EvapCondAirFlow ),
-			EvapCondPumpElecNomPower( MaxModes, EvapCondPumpElecNomPower ),
-			EvapCondPumpElecPower( EvapCondPumpElecPower ),
-			EvapCondPumpElecConsumption( EvapCondPumpElecConsumption ),
-			EvapWaterConsumpRate( EvapWaterConsumpRate ),
-			EvapWaterConsump( EvapWaterConsump ),
-			EvapCondAirFlow2( EvapCondAirFlow2 ),
-			EvapCondEffect2( EvapCondEffect2 ),
-			EvapCondPumpElecNomPower2( EvapCondPumpElecNomPower2 ),
-			BasinHeaterPower( BasinHeaterPower ),
-			BasinHeaterConsumption( BasinHeaterConsumption ),
-			NumCapacityStages( NumCapacityStages ),
-			NumDehumidModes( NumDehumidModes ),
-			CoilPerformanceType( MaxModes, CoilPerformanceType ),
-			CoilPerformanceType_Num( MaxModes, CoilPerformanceType_Num ),
-			CoilPerformanceName( MaxModes, CoilPerformanceName ),
-			CoolingCoilStg2RuntimeFrac( CoolingCoilStg2RuntimeFrac ),
-			DehumidificationMode( DehumidificationMode ),
-			WaterInNode( WaterInNode ),
-			WaterOutNode( WaterOutNode ),
-			HCOPFTemp( HCOPFTemp ),
-			HCOPFTempErrorIndex( HCOPFTempErrorIndex ),
-			HCOPFTempCurveType( HCOPFTempCurveType ),
-			HCOPFAirFlow( HCOPFAirFlow ),
-			HCOPFAirFlowErrorIndex( HCOPFAirFlowErrorIndex ),
-			HCOPFWaterFlow( HCOPFWaterFlow ),
-			HCOPFWaterFlowErrorIndex( HCOPFWaterFlowErrorIndex ),
-			HCapFTemp( HCapFTemp ),
-			HCapFTempErrorIndex( HCapFTempErrorIndex ),
-			HCapFTempCurveType( HCapFTempCurveType ),
-			HCapFAirFlow( HCapFAirFlow ),
-			HCapFAirFlowErrorIndex( HCapFAirFlowErrorIndex ),
-			HCapFWaterFlow( HCapFWaterFlow ),
-			HCapFWaterFlowErrorIndex( HCapFWaterFlowErrorIndex ),
-			InletAirTemperatureType( InletAirTemperatureType ),
-			RatedInletDBTemp( RatedInletDBTemp ),
-			RatedInletWBTemp( RatedInletWBTemp ),
-			RatedInletWaterTemp( RatedInletWaterTemp ),
-			HPWHCondPumpElecNomPower( HPWHCondPumpElecNomPower ),
-			HPWHCondPumpFracToWater( HPWHCondPumpFracToWater ),
-			RatedHPWHCondWaterFlow( RatedHPWHCondWaterFlow ),
-			ElecWaterHeatingPower( ElecWaterHeatingPower ),
-			ElecWaterHeatingConsumption( ElecWaterHeatingConsumption ),
-			FanPowerIncludedInCOP( FanPowerIncludedInCOP ),
-			CondPumpHeatInCapacity( CondPumpHeatInCapacity ),
-			CondPumpPowerInCOP( CondPumpPowerInCOP ),
-			LowTempLast( LowTempLast ),
-			HighTempLast( HighTempLast ),
-			ErrIndex1( ErrIndex1 ),
-			ErrIndex2( ErrIndex2 ),
-			ErrIndex3( ErrIndex3 ),
-			ErrIndex4( ErrIndex4 ),
-			LowAmbErrIndex( LowAmbErrIndex ),
-			HighAmbErrIndex( HighAmbErrIndex ),
-			PLFErrIndex( PLFErrIndex ),
-			PLRErrIndex( PLRErrIndex ),
-			PrintLowAmbMessage( PrintLowAmbMessage ),
-			LowAmbBuffer1( LowAmbBuffer1 ),
-			LowAmbBuffer2( LowAmbBuffer2 ),
-			PrintHighAmbMessage( PrintHighAmbMessage ),
-			HighAmbBuffer1( HighAmbBuffer1 ),
-			HighAmbBuffer2( HighAmbBuffer2 ),
-			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( EvapWaterSupplyName ),
-			EvapWaterSupTankID( EvapWaterSupTankID ),
-			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
-			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( CondensateCollectName ),
-			CondensateTankID( CondensateTankID ),
-			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
-			CondensateVdot( CondensateVdot ),
-			CondensateVol( CondensateVol ),
-			CurrentEndTimeLast( CurrentEndTimeLast ),
-			TimeStepSysLast( TimeStepSysLast ),
-			FuelType( FuelType ),
-			NumOfSpeeds( NumOfSpeeds ),
-			PLRImpact( PLRImpact ),
-			LatentImpact( LatentImpact ),
-			MSErrIndex( MSErrIndex ),
-			MSRatedTotCap( MSRatedTotCap ),
-			MSRatedSHR( MSRatedSHR ),
-			MSRatedCOP( MSRatedCOP ),
-			MSRatedAirVolFlowRate( MSRatedAirVolFlowRate ),
-			MSRatedAirMassFlowRate( MSRatedAirMassFlowRate ),
-			MSRatedCBF( MSRatedCBF ),
-			MSCCapFTemp( MSCCapFTemp ),
-			MSCCapFFlow( MSCCapFFlow ),
-			MSEIRFTemp( MSEIRFTemp ),
-			MSEIRFFlow( MSEIRFFlow ),
-			MSPLFFPLR( MSPLFFPLR ),
-			MSWasteHeat( MSWasteHeat ),
-			MSWasteHeatFrac( MSWasteHeatFrac ),
-			MSEvapCondEffect( MSEvapCondEffect ),
-			MSEvapCondAirFlow( MSEvapCondAirFlow ),
-			MSEvapCondPumpElecNomPower( MSEvapCondPumpElecNomPower ),
-			MSTotCapTempModFacCurveType( MSTotCapTempModFacCurveType ),
-			MSEIRTempModFacCurveType( MSEIRTempModFacCurveType ),
-			MSTwet_Rated( MSTwet_Rated ),
-			MSGamma_Rated( MSGamma_Rated ),
-			MSMaxONOFFCyclesperHour( MSMaxONOFFCyclesperHour ),
-			MSLatentCapacityTimeConstant( MSLatentCapacityTimeConstant ),
-			MSFanPowerPerEvapAirFlowRate( MSFanPowerPerEvapAirFlowRate ),
-			FuelUsed( FuelUsed ),
-			FuelConsumed( FuelConsumed ),
-			MSHPHeatRecActive( MSHPHeatRecActive ),
-			CoolingCoilPresent( CoolingCoilPresent ),
-			HeatingCoilPresent( HeatingCoilPresent ),
-			ISHundredPercentDOASDXCoil( ISHundredPercentDOASDXCoil ),
-			SHRFTemp( MaxModes, SHRFTemp ),
-			SHRFTempErrorIndex( SHRFTempErrorIndex ),
-			SHRFTempCurveType( MaxModes, SHRFTempCurveType ),
-			SHRFFlow( MaxModes, SHRFFlow ),
-			SHRFFlowErrorIndex( SHRFFlowErrorIndex ),
-			SHRFTemp2( SHRFTemp2 ),
-			SHRFFlow2( SHRFFlow2 ),
-			SHRFTempCurveType2( SHRFTempCurveType2 ),
-			UserSHRCurveExists( UserSHRCurveExists ),
-			ASHRAE127StdRprt( ASHRAE127StdRprt ),
-			SecZonePtr( SecZonePtr ),
-			SecCoilSHRFT( SecCoilSHRFT ),
-			SecCoilSHRFF( SecCoilSHRFF ),
-			SecCoilAirFlow( SecCoilAirFlow ),
-			SecCoilAirFlowScalingFactor( SecCoilAirFlowScalingFactor ),
-			SecCoilRatedSHR( SecCoilRatedSHR ),
-			SecCoilSHR( SecCoilSHR ),
-			EvapInletWetBulb( EvapInletWetBulb ),
-			SecCoilSensibleHeatGainRate( SecCoilSensibleHeatGainRate ),
-			SecCoilTotalHeatRemovalRate( SecCoilTotalHeatRemovalRate ),
-			SecCoilSensibleHeatRemovalRate( SecCoilSensibleHeatRemovalRate ),
-			SecCoilLatentHeatRemovalRate( SecCoilLatentHeatRemovalRate ),
-			IsSecondaryDXCoilInZone( IsSecondaryDXCoilInZone ),
-			IsDXCoilInZone( IsDXCoilInZone ),
-			CompressorPartLoadRatio( CompressorPartLoadRatio ),
-			MSSecCoilSHRFT( MSSecCoilSHRFT ),
-			MSSecCoilSHRFF( MSSecCoilSHRFF ),
-			MSSecCoilAirFlow( MSSecCoilAirFlow ),
-			MSSecCoilAirFlowScalingFactor( MSSecCoilAirFlowScalingFactor ),
-			MSSecCoilRatedSHR( MSSecCoilRatedSHR ),
-			MSSpeedNumLS( MSSpeedNumLS ),
-			MSSpeedNumHS( MSSpeedNumHS ),
-			MSSpeedRatio( MSSpeedRatio ),
-			MSCycRatio( MSCycRatio ),
-			VRFIUPtr( VRFIUPtr ),
-			VRFOUPtr( VRFOUPtr ),
-			EvaporatingTemp( EvaporatingTemp ),
-			CondensingTemp( CondensingTemp ),
-			C1Te( C1Te ),
-			C2Te( C2Te ),
-			C3Te( C3Te ),
-			C1Tc( C1Tc ),
-			C2Tc( C2Tc ),
-			C3Tc( C3Tc ),   
-			SH( SH ),
-			SC( SC ),
-			ActualSH( ActualSH ),
-			ActualSC( ActualSC )
+			EvaporatingTemp( 4.0 ),
+			CondensingTemp( 40.0 ),
+			C1Te( 0.0 ),
+			C2Te( 0.0 ),
+			C3Te( 0.0 ),
+			C1Tc( 0.0 ),
+			C2Tc( 0.0 ),
+			C3Tc( 0.0 ),
+			SH( 0.0 ),
+			SC( 0.0 ),
+			ActualSH( 0.0 ),
+			ActualSC( 0.0 )
 		{}
 
 	};
@@ -1261,12 +770,6 @@ namespace DXCoils {
 			FieldNames()
 		{}
 
-		// Member Constructor
-		PerfModeData(
-			Array1D< std::string > const & FieldNames // Name of the HeatingCoil numeric field descriptions
-		) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	struct DXCoilNumericFieldData
@@ -1279,12 +782,6 @@ namespace DXCoils {
 			PerfMode( 0 )
 		{}
 
-		// Member Constructor
-		DXCoilNumericFieldData(
-			Array1_int const & EP_UNUSED( PerfMode ) // Name of the HeatingCoil numeric field descriptions
-	) :
-		PerfMode( 0 )
-		{}
 	};
 
 	// Object Data
@@ -1315,7 +812,8 @@ namespace DXCoils {
 		int & CompIndex,
 		Optional_int_const SpeedNum = _, // Speed number for multispeed cooling coil onlyn
 		Optional_int_const FanOpMode = _, // Fan operation mode
-		Optional_int_const CompOp = _ // Compressor on/off; 1=on, 0=off
+		Optional_int_const CompOp = _, // Compressor on/off; 1=on, 0=off
+		Optional_int_const SingleMode = _ // Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
@@ -1421,7 +919,7 @@ namespace DXCoils {
 		Real64 const TotCap, // coil total capacity [W]
 		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
 		Real64 const InitialSHR, // coil sensible heat ratio []
-		std::string const CallingRoutine // function name calling this routine 
+		std::string const & CallingRoutine // function name calling this routine
 		);
 
 	Real64
@@ -1462,7 +960,8 @@ namespace DXCoils {
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
 		int const FanOpMode, // Sets fan control to CycFanCycCoil or ContFanCycCoil
-		int const CompOp // Compressor on/off; 1=on, 0=off
+		int const CompOp, // Compressor on/off; 1=on, 0=off
+		int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
@@ -1471,7 +970,8 @@ namespace DXCoils {
 		Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
-		int const FanOpMode // Fan operation mode
+		int const FanOpMode, // Fan operation mode
+		int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
@@ -1684,7 +1184,7 @@ namespace DXCoils {
 		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
 		Optional< Real64 const > OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
 	);
-	
+
 	void
 	CalcVRFHeatingCoil_FluidTCtrl(
 		int const CompOp, // compressor operation; 1=on, 0=off
@@ -1694,15 +1194,15 @@ namespace DXCoils {
 		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
 		Optional< Real64 const > MaxHeatCap // maximum allowed heating capacity
 	);
-	
+
 	void
-	ControlVRFIUCoil (
-		int const CoilIndex,  // index to VRFTU coil 
+	ControlVRFIUCoil(
+		int const CoilIndex,  // index to VRFTU coil
 		Real64 const QCoil,   // coil load
 		Real64 const Tin,     // inlet air temperature
 		Real64 const Win,     // inlet air humidity ratio
 		Real64 const TeTc,    // evaporating or condensing temperature
-		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
+		Real64 const OAMassFlow,  // mass flow rate of outdoor air
 		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
 		Real64 & Wout,    // outlet air humidity ratio
 		Real64 & Tout, // outlet air temperature
@@ -1710,11 +1210,11 @@ namespace DXCoils {
 		Real64 & SHact,   // actual SH
 		Real64 & SCact    // actual SC
 	);
-	
+
 	void
 	CalcVRFCoilSenCap(
 		int const OperationMode, // mode 0 for cooling, 1 for heating
-		int const CoilNum,  // index to VRFTU cooling or heating coil 
+		int const CoilNum,  // index to VRFTU cooling or heating coil
 		Real64 const Tinlet,// dry bulb temperature of air entering the coil
 		Real64 const TeTc,  // evaporating or condensing temperature
 		Real64 const SHSC,  // SH at cooling /SC at heating
@@ -1722,7 +1222,7 @@ namespace DXCoils {
 		Real64 & Q_sen,     // VRF coil sensible capacity per air mass flow rate
 		Real64 & T_coil_surf// Air temperature at coil surface
 	);
-	
+
 	void
 	CalcVRFCoilCapModFac(
 		int const OperationMode, // mode 0 for cooling, 1 for heating
@@ -1734,16 +1234,16 @@ namespace DXCoils {
 		Optional< Real64 const > BF,    // Bypass factor
 		Real64 & CapModFac // Coil capacity modification factor
 	);
-	
-	Real64 
-	FanSpdResidualCool( 
-		Real64 const FanSpdRto, // indoor unit fan speed ratio  
+
+	Real64
+	FanSpdResidualCool(
+		Real64 const FanSpdRto, // indoor unit fan speed ratio
 		Array1< Real64 > const & Par // array of parameters
 	);
-	
-	Real64 
-	FanSpdResidualHeat( 
-		Real64 FanSpdRto, // indoor unit fan speed ratio  
+
+	Real64
+	FanSpdResidualHeat(
+		Real64 FanSpdRto, // indoor unit fan speed ratio
 		Array1< Real64 > const & Par // array of parameters
 	);
 	// End of Methods for New VRF Model: Fluid Temperature Control
@@ -1756,30 +1256,6 @@ namespace DXCoils {
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
-
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DXCoils
 

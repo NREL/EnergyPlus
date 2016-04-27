@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -178,34 +236,34 @@ namespace SetPointManager {
 	int const iSPMType_TESScheduled( 30 );
 
 	int const NumValidSPMTypes( 30 );
-	Array1D_string const cValidSPMTypes( 
-		NumValidSPMTypes, { 
-			"SetpointManager:Scheduled", 
-			"SetpointManager:Scheduled:DualSetpoint", 
-			"SetpointManager:OutdoorAirReset", 
-			"SetpointManager:SingleZone:Reheat", 
-			"SetpointManager:SingleZone:Heating", 
-			"SetpointManager:SingleZone:Cooling", 
-			"SetpointManager:SingleZone:Humidity:Minimum", 
-			"SetpointManager:SingleZone:Humidity:Maximum", 
-			"SetpointManager:MixedAir", 
-			"SetpointManager:OutdoorAirPretreat", 
-			"SetpointManager:Warmest", 
-			"SetpointManager:Coldest", 
-			"SetpointManager:WarmestTemperatureFlow", 
-			"SetpointManager:ReturnAirBypassFlow", 
-			"SetpointManager:MultiZone:Cooling:Average", 
-			"SetpointManager:MultiZone:Heating:Average", 
-			"SetpointManager:MultiZone:MinimumHumidity:Average", 
-			"SetpointManager:MultiZone:MaximumHumidity:Average", 
-			"SetpointManager:MultiZone:Humidity:Minimum", 
-			"SetpointManager:MultiZone:Humidity:Maximum", 
-			"SetpointManager:FollowOutdoorAirTemperature", 
-			"SetpointManager:FollowSystemNodeTemperature", 
-			"SetpointManager:FollowGroundTemperature", 
-			"SetpointManager:CondenserEnteringReset", 
-			"SetpointManager:CondenserEnteringReset:Ideal", 
-			"SetpointManager:SingleZone:OneStageCooling", 
+	Array1D_string const cValidSPMTypes(
+		NumValidSPMTypes, {
+			"SetpointManager:Scheduled",
+			"SetpointManager:Scheduled:DualSetpoint",
+			"SetpointManager:OutdoorAirReset",
+			"SetpointManager:SingleZone:Reheat",
+			"SetpointManager:SingleZone:Heating",
+			"SetpointManager:SingleZone:Cooling",
+			"SetpointManager:SingleZone:Humidity:Minimum",
+			"SetpointManager:SingleZone:Humidity:Maximum",
+			"SetpointManager:MixedAir",
+			"SetpointManager:OutdoorAirPretreat",
+			"SetpointManager:Warmest",
+			"SetpointManager:Coldest",
+			"SetpointManager:WarmestTemperatureFlow",
+			"SetpointManager:ReturnAirBypassFlow",
+			"SetpointManager:MultiZone:Cooling:Average",
+			"SetpointManager:MultiZone:Heating:Average",
+			"SetpointManager:MultiZone:MinimumHumidity:Average",
+			"SetpointManager:MultiZone:MaximumHumidity:Average",
+			"SetpointManager:MultiZone:Humidity:Minimum",
+			"SetpointManager:MultiZone:Humidity:Maximum",
+			"SetpointManager:FollowOutdoorAirTemperature",
+			"SetpointManager:FollowSystemNodeTemperature",
+			"SetpointManager:FollowGroundTemperature",
+			"SetpointManager:CondenserEnteringReset",
+			"SetpointManager:CondenserEnteringReset:Ideal",
+			"SetpointManager:SingleZone:OneStageCooling",
 			"SetpointManager:SingleZone:OneStageHeating",
 			"SetpointManager:ReturnTemperature:ChilledWater",
 			"SetpointManager:ReturnTemperature:HotWater",
@@ -257,6 +315,21 @@ namespace SetPointManager {
 	namespace {
 		bool InitSetPointManagersOneTimeFlag( true );
 		bool InitSetPointManagersOneTimeFlag2( true );
+		Real64 DCESPMDsn_EntCondTemp( 0.0 );
+		Real64 DCESPMDsn_MinCondSetpt( 0.0 );
+		Real64 DCESPMCur_MinLiftTD( 0.0 );
+		Real64 DCESPMDesign_Load_Sum( 0.0 );
+		Real64 DCESPMActual_Load_Sum( 0.0 );
+		Real64 DCESPMWeighted_Actual_Load_Sum( 0.0 );
+		Real64 DCESPMWeighted_Design_Load_Sum( 0.0 );
+		Real64 DCESPMWeighted_Ratio( 0.0 );
+		Real64 DCESPMMin_DesignWB( 0.0 );
+		Real64 DCESPMMin_ActualWb( 0.0 );
+		Real64 DCESPMOpt_CondEntTemp( 0.0 );
+		Real64 DCESPMDesignClgCapacity_Watts( 0.0 );
+		Real64 DCESPMCurrentLoad_Watts( 0.0 );
+		Real64 DCESPMCondInletTemp( 0.0 );
+		Real64 DCESPMEvapOutletTemp( 0.0 );
 	}
 	// temperature-based flow control manager
 	// Average Cooling Set Pt Mgr
@@ -308,7 +381,7 @@ namespace SetPointManager {
 	void
 	clear_state()
 	{
-	
+
 		NumAllSetPtMgrs = 0 ; // Number of all Setpoint Managers found in input
 		NumSchSetPtMgrs = 0 ; // Number of Scheduled Setpoint Managers found in input
 		NumDualSchSetPtMgrs = 0 ; // Number of Scheduled Dual Setpoint Managers found in input
@@ -339,6 +412,22 @@ namespace SetPointManager {
 		NumSZOneStageHeatingSetPtMgrs = 0 ; // number of singel zone one stage heating setpoint managers
 		NumReturnWaterResetChWSetPtMgrs = 0 ; // number of return water reset setpoint managers
 		NumReturnWaterResetHWSetPtMgrs = 0 ; // number of hot-water return water reset setpoint managers
+
+		DCESPMDsn_EntCondTemp = 0.0;
+		DCESPMDsn_MinCondSetpt = 0.0;
+		DCESPMCur_MinLiftTD = 0.0;
+		DCESPMDesign_Load_Sum = 0.0;
+		DCESPMActual_Load_Sum = 0.0;
+		DCESPMWeighted_Actual_Load_Sum = 0.0;
+		DCESPMWeighted_Design_Load_Sum = 0.0;
+		DCESPMWeighted_Ratio = 0.0;
+		DCESPMMin_DesignWB = 0.0;
+		DCESPMMin_ActualWb = 0.0;
+		DCESPMOpt_CondEntTemp = 0.0;
+		DCESPMDesignClgCapacity_Watts = 0.0;
+		DCESPMCurrentLoad_Watts = 0.0;
+		DCESPMCondInletTemp = 0.0;
+		DCESPMEvapOutletTemp = 0.0;
 
 		ManagerOn = false ;
 		GetInputFlag = true ; // First time, input is "gotten"
@@ -1507,6 +1596,14 @@ namespace SetPointManager {
 			}
 
 			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs;
+
+			if ( NumAlphas > 7 ) {
+				MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilInNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilOutNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				if ( NumNums == 1 ) {
+					MixedAirSetPtMgr( SetPtMgrNum ).MinCoolCoilOutTemp = rNumericArgs( 1 );
+				}
+			}
 
 			if ( ! NodeListError ) {
 				AllSetPtMgr( AllSetPtMgrNum ).CtrlNodes.allocate( NumNodesCtrld );
@@ -4532,10 +4629,10 @@ namespace SetPointManager {
 		//       DATE WRITTEN   Aug 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// Set the setpoint using a simple schedule, then modify the value based on TES simple controls logic
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Modified schedule setpoint manager logic
 
@@ -4545,10 +4642,10 @@ namespace SetPointManager {
 		Real64 const OnVal( 0.5 );
 		int const CoolOpComp ( 1 ); // a component that cools only (chillers)
 		int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
-		
+
 		CurSchValOnPeak  = GetCurrentScheduleValue( this->SchedPtr );
 		CurSchValCharge = GetCurrentScheduleValue( this->SchedPtrCharge );
-		
+
 		if ( this->CompOpType == CoolOpComp ) { //this is some sort of chiller
 			if ( CurSchValOnPeak >= OnVal ) {
 				this->SetPt = this->NonChargeCHWTemp;
@@ -4560,7 +4657,7 @@ namespace SetPointManager {
 		} else if ( this->CompOpType == DualOpComp ) { // this is some sort of ice storage system
 			this->SetPt = this->NonChargeCHWTemp;
 		}
-		
+
 	}
 
 	void
@@ -4651,15 +4748,15 @@ namespace SetPointManager {
 
 	Real64
 	DefineOutsideAirSetPointManager::CalcSetPoint(
-		Real64 OutLowTemp, 
-		Real64 OutHighTemp, 
-		Real64 OutDryBulbTemp, 
-		Real64 SetTempAtOutLow, 
+		Real64 OutLowTemp,
+		Real64 OutHighTemp,
+		Real64 OutDryBulbTemp,
+		Real64 SetTempAtOutLow,
 		Real64 SetTempAtOutHigh
 	)
 	{
 		Real64 SetPt;
-		if ( OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh 
+		if ( OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh
 			if ( OutDryBulbTemp <= OutLowTemp ) {
 				SetPt = SetTempAtOutLow;
 			} else if ( OutDryBulbTemp >= OutHighTemp ) {
@@ -4675,7 +4772,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineSZReheatSetPointManager::calculate() 
+	DefineSZReheatSetPointManager::calculate()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4827,7 +4924,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineSZHeatingSetPointManager::calculate() 
+	DefineSZHeatingSetPointManager::calculate()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4893,7 +4990,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineSZCoolingSetPointManager::calculate() 
+	DefineSZCoolingSetPointManager::calculate()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -5223,10 +5320,19 @@ namespace SetPointManager {
 		int FanInNode; // supply fan inlet node number
 		int FanOutNode; // supply fan outlet node number
 		int RefNode; // setpoint reference node number
+		int CoolCoilInNode; // Cooling coil inlet node number
+		int CoolCoilOutNode; // Cooling coil outlet node number
+		Real64 MinTemp; // Minimum temperature at cooling coil outlet node
+		Real64 dtFan; // Temperature difference across a fan
+		Real64 dtCoolCoil; // Temperature difference across a coolig coil
 
 		FanInNode = this->FanInNode;
 		FanOutNode = this->FanOutNode;
 		RefNode = this->RefNode;
+		CoolCoilInNode = this->CoolCoilInNode;
+		CoolCoilOutNode = this->CoolCoilOutNode;
+		MinTemp = this->MinCoolCoilOutTemp;
+		this->FreezeCheckEnable = false;
 
 		if ( ! SysSizingCalc && this->MySetPointCheckFlag ) {
 
@@ -5253,6 +5359,22 @@ namespace SetPointManager {
 		}
 
 		this->SetPt = Node( RefNode ).TempSetPoint - ( Node( FanOutNode ).Temp - Node( FanInNode ).Temp );
+		if ( CoolCoilInNode > 0 && CoolCoilOutNode > 0 ) {
+			dtFan = Node( FanOutNode ).Temp - Node( FanInNode ).Temp;
+			dtCoolCoil = Node( CoolCoilInNode ).Temp - Node( CoolCoilOutNode ).Temp;
+			if ( dtCoolCoil > 0.0 && MinTemp > OutDryBulbTemp ) {
+				this->FreezeCheckEnable = true;
+				if ( Node( RefNode ).Temp == Node( CoolCoilOutNode ).Temp ) { // blow through
+					this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) - dtFan + dtCoolCoil;
+				} else { // draw through
+					if ( RefNode != CoolCoilOutNode ) { // Ref node is outlet node
+						this->SetPt = max( Node( RefNode ).TempSetPoint - dtFan, MinTemp ) + dtCoolCoil;
+					} else {
+						this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) + dtCoolCoil;
+					}
+				}
+			}
+		}
 
 	}
 
@@ -6506,7 +6628,6 @@ namespace SetPointManager {
 
 		// Using/Aliasing
 		using DataEnvironment::CurMnDy;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutWetBulbTemp;
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -6523,42 +6644,43 @@ namespace SetPointManager {
 		// DERIVED TYPE DEFINITIONS
 		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		static Real64 NormDsnCondFlow( 0.0 ); // Normalized design condenser flow for cooling towers, m3/s per watt
-		static Real64 Twr_DesignWB( 0.0 ); // The cooling tower design inlet air wet bulb temperature, C
-		static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F}
-		static Real64 Dsn_CondMinThisChiller( 0.0 ); // Design Minimum Condenser Entering for current chillers this timestep
-		static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F}
-		static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep
-		static Real64 temp_MinLiftTD( 0.0 ); // Intermeidate variable associated with lift (TCond entering - Tevap leaving) TD
-		static Real64 Des_Load( 0.0 ); // array of chiller design loads
-		static Real64 Act_Load( 0.0 ); // array of chiller actual loads
-		static Real64 ALW( 0.0 ); // Actual load weighting of each chiller, W
-		static Real64 DLW( 0.0 ); // Design capacity of each chiller, W
-		static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W
-		static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W
-		static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W
-		static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W
-		static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers
-		static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C
-		static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C
-		static Real64 SetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C
-		static Real64 CondWaterSetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		static Real64 DesignClgCapacity_Watts( 0.0 );
-		static Real64 CurrentLoad_Watts( 0.0 );
-		static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C)
-		static Real64 TempDesCondIn( 0.0 ); // Design condenser inlet temp. C , or 25.d0
-		static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C)
-		static Real64 TempEvapOutDesign( 0.0 ); // design evaporator outlet temperature, water side
-		static Real64 CurLoad( 0.0 );
-		static int ChillerIndexPlantSide( 0 );
-		static int ChillerIndexDemandSide( 0 );
-		static int BranchIndexPlantSide( 0 );
-		static int BranchIndexDemandSide( 0 );
-		static int LoopIndexPlantSide( 0 );
-		static int LoopIndexDemandSide( 0 );
-		static int TypeNum( 0 );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F} // DCESPMDsn_EntCondTemp
+		// static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F} // DCESPMDsn_MinCondSetpt
+		// static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep // DCESPMCur_MinLiftTD
+		// static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W // DCESPMDesign_Load_Sum
+		// static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W // DCESPMActual_Load_Sum
+		// static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W // DCESPMWeighted_Actual_Load_Sum
+		// static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W // DCESPMWeighted_Design_Load_Sum
+		// static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers // DCESPMWeighted_Ratio
+		// static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C // DCESPMMin_DesignWB
+		// static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C // DCESPMMin_ActualWb
+		// static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C // DCESPMOpt_CondEntTemp
+		// static Real64 DesignClgCapacity_Watts( 0.0 ); // DCESPMDesignClgCapacity_Watts
+		// static Real64 CurrentLoad_Watts( 0.0 ); // DCESPMCurrentLoad_Watts
+		// static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C) // DCESPMCondInletTemp
+		// static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C) // DCESPMEvapOutletTemp
+		////////////////////////////////////////////////////////////////////////////////////
+		Real64 NormDsnCondFlow( 0.0 ); // Normalized design condenser flow for cooling towers, m3/s per watt
+		Real64 Twr_DesignWB( 0.0 ); // The cooling tower design inlet air wet bulb temperature, C
+		Real64 Dsn_CondMinThisChiller( 0.0 ); // Design Minimum Condenser Entering for current chillers this timestep
+		Real64 temp_MinLiftTD( 0.0 ); // Intermeidate variable associated with lift (TCond entering - Tevap leaving) TD
+		Real64 Des_Load( 0.0 ); // array of chiller design loads
+		Real64 Act_Load( 0.0 ); // array of chiller actual loads
+		Real64 ALW( 0.0 ); // Actual load weighting of each chiller, W
+		Real64 DLW( 0.0 ); // Design capacity of each chiller, W
+		Real64 SetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
+		Real64 CondWaterSetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
+		Real64 TempDesCondIn( 0.0 ); // Design condenser inlet temp. C , or 25.d0
+		Real64 TempEvapOutDesign( 0.0 ); // design evaporator outlet temperature, water side
+		Real64 CurLoad( 0.0 );
+		int ChillerIndexPlantSide( 0 );
+		int ChillerIndexDemandSide( 0 );
+		int BranchIndexPlantSide( 0 );
+		int BranchIndexDemandSide( 0 );
+		int LoopIndexPlantSide( 0 );
+		int LoopIndexDemandSide( 0 );
+		int TypeNum( 0 );
 
 		// Get from tower design values
 		NormDsnCondFlow = 5.38e-8; //m3/s per watt (typically 3 gpm/ton)=(Volume of condenser fluid)/(ton of heat rejection)
@@ -6581,11 +6703,11 @@ namespace SetPointManager {
 		if ( CurLoad > 0 ) {
 			if ( TypeNum == TypeOf_Chiller_Absorption || TypeNum == TypeOf_Chiller_CombTurbine || TypeNum == TypeOf_Chiller_Electric || TypeNum == TypeOf_Chiller_ElectricReformEIR || TypeNum == TypeOf_Chiller_EngineDriven ) {
 				TempDesCondIn = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).TempDesCondIn;
-				CondInletTemp = Node( PlantLoop( LoopIndexDemandSide ).LoopSide( DemandSide ).Branch( BranchIndexDemandSide ).Comp( ChillerIndexDemandSide ).NodeNumIn ).Temp;
-				EvapOutletTemp = Node( PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).NodeNumOut ).Temp;
+				DCESPMCondInletTemp = Node( PlantLoop( LoopIndexDemandSide ).LoopSide( DemandSide ).Branch( BranchIndexDemandSide ).Comp( ChillerIndexDemandSide ).NodeNumIn ).Temp;
+				DCESPMEvapOutletTemp = Node( PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).NodeNumOut ).Temp;
 				TempEvapOutDesign = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).TempDesEvapOut;
-				DesignClgCapacity_Watts = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).MaxLoad;
-				CurrentLoad_Watts = PlantReport( LoopIndexPlantSide ).CoolingDemand;
+				DCESPMDesignClgCapacity_Watts = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).MaxLoad;
+				DCESPMCurrentLoad_Watts = PlantReport( LoopIndexPlantSide ).CoolingDemand;
 			} else if ( TypeNum == TypeOf_Chiller_Indirect_Absorption || TypeNum == TypeOf_Chiller_DFAbsorption ) {
 				TempDesCondIn = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).TempDesCondIn;
 				TempEvapOutDesign = 6.666;
@@ -6595,31 +6717,31 @@ namespace SetPointManager {
 			}
 
 			// for attached chillers (that are running this timestep) find their Dsn_MinCondSetpt and Dsn_EntCondTemp
-			Dsn_MinCondSetpt = 999.0;
-			Dsn_EntCondTemp = 0.0;
+			DCESPMDsn_MinCondSetpt = 999.0;
+			DCESPMDsn_EntCondTemp = 0.0;
 
 			// Design Minimum Condenser Entering as a function of the minimum lift and TEvapLvg
 			// for chillers operating on current cond loop this timestep
 			Dsn_CondMinThisChiller = TempEvapOutDesign + ( this->MinimumLiftTD );
-			Dsn_MinCondSetpt = min( Dsn_MinCondSetpt, Dsn_CondMinThisChiller );
+			DCESPMDsn_MinCondSetpt = min( DCESPMDsn_MinCondSetpt, Dsn_CondMinThisChiller );
 
 			// Design entering condenser water temperature for chillers operating
 			// on current cond loop this timestep
-			Dsn_EntCondTemp = max( Dsn_EntCondTemp, TempDesCondIn );
+			DCESPMDsn_EntCondTemp = max( DCESPMDsn_EntCondTemp, TempDesCondIn );
 
 			// Load this array with the design capacity and actual load of each chiller this timestep
-			Des_Load = DesignClgCapacity_Watts;
-			Act_Load = CurrentLoad_Watts;
+			Des_Load = DCESPMDesignClgCapacity_Watts;
+			Act_Load = DCESPMCurrentLoad_Watts;
 
 			// ***** Load Calculations *****
 			// In this section the sum of the actual load (watts) and design load (watts)
 			// of the chillers that are on is calculated.
-			Actual_Load_Sum += Act_Load;
-			Design_Load_Sum += Des_Load;
+			DCESPMActual_Load_Sum += Act_Load;
+			DCESPMDesign_Load_Sum += Des_Load;
 
 			// Exit if the chillers are all off this hour
-			if ( Actual_Load_Sum <= 0 ) {
-				CondWaterSetPoint = Dsn_EntCondTemp;
+			if ( DCESPMActual_Load_Sum <= 0 ) {
+				CondWaterSetPoint = DCESPMDsn_EntCondTemp;
 				return;
 			}
 
@@ -6627,48 +6749,48 @@ namespace SetPointManager {
 			// This section first calculates the actual (ALW) and design (DLW) individual
 			// weights. Then the weighted actual and design loads are computed. Finally
 			// the Weighted Ratio is found.
-			if ( Actual_Load_Sum != 0 && Design_Load_Sum != 0 ) {
-				ALW = ( ( Act_Load / Actual_Load_Sum ) * Act_Load );
-				DLW = ( ( Des_Load / Design_Load_Sum ) * Des_Load );
+			if ( DCESPMActual_Load_Sum != 0 && DCESPMDesign_Load_Sum != 0 ) {
+				ALW = ( ( Act_Load / DCESPMActual_Load_Sum ) * Act_Load );
+				DLW = ( ( Des_Load / DCESPMDesign_Load_Sum ) * Des_Load );
 			} else {
 				ALW = 0.0;
 				DLW = 0.0;
 			}
-			Weighted_Actual_Load_Sum += ALW;
-			Weighted_Design_Load_Sum += DLW;
-			Weighted_Ratio = Weighted_Actual_Load_Sum / Weighted_Design_Load_Sum;
+			DCESPMWeighted_Actual_Load_Sum += ALW;
+			DCESPMWeighted_Design_Load_Sum += DLW;
+			DCESPMWeighted_Ratio = DCESPMWeighted_Actual_Load_Sum / DCESPMWeighted_Design_Load_Sum;
 
 			// ***** Optimal Temperature Calculation *****
 			// In this section the optimal temperature is computed along with the minimum
 			// design wet bulb temp and the mimimum actual wet bulb temp.
 			// Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
-			Min_DesignWB = CurveValue( this->MinTwrWbCurve, OutWetBulbTemp, Weighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
+			DCESPMMin_DesignWB = CurveValue( this->MinTwrWbCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
 			// Min_ActualWb = BCoef1 + BCoef2*MinDsnWB + BCoef3*WPLR + BCoef4*TwrDsnWB + BCoef5*NF
-			Min_ActualWb = CurveValue( this->MinOaWbCurve, Min_DesignWB, Weighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
+			DCESPMMin_ActualWb = CurveValue( this->MinOaWbCurve, DCESPMMin_DesignWB, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
 			// Opt_CondEntTemp = CCoef1 + CCoef2*OaWb + CCoef3*WPLR + CCoef4*TwrDsnWB + CCoef5*NF
-			Opt_CondEntTemp = CurveValue( this->OptCondEntCurve, OutWetBulbTemp, Weighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
+			DCESPMOpt_CondEntTemp = CurveValue( this->OptCondEntCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
 			// ***** Calculate (Cond ent - Evap lvg) Section *****
 			// In this section we find the worst case of (Cond ent - Evap lvg) for the
 			// chillers that are running.
-			Cur_MinLiftTD = 9999.0;
-			temp_MinLiftTD = 20.0 / 1.8;
-			temp_MinLiftTD = CondInletTemp - EvapOutletTemp;
-			Cur_MinLiftTD = min( Cur_MinLiftTD, temp_MinLiftTD );
+			DCESPMCur_MinLiftTD = 9999.0;
+			// temp_MinLiftTD = 20.0 / 1.8;
+			temp_MinLiftTD = DCESPMCondInletTemp - DCESPMEvapOutletTemp;
+			DCESPMCur_MinLiftTD = min( DCESPMCur_MinLiftTD, temp_MinLiftTD );
 		}
 
 		// ***** Limit conditions Section *****
 		// Check for limit conditions and control to the proper value.
-		if ( ( Weighted_Ratio >= 0.90 ) && ( Opt_CondEntTemp >= ( Dsn_EntCondTemp + 1.0 ) ) ) {
+		if ( ( DCESPMWeighted_Ratio >= 0.90 ) && ( DCESPMOpt_CondEntTemp >= ( DCESPMDsn_EntCondTemp + 1.0 ) ) ) {
 			// Optimized value exceeds the design condenser entering condition or chillers
 			// near full load condition; reset condenser entering setpoint to its design value
-			SetPoint = Dsn_EntCondTemp + 1.0;
+			SetPoint = DCESPMDsn_EntCondTemp + 1.0;
 		} else {
-			if ( ( OutWetBulbTemp >= Min_ActualWb ) && ( Twr_DesignWB >= Min_DesignWB ) && ( Cur_MinLiftTD > this->MinimumLiftTD ) ) {
+			if ( ( OutWetBulbTemp >= DCESPMMin_ActualWb ) && ( Twr_DesignWB >= DCESPMMin_DesignWB ) && ( DCESPMCur_MinLiftTD > this->MinimumLiftTD ) ) {
 				// Boundaries are satified; use optimized condenser entering water temp
-				SetPoint = Opt_CondEntTemp;
+				SetPoint = DCESPMOpt_CondEntTemp;
 			} else {
 				//Boundaries violated; Reset to scheduled value of condenser water entering setpoint
 				SetPoint = CondWaterSetPoint;
@@ -6676,7 +6798,7 @@ namespace SetPointManager {
 		}
 		// Do not allow new setpoint to be less than the design condenser minimum entering condition,
 		// i.e., TCondWaterEnt not allowed to be less than DsnEvapWaterLvg + MinimumLiftTD
-		CondWaterSetPoint = max( SetPoint, Dsn_MinCondSetpt );
+		CondWaterSetPoint = max( SetPoint, DCESPMDsn_MinCondSetpt );
 		this->SetPt = CondWaterSetPoint;
 
 	}
@@ -6764,10 +6886,10 @@ namespace SetPointManager {
 	void
 	DefineIdealCondEntSetPointManager::setupSetPointAndFlags(
 		Real64 & TotEnergy,
-		Real64 & TotEnergyPre, 
-		Real64 & CondWaterSetPoint, 
-		Real64 & CondTempLimit, 
-		bool & RunOptCondEntTemp, 
+		Real64 & TotEnergyPre,
+		Real64 & CondWaterSetPoint,
+		Real64 & CondTempLimit,
+		bool & RunOptCondEntTemp,
 		bool & RunSubOptCondEntTemp,
 		bool & RunFinalOptCondEntTemp
 	) {
@@ -7089,7 +7211,7 @@ namespace SetPointManager {
 		int ChillerNum( this->ChillerIndexPlantSide ); // Chiller number
 		int ChilledPumpBranchNum( this->ChilledPumpBranchNum ); // Chilled water pump branch number
 		int ChilledPumpNum( this->ChilledPumpNum ); // Chilled water pump number
-		
+
 		// Tower and CW pump location, assumes supply side, and tower branch/comp nums are used directly instead of local variable copies
 		int TowerLoopNum( this->CondLoopNum ); // Tower loop number
 		int CondPumpBranchNum( this->CondPumpBranchNum ); // Condenser water pump branch number
@@ -7268,15 +7390,15 @@ namespace SetPointManager {
 		} // setpoint manger:scheduled
 
 		// Loop over all the Scheduled TES Setpoint Managers
-		
+
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchTESSetPtMgrs; ++SetPtMgrNum ) {
-			
+
 			// only one setpoint for each scheduled TES setpoint manager and its a temperature setpoint
 			NodeNum = SchTESSetPtMgr( SetPtMgrNum ).CtrlNodeNum; // Get the node number
 			Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( SetPtMgrNum ).SetPt;
-			
+
 		} // setpoint manger:scheduledTES
-		
+
 		// Loop over all the Scheduled Dual Setpoint Managers
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
@@ -7872,7 +7994,7 @@ namespace SetPointManager {
 	void
 	ResetHumidityRatioCtrlVarType(
 		int const NodeNum
-	) 
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -7883,10 +8005,10 @@ namespace SetPointManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Resets setpoint control variable type to "Maximum Humidty Ratio" if control variable type
-		// is "Humidity Ratio". 
+		// is "Humidity Ratio".
 
 		// METHODOLOGY EMPLOYED:
-		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control 
+		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control
 		// variable type. This routine is called from "GetControllerInput" routine.  This reset is
 		// just to stop false warning message due to control variable type mismatch.
 
@@ -7912,7 +8034,7 @@ namespace SetPointManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SetPtMgrNum; // loop counter for each set point manager
 		int NumNode; // loop counter for each node and specific control type
-		int SetPtMgrNumPtr; // setpoint manager 
+		int SetPtMgrNumPtr; // setpoint manager
 		bool ResetCntrlVarType; // if true reset Hum Rat control var type to maxhumidity ratio
 
 		// First time called, get the input for all the setpoint managers
@@ -7920,7 +8042,7 @@ namespace SetPointManager {
 			GetSetPointManagerInputs();
 			GetInputFlag = false;
 		}
-		
+
 		ResetCntrlVarType = false;
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
@@ -7935,7 +8057,7 @@ namespace SetPointManager {
 				}
 			}
 		}
-	
+
 		SPMLoop_exit:;
 
 		if ( ResetCntrlVarType ) {
@@ -8137,36 +8259,36 @@ namespace SetPointManager {
 		//       DATE WRITTEN   August 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-		
+
 		// PURPOSE OF THIS SUBROUTINE
 		// Set up new scheduled TES setpoint managers based on plant control Simple TES
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Set up internally created scheduled setpoint managers to control the setpoints
 		// of various ice storage equipment with the user having to do this manually.  The
 		// point is to provide a simpler input description and take care of logic internally.
-		
+
 		// REFERENCES:
 		// na
-		
+
 		// USE STATEMENTS:
-		
+
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFoundinTESSchSetup( false );
 		int NodeNum;
-		
+
 		NumSchTESSetPtMgrs += 1;
 		NumAllSetPtMgrs    += 1;
-		
+
 		// allocate/redimension structures for new item
 		if ( NumSchTESSetPtMgrs == 1 ) { // first time through--main structure not allocated yet
 			SchTESSetPtMgr.allocate( 1 );
@@ -8174,7 +8296,7 @@ namespace SetPointManager {
 			SchTESSetPtMgr.redimension( NumSchTESSetPtMgrs );
 		}
 		AllSetPtMgr.redimension( NumAllSetPtMgrs );
-		
+
 		// Set up the scheduled TES setpoint manager information
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtr = SchedPtr;
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtrCharge = SchedPtrCharge;
@@ -8182,7 +8304,7 @@ namespace SetPointManager {
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).ChargeCHWTemp = ChargeCHWTemp;
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).CompOpType = CompOpType;
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum = ControlNodeNum;
-		
+
 		// Set up the all setpoint manager information for "verification" that no other setpoint manager controls the node that this new ones does
 		AllSetPtMgr( NumAllSetPtMgrs ).CtrlNodes.allocate( 1 );
 		AllSetPtMgr( NumAllSetPtMgrs ).CtrlNodes( 1 ) = SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum;
@@ -8190,7 +8312,7 @@ namespace SetPointManager {
 		AllSetPtMgr( NumAllSetPtMgrs ).SPMType = iSPMType_TESScheduled;
 		AllSetPtMgr( NumAllSetPtMgrs ).CtrlTypeMode = iCtrlVarType_Temp;
 		AllSetPtMgr( NumAllSetPtMgrs ).NumCtrlNodes = 1;
-		
+
 		// Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
 		ErrorsFoundinTESSchSetup = false;
 		VerifySetPointManagers( ErrorsFoundinTESSchSetup );
@@ -8200,38 +8322,126 @@ namespace SetPointManager {
 		// Since all of the other setpoint managers not only been read and verified but also initialized, simulated, and updated,
 		// we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate
 		// steps are the same so we can call the simulate first.
-		
+
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).calculate();
-		
+
 		// Now update reusing code from Update routine specialized to only doing the current (new) setpoint manager and then we are done
-		
+
 		NodeNum = SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum; // Get the node number
 		Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( NumSchTESSetPtMgrs ).SetPt;
-		
+
 	}   // end of SetUpNewScheduledTESSetPtMgr
-	
-	//     NOTICE
 
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
+	bool
+	GetCoilFreezingCheckFlag( int const MixedAirSPMNum )
+	{
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Nov. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
+		// PURPOSE OF THIS SUBROUTINE
+		// Get freezing check status
 
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		bool FeezigCheckFlag;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CtrldNodeNum;
+
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs( );
+			GetInputFlag = false;
+		}
+
+		FeezigCheckFlag = false;
+
+		for ( CtrldNodeNum = 1; CtrldNodeNum <= MixedAirSetPtMgr( MixedAirSPMNum ).NumCtrlNodes; ++CtrldNodeNum ) {
+			if ( MixedAirSetPtMgr( MixedAirSPMNum ).FreezeCheckEnable ) {
+				FeezigCheckFlag = true;
+				break;
+			}
+		}
+
+		return FeezigCheckFlag;
+	}  // End of GetCoilFreezingCheckFlag
+
+	int
+	GetMixedAirNumWithCoilFreezingCheck( int const MixedAirNode )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Nov. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Loop over all the MixedAir setpoint Managers to find coil freezing check flag
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		int MixedAirSPMNum;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SetPtMgrNum;
+		int CtrldNodeNum;
+
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs( );
+			GetInputFlag = false;
+		}
+
+		MixedAirSPMNum = 0;
+
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum ) {
+
+			for ( CtrldNodeNum = 1; CtrldNodeNum <= MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrldNodeNum ) {
+				if ( MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrldNodeNum ) == MixedAirNode ) {
+					if ( MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilInNode > 0 && MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilOutNode > 0 ) {
+						MixedAirSPMNum = CtrldNodeNum;
+						break;
+					}
+				}
+			}
+		}
+
+		return MixedAirSPMNum;
+	}  // End of GetMixedAirNumWithCoilFreezingCheck(
+
 
 } // SetPointManager
 

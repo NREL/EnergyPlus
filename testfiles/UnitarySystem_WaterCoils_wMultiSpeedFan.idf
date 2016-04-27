@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1566,6 +1566,7 @@
     UnitarySystemFanFlowRatio, !-  Name
     4,                       !-  Number of Speeds for Heating
     4,                       !-  Number of Speeds for Cooling
+    No,                      !-  Single Mode Operation 
     0.25,                    !-  Heating Speed 1 Supply Air Flow Ratio
     0.25,                    !-  Cooling Speed 1 Supply Air Flow Ratio
     0.50,                    !-  Heating Speed 2 Supply Air Flow Ratio

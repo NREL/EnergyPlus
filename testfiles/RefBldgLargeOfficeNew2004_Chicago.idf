@@ -73,7 +73,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
-  Version,8.4;
+  Version,8.5;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -7410,8 +7410,24 @@
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
-    Intermittent;            !- Pump Control Type
+    autosize,                !- Minimum Flow Rate {m3/s}
+    Intermittent,            !- Pump Control Type
+    ,                        !- Pump Flow Rate Schedule Name
+    ,                        !- Pump Curve Name
+    ,                        !- Impeller Diameter
+    ,                        !- VFD Control Type
+    ,                        !- Pump rpm Schedule Name
+    ,                        !- Minimum Pressure Schedule
+    ,                        !- Maximum Pressure Schedule
+    ,                        !- Minimum RPM Schedule
+    ,                        !- Maximum RPM Schedule
+    ,                        !- Zone Name
+    ,                        !- Skin Loss Radiative Fraction
+    PowerPerFlow,            !- Design Power Sizing Method
+    348701.1,                !- Design Electric Power per Unit Flow Rate
+    1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head
+    0.0;                     !- Design Minimum Flow Rate Sizing Factor
+
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
@@ -7438,7 +7454,16 @@
     AUTOSIZE,                !- Rated Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
-    Intermittent;            !- Pump Control Type
+    Intermittent,            !- Pump Control Type
+    ,                        !- Pump Flow Rate Schedule Name
+    ,                        !- Pump Curve Name
+    ,                        !- Impeller Diameter
+    ,                        !- Rotational Speed
+    ,                        !- Zone Name
+    ,                        !- Skin Loss Radiative Fraction
+    PowerPerFlow,            !- Design Power Sizing Method
+    301156.1,                !- Design Electric Power per Unit Flow Rate
+    ;                        !- Design Shaft Power per Unit Flow Rate per Unit Head
 
   PlantEquipmentList,
     CoolSys1 Equipment List, !- Name
