@@ -18,6 +18,7 @@
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array3A.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
@@ -368,6 +369,64 @@ TEST( ArraySTest, Functions1D )
 	EXPECT_EQ( 14, magnitude_squared( u ) );
 	EXPECT_EQ( 3, distance_squared( u, v ) );
 	EXPECT_EQ( 20, dot( u, v ) );
+}
+
+TEST( ArraySTest, Function2DMinMaxLoc )
+{
+	{
+		Array2D_int const A( 4, 4, reshape( {
+		  4,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+		Array2S_int S( A );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( S ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( S ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( S, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( S, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( S, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( S, 2 ) ) ); // Max of rows
+	}
+	{
+		Array2D_int const A( 4, 4, reshape( {
+		 -9,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+		Array2S_int S( A( _, _ ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), minloc( S ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( S ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( S, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 1, 3, 3, 1 } ), minloc( S, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( S, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( S, 2 ) ) ); // Max of rows
+	}
+	{
+		Array2D_int const A( 4, 4, reshape( {
+		  9,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+		Array2S_int S( A );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( S ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), maxloc( S ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( S, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( S, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( S, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 1, 4, 1, 3 } ), maxloc( S, 2 ) ) ); // Max of rows
+	}
 }
 
 TEST( ArraySTest, StreamOut )
