@@ -3232,6 +3232,7 @@ namespace VariableSpeedCoils {
 					} else {
 						RatedCapCoolTotalDes = CoolCapAtPeak;
 					}
+					RatedCapCoolTotalDes = VolFlowRate / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( NormSpeed );
 				} else {
 					RatedCapCoolTotalDes = 0.0;
 				}
@@ -3285,7 +3286,7 @@ namespace VariableSpeedCoils {
 		//VarSpeedCoil(DXCoilNum)%RatedCapHeat = DXCoolCap
 		if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "HEATING" ) {
 			if ( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum > 0 ) {
-				RatedCapHeatDes = VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).RatedCapCoolTotal;
+				RatedCapHeatDes = VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).RatedCapCoolTotal * min( 1.0, VarSpeedCoil( VarSpeedCoil( DXCoilNum ).CompanionCoolingCoilNum ).MSRatedAirVolFlowPerRatedTotCap( NormSpeed ) / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( NormSpeed ) );
 				VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal = RatedCapHeatDes; //AVOID BEING ZERO
 			} else {
 				RatedCapHeatDes = DXCoolCap; //previous code, can be risky
