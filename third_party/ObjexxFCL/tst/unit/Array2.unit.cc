@@ -14,11 +14,13 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2.all.hh>
 #include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
+#include <array>
 #include <string>
 
 using namespace ObjexxFCL;
@@ -2399,4 +2401,164 @@ TEST( Array2Test, FunctionProduct )
 	EXPECT_EQ( 60984, product( A ) );
 	EXPECT_TRUE( eq( P1, product( A, 1 ) ) );
 	EXPECT_TRUE( eq( P2, product( A, 2 ) ) );
+}
+
+TEST( Array2Test, FunctionAbs )
+{
+	Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
+	Array2D_int const E( 2, 2, { 11, 12, 21, 22 } );
+	EXPECT_TRUE( eq( E, abs( A ) ) );
+}
+
+TEST( Array2Test, FunctionPow )
+{
+	Array2D_int A( 2, 2, { 5, -3, 7, -4 } );
+	Array2D_int const E( 2, 2, { 25, 9, 49, 16 } );
+	EXPECT_TRUE( eq( E, pow( A, 2 ) ) );
+}
+
+TEST( Array2Test, FunctionSign )
+{
+	{
+		Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
+		Array2D_int const AP( 2, 2, { 11, 12, 21, 22 } );
+		Array2D_int const AN( 2, 2, { -11, -12, -21, -22 } );
+		EXPECT_TRUE( eq( AP, sign( A, 1 ) ) );
+		EXPECT_TRUE( eq( AP, sign( A, 0 ) ) );
+		EXPECT_TRUE( eq( AN, sign( A, -1 ) ) );
+	}
+
+	{
+		Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
+		Array2D_int const A1( 2, 2, { 1, -1, 1, -1 } );
+		Array2D_int const A0( 2, 2, { 0, -0, 0, -0 } ); // Minuses don't matter
+		EXPECT_TRUE( eq( A1, sign( 1, A ) ) );
+		EXPECT_TRUE( eq( A0, sign( 0, A ) ) );
+		EXPECT_TRUE( eq( A1, sign( -1, A ) ) );
+	}
+}
+
+TEST( Array2Test, FunctionMinMaxLoc )
+{
+	{
+		Array2D_int const A( 4, 4, reshape( {
+		  4,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( A ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( A ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1, 4u ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( A, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1, 4u ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( A, 2 ) ) ); // Max of rows
+	}
+	{
+		Array2D_int const A( 4, 4, reshape( {
+		 -9,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), minloc( A ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( A ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( A, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( A, 1, 4u ) ) ); // Min of cols // Test large array method
+		EXPECT_TRUE( eq( Array1D_int( { 1, 3, 3, 1 } ), minloc( A, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( A, 1, 4u ) ) ); // Max of cols // Test large array method
+		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( A, 2 ) ) ); // Max of rows
+	}
+	{
+		Array2D_int const A( 4, 4, reshape( {
+		  9,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( A ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), maxloc( A ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( A, 1, 4u ) ) ); // Min of cols // Test large array method
+		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( A, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( A, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( A, 1, 4u ) ) ); // Max of cols // Test large array method
+		EXPECT_TRUE( eq( Array1D_int( { 1, 4, 1, 3 } ), maxloc( A, 2 ) ) ); // Max of rows
+	}
+}
+
+TEST( Array2Test, FunctionMatmul12 )
+{
+	Array1D_int A( 3 );
+	Array2D_int B( 3, 2 );
+	A( 1 ) = 4;
+	A( 2 ) = 3;
+	A( 3 ) = 5;
+	B( 1, 1 ) = 7;
+	B( 1, 2 ) = 2;
+	B( 2, 1 ) = 5;
+	B( 2, 2 ) = 0;
+	B( 3, 1 ) = 4;
+	B( 3, 2 ) = 6;
+	Array1D_int R( 2 );
+	R( 1 ) = 63;
+	R( 2 ) = 38;
+	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
+}
+
+TEST( Array2Test, FunctionMatmul21 )
+{
+	Array2D_int A( 2, 3 );
+	Array1D_int B( 3 );
+	A( 1, 1 ) = 4;
+	A( 1, 2 ) = 3;
+	A( 1, 3 ) = 5;
+	A( 2, 1 ) = 9;
+	A( 2, 2 ) = 2;
+	A( 2, 3 ) = 8;
+	B( 1 ) = 7;
+	B( 2 ) = 5;
+	B( 3 ) = 4;
+	Array1D_int R( 2 );
+	R( 1 ) = 63;
+	R( 2 ) = 105;
+	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
+}
+
+TEST( Array2Test, FunctionMatmul22 )
+{
+	Array2D_int A( 2, 3 );
+	Array2D_int B( 3, 2 );
+	A( 1, 1 ) = 4;
+	A( 1, 2 ) = 3;
+	A( 1, 3 ) = 5;
+	A( 2, 1 ) = 9;
+	A( 2, 2 ) = 2;
+	A( 2, 3 ) = 8;
+	B( 1, 1 ) = 7;
+	B( 1, 2 ) = 2;
+	B( 2, 1 ) = 5;
+	B( 2, 2 ) = 0;
+	B( 3, 1 ) = 4;
+	B( 3, 2 ) = 6;
+	Array2D_int R( 2, 2 );
+	R( 1, 1 ) = 63;
+	R( 1, 2 ) = 38;
+	R( 2, 1 ) = 105;
+	R( 2, 2 ) = 66;
+	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
+	Array2D_int BT( transposed( B ) );
+	EXPECT_TRUE( eq( R, matmul_T( A, BT ) ) );
 }

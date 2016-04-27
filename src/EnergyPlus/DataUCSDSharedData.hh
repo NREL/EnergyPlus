@@ -101,6 +101,9 @@ namespace DataUCSDSharedData {
 	extern Array1D< Real64 > HWindow;
 	extern Array1D< Real64 > HDoor;
 
+	void
+	clear_state();
+
 } // DataUCSDSharedData
 
 } // EnergyPlus

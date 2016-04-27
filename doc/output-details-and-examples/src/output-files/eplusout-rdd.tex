@@ -1,0 +1,110 @@
+\section{eplusout.rdd}
+
+This file (from the \textbf{Output:VariableDictionary,regular;} and \textbf{Output:VariableDictionary,IDF;} commands) shows all the report variables along with their “availability” for the current input file. Each simulation \emph{may have} different output variables though some are constant (for example the environmental/outdoor variables! A user must first run the simulation (at least semi-successfully) before the available output variables are known. This output file is available in two flavors: regular (listed as they are in the Input Output Reference) and IDF (ready to be copied and pasted into your Input File). Once this file is generated, the IDF editor can use them for Output:Variable keys. You can also ask for the outputs to be sorted by name.
+
+\begin{lstlisting}
+Output:VariableDictionary,regular,Name;
+\end{lstlisting}
+
+``\textbf{Zone}'' variables are calculated and can be reported after each Zone/Heat Balance timestep (ref: TimeSteps in Hour command). ``\textbf{HVAC}'' variables are calculated and can be reported with each variable HVAC timestep. ``Average'' variables will be averaged over the time interval being reported whereas ``sum'' variables are summed over that time interval.
+
+There are two mitigating factors for this output variable list. One is the “Advanced Report Variables” and the other is the “Create Minimal Surface Variables”.
+
+\subsection{Normal Output Variables – regular format}
+
+A typical rdd file might be:
+
+\begin{lstlisting}
+Program Version,EnergyPlus, <version>, <date/time of run>,IDD_Version <IDD Version>
+Var Type (reported timestep),Var Report Type,Variable Name [Units]
+Zone,Average,Site Outdoor Air Drybulb Temperature [C]
+Zone,Average,Site Outdoor Air Dewpoint Temperature [C]
+Zone,Average,Site Outdoor Air Wetbulb Temperature [C]
+Zone,Average,Site Outdoor Air Humidity Ratio [kgWater/kgAir]
+Zone,Average,Site Outdoor Air Relative Humidity [%]
+Zone,Average,Site Outdoor Air Barometric Pressure [Pa]
+Zone,Average,Site Wind Speed [m/s]
+Zone,Average,Site Wind Direction [deg]
+Zone,Average,Site Sky Temperature [C]
+Zone,Average,Site Diffuse Solar Radiation Rate per Area [W/m2]
+Zone,Average,Site Direct Solar Radiation Rate per Area [W/m2]
+Zone,Average,Site Ground Reflected Solar Radiation Rate per Area [W/m2]
+Zone,Average,Site Ground Temperature [C]
+<reduced>
+
+Zone,Average,Surface Window Transmitted Solar Radiation Rate[W]
+Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate[W]
+Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate[W]
+Zone,Average,Zone Windows Total Heat Gain Rate[W]
+Zone,Average,Zone Windows Total Heat Loss Rate[W]
+Zone,Average,Surface Window Gap Convective Heat Transfer Rate[W]
+Zone,Average,Surface Window Shading Device Absorbed Solar Radiation Rate[W]
+<reduced>
+
+HVAC,Average,System Node Temperature [C]
+HVAC,Average,System Node Mass Flow Rate[kg/s]
+HVAC,Average,System Node Humidity Ratio[]
+HVAC,Average,System Node Setpoint Temperature[C]
+HVAC,Average,System Node Setpoint Temperature Hi[C]
+HVAC,Average,System Node Setpoint Temperature Lo[C]
+HVAC,Average,System Node Setpoint Humidity Ratio[kgWater/kgDryAir]
+HVAC,Average,System Node Setpoint Minimum Humidity Ratio[kgWater/kgDryAir]
+HVAC,Average,System Node Setpoint Maximum Humidity Ratio[kgWater/kgDryAir]
+HVAC,Average,System Node Current Density Volume Flow Rate[m3/s]HVAC,Average,System Node Enthalpy[J/kg]
+HVAC,Average,System Node Wetbulb Temperature[C]
+
+<reduced>
+HVAC,Sum, Zone Mechanical Ventilation No Load Heat Removal Energy [J]
+HVAC,Sum,Zone Mechanical Ventilation Cooling Load Increase Energy [J]
+HVAC,Sum, Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy [J]
+HVAC,Sum,Zone Mechanical Ventilation Cooling Load Decrease Energy [J]
+HVAC,Sum,Zone Mechanical Ventilation No Load Heat Addition [J]
+HVAC,Sum,Zone Mechanical Ventilation Heating Load Increase Energy [J]
+HVAC,Sum, Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy[J]
+HVAC,Sum,Zone Mechanical Ventilation Heating Load Decrease Energy [J]
+HVAC,Average,Zone Mechanical Ventilation Mass Flow Rate [kg/s]
+HVAC,Average, Zone Mechanical Ventilation Standard Density Volume Flow Rate [m3/s]
+HVAC,Sum,Zone Mechanical Ventilation Standard Density Volume [m3]
+HVAC,Sum,Zone Mechanical Ventilation Mass [kg]
+HVAC,Average,Zone Mechanical Ventilation Air Changes per Hour [ach]
+\end{lstlisting}
+
+\subsection{Normal Output Variables – regular format – sorted by name}
+
+The same variables but now sorted alphabetically by name.
+
+\begin{lstlisting}
+Program Version,EnergyPlus, <version>, <date/time of run>,IDD\_Version <IDD Version>
+Var Type (reported time step),Var Report Type,Variable Name [Units]
+HVAC,Sum,Air System Solver Iteration Count []
+HVAC,Sum,Environmental Impact Total CH4 Emissions Carbon Equivalent Mass [kg]
+HVAC,Sum,Environmental Impact Total CO2 Emissions Carbon Equivalent Mass [kg]
+HVAC,Sum, Environmental Impact Total N2O Emissions Carbon Equivalent Mass [kg]
+Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]
+Zone,Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
+Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]
+Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
+Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area [W/m2]
+Zone,Average, Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area [W/m2]
+\end{lstlisting}
+
+\subsection{Normal Output Variables – IDF format}
+
+A brief excerpt of the IDF format is shown below. These can be copied and pasted directly into an IDF or used from the IDF Editor.
+
+\begin{lstlisting}
+! Program Version, <version>, <date/time of run>,IDD\_Version <IDD version>
+! Output:Variable Objects (applicable to this run)
+Output:Variable,\*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
+Output:Variable,\*,Site Outdoor Air Dewpoint Temperature,hourly; !- Zone Average [C]
+Output:Variable,\*,Site Outdoor Air Wetbulb Temperature,hourly; !- Zone Average [C]
+Output:Variable,\*,Site Outdoor Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgDryAir]
+Output:Variable,\*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average [%]
+Output:Variable,\*,Site Outdoor Air Barometric Pressure,hourly; !- Zone Average [Pa]
+Output:Variable,\*,Site Wind Speed,hourly; !- Zone Average [m/s]
+Output:Variable,\*,Site Wind Direction,hourly; !- Zone Average [deg]
+\end{lstlisting}
+
+\subsection{Advanced Output Variables}
+
+The DisplayAdvancedReportVariables key to the Output:Diagnostics object adds a number of variables that may need special handling or understanding of the users. Search on the Input Output Reference document for DisplayAdvancedReportVariables for more details.
