@@ -584,6 +584,19 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	Real64
+	GetSupHeatTempRefrig(
+		std::string const & Refrigerant, // carries in substance name
+		Real64 const Pressure, // actual pressure given as input
+		Real64 const Enthalpy, // actual enthalpy given as input
+		Real64 TempLow, // lower bound of temperature in the iteration
+		Real64 TempUp, // upper bound of temperature in the iteration
+		int & RefrigIndex, // Index to Refrigerant Properties
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	);
+
+	//*****************************************************************************
+
+	Real64
 	GetSupHeatDensityRefrig(
 		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input

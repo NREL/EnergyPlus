@@ -605,6 +605,8 @@ namespace HVACVariableRefrigerantFlow {
 			IUEvapTempHigh( 15.0 ),
 			IUCondTempLow( 42.0 ), 
 			IUCondTempHigh( 46.0 ),
+			IUCondHeatRate( 0.0 ),
+			IUEvapHeatRate( 0.0 ),
 			OUEvapTempLow( -30.0 ),
 			OUEvapTempHigh( 20.0 ),
 			OUCondTempLow( 30.0 ), 
@@ -613,8 +615,6 @@ namespace HVACVariableRefrigerantFlow {
 			OUAirFlowRatePerCapcity( 0.0 ),
 			OUCondHeatRate( 0.0 ),
 			OUEvapHeatRate( 0.0 ),
-			IUCondHeatRate( 0.0 ),
-			IUEvapHeatRate( 0.0 ),
 			SH( 0.0 ),
 			SC( 0.0 ),
 			SHLow( 0.0 ),
@@ -630,20 +630,20 @@ namespace HVACVariableRefrigerantFlow {
 			AlgorithmIUCtrl( 1 ),
 			EvapTempFixed( 0.0 ),
 			CondTempFixed( 0.0 ),
+			OUFanPower( 0.0 ),
+			DiffOUTeTo( 5 ),
+			CoffEvapCap( 1.0 ),
+			CompActSpeed( 0.0 ),
+			EffCompInverter( 0.95 ),
+			HROUHexRatio( 0.0 ),
+			Ncomp( 0.0 ), 
+			NcompCooling( 0.0 ),
+			NcompHeating( 0.0 ),
+			CompMaxDeltaP( 0.0 ),
 			RatedOUFanPower( 0.0 ),
 			RatedOUFanPowerPerCapcity( 0.0 ),
 			RateBFOUEvap( 0.2 ),
 			RateBFOUCond( 0.4 ),
-			DiffOUTeTo( 5 ),
-			OUFanPower( 0.0 ),  
-			CompActSpeed( 0.0 ),   
-			CoffEvapCap( 1.0 ),
-			EffCompInverter( 0.95 ),
-			Ncomp( 0.0 ), 
-			HROUHexRatio( 0.0 ),
-			NcompCooling( 0.0 ),
-			NcompHeating( 0.0 ),
-			CompMaxDeltaP( 0.0 ),
 			RefPipDiaSuc( 0.0 ),
 			RefPipDiaDis( 0.0 ),
 			RefPipLen( 0.0 ),   
@@ -1112,8 +1112,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
 		Real64 const m_air, // OU coil air mass flow rate [kg/s]
 		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
-		Real64 const OutdoorPressure // Outdoor air pressure [Pa]
+		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
 	);
 	
 	Real64
@@ -1124,8 +1123,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
 		Real64 const Q_coil, // absolute value of OU coil heat release or heat extract [W]
 		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
-		Real64 const OutdoorPressure // Outdoor air pressure [Pa]
+		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
 	);
 	
 	Real64
@@ -1226,15 +1224,12 @@ namespace HVACVariableRefrigerantFlow {
 	VRFOU_CalcComp_HR(
 		int const VRFCond, // Index to VRF outdoor unit
 		Real64 const Q_c_OU, // OU evaporator load [W]
-		Real64 const Q_h_OU, // OU condenser load [W]
 		Real64 const Q_c_TU_PL, // IU evaporator load, including piping loss [W]
-		Real64 const Q_h_TU_PL, // IU condenser load, including piping loss [W]
 		Real64 const Pipe_Q_c, // IU condenser side piping loss [W]
-		Real64 const Pipe_Q_h, // IU evaporator side piping loss [W]
 		Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
 		Real64 const h_IU_evap_in, // Enthalpy of IU at inlet [kJ/kg]
-		Real64 & T_comp_in, // Refrigerant temperature at comparessor inlet (after piping loss) [C]
-		Real64 & h_comp_in, // Enthalpy after piping loss (comparessor inlet) [kJ/kg]
+		Real64 & T_comp_in, // Refrigerant temperature at compressor inlet (after piping loss) [C]
+		Real64 & h_comp_in, // Enthalpy after piping loss (compressor inlet) [kJ/kg]
 		Real64 & T_suction, // Compressor suction temperature Te' [C]
 		Real64 & CompSpdActual, // Actual compressor running speed [rps]
 		Real64 & Ncomp // Compressor power [W]

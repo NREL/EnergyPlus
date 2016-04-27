@@ -4487,6 +4487,129 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	Real64
+	GetSupHeatTempRefrig(
+		std::string const & Refrigerant, // carries in substance name
+		Real64 const Pressure, // actual pressure given as input
+		Real64 const Enthalpy, // actual enthalpy given as input
+		Real64 TempLow, // lower bound of temperature in the iteration
+		Real64 TempUp, // upper bound of temperature in the iteration
+		int & RefrigIndex, // Index to Refrigerant Properties
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Jan 2016
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Performs iterations to calculate the refrigerant temperature corresponding to the given 
+		// enthalpy and pressure.  Works only in superheated region.
+
+		// METHODOLOGY EMPLOYED:
+		// Perform iterations to identify the temperature by calling GetSupHeatEnthalpyRefrig.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		Real64 ReturnValue;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETERS:
+		// the enthalpy calculated from the pressure found
+		static std::string const RoutineName( "GetSupHeatTempRefrig: " );
+		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrig:" );
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int RefrigNum; // index for refrigerant under consideration
+		Real64 EnthalpyCheck; // recalculates enthalpy based on calculated pressure
+		Real64 EnthalpyHigh; // Enthalpy value at interpolated pressure and high temperature
+		Real64 EnthalpyLow; // Enthalpy value at interpolated pressure and low temperature
+		Real64 RefTHigh; // High Temperature Value for Ps (max in tables)
+		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
+		Real64 Temp; // Temperature of the superheated refrigerant at the given enthalpy and pressure
+		
+		// FLOW:
+
+		if ( GetInput ) {
+			GetFluidPropertiesData();
+			GetInput = false;
+		}
+
+		RefrigNum = 0;
+		if ( NumOfRefrigerants == 0 ) {
+			ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom );
+		}
+
+		// Find which refrigerant (index) is being requested and then determine
+		// where the temperature is within the temperature array
+		if ( RefrigIndex > 0 ) {
+			RefrigNum = RefrigIndex;
+		} else {
+			// Find which refrigerant (index) is being requested
+			RefrigNum = FindRefrigerant( Refrigerant );
+			if ( RefrigNum == 0 ) {
+				ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom );
+			}
+			RefrigIndex = RefrigNum;
+		}
+		auto const & refrig( RefrigData( RefrigNum ) );
+
+		// check temperature data range and attempt to cap if necessary
+		RefTHigh = refrig.PsHighTempValue;
+		RefTSat = GetSatTemperatureRefrig( Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+		
+		if ( TempLow < RefTSat ) {
+			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
+			ShowContinueError( " Called From:" + CalledFrom );
+			ShowContinueErrorTimeStamp( "" );
+			TempLow = RefTSat;
+		}
+		if ( TempUp > RefTHigh ) {
+			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
+			ShowContinueError( " Called From:" + CalledFrom );
+			ShowContinueErrorTimeStamp( "" );
+			TempUp = RefTHigh;
+		}		
+		if ( TempLow >= TempUp ) {
+			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
+			ShowContinueError( " Called From:" + CalledFrom );
+			ShowContinueErrorTimeStamp( "" );
+			TempLow = RefTSat;
+			TempUp = RefTHigh;
+		}
+			
+		// check enthalpy data range and attempt to cap if necessary
+		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+		if ( ( Enthalpy < EnthalpyLow) || ( Enthalpy > EnthalpyHigh ) ) return RefTSat;
+			
+		for ( Temp = TempLow; Temp <= TempUp; Temp++ ){
+			EnthalpyCheck = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+			
+			if( EnthalpyCheck > Enthalpy )  break; 
+		}
+		
+		return Temp;
+
+	}
+
+	
+	//*****************************************************************************
+
+	Real64
 	GetSupHeatDensityRefrig(
 		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input

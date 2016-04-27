@@ -9556,8 +9556,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
 		Real64 const m_air, // OU coil air mass flow rate [kg/s]
 		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
-		Real64 const OutdoorPressure // Outdoor air pressure [Pa]
+		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
 	)
 	{
 	
@@ -9589,7 +9588,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Q_coil; // OU coil heat release at cooling mode or heat extract at heating mode [W]
 		Real64 T_coil_out; // Air temperature at coil outlet [C]
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
-		Real64 T_coil_surf_sat; // Saturated air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
 		
 		if( OperationMode == FlagCondMode ) {
@@ -9647,8 +9645,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
 		Real64 const Q_coil, // absolute value of OU coil heat release or heat extract [W]
 		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
-		Real64 const OutdoorPressure // Outdoor air pressure [Pa]
+		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
 	)
 	{
 	
@@ -9680,7 +9677,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 m_air; // OU coil air mass flow rate [kg/s]
 		Real64 T_coil_out; // Air temperature at coil outlet [C]
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
-		Real64 T_coil_surf_sat; // Saturated air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
 		
 		if( OperationMode == FlagCondMode ) {
@@ -10878,11 +10874,8 @@ namespace HVACVariableRefrigerantFlow {
 	VRFOU_CalcComp_HR(
 		int const VRFCond, // Index to VRF outdoor unit
 		Real64 const Q_c_OU, // OU evaporator load [W]
-		Real64 const Q_h_OU, // OU condenser load [W]
 		Real64 const Q_c_TU_PL, // IU evaporator load, including piping loss [W]
-		Real64 const Q_h_TU_PL, // IU condenser load, including piping loss [W]
 		Real64 const Pipe_Q_c, // IU condenser side piping loss [W]
-		Real64 const Pipe_Q_h, // IU evaporator side piping loss [W]
 		Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
 		Real64 const h_IU_evap_in, // Enthalpy of IU at inlet [kJ/kg]
 		Real64 & T_comp_in, // Refrigerant temperature at compressor inlet (after piping loss) [C]
@@ -11211,28 +11204,19 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 m_air_evap; // OU evaporator air mass flow rate [kg/s]
 		Real64 m_air_cond; // OU condenser air mass flow rate [kg/s]
 		Real64 m_air_evap_rated; // Rated OU evaporator air mass flow rate [kg/s]
-		Real64 m_air_cond_rated; // Rated OU condenser air mass flow rate [kg/s]
 		Real64 N_fan_OU_evap( 0 ); // OU evaporator air mass flow rate [kg/s]
 		Real64 N_fan_OU_cond( 0 ); // OU condenser air mass flow rate [kg/s]
 		Real64 RhoAir; // outdoor air density [kg/m3]
-		Real64 Q_delt_OU; // load difference between VRF-HR OU condenser and evaporator [W]
 		Real64 Q_c_tot; // Total evaporator capacity [W]
 		Real64 Q_h_tot; // Total condenser capacity [W]
-		Real64 Q_c_TU_PL_new; // IU evaporator load, including piping loss (new) [W]
-		Real64 Q_h_TU_PL_new; // IU condenser load, including piping loss (new) [W]
 		Real64 Pipe_Q_c_new; // IU evaporator side piping loss (new), updated because of Te update [W]
 		Real64 rps1_evap; // compressor speed satisfying IU cooling load
 		Real64 rps2_cond; // compressor speed satisfying IU heating load
 		Real64 RefPLow; // Low Pressure Value for Ps (>0.0) [Pa]
 		Real64 RefPHigh; // High Pressure Value for Ps (max in tables) [Pa]
-		Real64 SHLow; // VRF outdoor unit superheating degrees lower limit [C]
-		Real64 SCLow; // VRF outdoor unit subcooling degrees lower limit [C]
-		Real64 SHHigh; // VRF outdoor unit superheating degrees upper limit [C]
-		Real64 SCHigh; // VRF outdoor unit subcooling degrees upper limit [C]
 		Real64 Tfs; // temperature of the air at coil surface [C]
 		Real64 Tolerance( 0.05 ); // Tolerance for condensing temperature calculation [C}
 		Real64 Tsuction_new; // VRF compressor suction refrigerant temperature (new) [C]
-		Real64 Tsuction_new2; // VRF compressor suction refrigerant temperature (new) [C]
 		
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFHR_OU_Mode" );
@@ -11315,7 +11299,7 @@ namespace HVACVariableRefrigerantFlow {
 				Q_h_OU = 0;
 				
 				//OU fan flow rate and power
-				m_air_evap = VRFOU_FlowRate( VRFCond, FlagEvapMode, Tsuction, VRF( VRFCond ).SH, Q_c_OU, OutDryBulbTemp, OutHumRat, OutBaroPress );
+				m_air_evap = VRFOU_FlowRate( VRFCond, FlagEvapMode, Tsuction, VRF( VRFCond ).SH, Q_c_OU, OutDryBulbTemp, OutHumRat );
 				m_air_evap_rated = m_air_rated;
 				N_fan_OU_evap = VRF( VRFCond ).RatedOUFanPower * m_air_evap / m_air_evap_rated;
 				N_fan_OU_cond = 0;
@@ -11405,8 +11389,6 @@ namespace HVACVariableRefrigerantFlow {
 		} else if ( HRMode == 3 ){ // Mode3 & Mode4 share the same algorithm
 			
 			//local parameters
-			int Counter_Iter_Te;
-			bool Flag_Iter_Te( true ); //Flag to perform iterations
 			Real64 Ncomp_new;
 			Real64 Q_c_tot_temp;
 			Real64 Q_c_OU_temp;
@@ -11454,7 +11436,7 @@ namespace HVACVariableRefrigerantFlow {
 				Q_c_OU = Q_c_tot - Q_c_TU_PL;
 			
 				//OU evaporator fan flow rate and power
-				m_air_evap = VRFOU_FlowRate( VRFCond, FlagEvapMode, Tsuction, VRF( VRFCond ).SH, Q_c_OU_temp, OutDryBulbTemp, OutHumRat, OutBaroPress );
+				m_air_evap = VRFOU_FlowRate( VRFCond, FlagEvapMode, Tsuction, VRF( VRFCond ).SH, Q_c_OU_temp, OutDryBulbTemp, OutHumRat );
 				
 			} else {
 				//Need to update Te_update & Pipe_Q_c_new, corresponding to Tsuction update.
@@ -11478,7 +11460,7 @@ namespace HVACVariableRefrigerantFlow {
 			Q_h_OU = Q_h_tot - Q_h_TU_PL;
 			 
 			//OU condenser fan flow rate and power
-			m_air_cond = VRFOU_FlowRate( VRFCond, FlagCondMode, Tdischarge, VRF( VRFCond ).SC, Q_h_OU, OutDryBulbTemp, OutHumRat, OutBaroPress );
+			m_air_cond = VRFOU_FlowRate( VRFCond, FlagCondMode, Tdischarge, VRF( VRFCond ).SC, Q_h_OU, OutDryBulbTemp, OutHumRat );
 			
 			// OU fan power
 			N_fan_OU_evap = VRF( VRFCond ).RatedOUFanPower * m_air_evap / m_air_rated;
@@ -11498,7 +11480,7 @@ namespace HVACVariableRefrigerantFlow {
 				Q_c_OU = 0;
 				
 				//OU fan flow rate and power
-				m_air_cond = VRFOU_FlowRate( VRFCond, FlagCondMode, Tdischarge, VRF( VRFCond ).SC, Q_h_OU, OutDryBulbTemp, OutHumRat, OutBaroPress );
+				m_air_cond = VRFOU_FlowRate( VRFCond, FlagCondMode, Tdischarge, VRF( VRFCond ).SC, Q_h_OU, OutDryBulbTemp, OutHumRat );
 				N_fan_OU_cond = VRF( VRFCond ).RatedOUFanPower * m_air_cond / m_air_rated;
 				N_fan_OU_evap = 0;
 				
@@ -11523,7 +11505,7 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 h_OU_cond_out; // enthalpy of OU condenser at outlet [kJ/kg]
 			
 			Real64 Psuction = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Tsuction, RefrigerantIndex, RoutineName );
-			Real64 Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Tdischarge, RefrigerantIndex, RoutineName );
+			//Real64 Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Tdischarge, RefrigerantIndex, RoutineName );
 			
 			// enthalpy of OU evaporator/condenser inlets and outlets
 			h_OU_evap_in = h_IU_evap_in; 
@@ -11641,7 +11623,6 @@ namespace HVACVariableRefrigerantFlow {
 		
 		// Refrigerant data
 		int RefrigNum = FindRefrigerant( VRF( VRFCond ).RefrigerantName ); 
-		Real64 RefTHigh = RefrigData( RefrigNum ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
 		Real64 RefPLow = RefrigData( RefrigNum ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
 		Real64 RefPHigh = RefrigData( RefrigNum ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
 		
