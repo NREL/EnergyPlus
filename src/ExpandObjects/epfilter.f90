@@ -10772,8 +10772,6 @@ DO iSys = 1, numCompactSysVAV
   IF (.NOT. isDehumidifyNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Maximum')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Dehumidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + vsDehumCtrlZoneOff,' Zone Air Node',.TRUE.)
   END IF
@@ -11104,8 +11102,6 @@ DO iSys = 1, numCompactSysVAV
   IF (.NOT. isHumidifierNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + vsAirHandlerNameOff,' Humidifier Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + vsHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
@@ -12444,8 +12440,6 @@ DO iSys = 1, numCompactSysPVAV
     !Object ==> SetpointManager:SingleZone:Humidity:Maximum
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Maximum')
     CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Dehumidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + pvavsDehumCtrlZoneOff,' Zone Air Node',.TRUE.)
   END IF
@@ -12766,8 +12760,6 @@ DO iSys = 1, numCompactSysPVAV
   IF (.NOT. isHumidifierNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + pvavsAirHandlerNameOff,' Humidifier Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + pvavsHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
@@ -13934,8 +13926,6 @@ DO iSys = 1, numCompactSysUnit
   IF (.NOT. isHumidifierNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + usAirHandlerNameOff,' Humidifier Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + usHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
 
@@ -14897,8 +14887,6 @@ DO iSys = 1, numCompactSysUnitHP
     !Object ==> SetpointManager:SingleZone:Humidity:Minimum
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + uhpsAirHandlerNameOff,' Humidifier Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + uhpsHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
@@ -17674,8 +17662,6 @@ DO iSys = 1, numCompactSysUnitarySystem
     !Object ==> SetpointManager:SingleZone:Humidity:Minimum
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + ussAirHandlerNameOff,TRIM(humidifierOutlet))
     CALL AddToObjFld('Control Zone Air Node Name', base + ussHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
@@ -19848,8 +19834,6 @@ DO iSys = 1, numCompactSysConstVol
   IF (.NOT. isDehumidifyNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Maximum')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Dehumidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet))
     CALL AddToObjFld('Control Zone Air Node Name', base + cvsDehumCtrlZoneOff,' Zone Air Node',.TRUE.)
   END IF
@@ -19858,8 +19842,6 @@ DO iSys = 1, numCompactSysConstVol
   IF (.NOT. isHumidifierNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(humidifierOutlet))
     CALL AddToObjFld('Control Zone Air Node Name', base + cvsHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
@@ -21614,8 +21596,6 @@ DO iSys = 1, numCompactSysDualDuct
   IF (.NOT. isDehumidifyNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Maximum')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Dehumidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + ddsAirHandlerNameOff,' Cooling Coil Outlet')
     CALL AddToObjFld('Control Zone Air Node Name', base + ddsDehumCtrlZoneOff,' Zone Air Node',.TRUE.)
   END IF
@@ -22060,8 +22040,6 @@ DO iSys = 1, numCompactSysDualDuct
   IF (.NOT. isHumidifierNone) THEN
     CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','')
-    CALL AddToObjStr('Schedule Name','')
     CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(humidifierOutlet))
     CALL AddToObjFld('Control Zone Air Node Name', base + ddsHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
