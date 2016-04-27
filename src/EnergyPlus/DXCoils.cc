@@ -4988,6 +4988,7 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
 			DXCoil( DXCoilNum ).RatedSHR( 1 ) = Numbers( 2 );
 			DXCoil( DXCoilNum ).SH = Numbers( 3 );
+			// @@ DXCoil( DXCoilNum ).RateBFVRFIUEvap = 0.0592; there will be a new field for this, which will be handled in a separate issue to update VRF-HP idd. It is not hanlded here to avoide tranistion issues for VRF-HP.
 
 			int indexSHCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -5076,6 +5077,7 @@ namespace DXCoils {
 
 			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
 			DXCoil( DXCoilNum ).SC = Numbers( 2 );
+			//@@ DXCoil( DXCoilNum ).RateBFVRFIUCond = 0.136; 
 
 			int indexSCCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -15344,9 +15346,9 @@ Label50: ;
 			C1Tevap = DXCoil( CoilIndex ).C1Te;
 			C2Tevap = DXCoil( CoilIndex ).C2Te;
 			C3Tevap = DXCoil( CoilIndex ).C3Te;
-			BF = 0.0592;
-
-			// Coil sensible heat transfer minimum value
+			BF = DXCoil( CoilIndex ).RateBFVRFIUEvap;
+			
+			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = Tin - QinSenPerFlowRate / 1005;
 			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
@@ -15445,10 +15447,9 @@ Label50: ;
 			C1Tcond = DXCoil( CoilIndex ).C1Tc;
 			C2Tcond = DXCoil( CoilIndex ).C2Tc;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
-
-			BF = 0.136;
-
-			// Coil sensible heat transfer minimum value
+			BF = DXCoil( CoilIndex ).RateBFVRFIUCond; 
+			
+			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = QinSenPerFlowRate / 1005 + Tin;
 			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
@@ -15641,14 +15642,14 @@ Label50: ;
 		bool ErrorsFound( false );       // Flag for errors
 		int const FlagCoolMode( 0 );     // Flag for cooling mode
 		int const FlagHeatMode( 1 );     // Flag for heating mode
-		Real64 const BFC_rate( 0.0592 ); // Bypass factor at cooling mode (-)
-		Real64 const BFH_rate( 0.1360 ); // Bypass factor at heating mode (-)
 		Real64 const SH_rate( 3 );       // Super heating at cooling mode, default 3(C)
 		Real64 const SC_rate( 5 );       // Subcooling at heating mode, default 5 (C)
 		Real64 const Te_rate( 6 );       // Evaporating temperature at cooling mode, default 6 (C)
 		Real64 const Tc_rate( 44 );      // Condensing temperature at heating mode, default 44 (C)
 		int CoilNum;       // index to VRFTU cooling or heating coil
 		Real64 BF_real;    // Bypass factor (-)
+		Real64 BFC_rate;   // Bypass factor at cooling mode (-)
+		Real64 BFH_rate;   // Bypass factor at heating mode (-)
 		Real64 SHSC_real;  // Super heating or Subcooling (C)
 		Real64 TeTc_real;  // Evaporating temperature or condensing temperature (C)
 		Real64 Ts;         // Air temperature at coil surface (C)
@@ -15661,10 +15662,13 @@ Label50: ;
 			GetDXCoilIndex( CoilName, CoilNum, ErrorsFound );
 		}
 
-		if ( OperationMode == FlagCoolMode ) {
-			//Cooling: OperationMode 0
+		BFC_rate = DXCoil( CoilNum ).RateBFVRFIUEvap;
+		BFH_rate = DXCoil( CoilNum ).RateBFVRFIUCond;
 
-			if ( present( BF ) ) {
+		if( OperationMode == FlagCoolMode ) {
+		//Cooling: OperationMode 0
+			
+			if( present( BF ) ) {
 				BF_real = BF;
 			} else {
 				BF_real = BFC_rate;
@@ -15679,10 +15683,10 @@ Label50: ;
 			} else {
 				SHSC_real = SH_rate;
 			}
-
+			
 			// Coil capacity at rated conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, 24, Te_rate, SH_rate, BFC_rate, Q_rate, Ts );
-
+			
 			// Coil capacity at given conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, Tinlet, TeTc_real, SHSC_real, BF_real, Q_real, Ts );
 
