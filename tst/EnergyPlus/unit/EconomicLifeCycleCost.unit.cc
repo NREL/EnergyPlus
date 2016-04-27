@@ -79,10 +79,8 @@ using namespace EnergyPlus::EconomicLifeCycleCost;
 TEST_F( EnergyPlusFixture, EconomicLifeCycleCost_GetInput )
 {
 
-	bool ErrorsFound( false );
-
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
+		"Version,8.5;",
 		"  LifeCycleCost:Parameters,                                           ",
 		"    TypicalLCC,              !- Name                                  ",
 		"    EndOfYear,               !- Discounting Convention                ",
