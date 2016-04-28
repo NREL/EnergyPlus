@@ -346,7 +346,7 @@ namespace EnergyPlus {
 
 	}
 
-}
+
 
 	TEST_F( EnergyPlusFixture, TestAFNPressureStat ) {
 
