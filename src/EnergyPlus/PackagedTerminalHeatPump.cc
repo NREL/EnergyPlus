@@ -3575,6 +3575,8 @@ namespace PackagedTerminalHeatPump {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
+		using VariableSpeedCoils::SimVariableSpeedCoils;
+		using VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed;
 
 		// Locals
 		bool IsAutoSize; // Indicator to autosize
@@ -3817,20 +3819,46 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
 				// specified in the zoneHVAC object
-
-				PrintFlag = true;
+				PrintFlag = false;
 				SizingMethod = CoolingAirflowSizing;
 				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+				if( PTUnit( PTUnitNum ).useVSCoilModel ) {
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = TempSize;
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+					SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, 0.0, 1, 0.0, 0.0, 0.0, 1.0 );
+					TempSize = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, ErrorsFound );
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = TempSize;
+					TempSize = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+					ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+				}
+				PrintFlag = true;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
 				PTUnit( PTUnitNum ).MaxCoolAirVolFlow = TempSize;
 
+				PrintFlag = false;
 				SizingMethod = HeatingAirflowSizing;
 				FieldNum = 2; //N2, \field Supply Air Flow Rate During Heating Operation
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+				if( PTUnit( PTUnitNum ).useVSCoilModel ) {
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = TempSize;
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+					SimVariableSpeedCoils( PTUnit( PTUnitNum ).DXHeatCoilName, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, 0.0, 1, 0.0, 0.0, 0.0, 1.0 );
+					TempSize = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = TempSize;
+					TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+					ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
+				}
+				PrintFlag = true;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
 				PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
 
 				SizingMethod = SystemAirflowSizing;
