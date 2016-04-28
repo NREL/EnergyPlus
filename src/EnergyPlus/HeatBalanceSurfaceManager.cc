@@ -423,6 +423,7 @@ namespace HeatBalanceSurfaceManager {
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
 		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
 
 		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
@@ -433,6 +434,7 @@ namespace HeatBalanceSurfaceManager {
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the surface centroids, modify the surface Dry/Wet BulbTemps
 		SetSurfaceOutBulbTempAt();
+		CheckSurfaceOutBulbTempAt();
 
 		SetSurfaceWindSpeedAt();
 		//  DO SurfNum = 1, TotSurfaces
@@ -848,6 +850,7 @@ namespace HeatBalanceSurfaceManager {
 		Array1D_int numExtSurfaces( 20 );
 		int frameDivNum;
 		bool isExterior;
+		Array1D< Real64 > computedNetArea; // holds the gross wall area minus the window and door areas
 
 		// the following variables are for the CalcNominalWindowCond call but only SHGCSummer is needed
 		Real64 nomCond;
@@ -880,6 +883,9 @@ namespace HeatBalanceSurfaceManager {
 		numSurfaces = 0;
 		numExtSurfaces = 0;
 
+		computedNetArea.allocate( TotSurfaces );
+		computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
+
 		for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
 			zonePt = Surface( iSurf ).Zone;
 			//only exterior surfaces including underground
@@ -894,6 +900,7 @@ namespace HeatBalanceSurfaceManager {
 					PreDefTableEntry( pdchOpUfactNoFilm, surfName, NominalU( Surface( iSurf ).Construction ), 3 );
 					mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 					PreDefTableEntry( pdchOpGrArea, surfName, Surface( iSurf ).GrossArea * mult );
+					computedNetArea(iSurf) += Surface( iSurf ).GrossArea * mult;
 					curAzimuth = Surface( iSurf ).Azimuth;
 					PreDefTableEntry( pdchOpAzimuth, surfName, curAzimuth );
 					curTilt = Surface( iSurf ).Tilt;
@@ -934,6 +941,7 @@ namespace HeatBalanceSurfaceManager {
 					PreDefTableEntry( pdchFenDividerAreaOf1, surfName, dividerArea );
 					PreDefTableEntry( pdchFenGlassAreaOf1, surfName, windowArea - ( frameArea + dividerArea ) );
 					PreDefTableEntry( pdchFenArea, surfName, windowAreaWMult );
+					computedNetArea( Surface( iSurf ).BaseSurf ) -= windowAreaWMult;
 					nomUfact = NominalU( Surface( iSurf ).Construction );
 					PreDefTableEntry( pdchFenUfact, surfName, nomUfact, 3 );
 					//if the construction report is requested the SummerSHGC is already calculated
@@ -1071,6 +1079,7 @@ namespace HeatBalanceSurfaceManager {
 					mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 					PreDefTableEntry( pdchDrGrArea, surfName, Surface( iSurf ).GrossArea * mult );
 					PreDefTableEntry( pdchDrParent, surfName, Surface( iSurf ).BaseSurfName );
+					computedNetArea( Surface( iSurf ).BaseSurf ) -= Surface( iSurf ).GrossArea * mult;
 
 				}}
 			} else {
@@ -1116,11 +1125,39 @@ namespace HeatBalanceSurfaceManager {
 					}
 				}
 			}
-			// do counts - use classification (note using numeric.  if class assignments change, this won't work)
 			if ( ( Surface( iSurf ).Class <= 20 ) && ( Surface( iSurf ).Class >= 1 ) ) {
 				++numSurfaces( Surface( iSurf ).Class );
 				if ( isExterior ) {
 					++numExtSurfaces( Surface( iSurf ).Class );
+				}
+				if ( Surface( iSurf ).Class == SurfaceClass_Window ){
+					if ( SurfaceWindow( iSurf ).OriginalClass == SurfaceClass_GlassDoor || SurfaceWindow( iSurf ).OriginalClass == SurfaceClass_TDD_Diffuser ){
+						++numSurfaces( SurfaceWindow( iSurf ).OriginalClass );
+						if ( isExterior ) {
+							++numExtSurfaces( SurfaceWindow( iSurf ).OriginalClass );
+						}
+					}
+				}
+			}
+		}
+		// for fins and overhangs just add them explicitly since not otherwise classified
+		int totOverhangs = GetNumObjectsFound( "Shading:Overhang" ) + GetNumObjectsFound( "Shading:Overhang:Projection" );
+		numSurfaces( SurfaceClass_Overhang ) = totOverhangs;
+		numExtSurfaces( SurfaceClass_Overhang ) = totOverhangs;
+		int totFins = GetNumObjectsFound( "Shading:Fin" ) + GetNumObjectsFound( "Shading:Fin:Projection" );
+		numSurfaces( SurfaceClass_Fin ) = totFins;
+		numExtSurfaces( SurfaceClass_Fin ) = totFins;
+		// go through all the surfaces again and this time insert the net area results
+		for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
+			zonePt = Surface( iSurf ).Zone;
+			//only exterior surfaces including underground
+			if ( ( Surface( iSurf ).ExtBoundCond == ExternalEnvironment ) || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) ) {
+				isExterior = true;
+				{ auto const SELECT_CASE_var( Surface( iSurf ).Class );
+				if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Floor ) || ( SELECT_CASE_var == SurfaceClass_Roof ) ) {
+					surfName = Surface( iSurf ).Name;
+					PreDefTableEntry( pdchOpNetArea, surfName, computedNetArea( iSurf ) );
+				}
 				}
 			}
 		}
@@ -1875,7 +1912,7 @@ namespace HeatBalanceSurfaceManager {
 			window.ConvHeatFlowNatural = 0.0;
 			window.ConvHeatGainToZoneAir = 0.0;
 			window.RetHeatGainToZoneAir = 0.0;
-			window.DividerConduction = 0.0;
+			window.DividerHeatGain = 0.0;
 			window.BlTsolBmBm = 0.0;
 			window.BlTsolBmDif = 0.0;
 			window.BlTsolDifDif = 0.0;
@@ -1914,6 +1951,7 @@ namespace HeatBalanceSurfaceManager {
 		}
 
 		WinHeatGain = 0.0;
+		WinHeatTransfer = 0.0;
 		WinHeatGainRep = 0.0;
 		WinHeatLossRep = 0.0;
 		WinGainConvGlazToZoneRep = 0.0;
@@ -1957,6 +1995,7 @@ namespace HeatBalanceSurfaceManager {
 		WinHeatGainRepEnergy = 0.0;
 		WinHeatLossRepEnergy = 0.0;
 		WinGapConvHtFlowRepEnergy = 0.0;
+		WinHeatTransferRepEnergy = 0.0;
 		ZoneWinHeatGainRepEnergy = 0.0;
 		ZoneWinHeatLossRepEnergy = 0.0;
 		ZnOpqSurfInsFaceCondGnRepEnrg = 0.0;
@@ -5103,6 +5142,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 		if ( PartialResimulate ) {
 			WinHeatGain( SurfNum ) = 0.0;
+			WinHeatTransfer( SurfNum ) = 0.0;
 			WinHeatGainRep( SurfNum ) = 0.0;
 			WinHeatLossRep( SurfNum ) = 0.0;
 			WinGainConvGlazToZoneRep( SurfNum ) = 0.0;
@@ -5165,6 +5205,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	// CalcWindowHeatBalance.
 	if ( ! PartialResimulate ) {
 		WinHeatGain = 0.0;
+		WinHeatTransfer = 0.0;
 		WinHeatGainRep = 0.0;
 		WinHeatLossRep = 0.0;
 		WinGainConvGlazToZoneRep = 0.0;
@@ -5411,6 +5452,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						// Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
 						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( surface.Zone ) * surface.Area * Construct( surface.Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
 						// Zone diffuse interior shortwave reflected back into the TDD
+						WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 
 						// fill out report vars for components of Window Heat Gain
 						WinGainConvGlazToZoneRep( SurfNum ) = HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) );
@@ -5423,6 +5465,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
 							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 						}
+						WinHeatTransferRepEnergy( SurfNum ) = WinHeatGain( SurfNum ) * TimeStepZoneSec;
 
 						TDDPipe( PipeNum ).HeatGain = WinHeatGainRep( SurfNum );
 						TDDPipe( PipeNum ).HeatLoss = WinHeatLossRep( SurfNum );
@@ -5490,6 +5533,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
 								WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 							}
+
+							WinHeatTransferRepEnergy( SurfNum ) = WinHeatGain( SurfNum ) * TimeStepZoneSec;
 
 							TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
 						}

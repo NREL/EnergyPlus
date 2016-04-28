@@ -1,0 +1,121 @@
+\section{Zone Air Mass Flow Conservation}\label{zone-air-mass-flow-conservation}
+
+\subsubsection{Overiew}\label{overiew}
+
+The zone air mass flow conservation object, ZoneAirMassFlowConservation, activates zone air mass flow balance calculations. This feature is available only for controlled zones (ZoneVAC:EquipmentConnections) which also have either a zone mixing or infiltration object. The user may specify that zone mixing, infiltration, or both can be overridden to balance the zone air mass flows. The following rules apply:
+
+\begin{itemize}
+\tightlist
+\item
+  If there are no zone mixing flows to adjacent zones, then the zone air mass flow is balanced by setting the Zone Mixing objects mass flow rate to zero.
+\item
+  If there are no zone exhaust fans defined and there are no zone mixing objects specified, then a zone in an air loop is always balanced.
+\item
+  Infiltration mass flow is included in the zone air mass flow balance depending upon one of three options: none (all infiltration is assumed to be self-balanced), all zones, or only zones that serve as a source zone for zone mixing objects.
+\item
+  The base infiltration mass flow rate (calculated based on user inputs) may be controlled one of two ways for zone air mass flow balance purposes: adjust the base infiltration up or down as needed to balance the zone air mass flow, or assume the base infiltration rate is self-balanced and add infiltration if needed to balance the zone air mass flow.
+\item
+  Optional user inputs can override the default return air flow rate.
+\end{itemize}
+
+The zone air mass flow conservation equation always includes: supply air flow rates, return air flow rates, and zone exhaust fan flow rates. Zone mixing and infiltration object flow rates may be included depending upon the selected options. A particular zone can be a source zone, receiving zone, or both depending on the number of ZoneMixing objects specified for that zone.
+
+\subsubsection{Return Air Flow Rate Calculations}\label{return-air-flow-rate-calculations}
+
+The return air flow rate is calculated one of two ways.
+
+The default calculation is:
+
+\begin{equation}
+{\dot m_{R}} = ReturnFlowSchedule*MAX\left( {0.0,\,{{\dot m}_S} + {{\dot m}_{XR}} - {{\dot m}_{EX}} - {{\dot m}_{XS}}} \right)
+\end{equation}
+
+If one or more Zone Return Air Flow Rate Basis Nodes are specified in the ZoneHVAC:EquipmentConnections object, then the base return flow rate is:
+
+\begin{equation}
+{\dot m_{R}} = ReturnFlowSchedule*\sum\nolimits_j {{{\dot m}_{BasisNode,j}}}
+\end{equation}
+
+where,
+
+\({\dot m_{R}}\) = zone return air mass flow rate, (kg/s)
+
+\({\dot m_{Basis Node,j}}\) = zone return air flow basis node mass flow rate, (kg/s)
+
+\({\dot m_{EX}}\) = zone exhaust air mass flow rate from exhaust fans, (kg/s)
+
+\({\dot m_{XR}}\) = zone mixing mass flow rate as a receiving zone, (kg/s)
+
+\({\dot m_{XS}}\) = zone mixing mass flow rate as a source zone, (kg/s)
+
+\({\dot m_S}\) = zone supply air mass flow rate, (kg/s)
+
+ReturnFlowSchedule = optional Zone Return Air Flow Rate Fraction Schedule value
+
+\subsubsection{Zone Mixing Flow Rate Calculations}\label{zone-mixing-flow-rate-calculations}
+
+Figure~\ref{fig:illustration-of-zone-air-mass-flow-balance} illustrates the zone mass flow components for an air loop system providing conditioned air to the two zones connected with a zone mixing object. Since Zone 1 is a source zone only, infiltration object is defined for zone 1 only. The zone mixing object air flow rate depends on the user specified values and the zone air mass flow balance requirements. When required the zone mixing object flow rate is adjusted from the user specified value for balancing purpose.
+
+\begin{figure}[hbtp] % fig 8
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image134.svg.png}
+\caption{Illustration of zone air mass flow balance components \protect \label{fig:illustration-of-zone-air-mass-flow-balance}}
+\end{figure}
+
+An individual zone may be a source zone for multiple receiving zones, and the same source zone may receive mixing flows from multiple adjacent zones in an air loop. The source and receiving mass flow rates of ZoneMixing objects are calculated from user defined mixing flow rates at the first HVAC iteration for each time step and adjusted in subsequent iterations to balance the zone air mass flow. The source zone mixing mass flow rate is calculated by tracking the mass flow rates of ZoneMixing objects connected to a zone and is given by:
+
+\begin{equation}
+{\dot m_{XS}} = \sum\nolimits_j {{{\dot m}_{XS,j}}}
+\end{equation}
+
+Determine the zone return air mass flow rate as shown above, then adjust the zone mixing mass flow rates based on the current zone return air mass flow rate:
+
+\begin{equation}
+{\dot m_{XR,\,new}} = {\dot m_R} + {\dot m_{EX}} + {\dot m_{XS}} - {\dot m_S}
+\end{equation}
+
+This updated receiving zone mixing air mass flow rate is distributed to the mixing objects connected to the current zone proportional to user specified design flow rate. A single zone may be connected to more than one adjacent zone using multiple ZoneMixing objects. Thus, the mixing flow rate of each contributing mixing objects defined in the current zone is updated as follows:
+
+\begin{equation}
+{\dot m_{XR,\,new,j}} = \left( {{{\dot m}_{XR,jDesign}}/{{\dot m}_{XR,Design}}} \right) \cdot {\dot m_{XR,\,new}}
+\end{equation}
+
+\subsubsection{Infiltration Flow Rate Adjustments}\label{infiltration-flow-rate-adjustments}
+
+There are three options for the treatement of infiltration in the zone air mass balance: None, AddInfiltrationFlow, and AdjustInfiltrationFlow. There are also two options to specify which zones are included in the infiltration adjustments: AllZones or MixingSourceZonesOnly.
+
+If a zone is excluded from infiltration adjustments, then the base infiltration rate specified by the Infiltration:* object(s) in the zone is assumed to be self-balanced, and infiltration is not included in the mass flow calculations for that zone.
+
+If a zone is included in the infiltration adjustment, the infiltration air mass flow rate required to balance the zone is determined as follows:
+
+\begin{equation}
+{\dot m_{Inf-required}} = MAX\left( {0.0,\,{{\dot m}_{XS}} + {{\dot m}_{EX}} + {{\dot m}_{R}} - {{\dot m}_S}} \right)
+\end{equation}
+
+This infiltration air mass flow rate calculated is either added to the base infiltration air flow, which is calculated from user inputs, or overrides the base infiltration air flow depending on user choice. For AddInfiltrationFlow, the zoneinfiltration flow rate is:
+
+\begin{equation}
+{\dot m_{Inf}} = {\dot m_{Inf-base}} + {\dot m_{Inf-required}}
+\end{equation}
+
+For AdjustInfiltrationFlow, the zone infiltration flow rate is:
+
+\begin{equation}
+{\dot m_{Inf}} = {\dot m_{Inf-required}}
+\end{equation}
+
+where,
+
+\({\dot m_{Inf}}\) = zone infiltration mass flow rate, (kg/s)
+
+\({\dot m_{Inf-base}}\) = base zone infiltration mass flow rate calculated from Infiltration:* objects, (kg/s)
+
+\({\dot m_{Inf-required}}\) = required zone infiltration mass flow rate to balance the zone, (kg/s)
+
+There is an additional constraint to the return air mass flow rate calculation. The sum of the return air mass flow rates of zones in air loop must satisfy the air loop return air mass flow balance. The above four sets of equations are iterated for each zone in an air loop until the convergence criterion is satisfied or until the maximum iteration limit is exceeded.
+
+The mass conservation calculations are performed in routine CalcZoneMassBalance in the ZoneEquipmentManager module. The latest ZoneMixing and Infiltration object flow rates are communicated back to the zone air heat balance terms. This is done by re-simulating the simple flow objects as zone equipment during each HVAC iteration. This requires calling the routine CalcAirFlowSimple in SimZoneEquipment routine as zone equipment. Both of these routines are also in the ZoneEquipmentManager module.
+
+\emph{Zone Mass Conservation Convergence}
+
+The zone mass conservation calculation convergence criterion is based on the absolute difference of the zone mixing objects mass flow rates between successive iteration. If the difference is above tolerance limits of 0.00001 then the HVAC Air loop is simulated again.

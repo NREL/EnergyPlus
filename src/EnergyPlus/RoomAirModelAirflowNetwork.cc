@@ -1043,7 +1043,7 @@ namespace RoomAirModelAirflowNetwork {
 				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
 					// The shade area covers the area of the glazing plus the area of the dividers.
 					Area += SurfaceWindow( SurfNum ).DividerArea;
-					SumIntGain += SurfaceWindow( SurfNum ).DividerConduction;
+					SumIntGain += SurfaceWindow( SurfNum ).DividerHeatGain;
 				}
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
@@ -1056,6 +1056,7 @@ namespace RoomAirModelAirflowNetwork {
 					if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
 						SumIntGain += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
 						WinHeatGain( SurfNum ) += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
+						WinHeatTransfer( SurfNum ) += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );
 							WinHeatGainRepEnergy( SurfNum ) = WinHeatGainRep( SurfNum ) * TimeStepZone * SecInHour;
@@ -1063,6 +1064,8 @@ namespace RoomAirModelAirflowNetwork {
 							WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
 							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZone * SecInHour;
 						}
+						WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
+						WinHeatTransferRepEnergy( SurfNum ) = WinHeatGain( SurfNum ) * TimeStepZone * SecInHour;
 					}
 				}
 

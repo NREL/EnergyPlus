@@ -200,6 +200,7 @@ namespace OutputReportPredefined {
 	extern int pdchOpUfactFilm;
 	extern int pdchOpUfactNoFilm;
 	extern int pdchOpGrArea;
+	extern int pdchOpNetArea;
 	extern int pdchOpAzimuth;
 	extern int pdchOpTilt;
 	extern int pdchOpDir;
@@ -851,6 +852,13 @@ namespace OutputReportPredefined {
 		std::string const & objName,
 		int const tableEntryInt
 	);
+
+	std::string
+		RetrievePreDefTableEntry(
+		int const columnIndex,
+		std::string const & objName
+	);
+
 
 	void
 	incrementTableEntry();

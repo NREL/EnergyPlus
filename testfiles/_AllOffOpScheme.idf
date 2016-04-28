@@ -109,7 +109,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.4;
+  Version,8.5;
 
   Timestep,6;
 
@@ -2171,7 +2171,6 @@
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.47,                    !- Maximum Air Flow Rate {m3/s}
-    Zone 1 Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0013,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -2184,7 +2183,6 @@
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.36,                    !- Maximum Air Flow Rate {m3/s}
-    Zone 2 Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0012,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -2197,7 +2195,6 @@
     Zone 3 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 3 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.47,                    !- Maximum Air Flow Rate {m3/s}
-    Zone 3 Reheat Water Inlet Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil Zone 3,      !- Reheat Coil Name
     0.0013,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}

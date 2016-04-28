@@ -60,7 +60,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                Yes, (circa 2004, Reliant , TX)
 
-  Version,8.4;
+  Version,8.5;
 
   Timestep,6;
 
@@ -4710,7 +4710,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
     Electric Storage Thermal Loss Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Electric Storage Charge State,  !- Variable or Meter 7 Name
+    Electric Storage Simple Charge State,  !- Variable or Meter 7 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 7
 
   Output:Table:Monthly,
@@ -5415,7 +5415,7 @@
 
   Output:Variable,*,Inverter Thermal Loss Energy,timestep;
 
-  Output:Variable,*,Electric Storage Charge State,timestep;
+  Output:Variable,*,Electric Storage Simple Charge State,timestep;
 
   Output:Variable,*,Electric Storage Charge Power,timestep;
 

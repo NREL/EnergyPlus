@@ -598,6 +598,14 @@ namespace PollutionModule {
 
 	// Functions
 
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
+	void
+	clear_state();
+
 	void
 	CalculatePollution();
 
