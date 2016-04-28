@@ -1,9 +1,25 @@
-Outdoor Air Controller Makeover - Issue #4663
+Outdoor Air Controller Cleanup - Issue #4663
 ================
 
 **M.J. Witte, GARD Analytics, Inc.**
 
  - April 22, 2016
+ - Revised April 28, 2016
+
+## Conference Calls and Other Discussion ##
+
+e-mail comments
+Questions about why `DesignSpecification:OutdoorAir` has a schedule in the first place?
+It was part of the original object that was added to provide OA control for VAV terminal units (v6.0).
+
+There was general support for modifying the objects (original proposal to move some fields from `Controller:MechanicalVentilation` into `Controller:OutdoorAir`.
+
+
+
+April 27, 2016 - Sizing group conference call
+Group consensus was to *not* reconfigure the objects right now, but just focus on fixing the items that are not working properly, fixing documentation, and some code refactoring.
+
+There was a question about how many test suite diffs would be caused by activating the `DesignSpecification:OutdoorAir` OA schedule in `Controller:MechanicalVentilation`.  Only a few files would be impacted:  5ZoneAutoDXVAV.idf, AirflowNetwork_MultiZone_SmallOffice_VAV.idf, DOASDualDuctSchool.idf, HVACTemplate-5ZonePurchAir.idf
 
 
 ## Background ##
@@ -101,84 +117,31 @@ The current combination of Controller:OutdoorAir plus Controller:MechanicalVenti
 
 ## Proposed Changes ##
 
-1. Move these three fields from `Controller:MechanicalVentilation` to `Controller:OutdoorAir`:
-```
-    ALWAYS_ON,               !- Availability Schedule Name
-    Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
-```
+1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir` inputs.
 
-2. Rename `Controller:MechanicalVentilation` to `Controller:OutdoorAir:ZoneList` and make it optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there.
+2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
 
 3. Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*
 
-4. Make the Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
+4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
 
-5. Change the advanced methods (ZoneSum, VentilationRateProcedure,IndoorAirQualityProcedure, ProportionalControlBasedOnDesignOccupancy,ProportionalControlBasedonOccupancySchedule,IndoorAirQualityProcedureGenericContaminant) to use the `DesignSpecification:OutdoorAir` Outdoor Air Flow Rate Fraction Schedule.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
+5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Schedule Name" to "Outdoor Air Schedule Name" and use this schedule in `Controller:MechanicalVentilation`.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
 
-6. Add a new outdoor air control type = "100PercentOA" which always delivers 100% OA.
+6. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
 
-7. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
-
-8. Reorder and rename some of the fields in Controller:OutdoorAir.
-
-9. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
+7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
 
 ## Modified Objects ##
 
 
 ```
-
- Controller:OutdoorAir,
-    VAV WITH REHEAT_OA_Controller,  !- Name
-    VAV WITH REHEAT_OARelief Node,  !- Relief Air Outlet Node Name
-    VAV WITH REHEAT Supply Equipment Inlet Node,  !- Return Air Node Name
-    VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Mixed Air Node Name
-    VAV WITH REHEAT_OAInlet Node,  !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    FixedMinimum,            !- Minimum Outdoor Air Flow Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Flow Rate Schedule Name
-    VentilationRateProcedure,!- Advanced Outdoor Air Control Type
-    ALWAYS_ON,               !- Advanced Control Availability Schedule Name
-    Yes,                     !- Advanced Control Demand Controlled Ventilation
-    0.3,                     !- Advanced Control Zone Maximum Outdoor Air Fraction
-    VAV WITH REHEAT Zone OA List,  !- Advanced Outdoor Air Control Zonelist Name
-    NoEconomizer,            !- Economizer Control Type
-    ModulateFlow,            !- Economizer Control Action Type
-    19.0,                    !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-    32000.0,                 !- Economizer Maximum Limit Enthalpy {J/kg}
-    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                        !- Electronic Enthalpy Limit Curve Name
-    0.0,                     !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-    NoLockout,               !- Economizer Lockout Type
-    ,                        !- Economizer Control Schedule Name
-    BypassWhenWithinEconomizerLimits,  !- Heat Recovery Bypass Control Type
-    ,                        !- High Humidity Outdoor Air Control
-    ,                        !- Humidistat Control Zone Name
-    ,                        !- High Humidity Outdoor Air Flow Ratio
-    ,             !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
-    ,                        !- Minimum Fraction of Outdoor Air Schedule Name
-    ;                        !- Maximum Fraction of Outdoor Air Schedule Name
-
- Controller:OutdoorAir:ZoneList,
-    VAV WITH REHEAT Zone OA List,  !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone 1 Name
-    CM DSOA ZN_1_FLR_1_SEC_1,!- Design Specification Outdoor Air Object Name 1
-    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name 1
-    ZN_1_FLR_1_SEC_2,        !- Zone 2 Name
-    CM DSOA ZN_1_FLR_1_SEC_2,!- Design Specification Outdoor Air Object Name 2
-    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name 2
-    ZN_1_FLR_1_SEC_3,        !- Zone 3 Name
-    CM DSOA ZN_1_FLR_1_SEC_3,!- Design Specification Outdoor Air Object Name 3
-    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name 3
-    ZN_1_FLR_1_SEC_4,        !- Zone 4 Name
-    CM DSOA ZN_1_FLR_1_SEC_4,!- Design Specification Outdoor Air Object Name 4
-    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name 4
-    ZN_1_FLR_1_SEC_5,        !- Zone 5 Name
-    CM DSOA ZN_1_FLR_1_SEC_5,!- Design Specification Outdoor Air Object Name 5
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name 5
-
+ DesignSpecification:OutdoorAir,
+    CM DSOA ZN_1_FLR_1_SEC_1,!- Name
+    Sum,                     !- Outdoor Air Method
+    0.0100,                  !- Outdoor Air Flow per Person {m3/s-person}
+    0.0000,                  !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow per Zone {m3/s}
+    ,                        !- Outdoor Air Flow Air Changes per Hour {1/hr}
+    MinOA_MotorizedDamper_Sched;  !- **Outdoor Air Schedule Name**
 
 ```
-
