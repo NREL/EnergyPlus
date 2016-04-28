@@ -30,6 +30,7 @@ set( test_src
   DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
+  EconomicLifeCycleCost.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
