@@ -544,8 +544,6 @@ namespace HVACUnitaryBypassVAV {
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions
-		int FanIndex; // Index to CBVAV's supply air fan
-//		Real64 FanVolFlow; // Maximum air volumetric flow rate of fan
 		int AirLoopNum; // Index to air loop served by this system
 		int AirLoopZoneNum; // Index to controlled zone
 		int BranchNum; // Index to branch containing this system
@@ -1303,8 +1301,6 @@ namespace HVACUnitaryBypassVAV {
 		static Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
 		Real64 QSensUnitOut; // Output of CBVAV system with coils off
 		Real64 OutsideAirMultiplier; // Outside air multiplier schedule (= 1.0 if no schedule)
-		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
-		int FanIndex; // Index to CBVAV's supply air fan
 		std::string CurrentModuleObject; // Object type for error messages
 		static bool EMSSetPointCheck( false ); // local temporary
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine

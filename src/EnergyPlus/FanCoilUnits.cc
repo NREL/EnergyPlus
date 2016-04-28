@@ -3243,7 +3243,7 @@ namespace FanCoilUnits {
 
 		} else { // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
 
-			// calculate fan speed ratio for Fan:OnOff of Fan:SystemModel(not used for other fan types). Only used in fan model if performance curves are present.
+			// calculate fan speed ratio for Fan:OnOff or Fan:SystemModel (not used for other fan types). Only used in fan:OnOff model if performance curves are present.
 			FanSpeedRatio = Node( InletNode ).MassFlowRate / ( FanCoil( FanCoilNum ).FanAirVolFlow * StdRhoAir );
 
 			// Constant fan and variable flow calculation AND variable fan

@@ -975,10 +975,10 @@ namespace HVACUnitarySystem {
 		UnitarySystem( UnitarySysNum ).SuppHeatPartLoadFrac = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingCycRatio = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
-		UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0.0;
+		UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 		UnitarySystem( UnitarySysNum ).HeatingCycRatio = 0.0;
 		UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
-		UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0.0;
+		UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
 		UnitarySystem( UnitarySysNum ).HeatingCoilSensDemand = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingCoilSensDemand = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingCoilLatentDemand = 0.0;
@@ -1451,7 +1451,12 @@ namespace HVACUnitarySystem {
 				MyFanFlag( UnitarySysNum ) = false;
 			} else {
 				if ( UnitarySystem( UnitarySysNum ).FanExists ) {
-					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( BlankString, BlankString, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
+					if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate();
+					} else {
+						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( BlankString, BlankString, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
+					}
+
 				} else {
 					CheckSystemBranchFlow( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 0.0, errFlag );
 				}
