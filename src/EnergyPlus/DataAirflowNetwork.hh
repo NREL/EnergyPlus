@@ -95,6 +95,8 @@ namespace DataAirflowNetwork {
 	extern int const CompTypeNum_HEX; // Distribution system heat exchanger
 	extern int const CompTypeNum_HOP; // Horizontal opening component
 	extern int const CompTypeNum_RVD; // Reheat VAV terminal damper
+	extern int const CompTypeNum_OAF; // Distribution system OA 
+	extern int const CompTypeNum_REL; // Distribution system relief air 
 
 	// EPlus component Type
 	extern int const EPlusTypeNum_SCN; // Supply connection
@@ -123,6 +125,9 @@ namespace DataAirflowNetwork {
 
 	extern int const iWPCCntr_Input;
 	extern int const iWPCCntr_SurfAvg;
+
+	extern int const PressureCtrlExhaust;
+	extern int const PressureCtrlRelief;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -179,6 +184,9 @@ namespace DataAirflowNetwork {
 	// Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
 	extern Real64 VAVTerminalRatio; // The terminal flow ratio when a supply VAV fan reach its max flow rate
 	extern bool VAVSystem; // This flag is used to represent a VAV system
+	extern Real64 ExhaustFanMassFlowRate; // Exhaust fan flow rate used in PressureStat
+	extern int PressureSetFlag; // PressureSet flag
+	extern Real64 ReliefMassFlowRate; // OA Mixer relief node flow rate used in PressureStat
 
 	// Types
 
@@ -1092,6 +1100,57 @@ namespace DataAirflowNetwork {
 
 	};
 
+	struct PressureControllerProp
+	{
+		// Members
+		std::string Name; // Provide a unique object name
+		std::string ZoneName; // Name of the zone that is being controlled
+		int ZoneNum; // Zone number
+		int AFNNodeNum; // AFN node number
+		std::string ControlObjectType; // The control type to be used for pressure control
+		std::string ControlObjectName; // Corresponding control type name
+		int ControlTypeSet; // Control type set to be used for pressure control
+		int AvailSchedPtr; // Availability schedule pointer
+		int PresSetpointSchedPtr; // Pressure setpoint schedule pointer
+
+		// Default Constructor
+		PressureControllerProp( ) :
+			ZoneNum( 0 ),
+			AFNNodeNum( 0 ),
+			ControlTypeSet( 0 ),
+			AvailSchedPtr( 0 ),
+			PresSetpointSchedPtr( 0 )
+		{}
+
+	};
+
+	struct DisSysCompAirflowProp // OA fan component
+	{
+		// Members
+		std::string Name; // Name of exhaust fan component
+		int SchedPtr; // Schedule pointer
+		Real64 FlowCoef; // Air Mass Flow Coefficient
+		Real64 FlowExpo; // Air Mass Flow exponent
+		Real64 StandardT; // Standard temperature for crack data
+		Real64 StandardP; // Standard borometric pressure for crack data
+		Real64 StandardW; // Standard humidity ratio for crack data
+		int InletNode; // Inlet node number
+		int OutletNode; // Outlet node number
+
+		// Default Constructor
+		DisSysCompAirflowProp( ) :
+			SchedPtr( 0 ),
+			FlowCoef( 0.0 ),
+			FlowExpo( 0.0 ),
+			StandardT( 0.0 ),
+			StandardP( 0.0 ),
+			StandardW( 0.0 ),
+			InletNode( 0 ),
+			OutletNode( 0 )
+		{}
+
+	};
+
 	struct AirflowNetworkNodeSimuData // Node variable for simulation
 	{
 		// Members
@@ -1369,6 +1428,9 @@ namespace DataAirflowNetwork {
 	extern Array1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
 	extern Array1D< DisSysCompCPDProp > DisSysCompCPDData;
 	extern Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+	extern Array1D< PressureControllerProp > PressureControllerData;
+	extern Array1D< DisSysCompAirflowProp > DisSysCompOutdoorAirData;
+	extern Array1D< DisSysCompAirflowProp > DisSysCompReliefAirData;
 
 	void
 	clear_state();

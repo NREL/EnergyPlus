@@ -23791,6 +23791,40 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
       \units dimensionless
       \note Enter the WPC Value corresponding to the 36th wind direction.
 
+AirflowNetwork:ZoneControl:PressureController,
+	 \memo Define the Pressures control settings for a zone or list of zones.
+	 \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
+	 \memo to all the zones in the ZoneList.
+ A1 , \field Name
+      \required-field
+      \reference AirflowNetworkZoneControlPressureControllerNames
+ A2 , \field Zone Name
+      \required-field
+      \type object-list
+      \object-list ZoneAndZoneListNames
+ A3 , \field Control Object Type
+      \required-field
+      \type choice
+      \key AirflowNetwork:MultiZone:Component:ZoneExhaustFan
+      \key AirflowNetwork:Distribution:Component:ReliefAirFlow
+      \note The current selection is AirflowNetwork:MultiZone:Component:ZoneExhaustFan 
+      \note or AirflowNetwork:Distribution:Component:ReliefAirFlow.
+ A4 , \field Control Name
+      \note Control names are names of individual control objects 
+      \required-field
+      \type object-list
+      \object-list ControlTypeNames
+ A5 , \field Pressure Control Availability Schedule Name
+      \note Availability schedule name for pressure controller. Schedule value > 0 means the 
+      \note pressure controller is enabled. If this field is blank, then pressure controller is 
+      \note always enabled.
+      \type object-list
+      \object-list ScheduleNames
+ A6 ; \field Pressure Setpoint Schedule Name
+      \required-field
+      \type object-list
+      \object-list ScheduleNames
+
 AirflowNetwork:Distribution:Node,
       \min-fields 4
       \memo This object represents an air distribution node in the AirflowNetwork model.
@@ -24077,6 +24111,70 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
       \type real
       \minimum> 0.0
       \note Enter the pressure drop across this component.
+
+AirflowNetwork:Distribution:Component:OutdoorAirFlow,
+      \min-fields 3
+      \memo This object adopts outdoor air flow based on Controller:OutdoorAir object
+ A1 , \field Name
+      \required-field
+      \reference AFNOutdoorAirFlowNames
+ N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor iar flow rate.
+ N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor iar flow rate.
+ A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
+
+AirflowNetwork:Distribution:Component:ReliefAirFlow,
+      \min-fields 3
+      \memo This object allows variation of air flow rate to perform pressure. 
+ A1 , \field Name
+      \required-field
+      \reference AFNReliefAirFlowNames
+ N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor iar flow rate.
+ N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor iar flow rate.
+ A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
 
 AirflowNetwork:Distribution:Linkage,
       \min-fields 4
