@@ -971,43 +971,61 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied. The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside, SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-\begin{longtable}[c]{@{}ll@{}}
+\begin{longtable}[c]{p{3.49in}p{2.5in}}
 \toprule 
-Report Code & Related key and model \tabularnewline
+Key choice & Applies to Insihe or Outsihe \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Code & Related key and model \tabularnewline
+Key choice & Applies to Insihe or Outsihe \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+Value & Both \tabularnewline
+Schedule & Both \tabularnewline
+Simple & Inside \tabularnewline
+SimpleCombined & Outside \tabularnewline
+TARP & Both \tabularnewline
+DOE-2 & Outside \tabularnewline
+MoWitt & Outside \tabularnewline
+AdaptiveConvectionAlgorithm & Both \tabularnewline
+ASHRAEVerticalWall~~~ & Both \tabularnewline
+WaltonUnstableHorizontalOrTilt & Both \tabularnewline
+WaltonStableHorizontalOrTilt & Both \tabularnewline
+FisherPedersenCeilingDiffuserWalls & Inside \tabularnewline
+FisherPedersenCeilingDiffuserCeiling & Inside \tabularnewline
+FisherPedersenCeilingDiffuserFloor & Inside \tabularnewline
+AlamdariHammondStableHorizontal & Both \tabularnewline
+AlamdariHammondUnstableHorizontal & Both \tabularnewline
+AlamdariHammondVerticalWall & Both \tabularnewline
+KhalifaEq3WallAwayFromHeat & Inside \tabularnewline
+KhalifaEq4CeilingAwayFromHeat & Inside \tabularnewline
+KhalifaEq5WallNearHeat & Inside \tabularnewline
+KhalifaEq6NonHeatedWalls & Inside \tabularnewline
+KhalifaEq7Ceiling & Inside \tabularnewline
+AwbiHattonHeatedFloor & Inside \tabularnewline
+AwbiHattonHeatedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedAssistedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedOpposingWall & Inside \tabularnewline
+BeausoleilMorrisonMixedStableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedStableCeiling & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableCeiling & Inside \tabularnewline
+FohannoPolidoriVerticalWall~~~~~~ & Both \tabularnewline
+KaradagChilledCeiling & Inside \tabularnewline
+ISO15099Windows & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWindow & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWalls & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserFloor & Inside \tabularnewline
+SimpleCombined~~~~~ & Outside \tabularnewline
+NusseltJurges & Outside \tabularnewline
+McAdams & Outside \tabularnewline
+Mitchell & Outside \tabularnewline
+BlockenWindard & Outside \tabularnewline
+Emmel & Outside \tabularnewline
+ClearRoof & Outside \tabularnewline
+UserCurve & Both \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1118,43 +1136,61 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.~ The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-\begin{longtable}[c]{@{}ll@{}}
+\begin{longtable}[c]{p{3.49in}p{2.5in}}
 \toprule 
-Report Code & Related key and model \tabularnewline
+Key choice & Applies to Insihe or Outsihe \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Code & Related key and model \tabularnewline
+Key choice & Applies to Insihe or Outsihe \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+Value & Both \tabularnewline
+Schedule & Both \tabularnewline
+Simple & Inside \tabularnewline
+SimpleCombined & Outside \tabularnewline
+TARP & Both \tabularnewline
+DOE-2 & Outside \tabularnewline
+MoWitt & Outside \tabularnewline
+AdaptiveConvectionAlgorithm & Both \tabularnewline
+ASHRAEVerticalWall~~~ & Both \tabularnewline
+WaltonUnstableHorizontalOrTilt & Both \tabularnewline
+WaltonStableHorizontalOrTilt & Both \tabularnewline
+FisherPedersenCeilingDiffuserWalls & Inside \tabularnewline
+FisherPedersenCeilingDiffuserCeiling & Inside \tabularnewline
+FisherPedersenCeilingDiffuserFloor & Inside \tabularnewline
+AlamdariHammondStableHorizontal & Both \tabularnewline
+AlamdariHammondUnstableHorizontal & Both \tabularnewline
+AlamdariHammondVerticalWall & Both \tabularnewline
+KhalifaEq3WallAwayFromHeat & Inside \tabularnewline
+KhalifaEq4CeilingAwayFromHeat & Inside \tabularnewline
+KhalifaEq5WallNearHeat & Inside \tabularnewline
+KhalifaEq6NonHeatedWalls & Inside \tabularnewline
+KhalifaEq7Ceiling & Inside \tabularnewline
+AwbiHattonHeatedFloor & Inside \tabularnewline
+AwbiHattonHeatedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedAssistedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedOpposingWall & Inside \tabularnewline
+BeausoleilMorrisonMixedStableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedStableCeiling & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableCeiling & Inside \tabularnewline
+FohannoPolidoriVerticalWall~~~~~~ & Both \tabularnewline
+KaradagChilledCeiling & Inside \tabularnewline
+ISO15099Windows & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWindow & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWalls & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserFloor & Inside \tabularnewline
+SimpleCombined~~~~~ & Outside \tabularnewline
+NusseltJurges & Outside \tabularnewline
+McAdams & Outside \tabularnewline
+Mitchell & Outside \tabularnewline
+BlockenWindard & Outside \tabularnewline
+Emmel & Outside \tabularnewline
+ClearRoof & Outside \tabularnewline
+UserCurve & Both \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1252,43 +1288,62 @@ When EnergyPlus is set to Display Advanced Variables (Output:Diagnostics, Displa
 
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the inside face.~ The algorithm examines probable flow regimes, heat flow directions, orientations, HVAC equipment connections, and current operating status to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
-\begin{longtable}[c]{@{}ll@{}}
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \toprule 
-Report Code & Related key and model \tabularnewline
+Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Code & Related key and model \tabularnewline
+Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+1 & A1 Radiant Heated Floor or Chilled Ceiling & Vertical Wall & Any \tabularnewline
+2 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Stable \tabularnewline
+3 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Unstable \tabularnewline
+4 & A1 Radiant Heated Floor or Chilled Ceiling & Heated Floor & Unstable \tabularnewline
+5 & A1 Radiant Heated Floor or Chilled Ceiling & Chilled Ceiling & Unstable \tabularnewline
+6 & A1 Radiant Heated Floor or Chilled Ceiling & Tilted & Stable \tabularnewline
+7 & A1 Radiant Heated Floor or Chilled Ceiling & Tilted & Unstable \tabularnewline
+8 & A1 Radiant Heated Floor or Chilled Ceiling & Window & Any \tabularnewline
+9 & A2 Radiant Wall Heat & Non-heated Vertical Wall & Any \tabularnewline
+10 & A2 Radiant Wall Heat & Heated wall & Any \tabularnewline
+11 & A2 Radiant Wall Heat & Horizontal & Stable \tabularnewline
+12 & A2 Radiant Wall Heat & Horizontal & Unstable \tabularnewline
+13 & A2 Radiant Wall Heat & Tilted & Stable \tabularnewline
+14 & A2 Radiant Wall Heat & Tilted & Unstable \tabularnewline
+15 & A2 Radiant Wall Heat & Windows & Any \tabularnewline
+16 & A3 Simple Buoyancy & Vertical Walls & Any \tabularnewline
+17 & A3 Simple Buoyancy & Horizontal & Stable \tabularnewline
+18 & A3 Simple Buoyancy & Horizontal & Unstable \tabularnewline
+19 & A3 Simple Buoyancy & Tilted & Stable \tabularnewline
+20 & A3 Simple Buoyancy & Tilted & Unstable \tabularnewline
+21 & A3 Simple Buoyancy & Windows & Any \tabularnewline
+22 & B Convective Zone Heat & Vertical Walls & Any \tabularnewline
+23 & B Convective Zone Heat & Vertical Walls near heater & Any \tabularnewline
+24 & B Convective Zone Heat & Horizontal & Stable \tabularnewline
+25 & B Convective Zone Heat & Horizontal & Unstable \tabularnewline
+26 & B Convective Zone Heat & Tilted & Stable \tabularnewline
+27 & B Convective Zone Heat & Tilted & Unstable \tabularnewline
+28 & B Convective Zone Heat & Windows & Any \tabularnewline
+29 & C Central Air Diffuser & Walls & Any \tabularnewline
+30 & C Central Air Diffuser & Ceiling & Any \tabularnewline
+31 & C Central Air Diffuser & Floor & Any \tabularnewline
+32 & C Central Air Diffuser & Windows & Any \tabularnewline
+33 & D Zone Fan Unit & Walls & Any \tabularnewline
+34 & D Zone Fan Unit & Horizontal & Stable \tabularnewline
+35 & D Zone Fan Unit & Horizontal & Unstable \tabularnewline
+36 & D Zone Fan Unit & Tilted & Stable \tabularnewline
+37 & D Zone Fan Unit & Tilted & Unstable \tabularnewline
+38 & D Zone Fan Unit & Windows & Any \tabularnewline
+39 & E Mixed Forced and Buoyancy & Walls & Assisting \tabularnewline
+40 & E Mixed Forced and Buoyancy & Walls & Opposing \tabularnewline
+41 & E Mixed Forced and Buoyancy & Floor & Stable \tabularnewline
+42 & E Mixed Forced and Buoyancy & Floor & Unstable \tabularnewline
+43 & E Mixed Forced and Buoyancy & Ceiling & Stable \tabularnewline
+44 & E Mixed Forced and Buoyancy & Ceiling & Unstable \tabularnewline
+45 & E Mixed Forced and Buoyancy & Windows & Any \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1298,41 +1353,46 @@ This variable reports the specific model equation used to calculate the inside f
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Report Code & Related key and model \tabularnewline
+Report Cohe & Relateh key anh mohel \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Code & Related key and model \tabularnewline
+Report Cohe & Relateh key anh mohel \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+200 & UserValue~~~~ \tabularnewline
+201 & UserSchedule \tabularnewline
+202 & UserCurve~ \tabularnewline
+203 & ASHRAEVerticalWall~ \tabularnewline
+204 & WaltonUnstableHorizontalOrTilt \tabularnewline
+205 & WaltonStableHorizontalOrTilt~~ \tabularnewline
+206 & FisherPedersenCeilDiffuserFloor \tabularnewline
+207 & FisherPedersenCeilDiffuserCeiling \tabularnewline
+208 & FisherPedersenCeilDiffuserWalls~~~~~~~~ \tabularnewline
+209 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+210 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+211 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+212 & KhalifaEq3WallAwayFromHeat~~~~~~~~~~~~~ \tabularnewline
+213 & KhalifaEq4CeilingAwayFromHeat~~~~~~~~~~ \tabularnewline
+214 & KhalifaEq5WallNearHeat~~~~~~~~~~~~~~~~~ \tabularnewline
+215 & KhalifaEq6NonHeatedWalls~ \tabularnewline
+216 & KhalifaEq7Ceiling~ \tabularnewline
+217 & AwbiHattonHeatedFloor~~~~~~~~~~~~~~~~~~ \tabularnewline
+218 & AwbiHattonHeatedWall~~~~~~~~~~~~~~~~~~~ \tabularnewline
+219 & BeausoleilMorrisonMixedAssistingWall~~~ \tabularnewline
+220 & BeausoleilMorrisonMixedOppossingWall~~~ \tabularnewline
+221 & BeausoleilMorrisonMixedStableCeiling~~~ \tabularnewline
+222 & BeausoleilMorrisonMixedUnstableCeiling~ \tabularnewline
+223 & BeausoleilMorrisonMixedStableFloor~~~~~ \tabularnewline
+224 & BeausoleilMorrisonMixedUnstableFloor~~~ \tabularnewline
+225 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+226 & KaradagChilledCeiling~~~~~~~~~~~~~~~~~~ \tabularnewline
+227 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+228 & GoldsteinNovoselacCeilingDiffuserWindow \tabularnewline
+229 & GoldsteinNovoselacCeilingDiffuserWalls~ \tabularnewline
+230 & GoldsteinNovoselacCeilingDiffuserFloor \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1342,41 +1402,18 @@ The inside face convection heat transfer calculations can be based on different 
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Report Code & Related key and model \tabularnewline
+Report Cohe & Reference Air Temperature Methoh \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Code & Related key and model \tabularnewline
+Report Cohe & Reference Air Temperature Methoh \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+1 & Zone mean air temperature \tabularnewline
+2 & Surface adjacent air temperature \tabularnewline
+3 & Supply air temperature \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1386,41 +1423,19 @@ This variable reports how the surface was classified as part of the adaptive con
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Report Code & Related key and model \tabularnewline
+Report Cohe & Surface Classification \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Code & Related key and model \tabularnewline
+Report Cohe & Surface Classification \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+101 & Vertical Wall, Windward \tabularnewline
+102 & Vertical Wall, Leeward \tabularnewline
+103 & Roof, stable heat flow direction \tabularnewline
+104 & Roof, unstable heat flow direction \tabularnewline
 \bottomrule
 \end{longtable}
 
