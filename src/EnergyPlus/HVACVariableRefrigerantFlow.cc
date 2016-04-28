@@ -292,7 +292,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE INFORMATION:
 		// AUTHOR         Richard Raustad, FSEC
 		// DATE WRITTEN   August 2010
-		// MODIFIED       Jul 2015, RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc). Add a physics based VRF model appliable for Fluid Temperature Co
+		// MODIFIED       Jul 2015, RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc). Add a physics-based VRF model appliable for Fluid Temperature Control
 		// RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -407,8 +407,7 @@ namespace HVACVariableRefrigerantFlow {
 			
 			if ( VRF( VRFCondenser ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
 			// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-				CalcVRFCondenser_FluidTCtrl( VRFCondenser, FirstHVACIteration ); // Analyse the VRF OU operations
-				CalcVRFIUTeTc_FluidTCtrl( VRFCondenser ); // Get the VRF IU Te/Tc
+				CalcVRFCondenser_FluidTCtrl( VRFCondenser, FirstHVACIteration );
 			} else {
 			// Algorithm Type: VRF model based on system curve 
 				CalcVRFCondenser( VRFCondenser, FirstHVACIteration );
@@ -931,7 +930,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 					HRCAPFTConst = VRF( VRFCond ).HRCAPFTCoolConst;
 					HRInitialCapFrac = VRF( VRFCond ).HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-					HRCapTC = VRF( VRFCond ).HRCoolCapTC; // Time constant used to recover from intial degratation in cooling heat recovery
+					HRCapTC = VRF( VRFCond ).HRCoolCapTC; // Time constant used to recover from initial degradation in cooling heat recovery
 
 					HREIRFT = VRF( VRFCond ).HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
 					if ( HREIRFT > 0 ) {
@@ -944,7 +943,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 					HREIRFTConst = VRF( VRFCond ).HREIRFTCoolConst;
 					HRInitialEIRFrac = VRF( VRFCond ).HRInitialCoolEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-					HREIRTC = VRF( VRFCond ).HRCoolEIRTC; // Time constant used to recover from intial degratation in cooling heat recovery
+					HREIRTC = VRF( VRFCond ).HRCoolEIRTC; // Time constant used to recover from initial degradation in cooling heat recovery
 				} else if ( HeatingLoad( VRFCond ) ) {
 					if ( ! VRF( VRFCond ).HRHeatingActive && VRF( VRFCond ).HRCoolingActive ) {
 						VRF( VRFCond ).HRModeChange = true;
@@ -969,7 +968,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 					HRCAPFTConst = VRF( VRFCond ).HRCAPFTHeatConst;
 					HRInitialCapFrac = VRF( VRFCond ).HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from cooling mode
-					HRCapTC = VRF( VRFCond ).HRHeatCapTC; // Time constant used to recover from intial degratation in heating heat recovery
+					HRCapTC = VRF( VRFCond ).HRHeatCapTC; // Time constant used to recover from initial degradation in heating heat recovery
 
 					HREIRFT = VRF( VRFCond ).HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
 					if ( HREIRFT > 0 ) {
@@ -989,7 +988,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 					HREIRFTConst = VRF( VRFCond ).HRCAPFTHeatConst;
 					HRInitialEIRFrac = VRF( VRFCond ).HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
-					HREIRTC = VRF( VRFCond ).HRHeatEIRTC; // Time constant used to recover from intial degratation in heating heat recovery
+					HREIRTC = VRF( VRFCond ).HRHeatEIRTC; // Time constant used to recover from initial degradation in heating heat recovery
 				} else {
 					//   zone thermostats satisfied, condenser is off. Set values anyway
 					HRCAPFTConst = 1.0;
@@ -2133,7 +2132,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				//  INTEGER      :: HRCAPFTCool                =0   ! Index to cool capacity as a function of temperature curve for heat recovery
 				//  REAL(r64)    :: HRInitialCoolCapFrac       =0.0d0 ! Fractional cooling degradation at the start of heat recovery from cooling mode
-				//  REAL(r64)    :: HRCoolCapTC                =0.0d0 ! Time constant used to recover from intial degratation in cooling heat recovery
+				//  REAL(r64)    :: HRCoolCapTC                =0.0d0 ! Time constant used to recover from initial degradation in cooling heat recovery
 				VRF( VRFNum ).HRCAPFTCool = GetCurveIndex( cAlphaArgs( 40 ) );
 				if ( VRF( VRFNum ).HRCAPFTCool > 0 ) {
 					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
@@ -2154,7 +2153,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				//  INTEGER      :: HREIRFTCool                =0   ! Index to cool EIR as a function of temperature curve for heat recovery
 				//  REAL(r64)    :: HRInitialCoolEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from cooling mode
-				//  REAL(r64)    :: HRCoolEIRTC                =0.0d0 ! Time constant used to recover from intial degratation in cooling heat recovery
+				//  REAL(r64)    :: HRCoolEIRTC                =0.0d0 ! Time constant used to recover from initial degradation in cooling heat recovery
 				VRF( VRFNum ).HREIRFTCool = GetCurveIndex( cAlphaArgs( 41 ) );
 				if ( VRF( VRFNum ).HREIRFTCool > 0 ) {
 					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
@@ -2173,7 +2172,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				//  INTEGER      :: HRCAPFTHeat                =0   ! Index to heat capacity as a function of temperature curve for heat recovery
 				//  REAL(r64)    :: HRInitialHeatCapFrac       =0.0d0 ! Fractional heating degradation at the start of heat recovery from heating mode
-				//  REAL(r64)    :: HRHeatCapTC                =0.0d0 ! Time constant used to recover from intial degratation in heating heat recovery
+				//  REAL(r64)    :: HRHeatCapTC                =0.0d0 ! Time constant used to recover from initial degradation in heating heat recovery
 				VRF( VRFNum ).HRCAPFTHeat = GetCurveIndex( cAlphaArgs( 42 ) );
 				if ( VRF( VRFNum ).HRCAPFTHeat > 0 ) {
 					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
@@ -2192,7 +2191,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				//  INTEGER      :: HREIRFTHeat                =0   ! Index to heat EIR as a function of temperature curve for heat recovery
 				//  REAL(r64)    :: HRInitialHeatEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from heating mode
-				//  REAL(r64)    :: HRHeatEIRTC                =0.0d0 ! Time constant used to recover from intial degratation in heating heat recovery
+				//  REAL(r64)    :: HRHeatEIRTC                =0.0d0 ! Time constant used to recover from initial degradation in heating heat recovery
 				VRF( VRFNum ).HREIRFTHeat = GetCurveIndex( cAlphaArgs( 43 ) );
 				if ( VRF( VRFNum ).HREIRFTHeat > 0 ) {
 					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
@@ -5192,7 +5191,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 				}
 			} else {
-				// no scalble sizing method has been specified. Sizing proceeds using the method
+				// no scalable sizing method has been specified. Sizing proceeds using the method
 				// specified in the zoneHVAC object
 
 				PrintFlag = true;
@@ -5517,8 +5516,8 @@ namespace HVACVariableRefrigerantFlow {
 					VRF( VRFCond ).CoolingCapacity = VRF( VRFCond ).RatedEvapCapacity;
 					VRF( VRFCond ).HeatingCapacity = VRF( VRFCond ).RatedEvapCapacity * ( 1 + VRF( VRFCond ).RatedCompPowerPerCapcity );
 					
-					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", VRF( VRFCond ).CoolingCapacity );
-					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", VRF( VRFCond ).HeatingCapacity );
+					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", VRF( VRFCond ).HeatingCapacity );
+					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", VRF( VRFCond ).CoolingCapacity );
 				} else {
 					CoolingCapacityUser = VRF( VRFCond ).CoolingCapacity;
 					HeatingCapacityUser = VRF( VRFCond ).HeatingCapacity;
@@ -6766,7 +6765,7 @@ namespace HVACVariableRefrigerantFlow {
 		CoolingLoad( VRFCond ) = false;
 		TerminalUnitList( TUListNum ).CoolingCoilAvailable = false;
 		TerminalUnitList( TUListNum ).HeatingCoilAvailable = false;
-		// loop through all TU's to find operating mode. Be carefull not to mix loop counters with current TU/Cond index
+		// loop through all TU's to find operating mode. Be careful not to mix loop counters with current TU/Cond index
 		for ( NumTU = 1; NumTU <= TerminalUnitList( TUListNum ).NumTUInList; ++NumTU ) {
 			// make sure TU's have been sized before looping through each one of them to determine operating mode
 			// (which would size all coils based on the zone that called this specific VRF terminal unit)
@@ -7070,11 +7069,11 @@ namespace HVACVariableRefrigerantFlow {
 		// TU capacity is greater than the available capacity, limit the TU's with the highest capacity so that
 		// the TU capacity equals the available capacity. The report variable Variable Refrigerant Flow Heat Pump
 		// Maximum Terminal Unit Cool/Heating Capacity holds the value for maximum TU capacity. This value may not
-		// match the maximum individual coil capacity exactly since the available capaity uses a load weighted
+		// match the maximum individual coil capacity exactly since the available capacity uses a load weighted
 		// average WB temperature to calculate available capacity. When the TU's are limited, this weighting changes.
 		// The extra iterations required for these values to converge is considered excessive.
-		// If the globabl flag SimZoneEquipment could be set for 1 additional iteration, these variables would
-		// converge more closely (setting this globabl flag is not yet implemented).
+		// If the global flag SimZoneEquipment could be set for 1 additional iteration, these variables would
+		// converge more closely (setting this global flag is not yet implemented).
 
 		// REFERENCES:
 		// na
@@ -7150,11 +7149,11 @@ namespace HVACVariableRefrigerantFlow {
 		// TU capacity is greater than the available capacity, limit the TU's with the highest capacity so that
 		// the TU capacity equals the available capacity. The report variable Variable Refrigerant Flow Heat Pump
 		// Maximum Terminal Unit Cool/Heating Capacity holds the value for maximum TU capacity. This value may not
-		// match the maximum individual coil capacity exactly since the available capaity uses a load weighted
+		// match the maximum individual coil capacity exactly since the available capacity uses a load weighted
 		// average WB temperature to calculate available capacity. When the TU's are limited, this weighting changes.
 		// The extra iterations required for these values to converge is considered excessive.
-		// If the globabl flag SimZoneEquipment could be set for 1 additional iteration, these variables would
-		// converge more closely (setting this globabl flag is not yet implemented).
+		// If the global flag SimZoneEquipment could be set for 1 additional iteration, these variables would
+		// converge more closely (setting this global flag is not yet implemented).
 
 		// REFERENCES:
 		// na
@@ -7668,14 +7667,10 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 InputPowerMultiplier; // Multiplier for power when system is in defrost
 		Real64 LoadDueToDefrost; // Additional load due to defrost
 		Real64 DefrostEIRTempModFac; // EIR modifier for defrost (function of entering drybulb, outside wetbulb)
-		// int HRCAPFT; // index to heat recovery CAPFTCool curve (Used for HR operations in SysCurve model)
-		// Real64 HRCAPFTConst; // stead-state capacity fraction (Used for HR operations in SysCurve model)
 		Real64 HRInitialCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-		Real64 HRCapTC; // Time constant used to recover from intial degratation in cooling heat recovery
-		// int HREIRFT; // Index to cool EIR as a function of temperature curve for heat recovery
-		// Real64 HREIRFTConst; // stead-state EIR fraction (Used for HR operations in SysCurve model)
+		Real64 HRCapTC; // Time constant used to recover from initial degradation in cooling heat recovery
 		Real64 HRInitialEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-		Real64 HREIRTC; // Time constant used to recover from intial degratation in cooling heat recovery
+		Real64 HREIRTC; // Time constant used to recover from initial degradation in cooling heat recovery
 		static Real64 CurrentEndTime; // end time of current time step
 		static Real64 CurrentEndTimeLast; // end time of last time step
 		static Real64 TimeStepSysLast; // system time step on last time step
@@ -7691,7 +7686,6 @@ namespace HVACVariableRefrigerantFlow {
 		int NumIteHIUIn; // index for HIU calculation iterations [-]
 		int NumOfCompSpdInput; // Number of compressor speed input by the user [-]
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		int SolFla; // Slove flag for SolveRegulaFalsi [-]
 		Real64 CompSpdActual; // Actual compressor running speed [rps]
 		Real64 C_cap_operation; // Compressor capacity modification algorithm_modified Cap [-]
 		Real64 CompEvaporatingCAPSpdMin; // evaporating capacity at the lowest compressor speed [W]
@@ -7731,7 +7725,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 m_ref_OU_cond; // mass flow rate of Refrigerant through OU condenser [kg/s]
 		Real64 Ncomp; // compressor power [W]
 		Real64 Ncomp_new; // compressor power for temporary use in iterations [W]
-		Real64 Ncomp_new2; // compressor power for temporary use in iterations [W]
 		Real64 P_comp_in; // pressure of refrigerant at IU condenser outlet [Pa]
 		Real64 Pcond; // VRF condensing pressure [Pa]
 		Real64 Pevap; // VRF evaporating pressure [Pa]
@@ -7745,13 +7738,13 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Q_h_TU_PL; // Heating load to be met at heating mode, including the piping loss (W)
 		Real64 Q_h_OU; // outdoor unit condenser heat release (cooling mode) [W]
 		Real64 Q_c_OU; // outdoor unit evaporator heat extract (heating mode) [W]
-		Real64 RefMaxPc; // maximum refirgerant condensing pressure [Pa]
-		Real64 RefMinTe; // Minimum refirgerant eveporating temperature [Pa]
-		Real64 RefMinPe; // Minimum refirgerant eveporating pressure [Pa]
+		Real64 RefMaxPc; // maximum refrigerant condensing pressure [Pa]
+		Real64 RefMinTe; // Minimum refrigerant evaporating temperature [Pa]
+		Real64 RefMinPe; // Minimum refrigerant evaporating pressure [Pa]
 		Real64 RefPLow; // Low Pressure Value for Ps (>0.0) [Pa]
 		Real64 RefPHigh; // High Pressure Value for Ps (max in tables) [Pa]
 		Real64 RefTHigh; // High Temperature Value for Ps (max in tables) [C]
-		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area [C]
+		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigerant is in the superheat area [C]
 		Real64 SC_IU_merged; // Piping Loss Algorithm Parameter: average subcooling degrees after the indoor units [C]
 		Real64 SH_IU_merged; // Piping Loss Algorithm Parameter: average super heating degrees after the indoor units [C]
 		Real64 SC_OU; // subcooling degrees at OU condenser [C]
@@ -8005,7 +7998,7 @@ namespace HVACVariableRefrigerantFlow {
 		
 				//Iteration_Ncomp: Perform iterations to calculate Ncomp (Label10)
 				Counter = 1;
-				Ncomp = Q_c_TU_PL / VRF( VRFCond ).CoolingCOP; 
+				Ncomp = TU_CoolingLoad / VRF( VRFCond ).CoolingCOP; 
 				Ncomp_new = Ncomp;
 				Label10: ;
 				Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
@@ -8072,6 +8065,7 @@ namespace HVACVariableRefrigerantFlow {
 		
 			//Initialization of VRF-FluidTCtrl Model
 			Q_h_TU_PL = TU_HeatingLoad;
+			Ncomp = TU_HeatingLoad / VRF( VRFCond ).HeatingCOP; 
 			
 			// Evaporative capacity ranges_Max
 			CapMaxTe = OutdoorDryBulb - VRF( VRFCond ).SH;
@@ -8116,7 +8110,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 				if( m_ref_IU_cond > 0 ) {
 					h_IU_cond_out_ave = h_IU_cond_out_ave / m_ref_IU_cond; //h_merge
-					SC_IU_merged = SC_IU_merged / m_ref_IU_cond; //SC_merged  0923: theoreticaly, it is not correct. It should be calculated from h_IU_cond_out & Pe
+					SC_IU_merged = SC_IU_merged / m_ref_IU_cond;
 				} else {
 					h_IU_cond_out_ave = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) - 5.0, 0.0, RefrigerantIndex, RoutineName );  //Quality=0 
 					SC_IU_merged = 5;
@@ -8145,7 +8139,7 @@ namespace HVACVariableRefrigerantFlow {
 			C_cap_operation = VRFOU_CapModFactor( VRFCond, h_comp_in, h_IU_cond_out_ave, max( min( CapMinPe, RefPHigh ), RefPLow ), CapMinTe + VRF( VRFCond ).SH, CapMinTe + 8, VRF( VRFCond ).IUCondensingTemp - 5 );
 			
 			if( ( Q_c_OU * C_cap_operation ) <= CompEvaporatingCAPSpdMin ) { 
-			// Reuired heating load is smaller than the min heating capacity
+			// Required heating load is smaller than the min heating capacity
 			
 				if( Q_c_OU == 0 ) { 
 				// Q_h_TU_PL is less than or equal to CompEvaporatingPWRSpdMin
@@ -8162,14 +8156,13 @@ namespace HVACVariableRefrigerantFlow {
 				VRF( VRFCond ).EvaporatingTemp = CapMinTe;
 			  
 			} else {
-			// Reuired heating load is greater than or equal to the min heating capacity
+			// Required heating load is greater than or equal to the min heating capacity
 		
 				//Iteration_Ncomp: Perform iterations to calculate Ncomp (Label20)
 				Counter = 1;
-				Ncomp = Q_h_TU_PL / VRF( VRFCond ).HeatingCOP; 
-				Ncomp_new = Ncomp;
 				Label20: ;
-				Q_c_OU = max( 0.0, Q_h_TU_PL - Ncomp_new );
+				Ncomp_new = Ncomp;
+				Q_c_OU = max( 0.0, Q_h_TU_PL - Ncomp );
 				
 				// *VRF OU Te calculations
 				m_air = VRF( VRFCond ).OUAirFlowRate * RhoAir;
@@ -8178,10 +8171,10 @@ namespace HVACVariableRefrigerantFlow {
 				VRF( VRFCond ).SH = SH_OU;
 				
 				// *VRF OU Compressor Simulation at heating mode: Specify the compressor speed and power consumption
-				VRFOU_CalcCompH( VRFCond, TU_HeatingLoad, VRF( VRFCond ).EvaporatingTemp, Tdischarge, h_IU_cond_out_ave, VRF( VRFCond ).IUCondensingTemp, CapMinTe, Tfs, Pipe_Q_h, Q_c_OU, CompSpdActual, Ncomp );
+				VRFOU_CalcCompH( VRFCond, TU_HeatingLoad, VRF( VRFCond ).EvaporatingTemp, Tdischarge, h_IU_cond_out_ave, VRF( VRFCond ).IUCondensingTemp, CapMinTe, Tfs, Pipe_Q_h, Q_c_OU, CompSpdActual, Ncomp_new );
 				
-				if( ( abs( Ncomp - Ncomp_new ) > ( Tolerance * Ncomp_new ) ) && ( Counter < 30 ) ) {
-					Ncomp_new = Ncomp;
+				if( ( abs( Ncomp_new - Ncomp ) > ( Tolerance * Ncomp ) ) && ( Counter < 30 ) ) {
+					Ncomp = Ncomp_new;
 					Counter = Counter + 1;
 					goto Label20; 
 				}
@@ -8190,7 +8183,7 @@ namespace HVACVariableRefrigerantFlow {
 				P_comp_in = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp, RefrigerantIndex, RoutineName );
 				RefTSat = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( P_comp_in, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 				h_comp_in_new = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, max( RefTSat, VRF( VRFCond ).SH + VRF( VRFCond ).EvaporatingTemp ), max( min( P_comp_in, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
-				h_comp_out_new = Ncomp / m_ref_IU_cond + h_comp_in_new; 
+				h_comp_out_new = Ncomp_new / m_ref_IU_cond + h_comp_in_new; 
 				
 				if( ( abs( h_comp_out - h_comp_out_new ) > Tolerance * h_comp_out ) && ( h_IU_cond_in < h_IU_cond_in_up ) ) {
 					h_IU_cond_in = h_IU_cond_in + 0.1 * ( h_IU_cond_in_up - h_IU_cond_in_low );
@@ -8199,6 +8192,7 @@ namespace HVACVariableRefrigerantFlow {
 				if( h_IU_cond_in > h_IU_cond_in_up ) {
 					h_IU_cond_in = 0.5 * ( h_IU_cond_in_up + h_IU_cond_in_low );
 				}
+				Ncomp = Ncomp_new;
 		
 			} 
 			
@@ -8535,10 +8529,10 @@ namespace HVACVariableRefrigerantFlow {
 					VRF( VRFCond ).HRHeatingActive = true;
 					
 					HRInitialCapFrac = VRF( VRFCond ).HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from cooling mode
-					HRCapTC = VRF( VRFCond ).HRHeatCapTC; // Time constant used to recover from intial degratation in heating heat recovery
+					HRCapTC = VRF( VRFCond ).HRHeatCapTC; // Time constant used to recover from initial degradation in heating heat recovery
 
 					HRInitialEIRFrac = VRF( VRFCond ).HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
-					HREIRTC = VRF( VRFCond ).HRHeatEIRTC; // Time constant used to recover from intial degratation in heating heat recovery
+					HREIRTC = VRF( VRFCond ).HRHeatEIRTC; // Time constant used to recover from initial degradation in heating heat recovery
 					
 				} else {
 					// zone thermostats satisfied, condenser is off. Set values anyway
@@ -8713,7 +8707,9 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		} else {
 		}
-
+		
+		// Calculate the IU Te/Tc for the next time step
+		CalcVRFIUTeTc_FluidTCtrl( VRFCond ); 
 	}
 	
 	
@@ -8795,7 +8791,7 @@ namespace HVACVariableRefrigerantFlow {
 		HRCoolingMode = TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList );
 		HRHeatingMode = TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList );
 
-		// The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with lastest PLR
+		// The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
 		// do nothing else if TU is scheduled off
 		//!!LKL Discrepancy < 0
@@ -10403,7 +10399,6 @@ namespace HVACVariableRefrigerantFlow {
 		int NumIteCcap; // counter for Ccap calculation iterations [-]
 		int NumIteTe; // counter for Te calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
-		int NumTeIte; // counter for Te calculation iterations [-]
 		int RefrigerantIndex; // Index of the refrigerant [-]
 		int SolFla; // Slove flag for SolveRegulaFalsi [-]
 		int TUListNum; // index to TU List
@@ -10434,11 +10429,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 RefTSat; // Saturated temperature of the refrigerant [C]
 		Real64 RefPLow; // Low Pressure Value for Ps (>0.0) [Pa]
 		Real64 RefPHigh; // High Pressure Value for Ps (max in tables) [Pa]
-		Real64 SH_IU_update; // Modified SH for VRF IU [C]
 		Real64 T_discharge_new; // Condensing temperature, for temporary use in iterations [C]
-		Real64 Te_ItePreci; // Precision of iterations for Te [C]he superheat area [C]
 		Real64 Tfs; // Temperature of the air at the coil surface [C]]
-		Real64 Tsuction; // VRF compressor suction refrigerant temperature [Pa]
 		Real64 Tolerance( 0.05 ); // Tolerance for condensing temperature calculation [C}
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
@@ -10711,48 +10703,26 @@ namespace HVACVariableRefrigerantFlow {
 		int CounterCompSpdTemp ; // Index for the compressor speed level[-] 
 		int CompSpdLB; // index for Compressor speed low bound [-]
 		int CompSpdUB; // index for Compressor speed up bound [-]
-		int CoolCoilIndex; // index to cooling coil in terminal unit
 		int MaxIter( 500 ); // max iteration number allowed [-] 
 		int NumOfCompSpdInput; // Number of compressor speed input by the user [-]
 		int NumIteCcap; // counter for Ccap calculation iterations [-]
-		int NumIteTe; // counter for Te calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
-		int NumTeIte; // counter for Te calculation iterations [-]
 		int RefrigerantIndex; // Index of the refrigerant [-]
 		int SolFla; // Solve flag for SolveRegulaFalsi [-]
 		int TUListNum; // index to TU List
-		int TUIndex; // Index to terminal unit
 		Real64 Cap_Eva0; // Evaporating capacity calculated based on physics model, used in the iterations [W]
 		Real64 Cap_Eva1; // Evaporating capacity calculated by curves, used in the iterations [W]
 		Real64 CapDiff; // Evaporating capacity difference used in the iterations [W]
 		Real64 C_cap_operation; // Compressor capacity modification algorithm_modified Cap [-]
-		Real64 C_cap_operation0; // Compressor capacity modification algorithm_modified Cap, for temporary use [-]
 		Real64 SmallLoadTe; // Updated suction temperature at small load conditions (Te') [C]
 		Real64 Modifi_SH; // Temperature between compressor inlet temperature and evaporative temperature Te' [C]
-		Real64 MaxNumIteTe; // Piping Loss Algorithm Parameter: max number of iterations for Te [-]
 		Real64 MinOutdoorUnitPe; // The minimum pressure that Pe can be at cooling mode (only used for calculating Min capacity)
-		Real64 MinRefriPe; // Minimum refrigerant evaporating pressure [Pa]
 		Real64 Modifi_Pe; // Compressor power modification algorithm_modified Pe [Pa]
-		Real64 Modifi_SHin; // Compressor power modification algorithm_modified SH for IDU [C]
-		Real64 P_discharge; // VRF compressor discharge pressure [Pa]
-		Real64 Pipe_m_ref; // Piping Loss Algorithm Parameter: Refrigerant mass flow rate [kg/s]
-		Real64 Pipe_DeltP; // Piping Loss Algorithm Parameter: Pipe pressure drop [Pa]
-		Real64 Pipe_Q0; // Compressor capacity modification algorithm_modified Pipe_Q, for temporary use [W]
-		Real64 Pipe_m_ref_i; // Piping Loss Algorithm Parameter: Refrigerant mass flow rate for a individual IU[kg/s]
 		Real64 Pipe_h_comp_in; // Piping Loss Algorithm Parameter: Enthalpy after piping loss (compressor inlet) [kJ/kg]
-		Real64 Pipe_h_IU_out; // Piping Loss Algorithm Parameter: enthalpy of IU at outlet [kJ/kg]
-		Real64 Pipe_h_IU_out_i; // Piping Loss Algorithm Parameter: enthalpy of IU at outlet (individual) [kJ/kg]
-		Real64 Pipe_Pe_assumed; // Piping Loss Algorithm Parameter: evaporating pressure assumed for iterations[Pa]
-		Real64 Pipe_SH_merged; // Piping Loss Algorithm Parameter: average super heating degrees after the indoor units [C]
-		Real64 Pipe_Te_assumed; // Piping Loss Algorithm Parameter: evaporating temperature assumed for iterations[C]
 		Real64 Q_evap_req; // Required evaporative capacity [W]
 		Real64 RefTSat; // Saturated temperature of the refrigerant [C]
 		Real64 RefPLow; // Low Pressure Value for Ps (>0.0) [Pa]
 		Real64 RefPHigh; // High Pressure Value for Ps (max in tables) [Pa]
-		Real64 SH_IU_update; // Modified SH for VRF IU [C]
-		Real64 T_discharge_new; // Condensing temperature, for temporary use in iterations [C]
-		Real64 Te_ItePreci; // Precision of iterations for Te [C]he superheat area [C]
-		Real64 Tsuction; // VRF compressor suction refrigerant temperature [Pa]
 		Real64 Tolerance( 0.05 ); // Tolerance for condensing temperature calculation [C}
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
@@ -10926,48 +10896,28 @@ namespace HVACVariableRefrigerantFlow {
 		int CounterCompSpdTemp ; // Index for the compressor speed level[-] 
 		int CompSpdLB; // index for Compressor speed low bound [-]
 		int CompSpdUB; // index for Compressor speed up bound [-]
-		int CoolCoilIndex; // index to cooling coil in terminal unit
 		int MaxIter( 500 ); // max iteration number allowed [-] 
 		int NumOfCompSpdInput; // Number of compressor speed input by the user [-]
 		int NumIteCcap; // counter for Ccap calculation iterations [-]
-		int NumIteTe; // counter for Te calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
-		int NumTeIte; // counter for Te calculation iterations [-]
 		int RefrigerantIndex; // Index of the refrigerant [-]
 		int SolFla; // Solve flag for SolveRegulaFalsi [-]
 		int TUListNum; // index to TU List
-		int TUIndex; // Index to terminal unit
 		Real64 Cap_Eva0; // Evaporating capacity calculated based on physics model, used in the iterations [W]
 		Real64 Cap_Eva1; // Evaporating capacity calculated by curves, used in the iterations [W]
 		Real64 CapDiff; // Evaporating capacity difference used in the iterations [W]
 		Real64 C_cap_operation; // Compressor capacity modification algorithm_modified Cap [-]
-		Real64 SmallLoadTe; // Updated suction temperature at small load conditions (Te') [C]
-		Real64 MaxNumIteTe; // Piping Loss Algorithm Parameter: max number of iterations for Te [-]
 		Real64 MinOutdoorUnitTe; // The minimum temperature that Te can be at cooling mode (only used for calculating Min capacity)
 		Real64 MinOutdoorUnitPe; // The minimum pressure that Pe can be at cooling mode (only used for calculating Min capacity)
 		Real64 MinRefriPe; // Minimum refrigerant evaporating pressure [Pa]
 		Real64 P_discharge; // VRF compressor discharge pressure [Pa]
 		Real64 P_suction; // Compressor suction pressure Pe' [Pa]
-		Real64 Pipe_m_ref; // Piping Loss Algorithm Parameter: Refrigerant mass flow rate [kg/s]
-		Real64 Pipe_DeltP; // Piping Loss Algorithm Parameter: Pipe pressure drop [Pa]
-		Real64 Pipe_m_ref_i; // Piping Loss Algorithm Parameter: Refrigerant mass flow rate for a individual IU[kg/s]
-		Real64 Pipe_h_IU_out; // Piping Loss Algorithm Parameter: enthalpy of IU at outlet [kJ/kg]
-		Real64 Pipe_h_IU_out_i; // Piping Loss Algorithm Parameter: enthalpy of IU at outlet (individual) [kJ/kg]
-		Real64 Pipe_Pe_assumed; // Piping Loss Algorithm Parameter: evaporating pressure assumed for iterations[Pa]
-		Real64 Pipe_SH_merged; // Piping Loss Algorithm Parameter: average super heating degrees after the indoor units [C]
-		Real64 Pipe_Te_assumed; // Piping Loss Algorithm Parameter: evaporating temperature assumed for iterations[C]
 		Real64 Q_evap_req; // Required evaporative capacity [W]
 		Real64 Q_c_IU; // IU evaporator load [W]
-		Real64 Q_h_IU; // IU condenser load [W]
-		Real64 RefTSat; // Saturated temperature of the refrigerant [C]
 		Real64 RefPLow; // Low Pressure Value for Ps (>0.0) [Pa]
 		Real64 RefPHigh; // High Pressure Value for Ps (max in tables) [Pa]
-		Real64 SH_IU_update; // Modified SH for VRF IU [C]
 		Real64 SH_Comp; // Temperature between compressor inlet temperature and evaporative temperature Te' [C]
-		Real64 Te_ItePreci; // Precision of iterations for Te [C]he superheat area [C]
 		Real64 Te_update; // Updated Te [C]
-		Real64 Tfs; // Temperature of the air at the coil surface [C]]
-		Real64 Tsuction; // VRF compressor suction refrigerant temperature [Pa]
 		Real64 Tolerance( 0.05 ); // Tolerance for condensing temperature calculation [C}
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
@@ -11008,7 +10958,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 OutdoorDryBulb = OutDryBulbTemp;
 		Real64 OutdoorHumRat = OutHumRat;
 		Real64 OutdoorPressure = OutBaroPress;
-		Real64 RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
 		
 		//Calculate capacity modification factor
 		C_cap_operation = VRFOU_CapModFactor( VRFCond, h_comp_in, h_IU_evap_in, max( min( P_suction, RefPHigh ), RefPLow ), T_suction + SH_Comp, T_suction + 8, T_discharge - 5 );
@@ -11505,7 +11454,6 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 h_OU_cond_out; // enthalpy of OU condenser at outlet [kJ/kg]
 			
 			Real64 Psuction = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Tsuction, RefrigerantIndex, RoutineName );
-			//Real64 Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Tdischarge, RefrigerantIndex, RoutineName );
 			
 			// enthalpy of OU evaporator/condenser inlets and outlets
 			h_OU_evap_in = h_IU_evap_in; 
@@ -11737,7 +11685,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Pipe_v_ref; // Piping Loss Algorithm Parameter: Refrigerant velocity [m/s]
 		Real64 Pipe_T_room; // Piping Loss Algorithm Parameter: Average Room Temperature [C]
 		Real64 Pipe_T_IU_in; // Piping Loss Algorithm Parameter: Average Refrigerant Temperature [C]
-		Real64 Pipe_h_IU_in_temp; // Piping Loss Algorithm Parameter: enthalpy of IU at inlet (temp) [kJ/kg]
 		Real64 Pipe_Num_Re; // Piping Loss Algorithm Parameter: refrigerant Re Number [-]
 		Real64 Pipe_Num_Pr; // Piping Loss Algorithm Parameter: refrigerant Pr Number [-]
 		Real64 Pipe_Num_Nu; // Piping Loss Algorithm Parameter: refrigerant Nu Number [-]
@@ -11778,7 +11725,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 RefTHigh = RefrigData( RefrigNum ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
 		Real64 RefPLow = RefrigData( RefrigNum ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
 		Real64 RefPHigh = RefrigData( RefrigNum ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
-		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigerant is in the superheat area.
 		
 		//Perform iteration to calculate Pipe_T_IU_in, given P and h
 		Pipe_T_IU_in = GetSupHeatTempRefrig( VRF( VRFCond ).RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), Pipe_h_IU_in, VRF( VRFCond ).IUCondensingTemp, min( VRF( VRFCond ).IUCondensingTemp + 50, RefTHigh ), RefrigerantIndex, RoutineName );

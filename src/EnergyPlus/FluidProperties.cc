@@ -4594,15 +4594,23 @@ namespace FluidProperties {
 		// check enthalpy data range and attempt to cap if necessary
 		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
-		if ( ( Enthalpy < EnthalpyLow) || ( Enthalpy > EnthalpyHigh ) ) return RefTSat;
+		if ( Enthalpy <= EnthalpyLow ) {
+			ReturnValue = TempLow;
+			return ReturnValue;
+		}
+		if ( Enthalpy >= EnthalpyHigh ) {
+			ReturnValue = TempUp;
+			return ReturnValue;
+		}
 			
 		for ( Temp = TempLow; Temp <= TempUp; Temp++ ){
 			EnthalpyCheck = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 			
 			if( EnthalpyCheck > Enthalpy )  break; 
 		}
-		
-		return Temp;
+		ReturnValue = Temp;
+
+		return ReturnValue;
 
 	}
 
