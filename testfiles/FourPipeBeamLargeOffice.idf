@@ -7942,8 +7942,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_mid_ZN_4 4pipe Beam,  !- Component 1 Name
     Perimeter_mid_ZN_4 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_4 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_mid_ZN_4 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name  
 
   Branch,
     Secondary CW Demand Load Branch 4,  !- Name
@@ -7952,8 +7951,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_3 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_3 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_3 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_3 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name  
 
   Branch,
     Secondary CW Demand Load Branch 5,  !- Name
@@ -7962,8 +7960,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_2 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_2 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_2 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_2 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 6,  !- Name
@@ -7972,8 +7969,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_1 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_1 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_1 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_1 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name  
 
   Branch,
     Secondary CW Demand Load Branch 7,  !- Name
@@ -7982,8 +7978,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_4 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_4 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_4 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_4 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 8,  !- Name
@@ -7992,8 +7987,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Core_bottom 4pipe Beam,  !- Component 1 Name
     Core_bottom 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_bottom 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Core_bottom 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 9,  !- Name
@@ -8002,8 +7996,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Core_mid 4pipe Beam,  !- Component 1 Name
     Core_mid 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_mid 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Core_mid 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 10,  !- Name
@@ -8012,8 +8005,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Core_top 4pipe Beam,  !- Component 1 Name
     Core_top 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_top 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Core_top 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 11,  !- Name
@@ -8022,8 +8014,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_3 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_3 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_3 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_3 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 12,  !- Name
@@ -8032,8 +8023,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_2 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_2 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_2 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_2 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 13,  !- Name
@@ -8042,8 +8032,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_1 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_1 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_1 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_1 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 14,  !- Name
@@ -8052,8 +8041,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_4 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_4 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_4 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_4 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 15,  !- Name
@@ -8062,9 +8050,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_mid_ZN_3 4pipe Beam,  !- Component 1 Name
     Perimeter_mid_ZN_3 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_3 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
-
+    Perimeter_mid_ZN_3 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Cooling Demand Bypass Branch,  !- Name
@@ -8787,8 +8773,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_mid_ZN_4 4pipe Beam,  !- Component 1 Name
     Perimeter_mid_ZN_4 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_4 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_mid_ZN_4 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 4,  !- Name
@@ -8797,8 +8782,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_3 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_3 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_3 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_3 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 5,  !- Name
@@ -8807,8 +8791,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_2 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_2 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_2 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_2 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 6,  !- Name
@@ -8817,9 +8800,8 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_1 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_1 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_1 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
-
+    Perimeter_top_ZN_1 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
+    
   Branch,
     Secondary HW Demand Load Branch 7,  !- Name
     ,                        !- Maximum Flow Rate {m3/s}
@@ -8827,8 +8809,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_top_ZN_4 4pipe Beam,  !- Component 1 Name
     Perimeter_top_ZN_4 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_4 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_top_ZN_4 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 8,  !- Name
@@ -8837,8 +8818,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Core_bottom 4pipe Beam,  !- Component 1 Name
     Core_bottom 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_bottom 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Core_bottom 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 9,  !- Name
@@ -8847,8 +8827,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Core_mid 4pipe Beam,  !- Component 1 Name
     Core_mid 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_mid 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Core_mid 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 10,  !- Name
@@ -8857,8 +8836,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Core_top 4pipe Beam,  !- Component 1 Name
     Core_top 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_top 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Core_top 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 11,  !- Name
@@ -8867,8 +8845,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_3 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_3 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_3 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_3 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 12,  !- Name
@@ -8877,8 +8854,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_2 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_2 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_2 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_2 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 13,  !- Name
@@ -8887,8 +8863,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_1 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_1 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_1 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_1 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 14,  !- Name
@@ -8897,8 +8872,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_bot_ZN_4 4pipe Beam,  !- Component 1 Name
     Perimeter_bot_ZN_4 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_4 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
+    Perimeter_bot_ZN_4 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary HW Demand Load Branch 15,  !- Name
@@ -8907,9 +8881,7 @@
     AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type
     Perimeter_mid_ZN_3 4pipe Beam,  !- Component 1 Name
     Perimeter_mid_ZN_3 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_3 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name
-    Active;  
-
+    Perimeter_mid_ZN_3 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Bypass Branch,  !- Name
