@@ -16237,8 +16237,7 @@
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
@@ -16247,8 +16246,7 @@
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
@@ -16311,8 +16309,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -16326,8 +16323,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -16454,8 +16450,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Inlet Pipe,  !- Name
@@ -16469,8 +16464,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
@@ -16479,8 +16473,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_1 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_1 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_1 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_1 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
@@ -16489,8 +16482,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
@@ -16499,8 +16491,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_2 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_2 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_2 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_2 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
@@ -16509,8 +16500,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
@@ -16519,8 +16509,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_3 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_3 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_3 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_3 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
@@ -16529,8 +16518,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 8,  !- Name
@@ -16539,8 +16527,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_4 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_4 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_4 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_4 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 9,  !- Name
@@ -16549,8 +16536,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
@@ -16559,8 +16545,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_5 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_5 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_5 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_5 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
@@ -16569,8 +16554,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_6 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_6 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_6 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_6 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
@@ -16579,8 +16563,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_6 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_6 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_6 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_6 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
@@ -16589,8 +16572,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_7 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_7 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_7 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_7 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
@@ -16599,8 +16581,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_7 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_7 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_7 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_7 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 15,  !- Name
@@ -16609,8 +16590,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_8 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_8 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_8 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_8 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 16,  !- Name
@@ -16619,8 +16599,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_8 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_8 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_8 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_8 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 17,  !- Name
@@ -16629,8 +16608,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_9 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_9 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_9 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_9 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 18,  !- Name
@@ -16639,8 +16617,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_9 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_9 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_9 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_9 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 19,  !- Name
@@ -16649,8 +16626,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_10 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_10 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_10 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_10 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 20,  !- Name
@@ -16659,8 +16635,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_10 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_10 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_10 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_10 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 21,  !- Name
@@ -16669,8 +16644,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_11 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_11 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_11 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_11 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 22,  !- Name
@@ -16679,8 +16653,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_11 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_11 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_11 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_11 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 23,  !- Name
@@ -16689,8 +16662,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_12 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_12 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_12 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_12 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 24,  !- Name
@@ -16699,8 +16671,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_12 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_12 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_12 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_12 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 25,  !- Name
@@ -16709,8 +16680,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_13 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_13 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_13 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_13 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 26,  !- Name
@@ -16719,8 +16689,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_13 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_13 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_13 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_13 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 27,  !- Name
@@ -16729,8 +16698,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_14 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_14 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_14 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_14 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 28,  !- Name
@@ -16739,8 +16707,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_14 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_14 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_14 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_14 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 29,  !- Name
@@ -16749,8 +16716,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_15 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_15 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_15 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_15 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 30,  !- Name
@@ -16759,8 +16725,7 @@
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_2_SEC_15 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_2_SEC_15 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_2_SEC_15 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_2_SEC_15 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
@@ -16769,8 +16734,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Bypass Pipe,  !- Name
@@ -16784,8 +16748,7 @@
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Outlet Pipe,  !- Name

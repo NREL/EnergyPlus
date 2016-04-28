@@ -12736,22 +12736,18 @@
     PSZ-AC:1_OA,             !- Component 1 Name
     PSZ-AC:1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:1_CoolC,          !- Component 2 Name
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:1_HeatC,          !- Component 3 Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:1_HeatC-PSZ-AC:1 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:1 Fan,            !- Component 4 Name
     PSZ-AC:1_HeatC-PSZ-AC:1 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:1 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:1_OA_Controllers, !- Name
@@ -13024,22 +13020,18 @@
     PSZ-AC:2_OA,             !- Component 1 Name
     PSZ-AC:2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:2_CoolC,          !- Component 2 Name
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:2_HeatC,          !- Component 3 Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:2_HeatC-PSZ-AC:2 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:2 Fan,            !- Component 4 Name
     PSZ-AC:2_HeatC-PSZ-AC:2 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:2 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:2 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:2_OA_Controllers, !- Name
@@ -13312,22 +13304,18 @@
     PSZ-AC:3_OA,             !- Component 1 Name
     PSZ-AC:3 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:3_CoolC,          !- Component 2 Name
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:3_HeatC,          !- Component 3 Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:3_HeatC-PSZ-AC:3 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:3 Fan,            !- Component 4 Name
     PSZ-AC:3_HeatC-PSZ-AC:3 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:3 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:3 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:3_OA_Controllers, !- Name
@@ -13600,22 +13588,18 @@
     PSZ-AC:4_OA,             !- Component 1 Name
     PSZ-AC:4 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:4_CoolC,          !- Component 2 Name
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:4_HeatC,          !- Component 3 Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:4_HeatC-PSZ-AC:4 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:4 Fan,            !- Component 4 Name
     PSZ-AC:4_HeatC-PSZ-AC:4 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:4 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:4 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:4_OA_Controllers, !- Name
@@ -13888,22 +13872,18 @@
     PSZ-AC:5_OA,             !- Component 1 Name
     PSZ-AC:5 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:5_CoolC,          !- Component 2 Name
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:5_HeatC,          !- Component 3 Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:5_HeatC-PSZ-AC:5 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:5 Fan,            !- Component 4 Name
     PSZ-AC:5_HeatC-PSZ-AC:5 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:5 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:5 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:5_OA_Controllers, !- Name
@@ -14176,22 +14156,18 @@
     PSZ-AC:6_OA,             !- Component 1 Name
     PSZ-AC:6 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:6_OA-PSZ-AC:6_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:6_CoolC,          !- Component 2 Name
     PSZ-AC:6_OA-PSZ-AC:6_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:6_HeatC,          !- Component 3 Name
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:6_HeatC-PSZ-AC:6 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:6 Fan,            !- Component 4 Name
     PSZ-AC:6_HeatC-PSZ-AC:6 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:6 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:6 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:6_OA_Controllers, !- Name
@@ -14464,22 +14440,18 @@
     PSZ-AC:7_OA,             !- Component 1 Name
     PSZ-AC:7 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:7_OA-PSZ-AC:7_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:7_CoolC,          !- Component 2 Name
     PSZ-AC:7_OA-PSZ-AC:7_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:7_HeatC,          !- Component 3 Name
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:7_HeatC-PSZ-AC:7 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:7 Fan,            !- Component 4 Name
     PSZ-AC:7_HeatC-PSZ-AC:7 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:7 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:7 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:7_OA_Controllers, !- Name
@@ -14752,22 +14724,18 @@
     PSZ-AC:8_OA,             !- Component 1 Name
     PSZ-AC:8 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:8_OA-PSZ-AC:8_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:8_CoolC,          !- Component 2 Name
     PSZ-AC:8_OA-PSZ-AC:8_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:8_HeatC,          !- Component 3 Name
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:8_HeatC-PSZ-AC:8 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:8 Fan,            !- Component 4 Name
     PSZ-AC:8_HeatC-PSZ-AC:8 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:8 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:8 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:8_OA_Controllers, !- Name
@@ -15040,22 +15008,18 @@
     PSZ-AC:9_OA,             !- Component 1 Name
     PSZ-AC:9 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:9_OA-PSZ-AC:9_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:9_CoolC,          !- Component 2 Name
     PSZ-AC:9_OA-PSZ-AC:9_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:9_HeatC,          !- Component 3 Name
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:9_HeatC-PSZ-AC:9 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:9 Fan,            !- Component 4 Name
     PSZ-AC:9_HeatC-PSZ-AC:9 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:9 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:9 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:9_OA_Controllers, !- Name
@@ -15328,22 +15292,18 @@
     PSZ-AC:10_OA,            !- Component 1 Name
     PSZ-AC:10 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:10_OA-PSZ-AC:10_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:10_CoolC,         !- Component 2 Name
     PSZ-AC:10_OA-PSZ-AC:10_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:10_HeatC,         !- Component 3 Name
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:10_HeatC-PSZ-AC:10 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:10 Fan,           !- Component 4 Name
     PSZ-AC:10_HeatC-PSZ-AC:10 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:10 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:10 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:10_OA_Controllers,!- Name
@@ -15616,22 +15576,18 @@
     PSZ-AC:11_OA,            !- Component 1 Name
     PSZ-AC:11 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:11_OA-PSZ-AC:11_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:11_CoolC,         !- Component 2 Name
     PSZ-AC:11_OA-PSZ-AC:11_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:11_HeatC,         !- Component 3 Name
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:11_HeatC-PSZ-AC:11 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:11 Fan,           !- Component 4 Name
     PSZ-AC:11_HeatC-PSZ-AC:11 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:11 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:11 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:11_OA_Controllers,!- Name
@@ -15904,22 +15860,18 @@
     PSZ-AC:12_OA,            !- Component 1 Name
     PSZ-AC:12 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:12_OA-PSZ-AC:12_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:12_CoolC,         !- Component 2 Name
     PSZ-AC:12_OA-PSZ-AC:12_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:12_HeatC,         !- Component 3 Name
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:12_HeatC-PSZ-AC:12 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:12 Fan,           !- Component 4 Name
     PSZ-AC:12_HeatC-PSZ-AC:12 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:12 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:12 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:12_OA_Controllers,!- Name
@@ -16192,22 +16144,18 @@
     PSZ-AC:13_OA,            !- Component 1 Name
     PSZ-AC:13 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:13_OA-PSZ-AC:13_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:13_CoolC,         !- Component 2 Name
     PSZ-AC:13_OA-PSZ-AC:13_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:13_HeatC,         !- Component 3 Name
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:13_HeatC-PSZ-AC:13 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:13 Fan,           !- Component 4 Name
     PSZ-AC:13_HeatC-PSZ-AC:13 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:13 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:13 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:13_OA_Controllers,!- Name
@@ -16480,22 +16428,18 @@
     PSZ-AC:14_OA,            !- Component 1 Name
     PSZ-AC:14 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:14_OA-PSZ-AC:14_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:14_CoolC,         !- Component 2 Name
     PSZ-AC:14_OA-PSZ-AC:14_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:14_HeatC,         !- Component 3 Name
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:14_HeatC-PSZ-AC:14 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:14 Fan,           !- Component 4 Name
     PSZ-AC:14_HeatC-PSZ-AC:14 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:14 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:14 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:14_OA_Controllers,!- Name
@@ -16768,22 +16712,18 @@
     PSZ-AC:15_OA,            !- Component 1 Name
     PSZ-AC:15 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:15_OA-PSZ-AC:15_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:15_CoolC,         !- Component 2 Name
     PSZ-AC:15_OA-PSZ-AC:15_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:15_HeatC,         !- Component 3 Name
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:15_HeatC-PSZ-AC:15 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:15 Fan,           !- Component 4 Name
     PSZ-AC:15_HeatC-PSZ-AC:15 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:15 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:15 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:15_OA_Controllers,!- Name
@@ -17056,22 +16996,18 @@
     PSZ-AC:16_OA,            !- Component 1 Name
     PSZ-AC:16 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:16_OA-PSZ-AC:16_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:16_CoolC,         !- Component 2 Name
     PSZ-AC:16_OA-PSZ-AC:16_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:16_CoolC-PSZ-AC:16_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:16_HeatC,         !- Component 3 Name
     PSZ-AC:16_CoolC-PSZ-AC:16_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:16_HeatC-PSZ-AC:16 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:16 Fan,           !- Component 4 Name
     PSZ-AC:16_HeatC-PSZ-AC:16 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:16 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:16 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:16_OA_Controllers,!- Name
@@ -17344,22 +17280,18 @@
     PSZ-AC:17_OA,            !- Component 1 Name
     PSZ-AC:17 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:17_OA-PSZ-AC:17_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:17_CoolC,         !- Component 2 Name
     PSZ-AC:17_OA-PSZ-AC:17_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:17_CoolC-PSZ-AC:17_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:17_HeatC,         !- Component 3 Name
     PSZ-AC:17_CoolC-PSZ-AC:17_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:17_HeatC-PSZ-AC:17 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:17 Fan,           !- Component 4 Name
     PSZ-AC:17_HeatC-PSZ-AC:17 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:17 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:17 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:17_OA_Controllers,!- Name
@@ -17632,22 +17564,18 @@
     PSZ-AC:18_OA,            !- Component 1 Name
     PSZ-AC:18 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:18_OA-PSZ-AC:18_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:18_CoolC,         !- Component 2 Name
     PSZ-AC:18_OA-PSZ-AC:18_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:18_CoolC-PSZ-AC:18_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:18_HeatC,         !- Component 3 Name
     PSZ-AC:18_CoolC-PSZ-AC:18_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:18_HeatC-PSZ-AC:18 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:18 Fan,           !- Component 4 Name
     PSZ-AC:18_HeatC-PSZ-AC:18 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:18 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:18 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:18_OA_Controllers,!- Name
@@ -17920,22 +17848,18 @@
     PSZ-AC:19_OA,            !- Component 1 Name
     PSZ-AC:19 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:19_OA-PSZ-AC:19_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:19_CoolC,         !- Component 2 Name
     PSZ-AC:19_OA-PSZ-AC:19_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:19_CoolC-PSZ-AC:19_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:19_HeatC,         !- Component 3 Name
     PSZ-AC:19_CoolC-PSZ-AC:19_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:19_HeatC-PSZ-AC:19 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:19 Fan,           !- Component 4 Name
     PSZ-AC:19_HeatC-PSZ-AC:19 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:19 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:19 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:19_OA_Controllers,!- Name
@@ -18208,22 +18132,18 @@
     PSZ-AC:20_OA,            !- Component 1 Name
     PSZ-AC:20 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:20_OA-PSZ-AC:20_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:20_CoolC,         !- Component 2 Name
     PSZ-AC:20_OA-PSZ-AC:20_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:20_CoolC-PSZ-AC:20_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:20_HeatC,         !- Component 3 Name
     PSZ-AC:20_CoolC-PSZ-AC:20_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:20_HeatC-PSZ-AC:20 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:20 Fan,           !- Component 4 Name
     PSZ-AC:20_HeatC-PSZ-AC:20 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:20 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:20 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:20_OA_Controllers,!- Name
@@ -18496,22 +18416,18 @@
     PSZ-AC:21_OA,            !- Component 1 Name
     PSZ-AC:21 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:21_OA-PSZ-AC:21_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:21_CoolC,         !- Component 2 Name
     PSZ-AC:21_OA-PSZ-AC:21_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:21_CoolC-PSZ-AC:21_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:21_HeatC,         !- Component 3 Name
     PSZ-AC:21_CoolC-PSZ-AC:21_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:21_HeatC-PSZ-AC:21 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:21 Fan,           !- Component 4 Name
     PSZ-AC:21_HeatC-PSZ-AC:21 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:21 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:21 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:21_OA_Controllers,!- Name
@@ -18784,22 +18700,18 @@
     PSZ-AC:22_OA,            !- Component 1 Name
     PSZ-AC:22 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:22_OA-PSZ-AC:22_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:22_CoolC,         !- Component 2 Name
     PSZ-AC:22_OA-PSZ-AC:22_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:22_CoolC-PSZ-AC:22_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:22_HeatC,         !- Component 3 Name
     PSZ-AC:22_CoolC-PSZ-AC:22_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:22_HeatC-PSZ-AC:22 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:22 Fan,           !- Component 4 Name
     PSZ-AC:22_HeatC-PSZ-AC:22 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:22 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:22 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:22_OA_Controllers,!- Name
@@ -19072,22 +18984,18 @@
     PSZ-AC:23_OA,            !- Component 1 Name
     PSZ-AC:23 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:23_OA-PSZ-AC:23_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:23_CoolC,         !- Component 2 Name
     PSZ-AC:23_OA-PSZ-AC:23_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:23_CoolC-PSZ-AC:23_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:23_HeatC,         !- Component 3 Name
     PSZ-AC:23_CoolC-PSZ-AC:23_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:23_HeatC-PSZ-AC:23 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:23 Fan,           !- Component 4 Name
     PSZ-AC:23_HeatC-PSZ-AC:23 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:23 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:23 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:23_OA_Controllers,!- Name
@@ -19360,22 +19268,18 @@
     PSZ-AC:24_OA,            !- Component 1 Name
     PSZ-AC:24 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:24_OA-PSZ-AC:24_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:24_CoolC,         !- Component 2 Name
     PSZ-AC:24_OA-PSZ-AC:24_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:24_CoolC-PSZ-AC:24_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:24_HeatC,         !- Component 3 Name
     PSZ-AC:24_CoolC-PSZ-AC:24_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:24_HeatC-PSZ-AC:24 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:24 Fan,           !- Component 4 Name
     PSZ-AC:24_HeatC-PSZ-AC:24 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:24 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:24 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:24_OA_Controllers,!- Name
@@ -19648,22 +19552,18 @@
     PSZ-AC:25_OA,            !- Component 1 Name
     PSZ-AC:25 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:25_OA-PSZ-AC:25_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:25_CoolC,         !- Component 2 Name
     PSZ-AC:25_OA-PSZ-AC:25_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:25_CoolC-PSZ-AC:25_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:25_HeatC,         !- Component 3 Name
     PSZ-AC:25_CoolC-PSZ-AC:25_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:25_HeatC-PSZ-AC:25 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:25 Fan,           !- Component 4 Name
     PSZ-AC:25_HeatC-PSZ-AC:25 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:25 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:25 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:25_OA_Controllers,!- Name
@@ -19936,22 +19836,18 @@
     PSZ-AC:26_OA,            !- Component 1 Name
     PSZ-AC:26 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:26_OA-PSZ-AC:26_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:26_CoolC,         !- Component 2 Name
     PSZ-AC:26_OA-PSZ-AC:26_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:26_CoolC-PSZ-AC:26_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:26_HeatC,         !- Component 3 Name
     PSZ-AC:26_CoolC-PSZ-AC:26_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:26_HeatC-PSZ-AC:26 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:26 Fan,           !- Component 4 Name
     PSZ-AC:26_HeatC-PSZ-AC:26 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:26 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:26 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:26_OA_Controllers,!- Name
@@ -20224,22 +20120,18 @@
     PSZ-AC:27_OA,            !- Component 1 Name
     PSZ-AC:27 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:27_OA-PSZ-AC:27_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:27_CoolC,         !- Component 2 Name
     PSZ-AC:27_OA-PSZ-AC:27_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:27_CoolC-PSZ-AC:27_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:27_HeatC,         !- Component 3 Name
     PSZ-AC:27_CoolC-PSZ-AC:27_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:27_HeatC-PSZ-AC:27 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:27 Fan,           !- Component 4 Name
     PSZ-AC:27_HeatC-PSZ-AC:27 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:27 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:27 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:27_OA_Controllers,!- Name
@@ -20512,22 +20404,18 @@
     PSZ-AC:28_OA,            !- Component 1 Name
     PSZ-AC:28 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:28_OA-PSZ-AC:28_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:28_CoolC,         !- Component 2 Name
     PSZ-AC:28_OA-PSZ-AC:28_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:28_CoolC-PSZ-AC:28_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:28_HeatC,         !- Component 3 Name
     PSZ-AC:28_CoolC-PSZ-AC:28_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:28_HeatC-PSZ-AC:28 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:28 Fan,           !- Component 4 Name
     PSZ-AC:28_HeatC-PSZ-AC:28 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:28 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:28 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:28_OA_Controllers,!- Name
@@ -20800,22 +20688,18 @@
     PSZ-AC:29_OA,            !- Component 1 Name
     PSZ-AC:29 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:29_OA-PSZ-AC:29_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:29_CoolC,         !- Component 2 Name
     PSZ-AC:29_OA-PSZ-AC:29_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:29_CoolC-PSZ-AC:29_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:29_HeatC,         !- Component 3 Name
     PSZ-AC:29_CoolC-PSZ-AC:29_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:29_HeatC-PSZ-AC:29 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:29 Fan,           !- Component 4 Name
     PSZ-AC:29_HeatC-PSZ-AC:29 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:29 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:29 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:29_OA_Controllers,!- Name
@@ -21088,22 +20972,18 @@
     PSZ-AC:30_OA,            !- Component 1 Name
     PSZ-AC:30 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:30_OA-PSZ-AC:30_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:30_CoolC,         !- Component 2 Name
     PSZ-AC:30_OA-PSZ-AC:30_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:30_CoolC-PSZ-AC:30_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Gas,        !- Component 3 Object Type
     PSZ-AC:30_HeatC,         !- Component 3 Name
     PSZ-AC:30_CoolC-PSZ-AC:30_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:30_HeatC-PSZ-AC:30 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:30 Fan,           !- Component 4 Name
     PSZ-AC:30_HeatC-PSZ-AC:30 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:30 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:30 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:30_OA_Controllers,!- Name
