@@ -533,7 +533,7 @@ namespace AirflowNetworkSolver {
 		// FLOW:
 
 		// Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
-		if ( AirflowNetworkSimu.InitFlag == 0 || PressureSetFlag > 0 && AirflowNetworkFanActivated ) {
+		if ( ( AirflowNetworkSimu.InitFlag == 0 ) || ( PressureSetFlag > 0 && AirflowNetworkFanActivated ) ) {
 			for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
 				if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) PZ( n ) = 0.0;
 			}
@@ -3303,7 +3303,7 @@ Label90: ;
 		int const j, // Component number
 		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const i, // Linkage number
+		int const EP_UNUSED( i ), // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
@@ -3459,7 +3459,7 @@ Label90: ;
 		int const j, // Component number
 		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const i, // Linkage number
+		int const EP_UNUSED( i ), // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
