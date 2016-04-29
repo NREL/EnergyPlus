@@ -28,7 +28,7 @@ To allow for this configuration, the two terminal unit mixer existing objects, *
 3. **ZoneHVAC:TerminalUnit:VariableRefrigerantFlow**
 
 #Approach:
-Two existing terminal unit mixer objects ***AirTerminal:SingleDuct:SupplySideMixer*** and ***AirTerminal:SingleDuct:InletSideMixer*** in *Air Distribution Equipment* group will be used. A terminal unit mixer object provides the zoneHVAC equipment object type and object name, and three node names: primary air inlet node name, secondary air inlet node name, and an air outlet node name. Each mixer object will sum the airflows and average the air properties of the two incoming streams and deliver mixed air either to the zone supply node or the inlet of the local zoneHVAC equipment. Like all other existing terminal units, the supply air flow is balanced with the zone return air flow (with zone exhaust subtracted). This is done automatically in the subroutine *CalcZoneMassBalance*, module *ZoneEqupmentManager*. These terminal units resemble the induction type terminal units: they mix supply air with recirculated zone air and deliver the mixed air into a zone. The mixer objects will contain a reference to the upstream or downstream allowed zoneHVAC equipment. If present, the mixers will be simulated and will be able to pass the zone *load met* taking into account the outdoor air conditions to the local zoneHVAC equipment calculation routines.     
+Two existing terminal unit mixer objects ***AirTerminal:SingleDuct:SupplySideMixer*** and ***AirTerminal:SingleDuct:InletSideMixer*** in *Air Distribution Equipment* group will be used. A terminal unit mixer object provides the zoneHVAC equipment object type and object name, and three node names: primary air inlet node name, secondary air inlet node name, and an air outlet node name. Each mixer object will sum the airflows and average the air properties of the two incoming streams and deliver mixed air either to the zone supply node or the inlet of the local zoneHVAC equipment. The total supply air delivered to a zone is equal to the sum of the primary air and the recirculating air. The primary air flow is balanced with the zone return air flow. This is done automatically in the subroutine *CalcZoneMassBalance*, module *ZoneEqupmentManager*. These terminal units resemble the induction type terminal units: they mix supply air with recirculated zone air and deliver the mixed air into a zone. The mixer objects will contain a reference to the upstream or downstream allowed zoneHVAC equipment. If present, the mixers will be simulated and will be able to pass the zone *load met* taking into account the outdoor air conditions to the local zoneHVAC equipment calculation routines.     
 
 ###Testing/Validation/Data Source(s):
 The new feature will be compared against exiting model.
@@ -197,6 +197,38 @@ An example is shown below.
     SPACE1-1 ATMixer Primary Inlet,     !- Terminal Unit Primary Air Inlet Node Name
     SPACE1-1 ATMixer Secondary Inlet;   !- Terminal Unit Secondary Air Inlet Node Name
 
+
+Example of PTHP served with dedicated outdoor air system (DOAS). The Outdoor Air Mixer object type and name input fields are left blank and the outdoor air flow rates in the PTHP are set to zero.
+
+ **ZoneHVAC:PackagedTerminalHeatPump,**
+
+    SPACE1-1 Heat Pump,      !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE1-1 Heat Pump Inlet,!- Air Inlet Node Name
+    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name
+    ,                        !- Outdoor Air Mixer Object Type
+    ,                        !- Outdoor Air Mixer Name
+    Autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    Fan:OnOff,               !- Supply Air Fan Object Type
+    SPACE1-1 Supply Fan,     !- Supply Air Fan Name
+    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
+    SPACE1-1 HP Heating Mode,     !- Heating Coil Name
+    0.001,                   !- Heating Convergence Tolerance {dimensionless}
+    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    SPACE1-1 HP Cooling Mode,     !- Cooling Coil Name
+    0.001,                   !- Cooling Convergence Tolerance {dimensionless}
+    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    SPACE1-1 HP Supp Coil,   !- Supplemental Heating Coil Name
+    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
+    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+    BlowThrough,             !- Fan Placement
+    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
 
 ###Proposed Report Variables:
 N/A

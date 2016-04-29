@@ -32761,12 +32761,10 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \type node
         \note Air outlet node for the PTAC must be a zone air inlet node.
    A5,  \field Outdoor Air Mixer Object Type
-        \required-field
         \type choice
         \key OutdoorAir:Mixer
         \note currently only one OutdoorAir:Mixer object type is available.
    A6 , \field Outdoor Air Mixer Name
-        \required-field
         \type object-list
         \object-list OutdoorAirMixers
         \note Needs to match the name of the PTAC outdoor air mixer object.
@@ -32907,12 +32905,10 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \type node
         \note Air outlet node for the PTHP must be a zone air inlet node.
    A5,  \field Outdoor Air Mixer Object Type
-        \required-field
         \type choice
         \key OutdoorAir:Mixer
         \note currently only one OutdoorAir:Mixer object type is available.
    A6 , \field Outdoor Air Mixer Name
-        \required-field
         \type object-list
         \object-list OutdoorAirMixers
         \note Needs to match name of outdoor air mixer object.
