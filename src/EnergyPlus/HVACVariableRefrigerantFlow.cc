@@ -7873,13 +7873,22 @@ namespace HVACVariableRefrigerantFlow {
 		//	 7. No running
 		
 		// Flag for VRF-HR Operations
-		HRHeatRequestFlag = any( TerminalUnitList( TUListNum ).HRHeatRequest );
-		HRCoolRequestFlag = any( TerminalUnitList( TUListNum ).HRCoolRequest );
+		if ( TU_HeatingLoad > 0 ){
+			HRHeatRequestFlag = true;
+		} else {
+			HRHeatRequestFlag = false;
+		}
+		if ( TU_CoolingLoad > 0 ){
+			HRCoolRequestFlag = true;
+		} else {
+			HRCoolRequestFlag = false;
+		}
 		
 		// Initialization for Ncomp iterations
 		NumOfCompSpdInput = VRF( VRFCond ).CompressorSpeed.size();
 		CompEvaporatingPWRSpd.dimension( NumOfCompSpdInput );
 		CompEvaporatingCAPSpd.dimension( NumOfCompSpdInput );
+		VRF( VRFCond ).OperatingMode = 0; // report variable for heating or cooling mode
 		
 		// 1. VRF-HP Cooling Mode .OR. VRF-HR Mode_1 
 		if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && ! HRHeatRequestFlag && HRCoolRequestFlag) ) {
@@ -8412,7 +8421,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 		
 		// calculate capacities and energy use
-		if ( CoolingLoad( VRFCond ) && TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTUInList ) ) {
+		if ((( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && HRCoolRequestFlag )) && TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTUInList )) {
 			InletAirWetBulbC = SumCoolInletWB;
 			
 			// From the VRF_FluidTCtrl model
@@ -8425,7 +8434,8 @@ namespace HVACVariableRefrigerantFlow {
 				CoolingPLR = 0.0;
 			}
 
-		} else if ( HeatingLoad( VRFCond ) && TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTUInList ) ) {
+		} 
+		if ((( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && HRHeatRequestFlag )) && TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTUInList )) {
 			InletAirDryBulbC = SumHeatInletDB;
 			InletAirWetBulbC = SumHeatInletWB;
 
@@ -8496,12 +8506,15 @@ namespace HVACVariableRefrigerantFlow {
 			} else {
 				HeatingPLR = 0.0;
 			}
-			
 		}
 
 		VRF( VRFCond ).VRFCondPLR = max( CoolingPLR, HeatingPLR );
 
 		// For VRF-HR Operations
+		HRInitialCapFrac = 1.0;
+		HRInitialEIRFrac = 1.0;
+		HRCapTC = 0.0;
+		HREIRTC = 0.0;
 		if ( ! DoingSizing && ! WarmupFlag ) {
 			if ( HRHeatRequestFlag && HRCoolRequestFlag ) { // Simultaneous Heating and Cooling operations for HR system
 				// determine operating mode change: (1) ModeChange (2) HRCoolingActive (3) HRHeatingActive
@@ -8625,7 +8638,6 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 
-		VRF( VRFCond ).OperatingMode = 0; // report variable for heating or cooling mode
 		VRFRTF = 0.0;
 		// cooling and heating is optional (only one may exist), if so then performance curve for missing coil are not required
 		if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
@@ -10953,11 +10965,6 @@ namespace HVACVariableRefrigerantFlow {
 		MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );
 		MinOutdoorUnitPe = max( P_discharge - VRF( VRFCond ).CompMaxDeltaP, MinRefriPe );
 		MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
-		
-		// variable initializations: Outdoor air conditions
-		Real64 OutdoorDryBulb = OutDryBulbTemp;
-		Real64 OutdoorHumRat = OutHumRat;
-		Real64 OutdoorPressure = OutBaroPress;
 		
 		//Calculate capacity modification factor
 		C_cap_operation = VRFOU_CapModFactor( VRFCond, h_comp_in, h_IU_evap_in, max( min( P_suction, RefPHigh ), RefPLow ), T_suction + SH_Comp, T_suction + 8, T_discharge - 5 );

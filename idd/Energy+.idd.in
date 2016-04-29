@@ -20105,10 +20105,6 @@ Lights,
        \maximum 1.0
        \default 1.0
   A5 , \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20194,10 +20190,6 @@ ElectricEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20277,10 +20269,6 @@ GasEquipment,
        \note converted from a natural gas CO2 emission rate of 117 lbs CO2 per million Btu.
        \note The maximum value assumes to be 10 times of the recommended value.
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20348,10 +20336,6 @@ HotWaterEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20418,10 +20402,6 @@ SteamEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24290,10 +24270,6 @@ Exterior:Lights,
        \key ScheduleNameOnly
        \key AstronomicalClock
   A4 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24331,10 +24307,6 @@ Exterior:FuelEquipment,
        \minimum 0
        \ip-units W
   A4 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24360,10 +24332,6 @@ Exterior:WaterEquipment,
        \type real
        \minimum 0
   A4 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -54756,7 +54724,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
   N37, \field Initial Heat Recovery Cooling Capacity Fraction
        \type real
        \units W/W
-       \default 0.5
+       \default 1
        \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
        \note Enter the fractional capacity available at the start
        \note of heat recovery mode. The capacity exponentially approaches
@@ -54766,14 +54734,14 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
   N38, \field Heat Recovery Cooling Capacity Time Constant
        \type real
        \units hr
-       \default 0.15
+       \default 0
        \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
        \note Enter the time constant used to model the transition
        \note from cooling only mode to heat recovery mode
   N39, \field Initial Heat Recovery Cooling Energy Fraction
        \type real
        \units W/W
-       \default 1.0
+       \default 1
        \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
        \note Enter the fractional electric consumption rate at the start
        \note of heat recovery mode. The electric consumption rate exponentially
@@ -54800,7 +54768,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
   N43, \field Heat Recovery Heating Capacity Time Constant
        \type real
        \units hr
-       \default 0.15
+       \default 0
        \note This is used to describe the transition from Heating Only mode to Heat Recovery mode
        \note Enter the time constant used to model the transition
        \note from cooling only mode to heat recovery mode
