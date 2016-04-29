@@ -509,6 +509,21 @@ TEST( OutputReportTabularTest, ConvertUnicodeToUTF8 )
 }
 
 
+TEST( OutputReportTabularTest, GetUnitSubStringTest )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitSubStringTest" );
+	EXPECT_EQ( "", GetUnitSubString( "" ) );
+	EXPECT_EQ( "", GetUnitSubString( " " ) );
+	EXPECT_EQ( "J/KG", GetUnitSubString( "[J/KG]" ) );
+	EXPECT_EQ( "M3/S-PERSON", GetUnitSubString( " [M3/S-PERSON]" ) ); //leading space
+	EXPECT_EQ( "W/M2-K", GetUnitSubString( "[W/M2-K] " ) ); // trailing space
+	EXPECT_EQ( "MJ/m2", GetUnitSubString( " [MJ/m2] " ) ); // leading and trailing space
+	EXPECT_EQ( "PA", GetUnitSubString( "This is a column header with units [PA] " ) );
+	EXPECT_EQ( "W", GetUnitSubString( "This is a column header with units [W] " ) );
+	EXPECT_EQ( "K/M", GetUnitSubString( "This is a column header with units [K/M] and trailing text." ) );
+}
+
+
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
 	// AUTHOR: R. Raustad, FSEC
@@ -5655,6 +5670,25 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 
 }
 
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest )
+{
+
+	SetPredefinedTables();
+
+	PreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting", 1000., 2 );
+	EXPECT_EQ( "1000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting" ) );
+	EXPECT_EQ( "NOT FOUND", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING" ) );
+
+	PreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING", 2000., 2 );
+	EXPECT_EQ( "1000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting" ) );
+	EXPECT_EQ( "2000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING" ) );
+
+}
+
+
+
+
+
 TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitSubstring_Test" );
@@ -5670,4 +5704,7 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 	EXPECT_EQ( "", GetUnitSubString( "String with empty unit string at end []" ) );
 	EXPECT_EQ( "", GetUnitSubString( "[] String with empty unit string at beginning" ) );
 }
+
+
+
 

@@ -234,6 +234,30 @@ namespace EconomicLifeCycleCost {
 	Array1D< UseAdjustmentType > UseAdjustment;
 	Array1D< CashFlowType > CashFlow;
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetInput_GetLifeCycleCostInput( true );
+
+		//from former statics in GetInputLifeCycleCostUsePriceEscalation()
+		int UsePriceEscalation_escStartYear( 0 );
+		int UsePriceEscalation_escNumYears( 0 );
+		int UsePriceEscalation_escEndYear( 0 );
+		int UsePriceEscalation_earlierEndYear( 0 );
+		int UsePriceEscalation_laterStartYear( 0 );
+		int UsePriceEscalation_curEsc( 0 );
+		int UsePriceEscalation_curFld( 0 );
+
+		// from former statics in ExpressAsCashFlows
+		int ExpressAsCashFlows_baseMonths1900( 0 ); // number of months since 1900 for base period
+		int ExpressAsCashFlows_serviceMonths1900( 0 ); // number of months since 1900 for service period
+
+	}
+
+
 	// Functions
 
 	void
@@ -270,9 +294,8 @@ namespace EconomicLifeCycleCost {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetLifeCycleCostInput( true );
 
-		if ( GetLifeCycleCostInput ) {
+		if ( GetInput_GetLifeCycleCostInput ) {
 			GetInputLifeCycleCostParameters();
 			GetInputLifeCycleCostRecurringCosts();
 			GetInputLifeCycleCostNonrecurringCost();
@@ -281,7 +304,7 @@ namespace EconomicLifeCycleCost {
 			if ( LCCparamPresent ) {
 				AddTOCEntry( "Life-Cycle Cost Report", "Entire Facility" );
 			}
-			GetLifeCycleCostInput = false;
+			GetInput_GetLifeCycleCostInput = false;
 		}
 	}
 
@@ -918,13 +941,6 @@ namespace EconomicLifeCycleCost {
 		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
-		static int escStartYear( 0 );
-		static int escNumYears( 0 );
-		static int escEndYear( 0 );
-		static int earlierEndYear( 0 );
-		static int laterStartYear( 0 );
-		static int curEsc( 0 );
-		static int curFld( 0 );
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
@@ -1004,17 +1020,17 @@ namespace EconomicLifeCycleCost {
 				// Since the years in the UsePriceEscalation may not match up with the baseDateYear and
 				// the lenghtStudyYears, need to make adjustments when reading in the values to align
 				// with the baseDateYear (the first item in all yearly arrays)
-				escStartYear = UsePriceEscalation( iInObj ).escalationStartYear;
-				escNumYears = NumNums - 1;
-				escEndYear = escStartYear + escNumYears - 1;
-				earlierEndYear = min( escEndYear, lastDateYear ); // pick the earlier ending date
-				laterStartYear = max( escStartYear, baseDateYear ); //pick the later starting date
-				for ( jYear = laterStartYear; jYear <= earlierEndYear; ++jYear ) {
-					curFld = 2 + jYear - escStartYear;
-					curEsc = 1 + jYear - baseDateYear;
-					if ( ( curFld <= NumNums ) && ( curFld >= 1 ) ) {
-						if ( ( curEsc <= lengthStudyYears ) && ( curEsc >= 1 ) ) {
-							UsePriceEscalation( iInObj ).Escalation( curEsc ) = NumArray( curFld );
+				UsePriceEscalation_escStartYear = UsePriceEscalation( iInObj ).escalationStartYear;
+				UsePriceEscalation_escNumYears = NumNums - 1;
+				UsePriceEscalation_escEndYear = UsePriceEscalation_escStartYear + UsePriceEscalation_escNumYears - 1;
+				UsePriceEscalation_earlierEndYear = min( UsePriceEscalation_escEndYear, lastDateYear ); // pick the earlier ending date
+				UsePriceEscalation_laterStartYear = max( UsePriceEscalation_escStartYear, baseDateYear ); //pick the later starting date
+				for ( jYear = UsePriceEscalation_laterStartYear; jYear <= UsePriceEscalation_earlierEndYear; ++jYear ) {
+					UsePriceEscalation_curFld = 2 + jYear - UsePriceEscalation_escStartYear;
+					UsePriceEscalation_curEsc = 1 + jYear - baseDateYear;
+					if ( ( UsePriceEscalation_curFld <= NumNums ) && ( UsePriceEscalation_curFld >= 1 ) ) {
+						if ( ( UsePriceEscalation_curEsc <= lengthStudyYears ) && ( UsePriceEscalation_curEsc >= 1 ) ) {
+							UsePriceEscalation( iInObj ).Escalation( UsePriceEscalation_curEsc ) = NumArray( UsePriceEscalation_curFld );
 						}
 					}
 				}
@@ -1249,8 +1265,6 @@ namespace EconomicLifeCycleCost {
 		int offset;
 		int month; // number of months since base date
 		int firstMonth;
-		static int baseMonths1900( 0 ); // number of months since 1900 for base period
-		static int serviceMonths1900( 0 ); // number of months since 1900 for service period
 		int monthsBaseToService;
 		Array2D< Real64 > resourceCosts;
 		Array1D< Real64 > curResourceCosts( 12 );
@@ -1265,9 +1279,9 @@ namespace EconomicLifeCycleCost {
 		int iLoop;
 
 		// compute months from 1900 for base and service period
-		baseMonths1900 = ( baseDateYear - 1900 ) * 12 + baseDateMonth;
-		serviceMonths1900 = ( serviceDateYear - 1900 ) * 12 + serviceDateMonth;
-		monthsBaseToService = serviceMonths1900 - baseMonths1900;
+		ExpressAsCashFlows_baseMonths1900 = ( baseDateYear - 1900 ) * 12 + baseDateMonth;
+		ExpressAsCashFlows_serviceMonths1900 = ( serviceDateYear - 1900 ) * 12 + serviceDateMonth;
+		monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
 		// if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
 		if ( CurntBldg.GrandTotal > 0.0 ) { //from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
 			++numNonrecurringCost;
@@ -1379,10 +1393,17 @@ namespace EconomicLifeCycleCost {
 		for ( iResource = 1; iResource <= NumOfResourceTypes; ++iResource ) {
 			if ( resourceCostNotZero( iResource ) ) {
 				++cashFlowCounter;
-				CashFlow( cashFlowCounter ).Category = costCatEnergy;
-				CashFlow( cashFlowCounter ).Resource = iResource + ResourceTypeInitialOffset;
+				int curResource_iRT = iResource + ResourceTypeInitialOffset;
+				if ( curResource_iRT == iRT_Water || ( curResource_iRT >= iRT_OnSiteWater &&  curResource_iRT <= iRT_Condensate )){
+					CashFlow( cashFlowCounter ).Category = costCatWater;
+				} else if ( curResource_iRT >= iRT_Electricity &&  curResource_iRT <= iRT_SolarAir ) { //iRT_Water already filtered by first if block
+					CashFlow( cashFlowCounter ).Category = costCatEnergy;
+				} else {
+					CashFlow( cashFlowCounter ).Category = costCatOperation;
+				}
+				CashFlow( cashFlowCounter ).Resource = curResource_iRT;
 				CashFlow( cashFlowCounter ).SourceKind = skResource;
-				CashFlow( cashFlowCounter ).name = GetResourceTypeChar( iResource + ResourceTypeInitialOffset );
+				CashFlow( cashFlowCounter ).name = GetResourceTypeChar( curResource_iRT );
 				if ( cashFlowCounter <= numCashFlow ) {
 					//put the monthly energy costs into the cashflow prior to adjustments
 					//energy costs (a.k.a. resource costs) start at the start of service and repeat
@@ -2173,7 +2194,7 @@ namespace EconomicLifeCycleCost {
 			rowHead.deallocate();
 			columnWidth.deallocate();
 			tableBody.deallocate();
-			//---- Energy Cost Cash Flows
+			//---- Energy and Water Cost Cash Flows
 			numColumns = max( 1, numResourcesUsed );
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( numColumns );
@@ -2190,10 +2211,10 @@ namespace EconomicLifeCycleCost {
 					tableBody( jObj, iYear ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
 				}
 			}
-			WriteSubtitle( "Energy Cost Cash Flows (Without Escalation)" );
+			WriteSubtitle( "Energy and Water Cost Cash Flows (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (Without Escalation)" );
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -2267,52 +2288,50 @@ namespace EconomicLifeCycleCost {
 			columnWidth.deallocate();
 			tableBody.deallocate();
 			//---- DEBUG ONLY - Monthly Cash Flows
-			// This table is not usually produced but was used as a debugging aid. The code
-			// was kept for future debugging efforts related to cashflows but should generally
-			// be commented out.
-			//  ALLOCATE(rowHead(lengthStudyTotalMonths))
-			//  ALLOCATE(columnHead(numCashFlow))
-			//  ALLOCATE(columnWidth(numCashFlow))
-			//  ALLOCATE(tableBody(lengthStudyTotalMonths,numCashFlow))
-			//  tableBody = ''
-			//  columnHead(1) = 'mnt'
-			//  columnHead(2) = 'rpr'
-			//  columnHead(3) = 'opr'
-			//  columnHead(4) = 'repl'
-			//  columnHead(5) = 'mOvhl'
-			//  columnHead(6) = 'MOvhl'
-			//  columnHead(7) = 'oOpr'
-			//  columnHead(8) = 'cons'
-			//  columnHead(9) = 'slvg'
-			//  columnHead(10) = 'oCap'
-			//  columnHead(11) = 'H20'
-			//  columnHead(12) = 'ene'
-			//  columnHead(13) = 'tEne'
-			//  columnHead(14) = 'tOpr'
-			//  columnHead(15) = 'tCap'
-			//  columnHead(16) = 'Totl'
-			//  DO jObj = countOfCostCat + 1, numCashFlow
-			//    columnHead(jObj) = CashFlow(jObj)%name
-			//  END DO
-			//  DO kMonth = 1,lengthStudyTotalMonths
-			//    rowHead(kMonth) = MonthNames(1 + MOD((kMonth + baseDateMonth - 2),12)) // ' ' // IntToStr(baseDateYear + INT((kMonth - 1) / 12))
-			//  END DO
-			//  DO kMonth = 1,lengthStudyTotalMonths
-			//    DO jObj = 1,numCashFlow
-			//      tableBody(kMonth,jObj) = TRIM(RealToStr(CashFlow(jObj)%mnAmount(kMonth),2))
-			//    END DO
-			//  END DO
-			//  columnWidth = 14 !array assignment - same for all columns
-			//  CALL WriteSubtitle('DEBUG ONLY - Monthly Cash Flows')
-			//  CALL WriteTable(tableBody,rowHead,columnHead,columnWidth)
-			//  CALL CreateSQLiteTabularDataRecords(tableBody,rowHead,columnHead,&
-			//                                      'Life-Cycle Cost Report',&
-			//                                      'Entire Facility',&
-			//                                      'DEBUG ONLY - Monthly Cash Flows')
-			//  DEALLOCATE(columnHead)
-			//  DEALLOCATE(rowHead)
-			//  DEALLOCATE(columnWidth)
-			//  DEALLOCATE(tableBody)
+			bool showMonthlyCashFlows = false;
+			if ( showMonthlyCashFlows ){
+				rowHead.allocate( lengthStudyTotalMonths );
+				columnHead.allocate( numCashFlow );
+				columnWidth.allocate( numCashFlow );
+				tableBody.allocate( numCashFlow, lengthStudyTotalMonths);
+				tableBody = "";
+				columnHead( 1 ) = "mnt";
+				columnHead( 2 ) = "rpr";
+				columnHead( 3 ) = "opr";
+				columnHead( 4 ) = "repl";
+				columnHead( 5 ) = "mOvhl";
+				columnHead( 6 ) = "MOvhl";
+				columnHead( 7 ) = "oOpr";
+				columnHead( 8 ) = "cons";
+				columnHead( 9 ) = "slvg";
+				columnHead( 10 ) = "oCap";
+				columnHead( 11 ) = "H20";
+				columnHead( 12 ) = "ene";
+				columnHead( 13 ) = "tEne";
+				columnHead( 14 ) = "tOpr";
+				columnHead( 15 ) = "tCap";
+				columnHead( 16 ) = "Totl";
+				for ( jObj = countOfCostCat + 1; jObj <= numCashFlow; ++jObj ) {
+					columnHead( jObj ) = CashFlow( jObj ).name;
+				}
+				for ( kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth ) {
+					rowHead( kMonth ) = MonthNames( 1 + ( kMonth + baseDateMonth - 2 ) % 12 ) + ' ' + IntToStr( baseDateYear + int( ( kMonth - 1 ) / 12 ) );
+				}
+				for ( kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth ) {
+					for ( jObj = 1; jObj <= numCashFlow; ++jObj ) {
+						tableBody( jObj, kMonth ) = RealToStr( CashFlow( jObj ).mnAmount( kMonth ), 2 );
+					}
+				}
+				WriteSubtitle( "DEBUG ONLY - Monthly Cash Flows" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows" );
+				}
+				columnHead.deallocate();
+				rowHead.deallocate();
+				columnWidth.deallocate();
+				tableBody.deallocate();
+			}
 			//---- Monthly Total Cash Flow
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( 12 );
@@ -2392,8 +2411,13 @@ namespace EconomicLifeCycleCost {
 				} else if ( SELECT_CASE_var == skRecurring ) {
 					tableBody( 2, jObj ) = "Recurring";
 				} else if ( SELECT_CASE_var == skResource ) {
-					tableBody( 2, jObj ) = "Energy Cost";
-				} else {
+					if ( CashFlow( offset + jObj ).Category == costCatWater ){
+						tableBody( 2, jObj ) = "Water Cost";
+					} else {
+						tableBody( 2, jObj ) = "Energy Cost";
+					}
+				}
+				else {
 					tableBody( 2, jObj ) = "-";
 				}}
 				tableBody( 3, jObj ) = RealToStr( CashFlow( offset + jObj ).orginalCost, 2 );
@@ -2537,6 +2561,59 @@ namespace EconomicLifeCycleCost {
 
 		}
 	}
+
+	void
+	clear_state()
+	{
+		LCCparamPresent = false;
+		LCCname = "";
+		discountConvension = disConvEndOfYear;
+		inflationApproach = inflAppConstantDollar;
+		realDiscountRate = 0.0;
+		nominalDiscountRate = 0.0;
+		inflation = 0.0;
+		baseDateMonth = 0;
+		baseDateYear = 0;
+		serviceDateMonth = 0;
+		serviceDateYear = 0;
+		lengthStudyYears = 0;
+		lengthStudyTotalMonths = 0;
+		taxRate = 0.0;
+		depreciationMethod = depMethNone;
+		lastDateMonth = 0;
+		lastDateYear = 0;
+		numRecurringCosts = 0;
+		numNonrecurringCost = 0;
+		numUsePriceEscalation = 0;
+		numUseAdjustment = 0;
+		numCashFlow = 0;
+		numResourcesUsed = 0;
+		SPV.deallocate();
+		energySPV.deallocate();
+		DepreciatedCapital.deallocate();
+		TaxableIncome.deallocate();
+		Taxes.deallocate();
+		AfterTaxCashFlow.deallocate();
+		AfterTaxPresentValue.deallocate();
+		RecurringCosts.deallocate();
+		NonrecurringCost.deallocate();
+		UsePriceEscalation.deallocate();
+		UseAdjustment.deallocate();
+		CashFlow.deallocate();
+
+		GetInput_GetLifeCycleCostInput = true;
+		UsePriceEscalation_escStartYear = 0;
+		UsePriceEscalation_escNumYears = 0;
+		UsePriceEscalation_escEndYear = 0;
+		UsePriceEscalation_earlierEndYear = 0;
+		UsePriceEscalation_laterStartYear = 0;
+		UsePriceEscalation_curEsc = 0;
+		UsePriceEscalation_curFld = 0;
+		ExpressAsCashFlows_baseMonths1900 = 0;
+		ExpressAsCashFlows_serviceMonths1900 = 0;
+
+	}
+
 
 } // EconomicLifeCycleCost
 

@@ -1833,31 +1833,32 @@ Relative humidity, \emph{r\(_{a}\)}, is also calculated from EnergyPlus weather 
 
 The soil thermal diffusivity (m\(^{2}\)/s), \emph{α\(_{s}\)}, and conductivity (W/m°C), \emph{k\(_{s}\)}, varies with the density and moisture content. From Table 3.3, pg. 26 of ASHRAE's Ground Source Heat Pumpss--Design of Geothermal Systems for Commercial and Institutional Buildings, 1997, the following values are recommended under different conditions.
 
-\begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}}
 \toprule 
-Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
+ & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline
+Soil Type & Dry Density  [kg/m3] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
+ & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline
+Soil Type & Dry Density  [kg/m3] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] & k  [W/m-K] & α   [m2/s] \tabularnewline
 \midrule
 \endhead
 
-Heavy clay & 15\% water & 1922 & 1.558 & 5.914E-07 \tabularnewline
- & 5\% water & 1922 & 1.212 & 6.452E-07 \tabularnewline
-Light clay & 15\% water & 1281 & 0.865 & 4.624E-07 \tabularnewline
- & 5\% water & 1281 & 0.692 & 4.839E-07 \tabularnewline
-Heavy sand & 15\% water & 1922 & 3.115 & 1.129E-07 \tabularnewline
- & 5\% water & 1922 & 2.596 & 1.344E-06 \tabularnewline
-Light sand & 15\% water & 1281 & 1.558 & 8.065E-07 \tabularnewline
- & 5\% water & 1281 & 1.385 & 9.677E-07 \tabularnewline
+Coarse 100\%  Sand & 1922 & 2.77 & 1.34E-06 & 2.94 & 1.24E-06 & 3.29 & 1.18E-06 &  &  \tabularnewline
+ & 1602 & 1.90 & 1.18E-06 & 2.34 & 1.18E-06 & 2.51 & 1.08E-06 & 2.68 & 8.82E-07 \tabularnewline
+ & 1281 & 1.38 & 1.18E-06 & 1.56 & 9.14E-07 & 1.56 & 8.06E-07 & 1.47 & 6.99E-07 \tabularnewline
+Fine Grain  100\% Clay & 1922 & 1.21 & 5.91E-07 & 1.21 & 4.84E-07 & 1.64 & 5.70E-07 &  &  \tabularnewline
+ & 1602 & 0.95 & 5.70E-07 & 0.95 & 4.73E-07 & 1.12 & 4.73E-07 & 1.21 & 5.16E-07 \tabularnewline
+ & 1281 & 0.69 & 4.84E-07 & 0.74 & 4.62E-07 & 0.81 & 4.73E-07 & 0.87 & 4.09E-07 \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 The following information is also available for reference from Table~\ref{table:atmospheric-variables-at-two-different}, pg. 34.6 of the ASHRAE Applications Handbook, 2015.
 
-\begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
 \toprule 
 Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & α   [m\^{}2/s] \tabularnewline
 \midrule
