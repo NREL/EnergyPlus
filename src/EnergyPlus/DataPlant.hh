@@ -104,7 +104,7 @@ namespace DataPlant {
 		CoolingRBOpSchemeType = 2, // Scheme Type for Cooling  Load Range Based Operation
 		WetBulbRBOpSchemeType = 3, // Scheme Type for Wet bulb range based Operation
 		DryBulbRBOpSchemeType = 4, // Scheme Type for Dry bulb range based Operation
-		DewPointRBOpSchemeType = 5, // Scheme Type for Dew point range based Operation
+		DewPointRBOpSchemeType = 5, // Scheme Type for Dewpoint range based Operation
 		RelHumRBOpSchemeType = 6, // Scheme Type for relative humidity range based Operation
 		DryBulbTDBOpSchemeType = 7, // Scheme Type for relative humidity range based Operation
 		WetBulbTDBOpSchemeType = 8, // Scheme Type for Wet bulb range based Operation

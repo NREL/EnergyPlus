@@ -3574,7 +3574,6 @@ HVACTemplate:System:Unitary,
   ,                        !- Sensible Heat Recovery Effectiveness
   ,                        !- Latent Heat Recovery Effectiveness
   None,                    !- Dehumidification Control Type
-  ,                        !- Dehumidification Control Zone Name
   60,                      !- Dehumidification Setpoint {percent}
   ElectricSteam,           !- Humidifier Type
   ,                        !- Humidifier Availability Schedule
@@ -4148,7 +4147,7 @@ The default value is Gas.
 
 \paragraph{Field: Number of Speeds or Stages for Heating}\label{field-number-of-speeds-or-stages-for-heating}
 
-This field defines the number of heating speeds or stages if a multi-speed heatpump or multi-stage heating coil is specifiedl. The default is 1. For heating coil type MultiSpeedDXHeatPumpAirSource, the maximum number of speeds allowed is 10. For heating coil types MultiStageElectric and MultiStageGas, the maximum number of stages allowed is 4. For other heating coil types, this field is ignored.
+This field defines the number of heating speeds or stages if a multi-speed heatpump or multi-stage heating coil is specified. The default is 1. For heating coil type MultiSpeedDXHeatPumpAirSource, the maximum number of speeds allowed is 10. For heating coil types MultiStageElectric and MultiStageGas, the maximum number of stages allowed is 4. For other heating coil types, this field is ignored.
 
 \paragraph{Field: Heating Coil Availability Schedule Name}\label{field-heating-coil-availability-schedule-name-3}
 
@@ -4391,10 +4390,6 @@ The \emph{CoolReheat} option cools beyond the dry-bulb setpoint as required to m
 
 The default is \emph{None} which meets the sensible cooling load only. The humidistat is located in the same zone that is specified above as the Control Zone or Thermostat Location Name.
 
-\paragraph{Field: Dehumidification Control Zone Name}\label{field-dehumidification-control-zone-name-1}
-
-This field specifies the zone name where the humidistat is located for controlling dehumidification.
-
 \paragraph{Field: Dehumidification Relative Humidity Setpoint}\label{field-dehumidification-relative-humidity-setpoint}
 
 This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100). The default is 60\%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
@@ -4525,7 +4520,6 @@ HVACTemplate:System:UnitarySystem,
   ,                        !- Heat Recovery Heat Exchanger Type
   ,                        !- Heat Recovery Frost Control Type
   None,                    !- Dehumidification Control Type
-  ,                        !- Dehumidification Control Zone Name
   60.0,       !- Dehumidification Relative Humidity Setpoint {percent}
   ,           !- Dehumidification Relative Humidity Setpoint Schedule Name
   None,                    !- Humidifier Type
