@@ -559,6 +559,11 @@ namespace SingleDuct {
 			} else {
 				Sys( SysNum ).ConstantMinAirFracSetByUser = true;
 				Sys( SysNum ).DesignMinAirFrac = Numbers( 2 );
+				if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
+					ShowWarningError( "Since " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + ", input for " + cNumericFields( 2 ) + " will be ignored." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+					Sys( SysNum ).ZoneMinAirFrac = 0.0;
+				}
 			}
 
 			Sys( SysNum ).ZoneFixedMinAir = Numbers( 3 );
@@ -568,6 +573,11 @@ namespace SingleDuct {
 			} else {
 				Sys( SysNum ).FixedMinAirSetByUser = true;
 				Sys( SysNum ).DesignMinAirFrac = Numbers( 3 );
+				if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
+					ShowWarningError( "Since " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + ", input for " + cNumericFields( 3 ) + " will be ignored." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+					Sys( SysNum ).ZoneFixedMinAir = 0.0;
+				}
 			}
 
 			Sys( SysNum ).ZoneMinAirFracSchPtr = GetScheduleIndex( Alphas( 6 ) );
