@@ -202,10 +202,10 @@ TEST_F( EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
 	// qualify
 	EXPECT_EQ( 1, numQualify );
-	EXPECT_EQ( false, qualify( 1 ).isMaximum );
+	EXPECT_FALSE( qualify( 1 ).isMaximum );
 	EXPECT_EQ( 12 , qualify( 1 ).thresholdVal );
 	EXPECT_EQ( seasonAnnual, qualify( 1 ).season );
-	EXPECT_EQ( false, qualify( 1 ).isConsecutive );
+	EXPECT_FALSE( qualify( 1 ).isConsecutive );
 	EXPECT_EQ( 2, qualify( 1 ).numberOfMonths );
 
 	// ChargeSimple

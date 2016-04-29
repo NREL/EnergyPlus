@@ -2181,7 +2181,7 @@ namespace OutputReportTabular {
 			gatherElecStorage = 0.0;
 			gatherPowerConversion = 0.0;
 
-			// get meter numbers for onsite theral components on BEPS report
+			// get meter numbers for onsite thermal components on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
 			meterNumAirHeatRecoveryCool = GetMeterIndex( "HeatRecoveryForCooling:EnergyTransfer" );
 			meterNumAirHeatRecoveryHeat = GetMeterIndex( "HeatRecoveryForHeating:EnergyTransfer" );
