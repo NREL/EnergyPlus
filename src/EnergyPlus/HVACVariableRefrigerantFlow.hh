@@ -387,6 +387,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 OUAirFlowRatePerCapcity; // Max condenser air flow rate per Evaporative Capacity [m3/s]
 		Real64 SH; // VRF outdoor unit superheating degrees [C]
 		Real64 SC; // VRF outdoor unit subcooling degrees [C]
+		Real64 SCHE; // Simultaneous Cooling and Heating Efficiency [C]
 		Real64 SHLow; // VRF outdoor unit superheating degrees lower limit [C]
 		Real64 SCLow; // VRF outdoor unit subcooling degrees lower limit [C]
 		Real64 SHHigh; // VRF outdoor unit superheating degrees uppler limit [C]
@@ -617,6 +618,7 @@ namespace HVACVariableRefrigerantFlow {
 			OUEvapHeatRate( 0.0 ),
 			SH( 0.0 ),
 			SC( 0.0 ),
+			SCHE( 0.0 ), 
 			SHLow( 0.0 ),
 			SCLow( 0.0 ),
 			SHHigh( 0.0 ),

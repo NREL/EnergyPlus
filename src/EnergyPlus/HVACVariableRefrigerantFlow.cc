@@ -189,6 +189,11 @@ namespace HVACVariableRefrigerantFlow {
 	int const FlagCondMode( 0 ); // Flag for the hex running as condenser [-]
 	int const FlagEvapMode( 1 ); // Flag for the hex running as evaporator [-]
 	
+	// Flag for VRF operational mode
+	int const ModeCoolingOnly( 1 ); // Flag for Cooling Only Mode [-]
+	int const ModeHeatingOnly( 2 ); // Flag for Heating Only Mode [-]
+	int const ModeCoolingAndHeating( 3 ); // Flag for Simultaneous Cooling and Heating Only Mode [-]
+	
 	// Fuel Types
 	int const FuelTypeElectric( 1 ); // Fuel type for electricity
 	int const FuelTypeNaturalGas( 2 ); // Fuel type for natural gas
@@ -666,6 +671,7 @@ namespace HVACVariableRefrigerantFlow {
 		VRF( VRFCond ).OperatingCoolingCOP = 0.0;
 		VRF( VRFCond ).OperatingHeatingCOP = 0.0;
 		VRF( VRFCond ).OperatingCOP = 0.0;
+		VRF( VRFCond ).SCHE = 0.0;
 		VRF( VRFCond ).BasinHeaterPower = 0.0;
 
 		// sum loads on TU coils
@@ -1084,7 +1090,7 @@ namespace HVACVariableRefrigerantFlow {
 		VRFRTF = 0.0;
 		// cooling and heating is optional (only one may exist), if so then performance curve for missing coil are not required
 		if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
-			VRF( VRFCond ).OperatingMode = 1;
+			VRF( VRFCond ).OperatingMode = ModeCoolingOnly;
 			if ( CoolingPLR > 1.0 ) {
 				if ( VRF( VRFCond ).CoolEIRFPLR2 > 0 ) EIRFPLRModFac = CurveValue( VRF( VRFCond ).CoolEIRFPLR2, max( VRF( VRFCond ).MinPLR, CoolingPLR ) );
 			} else {
@@ -1101,7 +1107,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).RatedCoolingPower * TotCoolCapTempModFac ) * TotCoolEIRTempModFac * EIRFPLRModFac * VRFRTF;
 		}
 		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
-			VRF( VRFCond ).OperatingMode = 2;
+			VRF( VRFCond ).OperatingMode = ModeHeatingOnly;
 			if ( HeatingPLR > 1.0 ) {
 				if ( VRF( VRFCond ).HeatEIRFPLR2 > 0 ) EIRFPLRModFac = CurveValue( VRF( VRFCond ).HeatEIRFPLR2, max( VRF( VRFCond ).MinPLR, HeatingPLR ) );
 			} else {
@@ -1206,7 +1212,10 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		TotPower = TUParasiticPower + TUFanPower + VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower;
-		if ( TotPower > 0.0 ) VRF( VRFCond ).OperatingCOP = ( VRF( VRFCond ).TUCoolingLoad + VRF( VRFCond ).TUHeatingLoad ) / TotPower;
+		if ( TotPower > 0.0 ) {
+			VRF( VRFCond ).OperatingCOP = ( VRF( VRFCond ).TUCoolingLoad + VRF( VRFCond ).TUHeatingLoad ) / TotPower;
+			VRF( VRFCond ).SCHE = VRF( VRFCond ).OperatingCOP * 3.412;
+		}
 
 		// limit the TU capacity when the condenser is maxed out on capacity
 		// I think this next line will make the max cap report variable match the coil objects, will probably change the answer though
@@ -3742,6 +3751,7 @@ namespace HVACVariableRefrigerantFlow {
 			SetupOutputVariable( "VRF Heat Pump Cooling COP []", VRF( NumCond ).OperatingCoolingCOP, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump Heating COP []", VRF( NumCond ).OperatingHeatingCOP, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump COP []", VRF( NumCond ).OperatingCOP, "System", "Average", VRF( NumCond ).Name );
+			SetupOutputVariable( "VRF Heat Pump Simultaneous Cooling and Heating Efficiency [Btu/h/W]", VRF( NumCond ).SCHE, "System", "Average", VRF( NumCond ).Name );
 
 			if( VRF( NumCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ){
 			// For VRF_FluidTCtrl Model
@@ -7743,6 +7753,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 RefMinPe; // Minimum refrigerant evaporating pressure [Pa]
 		Real64 RefPLow; // Low Pressure Value for Ps (>0.0) [Pa]
 		Real64 RefPHigh; // High Pressure Value for Ps (max in tables) [Pa]
+		Real64 RefTLow; // Low Temperature Value for Ps (max in tables) [C]
 		Real64 RefTHigh; // High Temperature Value for Ps (max in tables) [C]
 		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigerant is in the superheat area [C]
 		Real64 SC_IU_merged; // Piping Loss Algorithm Parameter: average subcooling degrees after the indoor units [C]
@@ -7795,6 +7806,7 @@ namespace HVACVariableRefrigerantFlow {
 		VRF( VRFCond ).OperatingCoolingCOP = 0.0;
 		VRF( VRFCond ).OperatingHeatingCOP = 0.0;
 		VRF( VRFCond ).OperatingCOP = 0.0;
+		VRF( VRFCond ).SCHE = 0.0;
 		VRF( VRFCond ).BasinHeaterPower = 0.0;
 		VRF( VRFCond ).CondensingTemp = 60.0; //OutDryBulbTemp;
 		
@@ -7804,6 +7816,7 @@ namespace HVACVariableRefrigerantFlow {
 		RefrigerantIndex = FindRefrigerant( VRF( VRFCond ).RefrigerantName ); 
 		RefMinPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, RefMinTe, RefrigerantIndex, RoutineName );   
 		RefMinPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, RefMinTe, RefrigerantIndex, RoutineName );
+		RefTLow = RefrigData( RefrigerantIndex ).PsLowTempValue; // High Temperature Value for Ps (max in tables)
 		RefTHigh = RefrigData( RefrigerantIndex ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
@@ -7893,7 +7906,7 @@ namespace HVACVariableRefrigerantFlow {
 		// 1. VRF-HP Cooling Mode .OR. VRF-HR Mode_1 
 		if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && ! HRHeatRequestFlag && HRCoolRequestFlag) ) {
 		
-			VRF( VRFCond ).OperatingMode = 1;
+			VRF( VRFCond ).OperatingMode = ModeCoolingOnly;
 			VRF( VRFCond ).VRFOperationSimPath = 10; 
 		
 			// Initialization of VRF-FluidTCtrl Model
@@ -8069,12 +8082,13 @@ namespace HVACVariableRefrigerantFlow {
 		// 2. VRF-HP Heating Mode .OR. VRF-HR Mode_6 
 		} else if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && ! HRCoolRequestFlag && HRHeatRequestFlag ) ) {
 				
-			VRF( VRFCond ).OperatingMode = 2;
+			VRF( VRFCond ).OperatingMode = ModeHeatingOnly;
 			VRF( VRFCond ).VRFOperationSimPath = 60; 
 		
 			//Initialization of VRF-FluidTCtrl Model
 			Q_h_TU_PL = TU_HeatingLoad;
 			Ncomp = TU_HeatingLoad / VRF( VRFCond ).HeatingCOP; 
+			VRF( VRFCond ).CondensingTemp = VRF( VRFCond ).IUCondensingTemp;
 			
 			// Evaporative capacity ranges_Max
 			CapMaxTe = OutdoorDryBulb - VRF( VRFCond ).SH;
@@ -8153,16 +8167,17 @@ namespace HVACVariableRefrigerantFlow {
 				if( Q_c_OU == 0 ) { 
 				// Q_h_TU_PL is less than or equal to CompEvaporatingPWRSpdMin
 					CyclingRatio = Q_h_TU_PL / CompEvaporatingPWRSpdMin;
+					VRF( VRFCond ).EvaporatingTemp = OutdoorDryBulb;
 				} else {
 				// Q_h_TU_PL is greater than CompEvaporatingPWRSpdMin
 					CyclingRatio = Q_c_OU * C_cap_operation / CompEvaporatingCAPSpdMin;
+					VRF( VRFCond ).EvaporatingTemp = max( CapMinTe, RefTLow );
 				}
 				
 				double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
 				double HPRTF = CyclingRatio / CyclingRatioFrac;
 				Ncomp = CompEvaporatingPWRSpdMin * HPRTF;
 				CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
-				VRF( VRFCond ).EvaporatingTemp = CapMinTe;
 			  
 			} else {
 			// Required heating load is greater than or equal to the min heating capacity
@@ -8228,7 +8243,7 @@ namespace HVACVariableRefrigerantFlow {
 		// 3. VRF-HR Mode_2-5, Simultaneous Heating and Cooling
 		} else if ( VRF( VRFCond ).HeatRecoveryUsed && HRCoolRequestFlag && HRHeatRequestFlag ) {
 		
-			VRF( VRFCond ).OperatingMode = 3;
+			VRF( VRFCond ).OperatingMode = ModeCoolingAndHeating;
 			
 			// Initialization of VRF-FluidTCtrl Model
 			Q_c_TU_PL = TU_CoolingLoad; 
@@ -8639,18 +8654,31 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		VRFRTF = 0.0;
-		// cooling and heating is optional (only one may exist), if so then performance curve for missing coil are not required
-		if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
+		// VRF Cooling and Heating Electric Power (output variables)
+		if ( VRF( VRFCond ).OperatingMode == ModeCoolingOnly ) {
 			PartLoadFraction = 1.0;
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 			
-			VRF( VRFCond ).ElecCoolingPower = VRF(VRFCond).Ncomp; 
-		}
-		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
+			VRF( VRFCond ).ElecCoolingPower = VRF(VRFCond).Ncomp;
+			VRF( VRFCond ).ElecHeatingPower = 0;
+			
+		} else if ( VRF( VRFCond ).OperatingMode == ModeHeatingOnly ) {
 			PartLoadFraction = 1.0;
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
+			VRF( VRFCond ).ElecCoolingPower = 0;
 			VRF( VRFCond ).ElecHeatingPower = VRF( VRFCond ).Ncomp;
+			
+		} else if ( VRF( VRFCond ).OperatingMode == ModeCoolingAndHeating ) {
+			PartLoadFraction = 1.0;
+			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
+
+			VRF( VRFCond ).ElecCoolingPower = VRF( VRFCond ).Ncomp * VRF( VRFCond ).IUEvapHeatRate / ( VRF( VRFCond ).IUCondHeatRate + VRF( VRFCond ).IUEvapHeatRate );
+			VRF( VRFCond ).ElecHeatingPower = VRF( VRFCond ).Ncomp * VRF( VRFCond ).IUCondHeatRate / ( VRF( VRFCond ).IUCondHeatRate + VRF( VRFCond ).IUEvapHeatRate );
+			
+		} else {
+			VRF( VRFCond ).ElecCoolingPower = 0;
+			VRF( VRFCond ).ElecHeatingPower = 0;
 		}
 		VRF( VRFCond ).VRFCondRTF = VRFRTF;
 
@@ -8701,7 +8729,10 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		TotPower = TUParasiticPower + TUFanPower + VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower;
-		if ( TotPower > 0.0 ) VRF( VRFCond ).OperatingCOP = ( VRF( VRFCond ).TUCoolingLoad + VRF( VRFCond ).TUHeatingLoad ) / TotPower;
+		if ( TotPower > 0.0 ) {
+			VRF( VRFCond ).OperatingCOP = ( VRF( VRFCond ).TUCoolingLoad + VRF( VRFCond ).TUHeatingLoad ) / TotPower;
+			VRF( VRFCond ).SCHE = VRF( VRFCond ).OperatingCOP * 3.412;
+		}
 
 		// limit the TU capacity when the condenser is maxed out on capacity
 		// I think this next line will make the max cap report variable match the coil objects, will probably change the answer though
@@ -11282,7 +11313,7 @@ namespace HVACVariableRefrigerantFlow {
 			
 			while( Flag_Iter_Ncomp ){
 			
-				Q_c_tot_temp = Q_h_TU_PL + Q_h_OU - Ncomp_ini; //Q_h_OU = 0
+				Q_c_tot_temp = Q_h_TU_PL - Ncomp_ini; //Q_h_OU = 0
 				Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
 				
 				// Tsuction_new updated based on OU evaporator air-side calculations (Tsuction_new < To)
@@ -11732,9 +11763,10 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 RefTHigh = RefrigData( RefrigNum ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
 		Real64 RefPLow = RefrigData( RefrigNum ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
 		Real64 RefPHigh = RefrigData( RefrigNum ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
+		Real64 RefTSat = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 		
 		//Perform iteration to calculate Pipe_T_IU_in, given P and h
-		Pipe_T_IU_in = GetSupHeatTempRefrig( VRF( VRFCond ).RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), Pipe_h_IU_in, VRF( VRFCond ).IUCondensingTemp, min( VRF( VRFCond ).IUCondensingTemp + 50, RefTHigh ), RefrigerantIndex, RoutineName );
+		Pipe_T_IU_in = GetSupHeatTempRefrig( VRF( VRFCond ).RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), Pipe_h_IU_in, max( VRF( VRFCond ).IUCondensingTemp, RefTSat ), min( VRF( VRFCond ).IUCondensingTemp + 50, RefTHigh ), RefrigerantIndex, RoutineName );
 		Pipe_T_IU_in = min( RefTHigh, Pipe_T_IU_in );
 		
 		// Calculate average room temperature
