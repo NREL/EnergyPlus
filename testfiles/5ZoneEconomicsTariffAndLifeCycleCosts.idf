@@ -3309,6 +3309,94 @@
     0.03,                    !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
+! 1 gallon per minute is 0.0000631 m3/2
+  WaterUse:Equipment,
+    SPACE1-1 DHW 1,          !- Name
+    Bathrooms,               !- End-Use Subcategory
+    0.0000631,                 !- Peak Flow Rate {m3/s}
+    Bathroom Flow Frac Sch,  !- Flow Rate Fraction Schedule Name
+    Bathroom Target Temp Schedule,  !- Target Temperature Schedule Name
+    Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
+
+  WaterUse:Equipment,
+    SPACE2-1 DHW 1,          !- Name
+    Kitchen Sink,            !- End-Use Subcategory
+    0.0000631,                  !- Peak Flow Rate {m3/s}
+    Kitchen Flow Frac Sch,   !- Flow Rate Fraction Schedule Name
+    Kitchen Target Temp Schedule,  !- Target Temperature Schedule Name
+    Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
+
+  WaterUse:Equipment,
+    SPACE3-1 DHW 1,          !- Name
+    Bathrooms,               !- End-Use Subcategory
+    0.0000631,                 !- Peak Flow Rate {m3/s}
+    Bathroom Flow Frac Sch,  !- Flow Rate Fraction Schedule Name
+    Bathroom Target Temp Schedule,  !- Target Temperature Schedule Name
+    Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
+
+
+  Schedule:Compact,
+    Bathroom Flow Frac Sch,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 4:00,0.00,        !- Field 3
+    UNTIL: 8:00,0.01,        !- Field 5
+    UNTIL: 12:00,0.05,       !- Field 7
+    UNTIL: 16:00,0.10,       !- Field 9
+    UNTIL: 20:00,0.05,       !- Field 11
+    UNTIL: 24:00,0.0;        !- Field 13
+
+  Schedule:Compact,
+    Bathroom Target Temp Schedule,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,40.0;       !- Field 3
+
+  Schedule:Compact,
+    Hot Water Supply Temp Schedule,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,60.0;       !- Field 3
+
+  Schedule:Compact,
+    Kitchen Flow Frac Sch,   !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 10:00,0.0,        !- Field 7
+    UNTIL: 14:00,0.3,        !- Field 11
+    UNTIL: 24:00,0.0;        !- Field 13
+
+  Schedule:Compact,
+    Kitchen Target Temp Schedule,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,50.0;       !- Field 3
+
+UtilityCost:Tariff,
+  Water Tariff,                           !- Name
+  Water:Facility,                         !- Output Meter Name
+  UserDefined,                            !- Conversion Factor Choice
+  1,                                      !- Energy Conversion Factor
+  ,                                       !- Demand Conversion Factor
+  ,                                       !- Time of Use Period Schedule Name
+  ,                                       !- Season Schedule Name
+  ,                                       !- Month Schedule Name
+  ,                                       !- Demand Window Length
+  0.0;                                    !- Monthly Charge or Variable Name
+
+UtilityCost:Charge:Simple,
+  WaterTariffEnergyCharge,                !- Name
+  Water Tariff,                           !- Tariff Name
+  totalEnergy,                            !- Source Variable
+  Annual,                                 !- Season
+  EnergyCharges,                          !- Category Variable Name
+  7.0;                                   !- Cost per Unit Value or Variable Name
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
