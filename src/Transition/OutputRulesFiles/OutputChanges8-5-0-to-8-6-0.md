@@ -33,3 +33,8 @@ Impacts the LEED Summary report table SEc1.1A-General Information and the Climat
 
 See [5572](https://github.com/NREL/EnergyPlus/pull/5572 "5572"). 
 
+### Economics, Tariff, and Life Cycle Cost Reports Explicitly Requested
+
+The Economics Results Summary Report, Tariff Report, and Life-Cycle Cost Report now need to be specifically requested rather than being automatically generated if specific objects are present in the file. To get the reports individually use EconomicResultSummary, TariffReport, and LifeCycleCostReport respectively in the Output:Table:SummaryReports object. These are also available when using any of the AllSummary options. The reports are unchanged just they way of generating them has changed.
+
+See [5598](https://github.com/NREL/EnergyPlus/pull/5598 "5598"). 
