@@ -3378,7 +3378,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	TimeValue( 1 ).TimeStep = 60;
 	TimeValue( 2 ).TimeStep = 60;
 
-	GetInputTabularPredefined();
+	GetInputOutputTableSummaryReports();
 
 	extLitUse = 1.01;
 
