@@ -27,29 +27,29 @@ The following discussion on variables and hierarchies is based on the text that 
 
 To understand how to use the utility bill calculation portion of EnergyPlus you first need to understand some important concepts of variables and hierarchy.~ A variable, for the purposes of this section, is simply a named holder of a series of numbers. In most cases, the variable will be a named holder of 12 numbers, one number for each monthly utility bill. Here is a visualization of a variable called Electric Energy Use:
 
-\begin{longtable}[c]{@{}lll@{}}
+\begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Object & Outputs & Inputs \tabularnewline
+Month & Electric Energy Use \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Object & Outputs & Inputs \tabularnewline
+Month & Electric Energy Use \tabularnewline
 \midrule
 \endhead
 
-Qualify & Name & Source \tabularnewline
-~ & ~ & Threshold \tabularnewline
-Charge:Simple & Name & Source \tabularnewline
-~ & Category & Cost Per Unit \tabularnewline
-Charge:Block & Name & Source \tabularnewline
-~ & Category & Block Size Multiplier \tabularnewline
-~ & Remaining & Block Size \tabularnewline
-~ & ~ & Block Cost \tabularnewline
-Ratchet & Name & Baseline \tabularnewline
-~ & ~ & Adjustment \tabularnewline
-~ & ~ & Multiplier \tabularnewline
-~ & ~ & Offset \tabularnewline
+January & 12143 \tabularnewline
+February & 13454 \tabularnewline
+March & 14178 \tabularnewline
+April & 14876 \tabularnewline
+May & 15343 \tabularnewline
+June & 16172 \tabularnewline
+July & 16105 \tabularnewline
+August & 15762 \tabularnewline
+September & 14543 \tabularnewline
+October & 13987 \tabularnewline
+November & 13287 \tabularnewline
+December & 12403 \tabularnewline
 \bottomrule
 \end{longtable}
 

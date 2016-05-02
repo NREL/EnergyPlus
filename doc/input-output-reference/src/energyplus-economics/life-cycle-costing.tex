@@ -23,7 +23,7 @@ The utility costs (see UtilityCost:Tariff) and first costs (see ComponentCost:Li
 
 It is important to understand that the comparison of different simulation results and their present values is not performed by EnergyPlus. Instead, EnergyPlus provides the present value calculations for a specific simulation combining the energy costs, first costs, and future costs and you need to make the comparison between the results of multiple simulations.
 
-The results of using the LifeCycleCost objects are included automatically in the tabular report file whenever the LifeCycleCost:Parameters object is present. The report appearing in the tabular report file is titled ``Life Cycle Cost Report.'' This report shows the costs and the timing of costs, often called ``cash flows,'' along with the present value in several different tables. The tabular results would show the present value of all current and future costs.
+The results of using the LifeCycleCost objects are included in the tabular report file when LifeCycleCostReport is specified in the Output:Table:SummaryReports object. It is also generated with any of the AllSummary options. The report appearing in the tabular report file is titled ``Life Cycle Cost Report.'' This report shows the costs and the timing of costs, often called ``cash flows,'' along with the present value in several different tables. The tabular results would show the present value of all current and future costs.
 
 The datasets file ``LCCusePriceEscalationDataSetXXXX.idf'' includes the energy escalation factors from the NIST Handbook 135 annual supplement for the year indicated. These are necessary to use because the expected change in price for electricity and various fuels does not change at the same rate as inflation.
 
