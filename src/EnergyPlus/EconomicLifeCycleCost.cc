@@ -301,9 +301,6 @@ namespace EconomicLifeCycleCost {
 			GetInputLifeCycleCostNonrecurringCost();
 			GetInputLifeCycleCostUsePriceEscalation();
 			GetInputLifeCycleCostUseAdjustment();
-			if ( LCCparamPresent ) {
-				AddTOCEntry( "Life-Cycle Cost Report", "Entire Facility" );
-			}
 			GetInput_GetLifeCycleCostInput = false;
 		}
 	}
@@ -1975,6 +1972,7 @@ namespace EconomicLifeCycleCost {
 		using OutputReportTabular::WriteTable;
 		using OutputReportTabular::RealToStr;
 		using OutputReportTabular::IntToStr;
+		using OutputReportTabular::displayLifeCycleCostReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2006,7 +2004,7 @@ namespace EconomicLifeCycleCost {
 		int numYears;
 		Real64 totalPV;
 
-		if ( LCCparamPresent ) {
+		if ( LCCparamPresent && displayLifeCycleCostReport ) {
 			//---------------------------------
 			// Life-Cycle Cost Verification and Results Report
 			//---------------------------------

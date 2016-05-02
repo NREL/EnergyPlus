@@ -895,6 +895,9 @@ namespace EconomicTariff {
 		Array1A< Real64 > outMonthlyCosts
 	);
 
+	void
+	clear_state();
+
 } // EconomicTariff
 
 } // EnergyPlus
