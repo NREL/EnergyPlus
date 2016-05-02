@@ -7548,7 +7548,7 @@ namespace HVACVariableRefrigerantFlow {
 		if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && CoolingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
 		//1.1) Cooling coil is running
 			QZnReqSenCoolingLoad = max( 0.0, - 1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP );
-			Tout = T_TU_in - QZnReqSenCoolingLoad / Garate / 1005;   
+			Tout = T_TU_in - QZnReqSenCoolingLoad * 1.2 / Garate / 1005;   
 			Th2 = T_coil_in - ( T_coil_in - Tout ) / ( 1 - BFC );
 			DeltaT = C3Tevap * SH * SH + C2Tevap * SH + C1Tevap;
 			EvapTemp = max( min( (Th2 - DeltaT ), EvapTempMax ), EvapTempMin );
