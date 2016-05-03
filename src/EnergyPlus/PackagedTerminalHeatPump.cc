@@ -6318,8 +6318,6 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
-			
-
 		}
 
 		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {

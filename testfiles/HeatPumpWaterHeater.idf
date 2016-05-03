@@ -3967,7 +3967,7 @@
     PlantHPWHSch ,               !- Availability Schedule Name
     HPPlantAirInletNode,         !- Air Inlet Node Name
     HPPlantFanAirOutletNode,     !- Air Outlet Node Name
-    2.2685 ,                     !- Design Maximum Air Flow Rate
+    2.6852 ,                     !- Design Maximum Air Flow Rate
     Discrete ,                   !- Speed Control Method
     0.0,                         !- Electric Power Minimum Flow Rate Fraction
     100.0,                       !- Design Pressure Rise
