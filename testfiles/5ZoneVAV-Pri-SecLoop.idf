@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -1999,7 +1999,6 @@
     SPACE1-1 Reheat Coil,    !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    SPACE1-1 Reheat Coil HW Inlet,  !- Hot Water or Steam Inlet Node Name
     0.001;                   !- Convergence Tolerance
 
   AirLoopHVAC:ZoneMixer,
@@ -2121,7 +2120,6 @@
     SPACE2-1 Reheat Coil,    !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    SPACE2-1 Reheat Coil HW Inlet,  !- Hot Water or Steam Inlet Node Name
     0.001;                   !- Convergence Tolerance
 
   AirLoopHVAC:ZoneMixer,
@@ -2243,7 +2241,6 @@
     SPACE3-1 Reheat Coil,    !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    SPACE3-1 Reheat Coil HW Inlet,  !- Hot Water or Steam Inlet Node Name
     0.001;                   !- Convergence Tolerance
 
   AirLoopHVAC:ZoneMixer,
@@ -2365,7 +2362,6 @@
     SPACE4-1 Reheat Coil,    !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    SPACE4-1 Reheat Coil HW Inlet,  !- Hot Water or Steam Inlet Node Name
     0.001;                   !- Convergence Tolerance
 
   AirLoopHVAC:ZoneMixer,

@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -857,7 +857,7 @@
     Electricity,             !- Fuel Use Type
     Always On Sch,           !- Schedule Name
     1000,                    !- Design Level {W}
-    Parking Garage Ventilation;  !- End-Use Subcategory
+    Fans-Parking Garage;     !- End-Use Subcategory
 
   Zone,
     SPACE1-1,                !- Name
@@ -1210,6 +1210,19 @@
     0,                       !- Carbon Dioxide Generation Rate {m3/s-W}
     Cooking;                 !- End-Use Subcategory
 
+ElectricEquipment,
+    Industrial Equip,        !- Name
+    SPACE3-1,                !- Zone or ZoneList Name
+    EQUIP-1,                 !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    3000,                    !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.2,                     !- Fraction Radiant
+    0.2,                     !- Fraction Lost
+    Industrial Process;      !- End-Use Subcategory
+
   HotWaterEquipment,
     SPACE2-1 HWEq 1,         !- Name
     SPACE2-1,                !- Zone or ZoneList Name
@@ -1230,6 +1243,19 @@
     Kitchen Flow Frac Sch,   !- Flow Rate Fraction Schedule Name
     Kitchen Target Temp Schedule,  !- Target Temperature Schedule Name
     Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
+
+ElectricEquipment,
+    Vertical Transportation, !- Name
+    SPACE2-1,                !- Zone or ZoneList Name
+    OCCUPY-1,                !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    1000,                    !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0,                       !- Fraction Lost
+    Elevators and Escalators;!- End-Use Subcategory
 
   BuildingSurface:Detailed,
     RIGHT-1,                 !- Name
@@ -1847,6 +1873,21 @@
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
     Task Lights;             !- End-Use Subcategory
+
+Lights,
+    Process Lighting,        !- Name
+    SPACE5-1,                !- Zone or ZoneList Name
+    EQUIP-1,                 !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    500,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.2,                     !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    1,                       !- Fraction Replaceable
+    Interior Lighting-Process,  !- End-Use Subcategory
+    No;                      !- Return Air Fraction Calculated from Plenum Temperature
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name

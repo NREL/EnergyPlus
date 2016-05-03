@@ -665,7 +665,7 @@ namespace ThermalComfort {
 					if ( present( PNum ) ) {
 						AirTemp = Tset;
 					} else {
-						AirTemp = ZTAV( ZoneNum );
+						AirTemp = ZTAVComf( ZoneNum );
 					}
 				}
 			} else {
@@ -678,9 +678,9 @@ namespace ThermalComfort {
 			RadTemp = CalcRadTemp( PeopleNum );
 			// Use mean air temp for calculating RH when thermal comfort control is used
 			if ( present( PNum ) ) {
-				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			} else {
-				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
+				RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			}
 			People( PeopleNum ).TemperatureInZone = AirTemp;
 			People( PeopleNum ).RelativeHumidityInZone = RelHum * 100.0;
@@ -960,10 +960,10 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum ); //PH 3/7/04
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			// Metabolic rate of body (W/m2)
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			// Energy consumption by external work (W/m2)
@@ -1392,10 +1392,10 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum ); //PH 3/7/04
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			WorkEff = GetCurrentScheduleValue( People( PeopleNum ).WorkEffPtr ) * ActLevel;
 			{ auto const SELECT_CASE_var( People( PeopleNum ).ClothingType );
@@ -2228,11 +2228,11 @@ namespace ThermalComfort {
 				if ( IsZoneDV( iZone ) || IsZoneUI( iZone ) ) {
 					CurAirTemp = TCMF( iZone );
 				} else {
-					CurAirTemp = ZTAV( iZone );
+					CurAirTemp = ZTAVComf( iZone );
 				}
 				CurMeanRadiantTemp = MRT( iZone );
 				OperTemp = CurAirTemp * 0.5 + CurMeanRadiantTemp * 0.5;
-				HumidRatio = ZoneAirHumRat( iZone );
+				HumidRatio = ZoneAirHumRatAvgComf( iZone );
 				//for debugging
 				//ThermalComfortInASH55(iZone)%dCurAirTemp = CurAirTemp
 				//ThermalComfortInASH55(iZone)%dCurMeanRadiantTemp = CurMeanRadiantTemp
@@ -2781,7 +2781,7 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum );
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
 			OpTemp = ( AirTemp + RadTemp ) / 2.0;
@@ -3007,7 +3007,7 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum );
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
 			OpTemp = ( AirTemp + RadTemp ) / 2.0;

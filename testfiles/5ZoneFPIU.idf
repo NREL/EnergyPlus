@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -2332,8 +2332,6 @@
     SPACE1-1 ATU Supply Node,!- Supply Air Inlet Node Name
     SPACE1-1 ATU Induc Node, !- Induced Air Inlet Node Name
     SPACE1-1 In Node,        !- Air Outlet Node Name
-    SPACE1-1 HW Coil Water In Node,  !- Hot Water Inlet Node Name
-    SPACE1-1 CW Coil Water In Node,  !- Cold Water Inlet Node Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE1-1 HW Coil,        !- Heating Coil Name
     autosize,                !- Maximum Hot Water Flow Rate {m3/s}
@@ -2354,8 +2352,6 @@
     SPACE2-1 ATU Supply Node,!- Supply Air Inlet Node Name
     SPACE2-1 ATU Induc Node, !- Induced Air Inlet Node Name
     SPACE2-1 In Node,        !- Air Outlet Node Name
-    SPACE2-1 HW Coil Water In Node,  !- Hot Water Inlet Node Name
-    SPACE2-1 CW Coil Water In Node,  !- Cold Water Inlet Node Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE2-1 HW Coil,        !- Heating Coil Name
     autosize,                !- Maximum Hot Water Flow Rate {m3/s}
@@ -2376,8 +2372,6 @@
     SPACE3-1 ATU Supply Node,!- Supply Air Inlet Node Name
     SPACE3-1 ATU Induc Node, !- Induced Air Inlet Node Name
     SPACE3-1 In Node,        !- Air Outlet Node Name
-    SPACE3-1 HW Coil Water In Node,  !- Hot Water Inlet Node Name
-    SPACE3-1 CW Coil Water In Node,  !- Cold Water Inlet Node Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE3-1 HW Coil,        !- Heating Coil Name
     autosize,                !- Maximum Hot Water Flow Rate {m3/s}
@@ -2398,8 +2392,6 @@
     SPACE4-1 ATU Supply Node,!- Supply Air Inlet Node Name
     SPACE4-1 ATU Induc Node, !- Induced Air Inlet Node Name
     SPACE4-1 In Node,        !- Air Outlet Node Name
-    SPACE4-1 HW Coil Water In Node,  !- Hot Water Inlet Node Name
-    SPACE4-1 CW Coil Water In Node,  !- Cold Water Inlet Node Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE4-1 HW Coil,        !- Heating Coil Name
     autosize,                !- Maximum Hot Water Flow Rate {m3/s}
@@ -2418,7 +2410,6 @@
     SPACE5-1 In Node,        !- Air Outlet Node Name
     SPACE5-1 ATU Supply Node,!- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
-    SPACE5-1 HW Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE5-1 HW Coil,        !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}

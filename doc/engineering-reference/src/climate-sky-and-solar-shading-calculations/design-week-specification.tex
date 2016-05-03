@@ -1,0 +1,5 @@
+\section{Design Week Specification}\label{design-week-specification}
+
+A design week (or longer) may be specified in EnergyPlus by selecting a RunPeriod of one week.~ One-week custom weather files may be constructed if extreme design week conditions are desired or one can use the specific dates from the EPW weather files that designate the extreme conditions on the weather file.~ The design week simulation requires that the simulation reach a `steady-periodic' state for the one week time period.~ This is achieved manually by increasing the `number of years of simulation' until the weekly profile does not change from one year to the next.~ The `steady-periodic' output for the last week of the simulation represents the design week simulation results.
+
+Using the SizingPeriod:WeatherFileDays object, one could size equipment from a longer period.

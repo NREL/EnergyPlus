@@ -1,0 +1,24 @@
+\section{Top Level Calling Tree}\label{top-level-calling-tree}
+
+EnergyPlus
+
+\begin{itemize}
+\item
+  ProcessInput (in InputProcessor)
+\item
+  ManageSimulation (in SimulationManager)
+\item
+  ManageWeather (in WeatherManager)
+\item
+  ManageHeatBalance (in HeatBalanceManager)
+\item
+  ManageSurfaceHeatBalance (in HeatBalanceSurfaceManager)
+\item
+  ManageAirHeatBalance (in HeatBalanceAirManager)
+\item
+  CalcHeatBalanceAir (in HeatBalanceAirManager)
+\item
+  ManageHVAC (in HVACManager)
+\end{itemize}
+
+The HVAC part of EnergyPlus is divided into a number of simulation blocks.~ At this point, there are blocks for the air system, the zone equipment, the plant equipment, and the on-site electrical equipment.~ There will be simulation blocks for waste heat supply and usage as well as electricity and gas.~ Within each HVAC time step, the blocks are simulated repeatedly until the conditions on each side of each block interface match up.~ The following calling tree represents the high level HVAC simulation structure.~ It is schematic -- not all routines are shown.

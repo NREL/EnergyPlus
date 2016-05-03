@@ -4265,22 +4265,22 @@ namespace HVACVariableRefrigerantFlow {
 			CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 			CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 			OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 		} else if ( TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) {
 			CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
 			CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 			OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 		} else if ( CoolingLoad( VRFCond ) && QZnReq != 0.0 ) {
 			CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 			CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 			OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 		} else if ( HeatingLoad( VRFCond ) && QZnReq != 0.0 ) {
 			CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
 			CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 			OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 		} else {
 			if ( LastModeCooling( VRFCond ) ) {
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
@@ -4292,7 +4292,7 @@ namespace HVACVariableRefrigerantFlow {
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
 			}
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 		}
 
 		if ( VRFTU( VRFTUNum ).OpMode == CycFanCycCoil ) {
@@ -4363,57 +4363,57 @@ namespace HVACVariableRefrigerantFlow {
 			CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 			CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 			OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			// uses current operating mode to set flow rate (after mode is set)
 			//  ELSE IF(VRF(VRFCond)%HeatRecoveryUsed .AND. TerminalUnitList(TUListIndex)%HRHeatRequest(IndexToTUInTUList))THEN
 		} else if ( TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) {
 			CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
 			CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 			OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
-			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+			OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 		} else if ( CurrentMode ) { // uses current operating mode to set flow rate (after mode is set)
 			if ( CoolingLoad( VRFCond ) ) {
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			} else if ( HeatingLoad( VRFCond ) ) {
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			} else if ( LastModeCooling( VRFCond ) ) { // if NOT cooling or heating then use last mode
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			} else if ( LastModeHeating( VRFCond ) ) { // if NOT cooling or heating then use last mode
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			} else { // should not happen so just set to cooling flow rate
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			}
 		} else { // uses previous operating mode to set flow rate (used for looping through each TU in Init before mode is set)
 			if ( LastModeCooling( VRFCond ) ) {
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			} else if ( LastModeHeating( VRFCond ) ) {
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			} else { // should not happen so just set to cooling flow rate
 				CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 				CompOffMassFlow = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
 				OACompOnMassFlow = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
-				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow;
+				OACompOffMassFlow = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 			}
 		}
 
@@ -6171,8 +6171,14 @@ namespace HVACVariableRefrigerantFlow {
 			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
 			AverageOAMassFlow = ( PartLoadRatio * OACompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * OACompOffMassFlow );
 		} else {
-			AverageUnitMassFlow = CompOnMassFlow;
-			AverageOAMassFlow = OACompOnMassFlow;
+			if ( PartLoadRatio == 0.0 ) {
+				// set the average OA air flow to off compressor values if the compressor PartLoadRatio is zero
+				AverageUnitMassFlow = CompOffMassFlow;
+				AverageOAMassFlow = OACompOffMassFlow;
+			} else {
+				AverageUnitMassFlow = CompOnMassFlow;
+				AverageOAMassFlow = OACompOnMassFlow;
+			}
 		}
 		if ( CompOffFlowRatio > 0.0 ) {
 			FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
@@ -6265,7 +6271,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 LoadToCoolingSP; // thermostat load to cooling setpoint (W)
 		Real64 LoadToHeatingSP; // thermostat load to heating setpoint (W)
 		Real64 TempOutput; // terminal unit output [W]
-		int FanOpMode; // TU fan operating mode
 
 		MaxDeltaT = 0.0;
 		MinDeltaT = 0.0;
@@ -6319,12 +6324,15 @@ namespace HVACVariableRefrigerantFlow {
 					SPTempLo = ZoneThermostatSetPointLo( ThisZoneNum );
 					{ auto const SELECT_CASE_var( TempControlType( ThisZoneNum ) );
 					if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+					// MaxDeltaT denotes cooling, MinDeltaT denotes heating
 					} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-						ZoneDeltaT = max( 0.0, SPTempLo - ZT( ThisZoneNum ) );
-						MaxDeltaT( VRFCond ) = max( MaxDeltaT( VRFCond ), ZoneDeltaT );
-					} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-						ZoneDeltaT = min( 0.0, SPTempHi - ZT( ThisZoneNum ) );
+						// if heating load, ZoneDeltaT will be negative
+						ZoneDeltaT = min( 0.0, ZT( ThisZoneNum ) - SPTempLo );
 						MinDeltaT( VRFCond ) = min( MinDeltaT( VRFCond ), ZoneDeltaT );
+					} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+						// if cooling load, ZoneDeltaT will be positive
+						ZoneDeltaT = max( 0.0, ZT( ThisZoneNum ) - SPTempHi );
+						MaxDeltaT( VRFCond ) = max( MaxDeltaT( VRFCond ), ZoneDeltaT );
 					} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
 						ZoneDeltaT = ZT( ThisZoneNum ) - SPTempHi; //- SPTempHi and SPTempLo are same value
 						if ( ZoneDeltaT > 0.0 ) {
@@ -6466,26 +6474,10 @@ namespace HVACVariableRefrigerantFlow {
 		// Determine operating mode based on VRF type and thermostat control selection
 		{ auto const SELECT_CASE_var( VRF( VRFCond ).ThermostatPriority );
 		if ( SELECT_CASE_var == ThermostatOffsetPriority ) {
-			TUIndex = VRF( VRFCond ).MasterZoneTUIndex;
-			if ( VRFTU( TUIndex ).FanOpModeSchedPtr > 0 ) {
-				if ( GetCurrentScheduleValue( VRFTU( TUIndex ).FanOpModeSchedPtr ) == 0.0 ) {
-					FanOpMode = CycFanCycCoil;
-				} else {
-					FanOpMode = ContFanCycCoil;
-				}
-			}
 			if ( MaxDeltaT( VRFCond ) > std::abs( MinDeltaT( VRFCond ) ) && MaxDeltaT( VRFCond ) > 0.0 ) {
 				HeatingLoad( VRFCond ) = false;
 				CoolingLoad( VRFCond ) = true;
 			} else if ( MaxDeltaT( VRFCond ) < std::abs( MinDeltaT( VRFCond ) ) && MinDeltaT( VRFCond ) < 0.0 ) {
-				HeatingLoad( VRFCond ) = true;
-				CoolingLoad( VRFCond ) = false;
-				// assuming if constant fan mode then previous operating mode will be needed
-				// could actually run the master zone TU to see if overshoot occurs, but seems overkill
-			} else if ( FanOpMode == ContFanCycCoil && LastModeCooling( VRFCond ) ) {
-				HeatingLoad( VRFCond ) = false;
-				CoolingLoad( VRFCond ) = true;
-			} else if ( FanOpMode == ContFanCycCoil && LastModeHeating( VRFCond ) ) {
 				HeatingLoad( VRFCond ) = true;
 				CoolingLoad( VRFCond ) = false;
 			} else {
@@ -8868,6 +8860,7 @@ namespace HVACVariableRefrigerantFlow {
 		if( PartLoadRatio == 0 ) {
 			// only provide required OA when coil is off
 			CompOnMassFlow = OACompOnMassFlow;
+			CompOffMassFlow = OACompOffMassFlow;
 		} else {
 			// identify the air flow rate corresponding to the coil load
 			CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl( VRFTUNum, PartLoadRatio, FirstHVACIteration );

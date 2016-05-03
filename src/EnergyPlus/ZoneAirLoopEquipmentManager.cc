@@ -124,7 +124,13 @@ namespace ZoneAirLoopEquipmentManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	bool GetAirDistUnitsFlag( true ); // If TRUE, Air Distribution Data has not been read in yet
+	bool MyOneTimeFlag( true );
+
+	namespace {
+
+		Array1D_bool EachOnceFlag;
+
+	}
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -132,13 +138,28 @@ namespace ZoneAirLoopEquipmentManager {
 	// MODULE VARIABLE DECLARATIONS:
 	// na
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetAirDistUnitsFlag(true); // If TRUE, Air Distribution Data has not been read in yet
+		bool InitAirDistUnitsFlag( true ); // If TRUE, Air Distribution unit actualtzonenums have not been initialized yet
+	}
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
 
 	// Functions
 	void
 	clear_state()
 	{
+
 		GetAirDistUnitsFlag = true;
+		EachOnceFlag = true;
+		MyOneTimeFlag = true;
+
+		InitAirDistUnitsFlag = true;
 	}
 
 	void
@@ -555,14 +576,13 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-		// int ZoneEqNum;
-		static Array1D_bool EachOnceFlag;
+		// na
+
 		// Do the Begin Simulation initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitAirDistUnitsFlag ) {
 			EachOnceFlag.allocate( NumAirDistUnits );
 			EachOnceFlag = true;
-			MyOneTimeFlag = false;
+			InitAirDistUnitsFlag = false;
 		}
 		if ( EachOnceFlag( AirDistUnitNum )) {
 			AirDistUnit( AirDistUnitNum ).ZoneNum = ZoneNum;
