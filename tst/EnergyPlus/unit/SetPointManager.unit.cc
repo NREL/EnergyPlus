@@ -64,6 +64,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+
+// EnergyPlus Headers
 #include <CurveManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
@@ -764,5 +767,35 @@ TEST( SetPointManager, DefineMixedAirSetPointManager )
 
 	// tear down
 	DataLoopNode::Node.deallocate( );
+
+}
+
+TEST_F( EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName )
+{
+
+	std::string const idf_objects = delimited_string( {
+		"SetpointManager:MixedAir,",
+		"  Mixed Air Temp,          !- Name",
+		"  Temperature,             !- Control Variable",
+		"  AirLoopSetpointNode,     !- Reference Setpoint Node Name",
+		"  AirLoopFanINLET,         !- Fan Inlet Node Name",
+		"  CoolingCoilAirINLET,     !- Fan Outlet Node Name",
+		"  AirLoopSetpointNode;     !- Setpoint Node or NodeList Name",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	// GetInput should fail since reference and set point node names are the same
+	bool ErrorsFound = false;
+	SetPointManager::GetSetPointManagerInputData( ErrorsFound );
+	EXPECT_TRUE( ErrorsFound );
+
+	std::string const error_string = delimited_string( {
+		"   ** Severe  ** GetSetPointManagerInputs: SetpointManager:MixedAir=\"MIXED AIR TEMP\", reference node.",
+		"   **   ~~~   ** ..Reference Node is the same as the SetPoint Node",
+		"   **   ~~~   ** Reference Node Name=\"AIRLOOPSETPOINTNODE\".",
+	} );
+
+	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 }
