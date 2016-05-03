@@ -38825,6 +38825,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \key Reverse
        \key ReverseWithLimits
        \default ReverseWithLimits
+       \note Normal means the damper is fixed at the minimum position in heating mode
+       \note Reverse means the damper can open fully during reheat
+       \note ReverseWithLimits means the damper will open partially during reheat 
+       \note as specified in the following 2 fields 
   N7 , \field Maximum Flow per Zone Floor Area During Reheat
        \type real
        \units m3/s-m2
@@ -38833,7 +38837,6 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits
        \note When autocalculating, the maximum flow per zone is set to 0.002032 m3/s-m2 (0.4 cfm/sqft)
        \note This optional field limits the maximum flow allowed in reheat mode.
-       \note If this field and the following field are left blank, the maximum flow will not be limited.
        \note At no time will the maximum flow rate calculated here exceed the value of
        \note Maximum Air Flow Rate.
   N8 , \field Maximum Flow Fraction During Reheat
@@ -38845,7 +38848,6 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note 0.002032 m3/s-m2 (0.4 cfm/sqft) multiplied by the zone floor area and the
        \note Maximum Air Flow Rate.
        \note This optional field limits the maximum flow allowed in reheat mode.
-       \note If this field and the previous field are left blank, the maximum flow will not be limited.
        \note At no time will the maximum flow rate calculated here exceed the value of
        \note Maximum Air Flow Rate.
   N9 , \field Maximum Reheat Air Temperature
