@@ -1088,22 +1088,29 @@ namespace SingleDuct {
 			if ( lNumericBlanks( 2 ) ) {
 				Sys( SysNum ).ConstantMinAirFracSetByUser = false;
 				Sys( SysNum ).DesignMinAirFrac = 0.0;
-			}
-			else {
+			} else {
 				Sys( SysNum ).ConstantMinAirFracSetByUser = true;
 				Sys( SysNum ).DesignMinAirFrac = Numbers( 2 );
+				if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
+					ShowWarningError( "Since " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + ", input for " + cNumericFields( 2 ) + " will be ignored." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+					Sys( SysNum ).ZoneMinAirFrac = 0.0;
+				}
 			}
 
 			Sys( SysNum ).ZoneFixedMinAir = Numbers( 3 );
 			if ( lNumericBlanks( 3 ) ) {
 				Sys( SysNum ).FixedMinAirSetByUser = false;
 				Sys( SysNum ).DesignFixedMinAir = 0.0;
-			}
-			else {
+			} else {
 				Sys( SysNum ).FixedMinAirSetByUser = true;
 				Sys( SysNum ).DesignFixedMinAir = Numbers( 3 );
+				if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
+					ShowWarningError( "Since " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + ", input for " + cNumericFields( 3 ) + " will be ignored." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+					Sys( SysNum ).ZoneFixedMinAir = 0.0;
+				}
 			}
-
 			Sys( SysNum ).ZoneMinAirFracSchPtr = GetScheduleIndex( Alphas( 6 ) );
 			if ( ( Sys( SysNum ).ZoneMinAirFracSchPtr == 0 ) && ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) ) {
 				ShowSevereError( cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " not found." );
@@ -2103,16 +2110,20 @@ namespace SingleDuct {
 		// apply limit based on min stop
 		MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac ) );
 		if ( IsAutoSize ) {
+			if ( ZoneSizingRunDone && CurZoneEqNum > 0 ) {
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax;
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = min( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, Sys( SysNum ).MaxAirVolFlowRate );
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = max( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, 
 					( Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac ) );
-			} else {				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
-
+			} else {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
 			}
-			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
-				Sys( SysNum ).MaxAirVolFlowRateDuringReheat / Sys( SysNum ).ZoneFloorArea );
-
+			if ( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+					Sys( SysNum ).MaxAirVolFlowRateDuringReheat / Sys( SysNum ).ZoneFloorArea );
+			} else {
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", 0.0 );
+			}
 		} else { // Hard size with sizing data
 			if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 0.0 && MaxAirVolFlowRateDuringReheatDes > 0.0 ) {
 				MaxAirVolFlowRateDuringReheatUser = Sys( SysNum ).MaxAirVolFlowRateDuringReheat;
