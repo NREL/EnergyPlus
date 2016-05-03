@@ -124,6 +124,13 @@ namespace ZoneAirLoopEquipmentManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
+	bool MyOneTimeFlag( true );
+
+	namespace {
+
+		Array1D_bool EachOnceFlag;
+
+	}
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -147,7 +154,11 @@ namespace ZoneAirLoopEquipmentManager {
 	void
 	clear_state()
 	{
+
 		GetAirDistUnitsFlag = true;
+		EachOnceFlag = true;
+		MyOneTimeFlag = true;
+
 		InitAirDistUnitsFlag = true;
 	}
 
@@ -565,8 +576,8 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// int ZoneEqNum;
-		static Array1D_bool EachOnceFlag;
+		// na
+
 		// Do the Begin Simulation initializations
 		if ( InitAirDistUnitsFlag ) {
 			EachOnceFlag.allocate( NumAirDistUnits );

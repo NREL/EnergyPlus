@@ -106,20 +106,6 @@ namespace DataSurfaces {
 	// MODULE PARAMETER DEFINITIONS:
 	int const MaxSlatAngs( 19 );
 
-	// Parameters to indicate surface shape for use with the Surface
-	// derived type (see below):
-
-	int const Triangle( 1 );
-	int const Quadrilateral( 2 );
-	int const Rectangle( 3 );
-	int const Polygonal( 9 );
-	int const RectangularDoorWindow( 4 );
-	int const RectangularOverhang( 5 );
-	int const RectangularLeftFin( 6 );
-	int const RectangularRightFin( 7 );
-	int const TriangularWindow( 8 );
-	int const TriangularDoor( 9 );
-
 	// Parameters to indicate exterior boundary conditions for use with
 	// the Surface derived type (see below):
 	// Note:  Positive values correspond to an interzone adjacent surface
@@ -436,6 +422,8 @@ namespace DataSurfaces {
 	// zone-side of shade plus gap air convection to zone) + (IR and
 	// convection from frame) + (IR and convection from divider if no
 	// interior shade) (W)
+	Array1D< Real64 > WinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction
+	// through glazing and frame
 	Array1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
 	Array1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
 
@@ -485,6 +473,7 @@ namespace DataSurfaces {
 	Array1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
 	Array1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	Array1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
+	Array1D< Real64 > WinHeatTransferRepEnergy; // Energy of WinHeatTransfer [J]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
@@ -691,21 +680,21 @@ namespace DataSurfaces {
 		SurfaceData::
 		computed_shapeCat() const
 		{
-			if ( Shape == Triangle ) {
+			if ( Shape == SurfaceShape::Triangle ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == TriangularWindow ) {
+			} else if ( Shape == SurfaceShape::TriangularWindow ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == TriangularDoor ) {
+			} else if ( Shape == SurfaceShape::TriangularDoor ) {
 				return ShapeCat::Triangular;
-			} else if ( Shape == Rectangle ) {
+			} else if ( Shape == SurfaceShape::Rectangle ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularDoorWindow ) {
+			} else if ( Shape == SurfaceShape::RectangularDoorWindow ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularOverhang ) {
+			} else if ( Shape == SurfaceShape::RectangularOverhang ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularLeftFin ) {
+			} else if ( Shape == SurfaceShape::RectangularLeftFin ) {
 				return ShapeCat::Rectangular;
-			} else if ( Shape == RectangularRightFin ) {
+			} else if ( Shape == SurfaceShape::RectangularRightFin ) {
 				return ShapeCat::Rectangular;
 			} else if ( IsConvex ) {
 				return ShapeCat::Convex;
@@ -856,6 +845,7 @@ namespace DataSurfaces {
 		WinDifSolar.deallocate();
 		WinDirSolTransAtIncAngle.deallocate();
 		WinHeatGain.deallocate();
+		WinHeatTransfer.deallocate();
 		WinHeatGainRep.deallocate();
 		WinHeatLossRep.deallocate();
 		WinGainConvGlazToZoneRep.deallocate();
@@ -890,6 +880,7 @@ namespace DataSurfaces {
 		WinHeatLossRepEnergy.deallocate();
 		WinShadingAbsorbedSolarEnergy.deallocate();
 		WinGapConvHtFlowRepEnergy.deallocate();
+		WinHeatTransferRepEnergy.deallocate();
 		Surface.deallocate();
 		SurfaceWindow.deallocate();
 		FrameDivider.deallocate();
@@ -914,11 +905,11 @@ namespace DataSurfaces {
 	}
 
 	void
-	CheckSurfaceOutBulbTempAt() 
+	CheckSurfaceOutBulbTempAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;
-		
+
 		Real64 minBulb = 0.0;
 		for ( auto & surface : Surface ) {
 			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );

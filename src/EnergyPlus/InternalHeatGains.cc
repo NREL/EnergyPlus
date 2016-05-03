@@ -3273,7 +3273,6 @@ namespace InternalHeatGains {
 		using DataRoomAirModel::TCMF;
 		using DataRoomAirModel::IsZoneUI;
 		using WaterThermalTanks::CalcWaterThermalTankZoneGains;
-		using PipeHeatTransfer::CalcZonePipesHeatGain;
 		using WaterUse::CalcWaterUseZoneGains;
 		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
 		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
@@ -3412,7 +3411,7 @@ namespace InternalHeatGains {
 
 				//For predefined tabular reports related to outside air ventilation
 				ZonePreDefRep( NZ ).isOccupied = true; //set flag to occupied to be used in tabular reporting for ventilation
-				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants *  Zone( NZ ).Multiplier * Zone( NZ ).ListMultiplier * TimeStepZone;
+				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants * TimeStepZone;
 				ZonePreDefRep( NZ ).NumOccAccumTime += TimeStepZone;
 			} else {
 				ZonePreDefRep( NZ ).isOccupied = false; //set flag to occupied to be used in tabular reporting for ventilation
@@ -3631,7 +3630,7 @@ namespace InternalHeatGains {
 		if ( NumZoneITEqStatements > 0 ) CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
-		CalcZonePipesHeatGain();
+		PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
 		CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
@@ -5313,7 +5312,7 @@ namespace InternalHeatGains {
 		static Array1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 		static Array1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
 		static Array1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
-		static Array1D_int IntGainTypesPowerGen( 8, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple } );
+		static Array1D_int IntGainTypesPowerGen( 9, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_ElectricLoadCenterConverter } );
 
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {
 			TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;

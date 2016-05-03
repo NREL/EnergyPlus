@@ -19,7 +19,7 @@
 
 namespace ObjexxFCL {
 
-// Character is in a cstring?
+// char is in a cstring?
 bool
 is_any_of( char const c, c_cstring const s )
 {
@@ -29,7 +29,7 @@ is_any_of( char const c, c_cstring const s )
 	return false; // No matches
 }
 
-// Character is not in a cstring?
+// char is not in a cstring?
 bool
 not_any_of( char const c, c_cstring const s )
 {

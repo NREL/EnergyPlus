@@ -1,0 +1,26 @@
+\section{General Input Rules}\label{general-input-rules}
+
+The following rules apply to both the Input Data Dictionary and the Input Data File.
+
+\begin{itemize}
+\item
+  The initial line of a definition or input MUST have a comma or semicolon.
+\item
+  Fields do not extend over line boundaries.~ Usually, if a comma or (as appropriate) semi-colon is not the last field value on a line, one will be inserted.~ Of course, several fields may appear on a single line as long as they are comma separated.
+\item
+  Commas delimit fields -- therefore, no fields can have embedded commas.~ No error will occur but you won't get what you want.
+\item
+  Blank lines are allowed.
+\item
+  The comment character is a exclamation ``!''.~ Anything on a line after the exclamation is ignored.
+\item
+  A special type of comment using the character combination: ``!-`` in the input file is a special form of comment that is followed by the field name(s) and units and should not include user provided text. This form is used to indicate automatic comments which may be written by interfaces and other utilities as an endline comment after a field value.
+\item
+  Input records can be up to 500 characters in length.~ If you go over that, no error will occur but you won't get what you want.
+\item
+  Each Section and Class/Object keyword can be up to 100 characters in length.~ Embedded spaces are allowed, but are significant (if you have 2 spaces in the section keyword -- you must have 2 when you write the object keyword).
+\item
+  Each Alpha string (including Section and Class/Object keywords) is mapped to UPPER case during processing, unless the ``retaincase'' flag marks the field in the IDD. ~Get routines from the EnergyPlus code that use the Section and Object keywords automatically map to UPPER case for finding the item.~ The primary drawback with this is that error messages coming out of the input processor will be in UPPER case and may not appear exactly as input.
+\item
+  Special characters, such as tabs, should NOT be included in the file.~ However, tabs can be accommodated and are turned into spaces.
+\end{itemize}

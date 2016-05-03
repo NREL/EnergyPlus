@@ -389,7 +389,8 @@ namespace HVACManager {
 		NumOfSysTimeSteps = 1;
 		FracTimeStepZone = TimeStepSys / TimeStepZone;
 
-		ManageEMS( emsCallFromBeginTimestepBeforePredictor ); //calling point
+		bool anyEMSRan;
+		ManageEMS( emsCallFromBeginTimestepBeforePredictor, anyEMSRan ); //calling point
 
 		SetOutAirNodes();
 
@@ -512,7 +513,7 @@ namespace HVACManager {
 			// Update the plant and condenser loop capacitance model temperature history.
 			UpdateNodeThermalHistory();
 
-			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting ); // EMS calling point
+			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
 
 			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
@@ -582,7 +583,7 @@ namespace HVACManager {
 				}
 				UpdateDataandReport( HVACTSReporting );
 			}
-			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting ); // EMS calling point
+			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan ); // EMS calling point
 			//UPDATE SYSTEM CLOCKS
 			SysTimeElapsed += TimeStepSys;
 
@@ -807,8 +808,8 @@ namespace HVACManager {
 
 		// Before the HVAC simulation, call ManageSetPoints to set all the HVAC
 		// node setpoints
-
-		ManageEMS( emsCallFromBeforeHVACManagers ); // calling point
+		bool anyEMSRan = false;
+		ManageEMS( emsCallFromBeforeHVACManagers, anyEMSRan ); // calling point
 
 		ManageSetPoints();
 
@@ -819,7 +820,8 @@ namespace HVACManager {
 		// the system on/off flags
 		ManageSystemAvailability();
 
-		ManageEMS( emsCallFromAfterHVACManagers ); // calling point
+		ManageEMS( emsCallFromAfterHVACManagers, anyEMSRan ); // calling point
+		ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 		// first explicitly call each system type with FirstHVACIteration,
 
@@ -840,7 +842,7 @@ namespace HVACManager {
 		// true, then specific components must be resimulated.
 		while ( ( SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag ) && ( HVACManageIteration <= MaxIter ) ) {
 
-			ManageEMS( emsCallFromHVACIterationLoop ); // calling point id
+			ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 			// Manages the various component simulations
 			SimSelectedEquipment( SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag, FirstHVACIteration, SimWithPlantFlowUnlocked );
@@ -851,6 +853,11 @@ namespace HVACManager {
 			UpdateZoneInletConvergenceLog();
 
 			++HVACManageIteration; // Increment the iteration counter
+
+			if ( anyEMSRan && HVACManageIteration <= 2 ) {
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice 
+				SimAirLoopsFlag = true;
+			}
 
 		}
 		if ( AnyPlantInModel ) {
@@ -1619,7 +1626,7 @@ namespace HVACManager {
 				}
 				if ( SimZoneEquipment ) {
 					if ( ( IterAir == 1 ) && ( ! FlowMaxAvailAlreadyReset ) ) { // don't do reset if already done in FirstHVACIteration
-						ResetTerminalUnitFlowLimits();
+						// ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
 						FlowResolutionNeeded = true;
 					} else {
 						ResolveAirLoopFlowLimits();
@@ -1795,6 +1802,7 @@ namespace HVACManager {
 							for ( ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesCooled; ++ZonesCooledIndex ) {
 								TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitCoolInletNodes( ZonesCooledIndex );
 								Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+								Node( TermInletNode ).MassFlowRateMinAvail = min( Node( TermInletNode ).MassFlowRateMaxAvail, Node( TermInletNode ).MassFlowRateMinAvail );
 							}
 						}
 						if ( ( Node( SupplyNode ).MassFlowRateSetPoint - Node( SupplyNode ).MassFlowRate ) < -HVACFlowRateToler * 0.01 ) {
@@ -1812,6 +1820,7 @@ namespace HVACManager {
 								for ( ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesCooled; ++ZonesCooledIndex ) {
 									TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitCoolInletNodes( ZonesCooledIndex );
 									Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+									Node( TermInletNode ).MassFlowRateMaxAvail = max(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
 								}
 							}
 						}
@@ -1829,6 +1838,7 @@ namespace HVACManager {
 							for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesHeated; ++ZonesHeatedIndex ) {
 								TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitHeatInletNodes( ZonesHeatedIndex );
 								Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+								Node( TermInletNode ).MassFlowRateMinAvail = min( Node( TermInletNode ).MassFlowRateMaxAvail, Node( TermInletNode ).MassFlowRateMinAvail );
 							}
 						}
 						if ( ( Node( SupplyNode ).MassFlowRateSetPoint - Node( SupplyNode ).MassFlowRate ) < -HVACFlowRateToler * 0.01 ) {
@@ -1846,6 +1856,7 @@ namespace HVACManager {
 								for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesHeated; ++ZonesHeatedIndex ) {
 									TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitHeatInletNodes( ZonesHeatedIndex );
 									Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+									Node( TermInletNode ).MassFlowRateMaxAvail = max( Node( TermInletNode ).MassFlowRateMaxAvail, Node( TermInletNode ).MassFlowRateMinAvail );
 								}
 							}
 						}

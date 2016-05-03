@@ -1,0 +1,3 @@
+\section{Weather Services}\label{weather-services}
+
+All weather data (including SizingPeriod:DesignDay and Site:Location validation) are processed by the WeatherManager module.~ The SimulationManager invokes the WeatherManager at the proper times to retrieve data.~ The WeatherManager will retrieve the proper data for the current timestep/hour/day/month from the proper data source (design day definition, weather data file).~ The WeatherManager puts weather-type data (outside dry bulb, outside wet bulb, humidity, barometric pressure) into the DataEnvironment global data area.~ There is no need for other modules to call the WeatherManager directly.~ However, if there is some weather-type data that is needed and not provided in the DataEnvironment global area, contact us.
