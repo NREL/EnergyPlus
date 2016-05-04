@@ -327,7 +327,17 @@ When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed
 
 When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
 
-\[{SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})\] \[{\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})\] \[{\dot m{w}} = {\dot m_{w, max}}\]
+\begin{equation}
+  {SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})
+\end{equation}
+
+\begin{equation}
+  {\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})
+\end{equation}
+
+\begin{equation}
+  {\dot m{w}} = {\dot m_{w, max}}
+\end{equation}
 
 \subparagraph{Cycling OnOff at Lowest Speed}\label{cycling-onoff-at-lowest-speed}
 

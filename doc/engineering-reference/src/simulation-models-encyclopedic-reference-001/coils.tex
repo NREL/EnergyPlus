@@ -3569,9 +3569,9 @@ Where,
 
 \(\frac{{{n_j}}}{N}\) = Fractional bin hours for the heating season; the ratio of the number of hours during the heating season when the outdoor temperature fell within the range represented by bin temperature \({T_j}\) ~to the total number of hours in the heating season, dimensionless. Obtain \(\frac{{{n_j}}}{N}\) ~values from Table \# 17 of AHRI Std. 210/240-2008 (Table~\ref{table:generalized-climatic-region-information} below).
 
-\[j\] = The bin number, dimensionless.
+\(j\) = The bin number, dimensionless.
 
-\(J\) = For each generalized climatic region, the total number of temperature bins, dimensionless. Referring to Table \# 17, \(J\) ~is the highest bin number (\[j\] ) having a nonzero entry for the fractional bin hours for the generalized climatic region of interest.
+\(J\) = For each generalized climatic region, the total number of temperature bins, dimensionless. Referring to Table \# 17, \(J\) ~is the highest bin number (\(j\) ) having a nonzero entry for the fractional bin hours for the generalized climatic region of interest.
 
 \({F_{def}}\) = The demand defrost credit described in section 3.9.2 of AHRI Std. 210/240-2008, dimensionless.~ For simplification, assigned a value of 1 for timed defrost control and a value of 1.03 for demand defrost control.
 
@@ -3631,7 +3631,7 @@ X({T_j}) = \left\{
   \right\}
 \end{equation}
 
-whichever is less; the heating mode load factor for temperature bin \[j\] , dimensionless.
+whichever is less; the heating mode load factor for temperature bin \(j\), dimensionless.
 
 \(\mathop {{Q_h}}\limits^ \cdot ({T_j})\) = the space heating capacity of the heat pump when operating at outdoor temperature \({T_j}\) , ~W.
 
@@ -6871,7 +6871,13 @@ Governing Equations for ``Cool and Charge Mode''
 {\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)
 \end{equation}
 
-\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\) \[{\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\]
+\begin{equation}
+  {\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)
+\end{equation}
 
 The input correlations are used in the following manner to determine cooling capacity, chargine capacity, and energy consumption for a given set of operationg conditions.
 
@@ -6978,7 +6984,13 @@ Governing Equations for ``Cool and Discharge Mode''
 {\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)
 \end{equation}
 
-\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\) \[{\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\]
+\begin{equation}
+  {\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)
+\end{equation}
 
 The input correlations are used in the following manner.
 
@@ -7105,7 +7117,13 @@ The governing equations for ``Charge Only Mode''
 {\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)
 \end{equation}
 
-\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\) \[{\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\]
+\begin{equation}
+  {\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)
+\end{equation}
 
 The input correlations are used in the following manner.
 
