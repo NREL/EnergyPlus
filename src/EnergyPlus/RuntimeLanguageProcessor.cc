@@ -2705,6 +2705,22 @@ namespace RuntimeLanguageProcessor {
 			GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			//  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
 			//  CALL GetObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
 			//  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
@@ -2731,21 +2747,56 @@ namespace RuntimeLanguageProcessor {
 
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
-			if ( NumUserGlobalVariables + NumExternalInterfaceGlobalVariables > 0 ) {
-				for ( GlobalNum = 1; GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables; ++GlobalNum ) {
+			if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+				+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
+				+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables > 0) {
+				for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables 
+					+ NumExternalInterfaceGlobalVariables 
+					+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+					+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables; ++GlobalNum) {
 					// If we process the ExternalInterface actuators, all we need to do is to change the
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					} else {
+						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, 
+							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					}
+					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, 
+							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					}
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
+						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables, 
+							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+					}
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
+						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables 
+							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables, 
+							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
 
 					// loop over each alpha and register variable named as global Erl variable
 					for ( ErlVarLoop = 1; ErlVarLoop <= NumAlphas; ++ErlVarLoop ) {
-						ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( ErlVarLoop ), cAlphaFieldNames( ErlVarLoop ), errFlag, ErrorsFound );
+						if ((cCurrentModuleObject.compare("ExternalInterface:FunctionalMockupUnitImport:To:Variable") == 0)){
+							if (ErlVarLoop == 1){
+								// Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable.
+								// This object is allowed to contain fields that do not need to be valid EMS fields (e.g. path to the FMU).
+								ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+							}
+						}
+						else{
+							ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+						}
 						if ( lAlphaFieldBlanks( ErlVarLoop ) ) {
 							ShowWarningError( RoutineName + cCurrentModuleObject );
 							ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );

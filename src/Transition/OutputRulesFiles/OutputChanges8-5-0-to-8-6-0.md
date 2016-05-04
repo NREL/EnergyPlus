@@ -38,3 +38,10 @@ See [5572](https://github.com/NREL/EnergyPlus/pull/5572 "5572").
 The Economics Results Summary Report, Tariff Report, and Life-Cycle Cost Report now need to be specifically requested rather than being automatically generated if specific objects are present in the file. To get the reports individually use EconomicResultSummary, TariffReport, and LifeCycleCostReport respectively in the Output:Table:SummaryReports object. These are also available when using any of the AllSummary options. The reports are unchanged just they way of generating them has changed.
 
 See [5598](https://github.com/NREL/EnergyPlus/pull/5598 "5598"). 
+
+
+### JtoKWH Unit Conversion Impacts LEED Summary Report
+
+When the JtoKHW unit conversion option is used in the OutputControl:Table:Style object it now changes the units used in the LEED Summary report. Columns that were previously left as GJ are now expressed as kWh and columns that were previously MJW/m2 are now expressed as kWh/m2.
+
+See [5616](https://github.com/NREL/EnergyPlus/pull/5616).
