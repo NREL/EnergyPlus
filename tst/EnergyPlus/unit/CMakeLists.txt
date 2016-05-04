@@ -23,6 +23,7 @@ set( test_src
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
+  CrossVentMgr.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -31,6 +32,8 @@ set( test_src
   DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
+  EconomicTariff.unit.cc
+  EconomicLifeCycleCost.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
