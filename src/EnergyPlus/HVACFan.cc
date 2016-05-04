@@ -466,7 +466,7 @@ namespace HVACFan {
 			powerModFuncFlowFractionCurveIndex_ = CurveManager::GetCurveIndex( alphaArgs( 7 ) );
 		}
 		nightVentPressureDelta_       = numericArgs( 10 );
-		nightVentFlowFraction_        = numericArgs( 11 );
+		nightVentFlowFraction_        = numericArgs( 11 ); // not used
 		zoneNum_ = InputProcessor::FindItemInList( alphaArgs( 8 ), DataHeatBalance::Zone );
 		if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 		if ( zoneNum_ == 0 ) {
@@ -603,10 +603,14 @@ namespace HVACFan {
 			if ( nightVentPressureDelta_ > 0.0 ) { 
 				localPressureRise =  nightVentPressureDelta_;
 			}
-			if ( nightVentFlowFraction_ > 0.0 ) {
-				localFlowFraction = nightVentFlowFraction_;
-				localAirMassFlow = localFlowFraction * maxAirMassFlowRate_;
+
+			if ( maxAirMassFlowRate_ > 0.0 ) { // protect div by 0
+				localFlowFraction = inletAirMassFlowRate_ / maxAirMassFlowRate_;
+			} else {
+				localFlowFraction = 1.0;
 			}
+			localAirMassFlow  = inletAirMassFlowRate_;
+
 		} else { // not in night mode
 			if ( present( pressureRise ) ) {
 				localPressureRise = pressureRise;
@@ -617,7 +621,7 @@ namespace HVACFan {
 				localFlowFraction = flowFraction;
 				localAirMassFlow = localFlowFraction * maxAirMassFlowRate_;
 			} else {
-				if ( maxAirMassFlowRate_ > 0.0 ) {
+				if ( maxAirMassFlowRate_ > 0.0 ) {  // protect div by 0
 					localFlowFraction = inletAirMassFlowRate_ / maxAirMassFlowRate_;
 				} else {
 					localFlowFraction = 1.0;
@@ -718,7 +722,12 @@ namespace HVACFan {
 			case SpeedControlMethod::continuous : {
 				localFanTotEff = fanTotalEff_;
 				Real64 localFlowFractionForPower = max( minPowerFlowFrac_, localFlowFraction );
-				Real64 localPowerFraction = CurveManager::CurveValue( powerModFuncFlowFractionCurveIndex_, localFlowFractionForPower );
+				Real64 localPowerFraction( 0.0);
+				if ( DataHVACGlobals::NightVentOn ) {
+					localPowerFraction = 1.0; // not sure why, but legacy fan had this for night ventilation
+				} else {
+					localPowerFraction = CurveManager::CurveValue( powerModFuncFlowFractionCurveIndex_, localFlowFractionForPower );
+				}
 				fanPower_ = localPowerFraction * maxAirMassFlowRate_ * localPressureRise / ( localFanTotEff * rhoAirStdInit_ );
 				Real64 fanShaftPower = motorEff_ * fanPower_;
 				powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;

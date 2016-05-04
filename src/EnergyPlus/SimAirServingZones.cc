@@ -2142,6 +2142,10 @@ namespace SimAirServingZones {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
 					NodeNumIn = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).NodeNumIn;
 					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment );
+
+					// ?seem like MassFlowRateMaxAvail should be set here as well? but that did not help with max iteration errors
+					//Node( NodeNumIn ).MassFlowRateMaxAvail = Node( NodeNumIn ).MassFlowRate;
+					//Node( NodeNumIn ).MassFlowRateMinAvail = Node( NodeNumIn ).MassFlowRate;
 				}
 			}
 

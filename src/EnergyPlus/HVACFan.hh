@@ -207,7 +207,7 @@ private: // data
 	Real64 fanTotalEff_; // Fan total system efficiency (fan*belt*motor*VFD)
 	int powerModFuncFlowFractionCurveIndex_; // pointer to performance curve or table
 	Real64 nightVentPressureDelta_; // fan pressure rise during night ventilation mode
-	Real64 nightVentFlowFraction_; // fan flow fraction during night ventilation mode
+	Real64 nightVentFlowFraction_; // fan's flow fraction during night ventilation mode, not used
 	int zoneNum_; // zone index for motor heat losses as internal gains
 	Real64 zoneRadFract_; // thermal radiation split for motor losses
 	ThermalLossDestination heatLossesDestination_; //enum for where motor loss go

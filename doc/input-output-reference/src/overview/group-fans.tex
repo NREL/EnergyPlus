@@ -103,7 +103,7 @@ This optional numeric field is the total system pressure rise experienced by the
 
 \paragraph{Field: Night Ventilation Mode Flow Fraction}\label{field-nite-vent-flow-fraction-fansysmodel}
 
-This optional numeric field is the air flow fraction for the fan speed used when operating in night mode using AvailabilityManager:NighVentilation.  This is fraction between 0 and 1 and describes the speed level for the fan relative to the Design Maximum Air Flow Rate. This field is only used when an AvailabilityManager:NightVentilation object is used that specifies the fan's availability schedule.  This field and the previous one replace the FanPerformance:NightVentilation object which is not needed with this fan.
+This numeric field is the air flow fraction for the fan speed used when operating in night mode using AvailabilityManager:NighVentilation.  This field corresponds to the input field called Maximum Flow Rate in the FanPerformance:NightVentilation object and, as is the case there, this field is not currently used by the night ventilation manager (which has its own flow fraction field at present).  This is a fraction between 0 and 1 and describes the speed level for the fan relative to the Design Maximum Air Flow Rate.  This field and the previous one replace the FanPerformance:NightVentilation object which is not needed with this fan.
 
 \paragraph{Field: Motor Loss Zone Name}\label{field-loss-zone-name-fansysmodel}
 
