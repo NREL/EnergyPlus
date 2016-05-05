@@ -23828,13 +23828,14 @@ AirflowNetwork:ZoneControl:PressureController,
 	 \memo Define the Pressures control settings for a zone or list of zones.
 	 \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
 	 \memo to all the zones in the ZoneList.
+      \unique-object
  A1 , \field Name
       \required-field
       \reference AirflowNetworkZoneControlPressureControllerNames
  A2 , \field Zone Name
       \required-field
       \type object-list
-      \object-list ZoneAndZoneListNames
+      \object-list ZoneNames
  A3 , \field Control Object Type
       \required-field
       \type choice
@@ -23842,11 +23843,12 @@ AirflowNetwork:ZoneControl:PressureController,
       \key AirflowNetwork:Distribution:Component:ReliefAirFlow
       \note The current selection is AirflowNetwork:MultiZone:Component:ZoneExhaustFan 
       \note or AirflowNetwork:Distribution:Component:ReliefAirFlow.
- A4 , \field Control Name
+ A4 , \field Control Object Name
       \note Control names are names of individual control objects 
       \required-field
       \type object-list
-      \object-list ControlTypeNames
+      \object-list AFNReliefAirFlowNames
+      \object-list FansZoneExhaustNames
  A5 , \field Pressure Control Availability Schedule Name
       \note Availability schedule name for pressure controller. Schedule value > 0 means the 
       \note pressure controller is enabled. If this field is blank, then pressure controller is 
@@ -24148,6 +24150,7 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
 AirflowNetwork:Distribution:Component:OutdoorAirFlow,
       \min-fields 3
       \memo This object adopts outdoor air flow based on Controller:OutdoorAir object
+      \unique-object
  A1 , \field Name
       \required-field
       \reference AFNOutdoorAirFlowNames
@@ -24161,7 +24164,7 @@ AirflowNetwork:Distribution:Component:OutdoorAirFlow,
       \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
       \note equation:
       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor iar flow rate.
+      \note Used only when no outdoor air flow rate.
  N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
       \units dimensionless
       \type real
@@ -24170,7 +24173,7 @@ AirflowNetwork:Distribution:Component:OutdoorAirFlow,
       \default 0.65
       \note Enter the exponent used in the following equation:
       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor iar flow rate.
+      \note Used only when no outdoor air flow rate.
  A2 ; \field Reference Crack Conditions
       \type object-list
       \object-list ReferenceCrackConditions
@@ -24180,6 +24183,7 @@ AirflowNetwork:Distribution:Component:OutdoorAirFlow,
 AirflowNetwork:Distribution:Component:ReliefAirFlow,
       \min-fields 3
       \memo This object allows variation of air flow rate to perform pressure. 
+      \unique-object
  A1 , \field Name
       \required-field
       \reference AFNReliefAirFlowNames
@@ -24193,7 +24197,7 @@ AirflowNetwork:Distribution:Component:ReliefAirFlow,
       \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
       \note equation:
       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor iar flow rate.
+      \note Used only when no outdoor air flow rate.
  N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
       \units dimensionless
       \type real
@@ -24202,7 +24206,7 @@ AirflowNetwork:Distribution:Component:ReliefAirFlow,
       \default 0.65
       \note Enter the exponent used in the following equation:
       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor iar flow rate.
+      \note Used only when no outdoor air flow rate.
  A2 ; \field Reference Crack Conditions
       \type object-list
       \object-list ReferenceCrackConditions

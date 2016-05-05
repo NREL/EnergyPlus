@@ -353,7 +353,6 @@ namespace EnergyPlus {
 		// Unit test for a new feature of PressureStat
 		int i;
 
-
 		std::string const idf_objects = delimited_string( {
 			"Version,8.4;",
 			"  Building,",
@@ -491,155 +490,6 @@ namespace EnergyPlus {
 			"    0.9200000,               !- Solar Absorptance",
 			"    0.9200000;               !- Visible Absorptance",
 
-			"  WindowMaterial:Glazing,",
-			"    SPECTRAL GLASS INNER PANE,  !- Name",
-			"    Spectral,                !- Optical Data Type",
-			"    TestSpectralDataSet,     !- Window Glass Spectral Data Set Name",
-			"    0.0099,                  !- Thickness {m}",
-			"    0.0,                     !- Solar Transmittance at Normal Incidence",
-			"    0.0,                     !- Front Side Solar Reflectance at Normal Incidence",
-			"    0.0,                     !- Back Side Solar Reflectance at Normal Incidence",
-			"    0.0,                     !- Visible Transmittance at Normal Incidence",
-			"    0.0,                     !- Front Side Visible Reflectance at Normal Incidence",
-			"    0.0,                     !- Back Side Visible Reflectance at Normal Incidence",
-			"    0.0,                     !- Infrared Transmittance at Normal Incidence",
-			"    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
-			"    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
-			"    0.798;                   !- Conductivity {W/m-K}",
-
-			"  WindowMaterial:Glazing,",
-			"    ELECTRO GLASS LIGHT STATE,  !- Name",
-			"    SpectralAverage,         !- Optical Data Type",
-			"    ,                        !- Window Glass Spectral Data Set Name",
-			"    0.006,                   !- Thickness {m}",
-			"    0.814,                   !- Solar Transmittance at Normal Incidence",
-			"    0.086,                   !- Front Side Solar Reflectance at Normal Incidence",
-			"    0.086,                   !- Back Side Solar Reflectance at Normal Incidence",
-			"    0.847,                   !- Visible Transmittance at Normal Incidence",
-			"    0.099,                   !- Front Side Visible Reflectance at Normal Incidence",
-			"    0.099,                   !- Back Side Visible Reflectance at Normal Incidence",
-			"    0.0,                     !- Infrared Transmittance at Normal Incidence",
-			"    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
-			"    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
-			"    0.9;                     !- Conductivity {W/m-K}",
-
-			"  WindowMaterial:Glazing,",
-			"    ELECTRO GLASS DARK STATE,!- Name",
-			"    SpectralAverage,         !- Optical Data Type",
-			"    ,                        !- Window Glass Spectral Data Set Name",
-			"    0.006,                   !- Thickness {m}",
-			"    0.111,                   !- Solar Transmittance at Normal Incidence",
-			"    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
-			"    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
-			"    0.128,                   !- Visible Transmittance at Normal Incidence",
-			"    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
-			"    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
-			"    0.0,                     !- Infrared Transmittance at Normal Incidence",
-			"    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
-			"    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
-			"    0.9;                     !- Conductivity {W/m-K}",
-
-			"  WindowMaterial:Gas,",
-			"    WinAirGap,               !- Name",
-			"    AIR,                     !- Gas Type",
-			"    0.013;                   !- Thickness {m}",
-
-			"  MaterialProperty:GlazingSpectralData,",
-			"    TestSpectralDataSet,     !- Name",
-			"    0.300,0.000,0.045,0.045,",
-			"    0.310,0.000,0.044,0.044,",
-			"    0.320,0.000,0.044,0.044,",
-			"    0.330,0.000,0.042,0.042,",
-			"    0.340,0.000,0.041,0.041,",
-			"    0.350,0.000,0.040,0.040,",
-			"    0.360,0.009,0.040,0.040,",
-			"    0.370,0.120,0.040,0.040,",
-			"    0.380,0.492,0.051,0.051,",
-			"    0.390,0.782,0.070,0.070,",
-			"    0.400,0.856,0.075,0.075,",
-			"    0.410,0.858,0.075,0.075,",
-			"    0.420,0.858,0.075,0.075,",
-			"    0.430,0.860,0.075,0.075,",
-			"    0.440,0.861,0.075,0.075,",
-			"    0.450,0.871,0.075,0.075,",
-			"    0.460,0.880,0.076,0.076,",
-			"    0.470,0.883,0.075,0.075,",
-			"    0.480,0.887,0.076,0.076,",
-			"    0.490,0.890,0.075,0.075,",
-			"    0.500,0.890,0.075,0.075,",
-			"    0.510,0.891,0.075,0.075,",
-			"    0.520,0.887,0.075,0.075,",
-			"    0.530,0.890,0.075,0.075,",
-			"    0.540,0.883,0.074,0.074,",
-			"    0.550,0.888,0.074,0.074,",
-			"    0.560,0.882,0.074,0.074,",
-			"    0.570,0.881,0.074,0.074,",
-			"    0.580,0.865,0.071,0.071,",
-			"    0.590,0.858,0.070,0.070,",
-			"    0.600,0.865,0.070,0.070,",
-			"    0.610,0.856,0.070,0.070,",
-			"    0.620,0.845,0.070,0.070,",
-			"    0.630,0.837,0.070,0.070,",
-			"    0.640,0.827,0.069,0.069,",
-			"    0.650,0.820,0.067,0.067,",
-			"    0.660,0.807,0.067,0.067,",
-			"    0.670,0.798,0.065,0.065,",
-			"    0.680,0.791,0.065,0.065,",
-			"    0.690,0.781,0.065,0.065,",
-			"    0.700,0.768,0.064,0.064,",
-			"    0.710,0.761,0.064,0.064,",
-			"    0.720,0.744,0.062,0.062,",
-			"    0.730,0.713,0.064,0.064,",
-			"    0.740,0.703,0.062,0.062,",
-			"    0.750,0.694,0.061,0.061,",
-			"    0.760,0.685,0.061,0.061,",
-			"    0.770,0.675,0.060,0.060,",
-			"    0.780,0.667,0.060,0.060,",
-			"    0.790,0.655,0.060,0.060,",
-			"    0.800,0.646,0.059,0.059,",
-			"    0.810,0.638,0.059,0.059,",
-			"    0.820,0.629,0.057,0.057,",
-			"    0.830,0.623,0.057,0.057,",
-			"    0.840,0.614,0.056,0.056,",
-			"    0.850,0.608,0.056,0.056,",
-			"    0.860,0.601,0.055,0.055,",
-			"    0.870,0.597,0.054,0.054,",
-			"    0.880,0.592,0.054,0.054,",
-			"    0.890,0.587,0.054,0.054,",
-			"    0.900,0.582,0.055,0.055,",
-			"    0.950,0.568,0.051,0.051,",
-			"    1.000,0.562,0.051,0.051,",
-			"    1.050,0.556,0.050,0.050,",
-			"    1.100,0.563,0.051,0.051,",
-			"    1.150,0.556,0.050,0.050,",
-			"    1.200,0.547,0.050,0.050,",
-			"    1.250,0.577,0.051,0.051,",
-			"    1.300,0.598,0.054,0.054,",
-			"    1.350,0.608,0.055,0.055,",
-			"    1.400,0.603,0.052,0.052,",
-			"    1.450,0.614,0.055,0.055,",
-			"    1.500,0.648,0.057,0.057,",
-			"    1.550,0.680,0.059,0.059,",
-			"    1.600,0.699,0.060,0.060,",
-			"    1.650,0.706,0.060,0.060,",
-			"    1.700,0.570,0.051,0.051,",
-			"    1.750,0.585,0.051,0.051,",
-			"    1.800,0.637,0.055,0.055,",
-			"    1.850,0.655,0.057,0.057,",
-			"    1.900,0.637,0.057,0.057,",
-			"    1.950,0.634,0.057,0.057,",
-			"    2.000,0.634,0.057,0.057,",
-			"    2.050,0.586,0.052,0.052,",
-			"    2.100,0.588,0.054,0.054,",
-			"    2.150,0.597,0.054,0.054,",
-			"    2.200,0.576,0.051,0.051,",
-			"    2.250,0.404,0.045,0.045,",
-			"    2.300,0.179,0.037,0.037,",
-			"    2.350,0.219,0.037,0.037,",
-			"    2.400,0.240,0.039,0.039,",
-			"    2.450,0.200,0.040,0.040,",
-			"    2.500,0.214,0.039,0.039;",
-
 			"  Construction,",
 			"    EXTWALL80,               !- Name",
 			"    A1 - 1 IN STUCCO,        !- Outside Layer",
@@ -673,21 +523,18 @@ namespace EnergyPlus {
 			"    B5 - 1 IN DENSE INSULATION;  !- Layer 2",
 
 			"  Construction,",
-			"    ELECTRO-CON-LIGHT,       !- Name",
-			"    ELECTRO GLASS LIGHT STATE,  !- Outside Layer",
-			"    WinAirGap,               !- Layer 2",
-			"    SPECTRAL GLASS INNER PANE;  !- Layer 3",
-
-			"  Construction,",
-			"    ELECTRO-CON-DARK,        !- Name",
-			"    ELECTRO GLASS DARK STATE,!- Outside Layer",
-			"    WinAirGap,               !- Layer 2",
-			"    SPECTRAL GLASS INNER PANE;  !- Layer 3",
-
-			"  Construction,",
 			"    DOOR-CON,                !- Name",
 			"    1.375in-Solid-Core;      !- Outside Layer",
 
+			" Construction,",
+			"  window - 90.1 - 2004 - nonres - fixed, !- Name",
+			"  ASHRAE NonRes Fixed Assembly Window;  !- Outside Layer",
+
+			" WindowMaterial:SimpleGlazingSystem,",
+			"  ASHRAE NonRes Fixed Assembly Window, !- Name",
+			"  3.23646, !- U - Factor{ W / m2 - K }",
+			"  0.39, !- Solar Heat Gain Coefficient",
+			"  ;                        !- Visible Transmittance",
 
 			"  Zone,",
 			"    West Zone,               !- Name",
@@ -1284,7 +1131,7 @@ namespace EnergyPlus {
 			"  FenestrationSurface:Detailed,",
 			"    Zn001:Wall001:Win001,    !- Name",
 			"    Window,                  !- Surface Type",
-			"    ELECTRO-CON-LIGHT,       !- Construction Name",
+			"    window - 90.1 - 2004 - nonres - fixed,  !- Construction Name",
 			"    Zn001:Wall001,           !- Building Surface Name",
 			"    ,                        !- Outside Boundary Condition Object",
 			"    0.5000000,               !- View Factor to Ground",
@@ -1316,7 +1163,7 @@ namespace EnergyPlus {
 			"  FenestrationSurface:Detailed,",
 			"    Zn003:Wall002:Win001,    !- Name",
 			"    Window,                  !- Surface Type",
-			"    ELECTRO-CON-LIGHT,       !- Construction Name",
+			"    window - 90.1 - 2004 - nonres - fixed,  !- Construction Name",
 			"    Zn003:Wall002,           !- Building Surface Name",
 			"    ,                        !- Outside Boundary Condition Object",
 			"    0.5000000,               !- View Factor to Ground",
@@ -2361,6 +2208,7 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		bool ErrorsFound = false;
+        // Read objects
 		HeatBalanceManager::GetProjectControlData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 		HeatBalanceManager::GetZoneData( ErrorsFound );
@@ -2371,7 +2219,6 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ErrorsFound );
 		HeatBalanceManager::GetConstructData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
-
 		SurfaceGeometry::GetGeometryParameters( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
@@ -2380,9 +2227,11 @@ namespace EnergyPlus {
 		SurfaceGeometry::GetSurfaceData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
+		// Read AirflowNetwork inputs
 		GetAirflowNetworkInput( );
 
 		Real64 PresssureSet = 0.5;
+		// Assign values
 		Schedule( 1 ).CurrentValue = PresssureSet; // Pressure setpoint
 		Schedule( 2 ).CurrentValue = 1.0; // set availability and fan schedule to 1
 		Schedule( 3 ).CurrentValue = 1.0; // On
@@ -2405,6 +2254,7 @@ namespace EnergyPlus {
 			}
 		}
 
+		// Set up node values
 		Node.allocate( 10 );
 		if ( MultizoneCompExhaustFanData( 1 ).InletNode == 0 ) {
 			MultizoneCompExhaustFanData( 1 ).InletNode = 3;
@@ -2428,8 +2278,10 @@ namespace EnergyPlus {
 			DisSysCompReliefAirData( 1 ).OutletNode = 5;
 		}
 
+        // Calculate mass flow rate based on pressure setpoint
 		CalcAirflowNetworkAirBalance( );
 
+		// Check indoor pressure and mass flow rate
 		EXPECT_NEAR( PresssureSet, AirflowNetworkNodeSimu( 3 ).PZ, 0.0001 );
 		EXPECT_NEAR( 0.00255337, ReliefMassFlowRate, 0.0001 );
 

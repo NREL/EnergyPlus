@@ -449,8 +449,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of large detailed opening component
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		std::string TypeName; // Name of Large vertical opening type
 		int LVOType; // Large vertical opening type number
 		Real64 LVOValue; // Extra crack length for LVO type 1 with multiple openable parts,
@@ -523,8 +523,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of large simple opening component
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 MinRhoDiff; // Minimum density difference for two-way flow
 		Real64 DischCoeff; // Discharge coefficient at full opening
 		Real64 OpenFactor; // Opening factor
@@ -544,8 +544,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of large horizontal opening component
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 Slope; // Sloping plane angle
 		Real64 DischCoeff; // Discharge coefficient at full opening
 
@@ -581,8 +581,8 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of crack component
 		std::string ExternalNodeNames; // Name of external node.Not requird for internal surface
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data
 		Real64 StandardP; // Standard borometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
@@ -627,8 +627,8 @@ namespace DataAirflowNetwork {
 		std::string Name; // Name of exhaust fan component
 		Real64 FlowRate; // mass flow rate
 		int SchedPtr; // Schedule pointer
-		Real64 FlowCoef; // Air Mass Flow Coefficient
-		Real64 FlowExpo; // Air Mass Flow exponent
+		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data
 		Real64 StandardP; // Standard borometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
@@ -787,8 +787,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of component leak
-		Real64 FlowCoef; // Air Mass Flow Coefficient
-		Real64 FlowExpo; // Air Mass Flow exponent
+		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 
 		// Default Constructor
 		DisSysCompLeakProp() :
@@ -920,8 +920,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of constant volume fan component
-		Real64 FlowCoef; // Coefficient for linear initialization
-		Real64 FlowExpo; // Turbulent flow coefficient
+		Real64 FlowCoef; // Coefficient for linear initialization [kg/s at 1Pa]
+		Real64 FlowExpo; // Turbulent flow coefficient [dimensionless]
 		Real64 RhoAir; // Reference air density
 		Real64 Qfree; // Free delivery flow at P=0
 		Real64 Pshut; // Shutoff pressure at Q=0
@@ -1129,11 +1129,11 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of exhaust fan component
 		int SchedPtr; // Schedule pointer
-		Real64 FlowCoef; // Air Mass Flow Coefficient
-		Real64 FlowExpo; // Air Mass Flow exponent
-		Real64 StandardT; // Standard temperature for crack data
-		Real64 StandardP; // Standard borometric pressure for crack data
-		Real64 StandardW; // Standard humidity ratio for crack data
+		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
+		Real64 StandardT; // Standard temperature for crack data [C]
+		Real64 StandardP; // Standard borometric pressure for crack data [Pa]
+		Real64 StandardW; // Standard humidity ratio for crack data [kg/kg]
 		int InletNode; // Inlet node number
 		int OutletNode; // Outlet node number
 

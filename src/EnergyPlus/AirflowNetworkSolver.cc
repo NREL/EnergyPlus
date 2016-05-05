@@ -3312,22 +3312,9 @@ Label90: ;
 	)
 	{
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         George Walton
-		//       DATE WRITTEN   Extracted from AIRNET
-		//       MODIFIED       Lixing Gu, 2/1/04
-		//                      Revised the subroutine to meet E+ needs
-		//       MODIFIED       Lixing Gu, 6/8/05
-		//       RE-ENGINEERED  na
-
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
@@ -3468,22 +3455,8 @@ Label90: ;
 	)
 	{
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         George Walton
-		//       DATE WRITTEN   Extracted from AIRNET
-		//       MODIFIED       Lixing Gu, 2/1/04
-		//                      Revised the subroutine to meet E+ needs
-		//       MODIFIED       Lixing Gu, 6/8/05
-		//       RE-ENGINEERED  na
-
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataLoopNode::Node;

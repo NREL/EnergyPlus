@@ -2924,7 +2924,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Read Ourdoor Airflow object
+		// Read Outdoor Airflow object
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
 		NumOfOAFans = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumOfOAFans > 1 ) {
@@ -3902,7 +3902,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		//Check node assignements using AirflowNetwork:Distribution:Component:OutdoorAirFlow or AirflowNetwork:Distribution:Component:ReliefAirFlow
+		//Check node assignments using AirflowNetwork:Distribution:Component:OutdoorAirFlow or AirflowNetwork:Distribution:Component:ReliefAirFlow
 		for ( count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count ) {
 			i = AirflowNetworkLinkageData( count ).CompNum;
 			j = AirflowNetworkLinkageData( count ).NodeNums( 1 );
@@ -3911,7 +3911,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( AirflowNetworkCompData( i ).CompTypeNum == CompTypeNum_OAF ) {
 				if ( !SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
 					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( j ).Name + "," );
-					ShowContinueError( "the component tyep in the first node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( j ).Name );
+					ShowContinueError( "the component type in the first node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( j ).Name );
 					ErrorsFound = true;
 				}
 				if ( !SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
@@ -3929,7 +3929,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 				if ( !SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
 					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( k ).Name + "," );
-					ShowContinueError( "the component tyep in the second node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( k ).Name );
+					ShowContinueError( "the component type in the second node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( k ).Name );
 					ErrorsFound = true;
 				}
 			}
@@ -4592,7 +4592,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 			}
-		} else {
+		} else { // PressureCtrlRelief - Pressure control type is Relief Flow 
 			MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
 			MaxReliefMassFlowrate = Node( DisSysCompReliefAirData( 1 ).OutletNode ).MassFlowRate;
 			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
@@ -4650,13 +4650,6 @@ namespace AirflowNetworkBalanceManager {
 					} else if ( SolFla == -2 ) {
 						ShowFatalError( "Zone pressure control failed using relief air: no solution is reached, for " + PressureControllerData( 1 ).Name );
 					}
-/*					static gio::Fmt Format_701( "('AirflowNetworkNodeSimu( ', I2,' ).TZ = ',F10.5,';')" );
-					static gio::Fmt Format_702( "('AirflowNetworkNodeSimu( ', I2,' ).WZ = ',F10.7,';')" );
-					for ( i = 1; i <= NetworkNumOfNodes; ++i ) {
-						gio::write( 12, Format_701 ) << i << AirflowNetworkNodeSimu( i ).TZ;
-						gio::write( 12, Format_702 ) << i << AirflowNetworkNodeSimu( i ).WZ;
-					}
-					ShowFatalError( "Complete inputs" );*/
 				}
 			}
 		}
