@@ -66,14 +66,16 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/CurveManager.hh>
 
 namespace EnergyPlus {
 
 TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
 {
-	// this unit test mimics "EnergyPlusFixture.Fans_FanSizing" 
+	// this unit test checks some get functions
 	// the idea is to set up a fan and run its sizing routine 
 	// the size is filled by the value in DataSizing::DataNonZoneNonAirloopValue
+	// then check three getter functions
 	std::string const idf_objects = delimited_string( {
 	
 		"  Fan:SystemModel,",
@@ -150,6 +152,138 @@ TEST_F( EnergyPlusFixture, SystemFanObj_FanSizing1 )
 	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
 	EXPECT_NEAR( 1.00635, locFanSizeVdot, 0.00001 );
 	DataSizing::DataNonZoneNonAirloopValue = 0.0;
+}
+
+
+TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1 )
+{
+	// this unit test checks the power averaging when cycling between a hi and low speed
+	// this uses discrete power fractions at the speed levels
+	std::string const idf_objects = delimited_string( {
+	
+		"  Fan:SystemModel,",
+		"    Test Fan ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFanAirInletNode,         !- Air Inlet Node Name",
+		"    TestFanOutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    100.0,                    !- Design Electric Power Consumption",
+		"    ,                      !- Design Power Sizing Method",
+		"    ,                      !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    ,                        !- Fan Total Efficiency",
+		"  , !- Electric Power Function of Flow Fraction Curve Name",
+		"  , !- Night Ventilation Mode Pressure Rise",
+		"  , !- Night Ventilation Mode Flow Fraction",
+		"  , !- Motor Loss Zone Name",
+		"  , !- Motor Loss Radiative Fraction ",
+		"  Fan Energy, !- End-Use Subcategory",
+		"  2, !- Number of Speeds",
+		"  0.5, !- Speed 1 Flow Fraction",
+		"  0.125, !- Speed 1 Electric Power Fraction",
+		"  1.0, !- Speed 2 Flow Fraction",
+		"  1.0; !- Speed 2 Electric Power Fraction",
+		} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	std::string fanName = "TEST FAN";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataSizing::CurZoneEqNum = 0;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
+
+	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75 
+	Real64 locFanElecPower = HVACFan::fanObjs[ 0 ]->fanPower();
+	Real64 locExpectPower = (0.5 * 0.125 * 100.0) + (0.5 * 1.0 * 100.0);
+	EXPECT_NEAR( locFanElecPower, locExpectPower, 0.01);
+
+	HVACFan::fanObjs[ 0 ]->simulate( 0.5 ,_,_,_ ); // call for flow fraction of 0.5
+	locFanElecPower = HVACFan::fanObjs[ 0 ]->fanPower();
+	locExpectPower = 0.125 * 100.0;
+	EXPECT_NEAR( locFanElecPower, locExpectPower, 0.01);
+}
+
+
+TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2 )
+{
+	// this unit test checks the power averaging when cycling between a hi and low speed
+	// this uses fan power curve instead of speed level power fractions
+
+	std::string const idf_objects = delimited_string( {
+	
+		"  Fan:SystemModel,",
+		"    Test Fan ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFanAirInletNode,         !- Air Inlet Node Name",
+		"    TestFanOutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    100.0,                    !- Design Electric Power Consumption",
+		"    ,                      !- Design Power Sizing Method",
+		"    ,                      !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    ,                        !- Fan Total Efficiency",
+		"  simple cubic, !- Electric Power Function of Flow Fraction Curve Name",
+		"  , !- Night Ventilation Mode Pressure Rise",
+		"  , !- Night Ventilation Mode Flow Fraction",
+		"  , !- Motor Loss Zone Name",
+		"  , !- Motor Loss Radiative Fraction ",
+		"  Fan Energy, !- End-Use Subcategory",
+		"  2, !- Number of Speeds",
+		"  0.5, !- Speed 1 Flow Fraction",
+		"  , !- Speed 1 Electric Power Fraction",
+		"  1.0, !- Speed 2 Flow Fraction",
+		"  ; !- Speed 2 Electric Power Fraction",
+		
+		"  Curve:Cubic,",
+		"    simple cubic,  !- Name",
+		"    0.0,                    !- Coefficient1 Constant",
+		"    0.0,                     !- Coefficient2 x",
+		"    0.0,                     !- Coefficient3 x**2",
+		"    1.0,                    !- Coefficient4 x**3",
+		"    0.0,                     !- Minimum Value of x",
+		"    1.0,                     !- Maximum Value of x",
+		"    0.0,                     !- Minimum Curve Output",
+		"    1.0,                     !- Maximum Curve Output",
+		"    Dimensionless,           !- Input Unit Type for X",
+		"    Dimensionless;           !- Output Unit Type",
+		} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	CurveManager::GetCurveInput();
+	std::string fanName = "TEST FAN";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataSizing::CurZoneEqNum = 0;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
+
+	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75 
+	Real64 locFanElecPower = HVACFan::fanObjs[ 0 ]->fanPower();
+	Real64 locExpectPower = (0.5 * 0.125 * 100.0) + (0.5 * 1.0 * 100.0);
+	EXPECT_NEAR( locFanElecPower, locExpectPower, 0.01);
+
+	HVACFan::fanObjs[ 0 ]->simulate( 0.5 ,_,_,_ ); // call for flow fraction of 0.5
+	locFanElecPower = HVACFan::fanObjs[ 0 ]->fanPower();
+	locExpectPower = 0.125 * 100.0;
+	EXPECT_NEAR( locFanElecPower, locExpectPower, 0.01);
 }
 
 } // EnergyPlus namespace

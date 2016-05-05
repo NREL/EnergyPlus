@@ -40701,7 +40701,6 @@ Fan:SystemModel,
        \type real
        \units W/(m3/s)
        \ip-units W/(ft3/min)
-       \default ???
   N8 , \field Electric Power Per Unit Flow Rate Per Unit Pressure
        \type real
        \units W/((m3/s) -Pa)
