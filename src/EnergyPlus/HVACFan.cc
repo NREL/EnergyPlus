@@ -464,6 +464,19 @@ namespace HVACFan {
 		}
 		if ( ! isAlphaFieldBlank( 7 ) ) {
 			powerModFuncFlowFractionCurveIndex_ = CurveManager::GetCurveIndex( alphaArgs( 7 ) );
+			if ( powerModFuncFlowFractionCurveIndex_ == 0 ) {
+				ShowWarningError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Invalid " + alphaFieldNames( 7 ) + " = " + alphaArgs( 7 ) );
+				ShowContinueError( "Curve not found." );
+				if ( speedControl_ == SpeedControlMethod::continuous ) {
+					errorsFound = true;
+				}
+			}
+		} else { //blank
+			if ( speedControl_ == SpeedControlMethod::continuous ) {
+				ShowWarningError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Continuous speed control requires a fan power curve in " + alphaFieldNames( 7 ) + " = " + alphaArgs( 7 ) );
+			}
 		}
 		nightVentPressureDelta_       = numericArgs( 10 );
 		nightVentFlowFraction_        = numericArgs( 11 ); // not used

@@ -52,7 +52,7 @@ This numeric field is the design volume flow rate of fan as installed in the HVA
 
 \paragraph{Field: Speed Control Method}\label{field-speed-method-fansysmodel}
 
-This field is used to select how the fan fan speed can be varied. There are two choices, Continuous or Discrete.  Discrete indicates that the fan can operate only at specific speed settings and cannot be continuously varied.  Continuous indicates that the fan speed is variable and can change smoothly up to the Design Maximum Air Flow Rate.  This input informs the program how power should be calculated with Discrete control using time-weighted averaging and Variable using flow-weighted averaging. A constant volume or on-off fan should use Discrete with Number of Speeds set to 1.  A variable air volume fan should use Continuous. 
+This field is used to select how the fan speed can be varied. There are two choices, Continuous or Discrete.  Discrete indicates that the fan can operate only at specific speed settings and cannot be continuously varied.  Continuous indicates that the fan speed is variable and can change smoothly up to the Design Maximum Air Flow Rate.  This input informs the program how power should be calculated with Discrete control using time-weighted averaging and Variable using flow-weighted averaging. A constant volume or on-off fan should use Discrete with Number of Speeds set to 1.  A variable air volume fan should use Continuous. Continuous requires that a fan performance curve be entered in the input field called Electric Power Function of Flow Fraction Curve Name.
 
 \paragraph{Field: Electric Power Minimum Flow Rate Fraction}\label{field-power-min-flow-fraction-fansysmodel}
 
