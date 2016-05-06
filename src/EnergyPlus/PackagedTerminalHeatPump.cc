@@ -2521,7 +2521,7 @@ namespace PackagedTerminalHeatPump {
 
 			//Set the Design Fan Volume Flow Rate
 			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-			
+				PTUnit( PTUnitNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->designAirVolFlowRate();
 			} else {
 				errFlag = false;
 				GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, FanVolFlow );
@@ -4435,7 +4435,7 @@ namespace PackagedTerminalHeatPump {
 		// if blow through, simulate fan then coils
 		if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
 			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio , ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
@@ -4544,7 +4544,7 @@ namespace PackagedTerminalHeatPump {
 		// if draw through, simulate coils then fan
 		if ( PTUnit( PTUnitNum ).FanPlace == DrawThru ) {
 			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
@@ -6314,7 +6314,7 @@ namespace PackagedTerminalHeatPump {
 		// if blow through, simulate fan then coils
 		if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
 			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
@@ -6382,7 +6382,7 @@ namespace PackagedTerminalHeatPump {
 		// if draw through, simulate coils then fan
 		if ( PTUnit( PTUnitNum ).FanPlace == DrawThru ) {
 			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}

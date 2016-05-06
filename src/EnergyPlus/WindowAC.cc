@@ -1357,7 +1357,7 @@ namespace WindowAC {
 		// if blow through, simulate fan then coil. For draw through, simulate coil then fan.
 		if ( WindAC( WindACNum ).FanPlace == BlowThru ) {
 			if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[  WindAC( WindACNum ).FanIndex ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			}
@@ -1371,7 +1371,7 @@ namespace WindowAC {
 
 		if ( WindAC( WindACNum ).FanPlace == DrawThru ) {
 			if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[  WindAC( WindACNum ).FanIndex ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 			}

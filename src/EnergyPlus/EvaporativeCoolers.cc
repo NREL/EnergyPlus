@@ -4393,7 +4393,7 @@ namespace EvaporativeCoolers {
 					if ( ZoneEvapUnit( UnitNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 						Fans::SimulateFanComponents( ZoneEvapUnit( UnitNum ).FanName, false, ZoneEvapUnit( UnitNum ).FanIndex, ZoneEvapUnit( UnitNum ).FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 					} else {
-						HVACFan::fanObjs[ ZoneEvapUnit( UnitNum ).FanIndex ]->simulate( 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+						HVACFan::fanObjs[ ZoneEvapUnit( UnitNum ).FanIndex ]->simulate( ZoneEvapUnit( UnitNum ).FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 					}
 				}
 			}

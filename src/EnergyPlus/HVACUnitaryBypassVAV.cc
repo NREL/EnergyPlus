@@ -2036,7 +2036,7 @@ namespace HVACUnitaryBypassVAV {
 
 		if ( CBVAV( CBVAVNum ).FanPlace == BlowThru ) {
 			if ( CBVAV( CBVAVNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->simulate( PartLoadFrac*FanSpeedRatio, _,_,_ );
+				HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, _,_,_ );
 			} else {
 				Fans::SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
 			}
@@ -2352,7 +2352,7 @@ namespace HVACUnitaryBypassVAV {
 
 		if ( CBVAV( CBVAVNum ).FanPlace == DrawThru ) {
 			if ( CBVAV( CBVAVNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->simulate( PartLoadFrac*FanSpeedRatio, _,_,_ );
+				HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, _,_,_ );
 			} else {
 				Fans::SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
 			}
