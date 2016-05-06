@@ -1630,9 +1630,6 @@ namespace BranchInputManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
-		using CurveManager::GetPressureCurveTypeAndIndex;
-		using General::RoundSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1651,18 +1648,13 @@ namespace BranchInputManager {
 		//////////// hoisted into namespace changed GetBranchInputOneTimeFlag////////////
 		// static bool GetInputFlag( true ); // Set for first time call
 		////////////////////////////////////////////////
-		int Count; // Loop Counter
 		int BCount; // Actual Num of Branches
-		int Comp; // Loop Counter
-		int Loop; // Loop Counter
-		int NumNodes; // Number of Nodes from NodeInputManager
-		Array1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)
 		bool ErrFound; // Flag for error detection
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		int NumInComps; // Number of components actually verified (no SPLITTER or MIXER allowed)
 		int NumAlphas; // Used to retrieve names from IDF
 		Array1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)
 		int NumNumbers; // Used to retrieve numbers from IDF
 		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
 		Array1D_string cAlphaFields;
@@ -1671,9 +1663,6 @@ namespace BranchInputManager {
 		Array1D_bool lAlphaBlanks;
 		int IOStat; // Could be used in the Get Routines, not currently checked
 		int NumParams;
-		int ConnectionType; // Used to pass variable node connection type to GetNodeNums
-		int PressureCurveType;
-		int PressureCurveIndex;
 
 		if ( GetBranchInputOneTimeFlag ) {
 			CurrentModuleObject = "Branch";
@@ -1692,7 +1681,8 @@ namespace BranchInputManager {
 				lAlphaBlanks.dimension( NumAlphas, true );
 				lNumericBlanks.dimension( NumNumbers, true );
 				BCount = 0;
-				for ( Count = 1; Count <= NumOfBranches; ++Count ) {
+				for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
+
 					GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					IsNotOK = false;
 					IsBlank = false;
@@ -1706,96 +1696,9 @@ namespace BranchInputManager {
 						}
 					}
 					++BCount;
-					Branch( BCount ).Name = Alphas( 1 );
-					Branch( BCount ).MaxFlowRate = Numbers( 1 );
-					GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
-					if ( PressureCurveType == PressureCurve_Error ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-						ShowContinueError( "..Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
-						ShowContinueError( "This curve could not be found in the input deck.  Ensure that this curve has been entered" );
-						ShowContinueError( " as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}" );
-						ShowContinueError( "This error could be caused by a misspelled curve name" );
-						ErrFound = true;
-					}
-					Branch( BCount ).PressureCurveType = PressureCurveType;
-					Branch( BCount ).PressureCurveIndex = PressureCurveIndex;
-					Branch( BCount ).NumOfComponents = ( NumAlphas - 2 ) / 4;
-					if ( Branch( BCount ).NumOfComponents * 4 != ( NumAlphas - 2 ) ) ++Branch( BCount ).NumOfComponents;
-					NumInComps = Branch( BCount ).NumOfComponents;
-					Branch( BCount ).Component.allocate( Branch( BCount ).NumOfComponents );
-					Comp = 1;
-					for ( Loop = 3; Loop <= NumAlphas; Loop += 4 ) {
-						if ( SameString( Alphas( Loop ), cSPLITTER ) || SameString( Alphas( Loop ), cMIXER ) ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject );
-							ErrFound = true;
-							continue;
-						}
-						if ( Comp > NumInComps ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "...Number of Arguments indicate [" + RoundSigDigits( NumInComps ) + "], but count of fields indicates [" + RoundSigDigits( Comp ) + ']' );
-							ShowContinueError( "...examine " + CurrentModuleObject + " carefully." );
-							continue;
-						}
-						Branch( BCount ).Component( Comp ).CType = Alphas( Loop );
-						Branch( BCount ).Component( Comp ).Name = Alphas( Loop + 1 );
-						ValidateComponent( Alphas( Loop ), Alphas( Loop + 1 ), IsNotOK, CurrentModuleObject );
-						if ( IsNotOK ) {
-							ShowContinueError( "Occurs on " + CurrentModuleObject + '=' + Alphas( 1 ) );
-							ErrFound = true;
-						}
-						Branch( BCount ).Component( Comp ).InletNodeName = Alphas( Loop + 2 );
-						// If first component on branch, then inlet node is inlet to branch, otherwise node is internal
-						if ( Loop == 3 ) {
-							ConnectionType = NodeConnectionType_Inlet;
-						} else {
-							ConnectionType = NodeConnectionType_Internal;
-						}
-						if ( ! lAlphaBlanks( Loop + 2 ) ) {
-							GetNodeNums( Branch( BCount ).Component( Comp ).InletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 2 ) );
-							if ( NumNodes > 1 ) {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-								ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
-								ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-								ErrFound = true;
-							} else {
-								Branch( BCount ).Component( Comp ).InletNode = NodeNums( 1 );
-							}
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "blank required field: " + cAlphaFields( Loop + 2 ) );
-							ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-							ErrFound = true;
-						}
-						Branch( BCount ).Component( Comp ).OutletNodeName = Alphas( Loop + 3 );
-						// If last component on branch, then outlet node is outlet from branch, otherwise node is internal
-						if ( Loop == NumAlphas - 3 ) {
-							ConnectionType = NodeConnectionType_Outlet;
-						} else {
-							ConnectionType = NodeConnectionType_Internal;
-						}
-						if ( ! lAlphaBlanks( Loop + 3 ) ) {
-							GetNodeNums( Branch( BCount ).Component( Comp ).OutletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 3 ) );
-							if ( NumNodes > 1 ) {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-								ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
-								ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-								ErrFound = true;
-							} else {
-								Branch( BCount ).Component( Comp ).OutletNode = NodeNums( 1 );
-							}
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "blank required field: " + cAlphaFields( Loop + 3 ) );
-							ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-							ErrFound = true;
-						}
 
-						if ( ! lAlphaBlanks( Loop ) && ! lAlphaBlanks( Loop + 1 ) && ! lAlphaBlanks( Loop + 2 ) && ! lAlphaBlanks( Loop + 3 ) ) SetUpCompSets( CurrentModuleObject, Branch( BCount ).Name, Alphas( Loop ), Alphas( Loop + 1 ), Alphas( Loop + 2 ), Alphas( Loop + 3 ) ); //no blanks in required field set
+					GetSingleBranchInput( RoutineName, Count, BCount, Alphas, Numbers, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
 
-						++Comp;
-					}
-					Branch( BCount ).NumOfComponents = NumInComps;
 				}
 
 				NumOfBranches = BCount;
@@ -1814,6 +1717,127 @@ namespace BranchInputManager {
 				GetBranchInputOneTimeFlag = false;
 			}
 		}
+
+	}
+
+	void
+	GetSingleBranchInput(
+		std::string const RoutineName,
+		int const Count,
+		int const BCount,
+		Array1D_string &Alphas,
+		Array1D< Real64 > &Numbers,
+		Array1D_string &cAlphaFields,
+		int const NumAlphas,
+		Array1D_int &NodeNums,
+		Array1D_bool &lAlphaBlanks
+	)
+	{
+		// Using
+		using InputProcessor::SameString;
+		using CurveManager::GetPressureCurveTypeAndIndex;
+		using General::RoundSigDigits;
+
+		// Locals
+		int PressureCurveType;
+		int PressureCurveIndex;
+		bool ErrFound; // Flag for error detection
+		int Comp; // Loop Counter
+		bool IsNotOK; // Flag to verify name
+		int NumInComps; // Number of components actually verified (no SPLITTER or MIXER allowed)
+		int ConnectionType; // Used to pass variable node connection type to GetNodeNums
+		int NumNodes; // Number of Nodes from NodeInputManager
+
+		Branch( BCount ).Name = Alphas( 1 );
+		Branch( BCount ).MaxFlowRate = Numbers( 1 );
+		GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
+		if ( PressureCurveType == PressureCurve_Error ) {
+			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+			ShowContinueError( "..Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
+			ShowContinueError( "This curve could not be found in the input deck.  Ensure that this curve has been entered" );
+			ShowContinueError( " as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}" );
+			ShowContinueError( "This error could be caused by a misspelled curve name" );
+			ErrFound = true;
+		}
+		Branch( BCount ).PressureCurveType = PressureCurveType;
+		Branch( BCount ).PressureCurveIndex = PressureCurveIndex;
+		Branch( BCount ).NumOfComponents = ( NumAlphas - 2 ) / 4;
+		if ( Branch( BCount ).NumOfComponents * 4 != ( NumAlphas - 2 ) ) ++Branch( BCount ).NumOfComponents;
+		NumInComps = Branch( BCount ).NumOfComponents;
+		Branch( BCount ).Component.allocate( Branch( BCount ).NumOfComponents );
+		Comp = 1;
+		for ( int Loop = 3; Loop <= NumAlphas; Loop += 4 ) {
+			if ( SameString( Alphas( Loop ), cSPLITTER ) || SameString( Alphas( Loop ), cMIXER ) ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject );
+				ErrFound = true;
+				continue;
+			}
+			if ( Comp > NumInComps ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "...Number of Arguments indicate [" + RoundSigDigits( NumInComps ) + "], but count of fields indicates [" + RoundSigDigits( Comp ) + ']' );
+				ShowContinueError( "...examine " + CurrentModuleObject + " carefully." );
+				continue;
+			}
+			Branch( BCount ).Component( Comp ).CType = Alphas( Loop );
+			Branch( BCount ).Component( Comp ).Name = Alphas( Loop + 1 );
+			ValidateComponent( Alphas( Loop ), Alphas( Loop + 1 ), IsNotOK, CurrentModuleObject );
+			if ( IsNotOK ) {
+				ShowContinueError( "Occurs on " + CurrentModuleObject + '=' + Alphas( 1 ) );
+				ErrFound = true;
+			}
+			Branch( BCount ).Component( Comp ).InletNodeName = Alphas( Loop + 2 );
+			// If first component on branch, then inlet node is inlet to branch, otherwise node is internal
+			if ( Loop == 3 ) {
+				ConnectionType = NodeConnectionType_Inlet;
+			} else {
+				ConnectionType = NodeConnectionType_Internal;
+			}
+			if ( ! lAlphaBlanks( Loop + 2 ) ) {
+				GetNodeNums( Branch( BCount ).Component( Comp ).InletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 2 ) );
+				if ( NumNodes > 1 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+					ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
+					ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+					ErrFound = true;
+				} else {
+					Branch( BCount ).Component( Comp ).InletNode = NodeNums( 1 );
+				}
+			} else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "blank required field: " + cAlphaFields( Loop + 2 ) );
+				ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+				ErrFound = true;
+			}
+			Branch( BCount ).Component( Comp ).OutletNodeName = Alphas( Loop + 3 );
+			// If last component on branch, then outlet node is outlet from branch, otherwise node is internal
+			if ( Loop == NumAlphas - 3 ) {
+				ConnectionType = NodeConnectionType_Outlet;
+			} else {
+				ConnectionType = NodeConnectionType_Internal;
+			}
+			if ( ! lAlphaBlanks( Loop + 3 ) ) {
+				GetNodeNums( Branch( BCount ).Component( Comp ).OutletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 3 ) );
+				if ( NumNodes > 1 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+					ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
+					ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+					ErrFound = true;
+				} else {
+					Branch( BCount ).Component( Comp ).OutletNode = NodeNums( 1 );
+				}
+			} else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "blank required field: " + cAlphaFields( Loop + 3 ) );
+				ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+				ErrFound = true;
+			}
+
+			if ( ! lAlphaBlanks( Loop ) && ! lAlphaBlanks( Loop + 1 ) && ! lAlphaBlanks( Loop + 2 ) && ! lAlphaBlanks( Loop + 3 ) ) SetUpCompSets( CurrentModuleObject, Branch( BCount ).Name, Alphas( Loop ), Alphas( Loop + 1 ), Alphas( Loop + 2 ), Alphas( Loop + 3 ) ); //no blanks in required field set
+
+			++Comp;
+		}
+		Branch( BCount ).NumOfComponents = NumInComps;
 
 	}
 

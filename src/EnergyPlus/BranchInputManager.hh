@@ -375,6 +375,19 @@ namespace BranchInputManager {
 	GetBranchInput();
 
 	void
+	GetSingleBranchInput(
+		std::string const RoutineName,
+		int const Count,
+		int const BCount,
+		Array1D_string &Alphas,
+		Array1D< Real64 > &Numbers,
+		Array1D_string &cAlphaFields,
+		int const NumAlphas,
+		Array1D_int &NodeNums,
+		Array1D_bool &lAlphaBlanks
+	);
+
+	void
 	GetBranchListInput();
 
 	void
