@@ -230,7 +230,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
 	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
-	EXPECT_EQ( 94, indexUnitConv );
+	EXPECT_EQ( 95, indexUnitConv );
 	EXPECT_EQ( "Invalid/Undefined", curUnits );
 	EXPECT_EQ( 1.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
@@ -244,6 +244,35 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	EXPECT_EQ( 0.0, curConversionOffset );
 
 }
+
+
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, OutputReportTabularTest_LookupJtokWH" );
+
+	int indexUnitConv;
+	std::string curUnits;
+	std::string varNameWithUnits;
+
+	SetupUnitConversions();
+
+	varNameWithUnits = "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]";
+	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
+	EXPECT_EQ( 0, indexUnitConv );
+	EXPECT_EQ( "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]", curUnits );
+
+	varNameWithUnits = "Electric Energy Use [GJ]";
+	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
+	EXPECT_EQ( 85, indexUnitConv );
+	EXPECT_EQ( "Electric Energy Use [kWh]", curUnits );
+
+	varNameWithUnits = "Electricty [MJ/m2]";
+	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
+	EXPECT_EQ( 94, indexUnitConv );
+	EXPECT_EQ( "Electricty [kWh/m2]", curUnits );
+
+}
+
 
 TEST( OutputReportTabularTest, GetColumnUsingTabs )
 {
@@ -5680,6 +5709,22 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTes
 
 
 
+
+TEST( OutputReportTabularTest, GetUnitSubstring_Test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitSubstring_Test" );
+	EXPECT_EQ( "", GetUnitSubString( "" ) );
+	EXPECT_EQ( "", GetUnitSubString( " " ) );
+	EXPECT_EQ( "", GetUnitSubString( "String with no units" ) );
+	EXPECT_EQ( "feet", GetUnitSubString( "[feet]" ) );
+	EXPECT_EQ( "meters", GetUnitSubString( "String with  unit string at end [meters]" ) );
+	EXPECT_EQ( "newtons", GetUnitSubString( "[newtons] String with unit string at beginning" ) );
+	EXPECT_EQ( "m", GetUnitSubString( "String with unit string at end [m]" ) );
+	EXPECT_EQ( "N", GetUnitSubString( "[N] String with unit string at beginning" ) );
+	EXPECT_EQ( "", GetUnitSubString( "[]" ) );
+	EXPECT_EQ( "", GetUnitSubString( "String with empty unit string at end []" ) );
+	EXPECT_EQ( "", GetUnitSubString( "[] String with empty unit string at beginning" ) );
+}
 
 
 

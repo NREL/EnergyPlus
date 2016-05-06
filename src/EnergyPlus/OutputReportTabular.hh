@@ -959,6 +959,13 @@ namespace OutputReportTabular {
 		std::string & stringOutWithIP
 	);
 
+	void
+	LookupJtokWH(
+		std::string const & stringInWithJ,
+		int & unitConvIndex,
+		std::string & stringOutWithKWH
+	);
+
 	Real64
 	ConvertIP(
 		int const unitConvIndex,
