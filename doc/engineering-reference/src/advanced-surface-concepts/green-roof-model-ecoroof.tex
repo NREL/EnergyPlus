@@ -1,6 +1,6 @@
-\subsection{Green Roof Model (EcoRoof)}\label{green-roof-model-ecoroof}
+\section{Green Roof Model (EcoRoof)}\label{green-roof-model-ecoroof}
 
-\subsubsection{Overview}\label{overview-018}
+\subsection{Overview}\label{overview-018}
 
 The input object Material:RoofVegetation provides a model for green roofs (aka ecoroofs or vegetated roofs) that are becoming increasingly common for both new and retrofit buildings. There is widespread recognition and a growing literature of measured data that suggest green roofs can reduce building energy consumption. Currently, however, there are few design tools available to assist developers and architects in assessing the likely magnitude of energy savings associated with various implementation options (e.g., soil type/depth, irrigation options, plant type). As a result there is a significant need for a quantitative and physically-based building energy simulation tool that represents the effects of green roof constructions. Such a tool would facilitate more rapid spread of green roof technologies and make it possible to account for green roof benefits in state energy codes and related energy efficiency standards such as LEED.
 
@@ -34,7 +34,7 @@ The model formulation includes the following:
 
 The detailed energy balance analysis and resulting equations, being rather complicated, are summarized here. The interested reader is referred to the FASST documentation cited herein for the complete development. The end result is a set of two simultaneous equations for temperature---one for the soil surface and the other for the foliage.
 
-\subsubsection{Green Roof Model Description}\label{green-roof-model-description}
+\subsection{Green Roof Model Description}\label{green-roof-model-description}
 
 As with a traditional roof, the energy balance of an green roof is dominated by radiative forcing from the sun. This solar radiation is balanced by sensible (convection) and latent (evaporative) heat flux from soil and plant surfaces combined with conduction of heat into the soil substrate. This energy balance is illustrated in Figure~\ref{fig:the-energy-balance-for-a-green-roof.}. The variables introduced in this figure are defined in the equations that follow.
 
@@ -48,7 +48,7 @@ The energy budget analysis follows the Fast All Season Soil Strength (FASST) mod
 
 In the following discussion this energy budget is divided into a budget for the foliage layer (F\(_{f}\)) and a budget for the ground surface (F\(_{g}\)­). The various parameterizations for latent and sensible heat flux are described in some detail and then the equation set is reduced to the simultaneous solution of two equations involving the temperatures of the foliage and ground surface.
 
-\paragraph{Energy budget in the foliage layer}\label{energy-budget-in-the-foliage-layer}
+\subsubsection{Energy budget in the foliage layer}\label{energy-budget-in-the-foliage-layer}
 
 The foliage energy balance is given by:
 
@@ -64,7 +64,7 @@ Where $\sigma$\(_{f}\) is calculated as a function of Leaf-Area-Index (LAI):
 
 In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H\(_{f}\) and L\(_{f­}\)) are somewhat complicated and therefore discussed in some detail below.
 
-\subparagraph{Sensible heat flux in the foliage layer}\label{sensible-heat-flux-in-the-foliage-layer}
+\paragraph{Sensible heat flux in the foliage layer}\label{sensible-heat-flux-in-the-foliage-layer}
 
 The sensible heat transfer between the leaf surface and near-canopy air (H\(_{f}\)) is influenced by the temperature difference between them, wind speed, and Leaf Area Index (LAI). The Leaf Area Index is the dimensionless ratio of the projected leaf area for a unit ground area (Oke). In contrast fractional vegetative cover (s\(_{f}\)) is the ratio of shaded ground surface to total ground surface area. The sensible heat flux is given by:
 
@@ -112,7 +112,7 @@ Finally, the bulk transfer coefficient as defined by Deardorff is given by:
 {C_f} = 0.01*\left( {1 + \frac{{0.3(m/s)}}{{{W_{af}}(m/s)}}} \right)
 \end{equation}
 
-\subparagraph{Latent heat flux in the foliage layer}\label{latent-heat-flux-in-the-foliage-layer}
+\paragraph{Latent heat flux in the foliage layer}\label{latent-heat-flux-in-the-foliage-layer}
 
 The process of water loss through plant respiration is known as transpiration. It is controlled by the closing and opening of stomata - the intercellular openings between to epidermal (guard) cells (Gates). The resistance to the diffusion of water vapor from these spaces into the atmosphere is called stomatal resistance. It depends on factors such as light intensity, soil moisture content and vapor pressure difference between inside leaf and the outside atmosphere. It is measured in units of s/m and is formulated as:
 
@@ -168,7 +168,7 @@ where the factor \emph{M\(_{g}\)} ~(ranging from 0 to 1) is the ratio of volumet
 {l_f} = 1.91846*{10^6}{\left[ {\frac{{{T_f}}}{{{T_f} - 33.91}}} \right]^2}
 \end{equation}
 
-\paragraph{Soil Energy budget}\label{soil-energy-budget}
+\subsubsection{Soil Energy budget}\label{soil-energy-budget}
 
 The energy budget at the soil surface is mainly influenced by the soil thermal properties, the amount of foliage coverage (s\(_{f}\)) and the amount of moisture in the soil. If the soil surface is densely covered the diurnal range of surface temperature is small. In the soil energy budget the heat released or gained due to phase changes of soil water, precipitation heat flux and heat flux due to vertical transport of water in the soil are ignored. Future refinements to this model will incorporate these phenomena. The sign convention followed here is the same as above (heat flux into the soil is positive). The overall energy balance at the soil surface (as given in Frankenstein and Koenig) is:
 
@@ -178,7 +178,7 @@ The energy budget at the soil surface is mainly influenced by the soil thermal p
 
 As with the energy equation for the foliage this equation represents sensible heat flux (H\(_{g}\)), latent heat flux (L\(_{g}\)) and the multiple reflections associated with long and short wave radiation. The final term on the right side gives the conduction of heat into the soil substrate.
 
-\subparagraph{Sensible heat flux in the soil layer}\label{sensible-heat-flux-in-the-soil-layer}
+\paragraph{Sensible heat flux in the soil layer}\label{sensible-heat-flux-in-the-soil-layer}
 
 Sensible heat flux between the soil surface and air in its vicinity is dependent on the temperature difference between them and the wind speed within the canopy. It is given as
 
@@ -231,7 +231,7 @@ The atmospheric stability factor is then given by Businger and Lumley and Panofs
   \right.
 \end{equation}
 
-\subparagraph{Latent heat flux in the soil layer}\label{latent-heat-flux-in-the-soil-layer}
+\paragraph{Latent heat flux in the soil layer}\label{latent-heat-flux-in-the-soil-layer}
 
 Removal of water vapor from the soil surface depends on the difference between the mixing ratio of the soil surface and air and the wind speed within the canopy. The resulting latent heat flux is then given by:
 
@@ -253,7 +253,7 @@ C_e^g = {\Gamma_e}\left[ {\left( {1 - {\sigma_f}} \right)C_{en}^g + {\sigma_f}C_
 
 where \(C_{en}^g\) is the near ground bulk transfer coefficient for Latent heat flux and G\(_{e}\) is the latent heat exchange stability correction factor (assumed to be the same as G\(_{h}\)).
 
-\subsubsection{Linearization}\label{linearization}
+\subsection{Linearization}\label{linearization}
 
 In order to solve the foliage and soil heat budget equations, the 4\(^{th}\) order terms T\(_{f}\)\(^{4}\) and T\(_{g}\)\(^{4}\) ~and mixing ratio terms q\(_{g,sat}\) and q\(_{f,sat}\) are linearized as given by Deardorff:
 
@@ -305,7 +305,7 @@ Where R\(_{v}\) is the gas constant for water vapor and l\(_{g}\) is the latent 
 
 The corresponding saturation mixing ratio relations for the leaf surfaces can be obtained by replacing T\(_{g}\) with T\(_{f}\) in the above relations.
 
-\subsubsection{Final Equations}\label{final-equations}
+\subsection{Final Equations}\label{final-equations}
 
 After linearization the final equations are of the form:
 
@@ -321,7 +321,7 @@ The coefficients in these equations result from the direct combination of the eq
 
 This final set of equations is then solved simultaneously to obtain T\emph{\(_{g}\)} and T\emph{\(_{f}\)} . One key difference in our implementation of the FASST algorithm is that the conduction terms in the equations for \(C_1^g\) and \(C_2^g\) ~are solved by inverting the Conduction Transfer Functions (CTF) within the EnergyPlus solution scheme.
 
-\subsubsection{Green Roof Nomenclature}\label{green-roof-nomenclature}
+\subsection{Green Roof Nomenclature}\label{green-roof-nomenclature}
 
 C\(_{1}\), C\(_{2}\), C\(_{3}\)~~~ = ~~~~~~~~~ coefficients in linearized temperature equations
 
@@ -413,7 +413,7 @@ Z\(_{d}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ displacement height (m)
 
 Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
-\paragraph{Greek letters}\label{greek-letters-000}
+\subsubsection{Greek letters}\label{greek-letters-000}
 
 \(\alpha\)\(_{f}\)~~~ ~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of the canopy
 
@@ -439,7 +439,7 @@ Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
 \(\sigma\)\(_f\) ~~~~~~~~~~~ ~~~~~~~~~~~ = ~~~~~~~~~ fractional vegetation coverage
 
-\paragraph{Subscripts and superscripts}\label{subscripts-and-superscripts-000}
+\subsubsection{Subscripts and superscripts}\label{subscripts-and-superscripts-000}
 
 a~~~~~~~~~~~~~~~ = ~~~~~~~~~ air
 
@@ -463,7 +463,7 @@ sat~~~~~~~~~~~~~ = ~~~~~~~~~ saturation value
 
 S~~~~~~~~~~~~~~~ = ~~~~~~~~~ short-wave
 
-\subsubsection{References}\label{references-025}
+\subsection{References}\label{references-025}
 
 ASHRAE. 2005. 2005 ASHRAE Handbook -- Fundamentals. Chapter 16, Air flow Around Buildings, Atlanta: American Society of Heating Refrigerating and Air-Conditioning Engineers, Inc.
 

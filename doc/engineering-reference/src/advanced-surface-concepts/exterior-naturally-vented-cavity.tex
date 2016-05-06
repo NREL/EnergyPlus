@@ -1,8 +1,8 @@
-\subsection{Exterior Naturally Vented~ Cavity}\label{exterior-naturally-vented-cavity}
+\section{Exterior Naturally Vented~ Cavity}\label{exterior-naturally-vented-cavity}
 
 The input object ``SurfaceProperty:ExteriorNaturalVentedCavity'' allows modeling a special case for the outside boundary conditions of heat transfer surfaces with a multi-skin exterior that is opaque.~ From the thermal envelope's point of view, the presence of a vented cavity on the outside of the surface modifies the conditions experienced by the underlying heat transfer surfaces.~ This exterior cavity acts as a radiation and convection baffle situated between the exterior environment and the outside face of the underlying heat transfer surface.~ The actual outer surface is referred to as the ``baffle''.~ The modeling here assumes that the heat capacity in the outer baffle can be neglected since it is much lower than the underlying mass surface.~ This object is used with the BuildingSurface:Detailed object where the heat transfer surfaces are referred to as the underlying surfaces.~ The constructions and materials for the heat transfer surfaces should reflect the construction of just the underlying surface.~ The SurfaceProperty:ExteriorNaturalVentedCavity object is used to describe the detached layer, or baffle, and the characteristics of the cavity and openings for natural ventilation.~ This model uses the SurfaceProperty:OtherSideConditionsModel object to pass boundary conditions to the heat transfer modeling for the underlying surfaces.
 
-\subsubsection{Baffle Heat Balance}\label{baffle-heat-balance}
+\subsection{Baffle Heat Balance}\label{baffle-heat-balance}
 
 The baffle is assumed to be sufficiently thin and high-conductivity so that it can be modeled using a single temperature (for both sides and along its area).~ This temperature \({T_{s,baff}}\) is determined by formulating a heat balance on a control volume that just encapsulates the baffle surface.~ The baffle is assumed to completely cover the underlying surface such that it is opaque to shortwave and longwave radiation.~ This assumption means that even though the baffle will have some open area for ventilation, no solar energy passes through these openings. The heat balance is diagrammed in the following figure.
 
@@ -28,23 +28,23 @@ where:
 
 All terms are positive for net flux to the baffle.~ Each of these heat balance components is introduced briefly below.
 
-\paragraph{External SW Radiation}\label{external-sw-radiation}
+\subsubsection{External SW Radiation}\label{external-sw-radiation}
 
 \(q''_{\alpha sol}\)~is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.~ This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.~ The baffle blocks all shortwave radiation from reaching the underlying surface.
 
-\paragraph{External LW Radiation}\label{external-lw-radiation}
+\subsubsection{External LW Radiation}\label{external-lw-radiation}
 
 \({q''_{LWR,Env}}\) ~is a standard radiation exchange formulation between the surface, the sky, the ground, and the atmosphere.~ The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky, air, and ground temperatures, and sky and ground view factors.~ Radiation is modeled using linearized coefficients. ~The baffle blocks all longwave radiation.
 
-\paragraph{External Convection}\label{external-convection}
+\subsubsection{External Convection}\label{external-convection}
 
 \(q''_{conv,env}\) is modeled using the classical formulation: \(q''_{conv} = h_{co}(T_{air} - T_{o})\) where h\(_{co}\), is the convection coefficient.~ The h\(_{co}\) is treated in the same way as an outside face with ExteriorEnvironment conditions.~ In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for \({h_{co}}\) .
 
-\paragraph{Cavity LW Radiation}\label{cavity-lw-radiation}
+\subsubsection{Cavity LW Radiation}\label{cavity-lw-radiation}
 
 \({q''_{LWR,cav}}\) is a standard radiation exchange formulation between the baffle surface and the underlying heat transfer surface located across the cavity.~ Radiation is modeled using linearized coefficients.
 
-\paragraph{Cavity Convection}\label{cavity-convection}
+\subsubsection{Cavity Convection}\label{cavity-convection}
 
 \(q''_{conv,cav}\) is modeled using the classical formulation: \(q''_{conv} = h_{cp}(T_{air} - T_{o})\) where h\(_{cp}\), is the convection coefficient. The value for h\(_{cp}\) is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
@@ -80,7 +80,7 @@ where,
 
 \({T_{a,cav}}\) ~is the drybulb temperature for air in the cavity {[}ºC{]}.
 
-\subsubsection{Cavity Heat Balance}\label{cavity-heat-balance}
+\subsection{Cavity Heat Balance}\label{cavity-heat-balance}
 
 The \emph{cavity} is the volume of air located between the baffle and the underlying heat transfer surface.~ The cavity air is modeled as well-mixed.~ The uniform temperature of the cavity air, \({T_{a,cav}}\) , is determined by formulating a heat balance on a control volume of air as diagrammed below.
 
@@ -157,15 +157,15 @@ Mass continuity arguments lead to modeling the area of the openings as one half 
 
 If the cavity is horizontal and \(T_{amb} > T_{a,cav}\) ~then \({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}{\rm{ = 0}}\) ~because this is a stable situation.
 
-\subsubsection{Underlying Heat Transfer Surface}\label{underlying-heat-transfer-surface}
+\subsection{Underlying Heat Transfer Surface}\label{underlying-heat-transfer-surface}
 
 The exterior baffle and cavity are applied to the outside of a heat transfer surface.~ This surface is modeled using the usual EnergyPlus methods for handling heat capacity and transients -- typically the CTF method.~ These native EnergyPlus heat balance routines are used to calculate \({T_{so}}\) .~ The exterior baffle and cavity system is coupled to the underlying surface using the SurfaceProperty:OtherSideConditionsModel mechanism.~ The exterior naturally vented cavity model provides values for \({h_{r,cav}}\) ,\({T_{s,baff}}\) , \({h_{c,cav}}\) , and \({T_{a,cav}}\) ~for use with the heat balance model calculations for the outside face of the underlying surface (described elsewhere in this manual).
 
-\subsubsection{Solar and Shading Calculations}\label{solar-and-shading-calculations}
+\subsection{Solar and Shading Calculations}\label{solar-and-shading-calculations}
 
 The exterior vented cavity model uses standard EnergyPlus surfaces in order to take advantage of the detailed solar and shading calculations.~ Solar radiation incident on the surface includes beam and diffuse radiation, as well as radiation reflected from the ground and adjacent surfaces.~ Shading of the collector by other surfaces, such as nearby buildings or trees, is also taken into account.
 
-\subsubsection{Local Wind Speed Calculations}\label{local-wind-speed-calculations}
+\subsection{Local Wind Speed Calculations}\label{local-wind-speed-calculations}
 
 The outdoor wind speed affects terms used in modeling.~ The wind speed in the weather file is assumed to be measured at a meteorological station located in an open field at a height of 10 m.~ To adjust for different terrain at the building site and differences in the height of building surfaces, the local wind speed is calculated for each surface.
 
@@ -201,7 +201,7 @@ Terrain & Description & Exponent, a & Layer Thickness, $\delta$ (m) \tabularnewl
 
 The exterior vented cavity can be defined such that it has multiple underlying heat transfer surfaces.~ The centroid heights for each surface are area-weighted to determine the average height for use in the local wind calculation.
 
-\subsubsection{Convection Coefficients}\label{convection-coefficients}
+\subsection{Convection Coefficients}\label{convection-coefficients}
 
 Exterior cavity modeling requires calculating up to three different coefficients for surface convection heat transfer.~ These coefficients are defined in the classic way by:
 
@@ -213,7 +213,7 @@ First, \({h_{co}}\) ~is the convection coefficient for the baffle surface facing
 
 Second, \({h_{c,cav}}\) ~is the convection coefficient for baffle surfaces facing the cavity.~ This coefficient is applied to both the baffle and the underlying surface.~ The convection coefficient is modeled in the same way used in EnergyPlus to model air gaps in windows.~ These correlations vary by Rayleigh number and surface tilt and are based on the work of various research including Hollands et. al., Elsherbiny et. al., Wright, and Arnold.~ The formulations are documented in ISO (2003) standard 15099.~ The routines were adapted from Subroutine NusseltNumber in WindowManager.f90 (by F. Winkelmann), which itself was derived from Window5 subroutine ``nusselt''.
 
-\subsubsection{Radiation Coefficients}\label{radiation-coefficients}
+\subsection{Radiation Coefficients}\label{radiation-coefficients}
 
 Exterior vented cavity modeling requires calculating up to four different linearized coefficients for radiation heat transfer.~ Whereas radiation calculations usually use temperature raised to the fourth power, this greatly complicates solving heat balance equations for a single temperature.~ Linearized radiation coefficients have the same units and are used in the same manner as surface convection coefficients and introduce very little error for the temperature levels involved.
 
@@ -235,7 +235,7 @@ all temperatures are converted to Kelvin,
 
 The three other coefficients, \({h_{r,atm}}\) , \({h_{r,sky}}\) , and \({h_{r,gnd}}\) ~are used elsewhere in EnergyPlus for the outside face surface heat balance and are calculated in the same manner as equation .~ {[}This is accomplished by calling subroutine InitExteriorConvectionCoeffs in the file HeatBalanceConvectionCoeffs.f90. {]}
 
-\subsubsection{References}\label{references-023}
+\subsection{References}\label{references-023}
 
 ASHRAE HOF 2001.~ 2001 ASHRAE Fundamentals Handbook.~ American Society of Heating Refrigeration and Air-Conditioning Engineers. Altanta GA.
 
