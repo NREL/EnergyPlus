@@ -6221,7 +6221,7 @@ namespace HVACUnitarySystem {
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				
-				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 			} else {
 				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
@@ -6268,7 +6268,7 @@ namespace HVACUnitarySystem {
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == DrawThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 			} else {
 				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
@@ -7534,7 +7534,7 @@ namespace HVACUnitarySystem {
 		// Call the series of components that simulate a Unitary System
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio,_,_,_ );
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 			} else {
 				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
@@ -7563,7 +7563,7 @@ namespace HVACUnitarySystem {
 			// If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
 			if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru && OnOffFanPartLoadFraction < 1.0 ) {
 				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio,_,_,_ );
+					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 				} else {
 					Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 				}
@@ -7605,7 +7605,7 @@ namespace HVACUnitarySystem {
 			// If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
 			if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru && OnOffFanPartLoadFraction < 1.0 ) {
 				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio,_,_,_ );
+					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 				} else {
 					Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 				}
@@ -7630,7 +7630,7 @@ namespace HVACUnitarySystem {
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == DrawThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio,_,_,_ );
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 			} else {
 				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
@@ -10344,7 +10344,7 @@ namespace HVACUnitarySystem {
 		//CALL the series of components that simulate a Unitary System
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 			} else {
 				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
@@ -10386,7 +10386,7 @@ namespace HVACUnitarySystem {
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == DrawThru ) {
 			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( FanSpeedRatio,_,_,_ );
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
 			} else {
 				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 			}
