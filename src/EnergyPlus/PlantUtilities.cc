@@ -501,6 +501,7 @@ namespace PlantUtilities {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum;
 		Real64 MdotOldRequest;
+		bool EMSLoadOverride;
 
 		// FLOW:
 
@@ -573,21 +574,29 @@ namespace PlantUtilities {
 
 			Real64 const a_node_MasFlowRate( a_node.MassFlowRate );
 			Real64 const a_node_MasFlowRateRequest( a_node.MassFlowRateRequest );
+			EMSLoadOverride = false;
+			// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+			for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+				auto const & comp( branch.Comp( CompNum ) );
+				if ( comp.EMSLoadOverrideOn ) EMSLoadOverride = true;
+			}
 			for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
 				auto const & comp( branch.Comp( CompNum ) );
 				NodeNum = comp.NodeNumIn;
-				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
-				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
-				if ( comp.EMSLoadOverrideOn ) {
-					if ( comp.EMSLoadOverrideValue == 0.0 ) {
-						Node( NodeNum ).MassFlowRate = 0.0;
-						Node( NodeNum ).MassFlowRateRequest = 0.0;
-					}
+				if ( EMSLoadOverride ) { // actuate EMS controlled components if On/Off Supervisory is used
+					Node( NodeNum ).MassFlowRate = 0.0;
+					Node( NodeNum ).MassFlowRateRequest = 0.0;
+					NodeNum = comp.NodeNumOut;
+					Node( NodeNum ).MassFlowRate = 0.0;
+					Node( NodeNum ).MassFlowRateRequest = 0.0;
+				} else {
+					Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
+					Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
+					NodeNum = comp.NodeNumOut;
+					Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
+					Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
 				}
 
-				NodeNum = comp.NodeNumOut;
-				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
-				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
 			}
 
 		} else {

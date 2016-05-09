@@ -68,13 +68,19 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataRuntimeLanguage;
+using namespace EnergyPlus::PlantUtilities;
 using namespace ObjexxFCL;
 
 TEST_F( EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators )
@@ -145,10 +151,10 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 		"EnergyManagementSystem:ProgramCallingManager,",
 		"Dual Setpoint Test Manager,  !- Name",
 		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
-		"DualSetpiontTestControl;  !- Program Name 1",
+		"DualSetpointTestControl;  !- Program Name 1",
 
 		"EnergyManagementSystem:Program,",
-		"DualSetpiontTestControl,",
+		"DualSetpointTestControl,",
 		"Set TempSetpointLo = 16.0,",
 		"Set TempSetpointHi  = 20.0;",
 
@@ -171,6 +177,149 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
 
 		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
+
+}
+
+TEST_F( EnergyPlusFixture, SupervisoryControl_Component ) {
+
+		std::string const idf_objects = delimited_string( { 
+		" EnergyManagementSystem:Actuator,",
+		"  CoilActuator,          !- Name",
+		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
+		"  Plant Component Coil:Heating:Water,    !- Actuated Component Type",
+		"  On/Off Supervisory;    !- Actuated Component Control Type",
+
+		" EnergyManagementSystem:ProgramCallingManager,",
+		"  Supervisory Control Manager,  !- Name",
+		"  BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+		"  HeatCoilController;  !- Program Name 1",
+
+		" EnergyManagementSystem:Program,",
+		"  HeatCoilController,",
+		"  Set CoilActuator = 0.0;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		EMSManager::CheckIfAnyEMS();
+
+		EMSManager::FinishProcessingUserInput = true;
+
+		DataPlant::TotNumLoops = 1;
+		PlantLoop.allocate( 1 );
+		PlantLoop( 1 ).Name = "MyPlant";
+		for ( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 2 );
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 41; // Coil:Heating:Water
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "Zone1FanCoilHeatingCoil";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).TypeOf_Num = 21; // Pipe:Adiabatic
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).Name = "Pipe";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumIn = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 3;
+		PlantCondLoopOperation::SetupPlantEMSActuators();
+
+		Node.allocate( 3 );
+		Real64 NodeMdot( 1.5 );
+		Node( 1 ).MassFlowRate = NodeMdot;
+		Node( 1 ).MassFlowRateMax = NodeMdot;
+		Node( 1 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 1 ).MassFlowRateRequest = NodeMdot;
+		Node( 2 ).MassFlowRate = NodeMdot;
+		Node( 2 ).MassFlowRateMax = NodeMdot;
+		Node( 2 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 2 ).MassFlowRateRequest = NodeMdot;
+		Node( 3 ).MassFlowRate = NodeMdot;
+		Node( 3 ).MassFlowRateMax = NodeMdot;
+		Node( 3 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 3 ).MassFlowRateRequest = NodeMdot;
+
+		bool anyRan;
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
+
+		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		SetActuatedBranchFlowRate( NodeMdot, 2, 1, 1, 1, false );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
+	
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan );
+
+		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 1.0, 0.000001 );
+		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		SetActuatedBranchFlowRate( NodeMdot, 2, 1, 1, 1, false );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
+
+		EXPECT_TRUE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, 0.0 );
+		SetActuatedBranchFlowRate( NodeMdot, 2, 1, 1, 1, false );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, 0.0 );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, 0.0 );
 
 }
 
