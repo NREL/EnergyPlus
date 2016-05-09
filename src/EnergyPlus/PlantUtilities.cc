@@ -578,6 +578,13 @@ namespace PlantUtilities {
 				NodeNum = comp.NodeNumIn;
 				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
 				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
+				if ( comp.EMSLoadOverrideOn ) {
+					if ( comp.EMSLoadOverrideValue == 0.0 ) {
+						Node( NodeNum ).MassFlowRate = 0.0;
+						Node( NodeNum ).MassFlowRateRequest = 0.0;
+					}
+				}
+
 				NodeNum = comp.NodeNumOut;
 				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
 				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
