@@ -364,13 +364,22 @@ The Energy Meters Summary (key: EnergyMeters) (which is a slight misnomer as som
 
 The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
 
-\paragraph{Object Count Summary}\label{object-count-summary}
+\paragraph{Tariff Report}\label{TariffReport}
 
-The Object Count Summary provides the count on the number of specific objects in the file. The key used to obtain this report is ObjectCountSummary.
+The Tariff Report provides the results of the UtilityCost:Tariff object. The report consists of a summary table, categories, charges, ratchets, qualifies, native variables, other variables and computation. The key used to obtain this report is TariffReport.
+
+\paragraph{Economic Result Summary}\label{EconomicResultSummary}
+
+The Economic Result Summary provides a summary of the Tariff Reports. The report consists of annual costs and costs for each tariff considered and why it was or was not selected. The key used to obtain this report is EconomicResultSummary.
 
 \paragraph{Component Cost Economics Summary}\label{component-cost-economics-summary}
 
 The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
+
+\paragraph{Life Cycle Cost Report}\label{LifeCycleCostReport}
+
+The Life Cycle Cost Report provides the a summary of the information from the Life Cycle Cost calculations.  This report shows the costs and the timing of costs, often called “cash flows,” along with the present value in several different tables. The tabular results show the present value of all current and future costs. The key used to obtain this report is LifeCycleCostReport.
+
 
 \subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
 
