@@ -444,7 +444,7 @@
   Fan:SystemModel,
     HPWHPlantFan ,          !- Name
     PlantHPWHSch ,      !- Availability Schedule Name
-    HPPlantAirOutletNode,  !- Air Inlet Node Name
+    HPPlantAirInletNode,  !- Air Inlet Node Name
     HPPlantFanAirOutletNode,  !- Air Outlet Node Name
     2.6852,                   !- Design Maximum Air Flow Rate
     Discrete ,                   !- Speed Control Method
