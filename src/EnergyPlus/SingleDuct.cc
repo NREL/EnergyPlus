@@ -689,6 +689,17 @@ namespace SingleDuct {
 
 			Sys( SysNum ).MaxAirVolFractionDuringReheat = Numbers( 8 );
 
+			if ( Sys( SysNum ).DamperHeatingAction != ReverseActionWithLimits ) {
+				if ( !lNumericBlanks( 7 ) ) {
+					ShowWarningError( "Since " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) + ", input for " + cNumericFields( 7 ) + " will be ignored." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				}
+				if ( !lNumericBlanks( 8 ) ) {
+					ShowWarningError( "Since " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) + ", input for " + cNumericFields( 8 ) + " will be ignored." );
+					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				}
+			}
+
 			// Maximum reheat air temperature, i.e. the maximum supply air temperature leaving the reheat coil
 			if ( ! lNumericBlanks( 9 ) ) {
 				Sys( SysNum ).MaxReheatTemp = Numbers( 9 );
