@@ -673,18 +673,33 @@ namespace HVACFan {
 			localPressureRise = localFaultPressureRise;
 		}
 		localFlowFraction = localAirMassFlow / maxAirMassFlowRate_;
+		localFlowFraction = min( 1.0, localFlowFraction);
 
 		Real64 powerLossToAir = 0.0;
 
 		if ( ( ScheduleManager::GetCurrentScheduleValue( availSchedIndex_ ) > 0.0 || objTurnFansOn_ ) && ! objTurnFansOff_ && localAirMassFlow > 0.0 ) {
 			//fan is running
 
+
 			switch ( speedControl_ ) {
 			
 			case SpeedControlMethod::discrete: {
+				//
+				if ( DataHVACGlobals::OnOffFanPartLoadFraction <= 0.0 ) {
+					DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+				}
+				if ( DataHVACGlobals::OnOffFanPartLoadFraction < 0.7 ) {
+					DataHVACGlobals::OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
+				}
+				Real64 locFanRunTimeFraction( 0.0 );
+				if ( DataHVACGlobals::OnOffFanPartLoadFraction >= 1.0 ){
+					locFanRunTimeFraction = localFlowFraction;
+				} else {
+					locFanRunTimeFraction = max( 0.0, min( 1.0, localFlowFraction/DataHVACGlobals::OnOffFanPartLoadFraction ) );
+				}
 				if ( numSpeeds_ == 1 ) { // CV or OnOff
 					localFanTotEff = fanTotalEff_;
-					fanRunTimeFractionAtSpeed_[ 0 ] = localFlowFraction;
+					fanRunTimeFractionAtSpeed_[ 0 ] = locFanRunTimeFraction;
 					fanPower_ = fanRunTimeFractionAtSpeed_[ 0 ] * maxAirMassFlowRate_ * localPressureRise / ( localFanTotEff * rhoAirStdInit_ );
 					Real64 fanShaftPower = motorEff_ * fanPower_;
 					powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
@@ -701,19 +716,19 @@ namespace HVACFan {
 						fanRunTimeFractionAtSpeed_[ loop ] = 0.0;
 					}
 
-					if ( localFlowFraction < flowFractionAtSpeed_[ 0 ] ) { // on/off between zero and lowest speed
+					if ( locFanRunTimeFraction < flowFractionAtSpeed_[ 0 ] ) { // on/off between zero and lowest speed
 						hiSideSpeed  = 0;
-						fanRunTimeFractionAtSpeed_[ 0 ] = localFlowFraction / flowFractionAtSpeed_[ 0 ];
+						fanRunTimeFractionAtSpeed_[ 0 ] = locFanRunTimeFraction / flowFractionAtSpeed_[ 0 ];
 					} else {
 						for ( auto loop = 0; loop < numSpeeds_ - 1; ++loop ) {
-							if ( ( flowFractionAtSpeed_[ loop ] <= localFlowFraction ) && ( localFlowFraction <= flowFractionAtSpeed_[ loop + 1 ] ) ) {
+							if ( ( flowFractionAtSpeed_[ loop ] <= locFanRunTimeFraction ) && ( locFanRunTimeFraction <= flowFractionAtSpeed_[ loop + 1 ] ) ) {
 								lowSideSpeed = loop;
 								hiSideSpeed = loop +1;
 								break;
 							}
 						}
-						fanRunTimeFractionAtSpeed_[ lowSideSpeed ] = ( flowFractionAtSpeed_[ hiSideSpeed ] - localFlowFraction ) / ( flowFractionAtSpeed_[ hiSideSpeed ] - flowFractionAtSpeed_[ lowSideSpeed ] );
-						fanRunTimeFractionAtSpeed_[ hiSideSpeed ] = ( localFlowFraction - flowFractionAtSpeed_[ lowSideSpeed ] ) / ( flowFractionAtSpeed_[ hiSideSpeed ] - flowFractionAtSpeed_[ lowSideSpeed ] );
+						fanRunTimeFractionAtSpeed_[ lowSideSpeed ] = ( flowFractionAtSpeed_[ hiSideSpeed ] - locFanRunTimeFraction ) / ( flowFractionAtSpeed_[ hiSideSpeed ] - flowFractionAtSpeed_[ lowSideSpeed ] );
+						fanRunTimeFractionAtSpeed_[ hiSideSpeed ] = ( locFanRunTimeFraction - flowFractionAtSpeed_[ lowSideSpeed ] ) / ( flowFractionAtSpeed_[ hiSideSpeed ] - flowFractionAtSpeed_[ lowSideSpeed ] );
 					}
 					if ( lowSideSpeed != -1 && hiSideSpeed != -1 ) {
 						fanPower_ = fanRunTimeFractionAtSpeed_[ lowSideSpeed ] * massFlowAtSpeed_[ lowSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ lowSideSpeed ] * rhoAirStdInit_ ) + fanRunTimeFractionAtSpeed_[ hiSideSpeed ] * massFlowAtSpeed_[ hiSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ hiSideSpeed ] * rhoAirStdInit_ );
