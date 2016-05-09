@@ -149,7 +149,11 @@ Where:
 
 The design air mass flow rate depends on the location of the coil. If the coil is in the outside air stream, the flow rate is set to
 
-\[\rho_{air}\dot{V}_{a,coil,oa,des}\] where \(\dot{V}_{a,coil.oa,des}\) is the design outside air volumetric flow rate for the system. Otherwise, it is set to:
+\begin{equation}
+  \rho_{air}\dot{V}_{a,coil,oa,des}
+\end{equation}
+
+where \(\dot{V}_{a,coil.oa,des}\) is the design outside air volumetric flow rate for the system. Otherwise, it is set to:
 
 \begin{equation}
 \rho_{air}\dot{V}_{cc,air}
@@ -2250,7 +2254,13 @@ For the parallel PIU, this is set to the minimum primary air flow fraction.
 
 The coil load and max hot water flow rate are then:
 
-\[\dot Q_{coil,des} = c_{p,air}\cdot \rho_{air}\cdot \dot V_{air,coil,heating}\cdot (T_{out,coil} - T_{in,coil})\] \[\dot V_{max,hw} = \dot Q_{coil,des}/(c_{p,w}\cdot \rho_{w}\cdot \Delta T_{loop,des})\]
+\begin{equation}
+  \dot Q_{coil,des} = c_{p,air}\cdot \rho_{air}\cdot \dot V_{air,coil,heating}\cdot (T_{out,coil} - T_{in,coil})
+\end{equation}
+
+\begin{equation}
+  \dot V_{max,hw} = \dot Q_{coil,des}/(c_{p,w}\cdot \rho_{w}\cdot \Delta T_{loop,des})
+\end{equation}
 
 where
 

@@ -154,7 +154,13 @@ After the unitary system cooling load is determined as described in Eq. above, t
 
 The model calculates the unitary system's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multi/variable speed DX cooling coil. The multi/variable speed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
-\[FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}\] \[NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}\]
+\begin{equation}
+  FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}
+\end{equation}
+
+\begin{equation}
+  NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}
+\end{equation}
 
 where:
 
@@ -596,7 +602,11 @@ UnitarySystemMoistureLoad = \frac{{ControlZoneMoistureLoad}}{{ControlZoneAirFlow
 
 Then the \emph{LatentPartLoadRatio} required to meet the high humidity setpoint is calculated as follows:
 
-\[LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)\] The model uses the greater of the two part-load ratios, \emph{PartLoadRatio} or \emph{LatentPartLoadRatio}, to determine the operating part-load ratio of the Unitary system's DX cooling coil.
+\begin{equation}
+  LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)
+\end{equation}
+
+The model uses the greater of the two part-load ratios, \emph{PartLoadRatio} or \emph{LatentPartLoadRatio}, to determine the operating part-load ratio of the Unitary system's DX cooling coil.
 
 \begin{equation}
 LatentPartLoadRatio = MAX\left( {PartLoadRatio,LatentPartLoadRatio} \right)
@@ -668,7 +678,17 @@ When modeling multi-speed fan and water coils in unitary system object, the coil
 
 When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
 
-\[{SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})\] \[{\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})\] \[{\dot m{w}} = {\dot m_{w, max}}\]
+\begin{equation}
+  {SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})
+\end{equation}
+  
+\begin{equation}
+  {\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})
+\end{equation}
+
+\begin{equation}
+  {\dot m{w}} = {\dot m_{w, max}}
+\end{equation}
 
 \paragraph{Cycling OnOff at Lowest Stage:}\label{cycling-onoff-at-lowest-stage}
 
@@ -686,7 +706,13 @@ The average supply air flow rate calculation when the fan is running at the lowe
 
 \subparagraph{Cycling Fan:}\label{cycling-fan}
 
-\[{\dot m} = {\dot m_{on, 1}} {PLR}\] \[{\dot m{w}} = {\dot m_{w, max}} * {PLR}\]
+\begin{equation}
+  {\dot m} = {\dot m_{on, 1}} {PLR}
+\end{equation}
+  
+\begin{equation}
+  {\dot m{w}} = {\dot m_{w, max}} * {PLR}
+\end{equation}
 
 where:
 

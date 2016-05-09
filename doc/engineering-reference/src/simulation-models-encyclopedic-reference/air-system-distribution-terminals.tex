@@ -487,11 +487,31 @@ The modification factor \({f_{ \Delta T_{cool,mod} }() }\) describes how the coo
 
 The modification factor \({f_{\dot m_{SA,cool,mod}}()}\) describes how the cooling capacity is adjusted to account for the primary air flow rate. This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized primary air flow rate, \({\dot m_{SA}}\) , and the normalized flow rate used to rate beam performance, \({\dot m_{SA,rated}}\) . Flow rates are normalized by dividing the total length of all the beam units in the zone. The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
 
-\[{f_{\dot m_{SA,cool,mod}}()} = f_{\dot m_{SA,cool,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)\] \[{\dot m_{SA}} = \frac{\dot M_{SA}}{L}\] \[{\dot m_{SA,rated}} = {\dot v_{SA,rated}} \cdot {\rho_{air,STP}}\]
+\begin{equation}
+  {f_{\dot m_{SA,cool,mod}}()} = f_{\dot m_{SA,cool,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)
+\end{equation}
+
+\begin{equation}
+  {\dot m_{SA}} = \frac{\dot M_{SA}}{L}
+\end{equation}
+
+\begin{equation}
+  {\dot m_{SA,rated}} = {\dot v_{SA,rated}} \cdot {\rho_{air,STP}}
+\end{equation}
 
 The modification factor \(f_{\dot m_{CW,mod}}()\) describes how the cooling capacity is adjusted to account for the flow rate of chilled water through the convector. This empirical correction factor is intended to account for how varying chilled water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized chilled water flow rate, \({\dot m_{CW}}\) , and the normalized chilled water flow rate at the rating point, \({\dot m_{CW,rated}}\) .
 
-\[{f_{\dot m_{CW,mod}}()} = f_{\dot m_{CW,mod}}\left(\frac{{\dot m_{CW}}}{{\dot m_{CW,rated}}}\right)\] \[{\dot m_{CW}} = \frac{\dot M_{CW}}{L}\] \[{\dot m_{CW,rated}} = {\dot v_{CW,rated}} \cdot {\rho_{CW}}\]
+\begin{equation}
+  {f_{\dot m_{CW,mod}}()} = f_{\dot m_{CW,mod}}\left(\frac{{\dot m_{CW}}}{{\dot m_{CW,rated}}}\right)
+\end{equation}
+
+\begin{equation}
+  {\dot m_{CW}} = \frac{\dot M_{CW}}{L}
+\end{equation}
+
+\begin{equation}
+  {\dot m_{CW,rated}} = {\dot v_{CW,rated}} \cdot {\rho_{CW}}
+\end{equation}
 
 The model for when the unit is operated in heating mode is very similar. The convector power is determined using the rated normalized heating capacity that is modified by three separate functions.
 
@@ -517,7 +537,17 @@ The modification factor \(f_{\dot m_{SA,heat,mod}}()\) describes how the heating
 
 The modification factor \(f_{\dot m_{HW,mod}}()\) describes how the heating capacity is adjusted to account for the flow rate of hot water through the convector. This empirical correction factor is intended to account for how varying hot water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized hot water flow rate, \({\dot m_{HW}}\) , and the normalized hot water flow rate at the rating point, \({\dot m_{HW,rated}}\) .
 
-\[f_{\dot m_{HW,mod}}() = f_{\dot m_{HW,mod}}\left(\frac{{\dot m_{HW}}}{{\dot m_{HW,rated}}}\right)\] \[{\dot m_{HW}} = \frac{\dot M_{HW}}{L}\] \[{\dot m_{HW,rated}} = {\dot v_{HW,rated}} \cdot {\rho_{HW}}\]
+\begin{equation}
+  f_{\dot m_{HW,mod}}() = f_{\dot m_{HW,mod}}\left(\frac{{\dot m_{HW}}}{{\dot m_{HW,rated}}}\right)
+\end{equation}
+
+\begin{equation}
+  {\dot m_{HW}} = \frac{\dot M_{HW}}{L}
+\end{equation}
+
+\begin{equation}
+  {\dot m_{HW,rated}} = {\dot v_{HW,rated}} \cdot {\rho_{HW}}
+\end{equation} 
 
 Where,
 
@@ -611,7 +641,13 @@ When cooling, the result for beam capacity (negative for cooling) is used to cal
 
 However, to protect from a non-physical result the leaving chilled water temperature is constrained to be no warmer than a 1.0 C approach temperature compared to the zone air or the primary supply air. If the above result is too warm the leaving temperature and beam cooling capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the cooliong performance input data.
 
-\[{T_{CW,out}} = { max( {T_{SA}} , {T_{Z}}) - 1.0 }\] \[{\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} \cdot {( {T_{CW,in}} - {T_{CW,out}}) }\]
+\begin{equation}
+  {T_{CW,out}} = { max( {T_{SA}} , {T_{Z}}) - 1.0 }
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} \cdot {( {T_{CW,in}} - {T_{CW,out}})}
+\end{equation}
 
 Similarly when heating, the result for beam capacity (positive for heating) is used the calculate the leaving temperature of the hot water using,
 
@@ -621,7 +657,13 @@ Similarly when heating, the result for beam capacity (positive for heating) is u
 
 To protect from a non-physical result the leaving hot water temperature is constrained to be no cooler than a 1.0 C approach temperature compared to the zone air or the primary supply air. If the above result is too cool the leaving temperature and beam heating capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the heating performance input data.
 
-\[{T_{HW,out}} = { min( {T_{SA}} , {T_{Z}}) + 1.0 }\] \[{\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} \cdot {( {T_{HW,in}} - {T_{HW,out}}) }\]
+\begin{equation}
+  {T_{HW,out}} = { min( {T_{SA}} , {T_{Z}}) + 1.0 }
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} \cdot {( {T_{HW,in}} - {T_{HW,out}}) }
+\end{equation}
 
 \subsubsection{Four Pipe Beam Sizing}\label{four-pipe-beam-sizing}
 
@@ -637,7 +679,17 @@ The four pipe beam model has four inputs that can be autosized:
 
 Because of the way the model is formulated with defaulted inputs for rated, normalized performance data, we can link the four inputs together to ensure an internally consistent set of sizes. If any one of these four inputs is not autosized (given a fixed value at input) then the other three can be computed using the normalized, rated performance data which are either input or have default values. If the total beam length is input, then the following equations are used
 
-\[{\dot V_{SA,Des}} = {{\dot v_{SA,rated}} \cdot {L} }\] \[{\dot V_{CW,Des}} = {{\dot v_{CW,rated}} \cdot {L} }\] \[{\dot V_{HW,Des}} = {{\dot v_{HW,rated}} \cdot {L} }\]
+\begin{equation}
+  {\dot V_{SA,Des}} = {{\dot v_{SA,rated}} \cdot {L}}
+\end{equation}
+
+\begin{equation}
+  {\dot V_{CW,Des}} = {{\dot v_{CW,rated}} \cdot {L}}
+\end{equation} 
+  
+\begin{equation}
+  {\dot V_{HW,Des}} = {{\dot v_{HW,rated}} \cdot {L}}
+\end{equation}
 
 If the design primary supply air flow rate is input then the beam length can be determined as follows and then water flow rates evaluated as above.
 
@@ -695,15 +747,115 @@ The sizing method here uses the non-linear solver inside EnergyPlus, called Solv
 
 When sizing for the cooling design load, the following design values are set for use in the model calculations:
 
-\[{T_{CW,in}} = {T_{CW,design}}\] \[{\dot m_{HW}} = 0.0\] \[{T_{Z}} = {T_{Z,cool,design } }\] \[{T_{SA}} = {T_{SA,cool,design } }\] \[{c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,cool,design } },  {T_{Z,cool,design } }  ) }\] \[{c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,cool,design } },  {T_{SA,cool,design } }   ) }\] \[{\dot Q_{Zone, Required}} = -1.0 \cdot {\dot Q_{Z,cool,design } }\] \[{\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot {( {T_{Z,cool,design } } - {T_{SA,cool,design } } )}}  \right) }\] or if \(( {T_{Z,cool,design }} - {T_{SA,cool,design } } ) < 2.0\) then \[{\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }\] \[{\dot m_{SA,min limit}} = min( {\dot V_{Z,final,OA} }, \frac{{\dot m_{SA,max limit}}}{3.0}, max({\dot V_{TU,Z,final,heat} } , {\dot V_{TU,Z,final,cool} }) )\]
+\begin{equation}
+  {T_{CW,in}} = {T_{CW,design}}
+\end{equation}
+
+\begin{equation}
+  {\dot m_{HW}} = 0.0
+\end{equation}
+
+\begin{equation}
+  {T_{Z}} = {T_{Z,cool,design }}
+\end{equation}
+
+\begin{equation}
+  {T_{SA}} = {T_{SA,cool,design}}
+\end{equation}
+
+\begin{equation}
+  {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,cool,design } },  {T_{Z,cool,design } }  ) }
+\end{equation}
+
+\begin{equation}
+  {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,cool,design } },  {T_{SA,cool,design } }   ) }
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Zone, Required}} = -1.0 \cdot {\dot Q_{Z,cool,design}}
+\end{equation}
+
+\begin{equation}
+  {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot {( {T_{Z,cool,design } } - {T_{SA,cool,design } } )}}  \right) }
+\end{equation}  
+  
+or if \(({T_{Z,cool,design }} - {T_{SA,cool,design}}) < 2.0\) then
+
+\begin{equation}
+  {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }
+\end{equation}
+
+\begin{equation}
+  {\dot m_{SA,min limit}} = min( {\dot V_{Z,final,OA} }, \frac{{\dot m_{SA,max limit}}}{3.0}, max({\dot V_{TU,Z,final,heat} } , {\dot V_{TU,Z,final,cool} }) )
+\end{equation}
 
 When sizing for the heating design load, the following design values are set for use in the model calculations:
 
-\[{T_{HW,in}} = {T_{HW,design}}\] \[{\dot m_{CW}} = {0.0}\] \[{T_{Z}} = {T_{Z,heat,design } }\] \[{T_{SA}} = {T_{SA,heat,design } }\] \[{c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,heat,design } },  {T_{Z,heat,design } }  ) }\] \[{c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,heat,design } },  {T_{SA,heat,design } }   ) }\] \[{\dot Q_{Zone, Required}} = {\dot Q_{Z,heat,design } }\] \[{\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot ( {T_{SA,heat,design } } - {T_{Z,heat,design }} ) } \right) }\] or if \(( {T_{SA,heat,design } } - {T_{Z,heat,design } }) < 2.0\) then \[{\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }\] \[{\dot m_{SA,min limit}} = {0.0}\]
+\begin{equation}
+  {T_{HW,in}} = {T_{HW,design}}
+\end{equation}
 
-The trial value for design primary supply air flow rate is used to calculate design values for length, chilled water flow, and hot water flow. \[{\dot V_{SA,Des}} = { \left(\frac{ {\dot m_{SA,trial}} }{{\rho_{air}} } \right) }\] \[{L} = {\frac{{\dot V_{SA,Des}}}{{\dot v_{SA,rated}}}  }\] \[{\dot V_{CW,Des}} = {{\dot v_{CW,rated}} \cdot {L} }\] \[{\dot V_{HW,Des}} = {{\dot v_{HW,rated}} \cdot {L} }\]
+\begin{equation}
+  {\dot m_{CW}} = {0.0}
+\end{equation}
 
-The residual is calculated by evaluating the entire model to determine the total capacity for a trial flow rate (and corresponding design length and maximum water flow rates) and comparing it to the design load. \[{residuum} = \left(\frac{ ({\dot Q_{Zone, Required}} - {\dot Q_{Tot}} )}{{\dot Q_{Zone, Required}}}\right)\]
+\begin{equation}
+  {T_{Z}} = {T_{Z,heat,design } }
+\end{equation}
+
+\begin{equation}
+  {T_{SA}} = {T_{SA,heat,design}}
+\end{equation}
+
+\begin{equation}
+  {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,heat,design } },  {T_{Z,heat,design } }  ) }
+\end{equation}
+
+\begin{equation}
+  {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,heat,design } },  {T_{SA,heat,design } }   ) }
+\end{equation}
+
+\begin{equation}
+  {\dot Q_{Zone, Required}} = {\dot Q_{Z,heat,design } }
+\end{equation}
+
+\begin{equation}
+  {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot ( {T_{SA,heat,design } } - {T_{Z,heat,design }} ) } \right) }
+\end{equation}
+
+or if \(( {T_{SA,heat,design } } - {T_{Z,heat,design } }) < 2.0\) then
+
+\begin{equation}
+  {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }
+\end{equation}
+
+\begin{equation}
+  {\dot m_{SA,min limit}} = {0.0}
+\end{equation}
+
+The trial value for design primary supply air flow rate is used to calculate design values for length, chilled water flow, and hot water flow.
+
+\begin{equation}
+  {\dot V_{SA,Des}} = { \left(\frac{ {\dot m_{SA,trial}} }{{\rho_{air}} } \right) }
+\end{equation}
+
+\begin{equation}
+  {L} = {\frac{{\dot V_{SA,Des}}}{{\dot v_{SA,rated}}}  }
+\end{equation}
+
+\begin{equation}
+  {\dot V_{CW,Des}} = {{\dot v_{CW,rated}} \cdot {L} }
+\end{equation}
+
+\begin{equation}
+  {\dot V_{HW,Des}} = {{\dot v_{HW,rated}} \cdot {L} }
+\end{equation}
+
+The residual is calculated by evaluating the entire model to determine the total capacity for a trial flow rate (and corresponding design length and maximum water flow rates) and comparing it to the design load.
+
+\begin{equation}
+  {residuum} = \left(\frac{ ({\dot Q_{Zone, Required}} - {\dot Q_{Tot}} )}{{\dot Q_{Zone, Required}}}\right)
+\end{equation}
 
 After the solvers have run and the final sizes for the four pipe beam have been determined, there is one more step taken to make further adjustments in the central sizing data structures for sizing air system components. The usual methods of sizing the main AirLoopHVAC branch and fans are not able account for the methods used to size the four pipe beam. When the Sizing:System object was set to use \emph{VentilationRequirement}, the air handler will be too small. When the Sizing:System object was set to use \emph{Sensible}, the air handler will be too large. The system sizing calculations have already been completed at the time the four pipe beam air terminals are sized so we need to make some adjustments. The final primary supply air flow rate size is compared to the original final zone sizes for the air terminal unit and the air loop sizes adjusted to make up for the difference. A sizing report item called ``AirLoopHVAC Design Supply Air Flow Rate Adjustment {[}m3/s{]}'' is generated for each four pipe beam that shows the magnitude of the adjustment to data structure values used to size central air systems. Therefore when autosizing air handlers with four pipe beams, it is expected that the outcomes for air system sizes will not agree with the system sizing reporting because of the differences introduced by this adjustment.
 
