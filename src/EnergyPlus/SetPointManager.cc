@@ -529,6 +529,22 @@ namespace SetPointManager {
 	void
 	GetSetPointManagerInputs()
 	{
+		// wrapper for GetInput to allow unit testing when fatal inputs are detected
+		static bool ErrorsFound( false );
+		static std::string const RoutineName( "GetSetPointManagerInputs: " ); // include trailing blank space
+
+		GetSetPointManagerInputData( ErrorsFound );
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+		}
+
+	}
+
+	void
+	GetSetPointManagerInputData( 
+		bool & ErrorsFound )
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
@@ -617,7 +633,6 @@ namespace SetPointManager {
 		int ZoneNum; // loop index for zone nodes
 		int NumNodes;
 		Array1D_int NodeNums;
-		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool NodeListError( false );
@@ -1585,14 +1600,14 @@ namespace SetPointManager {
 
 			Found = FindNumberInList( MixedAirSetPtMgr( SetPtMgrNum ).RefNode, MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes, MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes );
 			if ( Found > 0 ) {
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 				if ( MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes > 1 ) {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as one of the nodes in SetPoint NodeList" );
 				} else {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as the SetPoint Node" );
 				}
 				ShowContinueError( "Reference Node Name=\"" + NodeID( MixedAirSetPtMgr( SetPtMgrNum ).RefNode ) + "\"." );
+				ErrorsFound = true;
 			}
 
 			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs;
@@ -1704,14 +1719,14 @@ namespace SetPointManager {
 
 			Found = FindNumberInList( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode, OAPretreatSetPtMgr( SetPtMgrNum ).CtrlNodes, OAPretreatSetPtMgr( SetPtMgrNum ).NumCtrlNodes );
 			if ( Found > 0 ) {
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 				if ( OAPretreatSetPtMgr( SetPtMgrNum ).NumCtrlNodes > 1 ) {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as one of the nodes in SetPoint NodeList" );
 				} else {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as the SetPoint Node" );
 				}
 				ShowContinueError( "Reference Node Name=\"" + NodeID( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode ) + "\"." );
+				ErrorsFound = true;
 			}
 
 			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs + NumMixedAirSetPtMgrs;
@@ -2658,10 +2673,6 @@ namespace SetPointManager {
 
 		}
 
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
-		}
-
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
 			SetupOutputVariable( "Setpoint Manager Warmest Temperature Critical Zone Number []", WarmestSetPtMgrTempFlow( SetPtMgrNum ).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
 			SetupOutputVariable( "Setpoint Manager Warmest Temperature Turndown Flow Fraction []", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Turndown, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
@@ -3060,10 +3071,6 @@ namespace SetPointManager {
 		cNumericFieldNames.deallocate();
 		rNumericArgs.deallocate();
 		lNumericFieldBlanks.deallocate();
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
-		}
 
 	}
 
