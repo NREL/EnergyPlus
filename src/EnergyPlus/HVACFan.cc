@@ -745,6 +745,7 @@ namespace HVACFan {
 				}
 
 				localFanTotEff = fanTotalEff_;
+				DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
 				break;
 			}
 			case SpeedControlMethod::continuous : {

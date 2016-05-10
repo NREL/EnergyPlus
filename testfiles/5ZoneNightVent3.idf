@@ -3563,7 +3563,7 @@
     , !- Night Ventilation Mode Flow Fraction
     , !- Motor Loss Zone Name
     , !- Motor Loss Radiative Fraction 
-    Fan Energy; !- End-Use Subcategory
+    General; !- End-Use Subcategory
 
   Curve:Quartic,
     VAV Fan Curve , !- Name

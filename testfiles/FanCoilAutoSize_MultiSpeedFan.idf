@@ -116,7 +116,7 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   RunPeriod,
-    Jan14,                        !- Name
+    ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     1,                       !- End Month
@@ -129,7 +129,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    July7,                        !- Name
+    ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     7,                       !- End Month
@@ -1852,7 +1852,7 @@ Fan:SystemModel,
   , !- Night Ventilation Mode Flow Fraction
   , !- Motor Loss Zone Name
   , !- Motor Loss Radiative Fraction 
-  Fan Energy, !- End-Use Subcategory
+  General, !- End-Use Subcategory
   3, !- Number of Speeds
   0.33, !- Speed 1 Flow Fraction
   0.12, !- Speed 1 Electric Power Fraction
@@ -1975,7 +1975,7 @@ Fan:SystemModel,
   , !- Night Ventilation Mode Flow Fraction
   , !- Motor Loss Zone Name
   , !- Motor Loss Radiative Fraction 
-  Fan Energy, !- End-Use Subcategory
+  General, !- End-Use Subcategory
   3, !- Number of Speeds
   0.33, !- Speed 1 Flow Fraction
   0.33, !- Speed 1 Electric Power Fraction
@@ -2098,7 +2098,7 @@ Fan:SystemModel,
   , !- Night Ventilation Mode Flow Fraction
   , !- Motor Loss Zone Name
   , !- Motor Loss Radiative Fraction 
-  Fan Energy, !- End-Use Subcategory
+  General, !- End-Use Subcategory
   3, !- Number of Speeds
   0.33, !- Speed 1 Flow Fraction
   0.33, !- Speed 1 Electric Power Fraction

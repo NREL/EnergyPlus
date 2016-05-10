@@ -206,7 +206,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    annual,                        !- Name
+    ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -2279,7 +2279,7 @@
     , !- Night Ventilation Mode Flow Fraction
     , !- Motor Loss Zone Name
     , !- Motor Loss Radiative Fraction 
-    Slab Fan Energy; !- End-Use Subcategory
+    General; !- End-Use Subcategory
 
   Fan:SystemModel,
     Zone2VentSlabFan, !- Name
@@ -2302,7 +2302,7 @@
     , !- Night Ventilation Mode Flow Fraction
     , !- Motor Loss Zone Name
     , !- Motor Loss Radiative Fraction 
-    Slab Fan Energy; !- End-Use Subcategory
+    General; !- End-Use Subcategory
 
   Fan:SystemModel,
     Zone3VentSlabFan, !- Name
@@ -2325,7 +2325,7 @@
     , !- Night Ventilation Mode Flow Fraction
     , !- Motor Loss Zone Name
     , !- Motor Loss Radiative Fraction 
-    Slab Fan Energy; !- End-Use Subcategory
+    General; !- End-Use Subcategory
 
   Fan:SystemModel,
     Zone4VentSlabFan, !- Name
@@ -2348,7 +2348,7 @@
     , !- Night Ventilation Mode Flow Fraction
     , !- Motor Loss Zone Name
     , !- Motor Loss Radiative Fraction 
-    Slab Fan Energy; !- End-Use Subcategory
+    General; !- End-Use Subcategory
 
   Fan:SystemModel,
     Zone5VentSlabFan, !- Name
@@ -2371,7 +2371,7 @@
     , !- Night Ventilation Mode Flow Fraction
     , !- Motor Loss Zone Name
     , !- Motor Loss Radiative Fraction 
-    Slab Fan Energy; !- End-Use Subcategory
+    General; !- End-Use Subcategory
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:WATER ===========
 
