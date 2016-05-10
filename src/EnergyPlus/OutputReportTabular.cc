@@ -9486,6 +9486,7 @@ namespace OutputReportTabular {
 		static Array1D< Real64 > zstWallArea( 4 );
 		static Array1D< Real64 > zstUndWallArea( 4 );
 		static Array1D< Real64 > zstWindowArea( 4 );
+		static Array1D< Real64 > zstOpeningArea( 4 );
 		static Array1D< Real64 > zstLight( 4 );
 		static Array1D< Real64 > zstPeople( 4 );
 		static Array1D< Real64 > zstPlug( 4 );
@@ -9495,6 +9496,7 @@ namespace OutputReportTabular {
 		zstWallArea = 0.0;
 		zstUndWallArea = 0.0;
 		zstWindowArea = 0.0;
+		zstOpeningArea = 0.0;
 		zstLight = 0.0;
 		zstPeople  = 0.0;
 		zstPlug = 0.0;
@@ -9505,6 +9507,10 @@ namespace OutputReportTabular {
 		Real64 TotalWallArea;
 		Real64 TotalWindowArea;
 		Real64 TotalAboveGroundWallArea;
+
+		Array1D< Real64> zoneOpeningArea;
+		zoneOpeningArea.allocate( NumOfZones );
+		zoneOpeningArea = 0.0;
 
 		// all arrays are in the format: (row, columnm)
 		if ( displayTabularVeriSum ) {
@@ -9708,6 +9714,7 @@ namespace OutputReportTabular {
 								windowAreaW += curArea * mult;
 								if ( isConditioned ) windowAreaWcond += curArea * mult;
 							}
+							zoneOpeningArea( zonePt ) += curArea * mult; // total window opening area for each zone (glass plus frame area)
 							if ( DetailedWWR ) {
 								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
@@ -9895,10 +9902,10 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 11 );
-			columnWidth.allocate( 11 );
+			columnHead.allocate( 12 );
+			columnWidth.allocate( 12 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 11, NumOfZones + 4 );
+			tableBody.allocate( 12, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
@@ -9908,9 +9915,10 @@ namespace OutputReportTabular {
 			columnHead( 6 ) = "Above Ground Gross Wall Area " + m2_unitName;
 			columnHead( 7 ) = "Underground Gross Wall Area " + m2_unitName;
 			columnHead( 8 ) = "Window Glass Area " + m2_unitName;
-			columnHead( 9 ) = "Lighting " + Wm2_unitName;
-			columnHead( 10 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
-			columnHead( 11 ) = "Plug and Process " + Wm2_unitName;
+			columnHead( 9 ) = "Opening Area " + m2_unitName;
+			columnHead( 10 ) = "Lighting " + Wm2_unitName;
+			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
+			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
 
 			rowHead = "";
 
@@ -9953,6 +9961,7 @@ namespace OutputReportTabular {
 				tableBody( 6, iZone ) = RealToStr( Zone( iZone ).ExtGrossWallArea * m2_unitConv, 2 );
 				tableBody( 7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
 				tableBody( 8, iZone) = RealToStr(Zone(iZone).ExtWindowArea * m2_unitConv, 2);
+				tableBody( 9, iZone ) = RealToStr( zoneOpeningArea(iZone) * m2_unitConv, 2 );
 				// lighting density
 				totLightPower = 0.0;
 				for ( iLight = 1; iLight <= TotLights; ++iLight ) {
@@ -9961,7 +9970,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( 9, iZone ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
+					tableBody( 10, iZone ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
 				}
 				// people density
 				totNumPeople = 0.0;
@@ -9971,7 +9980,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( totNumPeople > 0 ) {
-					tableBody( 10, iZone ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
+					tableBody( 11, iZone ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
 				}
 				// plug and process density
 				totPlugProcess = 0.0;
@@ -9996,7 +10005,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( 11, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
+					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
@@ -10005,6 +10014,7 @@ namespace OutputReportTabular {
 					zstWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( grandTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstOpeningArea( grandTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( grandTotal ) += mult * totLightPower;
 					zstPeople( grandTotal ) += mult * totNumPeople;
 					zstPlug( grandTotal ) += mult * totPlugProcess;
@@ -10014,6 +10024,7 @@ namespace OutputReportTabular {
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstOpeningArea( notpartTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
 					zstPlug( notpartTotal ) += mult * totPlugProcess;
@@ -10024,6 +10035,7 @@ namespace OutputReportTabular {
 					zstWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( condTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstOpeningArea( condTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( condTotal ) += mult * totLightPower;
 					zstPeople( condTotal ) += mult * totNumPeople;
 					zstPlug( condTotal ) += mult * totPlugProcess;
@@ -10033,6 +10045,7 @@ namespace OutputReportTabular {
 					zstWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( uncondTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstOpeningArea( uncondTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( uncondTotal ) += mult * totLightPower;
 					zstPeople( uncondTotal ) += mult * totNumPeople;
 					zstPlug( uncondTotal ) += mult * totPlugProcess;
@@ -10042,6 +10055,7 @@ namespace OutputReportTabular {
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
 					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstOpeningArea( notpartTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
 					zstPlug( notpartTotal ) += mult * totPlugProcess;
@@ -10053,12 +10067,13 @@ namespace OutputReportTabular {
 				tableBody( 6, NumOfZones + iTotal ) = RealToStr( zstWallArea( iTotal ) * m2_unitConv, 2 );
 				tableBody( 7, NumOfZones + iTotal) = RealToStr( zstUndWallArea( iTotal ) * m2_unitConv, 2);
 				tableBody( 8, NumOfZones + iTotal) = RealToStr( zstWindowArea( iTotal ) * m2_unitConv, 2);
+				tableBody( 9, NumOfZones + iTotal ) = RealToStr( zstOpeningArea( iTotal ) * m2_unitConv, 2 );
 				if ( zstArea( iTotal ) != 0 ) {
-					tableBody( 9, NumOfZones + iTotal ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
-					tableBody( 11, NumOfZones + iTotal ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( 10, NumOfZones + iTotal ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( 12, NumOfZones + iTotal ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
 				}
 				if ( zstPeople( iTotal ) != 0 ) {
-					tableBody( 10, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
+					tableBody( 11, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
 				}
 			}
 			PreDefTableEntry( pdchLeedSutSpArea, "Totals", zstArea( grandTotal ), 2 );
