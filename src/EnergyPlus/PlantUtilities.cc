@@ -530,6 +530,20 @@ namespace PlantUtilities {
 					a_node.MassFlowRate = max( a_node.MassFlowRateMinAvail, CompFlow );
 					a_node.MassFlowRate = max( a_node.MassFlowRateMin, a_node.MassFlowRate );
 					// add MassFlowRateMin hardware constraints
+
+					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+					// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+					for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+						auto const & comp( branch.Comp( CompNum ) );
+						if ( comp.EMSLoadOverrideOn && comp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						a_node.MassFlowRate = 0.0;
+						a_node.MassFlowRateRequest = 0.0;
+					}
+
 					a_node.MassFlowRate = min( a_node.MassFlowRateMaxAvail, a_node.MassFlowRate );
 					a_node.MassFlowRate = min( a_node.MassFlowRateMax, a_node.MassFlowRate );
 					if ( a_node.MassFlowRate < MassFlowTolerance ) a_node.MassFlowRate = 0.0;
@@ -574,29 +588,14 @@ namespace PlantUtilities {
 
 			Real64 const a_node_MasFlowRate( a_node.MassFlowRate );
 			Real64 const a_node_MasFlowRateRequest( a_node.MassFlowRateRequest );
-			EMSLoadOverride = false;
-			// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
-			for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
-				auto const & comp( branch.Comp( CompNum ) );
-				if ( comp.EMSLoadOverrideOn ) EMSLoadOverride = true;
-			}
 			for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
 				auto const & comp( branch.Comp( CompNum ) );
 				NodeNum = comp.NodeNumIn;
-				if ( EMSLoadOverride ) { // actuate EMS controlled components if On/Off Supervisory is used
-					Node( NodeNum ).MassFlowRate = 0.0;
-					Node( NodeNum ).MassFlowRateRequest = 0.0;
-					NodeNum = comp.NodeNumOut;
-					Node( NodeNum ).MassFlowRate = 0.0;
-					Node( NodeNum ).MassFlowRateRequest = 0.0;
-				} else {
-					Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
-					Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
-					NodeNum = comp.NodeNumOut;
-					Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
-					Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
-				}
-
+				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
+				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
+				NodeNum = comp.NodeNumOut;
+				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
+				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
 			}
 
 		} else {
