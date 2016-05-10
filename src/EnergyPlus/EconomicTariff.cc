@@ -3791,40 +3791,62 @@ namespace EconomicTariff {
 
 		int elecFacilMeter;
 		int gasFacilMeter;
+		int distCoolFacilMeter;
+		int distHeatFacilMeter;
 		Real64 elecTotalEne;
 		Real64 gasTotalEne;
+		Real64 distCoolTotalEne;
+		Real64 distHeatTotalEne;
 		Real64 otherTotalEne;
 		Real64 elecTotalCost;
 		Real64 gasTotalCost;
 		Real64 otherTotalCost;
+		Real64 distCoolTotalCost;
+		Real64 distHeatTotalCost;
 		Real64 allTotalCost;
 		std::string elecTariffNames;
 		std::string gasTariffNames;
+		std::string distCoolTariffNames;
+		std::string distHeatTariffNames;
 		std::string othrTariffNames;
 		int elecUnits;
 		int gasUnits;
+		int distCoolUnits;
+		int distHeatUnits;
 		int othrUnits;
 		int gasDemWindowUnits;
+		int distCoolDemWindowUnits;
+		int distHeatDemWindowUnits;
 		int othrDemWindowUnits;
 		int iTariff;
 
 		if ( numTariff > 0 ) {
 			elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
 			gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
+			distCoolFacilMeter = GetMeterIndex( "DISTRICTCOOLING:FACILITY" );
+			distHeatFacilMeter = GetMeterIndex( "DISTRICTHEATING:FACILITY" );
 			elecTotalEne = 0.0;
 			gasTotalEne = 0.0;
+			distCoolTotalEne = 0.0;
+			distHeatTotalEne = 0.0;
 			otherTotalEne = 0.0;
 			elecTotalCost = 0.0;
 			gasTotalCost = 0.0;
+			distCoolTotalCost = 0.0;
+			distHeatTotalCost = 0.0;
 			otherTotalCost = 0.0;
 			allTotalCost = 0.0;
 			elecUnits = 0;
 			gasUnits = 0;
+			distCoolUnits = 0;
+			distHeatUnits = 0;
 			othrUnits = 0;
 			gasDemWindowUnits = 0;
 			othrDemWindowUnits = 0;
 			elecTariffNames = "";
 			gasTariffNames = "";
+			distCoolTariffNames = "";
+			distHeatTariffNames = "";
 			othrTariffNames = "";
 			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 				if ( tariff( iTariff ).isSelected ) {
@@ -3840,6 +3862,18 @@ namespace EconomicTariff {
 						gasTariffNames += ' ' + tariff( iTariff ).tariffName;
 						gasUnits = tariff( iTariff ).convChoice;
 						gasDemWindowUnits = tariff( iTariff ).demandWindow;
+					} else if ( tariff( iTariff ).reportMeterIndx == distCoolFacilMeter ) {
+						if ( tariff( iTariff ).totalAnnualEnergy > distCoolTotalEne ) distCoolTotalEne = tariff( iTariff ).totalAnnualEnergy;
+						distCoolTotalCost += tariff( iTariff ).totalAnnualCost;
+						distCoolTariffNames += ' ' + tariff( iTariff ).tariffName;
+						distCoolUnits = tariff( iTariff ).convChoice;
+						distCoolDemWindowUnits = tariff( iTariff ).demandWindow;
+					} else if ( tariff( iTariff ).reportMeterIndx == distHeatFacilMeter ) {
+						if ( tariff( iTariff ).totalAnnualEnergy > distHeatTotalEne ) distHeatTotalEne = tariff( iTariff ).totalAnnualEnergy;
+						distHeatTotalCost += tariff( iTariff ).totalAnnualCost;
+						distHeatTariffNames += ' ' + tariff( iTariff ).tariffName;
+						distHeatUnits = tariff( iTariff ).convChoice;
+						distHeatDemWindowUnits = tariff( iTariff ).demandWindow;
 					} else {
 						if ( tariff( iTariff ).totalAnnualEnergy > otherTotalEne ) otherTotalEne = tariff( iTariff ).totalAnnualEnergy;
 						otherTotalCost += tariff( iTariff ).totalAnnualCost;
@@ -3852,6 +3886,8 @@ namespace EconomicTariff {
 			//names of the rates
 			PreDefTableEntry( pdchLeedEtsRtNm, "Electricity", elecTariffNames );
 			PreDefTableEntry( pdchLeedEtsRtNm, "Natural Gas", gasTariffNames );
+			if ( distCoolTotalEne != 0 ) PreDefTableEntry( pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames );
+			if ( distHeatTotalEne != 0 ) PreDefTableEntry( pdchLeedEtsRtNm, "District Heating", distHeatTariffNames );
 			PreDefTableEntry( pdchLeedEtsRtNm, "Other", othrTariffNames );
 			//virtual rate
 			if ( elecTotalEne != 0 ) PreDefTableEntry( pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3 );
@@ -3868,11 +3904,24 @@ namespace EconomicTariff {
 			PreDefTableEntry( pdchLeedEcsTotal, "Electricity", elecTotalCost, 2 );
 			PreDefTableEntry( pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2 );
 			PreDefTableEntry( pdchLeedEcsTotal, "Other", otherTotalCost, 2 );
+			// show district energy if used
+			if ( distCoolTotalEne != 0 ) {
+				PreDefTableEntry( pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3 );
+				PreDefTableEntry( pdchLeedEtsEneUnt, "District Cooling", convEneStrings( distCoolUnits ) );
+				PreDefTableEntry( pdchLeedEtsDemUnt, "District Cooling", convDemStrings( distCoolUnits ) + demWindowStrings( distCoolDemWindowUnits ) );
+				PreDefTableEntry( pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2 );
+			}
+			if ( distHeatTotalEne != 0 ) {
+				PreDefTableEntry( pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3 );
+				PreDefTableEntry( pdchLeedEtsEneUnt, "District Heating", convEneStrings( distHeatUnits ) );
+				PreDefTableEntry( pdchLeedEtsDemUnt, "District Heating", convDemStrings( distHeatUnits ) + demWindowStrings( distHeatDemWindowUnits ) );
+				PreDefTableEntry( pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2 );
+			}
 			// save the total costs for later to compute process fraction
 			LEEDelecCostTotal = elecTotalCost;
 			LEEDgasCostTotal = gasTotalCost;
-			LEEDothrCostTotal = otherTotalCost;
-			PreDefTableEntry( pdchLeedEcsTotal, "Total", elecTotalCost + gasTotalCost + otherTotalCost, 2 );
+			LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
+			PreDefTableEntry( pdchLeedEcsTotal, "Total", elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost, 2 );
 		}
 	}
 
