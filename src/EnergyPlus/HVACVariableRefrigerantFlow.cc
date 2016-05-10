@@ -3751,7 +3751,6 @@ namespace HVACVariableRefrigerantFlow {
 			SetupOutputVariable( "VRF Heat Pump Cooling COP []", VRF( NumCond ).OperatingCoolingCOP, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump Heating COP []", VRF( NumCond ).OperatingHeatingCOP, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump COP []", VRF( NumCond ).OperatingCOP, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Simultaneous Cooling and Heating Efficiency [Btu/h/W]", VRF( NumCond ).SCHE, "System", "Average", VRF( NumCond ).Name );
 
 			if( VRF( NumCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ){
 			// For VRF_FluidTCtrl Model
@@ -3796,6 +3795,7 @@ namespace HVACVariableRefrigerantFlow {
 			SetupOutputVariable( "VRF Heat Pump Terminal Unit Heating Load Rate [W]", VRF( NumCond ).TUHeatingLoad, "System", "Average", VRF( NumCond ).Name );
 			if ( VRF( NumCond ).HeatRecoveryUsed ) {
 				SetupOutputVariable( "VRF Heat Pump Heat Recovery Status Change Multiplier []", VRF( NumCond ).SUMultiplier, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Simultaneous Cooling and Heating Efficiency [Btu/h/W]", VRF( NumCond ).SCHE, "System", "Average", VRF( NumCond ).Name );
 			}
 
 			if ( VRF( NumCond ).CondenserType == EvapCooled ) {
@@ -8659,7 +8659,7 @@ namespace HVACVariableRefrigerantFlow {
 			PartLoadFraction = 1.0;
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 			
-			VRF( VRFCond ).ElecCoolingPower = VRF(VRFCond).Ncomp;
+			VRF( VRFCond ).ElecCoolingPower = VRF(VRFCond).Ncomp + VRF( VRFCond ).OUFanPower;
 			VRF( VRFCond ).ElecHeatingPower = 0;
 			
 		} else if ( VRF( VRFCond ).OperatingMode == ModeHeatingOnly ) {
@@ -8667,14 +8667,14 @@ namespace HVACVariableRefrigerantFlow {
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
 			VRF( VRFCond ).ElecCoolingPower = 0;
-			VRF( VRFCond ).ElecHeatingPower = VRF( VRFCond ).Ncomp;
+			VRF( VRFCond ).ElecHeatingPower = VRF( VRFCond ).Ncomp + VRF( VRFCond ).OUFanPower;
 			
 		} else if ( VRF( VRFCond ).OperatingMode == ModeCoolingAndHeating ) {
 			PartLoadFraction = 1.0;
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
-			VRF( VRFCond ).ElecCoolingPower = VRF( VRFCond ).Ncomp * VRF( VRFCond ).IUEvapHeatRate / ( VRF( VRFCond ).IUCondHeatRate + VRF( VRFCond ).IUEvapHeatRate );
-			VRF( VRFCond ).ElecHeatingPower = VRF( VRFCond ).Ncomp * VRF( VRFCond ).IUCondHeatRate / ( VRF( VRFCond ).IUCondHeatRate + VRF( VRFCond ).IUEvapHeatRate );
+			VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).Ncomp + VRF( VRFCond ).OUFanPower ) * VRF( VRFCond ).IUEvapHeatRate / ( VRF( VRFCond ).IUCondHeatRate + VRF( VRFCond ).IUEvapHeatRate );
+			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).Ncomp + VRF( VRFCond ).OUFanPower ) * VRF( VRFCond ).IUCondHeatRate / ( VRF( VRFCond ).IUCondHeatRate + VRF( VRFCond ).IUEvapHeatRate );
 			
 		} else {
 			VRF( VRFCond ).ElecCoolingPower = 0;
@@ -11608,9 +11608,9 @@ namespace HVACVariableRefrigerantFlow {
 		Pipe_cp_ref = 1.6; 
 		
 		// Refrigerant data
-		int RefrigNum = FindRefrigerant( VRF( VRFCond ).RefrigerantName ); 
-		Real64 RefPLow = RefrigData( RefrigNum ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
-		Real64 RefPHigh = RefrigData( RefrigNum ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
+		RefrigerantIndex = FindRefrigerant( VRF( VRFCond ).RefrigerantName ); 
+		Real64 RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
+		Real64 RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
 		
 		//Calculate Pipe_T_room 
 		Pipe_T_room = 0;
@@ -11759,10 +11759,10 @@ namespace HVACVariableRefrigerantFlow {
 		Pipe_cp_ref = 1.6; 
 		
 		// Refrigerant data
-		int RefrigNum = FindRefrigerant( VRF( VRFCond ).RefrigerantName ); 
-		Real64 RefTHigh = RefrigData( RefrigNum ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
-		Real64 RefPLow = RefrigData( RefrigNum ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
-		Real64 RefPHigh = RefrigData( RefrigNum ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
+		RefrigerantIndex = FindRefrigerant( VRF( VRFCond ).RefrigerantName ); 
+		Real64 RefTHigh = RefrigData( RefrigerantIndex ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
+		Real64 RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
+		Real64 RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
 		Real64 RefTSat = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 		
 		//Perform iteration to calculate Pipe_T_IU_in, given P and h
