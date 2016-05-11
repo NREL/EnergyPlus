@@ -2758,7 +2758,7 @@
     VAV Sys 1 Mixed Air Outlet,  !- Mixed Air Node Name
     VAV Sys 1 Outside Air Inlet,  !- Actuator Node Name
     0,                       !- Minimum Outdoor Air Flow Rate {m3/s}
-    100,                     !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     19,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
