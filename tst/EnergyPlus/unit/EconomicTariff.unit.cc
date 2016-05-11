@@ -64,12 +64,16 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <OutputProcessor.hh>
+#include <OutputReportPredefined.hh>
 #include <EconomicTariff.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicTariff;
+using namespace EnergyPlus::OutputProcessor;
+using namespace EnergyPlus::OutputReportPredefined;
 
 TEST_F( EnergyPlusFixture, EconomicTariff_GetInput_Test)
 {
@@ -230,6 +234,57 @@ TEST_F( EnergyPlusFixture, EconomicTariff_GetInput_Test)
 	// Computation
 	EXPECT_EQ( 1, numComputation );
 
+
+}
+
+TEST_F( EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test )
+{
+	NumEnergyMeters = 4;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).Name = "ELECTRICITY:FACILITY";
+	EnergyMeters( 2 ).Name = "GAS:FACILITY";
+	EnergyMeters( 3 ).Name = "DISTRICTCOOLING:FACILITY";
+	EnergyMeters( 4 ).Name = "DISTRICTHEATING:FACILITY";
+
+	numTariff = 4;
+	tariff.allocate( numTariff );
+	tariff( 1 ).tariffName = "SecondaryGeneralUnit";
+	tariff( 1 ).isSelected = true;
+	tariff( 1 ).totalAnnualCost = 4151.45;
+	tariff( 1 ).totalAnnualEnergy = 4855.21;
+	tariff( 1 ).kindElectricMtr = 3;
+	tariff( 1 ).reportMeterIndx = 1;
+
+	tariff( 2 ).tariffName = "SmallCGUnit";
+	tariff( 2 ).isSelected = true;
+	tariff( 2 ).totalAnnualCost = 415.56;
+	tariff( 2 ).totalAnnualEnergy = 0.00;
+	tariff( 2 ).reportMeterIndx = 2;
+
+	tariff( 3 ).tariffName = "DistrictCoolingUnit";
+	tariff( 3 ).isSelected = true;
+	tariff( 3 ).totalAnnualCost = 55.22;
+	tariff( 3 ).totalAnnualEnergy = 8.64;
+	tariff( 3 ).reportMeterIndx = 3;
+
+	tariff( 4 ).tariffName = "DistrictHeatingUnit";
+	tariff( 4 ).isSelected = true;
+	tariff( 4 ).totalAnnualCost = 15.98;
+	tariff( 4 ).totalAnnualEnergy = 1.47;
+	tariff( 4 ).reportMeterIndx = 4;
+
+	SetPredefinedTables(); // need to setup the predefined table entry numbers
+
+	LEEDtariffReporting();
+
+	EXPECT_EQ( "SecondaryGeneralUnit", RetrievePreDefTableEntry( pdchLeedEtsRtNm, "Electricity" ) );
+	EXPECT_EQ( "SmallCGUnit", RetrievePreDefTableEntry( pdchLeedEtsRtNm, "Natural Gas" ) );
+	EXPECT_EQ( "DistrictCoolingUnit", RetrievePreDefTableEntry( pdchLeedEtsRtNm, "District Cooling" ) );
+	EXPECT_EQ( "DistrictHeatingUnit", RetrievePreDefTableEntry( pdchLeedEtsRtNm, "District Heating" ) );
+
+	EXPECT_EQ( "0.855", RetrievePreDefTableEntry( pdchLeedEtsVirt, "Electricity" ) );
+	EXPECT_EQ( "6.391", RetrievePreDefTableEntry( pdchLeedEtsVirt, "District Cooling" ) );
+	EXPECT_EQ( "10.871", RetrievePreDefTableEntry( pdchLeedEtsVirt, "District Heating" ) );
 
 }
 
