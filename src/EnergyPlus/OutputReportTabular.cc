@@ -95,6 +95,7 @@
 #include <DataZoneEquipment.hh>
 #include <DirectAirManager.hh>
 #include <DisplayRoutines.hh>
+#include <EconomicLifeCycleCost.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -284,6 +285,9 @@ namespace OutputReportTabular {
 	bool displayAdaptiveComfort( false );
 	bool displaySourceEnergyEndUseSummary( false );
 	bool displayZoneComponentLoadSummary( false );
+	bool displayLifeCycleCostReport( false );
+	bool displayTariffReport( false );
+	bool displayEconomicResultSummary( false );
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -517,7 +521,10 @@ namespace OutputReportTabular {
 		displayAdaptiveComfort = false;
 		displaySourceEnergyEndUseSummary = false;
 		displayZoneComponentLoadSummary = false;
-		meterNumTotalsBEPS = Array1D_int ( numResourceTypes, 0 );
+		displayLifeCycleCostReport = false;
+		displayTariffReport = false;
+		displayEconomicResultSummary = false;
+		meterNumTotalsBEPS = Array1D_int( numResourceTypes, 0 );
 		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
 		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
 		ffUsed = Array1D_bool ( numResourceTypes, false );
@@ -697,7 +704,7 @@ namespace OutputReportTabular {
 			OutputReportTabularAnnual::GetInputTabularAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
-			GetInputTabularPredefined();
+			GetInputOutputTableSummaryReports();
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
 			GetInputFuelAndPollutionFactors();
@@ -1786,7 +1793,7 @@ namespace OutputReportTabular {
 	}
 
 	void
-	GetInputTabularPredefined()
+	GetInputOutputTableSummaryReports()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -1924,6 +1931,18 @@ namespace OutputReportTabular {
 					displayLEEDSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "LifeCycleCostReport" ) ) {
+					displayLifeCycleCostReport = true;
+					WriteTabularFiles = true;
+					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "TariffReport" ) ) {
+					displayTariffReport = true;
+					WriteTabularFiles = true;
+					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "EconomicResultSummary" ) ) {
+					displayEconomicResultSummary = true;
+					WriteTabularFiles = true;
+					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
@@ -1937,6 +1956,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1951,6 +1973,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1973,6 +1998,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1990,6 +2018,9 @@ namespace OutputReportTabular {
 					displayDemandEndUse = true;
 					displayAdaptiveComfort = true;
 					displaySourceEnergyEndUseSummary = true;
+					displayLifeCycleCostReport = true;
+					displayTariffReport = true;
+					displayEconomicResultSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -3511,6 +3542,8 @@ namespace OutputReportTabular {
 		using OutputReportPredefined::reportName;
 		using OutputReportPredefined::numReportName;
 		using DataCostEstimate::DoCostEstimate;
+		using EconomicLifeCycleCost::LCCparamPresent;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3545,6 +3578,11 @@ namespace OutputReportTabular {
 		std::string origName;
 		std::string curName;
 		int indexUnitConv;
+
+		// normally do not add to the table of contents here but the order of calls is different for the life-cycle costs
+		if ( displayLifeCycleCostReport && LCCparamPresent ) {
+			AddTOCEntry( "Life-Cycle Cost Report", "Entire Facility" );
+		}
 
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			if ( TableStyle( iStyle ) == tableStyleHTML ) {
@@ -5322,10 +5360,11 @@ namespace OutputReportTabular {
 						coolingDesignlinepassed = true;
 						lineType = coolingConditionsLine;
 					}
-				} else if ( has( lineIn, "(standard) heating degree-days (10°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) heating degree-days (18.3°C baseline)" ) ) {
 					lineType = stdHDDLine;
-				} else if ( has( lineIn, "(standard) cooling degree-days (18.3°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) cooling degree-days (10°C baseline)" ) ) {
 					lineType = stdCDDLine;
+
 				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
 					lineType = maxDryBulbLine;
 				} else if ( has( lineIn, "Minimum Dry Bulb" ) ) {
@@ -5334,9 +5373,9 @@ namespace OutputReportTabular {
 					lineType = maxDewPointLine;
 				} else if ( has( lineIn, "Minimum Dew Point" ) ) {
 					lineType = minDewPointLine;
-				} else if ( has( lineIn, "(wthr file) heating degree-days (10°C baseline)" ) || has( lineIn, "heating degree-days (10°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) heating degree-days (18°C baseline)" ) || has( lineIn, "heating degree-days (18°C baseline)" ) ) {
 					lineType = wthHDDLine;
-				} else if ( has( lineIn, "(wthr file) cooling degree-days (18°C baseline)" ) || has( lineIn, "cooling degree-days (18°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) cooling degree-days (10°C baseline)" ) || has( lineIn, "cooling degree-days (10°C baseline)" ) ) {
 					lineType = wthCDDLine;
 				}
 				// these not part of big if/else because sequential
@@ -5616,51 +5655,53 @@ namespace OutputReportTabular {
 				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
 					if ( storeASHRAEHDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "Standard Heating Degree-Days - base 50°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Standard Heating Degree-Days (base 10°C)", storeASHRAEHDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "Standard Heating Degree-Days (base 50°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Standard Heating Degree-Days (base 10°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Heating Degree-Days - base 50°(C)";
+						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn.substr( 2, 4 ) );
 					}
-				} else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
+					PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
+				}
+				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
 					if ( storeASHRAECDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "Standard Cooling Degree-Days - base 65°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Standard Cooling Degree-Days (base 18.3°C)", storeASHRAECDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "Standard Cooling Degree-Days (base 65°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Standard Cooling Degree-Days (base 18.3°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 64.4°(C)";
+						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn.substr( 2, 4 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (Köppen classification)
@@ -6199,7 +6240,6 @@ namespace OutputReportTabular {
 		//CALL PreDefTableEntry(pdchLeedGenData,'Climate Zone','-')
 		//CALL PreDefTableEntry(pdchLeedGenData,'Heating Degree Days','-')
 		//CALL PreDefTableEntry(pdchLeedGenData,'Cooling Degree Days','-')
-		PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
 		if ( unitsStyle == unitsStyleInchPound ) {
 			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [ft2]", "-" );
 		} else {
@@ -7548,13 +7588,13 @@ namespace OutputReportTabular {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 							subCatName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub );
-							if ( SameString( subCatName, "Fans - Parking Garage" ) ) {
+							if ( SameString( subCatName, "Fans - Parking Garage" ) || SameString( subCatName, "Fans-Parking Garage" ) ) {
 								if ( jEndUse == 7 ) { //fans
 									leedFansParkFromFan( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								} else {
 									leedFansParkFromExtFuelEquip( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								}
-							} else if ( SameString( subCatName, "Interior Lighting - Process" ) ) {
+							} else if ( SameString( subCatName, "Interior Lighting - Process" ) || SameString( subCatName, "Interior Lighting-Process" ) ) {
 								leedIntLightProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 							} else if ( SameString( subCatName, "Cooking" ) ) {
 								leedCook( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
@@ -7578,8 +7618,8 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Fans-Interior", unconvert * ( useVal( colElectricity, 7 ) - leedFansParkFromFan( colElectricity ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colElectricity ) + leedFansParkFromExtFuelEquip( colElectricity ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Service Water Heating", unconvert * useVal( colElectricity, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Receptacle Equipment", unconvert * useVal( colElectricity, 5 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Interior Lighting (process)", unconvert * leedIntLightProc( colElectricity ), 2 );
+			PreDefTableEntry( pdchLeedPerfElEneUse, "Receptacle Equipment", unconvert * ( useVal( colElectricity, 5 ) - ( leedCook( colElectricity ) + leedElevEsc( colElectricity ) + leedIndProc( colElectricity ) ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfElEneUse, "Interior Lighting-Process", unconvert * leedIntLightProc( colElectricity ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Refrigeration Equipment", unconvert * useVal( colElectricity, 13 ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Cooking", unconvert * leedCook( colElectricity ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Industrial Process", unconvert * leedIndProc( colElectricity ), 2 );
@@ -7618,8 +7658,8 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedPerfGasEneUse, "Fans-Interior", unconvert * ( useVal( colGas, 7 ) - leedFansParkFromFan( colGas ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasEneUse, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colGas ) + leedFansParkFromExtFuelEquip( colGas ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasEneUse, "Service Water Heating", unconvert * useVal( colGas, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Receptacle Equipment", unconvert * useVal( colGas, 5 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Interior Lighting (process)", unconvert * leedIntLightProc( colGas ), 2 );
+			PreDefTableEntry( pdchLeedPerfGasEneUse, "Receptacle Equipment", unconvert * ( useVal( colGas, 5 ) - ( leedCook( colGas ) + leedElevEsc( colGas ) + leedIndProc( colGas ) ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfGasEneUse, "Interior Lighting-Process", unconvert * leedIntLightProc( colGas ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasEneUse, "Refrigeration Equipment", unconvert * useVal( colGas, 13 ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasEneUse, "Cooking", unconvert * leedCook( colGas ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasEneUse, "Industrial Process", unconvert * leedIndProc( colGas ), 2 );
@@ -7652,8 +7692,8 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedPerfOthEneUse, "Fans-Interior", unconvert * ( useVal( colAdditionalFuel, 7 ) + useVal( colPurchCool, 7 ) + useVal( colPurchHeat, 7 ) - ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthEneUse, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) + leedFansParkFromExtFuelEquip( colAdditionalFuel ) + leedFansParkFromExtFuelEquip( colPurchCool ) + leedFansParkFromExtFuelEquip( colPurchHeat ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthEneUse, "Service Water Heating", unconvert * ( useVal( colAdditionalFuel, 12 ) + useVal( colPurchCool, 12 ) + useVal( colPurchHeat, 12 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Receptacle Equipment", unconvert * ( useVal( colAdditionalFuel, 5 ) + useVal( colPurchCool, 5 ) + useVal( colPurchHeat, 5 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Interior Lighting (process)", unconvert * ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfOthEneUse, "Receptacle Equipment", unconvert * ( ( useVal( colAdditionalFuel, 5 ) + useVal( colPurchCool, 5 ) + useVal( colPurchHeat, 5 ) ) - ( leedCook( colAdditionalFuel ) + leedElevEsc( colAdditionalFuel ) + leedIndProc( colAdditionalFuel ) + leedCook( colPurchCool ) + leedElevEsc( colPurchCool ) + leedIndProc( colPurchCool ) + leedCook( colPurchHeat ) + leedElevEsc( colPurchHeat ) + leedIndProc( colPurchHeat ) ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfOthEneUse, "Interior Lighting-Process", unconvert * ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthEneUse, "Refrigeration Equipment", unconvert * ( useVal( colAdditionalFuel, 13 ) + useVal( colPurchCool, 13 ) + useVal( colPurchHeat, 13 ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthEneUse, "Cooking", unconvert * ( leedCook( colAdditionalFuel ) + leedCook( colPurchCool ) + leedCook( colPurchHeat ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthEneUse, "Industrial Process", unconvert * ( leedIndProc( colAdditionalFuel ) + leedIndProc( colPurchCool ) + leedIndProc( colPurchHeat ) ), 2 );
@@ -8843,13 +8883,13 @@ namespace OutputReportTabular {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 							subCatName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub );
-							if ( SameString( subCatName, "Fans - Parking Garage" ) ) {
+							if ( SameString( subCatName, "Fans - Parking Garage" ) || SameString( subCatName, "Fans-Parking Garage" ) ) {
 								if ( jEndUse == 7 ) { //fans
 									leedFansParkFromFan( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								} else {
 									leedFansParkFromExtFuelEquip( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								}
-							} else if ( SameString( subCatName, "Interior Lighting - Process" ) ) {
+							} else if ( SameString( subCatName, "Interior Lighting - Process" ) || SameString( subCatName, "Interior Lighting-Process" ) ) {
 								leedIntLightProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 							} else if ( SameString( subCatName, "Cooking" ) ) {
 								leedCook( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
@@ -8875,7 +8915,8 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedPerfElDem, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colElectricity ) + leedFansParkFromExtFuelEquip( colElectricity ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfElDem, "Service Water Heating", unconvert * useVal( colElectricity, 12 ), 2 );
 			PreDefTableEntry( pdchLeedPerfElDem, "Receptacle Equipment", unconvert * useVal( colElectricity, 5 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Interior Lighting (process)", unconvert * leedIntLightProc( colElectricity ), 2 );
+			PreDefTableEntry( pdchLeedPerfElDem, "Receptacle Equipment", unconvert * ( useVal( colElectricity, 5 ) - ( leedCook( colElectricity ) + leedElevEsc( colElectricity ) + leedIndProc( colElectricity ) ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfElDem, "Interior Lighting-Process", unconvert * leedIntLightProc( colElectricity ), 2 );
 			PreDefTableEntry( pdchLeedPerfElDem, "Refrigeration Equipment", unconvert * useVal( colElectricity, 13 ), 2 );
 			PreDefTableEntry( pdchLeedPerfElDem, "Cooking", unconvert * leedCook( colElectricity ), 2 );
 			PreDefTableEntry( pdchLeedPerfElDem, "Industrial Process", unconvert * leedIndProc( colElectricity ), 2 );
@@ -8891,8 +8932,8 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedPerfGasDem, "Fans-Interior", unconvert * ( useVal( colGas, 7 ) - leedFansParkFromFan( colGas ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasDem, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colGas ) + leedFansParkFromExtFuelEquip( colGas ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasDem, "Service Water Heating", unconvert * useVal( colGas, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Receptacle Equipment", unconvert * useVal( colGas, 5 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Interior Lighting (process)", unconvert * leedIntLightProc( colGas ), 2 );
+			PreDefTableEntry( pdchLeedPerfGasDem, "Receptacle Equipment", unconvert * ( useVal( colGas, 5 ) - ( leedCook( colGas ) + leedElevEsc( colGas ) + leedIndProc( colGas ) ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfGasDem, "Interior Lighting-Process", unconvert * leedIntLightProc( colGas ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasDem, "Refrigeration Equipment", unconvert * useVal( colGas, 13 ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasDem, "Cooking", unconvert * leedCook( colGas ), 2 );
 			PreDefTableEntry( pdchLeedPerfGasDem, "Industrial Process", unconvert * leedIndProc( colGas ), 2 );
@@ -8908,8 +8949,8 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedPerfOthDem, "Fans-Interior", unconvert * ( useVal( colAdditionalFuel, 7 ) + useVal( colPurchCool, 7 ) + useVal( colPurchHeat, 7 ) - ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthDem, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) + leedFansParkFromExtFuelEquip( colAdditionalFuel ) + leedFansParkFromExtFuelEquip( colPurchCool ) + leedFansParkFromExtFuelEquip( colPurchHeat ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthDem, "Service Water Heating", unconvert * ( useVal( colAdditionalFuel, 12 ) + useVal( colPurchCool, 12 ) + useVal( colPurchHeat, 12 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Receptacle Equipment", unconvert * ( useVal( colAdditionalFuel, 5 ) + useVal( colPurchCool, 5 ) + useVal( colPurchHeat, 5 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Interior Lighting (process)", unconvert * ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfOthDem, "Receptacle Equipment", unconvert * ( ( useVal( colAdditionalFuel, 5 ) + useVal( colPurchCool, 5 ) + useVal( colPurchHeat, 5 ) ) - ( leedCook( colAdditionalFuel ) + leedElevEsc( colAdditionalFuel ) + leedIndProc( colAdditionalFuel ) + leedCook( colPurchCool ) + leedElevEsc( colPurchCool ) + leedIndProc( colPurchCool ) + leedCook( colPurchHeat ) + leedElevEsc( colPurchHeat ) + leedIndProc( colPurchHeat ) ) ), 2 );
+			PreDefTableEntry( pdchLeedPerfOthDem, "Interior Lighting-Process", unconvert * ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthDem, "Refrigeration Equipment", unconvert * ( useVal( colAdditionalFuel, 13 ) + useVal( colPurchCool, 13 ) + useVal( colPurchHeat, 13 ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthDem, "Cooking", unconvert * ( leedCook( colAdditionalFuel ) + leedCook( colPurchCool ) + leedCook( colPurchHeat ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfOthDem, "Industrial Process", unconvert * ( leedIndProc( colAdditionalFuel ) + leedIndProc( colPurchCool ) + leedIndProc( colPurchHeat ) ), 2 );
@@ -10220,7 +10261,7 @@ namespace OutputReportTabular {
 			curObjectName = tableEntry( lTableEntry ).objectName;
 			found = 0;
 			for ( mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames ) {
-				if ( SameString( curObjectName, uniqueObjectName( mUnqObjNames ) ) ) {
+				if ( curObjectName == uniqueObjectName( mUnqObjNames ) ) {
 					found = mUnqObjNames;
 				}
 			}
@@ -10296,6 +10337,9 @@ namespace OutputReportTabular {
 								if ( unitsStyle == unitsStyleInchPound ) {
 									LookupSItoIP( colTagWithSI, indexUnitConv, curColTag );
 									colUnitConv( countColumn ) = indexUnitConv;
+								} else if (unitsStyle == unitsStyleJtoKWH){
+									LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
+									colUnitConv(countColumn) = indexUnitConv;
 								} else {
 									curColTag = colTagWithSI;
 									colUnitConv( countColumn ) = 0;
@@ -10325,9 +10369,9 @@ namespace OutputReportTabular {
 									}
 								}
 								//finally assign the entry to the place in the table body
-								if ( unitsStyle == unitsStyleInchPound ) {
+								if ( unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH ) {
 									columnUnitConv = colUnitConv( colCurrent );
-									if ( SameString( subTable( jSubTable ).name, "SizingPeriod:DesignDay" ) ) {
+									if ( SameString( subTable( jSubTable ).name, "SizingPeriod:DesignDay" ) && unitsStyle == unitsStyleInchPound ) {
 										if ( SameString( columnHead( colCurrent ), "Humidity Value" ) ) {
 											LookupSItoIP( tableEntry( lTableEntry + 1 ).charEntry, columnUnitConv, repTableTag );
 											tableEntry( lTableEntry + 1 ).charEntry = repTableTag;
@@ -14199,7 +14243,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 94;
+		UnitConvSize = 95;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14294,7 +14338,8 @@ Label900: ;
 		UnitConv( 91 ).siName = "MJ/m2";
 		UnitConv( 92 ).siName = "MJ/m2";
 		UnitConv( 93 ).siName = "MJ/m2";
-		UnitConv( 94 ).siName = "Invalid/Undefined";
+		UnitConv( 94 ).siName = "MJ/m2";
+		UnitConv( 95 ).siName = "Invalid/Undefined";
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14389,7 +14434,8 @@ Label900: ;
 		UnitConv( 91 ).ipName = "kWh/ft2";
 		UnitConv( 92 ).ipName = "kBtu/ft2";
 		UnitConv( 93 ).ipName = "kBtu/ft2";
-		UnitConv( 94 ).ipName = "Invalid/Undefined";
+		UnitConv( 94 ).ipName = "kWh/m2";
+		UnitConv( 95 ).ipName = "Invalid/Undefined";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14484,7 +14530,8 @@ Label900: ;
 		UnitConv( 91 ).mult = 0.277777777777778 / 10.764961;
 		UnitConv( 92 ).mult = 0.94708628903179 / 10.764961;
 		UnitConv( 93 ).mult = 0.94708628903179 / 10.764961;
-		UnitConv( 94 ).mult = 1.0;
+		UnitConv( 94 ).mult = 0.27777777777778;
+		UnitConv( 95 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14552,6 +14599,8 @@ Label900: ;
 		UnitConv( 90 ).several = true;
 		UnitConv( 91 ).several = true;
 		UnitConv( 92 ).several = true;
+		UnitConv( 93 ).several = true;
+		UnitConv( 94 ).several = true;
 	}
 
 	std::string
@@ -14607,8 +14656,6 @@ Label900: ;
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   February 12, 2009
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   The input string to this subroutine can either contain
@@ -14623,28 +14670,6 @@ Label900: ;
 		//   which can be used with the convertIP function. Also the
 		//   string with the IP units substituted is returned.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		//    na
-
-		// USE STATEMENTS:
-		//    na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//    na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//    na
-
-		// DERIVED TYPE DEFINITIONS:
-		//    na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//    na
 		std::string unitSIOnly;
 		int modeInString;
 		int const misBrac( 1 );
@@ -14725,6 +14750,35 @@ Label900: ;
 		//CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
 		//IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // IntToStr(foundConv) )
 		unitConvIndex = selectedConv;
+	}
+
+
+	void
+	LookupJtokWH(
+		std::string const & stringInWithJ,
+		int & unitConvIndex,
+		std::string & stringOutWithKWH
+	)
+	{
+		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
+		//    DATE WRITTEN   April 15, 2016
+
+		// For the given unit expressed in J find the unit conversion
+		// using kWh instead. This is used when unitsStyle == unitsStyleJtoKWH
+		// return zero if no unit conversion should be done
+
+		stringOutWithKWH = stringInWithJ;
+		std::string::size_type gjPos = stringOutWithKWH.find( "[GJ]" );
+		std::string::size_type mjm2Pos = stringOutWithKWH.find( "[MJ/m2]");
+		if ( gjPos != std::string::npos ){
+			stringOutWithKWH.replace( gjPos, 4, "[kWh]" );
+			unitConvIndex = getSpecificUnitIndex( "GJ", "kWh" );
+		} else if ( mjm2Pos != std::string::npos ){
+			stringOutWithKWH.replace( mjm2Pos, 7, "[kWh/m2]" );
+			unitConvIndex = getSpecificUnitIndex( "MJ/m2", "kWh/m2" );
+		} else{
+			unitConvIndex = 0;
+		}
 	}
 
 	Real64

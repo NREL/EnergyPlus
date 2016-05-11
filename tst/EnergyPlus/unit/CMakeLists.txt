@@ -31,6 +31,8 @@ set( test_src
   DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
+  EconomicTariff.unit.cc
+  EconomicLifeCycleCost.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -106,6 +108,7 @@ set( test_src
   VentilatedSlab.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
+  WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   WindowManager.unit.cc
