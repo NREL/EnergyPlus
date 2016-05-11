@@ -1432,7 +1432,7 @@ namespace FanCoilUnits {
 						Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 					} else {
-						HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate(_,_,_,_);
+						HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( _,_,_,_ );
 						FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate();
 					}
 				}
@@ -1469,7 +1469,7 @@ namespace FanCoilUnits {
 				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 				FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			} else {
-				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate(_,_,_,_);
+				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( _,_,_,_ );
 				FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate();
 			}
 			//   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
@@ -3197,7 +3197,7 @@ namespace FanCoilUnits {
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 				} else {
-					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 				}
 			} else if ( FanCoil( FanCoilNum ).SpeedFanSel == 2 ) {
 

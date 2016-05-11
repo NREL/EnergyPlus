@@ -134,11 +134,10 @@ namespace HVACFan {
 
 	void
 	FanSystem::simulate(
-//		bool const firstHVACIteration,
-		Optional< Real64 const > flowFraction,
-		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
-		Optional_bool_const zoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress, for rating DX coils without entire duct system
+		Optional< Real64 const > flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow rate.  It is not exactly the same as the legacy speed ratio that was used with SimulateFanComponents.
+		Optional_bool_const zoneCompTurnFansOn, // can be used as turn fans ON signal from ZoneHVAC component
+		Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
+		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress, for rating DX coils at a different pressure without entire duct system
 	)
 	{
 
