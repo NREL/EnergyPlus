@@ -7252,7 +7252,7 @@ namespace HVACUnitarySystem {
 				}
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP ) {
 				HeatPumpRunFrac( UnitarySysNum, PartLoadRatio, errFlag, RuntimeFrac );
-				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == CycFanCycCoil ) { // was ContFanCycCoil
 					OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
 				} else {
 					OnOffFanPartLoadFraction = 1;
@@ -7281,7 +7281,7 @@ namespace HVACUnitarySystem {
 				}
 			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHP ) {
 				HeatPumpRunFrac( UnitarySysNum, PartLoadRatio, errFlag, RuntimeFrac );
-				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == CycFanCycCoil ) { // was ContFanCycCoil, maybe file an issue or see if it fixes some
 					OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
 				} else {
 					OnOffFanPartLoadFraction = 1.0;
