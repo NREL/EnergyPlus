@@ -1586,12 +1586,12 @@ Fan:SystemModel,
   0.5, !- Fan Total Efficiency 
   CombinedPowerAndFanEff;
   
-  Curve:Cubic, ! from product of FanEffRatioCurve and FanPowerRatioCurve
+  Curve:Cubic, ! from FanPowerRatioCurve divided by FanEffRatioCurve and refit to 3rd order poly
     CombinedPowerAndFanEff,        !- Name
-    0.000836,              !- Coefficient1 Constant
-    -0.021002,              !- Coefficient2 x
-    -0.021695,             !- Coefficient3 x**2
-    1.036165,              !- Coefficient4 x**3
+    0.0,              !- Coefficient1 Constant
+    0.027411,              !- Coefficient2 x
+    0.008740,             !- Coefficient3 x**2
+    0.969563,              !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5,                     !- Maximum Value of x
     0.01,                     !- Minimum Curve Output
