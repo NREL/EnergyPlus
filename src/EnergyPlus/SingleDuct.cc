@@ -690,11 +690,11 @@ namespace SingleDuct {
 			Sys( SysNum ).MaxAirVolFractionDuringReheat = Numbers( 8 );
 
 			if ( Sys( SysNum ).DamperHeatingAction != ReverseActionWithLimits ) {
-				if ( !lNumericBlanks( 7 ) ) {
+				if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 0.0 ) {
 					ShowWarningError( "Since " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) + ", input for " + cNumericFields( 7 ) + " will be ignored." );
 					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				}
-				if ( !lNumericBlanks( 8 ) ) {
+				if ( Sys( SysNum ).MaxAirVolFractionDuringReheat > 0.0 ) {
 					ShowWarningError( "Since " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) + ", input for " + cNumericFields( 8 ) + " will be ignored." );
 					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				}
