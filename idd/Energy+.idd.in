@@ -57078,6 +57078,7 @@ Branch,
         \required-field
         \reference Branches
    N1, \field Maximum Flow Rate
+        \deprecated
         \default 0
         \units m3/s
         \minimum 0
