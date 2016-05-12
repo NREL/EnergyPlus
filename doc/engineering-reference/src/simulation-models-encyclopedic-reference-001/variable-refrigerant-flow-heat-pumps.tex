@@ -493,7 +493,7 @@ where:
 
 \(\left( 1 - e^{\left( -t / \tau_{c,\,EIR,\,cool} \right)} \right)\) = The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
-\subsubsection{Heating Operation}\label{heating-operation}
+\subsubsection{Heating Operation}\label{heating-operation-201605050924}
 
 Calculations of the heat pump's heating performance is nearly identical to the calculations described above for cooling operation.
 
@@ -841,7 +841,7 @@ Frost formation on the outdoor coil must be periodically removed. The fraction o
 
 If the outdoor air dry-bulb temperature is above the specified maximum temperature for defrost operation, the fractional defrost time period is set to zero and the heating capacity/input power multipliers are set to unity (1).
 
-\subsubsection{Defrost Operation}\label{defrost-operation}
+\subsubsection{Defrost Operation}\label{defrost-operation-201605050925}
 
 If the fractional defrost time period is greater than zero for the simulation time step, then the model calculates the electrical power used during defrost. The additional heating load due to defrost (indoor cooling during defrost) is also calculated so that it may be added to the existing heating load when calculating input power for the compressor(s) and outdoor coil fan(s).
 
@@ -1478,7 +1478,13 @@ If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), i
   Calculate the compressor power at a variety of loading index using the following equation. The resulting table (Table 2) from the same example used above is shown below.
 \end{enumerate}
 
-\[M_{comp} = c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2\] \[N_{comp,rps} = M_{comp} \times N_{comp,ref}\]
+\begin{equation}
+  M_{comp} = c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2
+\end{equation}
+
+\begin{equation}
+  N_{comp,rps} = M_{comp} \times N_{comp,ref}
+\end{equation}
 
 Where
 
@@ -1494,9 +1500,30 @@ Where
 
 \(N_{comp,rps}\) compressor power corresponding to \(rps\) (W)
 
-Table 2 -- Outdoor unit compressor power at different Loading Index
+\begin{longtable}[c]{ll}
+\caption{Outdoor unit compressor power at different Loading Index \label{table:outdoor-unit-compressor-power-at-different-loading-index-20160504}} \tabularnewline
+\toprule 
+Loading Index (\(rps\)) & Evaporative Capacity (kW), \(T_c\)=36°C, \({T_e}'\)=9°C \tabularnewline
+\midrule
+\endfirsthead
 
+\caption[]{Outdoor unit compressor power at different Loading Index} \tabularnewline
+\toprule 
+Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C \tabularnewline
+\midrule
+\endhead
 
+1 (18)  & 3.951  \tabularnewline
+2 (25)  & 5.400  \tabularnewline
+3 (30)  & 6.435  \tabularnewline
+4 (36)  & 8.516  \tabularnewline
+5 (45)  & 10.756 \tabularnewline
+6 (60)  & 14.445 \tabularnewline
+7 (75)  & 18.412 \tabularnewline
+8 (90)  & 22.045 \tabularnewline
+9 (108) & 26.162 \tabularnewline
+\bottomrule
+\end{longtable}
 
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
@@ -1877,7 +1904,13 @@ Calculate the required compressor Loading Index by the following procedures.
   Calculate the evaporative capacity at a variety of speeds:
 \end{enumerate}
 
-\[M_{cap} = C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)\] \[Q_{rps} = C_{cap,system} \times M_{cap} \times Q_{ref}\]
+\begin{equation}
+  M_{cap} = C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)
+\end{equation}
+
+\begin{equation}
+  Q_{rps} = C_{cap,system} \times M_{cap} \times Q_{ref}
+\end{equation}
 
 Where
 
@@ -1986,7 +2019,13 @@ It should be noted that, different from the corresponding step in the cooling mo
   Calculate the compressor power at a variety of Loading Index using the following equation. The resulting table (Table~\ref{table:atmospheric-variables-at-two-different}) from the same example is shown below.
 \end{enumerate}
 
-\[M_{comp} = c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2\] \[N_{comp,rps} = M_{comp} \times N_{comp,ref}\]
+\begin{equation}
+  M_{comp} = c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2
+\end{equation}
+
+\begin{equation}
+  N_{comp,rps} = M_{comp} \times N_{comp,ref}
+\end{equation}
 
 Where
 
