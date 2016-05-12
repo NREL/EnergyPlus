@@ -445,23 +445,19 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
 			if ( GasAbsorber( AbsorberNum ).isWaterCooled ) {
-				if ( lAlphaFieldBlanks( 4 ) ){
-					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+				if ( lAlphaFieldBlanks( 5 ) ){
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
 					ShowContinueError( "For WaterCooled chiller the condenser outlet node is required." );
+					Get_ErrorsFound = true;
 				}
 				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 			} else {
 				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
-
-				if ( lAlphaFieldBlanks( 5 ) ) {
-					GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 1 ) + " COND OUT NODE", Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				} else {
+				if ( !lAlphaFieldBlanks( 5 ) ) {
 					GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				}
-
-
 				// Connection not required for air or evap cooled condenser so no call to TestCompSet here
 				CheckAndAddAirNodeNumber( GasAbsorber( AbsorberNum ).CondReturnNodeNum, Okay );
 				if ( ! Okay ) {
@@ -772,7 +768,7 @@ namespace ChillerGasAbsorption {
 
 		} else {
 			mdot = 0.0;
-			if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ){
+			if ( GasAbsorber( ChillNum ).CDLoopNum > 0 && GasAbsorber( ChillNum ).isWaterCooled){
 				SetComponentFlowRate( mdot, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
 			}
 		}
@@ -1745,8 +1741,9 @@ namespace ChillerGasAbsorption {
 			//set node temperatures
 
 			Node( lChillSupplyNodeNum ).Temp = Node( lChillReturnNodeNum ).Temp;
-			Node( lCondSupplyNodeNum ).Temp = Node( lCondReturnNodeNum ).Temp;
-
+			if ( GasAbsorber( ChillNum ).isWaterCooled ){
+				Node( lCondSupplyNodeNum ).Temp = Node( lCondReturnNodeNum ).Temp;
+			}
 			//set node flow rates
 			//Update Outlet Conditions so that same as Inlet, so component
 			//can be bypassed if necessary
@@ -1759,7 +1756,9 @@ namespace ChillerGasAbsorption {
 		} else {
 			//set node temperatures
 			Node( lChillSupplyNodeNum ).Temp = GasAbsorberReport( ChillNum ).ChillSupplyTemp;
-			Node( lCondSupplyNodeNum ).Temp = GasAbsorberReport( ChillNum ).CondSupplyTemp;
+			if ( GasAbsorber( ChillNum ).isWaterCooled ){
+				Node( lCondSupplyNodeNum ).Temp = GasAbsorberReport( ChillNum ).CondSupplyTemp;
+			}
 			//set node flow rates;  for these load based models
 			//assume that the sufficient evaporator flow rate available
 			//    Node(lChillReturnNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%ChillWaterFlowRate

@@ -507,18 +507,17 @@ namespace ChillerExhaustAbsorption {
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
 			if ( ExhaustAbsorber( AbsorberNum ).isWaterCooled ) {
-				if ( lAlphaFieldBlanks( 4 )){
-					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+				if ( lAlphaFieldBlanks( 5 )){
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
 					ShowContinueError( "For WaterCooled chiller the condenser outlet node is required." );
+					Get_ErrorsFound = true;
 				}
 				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 				ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 			} else {
 				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
-				if ( lAlphaFieldBlanks( 5 ) ) {
-					ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 1 ) + " COND OUT NODE", Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				} else {
+				if ( !lAlphaFieldBlanks( 5 ) ) {
 					ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				}
 				// Connection not required for air or evap cooled condenser so no call to TestCompSet here
@@ -1942,7 +1941,9 @@ namespace ChillerExhaustAbsorption {
 			//set node temperatures
 
 			Node( lChillSupplyNodeNum ).Temp = Node( lChillReturnNodeNum ).Temp;
-			Node( lCondSupplyNodeNum ).Temp = Node( lCondReturnNodeNum ).Temp;
+			if ( ExhaustAbsorber( ChillNum ).isWaterCooled ){
+				Node( lCondSupplyNodeNum ).Temp = Node( lCondReturnNodeNum ).Temp;
+			}
 
 			Node( lExhaustAirInletNodeNum ).Temp = Node( lExhaustAirInletNodeNum ).Temp;
 			//set node flow rates
@@ -1958,7 +1959,9 @@ namespace ChillerExhaustAbsorption {
 		} else {
 			//set node temperatures
 			Node( lChillSupplyNodeNum ).Temp = ExhaustAbsorberReport( ChillNum ).ChillSupplyTemp;
-			Node( lCondSupplyNodeNum ).Temp = ExhaustAbsorberReport( ChillNum ).CondSupplyTemp;
+			if ( ExhaustAbsorber( ChillNum ).isWaterCooled ){
+				Node( lCondSupplyNodeNum ).Temp = ExhaustAbsorberReport( ChillNum ).CondSupplyTemp;
+			}
 			//set node flow rates;  for these load based models
 			//assume that the sufficient evaporator flow rate available
 			//    Node(lChillReturnNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%ChillWaterFlowRate
