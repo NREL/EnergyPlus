@@ -1105,7 +1105,7 @@ namespace PackagedTerminalHeatPump {
 				// check that the air teminal mixer out node is the heat pump inlet node
 				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
-					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
@@ -1121,34 +1121,14 @@ namespace PackagedTerminalHeatPump {
 				// check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != SuppHeatOutletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit supp heater outlet node name = " + NodeID( SuppHeatOutletNodeNum ) );
 					ErrorsFound = true;
 				}
 			}
 			// Check component placement
 			if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
-				// PTUnit inlet node must be the same as a zone exhaust node and the OA Mixer return node
-				// check that PTUnit inlet node is a zone exhaust node.
-				if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
-					ZoneNodeNotFound = true;
-					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-						if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-							if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-								ZoneNodeNotFound = false;
-								break;
-							}
-						}
-					}
-					if ( ZoneNodeNotFound ) {
-						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air inlet node name must be the same as a zone exhaust node name." );
-						ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-						ShowContinueError( "..Heat pumps inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-						ErrorsFound = true;
-					}
-				}
-				if ( !PTUnit( PTUnitNum ).ATMixerExists ) {
+				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
 					// check OA Mixer return node
 					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
@@ -1193,53 +1173,15 @@ namespace PackagedTerminalHeatPump {
 				}
 				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
 					// check that the air teminal mixer out node is the fan inlet node
-					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
+					if ( PTUnit( PTUnitNum ).ATMixerOutNode != FanInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
-						ErrorsFound = true;
-					}
-				}
-				if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
-					// check that PTUnit outlet node is a zone inlet node.
-					ZoneNodeNotFound = true;
-					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-						if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-							if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-								PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
-								ZoneNodeNotFound = false;
-								break;
-							}
-						}
-					}
-					if ( ZoneNodeNotFound ) {
-						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air outlet node name must be the same as a zone inlet node name." );
-						ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-						ShowContinueError( "..Heat pumps outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 						ErrorsFound = true;
 					}
 				}
 			} else { // draw through fan from IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
 				// check that PTUnit inlet node is a zone exhaust node.
-				if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
-					ZoneNodeNotFound = true;
-					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-						if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-							if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-								ZoneNodeNotFound = false;
-								break;
-							}
-						}
-					}
-					if ( ZoneNodeNotFound ) {
-						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air inlet node name must be the same as a zone exhaust node name." );
-						ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-						ShowContinueError( "..Heat pumps inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-						ErrorsFound = true;
-					}
-				}
 				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
 					// check OA Mixer return node
 					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
@@ -1287,27 +1229,10 @@ namespace PackagedTerminalHeatPump {
 					// check that the air teminal mixer out node is the cooling coil inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
 						ErrorsFound = true;
 					}
-				}
-				// check that PTUnit outlet node is a zone inlet node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-							ZoneNodeNotFound = false;
-							break;
-						}
-					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air outlet node name must be the same as a zone inlet node name." );
-					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Heat pumps outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-					ErrorsFound = true;
 				}
 			} // IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
 
@@ -1729,12 +1654,12 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				PTUnit( PTUnitNum ).ATMixerExists = true;
 			}
-			// check that heat pump doesn' have local outside air and DOA
+			// check that air-conditioner doesn' have local outside air and DOA
 			if ( PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
-				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit has local as well as central outdoor air specified" );
+				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". Air-conditioners has local as well as central outdoor air specified" );
 				ErrorsFound = true;
 			}
-			// check that PTUnit inlet node is a zone exhaust node.
+			// check that Air-conditioners inlet node is a zone exhaust node or the OA Mixer return node.
 			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				ZoneNodeNotFound = true;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
@@ -1748,13 +1673,13 @@ namespace PackagedTerminalHeatPump {
 				}
 				if ( ZoneNodeNotFound ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( "..Heat Pumps air inlet node name must be the same as a zone exhaust node name." );
+					ShowContinueError( "..Air-conditioners air inlet node name must be the same as a zone exhaust node name." );
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Heat pumps inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+					ShowContinueError( "..Air-conditioners inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
 			}
-			// check that PTUnit outlet node is a zone inlet node.
+			// check that Air-conditioners outlet node is a zone inlet node.
 			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
 				ZoneNodeNotFound = true;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
@@ -1769,62 +1694,38 @@ namespace PackagedTerminalHeatPump {
 				}
 				if ( ZoneNodeNotFound ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( "..Heat Pumps air outlet node name must be the same as a zone inlet node name." );
+					ShowContinueError( "..Air-conditioners air outlet node name must be the same as a zone inlet node name." );
 					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Heat pumps outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
+					ShowContinueError( "..Air-conditioners outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
 			}
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
-				// check that the air teminal mixer out node is the heat pump inlet node
+				// check that the air teminal mixer out node is the air-conditioner inlet node
 				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
-					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
-					ShowContinueError( "..heat pump unit air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Air-conditioners air inlet node name must be the same as the air terminal mixer outlet node name." );
+					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+					ShowContinueError( "..Air-conditioners air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
 			}
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
-				// check that the air teminal mixer secondary air node is the heat pump outlet node
+				// check that the air teminal mixer secondary air node is the air-conditioner outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != PTUnit( PTUnitNum ).ATMixerSecNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
-					ShowContinueError( "..heat pump unit air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-					ErrorsFound = true;
-				}
-				// check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
-				if ( PTUnit( PTUnitNum ).AirOutNode != SuppHeatOutletNodeNum ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
-					ShowContinueError( "..heat pump unit supp heater outlet node name = " + NodeID( SuppHeatOutletNodeNum ) );
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Air-conditioners air outlet node name must be the same as the air terminal mixer secondary node name." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
+					ShowContinueError( "..Air-conditioners air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
 			}
 
 			// Check component placement
 			if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
-				// PTUnit inlet node must be the same as a zone exhaust node and the OA Mixer return node
-				// check that PTUnit inlet node is a zone exhaust node.
-				if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
-					ZoneNodeNotFound = true;
-					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-						if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-							if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-								ZoneNodeNotFound = false;
-								break;
-							}
-						}
-					}
-					if ( ZoneNodeNotFound ) {
-						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as a zone exhaust node name." );
-						ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-						ShowContinueError( "..Air Conditioners inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-						ErrorsFound = true;
-					}
-				}
+
 				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
-					// Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
+					// Fan inlet node name must be the same as the air-conditioner's OA mixer mixed air node name
 					if ( OANodeNums( 4 ) != FanInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan inlet node name must be the same as the air conditioners" );
 						ShowContinueError( "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields( 13 ) + " is specified." );
@@ -1833,7 +1734,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 
-					// OA mixer return node must equal heat pump air inlet node
+					// OA mixer return node must equal air-conditioner air inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
@@ -1863,39 +1764,11 @@ namespace PackagedTerminalHeatPump {
 					ShowContinueError( "..Air conditioners outlet node name  = " + NodeID( SuppHeatInletNodeNum ) );
 					ErrorsFound = true;
 				}
-				//if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
-				//	// check that PTUnit outlet node is a zone inlet node.
-				//	ZoneNodeNotFound = true;
-				//	for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				//		if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				//		for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-				//			if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-				//				PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
-				//				ZoneNodeNotFound = false;
-				//				break;
-				//			}
-				//		}
-				//	}
-				//	if ( ZoneNodeNotFound ) {
-				//		ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air outlet node name must be the same as a zone inlet node name." );
-				//		ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-				//		ShowContinueError( "..Air Conditioners outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-				//		ErrorsFound = true;
-				//	}
-				//}
-				//if ( HeatCoilOutletNodeNum != SuppHeatInletNodeNum ) { // check that heating coil outlet equals supp heating coil inlet
-				//	ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-				//	ShowContinueError( "..Heating coil outlet node name must be the same as the supplemental heating coil inlet node name" );
-				//	ShowContinueError( "..when blow through " + cAlphaFields( 16 ) + " is specified." );
-				//	ShowContinueError( "..Heating coil outlet node name              = " + NodeID( HeatCoilOutletNodeNum ) );
-				//	ShowContinueError( "..Supplemental heating coil inlet node name  = " + NodeID( SuppHeatInletNodeNum ) );
-				//	ErrorsFound = true;
-				//}
 				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) == 0 ) {
-					// For no OA Mixer fan inlet node name must be the same as the heat pump's inlet air node name
+					// For no OA Mixer fan inlet node name must be the same as the Air-conditioner's inlet air node name
 					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-						ShowContinueError( "..Fan inlet node name must be the same as the heat pumps inlet air node name" );
+						ShowContinueError( "..Fan inlet node name must be the same as the Air-conditioners inlet air node name" );
 						ShowContinueError( "..when blow through " + cAlphaFields( 16 ) + " is specified and an outdoor air mixer is not used." );
 						ShowContinueError( "..Fan inlet node name           = " + NodeID( FanInletNodeNum ) );
 						ShowContinueError( "..Heat pump air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
@@ -1903,34 +1776,17 @@ namespace PackagedTerminalHeatPump {
 					}
 				}
 				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
-					// check that the air teminal mixer out node is the fan inlet node
-					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
+					// check that the air teminal mixer outlet node is the fan inlet node
+					if ( PTUnit( PTUnitNum ).ATMixerOutNode != FanInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
 						ErrorsFound = true;
 					}
 				}
 
 			} else { // draw through fan from IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
-				// PTUnit inlet node must be the same as a zone exhaust node and the OA Mixer return node
-				// check that PTUnit inlet node is a zone exhaust node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-							ZoneNodeNotFound = false;
-							break;
-						}
-					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as a zone exhaust node name." );
-					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Air Conditioners inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ErrorsFound = true;
-				}
+
 				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
 					// check OA Mixer return node
 					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
@@ -1972,28 +1828,8 @@ namespace PackagedTerminalHeatPump {
 					// check that the air teminal mixer out node is the cooling coil inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
-						ErrorsFound = true;
-					}
-				}
-				if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
-					// check that PTUnit outlet node is a zone inlet node.
-					ZoneNodeNotFound = true;
-					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-						if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-							if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-								PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
-								ZoneNodeNotFound = false;
-								break;
-							}
-						}
-					}
-					if ( ZoneNodeNotFound ) {
-						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditionerss air outlet node name must be the same as a zone inlet node name." );
-						ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-						ShowContinueError( "..Air Conditioners outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 						ErrorsFound = true;
 					}
 				}
@@ -2549,7 +2385,7 @@ namespace PackagedTerminalHeatPump {
 				// check that the air teminal mixer out node is the heat pump inlet node
 				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
-					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
@@ -2558,14 +2394,14 @@ namespace PackagedTerminalHeatPump {
 				// check that the air teminal mixer secondary air node is the heat pump outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != PTUnit( PTUnitNum ).ATMixerSecNode ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
 				// check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != SuppHeatOutletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit supp heater outlet node name = " + NodeID( SuppHeatOutletNodeNum ) );
 					ErrorsFound = true;
 				}
@@ -2623,7 +2459,7 @@ namespace PackagedTerminalHeatPump {
 					// check that the air teminal mixer out node is the fan inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
 						ErrorsFound = true;
 					}
@@ -2681,7 +2517,7 @@ namespace PackagedTerminalHeatPump {
 					// check that the air teminal mixer out node is the cooling coil inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
 						ErrorsFound = true;
 					}

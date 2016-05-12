@@ -39595,10 +39595,11 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
        \minimum> 0.0
        \default 0.0145
 
-AirTerminal:SingleDuct:InletSideMixer,
-       \memo The inlet side mixer air terminal unit provides a means of supplying central system air
-       \memo to the air inlet of a zone AC unit such as a four pipe fan coil. Normally the central air
-       \memo would be ventilation air from a dedicated outdoor air system (DOAS).
+AirTerminal:SingleDuct:Mixer,
+       \memo The mixer air terminal unit provides a means of supplying central system
+       \memo air to the air inlet or outlet side of a zoneHAC equipment such as a four
+       \memo pipe fan coil unit. Normally the central air would be ventilation air from
+       \memo a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
    A2, \field ZoneHVAC Terminal Unit Object Type
@@ -39606,6 +39607,10 @@ AirTerminal:SingleDuct:InletSideMixer,
        \type choice
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:WaterToAirHeatPump
+       \key ZoneHVAC:PackagedTerminalAirConditioner
+       \key ZoneHVAC:PackagedTerminalHeatPump
+       \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \key ZoneHVAC:EnergyRecoveryVentilator     
    A3, \field ZoneHVAC Terminal Unit Name
        \required-field
        \type object-list
@@ -39616,35 +39621,15 @@ AirTerminal:SingleDuct:InletSideMixer,
    A5, \field Terminal Unit Primary Air Inlet Node Name
        \required-field
        \type node
-   A6; \field Terminal Unit Secondary Air Inlet Node Name
+   A6, \field Terminal Unit Secondary Air Inlet Node Name
        \required-field
        \type node
-
-AirTerminal:SingleDuct:SupplySideMixer,
-       \memo The supply side mixer air terminal unit provides a means of supplying central system air
-       \memo to the air outlet of a zone AC unit such as a four pipe fan coil. Normally the central air
-       \memo would be ventilation air from a dedicated outdoor air system (DOAS).
-   A1, \field Name
-       \required-field
-   A2, \field ZoneHVAC Terminal Unit Object Type
+   A7; \field Terminal Unit Connection Type
        \required-field
        \type choice
-       \key ZoneHVAC:FourPipeFanCoil
-       \key ZoneHVAC:WaterToAirHeatPump
-   A3, \field ZoneHVAC Terminal Unit Name
-       \required-field
-       \type object-list
-       \object-list DOAToZonalUnit
-   A4, \field Terminal Unit Outlet Node Name
-       \required-field
-       \type node
-   A5, \field Terminal Unit Primary Air Inlet Node Name
-       \required-field
-       \type node
-   A6; \field Terminal Unit Secondary Air Inlet Node Name
-       \required-field
-       \type node
-
+       \key InletSide
+       \key SupplySide  
+   
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
        \min-fields 6
@@ -39782,6 +39767,7 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
        \key AirTerminal:DualDuct:VAV:OutdoorAir
        \key AirTerminal:SingleDuct:UserDefined
+       \key AirTerminal:SingleDuct:Mixer
        \required-field
   A4 , \field Air Terminal Name
        \required-field

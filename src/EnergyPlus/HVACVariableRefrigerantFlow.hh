@@ -67,6 +67,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <SingleDuct.hh>
 
 namespace EnergyPlus {
 
@@ -719,6 +720,13 @@ namespace HVACVariableRefrigerantFlow {
 		int FirstIterfailed; // index used for warning messages
 		int ZonePtr; // pointer to a zone served by a VRF terminal unit
 		int HVACSizingIndex; // index of a HVACSizing object for a VRF terminal
+		bool ATMixerExists; // True if there is an ATMixer
+		std::string ATMixerName; // name of air terminal mixer
+		int ATMixerIndex; // index to the air terminal mixer
+		int ATMixerType; // 1 = inlet side mixer, 2 = supply side mixer
+		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
+		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
+		int ATMixerOutNode; // outlet air node number for the air terminal mixer
 		// Default Constructor
 		VRFTerminalUnitEquipment() :
 			VRFTUType_Num( 0 ),
@@ -790,7 +798,13 @@ namespace HVACVariableRefrigerantFlow {
 			IterLimitExceeded( 0 ),
 			FirstIterfailed( 0 ),
 			ZonePtr( 0 ),
-			HVACSizingIndex( 0 )
+			HVACSizingIndex( 0 ),
+			ATMixerExists( false ),
+			ATMixerIndex( 0 ),
+			ATMixerType( 0 ),
+			ATMixerPriNode( 0 ),
+			ATMixerSecNode( 0 ),
+			ATMixerOutNode( 0 )
 		{}
 
 	};

@@ -1324,6 +1324,7 @@ namespace HVACVariableRefrigerantFlow {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::AutoSize;
 		using DataSizing::ZoneHVACSizing;
+		using SingleDuct::GetATMixer;
 
 		//    USE DataIPShortCuts
 
@@ -2556,6 +2557,7 @@ namespace HVACVariableRefrigerantFlow {
 			CCoilOutletNodeNum = 0;
 			HCoilInletNodeNum = 0;
 			HCoilOutletNodeNum = 0;
+			OANodeNums = 0;
 
 			GetObjectItem( cCurrentModuleObject, VRFTUNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
@@ -3089,26 +3091,39 @@ namespace HVACVariableRefrigerantFlow {
 			// Set up component set for OA mixer - use OA node and Mixed air node
 			if ( VRFTU( VRFTUNum ).OAMixerUsed ) SetUpCompSets( cCurrentModuleObject, VRFTU( VRFTUNum ).Name, "UNDEFINED", VRFTU( VRFTUNum ).OAMixerName, NodeID( OANodeNums( 1 ) ), NodeID( OANodeNums( 4 ) ) );
 
-			// TU inlet node must be the same as a zone exhaust node and the OA Mixer return node
-			// check that TU inlet node is a zone exhaust node.
-			ZoneNodeNotFound = true;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-					if ( VRFTU( VRFTUNum ).VRFTUInletNodeNum == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-						ZoneNodeNotFound = false;
-						break;
-					}
-				}
+			// Get AirTerminal mixer data
+			GetATMixer( VRFTU( VRFTUNum ).Name, VRFTU( VRFTUNum ).ATMixerName, VRFTU( VRFTUNum ).ATMixerIndex, VRFTU( VRFTUNum ).ATMixerType, VRFTU( VRFTUNum ).ATMixerPriNode, VRFTU( VRFTUNum ).ATMixerSecNode, VRFTU( VRFTUNum ).ATMixerOutNode );
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide || VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+				VRFTU( VRFTUNum ).ATMixerExists = true;
 			}
-			if ( ZoneNodeNotFound ) {
-				ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Zone terminal unit air inlet node name must be the same as a zone exhaust node name." );
-				ShowContinueError( "... Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "... Zone terminal unit inlet node name = " + NodeID( VRFTU( VRFTUNum ).VRFTUInletNodeNum ) );
+			// check that the VRF TU have local outside air and DOA
+			if ( VRFTU( VRFTUNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+				ShowSevereError( cCurrentModuleObject + " = \"" + VRFTU( VRFTUNum ).Name + "\". VRF terminal unit has local as well as central outdoor air specified" );
 				ErrorsFound = true;
 			}
+
+			// TU inlet node must be the same as a zone exhaust node and the OA Mixer return node
+			// check that TU inlet node is a zone exhaust node.
+			if ( !VRFTU( VRFTUNum ).ATMixerExists || VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+				ZoneNodeNotFound = true;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
+						if ( VRFTU( VRFTUNum ).VRFTUInletNodeNum == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
+							ZoneNodeNotFound = false;
+							break;
+						}
+					}
+				}
+				if ( ZoneNodeNotFound ) {
+					ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Zone terminal unit air inlet node name must be the same as a zone exhaust node name." );
+					ShowContinueError( "... Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "... Zone terminal unit inlet node name = " + NodeID( VRFTU( VRFTUNum ).VRFTUInletNodeNum ) );
+					ErrorsFound = true;
+				}
+			}
 			// check OA Mixer return node
-			if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
+			if ( !VRFTU( VRFTUNum ).ATMixerExists && VRFTU( VRFTUNum ).OAMixerUsed ) {
 				if ( VRFTU( VRFTUNum ).VRFTUInletNodeNum != OANodeNums( 3 ) ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Zone terminal unit air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
 					ShowContinueError( "... Zone terminal unit air inlet node name = " + NodeID( VRFTU( VRFTUNum ).VRFTUInletNodeNum ) );
@@ -3117,26 +3132,27 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 			// check that TU outlet node is a zone inlet node.
-			ZoneNodeNotFound = true;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-					if ( VRFTU( VRFTUNum ).VRFTUOutletNodeNum == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-						ZoneNodeNotFound = false;
-						break;
+			if ( !VRFTU( VRFTUNum ).ATMixerExists || VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) {
+				ZoneNodeNotFound = true;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+						if ( VRFTU( VRFTUNum ).VRFTUOutletNodeNum == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							ZoneNodeNotFound = false;
+							break;
+						}
 					}
 				}
+				if ( ZoneNodeNotFound ) {
+					ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Zone terminal unit air outlet node name must be the same as a zone inlet node name." );
+					ShowContinueError( "... Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "... Zone terminal unit outlet node name = " + NodeID( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) );
+					ErrorsFound = true;
+				}
 			}
-			if ( ZoneNodeNotFound ) {
-				ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Zone terminal unit air outlet node name must be the same as a zone inlet node name." );
-				ShowContinueError( "... Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "... Zone terminal unit outlet node name = " + NodeID( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) );
-				ErrorsFound = true;
-			}
-
 			// check fan inlet and outlet nodes
 			if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
-				if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
+				if ( !VRFTU( VRFTUNum ).ATMixerExists && VRFTU( VRFTUNum ).OAMixerUsed ) {
 					if ( FanInletNodeNum != OANodeNums( 4 ) ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
 						ShowContinueError( "as the outside air mixers mixed air node name when blow through fan is specified and an outside air mixer is present." );
@@ -3144,7 +3160,7 @@ namespace HVACVariableRefrigerantFlow {
 						ShowContinueError( "... OA mixers mixed air node = " + NodeID( OANodeNums( 4 ) ) );
 						ErrorsFound = true;
 					}
-				} else {
+				} else if ( !VRFTU( VRFTUNum ).OAMixerUsed && ( VRFTU( VRFTUNum ).ATMixerExists  && VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) ) {
 					if ( FanInletNodeNum != VRFTU( VRFTUNum ).VRFTUInletNodeNum ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
 						ShowContinueError( "as the terminal unit air inlet node name when blow through fan is specified and an outside air mixer is not present." );
@@ -3450,6 +3466,7 @@ namespace HVACVariableRefrigerantFlow {
 		using General::RoundSigDigits;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
+		using SingleDuct::SimATMixer;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3938,8 +3955,18 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 
-		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
-
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			// There is an air terminal mixer
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
+				// set the primary air inlet mass flow rate
+				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate );
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// (it is the "inlet" node flow rate)
+				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+			}
+		} else {
+			if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
+		}
 		OnOffAirFlowRatio = 1.0;
 
 		// these flags are used in Subroutine CalcVRF to turn on the correct coil (heating or cooling)
@@ -3973,7 +4000,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// next check for overshoot when constant fan mode is used
 		// check operating load to see if OA will overshoot setpoint temperature when constant fan mode is used
-		if ( VRFTU( VRFTUNum ).OpMode == ContFanCycCoil ) {
+		if ( VRFTU( VRFTUNum ).OpMode == ContFanCycCoil || VRFTU( VRFTUNum ).ATMixerExists ) {
 			SetCompFlowRate( VRFTUNum, VRFCond, true );
 
 			if ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
@@ -4459,6 +4486,7 @@ namespace HVACVariableRefrigerantFlow {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
+		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4930,7 +4958,11 @@ namespace HVACVariableRefrigerantFlow {
 			// set up the outside air data for sizing the DX coils
 			ZoneEqDXCoil = true;
 			if ( CurZoneEqNum > 0 ) {
-				if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow > 0.0 || VRFTU( VRFTUNum ).HeatOutAirVolFlow > 0.0 ) {
+				if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+					if ( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex > 0 ) {
+						ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex, VRFTU( VRFTUNum ).ZoneNum, true, true );
+					}
+				} else if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow > 0.0 || VRFTU( VRFTUNum ).HeatOutAirVolFlow > 0.0 ) {
 					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( VRFTU( VRFTUNum ).CoolOutAirVolFlow, VRFTU( VRFTUNum ).HeatOutAirVolFlow );
 				} else {
 					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = 0.0;
@@ -5627,6 +5659,8 @@ namespace HVACVariableRefrigerantFlow {
 		using DataSizing::AutoSize;
 		//  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
 		using DataAirLoop::LoopDXCoilRTF;
+		using SingleDuct::SimATMixer;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5650,7 +5684,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 SpecHumIn; // specific humidity ratio at inlet node
 		int TUListIndex; // index to TU list for this VRF system
 		int IndexToTUInTUList; // index to TU in specific list for the VRF system
-
+		static int ATMixOutNode( 0 ); // terminal unit mixer outlet node
+		int ZoneNode; // Zone node of VRFTU is serving
 		// FLOW
 
 		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
@@ -5659,13 +5694,26 @@ namespace HVACVariableRefrigerantFlow {
 		VRFTUOutletNodeNum = VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
 		VRFTUInletNodeNum = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
 		OpMode = VRFTU( VRFTUNum ).OpMode;
+		ZoneNode = ZoneEquipConfig( VRFTU( VRFTUNum ).ZoneNum ).ZoneNode;
 
 		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
 		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
 
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
-		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
-
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			// There is an air terminal mixer
+			ATMixOutNode = VRFTU( VRFTUNum ).ATMixerOutNode;
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
+				// set the primary air inlet mass flow rate
+				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// (it is the "inlet" node flow rate)
+				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+			}
+		} else {
+			ATMixOutNode = 0;
+			if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
+		}
 		// if blow through, simulate fan then coils
 		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
 			SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
@@ -5703,10 +5751,28 @@ namespace HVACVariableRefrigerantFlow {
 		// track fan power per terminal unit for calculating COP
 		VRFTU( VRFTUNum ).FanPower = FanElecPower;
 
-		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
-		MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
-		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) );
-
+		// If there is a supply side air terminal mixer, calculate its output
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+			}
+		}
+		// calculate sensible load met
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {			
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+				// Air terminal supply side mixer
+				MinHumRat = min( Node( ZoneNode ).HumRat, Node( ATMixOutNode ).HumRat );
+				LoadMet = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( Node( ATMixOutNode ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, MinHumRat ) );
+			} else {
+				// Air terminal inlet side mixer
+				MinHumRat = min( Node( ZoneNode ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
+				LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, MinHumRat ) );
+			}
+		} else {
+			// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
+			MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
+			LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) ); // sensible load met by TU
+		}
 		if ( present( LatOutputProvided ) ) {
 			//   CR9155 Remove specific humidity calculations
 			SpecHumOut = Node( VRFTUOutletNodeNum ).HumRat;
@@ -8819,6 +8885,8 @@ namespace HVACVariableRefrigerantFlow {
 		using DataSizing::AutoSize;
 		//  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
 		using DataAirLoop::LoopDXCoilRTF;
+		using SingleDuct::SimATMixer;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8844,6 +8912,8 @@ namespace HVACVariableRefrigerantFlow {
 		int IndexToTUInTUList; // index to TU in specific list for the VRF system
 		Real64 EvapTemp; //evaporating temperature
 		Real64 CondTemp; //condensing temperature
+		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
+		int ZoneNode; // Zone node of VRFTU is serving
 
 		// FLOW
 
@@ -8855,6 +8925,7 @@ namespace HVACVariableRefrigerantFlow {
 		OpMode = VRFTU( VRFTUNum ).OpMode;
 		EvapTemp = VRF(VRFCond).IUEvaporatingTemp;
 		CondTemp = VRF(VRFCond).IUCondensingTemp;
+		ZoneNode = ZoneEquipConfig( VRFTU( VRFTUNum ).ZoneNum ).ZoneNode;
 
 		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
 		if( PartLoadRatio == 0 ) {
@@ -8868,9 +8939,21 @@ namespace HVACVariableRefrigerantFlow {
 		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
 
-		// simulate OA Mixer
-		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
-
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			// There is an air terminal mixer
+			ATMixOutNode = VRFTU( VRFTUNum ).ATMixerOutNode;
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
+				// set the primary air inlet mass flow rate
+				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// (it is the "inlet" node flow rate)
+				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+			}
+		} else {
+			ATMixOutNode = 0;
+			// simulate OA Mixer
+			if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
+		}
 		// if blow through, simulate fan then coils
 		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
 			SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
@@ -8908,10 +8991,28 @@ namespace HVACVariableRefrigerantFlow {
 		// track fan power per terminal unit for calculating COP
 		VRFTU( VRFTUNum ).FanPower = FanElecPower;
 
-		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
-		MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
-		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) ); // sensible load met by TU
-
+		// calculate supply side terminal unit OA mixer
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+			}
+		}
+		// calculate sensible load met
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+				// Air terminal supply side mixer
+				MinHumRat = min( Node( ZoneNode ).HumRat, Node( ATMixOutNode ).HumRat );
+				LoadMet = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( Node( ATMixOutNode ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, MinHumRat ) );
+			} else {
+				// Air terminal inlet side mixer
+				MinHumRat = min( Node( ZoneNode ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
+				LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, MinHumRat ) );
+			}
+		} else {
+			// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
+			MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
+			LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) ); // sensible load met by TU
+		}
 		if ( present( LatOutputProvided ) ) {
 			//   CR9155 Remove specific humidity calculations
 			SpecHumOut = Node( VRFTUOutletNodeNum ).HumRat;
