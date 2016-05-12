@@ -650,6 +650,7 @@ namespace BranchNodeConnections {
 				FluidStreamOutletCount = 0;
 				FluidStreamCounts = false;
 				Loop1 = NodeObjects( Object );
+				if ( NumOfNodeConnections < 2 ) continue;
 				if ( NodeConnections( Loop1 ).ObjectIsParent ) continue;
 				if ( NodeConnections( Loop1 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Inlet ) ) ++FluidStreamInletCount( NodeConnections( Loop1 ).FluidStream );
 				if ( NodeConnections( Loop1 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Outlet ) ) ++FluidStreamOutletCount( NodeConnections( Loop1 ).FluidStream );

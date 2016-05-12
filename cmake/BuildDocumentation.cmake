@@ -9,4 +9,5 @@
 execute_process( COMMAND cmake -E copy_directory ${ORIGINAL_CMAKE_SOURCE_DIR}/doc/${INNAME} ${ORIGINAL_CMAKE_BINARY_DIR}/doc-build/${INNAME})
 execute_process( COMMAND ${XELATEX} -interaction=nonstopmode ${INNAME}.tex )
 execute_process( COMMAND ${XELATEX} -interaction=nonstopmode ${INNAME}.tex )
+execute_process( COMMAND ${XELATEX} -interaction=nonstopmode ${INNAME}.tex )
 file( RENAME "${INNAME}.pdf" "../${OUTNAME}.pdf" )

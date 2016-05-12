@@ -399,7 +399,6 @@ namespace BranchInputManager {
 	GetBranchData(
 		std::string const & LoopName, // Loop Name of this Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -458,7 +457,7 @@ namespace BranchInputManager {
 
 		BComponents.allocate( NumComps );
 
-		GetInternalBranchData( LoopName, BranchName, BranchMaxFlow, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+		GetInternalBranchData( LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 
 		MinCompsAllowed = min( size( CompType ), size( CompName ), size( CompInletNodeNames ), size( CompInletNodeNums ), size( CompOutletNodeNames ), size( CompOutletNodeNums ) );
 		if ( MinCompsAllowed < NumComps ) {
@@ -607,65 +606,6 @@ namespace BranchInputManager {
 		return GetAirBranchIndex;
 	}
 
-	Real64
-	GetBranchFlow( int const BranchNum )
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   April 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns the branch index so that the calling
-		// routine can search for a fan on this branch or use branch flow for sizing.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-		// Return value
-		Real64 GetBranchFlow( 0.0 );
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int NumBranches;
-
-		if ( GetBranchInputFlag ) {
-			GetBranchInputFlag = false;
-			GetBranchInput();
-		}
-
-		NumBranches = size( Branch );
-
-		if ( NumBranches == 0 ) {
-			ShowSevereError( "GetBranchFlow:  Branch index not found = " + TrimSigDigits( BranchNum ) );
-		} else {
-			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
-				GetBranchFlow = Branch( BranchNum ).MaxFlowRate;
-			}
-		}
-
-		return GetBranchFlow;
-	}
-
 	void
 	GetBranchFanTypeName(
 		int const BranchNum,
@@ -744,92 +684,9 @@ namespace BranchInputManager {
 	}
 
 	void
-	CheckBranchForOASys(
-		std::string const & CompType,
-		std::string const & CompName,
-		bool & OASysFlag,
-		bool & ErrFound
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   August 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns TRUE if the branch contains an OA System
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-		// Locals
-		// na
-
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int CompNum; // loop counter
-		int NumBranches; // number of branches
-		int BranchNum; // loop index
-		int AirBranchIndex( 0 ); // index to branch containing CompType, CompName
-
-		if ( GetBranchInputFlag ) {
-			GetBranchInputFlag = false;
-			GetBranchInput();
-		}
-
-		ErrFound = false;
-		OASysFlag = false;
-		NumBranches = size( Branch );
-
-		for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
-			for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
-				if ( ! SameString( CompType, Branch( BranchNum ).Component( CompNum ).CType ) && ! SameString( CompName, Branch( BranchNum ).Component( CompNum ).Name ) ) continue;
-				AirBranchIndex = BranchNum;
-				goto BranchLoop_exit;
-			}
-		}
-		BranchLoop_exit: ;
-
-		if ( AirBranchIndex == 0 ) {
-			ShowSevereError( "CheckBranchForOASys:  Branch index not found = " + TrimSigDigits( AirBranchIndex ) );
-			ErrFound = true;
-		} else {
-			if ( AirBranchIndex > 0 && AirBranchIndex <= NumBranches ) {
-				for ( CompNum = 1; CompNum <= Branch( AirBranchIndex ).NumOfComponents; ++CompNum ) {
-					if ( ! SameString( "AirLoopHVAC:OutdoorAirSystem", Branch( AirBranchIndex ).Component( CompNum ).CType ) ) continue;
-					OASysFlag = true;
-					break;
-				}
-			} else {
-				ShowSevereError( "CheckBranchForOASys:  Branch index not found = " + TrimSigDigits( AirBranchIndex ) );
-				ErrFound = true;
-			}
-		}
-
-	}
-
-	void
 	GetInternalBranchData(
 		std::string const & LoopName, // Loop Name for Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -884,12 +741,10 @@ namespace BranchInputManager {
 		if ( Found == 0 ) {
 			ShowSevereError( "GetInternalBranchData:  Branch not found=" + BranchName );
 			ErrorsFound = true;
-			BranchMaxFlow = 0.0;
 			NumComps = 0;
 		} else {
 			if ( Branch( Found ).AssignedLoopName == BlankString ) {
 				Branch( Found ).AssignedLoopName = LoopName;
-				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -903,10 +758,8 @@ namespace BranchInputManager {
 				ShowContinueError( "Branch already assigned to loop=" + Branch( Found ).AssignedLoopName );
 				ShowContinueError( "New attempt to assign to loop=" + LoopName );
 				ErrorsFound = true;
-				BranchMaxFlow = 0.0;
 				NumComps = 0;
 			} else {
-				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -1123,7 +976,6 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1177,7 +1029,7 @@ namespace BranchInputManager {
 			GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
-			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
+			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..occurs for Connector:Mixer Name=" + Mixers( Count ).Name );
 				ErrorsFound = true;
@@ -1199,7 +1051,7 @@ namespace BranchInputManager {
 				InletNodeNames = "";
 
 				for ( Loop = 1; Loop <= Mixers( Count ).NumInletBranches; ++Loop ) {
-					GetInternalBranchData( LoopName, Mixers( Count ).InletBranchNames( Loop ), MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+					GetInternalBranchData( LoopName, Mixers( Count ).InletBranchNames( Loop ), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 					if ( NumComps > 0 ) {
 						InletNodeNames( Loop ) = BComponents( NumComps ).OutletNodeName;
 						InletNodeNums( Loop ) = BComponents( NumComps ).OutletNode;
@@ -1272,7 +1124,6 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1330,7 +1181,7 @@ namespace BranchInputManager {
 			GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
-			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
+			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..occurs for Splitter Name=" + Splitters( Count ).Name );
 				ErrorsFound = true;
@@ -1352,7 +1203,7 @@ namespace BranchInputManager {
 				OutletNodeNames = "";
 
 				for ( Loop = 1; Loop <= Splitters( Count ).NumOutletBranches; ++Loop ) {
-					GetInternalBranchData( LoopName, Splitters( Count ).OutletBranchNames( Loop ), MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+					GetInternalBranchData( LoopName, Splitters( Count ).OutletBranchNames( Loop ), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 					if ( NumComps > 0 ) {
 						OutletNodeNames( Loop ) = BComponents( 1 ).InletNodeName;
 						OutletNodeNums( Loop ) = BComponents( 1 ).InletNode;
@@ -1500,88 +1351,6 @@ namespace BranchInputManager {
 
 	}
 
-	void
-	CheckSystemBranchFlow(
-		std::string const & SystemType, // type of air loop equipment
-		std::string const & SystemName, // name of air loop equipment
-		Real64 & BranchFlow, // branch volumetric flow rate [m3/s]
-		Real64 const BranchFanFlow, // branch flow rate [m3/s]
-		bool & ErrFound // logical error flag
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   August 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is used to check the branch flow rate with respect to system flow rate
-
-		// METHODOLOGY EMPLOYED:
-		// Obtains branch and branch fan flow rate.
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataSizing;
-		using DataHVACGlobals::SmallAirVolFlow;
-		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int BranchNum; // Index to branch on air loop
-		int SizeBranch; // size of branch list
-		bool OASysFlag; // TRUE when outdoor air system exists
-		std::string BranchName; // name of air loop branch
-
-		if ( GetBranchInputFlag ) {
-			GetBranchInputFlag = false;
-			GetBranchInput();
-		}
-
-		SizeBranch = size( Branch );
-		BranchNum = GetAirBranchIndex( SystemType, SystemName );
-		BranchName = "";
-		BranchFlow = 0.0;
-		ErrFound = false;
-		OASysFlag = false;
-
-		if ( BranchNum > 0 && BranchNum <= SizeBranch ) {
-			BranchFlow = Branch( BranchNum ).MaxFlowRate;
-			BranchName = Branch( BranchNum ).Name;
-		} else {
-			ErrFound = true;
-			ShowSevereError( "CheckSystemBranchFlow: Branch index not found = " + TrimSigDigits( BranchNum ) );
-			ShowContinueError( "Branch search for system type and name = " + SystemType + " \"" + SystemName + "\"" );
-		}
-
-		if ( BranchFanFlow > 0.0 && ! ErrFound ) {
-			if ( BranchFlow != AutoSize ) {
-				CheckBranchForOASys( SystemType, SystemName, OASysFlag, ErrFound );
-				if ( std::abs( BranchFlow - BranchFanFlow ) > SmallAirVolFlow && OASysFlag ) {
-					ShowWarningError( "Branch maximum flow rate differs from system flow rate." );
-					ShowContinueError( "Branch = " + BranchName + " has volume flow rate = " + TrimSigDigits( BranchFlow, 6 ) + " m3/s." );
-					ShowContinueError( "System = " + SystemType + " \"" + SystemName + "\" has volume flow rate = " + TrimSigDigits( BranchFanFlow, 6 ) + " m3/s." );
-					ShowContinueError( "A branch flow rate that is different from the system flow rate can cause discrepancies with outdoor air control." );
-				}
-			}
-		}
-
-	}
-
 	//==================================================================================
 	//   Routines that get the input for the internal branch management structure
 	//==================================================================================
@@ -1718,7 +1487,7 @@ namespace BranchInputManager {
 					}
 					++BCount;
 					Branch( BCount ).Name = Alphas( 1 );
-					Branch( BCount ).MaxFlowRate = Numbers( 1 );
+//					Branch( BCount ).MaxFlowRate = Numbers( 1 );
 					GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
 					if ( PressureCurveType == PressureCurve_Error ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
@@ -3322,10 +3091,6 @@ namespace BranchInputManager {
 					}
 				}
 				Branch( Found ).FluidType = BranchFluidType;
-				if ( IsAirBranch && Branch( Found ).MaxFlowRate == 0.0 ) {
-					ShowSevereError( "Branch=" + Branch( Found ).Name + " is an air branch with zero max flow rate." );
-					ErrFound = true;
-				}
 				BranchOutletNodeName = MatchNodeName;
 				if ( Branch( Found ).AssignedLoopName == BlankString ) {
 					BranchLoopName = "**Unknown**";
