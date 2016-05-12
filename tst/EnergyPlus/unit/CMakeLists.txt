@@ -15,6 +15,7 @@ set( test_src
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
