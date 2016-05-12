@@ -380,10 +380,10 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 C2Tc; // VRF Outdoor Unit Coefficient 2 to calculate Tc,req [--]
 		Real64 C3Tc; // VRF Outdoor Unit Coefficient 3 to calculate Tc,req [--]
 		Real64 DiffOUTeTo; // Difference between Outdoor Unit Te and OAT during Simultaneous Heating and Cooling operations
-		Real64 HROUHexRatio; // HR OU Heat Exchanger Capacity Ratio [--]
 		Real64 EffCompInverter; // Compressor Inverter Efficiency
 		Real64 EvaporatingTemp; // VRV system outdoor unit evaporating temperature [C]
 		Real64 EvapTempFixed; // Indoor unit evaporating temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+		Real64 HROUHexRatio; // HR OU Heat Exchanger Capacity Ratio [--]
 		Real64 IUEvaporatingTemp; // VRV system indoor unit evaporating temperature, min among all indoor units [C]
 		Real64 IUCondensingTemp; // VRV system indoor unit condensing temperature, max among all indoor units [C]
 		Real64 IUEvapTempLow; // VRV system indoor unit evaporating temperature, lower bound[C]

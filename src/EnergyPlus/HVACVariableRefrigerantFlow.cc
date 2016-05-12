@@ -9629,6 +9629,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
 		
+		Q_coil = 0.0;
+		
 		if( OperationMode == FlagCondMode ) {
 		//IU Cooling: OperationMode 0
 			if( m_air <= 0 ) {
@@ -9718,6 +9720,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
 		
+		m_air = 0.0;
+		
 		if( OperationMode == FlagCondMode ) {
 		//IU Cooling: OperationMode 0
 			
@@ -9801,6 +9805,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
 		Real64 T_coil_surf_sat; // Saturated air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
+		
+		SHSC = 0.0;
 		
 		if( OperationMode == FlagCondMode ) {
 		//Cooling: OperationMode 0
