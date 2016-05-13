@@ -23825,14 +23825,15 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
       \note Enter the WPC Value corresponding to the 36th wind direction.
 
 AirflowNetwork:ZoneControl:PressureController,
-	 \memo Define the Pressures control settings for a zone or list of zones.
-	 \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
-	 \memo to all the zones in the ZoneList.
+      \memo This object is used to control a zone to a specified indoor pressure 
+      \memo using the AirflowNetwork model. The specified pressure setpoint is used
+      \memo to control the zone exhaust fan flow rate in a controlled zone or 
+      \memo the relief air flow rate in an air loop.
       \unique-object
  A1 , \field Name
       \required-field
       \reference AirflowNetworkZoneControlPressureControllerNames
- A2 , \field Zone Name
+ A2 , \field Controlled Zone Name
       \required-field
       \type object-list
       \object-list ZoneNames
@@ -24149,7 +24150,8 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
 
 AirflowNetwork:Distribution:Component:OutdoorAirFlow,
       \min-fields 3
-      \memo This object adopts outdoor air flow based on Controller:OutdoorAir object
+      \memo This object includes the outdoor air flow rate set by the Controller:OutdoorAir
+      \memo object in the airflow network. 
       \unique-object
  A1 , \field Name
       \required-field
