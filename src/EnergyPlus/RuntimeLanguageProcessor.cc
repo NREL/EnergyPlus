@@ -923,9 +923,10 @@ namespace RuntimeLanguageProcessor {
 		int InstructionNum;
 		int InstructionNum2;
 		int ExpressionNum;
-		Real64 ReturnValueActual; // for testing
+	//	Real64 ReturnValueActual; // for testing
 		static int VariableNum;
 		int WhileLoopExitCounter; // to avoid infinite loop in While loop
+		bool seriousErrorFound( false );
 
 		WhileLoopExitCounter = 0;
 		ReturnValue.Type = ValueNumber;
@@ -940,14 +941,14 @@ namespace RuntimeLanguageProcessor {
 				// There probably shouldn't be any of these
 
 			} else if ( SELECT_CASE_var == KeywordReturn ) {
-				if ( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 > 0 ) ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 );
+				if ( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 > 0 ) ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1, seriousErrorFound );
 
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				break; // RETURN always terminates an instruction stack
 
 			} else if ( SELECT_CASE_var == KeywordSet ) {
 
-				ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument2 );
+				ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument2, seriousErrorFound );
 				VariableNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				if ( ( ! ErlVariable( VariableNum ).ReadOnly ) && ( ! ErlVariable( VariableNum ).Value.TrendVariable ) ) {
 					ErlVariable( VariableNum ).Value = ReturnValue;
@@ -956,12 +957,12 @@ namespace RuntimeLanguageProcessor {
 					ErlVariable( VariableNum ).Value.Error = ReturnValue.Error;
 				}
 
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 
 			} else if ( SELECT_CASE_var == KeywordRun ) {
 				ReturnValue.Type = ValueString;
 				ReturnValue.String = "";
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
 				ReturnValue = EvaluateStack( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 );
 
 			} else if ( ( SELECT_CASE_var == KeywordIf ) || ( SELECT_CASE_var == KeywordElse ) ) { // same???
@@ -969,8 +970,8 @@ namespace RuntimeLanguageProcessor {
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
 
 				if ( ExpressionNum > 0 ) { // could be 0 if this was an ELSE
-					ReturnValue = EvaluateExpression( ExpressionNum );
-					WriteTrace( StackNum, InstructionNum, ReturnValue );
+					ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
+					WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
 					if ( ReturnValue.Number == 0.0 ) { //  This is the FALSE case
 						// Eventually should handle strings and arrays too
 						InstructionNum = InstructionNum2;
@@ -980,7 +981,7 @@ namespace RuntimeLanguageProcessor {
 					// KeywordELSE  -- kind of a kludge
 					ReturnValue.Type = ValueNumber;
 					ReturnValue.Number = 1.0;
-					WriteTrace( StackNum, InstructionNum, ReturnValue );
+					WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
 				}
 
 			} else if ( SELECT_CASE_var == KeywordGoto ) {
@@ -996,14 +997,14 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == KeywordEndIf ) {
 				ReturnValue.Type = ValueString;
 				ReturnValue.String = "";
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
 
 			} else if ( SELECT_CASE_var == KeywordWhile ) {
 				// evaluate expresssion at while, skip to past endwhile if not true
 				ExpressionNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
-				ReturnValue = EvaluateExpression( ExpressionNum );
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
+				WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
 				if ( ReturnValue.Number == 0.0 ) { //  This is the FALSE case
 					// Eventually should handle strings and arrays too
 					InstructionNum = InstructionNum2;
@@ -1014,10 +1015,10 @@ namespace RuntimeLanguageProcessor {
 				// reevaluate expression at While and goto there if true, otherwise continue
 				ExpressionNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
-				ReturnValue = EvaluateExpression( ExpressionNum );
+				ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
 				if ( ( ReturnValue.Number != 0.0 ) && ( WhileLoopExitCounter <= MaxWhileLoopIterations ) ) { //  This is the True case
 					// Eventually should handle strings and arrays too
-					WriteTrace( StackNum, InstructionNum, ReturnValue ); // duplicative?
+					WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound ); // duplicative?
 					InstructionNum = InstructionNum2;
 					++WhileLoopExitCounter;
 
@@ -1027,11 +1028,11 @@ namespace RuntimeLanguageProcessor {
 						WhileLoopExitCounter = 0;
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-						WriteTrace( StackNum, InstructionNum, ReturnValue );
+						WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
 					} else {
 						ReturnValue.Type = ValueNumber;
 						ReturnValue.Number = 0.0;
-						WriteTrace( StackNum, InstructionNum, ReturnValue );
+						WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 						WhileLoopExitCounter = 0;
 					}
 				}
@@ -1043,8 +1044,6 @@ namespace RuntimeLanguageProcessor {
 			++InstructionNum;
 		} // InstructionNum
 
-		ReturnValueActual = ( 4.91 + 632.0 ) / ( 32.0 * ( 4.0 - 10.2 ) ); // must have extra periods
-
 		return ReturnValue;
 
 	}
@@ -1053,7 +1052,8 @@ namespace RuntimeLanguageProcessor {
 	WriteTrace(
 		int const StackNum,
 		int const InstructionNum,
-		ErlValueType const & ReturnValue
+		ErlValueType const & ReturnValue,
+		bool const seriousErrorFound
 	)
 	{
 
@@ -1128,6 +1128,17 @@ namespace RuntimeLanguageProcessor {
 		TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
 		gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+
+		if ( seriousErrorFound ) { // throw EnergyPlus severe then fatal
+			ShowSevereError( "Problem found in EMS EnergyPlus Runtime Language." );
+			ShowContinueError( "Erl program name: " + NameString );
+			ShowContinueError( "Erl program line number: " + LineNumString );
+			ShowContinueError( "Erl program line text: " + LineString );
+			ShowContinueError( "Error message: " + cValueString );
+			ShowContinueErrorTimeStamp( "" );
+			ShowFatalError( "Previous EMS error caused program termination.");
+		}
+
 
 	}
 
@@ -2093,7 +2104,10 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	EvaluateExpression( int const ExpressionNum )
+	EvaluateExpression( 
+		int const ExpressionNum,
+		bool & seriousErrorFound
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -2137,7 +2151,6 @@ namespace RuntimeLanguageProcessor {
 		Real64 tmpRANDG; // local temporary for gaussian random number
 		Real64 UnitCircleTest; // local temporary for Box-Muller algo
 		Real64 TestValue; // local temporary
-		bool errorsFound;
 
 		// Object Data
 		Array1D< ErlValueType > Operand;
@@ -2145,7 +2158,7 @@ namespace RuntimeLanguageProcessor {
 		static std::string const EMSBuiltInFunction( "EMS Built-In Function" );
 
 		// FLOW:
-		errorsFound = false;
+		//seriousErrorFound = false;
 		ReturnValue.Type = ValueNumber;
 		ReturnValue.Number = 0.0;
 
@@ -2156,26 +2169,19 @@ namespace RuntimeLanguageProcessor {
 			for ( OperandNum = 1; OperandNum <= ErlExpression( ExpressionNum ).NumOperands; ++OperandNum ) {
 				Operand( OperandNum ) = ErlExpression( ExpressionNum ).Operand( OperandNum );
 				if ( Operand( OperandNum ).Type == ValueExpression ) {
-					Operand( OperandNum ) = EvaluateExpression( Operand( OperandNum ).Expression ); //recursive call
+					Operand( OperandNum ) = EvaluateExpression( Operand( OperandNum ).Expression, seriousErrorFound ); //recursive call
 				} else if ( Operand( OperandNum ).Type == ValueVariable ) {
 					if ( ErlVariable( Operand( OperandNum ).Variable ).Value.initialized ) { // check that value has been initialized
 						Operand( OperandNum ) = ErlVariable( Operand( OperandNum ).Variable ).Value;
 					} else { // value has never been set
 						ReturnValue.Type = ValueError;
-						ReturnValue.Error = "Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!" ;
+						ReturnValue.Error = "EvaluateExpression: Variable = '" + ErlVariable( Operand( OperandNum ).Variable ).Name + "' used in expression has not been initialized!" ;
 						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
-
-							ShowSevereError( "EvaluateExpression: EMS Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!");
-							ShowContinueErrorTimeStamp( "" );
-							errorsFound = true;
+							seriousErrorFound = true;
 						}
 					}
 					
 				}
-				if ( errorsFound ) {
-					ShowFatalError("EvaluateExpression: Program terminated because of uninitialized variable in EMS Program. ");
-				}
-
 			}
 
 			if ( ReturnValue.Type != ValueError) {
@@ -2192,16 +2198,10 @@ namespace RuntimeLanguageProcessor {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					if ( Operand( 2 ).Number == 0.0 ) {
 						ReturnValue.Type = ValueError;
-						ReturnValue.Error = "Divide by zero!";
+						ReturnValue.Error = "EvaluateExpression: Divide By Zero in EMS Program!";
 						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
-
-							ShowSevereError( "EvaluateExpression: Divide By Zero in EMS Program!");
-							ShowContinueErrorTimeStamp( "" );
-							ShowFatalError("EvaluateExpression: Program terminated because of divide by zero in EMS Program. ");
-							errorsFound = true;
+							seriousErrorFound = true;
 						}
-
-
 					} else {
 						ReturnValue = SetErlValueNumber( Operand( 1 ).Number / Operand( 2 ).Number );
 					}
@@ -2284,15 +2284,10 @@ namespace RuntimeLanguageProcessor {
 					if ( std::isnan( TestValue ) ) { 
 						// throw Error
 						ReturnValue.Type = ValueError;
-						ReturnValue.Error = "Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
+						ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
 						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
-
-							ShowSevereError( "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 ) );
-							ShowContinueErrorTimeStamp( "" );
-							ShowFatalError("EvaluateExpression: Program terminated because of NAN in power operator in EMS program. ");
-							errorsFound = true;
+							seriousErrorFound = true;
 						}
-
 					} else {
 						ReturnValue = SetErlValueNumber( TestValue );
 					}
@@ -2331,18 +2326,18 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncRadToDeg ) {
 				ReturnValue = SetErlValueNumber( Operand( 1 ).Number / DegToRadians );
 			} else if ( SELECT_CASE_var == FuncExp ) {
-				if ( Operand( 1 ).Number < 700.0 ) {
+				if ( ( Operand( 1 ).Number < 700.0 ) && ( Operand( 1 ).Number > -20.0 ) ) {
 					ReturnValue = SetErlValueNumber( std::exp( Operand( 1 ).Number ) );
 				} else {
 					// throw Error
+					if ( Operand( 1 ).Number >= 700.0 ) {
+						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
+					} else if (  Operand( 1 ).Number <= -20.0 ) {
+						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too small a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
+					}
 					ReturnValue.Type = ValueError;
-					ReturnValue.Error = "Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
-					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
-
-						ShowSevereError( "EvaluateExpression: attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 ) );
-						ShowContinueErrorTimeStamp( "" );
-							ShowFatalError("EvaluateExpression: Program terminated because of too large exponential in EMS program. ");
-						errorsFound = true;
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+						seriousErrorFound = true;
 					}
 				}
 			} else if ( SELECT_CASE_var == FuncLn ) {
@@ -2351,13 +2346,9 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					// throw error,
 					ReturnValue.Type = ValueError;
-					ReturnValue.Error = "Natural Log of zero or less!";
+					ReturnValue.Error = "EvaluateExpression: Natural Log of zero or less! ln of value = " + TrimSigDigits( Operand( 1 ).Number, 4 ) ;
 					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
-
-						ShowSevereError( "EvaluateExpression: Natural Log of zero or less" );
-						ShowContinueErrorTimeStamp( "" );
-							ShowFatalError("EvaluateExpression: Program terminated because of natural log of zero or negative in EMS program. ");
-						errorsFound = true;
+						seriousErrorFound = true;
 					}
 				}
 			} else if ( SELECT_CASE_var == FuncMax ) {
