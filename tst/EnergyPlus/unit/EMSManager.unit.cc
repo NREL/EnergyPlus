@@ -182,6 +182,9 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
 TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlowRate ) {
 
+		// test EMS actuator for Plant Component
+		// test SetActuatedBranchFlowRate for expected response
+
 		std::string const idf_objects = delimited_string( { 
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
@@ -202,10 +205,13 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
+		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
 
+		// allows NodeSetpoint and AvailabilityManagers actuators to be setup
 		EMSManager::FinishProcessingUserInput = true;
 
+		// set up plant loop
 		DataPlant::TotNumLoops = 1;
 		PlantLoop.allocate( 1 );
 		PlantLoop( 1 ).Name = "MyPlant";
@@ -219,6 +225,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 			loopsidebranch.TotalComponents = 1;
 			loopsidebranch.Comp.allocate( 1 );
 		}
+		// create 2 components on a single branch to simulate water flow control for entire branch
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 2;
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 2 );
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 41; // Coil:Heating:Water
@@ -231,6 +238,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 3;
 		PlantCondLoopOperation::SetupPlantEMSActuators();
 
+		// set flow, max and maxavail on the nodes
 		Node.allocate( 3 );
 		Real64 NodeMdot( 1.5 );
 		Node( 1 ).MassFlowRate = NodeMdot;
@@ -247,13 +255,20 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		Node( 3 ).MassFlowRateRequest = NodeMdot;
 
 		bool anyRan;
+		// set up EMS
 		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+
+		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
+		// dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
 		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+
+		// expect node data to represent full flow
+		// SetActuatedBranchFlowRate( CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
 		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
 		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
 		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
@@ -273,8 +288,10 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
 	
+		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
+		// dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan );
 
 		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
@@ -298,10 +315,14 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
 
+		// dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
+		// override flag should also be true
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
 
 		EXPECT_TRUE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
 		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+
+		// expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
 		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
 		EXPECT_EQ(Node( 1 ).MassFlowRate, 0.0 );
 		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
@@ -325,6 +346,9 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 
 TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate ) {
 
+		// test EMS actuator for Plant Component
+		// test SetComponentFlowRate for expected response
+
 		std::string const idf_objects = delimited_string( { 
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
@@ -345,10 +369,13 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
+		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
 
+		// allows NodeSetpoint and AvailabilityManagers actuators to be setup
 		EMSManager::FinishProcessingUserInput = true;
 
+		// set up plant loop
 		DataPlant::TotNumLoops = 1;
 		PlantLoop.allocate( 1 );
 		PlantLoop( 1 ).Name = "MyPlant";
@@ -362,6 +389,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 			loopsidebranch.TotalComponents = 1;
 			loopsidebranch.Comp.allocate( 1 );
 		}
+		// create 2 components on a single branch to simulate water flow control for entire branch
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 2;
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 2 );
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 41; // Coil:Heating:Water
@@ -374,6 +402,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 3;
 		PlantCondLoopOperation::SetupPlantEMSActuators();
 
+		// set flow, max and maxavail on the nodes
 		Node.allocate( 3 );
 		Real64 NodeMdot( 1.5 );
 		Node( 1 ).MassFlowRate = NodeMdot;
@@ -390,13 +419,19 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		Node( 3 ).MassFlowRateRequest = NodeMdot;
 
 		bool anyRan;
+		// set up EMS
 		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
+		// dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
 		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+
+		// expect node data to represent full flow
+		// SetComponentFlowRate( CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
 		SetComponentFlowRate( NodeMdot, 1, 2, 1, 1, 1, 1 );
 		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
 		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
@@ -416,12 +451,16 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
 	
+		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
+		// dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan );
 
 		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
 		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 1.0, 0.000001 );
+
+		// expect node data to represent full flow
 		SetComponentFlowRate( NodeMdot, 1, 2, 1, 1, 1, 1 );
 		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
 		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
@@ -441,11 +480,15 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
 
+		// dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
+		// override flag should also be true
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
 
 		EXPECT_TRUE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
 		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
 		Real64 tempNodeMdot( NodeMdot );
+
+		// expect node data to represent no flow. Max, MaxAvail, and Request are not changed
 		SetComponentFlowRate( tempNodeMdot, 1, 2, 1, 1, 1, 1 );
 		EXPECT_EQ(Node( 1 ).MassFlowRate, 0.0 );
 		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
