@@ -39609,8 +39609,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:WaterToAirHeatPump
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
-       \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \key ZoneHVAC:EnergyRecoveryVentilator     
+       \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow     
    A3, \field ZoneHVAC Terminal Unit Name
        \required-field
        \type object-list

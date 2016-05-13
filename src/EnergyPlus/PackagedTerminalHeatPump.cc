@@ -3653,6 +3653,7 @@ namespace PackagedTerminalHeatPump {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
+		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
 		// Locals
 		bool IsAutoSize; // Indicator to autosize
@@ -4068,7 +4069,13 @@ namespace PackagedTerminalHeatPump {
 		SetCoilDesFlow( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, PTUnit( PTUnitNum ).MaxHeatAirVolFlow, ErrorsFound );
 
 		if ( CurZoneEqNum > 0 ) {
-			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+				if ( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex > 0 ) {
+					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex, PTUnit( PTUnitNum ).CtrlZoneNum, true, true );
+				}
+			} else {
+				ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
+			}
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
 		}
 
