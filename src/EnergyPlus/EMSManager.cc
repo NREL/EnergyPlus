@@ -2130,6 +2130,23 @@ namespace EMSManager {
 
 	}
 
+	void
+	checkForUnusedActuatorsAtEnd()
+	{
+		//check if any of the user's actuators were never initialized.  Could be a mistake we want to help users catch
+		int ActuatorUsedLoop( 0 );
+		for ( ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop ) {
+			if ( ! ErlVariable( EMSActuatorUsed( ActuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
+				ShowWarningError( "checkForUnusedActuatorsAtEnd: Unused EMS Actuator detected, suggesting possible unintended programming error or spelling mistake." );
+				ShowContinueError( "Check Erl programs related to EMS actuator variable name = " + EMSActuatorUsed( ActuatorUsedLoop ).Name );
+				ShowContinueError( "EMS Actuator type name = " + EMSActuatorUsed( ActuatorUsedLoop ).ComponentTypeName );
+				ShowContinueError( "EMS Actuator unique component name = " + EMSActuatorUsed( ActuatorUsedLoop ).UniqueIDName );
+				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( ActuatorUsedLoop ).ControlTypeName );
+			}
+		}
+	
+	}
+	
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between
