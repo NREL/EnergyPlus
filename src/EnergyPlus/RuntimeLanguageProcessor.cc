@@ -923,10 +923,9 @@ namespace RuntimeLanguageProcessor {
 		int InstructionNum;
 		int InstructionNum2;
 		int ExpressionNum;
-	//	Real64 ReturnValueActual; // for testing
 		static int VariableNum;
 		int WhileLoopExitCounter; // to avoid infinite loop in While loop
-		bool seriousErrorFound( false );
+		bool seriousErrorFound( false ); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
 		WhileLoopExitCounter = 0;
 		ReturnValue.Type = ValueNumber;
@@ -1061,6 +1060,7 @@ namespace RuntimeLanguageProcessor {
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   June 2006
 		//       MODIFIED       Brent Griffith, May 2009
+		//                      Brent Griffith, May 2016, added bool and fatal error messages for runtime problems with math and unitialized vars
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -2158,7 +2158,7 @@ namespace RuntimeLanguageProcessor {
 		static std::string const EMSBuiltInFunction( "EMS Built-In Function" );
 
 		// FLOW:
-		//seriousErrorFound = false;
+
 		ReturnValue.Type = ValueNumber;
 		ReturnValue.Number = 0.0;
 
@@ -2177,7 +2177,11 @@ namespace RuntimeLanguageProcessor {
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "EvaluateExpression: Variable = '" + ErlVariable( Operand( OperandNum ).Variable ).Name + "' used in expression has not been initialized!" ;
 						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
-							seriousErrorFound = true;
+
+							//check if this is an arg in CurveValue,
+							if ( ! ErlExpression( ExpressionNum ).Operator == FuncCurveValue ) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
+								seriousErrorFound = true;
+							}
 						}
 					}
 					
