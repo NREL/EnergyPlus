@@ -517,9 +517,7 @@ namespace ChillerExhaustAbsorption {
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 			} else {
 				ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
-				if ( !lAlphaFieldBlanks( 5 ) ) {
-					ExhaustAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				}
+				// Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
 				// Connection not required for air or evap cooled condenser so no call to TestCompSet here
 				CheckAndAddAirNodeNumber( ExhaustAbsorber( AbsorberNum ).CondReturnNodeNum, Okay );
 				if ( ! Okay ) {

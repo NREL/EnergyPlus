@@ -3071,7 +3071,7 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 \paragraph{Field: Cooling Capacity Function of Temperature Curve Name}\label{field-cooling-capacity-function-of-temperature-curve-name-2}
 
-The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the outdoor air node is used for the condenser temperature. The available cooling capacity is computed as follows:
+The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. The available cooling capacity is computed as follows:
 
 \begin{equation}
 \begin{array}{l}
