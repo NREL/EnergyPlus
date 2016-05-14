@@ -406,6 +406,9 @@ namespace ChillerExhaustAbsorption {
 	// End of Record Keeping subroutines for the Exhasut Fired Absorption Chiller Module
 	// *****************************************************************************
 
+	void
+	clear_state();
+
 	//                                 COPYRIGHT NOTICE
 
 	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
