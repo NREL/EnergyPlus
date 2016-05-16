@@ -2369,8 +2369,8 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = 1.0; // Default for stand-alone mode
 					}
 
-					if ( ( rNumericArgs( 19 ) > 1 ) || ( rNumericArgs( 19 ) < 0 ) ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
+					if ( ( rNumericArgs( 19 ) > 1 ) || ( rNumericArgs( 19 ) <= 0 ) ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 19 );
@@ -2862,6 +2862,10 @@ namespace WaterThermalTanks {
 					}
 
 					if ( NumNums > 25 ) {
+						if ( ( rNumericArgs( 26 ) > 1 ) || ( rNumericArgs( 26 ) <= 0 ) ) {
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
+							ErrorsFound = true;
+						}
 						WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 26 );
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = 1.0;
@@ -3148,8 +3152,8 @@ namespace WaterThermalTanks {
 					}
 					WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = rNumericArgs( 6 );
 
-					if ( ( rNumericArgs( 8 ) > 1 ) || ( rNumericArgs( 8 ) < 0 ) ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
+					if ( ( rNumericArgs( 8 ) > 1 ) || ( rNumericArgs( 8 ) <= 0 ) ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0> to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 8 );
@@ -3409,6 +3413,10 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 
+					if ( ( rNumericArgs( 13 ) > 1 ) || ( rNumericArgs( 13 ) <= 0 ) ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
+						ErrorsFound = true;
+					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 13 );
 
 					WaterThermalTank( WaterThermalTankNum ).SourceInletHeight = rNumericArgs( 14 );
