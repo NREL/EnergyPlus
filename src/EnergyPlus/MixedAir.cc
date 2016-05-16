@@ -3416,7 +3416,6 @@ namespace MixedAir {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::GetNumObjectsFound;
 		using DataHeatBalFanSys::ZoneAirHumRat;
-		using DataGlobals::DisplayExtraWarnings;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoingSizing;
 		using SetPointManager::GetCoilFreezingCheckFlag;
@@ -4003,6 +4002,8 @@ namespace MixedAir {
 		ZoneOAMin = 0.0;
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
+		MechVentOutsideAirMinFrac = 0.0;
+		MechVentOutsideAirFlow = 0.0;
 
 		if ( AirLoopNum > 0 && VentMechObjectNum != 0 ) {
 			// Apply mechanical ventilation only when it is available/allowed
