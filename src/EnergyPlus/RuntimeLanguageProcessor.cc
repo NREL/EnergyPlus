@@ -2179,7 +2179,7 @@ namespace RuntimeLanguageProcessor {
 						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
 
 							//check if this is an arg in CurveValue,
-							if ( ! ErlExpression( ExpressionNum ).Operator == FuncCurveValue ) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
+							if ( ErlExpression( ExpressionNum ).Operator != FuncCurveValue ) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
 								seriousErrorFound = true;
 							}
 						}

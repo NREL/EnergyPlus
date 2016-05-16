@@ -2135,14 +2135,13 @@ namespace EMSManager {
 	{
 		// call at end of simulation to check if any of the user's actuators were never initialized.  
 		// Could be a mistake we want to help users catch // Issue #4404.
-		int ActuatorUsedLoop( 0 );
-		for ( ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop ) {
-			if ( ! ErlVariable( EMSActuatorUsed( ActuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
+		for ( int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop ) {
+			if ( ! ErlVariable( EMSActuatorUsed( actuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
 				ShowWarningError( "checkForUnusedActuatorsAtEnd: Unused EMS Actuator detected, suggesting possible unintended programming error or spelling mistake." );
-				ShowContinueError( "Check Erl programs related to EMS actuator variable name = " + EMSActuatorUsed( ActuatorUsedLoop ).Name );
-				ShowContinueError( "EMS Actuator type name = " + EMSActuatorUsed( ActuatorUsedLoop ).ComponentTypeName );
-				ShowContinueError( "EMS Actuator unique component name = " + EMSActuatorUsed( ActuatorUsedLoop ).UniqueIDName );
-				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( ActuatorUsedLoop ).ControlTypeName );
+				ShowContinueError( "Check Erl programs related to EMS actuator variable name = " + EMSActuatorUsed( actuatorUsedLoop ).Name );
+				ShowContinueError( "EMS Actuator type name = " + EMSActuatorUsed( actuatorUsedLoop ).ComponentTypeName );
+				ShowContinueError( "EMS Actuator unique component name = " + EMSActuatorUsed( actuatorUsedLoop ).UniqueIDName );
+				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( actuatorUsedLoop ).ControlTypeName );
 			}
 		}
 	
