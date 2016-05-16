@@ -65,8 +65,10 @@ Figure~\ref{fig:system-with-one-fmu-linked-to-energyplus.}~shows a case where a 
 \begin{figure}[hbtp] % fig 6
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image016.png}
-\caption{System with one FMU linked to EnergyPlus. HERHERHEHERHERHERHERH Table 2 shows the different system configurations that are possible. \protect \label{fig:system-with-one-fmu-linked-to-energyplus.}}
+\caption{System with one FMU linked to EnergyPlus. \protect \label{fig:system-with-one-fmu-linked-to-energyplus.}}
 \end{figure}
+
+Table \ref{table:use-cases-with-different-system-configurations} shows the different system configurations that are possible. 
 
 \begin{itemize}
 \item
@@ -81,14 +83,14 @@ Figure~\ref{fig:system-with-one-fmu-linked-to-energyplus.}~shows a case where a 
 
 In the current implementation, it will be focused on the first and the second cases since the third and the fourth cases will constrain the FMU to be solved numerically in the iteration solver loop of EnergyPlus. This will necessitate the ability of the FMU to reject time steps (Modelisar, 2010) which is currently not implemented in the EnergyPlus FMU for co-simulation import. Applications for case 1 and 2 are described in the next sections.
 
-Table 2:~Use cases with different system configurations
-
 \begin{longtable}[c]{@{}lll@{}}
+\caption{Use cases with different system configurations \label{table:use-cases-with-different-system-configurations}} \tabularnewline
 \toprule 
 Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline
 \midrule
 \endfirsthead
 
+\caption[]{Use cases with different system configurations} \tabularnewline
 \toprule 
 Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline
 \midrule
