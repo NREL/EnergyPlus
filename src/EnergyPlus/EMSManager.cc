@@ -2133,7 +2133,8 @@ namespace EMSManager {
 	void
 	checkForUnusedActuatorsAtEnd()
 	{
-		//check if any of the user's actuators were never initialized.  Could be a mistake we want to help users catch
+		// call at end of simulation to check if any of the user's actuators were never initialized.  
+		// Could be a mistake we want to help users catch // Issue #4404.
 		int ActuatorUsedLoop( 0 );
 		for ( ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop ) {
 			if ( ! ErlVariable( EMSActuatorUsed( ActuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
