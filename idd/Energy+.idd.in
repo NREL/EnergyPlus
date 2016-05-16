@@ -66045,7 +66045,7 @@ WaterHeater:Mixed,
        \type node
   N19, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   N20, \field Use Side Design Flow Rate
