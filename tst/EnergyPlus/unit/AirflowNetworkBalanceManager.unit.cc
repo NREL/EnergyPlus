@@ -2141,9 +2141,9 @@ namespace EnergyPlus {
 
 			"  AirflowNetwork:ZoneControl:PressureController,",
 			"    PressureController,      !- Name",
-			"    NORTH ZONE,              !- Zone Name",
+			"    NORTH ZONE,              !- Control Zone Name",
 			"    AirflowNetwork:Distribution:Component:ReliefAirFlow, !- Control Object Type",
-			"    Relief Fan,              !- Control Name",
+			"    Relief Fan,              !- Control Object Name",
 			"    ,                        !- Pressure Control Availability Schedule Name",
 			"    Pressure Setpoint Schedule; !- Pressure Setpoint Schedule Name",
 

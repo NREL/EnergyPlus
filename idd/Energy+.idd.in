@@ -23833,7 +23833,7 @@ AirflowNetwork:ZoneControl:PressureController,
  A1 , \field Name
       \required-field
       \reference AirflowNetworkZoneControlPressureControllerNames
- A2 , \field Controlled Zone Name
+ A2 , \field Control Zone Name
       \required-field
       \type object-list
       \object-list ZoneNames

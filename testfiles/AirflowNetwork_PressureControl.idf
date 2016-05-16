@@ -2727,7 +2727,7 @@
 
   AirflowNetwork:ZoneControl:PressureController,
     PressureController,      !- Name
-    NORTH ZONE,              !- Controlled Zone Name
+    NORTH ZONE,              !- Control Zone Name
     AirflowNetwork:Distribution:Component:ReliefAirFlow, !- Control Object Type
     Relief Fan,              !- Control Object Name
     ,                        !- Pressure Control Availability Schedule Name
