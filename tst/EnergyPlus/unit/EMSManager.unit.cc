@@ -471,7 +471,8 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 }
 
 TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
-	// this tests the new initialized variable added to Erl variable value data structure.  
+	// this tests the new initialized variable added to Erl variable value data structure, for issue #4943
+	// this is also what is checked to see if an actuator has been used for issue #4404.
 	std::string const idf_objects = delimited_string( {
 		"Version,8.6;",
 
@@ -506,17 +507,10 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 	EXPECT_FALSE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
 	// next run a small program that sets the value
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
-	// check that it worked
+	// check that it worked and the value came thru
 	EXPECT_NEAR( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.Number, 21.0, 0.0000001 );
 	// check of state to see if now initialized
 	EXPECT_TRUE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
-
-	// now test new argument added to EvaluateExpression
-
-	ErlValueType ReturnValue;
-	bool seriousErrorFound = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound );
-
 
 }
 
