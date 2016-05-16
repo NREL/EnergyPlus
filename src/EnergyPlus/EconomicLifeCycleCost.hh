@@ -365,6 +365,9 @@ namespace EconomicLifeCycleCost {
 	void
 	WriteTabularLifeCycleCostReport();
 
+	void
+	clear_state();
+
 } // EconomicLifeCycleCost
 
 } // EnergyPlus

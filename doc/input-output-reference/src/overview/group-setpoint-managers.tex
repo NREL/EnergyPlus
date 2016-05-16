@@ -541,7 +541,7 @@ In EnergyPlus the relief and outdoor air dampers, the economizer, and any outdoo
 
 Of course any type of setpoint manager can be used to establish a temperature setpoint at the mixed air node. But the Mixed Air Setpoint Manager is likely to be the most useful.
 
-When optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node are provided, the setpoint temperature at the mixed air node is calculated based on the maximum of both the reference setpoint temperature and minimum cooling coil outlet temperature, minus the cooling coil air temperature reduction and the supply fan air temperature rise if the supply fan placement is blow through. The setpoin temperature at the mixed air node is used to calculate the maximum outdoor air flow fraction in the corresponding Controller:OutdoorAir object. The outdoor air flow fraction is capped at the maximum outdoor air flow fraction to prevent the cooling coil from freezing, even though the fraction is below the minimum outdoor air flow fraction.
+When optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node are provided, the setpoint temperature at the mixed air node is calculated based on the maximum of both the reference setpoint temperature and minimum cooling coil outlet temperature, minus the cooling coil air temperature reduction and the supply fan air temperature rise if the supply fan placement is blow through. The setpoint temperature at the mixed air node is used to calculate the maximum outdoor air flow fraction in the corresponding Controller:OutdoorAir object. The outdoor air flow fraction is capped at the maximum outdoor air flow fraction to prevent the cooling coil from freezing, even though the fraction is below the minimum outdoor air flow fraction.
 
 \subsubsection{Inputs}\label{inputs-8-022}
 
@@ -567,7 +567,7 @@ The name of the supply fan outlet node.
 
 \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-8}
 
-The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name where temperature setpoints will be established by this setpoint manager.
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name where temperature setpoints will be established by this setpoint manager. The node name(s) specified here cannot be the same as the Reference Setpoint Node Name in the previous field.
 
 \paragraph{Field: Cooling Coil Inlet Node Name}\label{field-cooling-coil-inlet-node-name}
 
@@ -674,7 +674,8 @@ The name of a node in the return air stream. This node is used to obtain the flo
 
 \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-9}
 
-The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature or humidity ratio setpoints will be established by this setpoint manager.
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature or humidity ratio setpoints will be established by this setpoint manager. The node name(s) specified here cannot be the same as the Reference Setpoint Node Name in the previous field.
+
 
 Below is an example input for an Outdoor Air Pretreat Setpoint Manager.
 

@@ -226,13 +226,15 @@ END\,\,IF
 
 The following equations calculate the outlet condensate-water and outlet air temperatures to the zone based on the amount of heating capacity provided by the coil.
 
-~~~~~ \[T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}\]
+\begin{equation}
+T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}
+\end{equation}
 
 \begin{equation}
 T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{zc}}}}{{\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}
 \end{equation}
 
-\[ELSE\] Else the coil is not running and in this case set outlets to inlets.
+\(ELSE\) Else the coil is not running and in this case set outlets to inlets.
 
 \begin{equation}
 {\dot m_s} = 0\,,\,\,\,{\dot m_a} = 0\,,\,\,\,\,\,\,\,\,\,\,\,\,{Q_{zc}} = 0,\,\,\,\,\,\,\,\,\,\,\,\,T{w_{out}} = T{s_{in\,\,,\,\,\,\,}}\,\,\,\,\,\,T{a_{out}} = T{a_{in}}

@@ -73,6 +73,8 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
@@ -111,6 +113,8 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
@@ -265,6 +269,8 @@ namespace EnergyPlus {
 		Boilers::clear_state();
 		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
+		ChillerExhaustAbsorption::clear_state();
+		ChillerGasAbsorption::clear_state();
 		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CoolTower::clear_state();
@@ -302,6 +308,8 @@ namespace EnergyPlus {
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
+		EconomicLifeCycleCost::clear_state();
+		EconomicTariff::clear_state();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
