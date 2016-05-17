@@ -63,7 +63,6 @@ using EnergyPlus::CommandLineInterface::ProcessArgs;
 int
 main( int argc, const char * argv[] )
 {
-	unsigned int fp_control_state = _controlfp( _EM_INEXACT, _MCW_EM );
 	ProcessArgs( argc, argv );
 	EnergyPlusPgm();
 }
