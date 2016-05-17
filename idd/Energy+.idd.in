@@ -61712,7 +61712,7 @@ ChillerHeater:Absorption:DirectFired,
           \required-field
           \type node
   A5   ,  \field Condenser Outlet Node Name
-          \required-field
+          \note Not required if air-cooled 
           \type node
   A6   ,  \field Hot Water Inlet Node Name
           \required-field
@@ -61779,7 +61779,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiquadraticCurves
+            \object-list BiVariateCurves
             \object-list BiVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -61788,7 +61788,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiquadraticCurves
+            \object-list BiVariateCurves
             \object-list BiVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -61805,7 +61805,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiquadraticCurves
+            \object-list BiVariateCurves
             \object-list BiVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -61924,7 +61924,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \required-field
        \type node
   A5 , \field Condenser Outlet Node Name
-       \required-field
+       \note Not required if air-cooled 
        \type node
   A6 , \field Hot Water Inlet Node Name
        \required-field
@@ -61991,7 +61991,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiquadraticCurves
+       \object-list BiVariateCurves
        \object-list BiVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -62000,7 +62000,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiquadraticCurves
+       \object-list BiVariateCurves
        \object-list BiVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -62017,7 +62017,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiquadraticCurves
+       \object-list BiVariateCurves
        \object-list BiVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
