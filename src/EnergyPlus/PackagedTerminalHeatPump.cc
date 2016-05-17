@@ -3699,6 +3699,9 @@ namespace PackagedTerminalHeatPump {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
+		bool UseOccSchFlag; // flag to use occupancy schedule when calculating OA
+		bool UseMinOASchFlag; // flag to use min OA schedule when calculating OA
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -4070,8 +4073,12 @@ namespace PackagedTerminalHeatPump {
 
 		if ( CurZoneEqNum > 0 ) {
 			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
-				if ( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex > 0 ) {
-					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex, PTUnit( PTUnitNum ).CtrlZoneNum, true, true );
+				// determine minimum outdoor air flow rate for DX coil sizing
+				DSOAPtr = FinalZoneSizing( DataZoneNumber ).ZoneDesignSpecOAIndex;
+				if ( DSOAPtr > 0 ) {
+					UseOccSchFlag = true;
+					UseMinOASchFlag = true;
+					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, DataZoneNumber, UseOccSchFlag, UseMinOASchFlag );
 				}
 			} else {
 				ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );

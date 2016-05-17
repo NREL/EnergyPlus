@@ -1687,11 +1687,11 @@ Heating by the supply air to the zone, exclusive of any cooling done by the beam
 
 The heat transfer energy for the chilled water serving the beams, in Joules.
 
-\subsection{AirTerminal:SingleDuct:InletSideMixer}\label{airterminalsingleductinletsidemixer}
+\subsection{AirTerminal:SingleDuct:Mixer}\label{airterminalsingleductmixer}
 
-The inlet side mixer air terminal unit provides a means of supplying central system air to the air inlet of a zone AC unit such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
+The air terminal mixer unit provides a means of supplying central system air either to air inlet or supply side of a zoneHVAC equipment such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
 
-The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is recirculated air from the zone. The outlet air stream of the inlet side mixer is then the inlet to the zone AC unit.
+This terminal unit mixer object mixes conditioned outdoor air (primary air) from DOAS air loop and recirculating (secondary air) and deliver it either to inlet or supply side of a local zoneHVAC equipment. The terminal unit mixer can be connected either to the inlet or supply side of the local zoneHVAC equipment and the connection type is specified by a user in the input field \textit{Terminal Unit Connection Type}. If the AirTerminal:SingleDuct:Mixer object is connected to the supply side, a mix of conditioned outdoor air from a central dedicated outdoor air system (DOAS) with conditioned recirculation air from the local zoneHVAC equipment is supplied as a single stream to the conditioned zone at its inlet node or else if the AirTerminal:SingleDuct:Mixer object is connected to the inlet side, a mix of outdoor air from the a central dedicated outdoor air system (DOAS) with un-conditioned recirculation air from a zone exhaust node is supplied to the zoneHVAC equipment inlet node. The mixer will sum the two air streams and average the air properties. The AirTerminal:SingleDuct:Mixer is used with the ZoneHVAC:FourPipeFanCoil, ZoneHVAC:WaterToAirHeatPump, ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, and ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects. Since, the zoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the zoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
 
 \begin{figure}[hbtp] % fig 108
 \centering
@@ -1699,94 +1699,77 @@ The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams int
 \caption{Inlet Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:inlet-side-mixer-air-terminal-unit-with-fan}}
 \end{figure}
 
-\subsubsection{Inputs}\label{inputs-12-000}
-
-\paragraph{Field: Name}\label{field-name-12}
-
-A unique user assigned name for a particular inlet side mixer terminal unit. Any reference to this unit by another object will use this name.
-
-\paragraph{Field: ZoneHVAC Terminal Unit Object Type}\label{field-zonehvac-terminal-unit-object-type}
-
-The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
-
-\paragraph{Field: ZoneHVAC Terminal Unit Name}\label{field-zonehvac-terminal-unit-name}
-
-The name of the zone AC unit to which this terminal will be connected.
-
-\paragraph{Field: Terminal Unit Outlet Node Name}\label{field-terminal-unit-outlet-node-name}
-
-The name of the air outlet node of the inlet side mixer. This will be the inlet air node of the zone AC unit.
-
-\paragraph{Field: Terminal Unit Primary Air Inlet Node Name}\label{field-terminal-unit-primary-air-inlet-node-name}
-
-The name of the primary air inlet node of the inlet side mixer. This will be an outlet node of an AirLoopHVAC:ZoneSplitter, providing the connection to the DOAS system.
-
-\paragraph{Field: Terminal Unit Secondary Air Inlet Node Name}\label{field-terminal-unit-secondary-air-inlet-node-name}
-
-The name of the secondary air inlet node of the inlet side mixer. This will be an exhaust node of the zone that is being conditioned.
-
-An IDF example:
-
-\begin{lstlisting}
-
-AirTerminal:SingleDuct:InletSideMixer,
-      SPACE2-1 DOAS Air Terminal,  !- Name
-      ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-      SPACE2-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-      SPACE2-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-      SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-      SPACE2-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
-\end{lstlisting}
-
-\subsection{AirTerminal:SingleDuct:SupplySideMixer}\label{airterminalsingleductsupplysidemixer}
-
-The supply side mixer air terminal unit provides a means of supplying central system air to the air outlet of a zone AC unit such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
-
-The AirTerminal:SingleDuct:SupplySideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is outlet air from the zone AC unit. The outlet air stream from the supply side mixer is then the inlet to the conditioned zone.
-
 \begin{figure}[hbtp] % fig 109
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image276.png}
 \caption{Supply Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:supply-side-mixer-air-terminal-unit-with-fan}}
 \end{figure}
 
-\subsubsection{Inputs}\label{inputs-13-000}
 
-\paragraph{Field: Name}\label{field-name-13}
+\subsubsection{Inputs}\label{inputs-12-000}
 
-A unique user assigned name for a particular supply side mixer terminal unit. Any reference to this unit by another object will use this name.
+\paragraph{Field: Name}\label{field-name-12}
 
-\paragraph{Field: ZoneHVAC Terminal Unit Object Type}\label{field-zonehvac-terminal-unit-object-type-1}
+A unique user assigned name for a particular mixer terminal unit. Any reference to this unit by another object will use this name.
 
-The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
+\paragraph{Field: ZoneHVAC Terminal Unit Object Type}\label{field-zonehvac-terminal-unit-object-type}
 
-\paragraph{Field: ZoneHVAC Terminal Unit Name}\label{field-zonehvac-terminal-unit-name-1}
+The type of zoneHVAC equipment to which this terminal unit will be connected. This is a choice input field. 
+Valid zoneHVAC choices are:
+\begin{itemize}
+\setlength{\parskip}{0pt}
+\setlength{\itemsep}{0pt plus 1pt}
+\item ZoneHVAC:FourPipeFanCoil
+\item ZoneHVAC:WaterToAirHeatPump
+\item ZoneHVAC:PackagedTerminalAirConditioner
+\item ZoneHVAC:PackagedTerminalHeatPump
+\item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow.
+\end{itemize}
 
-The name of the zone AC unit to which this terminal will be connected.
+\paragraph{Field: ZoneHVAC Terminal Unit Name}\label{field-zonehvac-terminal-unit-name}
 
-\paragraph{Field: Terminal Unit Outlet Node Name}\label{field-terminal-unit-outlet-node-name-1}
+The name of the zoneHVAC equipment to which this air terminal unit will be connected.
 
-The name of the air outlet node of the supply side mixer. This will be an inlet air node of the conditioned zone.
+\paragraph{Field: Terminal Unit Outlet Node Name}\label{field-terminal-unit-outlet-node-name}
 
-\paragraph{Field: Terminal Unit Primary Air Inlet Node Name}\label{field-terminal-unit-primary-air-inlet-node-name-1}
+The name of the air outlet node of the mixer. This will be an inlet air node name of the conditioned zone if the connection type specified in the input field \textit{Terminal Unit Connection Type} below is \textbf{SupplySide}. This will be an inlet air node of the zoneHVAC equipment if the connection type in the input field \textit{Terminal Unit Connection Type} below is \textbf{InletSide}.
 
-The name of the primary air inlet node of the supply side mixer. This will be an outlet node of an AirLoopHVAC:ZoneSplitter, providing the connection to the DOAS system.
+\paragraph{Field: Terminal Unit Primary Air Inlet Node Name}\label{field-terminal-unit-primary-air-inlet-node-name}
 
-\paragraph{Field: Terminal Unit Secondary Air Inlet Node Name}\label{field-terminal-unit-secondary-air-inlet-node-name-1}
+The name of the primary air (outdoor air) inlet node of the mixer. This will be an outlet node of an AirLoopHVAC:ZoneSplitter, providing the connection to the DOAS system.
 
-The name of the secondary air inlet node of the supply side mixer. This will be the outlet air node of the zone AC unit.
+\paragraph{Field: Terminal Unit Secondary Air Inlet Node Name}\label{field-terminal-unit-secondary-air-inlet-node-name}
 
-An IDF example:
+The name of the secondary air (recirculating air) inlet node of the mixer. This will be the outlet air node name of the zoneHVAC equipment if the connection type in the input field \textit{Terminal Unit Connection Type} below is \textbf{SupplySide}, or else this will be exhaust air node name of the zone that is being conditioned if the connection type in the input field \textit{Terminal Unit Connection Type} below is \textbf{InletSide}.
+
+\paragraph{Field: Terminal Unit Connection Type}\label{field-terminal-unit-connection-type}
+
+This input field allows user to specify the terminal unit mixer connection type. Valid choices are \textit{InletSide} or \textit{SupplySide}. This is a required input field. If the connection type selected is \textbf{InletSide}, then the terminal mixer unit is connected on the inlet side of the zoneHVAC equipment, else if the connection type selected is \textbf{SupplySide}, then the terminal mixer unit is connected at the outlet side of the zoneHVAC equipment.\\
+
+An IDF examples for InletSide and SupplySide connection type:
 
 \begin{lstlisting}
 
-AirTerminal:SingleDuct:SupplySideMixer,
-      SPACE1-1 DOAS Air Terminal,  !- Name
+AirTerminal:SingleDuct:Mixer,
+      SPACE2-1 DOAS Air Terminal,  !- Name
+      ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
+      SPACE2-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
+      SPACE2-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
+      SPACE2-1 ATM Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
+      SPACE2-1 ATM Secondary Inlet,!- Terminal Unit Secondary Air Inlet Node Name
+      InletSide;                   !- Terminal Unit Connection Type   
+\end{lstlisting}
+
+\begin{lstlisting}
+
+AirTerminal:SingleDuct:Mixer,
+      SPACE1-1 DOAS Air Terminal, !- Name
       ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
       SPACE1-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
       SPACE1-1 Supply Inlet,   !- Terminal Unit Outlet Node Name
-      SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-      SPACE1-1 Fan Coil Outlet;!- Terminal Unit Secondary Air Inlet Node Name
+      SPACE1-1 ATM Primary Inlet, !- Terminal Unit Primary Air Inlet Node Name
+      SPACE1-1 Fan Coil Outlet,   !- Terminal Unit Secondary Air Inlet Node Name
+      SupplySide;                 !- Terminal Unit Connection Type
 \end{lstlisting}
 
 \subsection{AirTerminal:DualDuct:ConstantVolume}\label{airterminaldualductconstantvolume}

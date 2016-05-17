@@ -4550,6 +4550,9 @@ namespace HVACVariableRefrigerantFlow {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
+		bool UseOccSchFlag; // flag to use occupancy schedule when calculating OA
+		bool UseMinOASchFlag; // flag to use min OA schedule when calculating OA
 
 		// Formats
 		static gio::Fmt Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
@@ -4597,10 +4600,10 @@ namespace HVACVariableRefrigerantFlow {
 
 		CompType = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
 		CompName = VRFTU( VRFTUNum ).Name;
+		DataZoneNumber = VRFTU( VRFTUNum ).ZoneNum;
 		if ( CurZoneEqNum > 0 ) {
 			if ( VRFTU( VRFTUNum ).HVACSizingIndex > 0 ) {
-				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;
-				DataZoneNumber = VRFTU( VRFTUNum ).ZoneNum;
+				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;				
 
 				SizingMethod = CoolingAirflowSizing;
 				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -4959,8 +4962,12 @@ namespace HVACVariableRefrigerantFlow {
 			ZoneEqDXCoil = true;
 			if ( CurZoneEqNum > 0 ) {
 				if ( VRFTU( VRFTUNum ).ATMixerExists ) {
-					if ( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex > 0 ) {
-						ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex, VRFTU( VRFTUNum ).ZoneNum, true, true );
+					// determine minimum outdoor air flow rate for sizing
+					DSOAPtr = FinalZoneSizing( DataZoneNumber ).ZoneDesignSpecOAIndex;
+					if ( DSOAPtr > 0 ) {
+						UseOccSchFlag = true;
+						UseMinOASchFlag = true;
+						ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, DataZoneNumber, UseOccSchFlag, UseMinOASchFlag );
 					}
 				} else if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow > 0.0 || VRFTU( VRFTUNum ).HeatOutAirVolFlow > 0.0 ) {
 					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( VRFTU( VRFTUNum ).CoolOutAirVolFlow, VRFTU( VRFTUNum ).HeatOutAirVolFlow );
