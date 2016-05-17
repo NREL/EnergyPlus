@@ -1,7 +1,7 @@
 EnergyPlus
 ===================
 
-This is the EnergyPlus Development Repository.  
+This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.
 
 # Contact/Support
 
