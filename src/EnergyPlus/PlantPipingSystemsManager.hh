@@ -74,8 +74,6 @@
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
-//#define CalcEnergyBalance = true
-
 namespace EnergyPlus {
 
 namespace PlantPipingSystemsManager {
@@ -163,13 +161,6 @@ namespace PlantPipingSystemsManager {
 		Real64 Temperature_PrevTimeStep; // C
 		Real64 Beta; // K/W
 		BaseThermalPropertySet Properties;
-#ifdef CalcEnergyBalance
-		Real64 energyImbalance = 0.0;
-		Real64 sumEnergyFromAllSides = 0.0;
-		Real64 totalEnergyChange = 0.0;
-		int numberOfSidesCalculated = 0;
-		Real64 tempDiffDueToImbalance = 0.0;
-#endif
 
 		// Default Constructor
 		BaseCell() :
@@ -1011,34 +1002,9 @@ namespace PlantPipingSystemsManager {
 		Real64 TotalEnergyUniformHeatFlux = 0.0;
 		Real64 TotalEnergyWeightedHeatFlux = 0.0;
 		Real64 HeatFluxWeightingFactor = 0.0;
-		bool BESTESTFlag = false;
-		bool BESTESTConstConvCoeff = false;
-		Real64 BESTESTSurfaceConvCoefficient = 0.0;
-		Real64 BESTESTGroundSurfTemp = 0.0;
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
-
-#ifdef CalcEnergyBalance
-		Real64 MaxEnergyImbalance = 0.0;
-		int MaxEnergyImbalance_XLocation = 0;
-		int MaxEnergyImbalance_YLocation = 0;
-		int MaxEnergyImbalance_ZLocation = 0;
-		bool finalIteration = false;
-		int minNumberOfSidesCalculated = 10;
-		int minNumberOfSidesCalculated_XLocation = 0;
-		int minNumberOfSidesCalculated_YLocation = 0;
-		int minNumberOfSidesCalculated_ZLocation = 0;
-		int maxNumberOfSidesCalculated = 0;
-		int maxNumberOfSidesCalculated_XLocation = 0;
-		int maxNumberOfSidesCalculated_YLocation = 0;
-		int maxNumberOfSidesCalculated_ZLocation = 0;
-		Real64 AvgUnweightedSurfTemp = 0.0;
-		Real64 maxTempDiffDueToImbalance = 0.0;
-		int maxTempDiffDueToImbalance_XLocation = 0;
-		int maxTempDiffDueToImbalance_YLocation = 0;
-		int maxTempDiffDueToImbalance_ZLocation = 0;
-#endif
 
 		// Default Constructor
 		FullDomainStructureInfo() :
@@ -1269,12 +1235,6 @@ namespace PlantPipingSystemsManager {
 	ReadBasementInputs(
 		int const StartingDomainNumForBasement,
 		int const NumBasements,
-		bool & ErrorsFound
-	);
-
-	void
-	ReadBESTESTInputs(
-		int const TotalNumDomains,
 		bool & ErrorsFound
 	);
 
@@ -1626,11 +1586,6 @@ namespace PlantPipingSystemsManager {
 		int & NumFieldCells,
 		int & NumBoundaryCells
 	);
-
-#ifdef CalcEnergyBalance
-	void
-	UpdateMaxEnergyBalance( int const DomainNum );
-#endif
 
 } // PlantPipingSystemsManager
 
