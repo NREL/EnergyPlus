@@ -56,8 +56,6 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// EnergyPlus::GetBranchInput Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -65,6 +63,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/InputProcessor.hh>
 
 using namespace EnergyPlus;
@@ -77,6 +76,8 @@ using InputProcessor::VerifyName;
 using InputProcessor::SameString;
 
 namespace EnergyPlus {
+
+	// EnergyPlus::GetBranchInput Unit Tests
 
 	TEST_F( EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch )
 	{
@@ -349,6 +350,180 @@ namespace EnergyPlus {
 			lNumericBlanks.deallocate();
 
 		}
+
+	}
+
+	// EnergyPlus::BranchNodeConnections Unit Tests
+
+		TEST_F( EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
+	{
+
+		std::string const idf_objects = delimited_string( {
+			" Version,8.5;",
+
+			"AirLoopHVAC,",
+			"  DOAS,                    !- Name",
+			"  ,                        !- Controller List Name",
+			"  DOAS Availability Managers,  !- Availability Manager List Name",
+			"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
+			"  DOAS Branches,           !- Branch List Name",
+			"  ,                        !- Connector List Name",
+			"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
+			"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
+			"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
+			"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
+
+			"AirLoopHVAC,",
+			"  Air Loop 1,                    !- Name",
+			"  ,                        !- Controller List Name",
+			"  Air Loop 1 Availability Managers,  !- Availability Manager List Name",
+			"  50.0,                !- Design Supply Air Flow Rate {m3/s}",
+			"  Air Loop 1 Branches,           !- Branch List Name",
+			"  ,                        !- Connector List Name",
+			"  Air Loop 1 Air Loop Inlet,     !- Supply Side Inlet Node Name",
+			"  Air Loop 1 Return Air Outlet,  !- Demand Side Outlet Node Name",
+			"  Air Loop 1 Supply Path Inlet,  !- Demand Side Inlet Node Names",
+			"  Air Loop 1 Supply Fan Outlet;  !- Supply Side Outlet Node Names",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		std::string BranchListName;
+		std::string FoundLoopName;
+		int FoundLoopNum;
+		std::string LoopType;
+		Real64 FoundLoopVolFlowRate;
+		bool MatchedLoop;
+
+		// Case 1 Find Air Loop 1 Branches
+		// Note the strings need to be uppercase at this point
+		BranchListName = "AIR LOOP 1 BRANCHES";
+		FoundLoopName = "None";
+		FoundLoopNum = 0;
+		LoopType = "None";
+		FoundLoopVolFlowRate = 0.0;
+		MatchedLoop = false;
+
+
+		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
+
+		EXPECT_EQ( "AIR LOOP 1", FoundLoopName );
+		EXPECT_EQ( 2 , FoundLoopNum );
+		EXPECT_EQ( "Air", LoopType );
+		EXPECT_EQ( 50.0, FoundLoopVolFlowRate );
+		EXPECT_TRUE( MatchedLoop );
+
+		// Case 2 Find DOAS Branches
+		BranchListName = "DOAS BRANCHES";
+		FoundLoopName = "None";
+		FoundLoopNum = 0;
+		LoopType = "None";
+		FoundLoopVolFlowRate = 0.0;
+		MatchedLoop = false;
+
+
+		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
+
+		EXPECT_EQ( "DOAS", FoundLoopName );
+		EXPECT_EQ( 1 , FoundLoopNum );
+		EXPECT_EQ( "Air", LoopType );
+		EXPECT_EQ( DataSizing::AutoSize, FoundLoopVolFlowRate );
+		EXPECT_TRUE( MatchedLoop );
+
+		// Case 3 Not found
+		BranchListName = "Not There";
+		FoundLoopName = "None";
+		FoundLoopNum = 0;
+		LoopType = "None";
+		FoundLoopVolFlowRate = 0.0;
+		MatchedLoop = false;
+
+
+		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
+
+		EXPECT_EQ( "None", FoundLoopName );
+		EXPECT_EQ( 0 , FoundLoopNum );
+		EXPECT_EQ( "None", LoopType );
+		EXPECT_EQ( 0.0, FoundLoopVolFlowRate );
+		EXPECT_FALSE( MatchedLoop );
+
+	}
+
+	TEST_F( EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
+	{
+
+		std::string const idf_objects = delimited_string( {
+			" Version,8.5;",
+
+			"Branch,",
+			"  DOAS Main Branch,        !- Name",
+			"  autosize,                !- Maximum Flow Rate {m3/s}",
+			"  ,                        !- Pressure Drop Curve Name",
+			"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
+			"  DOAS OA System,          !- Component 1 Name",
+			"  DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
+			"  DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
+			"  Passive,                 !- Component 1 Branch Control Type",
+			"  CoilSystem:Cooling:DX,   !- Component 2 Object Type",
+			"  DOAS Cooling Coil,       !- Component 2 Name",
+			"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
+			"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
+			"  Passive,                 !- Component 2 Branch Control Type",
+			"  Coil:Heating:Gas,        !- Component 2 Object Type",
+			"  DOAS Heating Coil,       !- Component 2 Name",
+			"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
+			"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",
+			"  Passive,                 !- Component 2 Branch Control Type",
+			"  Fan:VariableVolume,      !- Component 3 Object Type",
+			"  DOAS Supply Fan,         !- Component 3 Name",
+			"  DOAS Heating Coil Outlet,!- Component 3 Inlet Node Name",
+			"  DOAS Supply Fan Outlet,  !- Component 3 Outlet Node Name",
+			"  Active;                  !- Component 3 Branch Control Type",
+
+			"  Branch,",
+			"    TowerWaterSys Demand Bypass Branch,  !- Name",
+			"    ,                        !- Maximum Flow Rate {m3/s}",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name",
+			"    TowerWaterSys Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
+			"    TowerWaterSys Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name",
+			"    Bypass;                  !- Component 1 Branch Control Type",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		std::string CompType;
+		std::string CompName;
+		int BranchIndex;
+
+		// Case 1 Find OA System on DOAS branch
+		// Note the strings need to be uppercase at this point
+		CompType = "AIRLOOPHVAC:OUTDOORAIRSYSTEM";
+		CompName = "DOAS OA SYSTEM";
+		BranchIndex = 0;
+
+		BranchIndex = GetAirBranchIndex( CompType, CompName );
+
+		EXPECT_EQ( 1 , BranchIndex );
+
+		// Case 3 Find pipe
+		CompType = "PIPE:ADIABATIC";
+		CompName = "TOWERWATERSYS DEMAND BYPASS PIPE";
+		BranchIndex = 0;
+
+		BranchIndex = GetAirBranchIndex( CompType, CompName );
+
+		EXPECT_EQ( 2, BranchIndex );
+
+		// Case 4 Not found
+		CompType = "PIPE:ADIABATIC";
+		CompName = "TOWERWATERSYS DEMAND BYPASS PIPE NOT THERE";
+		BranchIndex = 0;
+
+		BranchIndex = GetAirBranchIndex( CompType, CompName );
+
+		EXPECT_EQ( 0, BranchIndex );
 
 	}
 

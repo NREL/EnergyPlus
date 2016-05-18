@@ -169,7 +169,6 @@ namespace BranchInputManager {
 		// Members
 		std::string Name; // Name for this Branch
 		std::string AssignedLoopName; // Loop Name for this branch
-		Real64 MaxFlowRate; // Max Flow Rate of the Branch
 		int PressureCurveType; // Integer index of pressure curve type
 		int PressureCurveIndex; // Integer index of pressure curve
 		int FluidType; // Fluid type (see DataLoopNode)
@@ -178,7 +177,6 @@ namespace BranchInputManager {
 
 		// Default Constructor
 		BranchData() :
-			MaxFlowRate( 0.0 ),
 			PressureCurveType( 0 ),
 			PressureCurveIndex( 0 ),
 			FluidType( NodeType_Unknown ),
@@ -251,7 +249,6 @@ namespace BranchInputManager {
 	GetBranchData(
 		std::string const & LoopName, // Loop Name of this Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -273,9 +270,6 @@ namespace BranchInputManager {
 		std::string const & CompName
 	);
 
-	Real64
-	GetBranchFlow( int const BranchNum );
-
 	void
 	GetBranchFanTypeName(
 		int const BranchNum,
@@ -285,18 +279,9 @@ namespace BranchInputManager {
 	);
 
 	void
-	CheckBranchForOASys(
-		std::string const & CompType,
-		std::string const & CompName,
-		bool & OASysFlag,
-		bool & ErrFound
-	);
-
-	void
 	GetInternalBranchData(
 		std::string const & LoopName, // Loop Name for Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
@@ -357,15 +342,6 @@ namespace BranchInputManager {
 
 	std::string
 	GetLastBranchOutletNodeName( std::string const & BranchListName ); // Branch List name to search
-
-	void
-	CheckSystemBranchFlow(
-		std::string const & SystemType, // type of air loop equipment
-		std::string const & SystemName, // name of air loop equipment
-		Real64 & BranchFlow, // branch volumetric flow rate [m3/s]
-		Real64 const BranchFanFlow, // branch flow rate [m3/s]
-		bool & ErrFound // logical error flag
-	);
 
 	//==================================================================================
 	//   Routines that get the input for the internal branch management structure

@@ -639,8 +639,6 @@ namespace DataPlant {
 		// Members
 		std::string Name; // Name of the branch
 		int ControlType;
-		Real64 MinVolFlowRate;
-		Real64 MaxVolFlowRate;
 		Real64 RequestedMassFlow;
 		bool HasConstantSpeedBranchPump; // true if branch has a constant speed branch pump
 		Real64 ConstantSpeedBranchMassFlow; // nominal flow rate if constant speed branch pump on
@@ -665,8 +663,6 @@ namespace DataPlant {
 		// Default Constructor
 		BranchData() :
 			ControlType( 0 ),
-			MinVolFlowRate( 0.0 ),
-			MaxVolFlowRate( 0.0 ),
 			RequestedMassFlow( 0.0 ),
 			HasConstantSpeedBranchPump( false ),
 			ConstantSpeedBranchMassFlow( 0.0 ),

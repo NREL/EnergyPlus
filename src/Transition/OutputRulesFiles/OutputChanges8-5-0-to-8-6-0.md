@@ -45,3 +45,9 @@ See [5598](https://github.com/NREL/EnergyPlus/pull/5598).
 When the JtoKHW unit conversion option is used in the OutputControl:Table:Style object it now changes the units used in the LEED Summary report. Columns that were previously left as GJ are now expressed as kWh and columns that were previously MJW/m2 are now expressed as kWh/m2.
 
 See [5616](https://github.com/NREL/EnergyPlus/pull/5616).
+
+### New Rows for District Heating and Cooling Virtual Rate in LEED EAp2-3 Table
+
+When district heating or cooling is used, additional rows in the LEED EAp2-3 are shown with the virtual rates for those energy sources are shown.   
+
+See [5639](https://github.com/NREL/EnergyPlus/pull/5639).

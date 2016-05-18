@@ -795,11 +795,13 @@ namespace EnergyPlus {
 		int AirloopNum = 1;
 		int OASysNum = 1;
 		int OAControllerNum = 1;
+		PrimaryAirSystem.allocate( AirloopNum );
+		PrimaryAirSystem( AirloopNum ).Name = "Airloop 1";
 		AirLoopControlInfo.allocate( AirloopNum ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
 		AirLoopFlow.allocate( AirloopNum ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
-		AirLoopFlow( AirloopNum ).DesSupply = 1.0;
 		DataEnvironment::StdRhoAir = 1.2;
 		DataEnvironment::OutBaroPress = 101250.0;
+		AirLoopFlow( AirloopNum ).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
 
 		// setup OA system and initialize nodes
 		ManageOutsideAirSystem( "OA Sys 1", true, AirloopNum, OASysNum );
@@ -809,8 +811,8 @@ namespace EnergyPlus {
 			Node( i ).Temp = 20.0;
 			Node( i ).HumRat = 0.01;
 			Node( i ).Enthalpy = 45478.0;
-			Node( i ).MassFlowRate = 1.0;
-			Node( i ).MassFlowRateMaxAvail = 1.0;
+			Node( i ).MassFlowRate = AirLoopFlow( AirloopNum ).DesSupply;
+			Node( i ).MassFlowRateMaxAvail = AirLoopFlow( AirloopNum ).DesSupply;
 			Node( i ).Press = 101250.0;
 		}
 
@@ -952,9 +954,11 @@ namespace EnergyPlus {
 		Real64 WaterConsumptionRate( 0.0 ); // water use rate of the humidifier
 		Real64 ElecPowerInput( 0.0 ); // electric use rate of the humidifier
 
+		PrimaryAirSystem.allocate( AirloopNum );
+		PrimaryAirSystem( AirloopNum ).Name = "Airloop 1";
 		AirLoopControlInfo.allocate( AirloopNum );
 		AirLoopFlow.allocate( AirloopNum );
-		AirLoopFlow( AirloopNum ).DesSupply = 1.0;
+		AirLoopFlow( AirloopNum ).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
 		DataEnvironment::StdRhoAir = 1.2;
 		DataEnvironment::OutBaroPress = 101250.0;
 		DataSizing::SysSizingRunDone = false;
@@ -971,8 +975,8 @@ namespace EnergyPlus {
 			Node( i ).Temp = 20.0;
 			Node( i ).HumRat = 0.0005;
 			Node( i ).Enthalpy = Psychrometrics::PsyHFnTdbW( DataLoopNode::Node( i ).Temp, DataLoopNode::Node( i ).HumRat );
-			Node( i ).MassFlowRate = 1.0;
-			Node( i ).MassFlowRateMaxAvail = 1.0;
+			Node( i ).MassFlowRate = AirLoopFlow( AirloopNum ).DesSupply;
+			Node( i ).MassFlowRateMaxAvail = AirLoopFlow( AirloopNum ).DesSupply;
 			Node( i ).Press = 101250.0;
 		}
 		// simulate OA system, common node properties are propagated
@@ -989,7 +993,7 @@ namespace EnergyPlus {
 		AirInNode = Humidifiers::Humidifier( HumNum ).AirInNode;
 		AirOutNode = Humidifiers::Humidifier( HumNum ).AirOutNode;
 		// Calculate expected humidifier water consumption rate
-		WaterConsumptionRate = 1.0 * ( 0.005 - 0.0005 );
+		WaterConsumptionRate = AirLoopFlow( AirloopNum ).DesSupply * ( 0.005 - 0.0005 );
 		// Calculate humidifier electric use rate (fan electric power and standby electric power are zero)
 		ElecPowerInput = ( WaterConsumptionRate / Humidifiers::Humidifier( HumNum ).NomCap ) * Humidifiers::Humidifier( HumNum ).NomPower;
 		// Confirm humidifier water consumption calculation
