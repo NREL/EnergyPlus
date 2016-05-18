@@ -3040,8 +3040,8 @@ namespace AirflowNetworkBalanceManager {
 				PressureControllerData( i ).ZoneNum = FindItemInList( Alphas( 2 ), Zone );
 				PressureControllerData( i ).AFNNodeNum = FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 				if ( PressureControllerData( i ).ZoneNum == 0 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields( 1 ) + " given." );
-					ShowContinueError( "..invalid " + cAlphaFields( 1 ) + " = \"" + PressureControllerData( i ).ZoneName + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields( 2 ) + " given." );
+					ShowContinueError( "..invalid " + cAlphaFields( 2 ) + " = \"" + PressureControllerData( i ).ZoneName + "\"" );
 					ErrorsFound = true;
 				}
 
@@ -3086,7 +3086,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 				PressureControllerData( i ).PresSetpointSchedPtr = GetScheduleIndex( Alphas( 6 ) );
 				if ( PressureControllerData( i ).PresSetpointSchedPtr == 0 ) {
-					ShowSevereError( CurrentModuleObject + ", \"" + PressureControllerData( i ).Name + "\" " + cAlphaFields( 6 ) + " not found: " + Alphas( 5 ) );
+					ShowSevereError( CurrentModuleObject + ", \"" + PressureControllerData( i ).Name + "\" " + cAlphaFields( 6 ) + " not found: " + Alphas( 6 ) );
 					ErrorsFound = true;
 				}
 			}
