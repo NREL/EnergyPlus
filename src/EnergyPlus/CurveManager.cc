@@ -355,7 +355,7 @@ namespace CurveManager {
 
 		{ auto const SELECT_CASE_var( PerfCurve( CurveIndex ).InterpolationType );
 		if ( SELECT_CASE_var == EvaluateCurveToLimits ) {
-			CurveValue = PerformanceCurveObject( CurveIndex, Var1, Var2, Var3 );
+			CurveValue = PerformanceCurveObject( CurveIndex, Var1, Var2, Var3, Var4 );
 		} else if ( SELECT_CASE_var == LinearInterpolationOfTable ) {
 			CurveValue = PerformanceTableObject( CurveIndex, Var1, Var2, Var3 );
 		} else if ( SELECT_CASE_var == LagrangeInterpolationLinearExtrapolation ) {

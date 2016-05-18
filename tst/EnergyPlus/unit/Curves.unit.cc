@@ -856,3 +856,818 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialSkewNormal) {
 	EXPECT_DOUBLE_EQ(3.5, CurveManager::CurveValue(2, 1)); // Value too large
 	EXPECT_DOUBLE_EQ(3.24109670456697, CurveManager::CurveValue(2, 2)); // In-range value
 }
+
+TEST_F(EnergyPlusFixture, Curves_BiQuadratic) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:Biquadratic,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 y**2",
+		"6,                       !- Coefficient6 x*y",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"-2,                      !- Minimum Value of y",
+		"0,                       !- Maximum Value of y",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type",
+		"Curve:Biquadratic,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 y**2",
+		"6,                       !- Coefficient6 x*y",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"-2,                      !- Minimum Value of y",
+		"0,                       !- Maximum Value of y",
+		"1.5,                     !- Minimum Curve Output",
+		"4.5,                     !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(2, max1);
+	EXPECT_EQ(-2, min2);
+	EXPECT_EQ(0, max2);
+	EXPECT_EQ(CurveManager::CurveType_BiQuadratic, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(2, max1);
+	EXPECT_EQ(-2, min2);
+	EXPECT_EQ(0, max2);
+	EXPECT_EQ(CurveManager::CurveType_BiQuadratic, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(5.0, CurveManager::CurveValue(1, 2, -2)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, -1, 0)); // Minimum x
+	EXPECT_DOUBLE_EQ(5.0, CurveManager::CurveValue(1, 3, -2)); // Maximum x
+	EXPECT_DOUBLE_EQ(5.0, CurveManager::CurveValue(1, 2, -3)); // Minimum y
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0, 1)); // Maximum y
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 1.5, 4.5);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(1.5, CurveManager::CurveValue(1, 0, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(4.5, CurveManager::CurveValue(1, 2, -2)); // Value too large
+
+	EXPECT_DOUBLE_EQ(1.5, CurveManager::CurveValue(2, 0, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(4.5, CurveManager::CurveValue(2, 2, -2)); // Value too large
+	EXPECT_DOUBLE_EQ(2.75, CurveManager::CurveValue(2, 0.5, 0)); // In-range value
+}
+
+TEST_F(EnergyPlusFixture, Curves_BiCubic) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:Bicubic,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 y**2",
+		"6,                       !- Coefficient6 x*y",
+		"7,                       !- Coefficient7 x**3",
+		"8,                       !- Coefficient8 y**3",
+		"9,                       !- Coefficient9 x**2 * y",
+		"10,                      !- Coefficient10 x*y**2",
+		"0,                       !- Minimum Value of x",
+		"4,                       !- Maximum Value of x",
+		"4,                       !- Minimum Value of y",
+		"6,                       !- Maximum Value of y",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type",
+		"Curve:Bicubic,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 y**2",
+		"6,                       !- Coefficient6 x*y",
+		"7,                       !- Coefficient7 x**3",
+		"8,                       !- Coefficient8 y**3",
+		"9,                       !- Coefficient9 x**2 * y",
+		"10,                      !- Coefficient10 x*y**2",
+		"0,                       !- Minimum Value of x",
+		"4,                       !- Maximum Value of x",
+		"4,                       !- Minimum Value of y",
+		"6,                       !- Maximum Value of y",
+		"610,                     !- Minimum Curve Output",
+		"4880,                    !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("BICUBIC", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(4, max1);
+	EXPECT_EQ(4, min2);
+	EXPECT_EQ(6, max2);
+	EXPECT_EQ(CurveManager::CurveType_BiCubic, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("BICUBIC", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(4, max1);
+	EXPECT_EQ(4, min2);
+	EXPECT_EQ(6, max2);
+	EXPECT_EQ(CurveManager::CurveType_BiCubic, CurveManager::GetCurveObjectTypeNum(2));
+	
+	EXPECT_DOUBLE_EQ(609.0, CurveManager::CurveValue(1, 0, 4)); // In-range value
+	EXPECT_DOUBLE_EQ(4885.0, CurveManager::CurveValue(1, 4, 6)); // In-range value
+	EXPECT_DOUBLE_EQ(609.0, CurveManager::CurveValue(1, -1, 4)); // Minimum x
+	EXPECT_DOUBLE_EQ(4885.0, CurveManager::CurveValue(1, 5, 6)); // Maximum x
+	EXPECT_DOUBLE_EQ(609.0, CurveManager::CurveValue(1, 0, 3)); // Minimum y
+	EXPECT_DOUBLE_EQ(4885.0, CurveManager::CurveValue(1, 4, 10)); // Maximum y
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 610, 4880);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(610.0, CurveManager::CurveValue(1, 0, 4)); // Value too small
+	EXPECT_DOUBLE_EQ(4880.0, CurveManager::CurveValue(1, 4, 6)); // Value too large
+
+	EXPECT_DOUBLE_EQ(610.0, CurveManager::CurveValue(2, 0, 4)); // Value too small
+	EXPECT_DOUBLE_EQ(4880.0, CurveManager::CurveValue(2, 4, 6)); // Value too large
+	EXPECT_DOUBLE_EQ(3829.0, CurveManager::CurveValue(2, 3, 6)); // In-range value
+
+}
+
+TEST_F(EnergyPlusFixture, Curves_QuadraticLinear) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:QuadraticLinear,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 x*y",
+		"6,                       !- Coefficient6 x**2 * y",
+		"0,                       !- Minimum Value of x",
+		"4,                       !- Maximum Value of x",
+		"4,                       !- Minimum Value of y",
+		"6,                       !- Maximum Value of y",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type",
+		"Curve:QuadraticLinear,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 x*y",
+		"6,                       !- Coefficient6 x**2 * y",
+		"0,                       !- Minimum Value of x",
+		"4,                       !- Maximum Value of x",
+		"4,                       !- Minimum Value of y",
+		"6,                       !- Maximum Value of y",
+		"20,                     !- Minimum Curve Output",
+		"700,                    !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(4, max1);
+	EXPECT_EQ(4, min2);
+	EXPECT_EQ(6, max2);
+	EXPECT_EQ(CurveManager::CurveType_QuadraticLinear, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(4, max1);
+	EXPECT_EQ(4, min2);
+	EXPECT_EQ(6, max2);
+	EXPECT_EQ(CurveManager::CurveType_QuadraticLinear, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(17.0, CurveManager::CurveValue(1, 0, 4)); // In-range value
+	EXPECT_DOUBLE_EQ(777.0, CurveManager::CurveValue(1, 4, 6)); // In-range value
+	EXPECT_DOUBLE_EQ(17.0, CurveManager::CurveValue(1, -1, 4)); // Minimum x
+	EXPECT_DOUBLE_EQ(777.0, CurveManager::CurveValue(1, 5, 6)); // Maximum x
+	EXPECT_DOUBLE_EQ(17.0, CurveManager::CurveValue(1, 0, 3)); // Minimum y
+	EXPECT_DOUBLE_EQ(777.0, CurveManager::CurveValue(1, 4, 10)); // Maximum y
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 20, 700);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(1, 0, 4)); // Value too small
+	EXPECT_DOUBLE_EQ(700.0, CurveManager::CurveValue(1, 4, 6)); // Value too large
+
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(2, 0, 4)); // Value too small
+	EXPECT_DOUBLE_EQ(700.0, CurveManager::CurveValue(2, 4, 6)); // Value too large
+	EXPECT_DOUBLE_EQ(472.0, CurveManager::CurveValue(2, 3, 6)); // In-range value
+
+}
+
+TEST_F(EnergyPlusFixture, Curves_CubicLinear) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:CubicLinear,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 x**3",
+		"5,                       !- Coefficient5 y",
+		"6,                       !- Coefficient6 x*y",
+		"0,                       !- Minimum Value of x",
+		"4,                       !- Maximum Value of x",
+		"4,                       !- Minimum Value of y",
+		"6,                       !- Maximum Value of y",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type",
+		"Curve:CubicLinear,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x",
+		"3,                       !- Coefficient3 x**2",
+		"4,                       !- Coefficient4 x**3",
+		"5,                       !- Coefficient5 y",
+		"6,                       !- Coefficient6 x*y",
+		"0,                       !- Minimum Value of x",
+		"4,                       !- Maximum Value of x",
+		"4,                       !- Minimum Value of y",
+		"6,                       !- Maximum Value of y",
+		"30,                     !- Minimum Curve Output",
+		"480,                    !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless;           !- Output Unit Type" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("CUBICLINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(4, max1);
+	EXPECT_EQ(4, min2);
+	EXPECT_EQ(6, max2);
+	EXPECT_EQ(CurveManager::CurveType_CubicLinear, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("CUBICLINEAR", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(4, max1);
+	EXPECT_EQ(4, min2);
+	EXPECT_EQ(6, max2);
+	EXPECT_EQ(CurveManager::CurveType_CubicLinear, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(21.0, CurveManager::CurveValue(1, 0, 4)); // In-range value
+	EXPECT_DOUBLE_EQ(487.0, CurveManager::CurveValue(1, 4, 6)); // In-range value
+	EXPECT_DOUBLE_EQ(21.0, CurveManager::CurveValue(1, -1, 4)); // Minimum x
+	EXPECT_DOUBLE_EQ(487.0, CurveManager::CurveValue(1, 5, 6)); // Maximum x
+	EXPECT_DOUBLE_EQ(21.0, CurveManager::CurveValue(1, 0, 3)); // Minimum y
+	EXPECT_DOUBLE_EQ(487.0, CurveManager::CurveValue(1, 4, 10)); // Maximum y
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 30, 480);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(30.0, CurveManager::CurveValue(1, 0, 4)); // Value too small
+	EXPECT_DOUBLE_EQ(480.0, CurveManager::CurveValue(1, 4, 6)); // Value too large
+
+	EXPECT_DOUBLE_EQ(30.0, CurveManager::CurveValue(2, 0, 4)); // Value too small
+	EXPECT_DOUBLE_EQ(480.0, CurveManager::CurveValue(2, 4, 6)); // Value too large
+	EXPECT_DOUBLE_EQ(280.0, CurveManager::CurveValue(2, 3, 6)); // In-range value
+
+}
+
+TEST_F(EnergyPlusFixture, Curves_FanPressureRise) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:FanPressureRise,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 C1",
+		"2,                       !- Coefficient2 C2",
+		"3,                       !- Coefficient3 C3",
+		"4,                       !- Coefficient4 C4",
+		"0,                       !- Minimum Value of Qfan",
+		"400,                     !- Maximum Value of Qfan",
+		"4000,                    !- Minimum Value of Psm",
+		"6000,                    !- Maximum Value of Psm",
+		",                        !- Minimum Curve Output",
+		";                        !- Maximum Curve Output",
+		"Curve:FanPressureRise,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 C1",
+		"2,                       !- Coefficient2 C2",
+		"3,                       !- Coefficient3 C3",
+		"4,                       !- Coefficient4 C4",
+		"0,                       !- Minimum Value of Qfan",
+		"400,                     !- Maximum Value of Qfan",
+		"4000,                    !- Minimum Value of Psm",
+		"6000,                    !- Maximum Value of Psm",
+		"20000,                        !- Minimum Curve Output",
+		"277000;                        !- Maximum Curve Output" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("FANPRESSURERISE", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(400, max1);
+	EXPECT_EQ(4000, min2);
+	EXPECT_EQ(6000, max2);
+	EXPECT_EQ(CurveManager::CurveType_FanPressureRise, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("FANPRESSURERISE", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(400, max1);
+	EXPECT_EQ(4000, min2);
+	EXPECT_EQ(6000, max2);
+	EXPECT_EQ(CurveManager::CurveType_FanPressureRise, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(16000.0, CurveManager::CurveValue(1, 0, 4000)); // In-range value
+	EXPECT_DOUBLE_EQ(277751.600308978, CurveManager::CurveValue(1, 400, 6000)); // In-range value
+	EXPECT_DOUBLE_EQ(16000.0, CurveManager::CurveValue(1, -1, 4000)); // Minimum x
+	EXPECT_DOUBLE_EQ(277751.600308978, CurveManager::CurveValue(1, 500, 6000)); // Maximum x
+	EXPECT_DOUBLE_EQ(16000.0, CurveManager::CurveValue(1, 0, 3000)); // Minimum y
+	EXPECT_DOUBLE_EQ(277751.600308978, CurveManager::CurveValue(1, 400, 7000)); // Maximum y
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 20000, 277000);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(20000.0, CurveManager::CurveValue(1, 0, 4000)); // Value too small
+	EXPECT_DOUBLE_EQ(277000, CurveManager::CurveValue(1, 400, 6000)); // Value too large
+
+	EXPECT_DOUBLE_EQ(20000, CurveManager::CurveValue(2, 0, 4000)); // Value too small
+	EXPECT_DOUBLE_EQ(277000, CurveManager::CurveValue(2, 400, 6000)); // Value too large
+	EXPECT_DOUBLE_EQ(28086.83298050514, CurveManager::CurveValue(2, 50, 4000)); // In-range value
+
+}
+
+TEST_F(EnergyPlusFixture, Curves_TriQuadratic) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:Triquadratic,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x**2",
+		"3,                       !- Coefficient3 x",
+		"4,                       !- Coefficient4 y**2",
+		"5,                       !- Coefficient5 y",
+		"6,                       !- Coefficient6 z**2",
+		"7,                       !- Coefficient7 z",
+		"8,                       !- Coefficient8 x**2 * y**2",
+		"9,                       !- Coefficient9 x*y",
+		"10,                      !- Coefficient10 x*y**2",
+		"11,                      !- Coefficient11 x**2 * y",
+		"12,                      !- Coefficient12 x**2 * z**2",
+		"13,                      !- Coefficient13 x*z",
+		"14,                      !- Coefficient14 x*z**2",
+		"15,                      !- Coefficient15 x**2 * z",
+		"16,                      !- Coefficient16 y**2 * z**2",
+		"17,                      !- Coefficient17 y*z",
+		"18,                      !- Coefficient18 y*z**2",
+		"19,                      !- Coefficient19 y**2 * z",
+		"20,                      !- Coefficient20 x**2 * y**2 * z**2",
+		"21,                      !- Coefficient21 x**2 * y**2 * z",
+		"22,                      !- Coefficient22 x**2 * y*z**2",
+		"23,                      !- Coefficient23 x*y**2 * z**2",
+		"24,                      !- Coefficient24 x**2 * y*z",
+		"25,                      !- Coefficient25 x*y**2 * z",
+		"26,                      !- Coefficient26 x*y*z**2",
+		"27,                      !- Coefficient27 x*y*z",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"2,                       !- Minimum Value of y",
+		"4,                       !- Maximum Value of y",
+		"3,                       !- Minimum Value of z",
+		"5,                       !- Maximum Value of z",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Input Unit Type for Z",
+		"Dimensionless;           !- Output Unit Type",
+		"Curve:Triquadratic,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 x**2",
+		"3,                       !- Coefficient3 x",
+		"4,                       !- Coefficient4 y**2",
+		"5,                       !- Coefficient5 y",
+		"6,                       !- Coefficient6 z**2",
+		"7,                       !- Coefficient7 z",
+		"8,                       !- Coefficient8 x**2 * y**2",
+		"9,                       !- Coefficient9 x*y",
+		"10,                      !- Coefficient10 x*y**2",
+		"11,                      !- Coefficient11 x**2 * y",
+		"12,                      !- Coefficient12 x**2 * z**2",
+		"13,                      !- Coefficient13 x*z",
+		"14,                      !- Coefficient14 x*z**2",
+		"15,                      !- Coefficient15 x**2 * z",
+		"16,                      !- Coefficient16 y**2 * z**2",
+		"17,                      !- Coefficient17 y*z",
+		"18,                      !- Coefficient18 y*z**2",
+		"19,                      !- Coefficient19 y**2 * z",
+		"20,                      !- Coefficient20 x**2 * y**2 * z**2",
+		"21,                      !- Coefficient21 x**2 * y**2 * z",
+		"22,                      !- Coefficient22 x**2 * y*z**2",
+		"23,                      !- Coefficient23 x*y**2 * z**2",
+		"24,                      !- Coefficient24 x**2 * y*z",
+		"25,                      !- Coefficient25 x*y**2 * z",
+		"26,                      !- Coefficient26 x*y*z**2",
+		"27,                      !- Coefficient27 x*y*z",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"2,                       !- Minimum Value of y",
+		"4,                       !- Maximum Value of y",
+		"3,                       !- Minimum Value of z",
+		"5,                       !- Maximum Value of z",
+		"3000,                    !- Minimum Curve Output",
+		"90000,                   !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Input Unit Type for Z",
+		"Dimensionless;           !- Output Unit Type" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("TRIQUADRATIC", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2, min3, max3;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2, min3, max3);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(2, max1);
+	EXPECT_EQ(2, min2);
+	EXPECT_EQ(4, max2);
+	EXPECT_EQ(3, min3);
+	EXPECT_EQ(5, max3);
+	EXPECT_EQ(CurveManager::CurveType_TriQuadratic, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("TRIQUADRATIC", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2, min3, max3);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(2, max1);
+	EXPECT_EQ(2, min2);
+	EXPECT_EQ(4, max2);
+	EXPECT_EQ(3, min3);
+	EXPECT_EQ(5, max3);
+	EXPECT_EQ(CurveManager::CurveType_TriQuadratic, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(4228.0, CurveManager::CurveValue(1, 0, 4, 3)); // In-range value
+	EXPECT_DOUBLE_EQ(1332.0, CurveManager::CurveValue(1, 0, 2, 3)); // In-range value
+	EXPECT_DOUBLE_EQ(91874.0, CurveManager::CurveValue(1, 2, 4, 5)); // In-range value
+	EXPECT_DOUBLE_EQ(4228.0, CurveManager::CurveValue(1, -1, 4, 3)); // Minimum x
+	EXPECT_DOUBLE_EQ(91874.0, CurveManager::CurveValue(1, 3, 4, 5)); // Maximum x
+	EXPECT_DOUBLE_EQ(1332.0, CurveManager::CurveValue(1, 0, 1, 3)); // Minimum y
+	EXPECT_DOUBLE_EQ(91874.0, CurveManager::CurveValue(1, 2, 5, 5)); // Maximum y
+	EXPECT_DOUBLE_EQ(1332.0, CurveManager::CurveValue(1, 0, 2, 2)); // Minimum z
+	EXPECT_DOUBLE_EQ(91874.0, CurveManager::CurveValue(1, 2, 4, 6)); // Maximum z
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 3000, 90000);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(3000.0, CurveManager::CurveValue(1, 0, 2, 3)); // Value too small
+	EXPECT_DOUBLE_EQ(90000.0, CurveManager::CurveValue(1, 2, 4, 5)); // Value too large
+
+	EXPECT_DOUBLE_EQ(3000.0, CurveManager::CurveValue(2, 0, 2, 3)); // Value too small
+	EXPECT_DOUBLE_EQ(90000.0, CurveManager::CurveValue(2, 2, 4, 6)); // Value too large
+	EXPECT_DOUBLE_EQ(4228.0, CurveManager::CurveValue(2, 0, 4, 3)); // In-range value
+
+}
+
+TEST_F(EnergyPlusFixture, Curves_ChillerPartLoadWithLift) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:ChillerPartLoadWithLift,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 C1",
+		"2,                       !- Coefficient2 C2",
+		"3,                       !- Coefficient3 C3",
+		"4,                       !- Coefficient4 C4",
+		"5,                       !- Coefficient5 C5",
+		"6,                       !- Coefficient6 C6",
+		"7,                       !- Coefficient7 C7",
+		"8,                       !- Coefficient8 C8",
+		"9,                       !- Coefficient9 C9",
+		"10,                      !- Coefficient10 C10",
+		"11,                      !- Coefficient11 C11",
+		"12,                      !- Coefficient12 C12",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"2,                       !- Minimum Value of y",
+		"4,                       !- Maximum Value of y",
+		"3,                       !- Minimum Value of z",
+		"5,                       !- Maximum Value of z",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Input Unit Type for Z",
+		"Dimensionless;           !- Output Unit Type",
+		"Curve:ChillerPartLoadWithLift,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 C1",
+		"2,                       !- Coefficient2 C2",
+		"3,                       !- Coefficient3 C3",
+		"4,                       !- Coefficient4 C4",
+		"5,                       !- Coefficient5 C5",
+		"6,                       !- Coefficient6 C6",
+		"7,                       !- Coefficient7 C7",
+		"8,                       !- Coefficient8 C8",
+		"9,                       !- Coefficient9 C9",
+		"10,                      !- Coefficient10 C10",
+		"11,                      !- Coefficient11 C11",
+		"12,                      !- Coefficient12 C12",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"2,                       !- Minimum Value of y",
+		"4,                       !- Maximum Value of y",
+		"3,                       !- Minimum Value of z",
+		"5,                       !- Maximum Value of z",
+		"400,                    !- Minimum Curve Output",
+		"4000,                   !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Input Unit Type for Z",
+		"Dimensionless;           !- Output Unit Type" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("CHILLERPARTLOADWITHLIFT", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2, min3, max3;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2, min3, max3);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(2, max1);
+	EXPECT_EQ(2, min2);
+	EXPECT_EQ(4, max2);
+	EXPECT_EQ(3, min3);
+	EXPECT_EQ(5, max3);
+	EXPECT_EQ(CurveManager::CurveType_ChillerPartLoadWithLift, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("CHILLERPARTLOADWITHLIFT", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2, min3, max3);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(2, max1);
+	EXPECT_EQ(2, min2);
+	EXPECT_EQ(4, max2);
+	EXPECT_EQ(3, min3);
+	EXPECT_EQ(5, max3);
+	EXPECT_EQ(CurveManager::CurveType_ChillerPartLoadWithLift, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(2913.0, CurveManager::CurveValue(1, 0, 4, 3)); // In-range value
+	EXPECT_DOUBLE_EQ(381.0, CurveManager::CurveValue(1, 0, 2, 3)); // In-range value
+	EXPECT_DOUBLE_EQ(5737.0, CurveManager::CurveValue(1, 2, 4, 5)); // In-range value
+	EXPECT_DOUBLE_EQ(2913.0, CurveManager::CurveValue(1, -1, 4, 3)); // Minimum x
+	EXPECT_DOUBLE_EQ(5737.0, CurveManager::CurveValue(1, 3, 4, 5)); // Maximum x
+	EXPECT_DOUBLE_EQ(381.0, CurveManager::CurveValue(1, 0, 1, 3)); // Minimum y
+	EXPECT_DOUBLE_EQ(5737.0, CurveManager::CurveValue(1, 2, 5, 5)); // Maximum y
+	EXPECT_DOUBLE_EQ(381.0, CurveManager::CurveValue(1, 0, 2, 2)); // Minimum z
+	EXPECT_DOUBLE_EQ(5737.0, CurveManager::CurveValue(1, 2, 4, 6)); // Maximum z
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 400, 4000);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(400.0, CurveManager::CurveValue(1, 0, 2, 3)); // Value too small
+	EXPECT_DOUBLE_EQ(4000.0, CurveManager::CurveValue(1, 2, 4, 5)); // Value too large
+
+	EXPECT_DOUBLE_EQ(400.0, CurveManager::CurveValue(2, 0, 2, 3)); // Value too small
+	EXPECT_DOUBLE_EQ(4000.0, CurveManager::CurveValue(2, 2, 4, 5)); // Value too large
+	EXPECT_DOUBLE_EQ(2913.0, CurveManager::CurveValue(2, 0, 4, 3)); // In-range value
+}
+
+TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Curve:QuadLinear,",
+		"TestCurve1,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 w",
+		"3,                       !- Coefficient3 x",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 z",
+		"-2,                      !- Minimum Value of w",
+		"0,                       !- Maximum Value of w",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"2,                       !- Minimum Value of y",
+		"4,                       !- Maximum Value of y",
+		"3,                       !- Minimum Value of z",
+		"5,                       !- Maximum Value of z",
+		",                        !- Minimum Curve Output",
+		",                        !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for w",
+		"Dimensionless,           !- Input Unit Type for x",
+		"Dimensionless,           !- Input Unit Type for y",
+		"Dimensionless;           !- Input Unit Type for z",
+		"Curve:QuadLinear,",
+		"TestCurve2,              !- Name",
+		"1,                       !- Coefficient1 Constant",
+		"2,                       !- Coefficient2 w",
+		"3,                       !- Coefficient3 x",
+		"4,                       !- Coefficient4 y",
+		"5,                       !- Coefficient5 z",
+		"-2,                      !- Minimum Value of w",
+		"0,                       !- Maximum Value of w",
+		"0,                       !- Minimum Value of x",
+		"2,                       !- Maximum Value of x",
+		"2,                       !- Minimum Value of y",
+		"4,                       !- Maximum Value of y",
+		"3,                       !- Minimum Value of z",
+		"5,                       !- Maximum Value of z",
+		"25,                      !- Minimum Curve Output",
+		"40,                      !- Maximum Curve Output",
+		"Dimensionless,           !- Input Unit Type for w",
+		"Dimensionless,           !- Input Unit Type for x",
+		"Dimensionless,           !- Input Unit Type for y",
+		"Dimensionless;           !- Input Unit Type for z" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	ASSERT_EQ(2, CurveManager::NumCurves);
+	EXPECT_EQ("QUADLINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTCURVE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2, min3, max3, min4, max4;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2, min3, max3); //, min4, max4);
+	EXPECT_EQ(-2, min1);
+	EXPECT_EQ(0, max1);
+	EXPECT_EQ(0, min2);
+	EXPECT_EQ(2, max2);
+	EXPECT_EQ(2, min3);
+	EXPECT_EQ(4, max3);
+	//EXPECT_EQ(3, min4);
+	//EXPECT_EQ(5, max4);
+	EXPECT_EQ(CurveManager::CurveType_QuadLinear, CurveManager::GetCurveObjectTypeNum(1));
+	EXPECT_EQ("QUADLINEAR", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTCURVE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTCURVE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTCURVE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2, min3, max3); //, min4, max4);
+	EXPECT_EQ(-2, min1);
+	EXPECT_EQ(0, max1);
+	EXPECT_EQ(0, min2);
+	EXPECT_EQ(2, max2);
+	EXPECT_EQ(2, min3);
+	EXPECT_EQ(4, max3);
+	//EXPECT_EQ(3, min4);
+	//EXPECT_EQ(5, max4);
+	EXPECT_EQ(CurveManager::CurveType_QuadLinear, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(1, -2, 0, 2, 3)); // In-range value
+	EXPECT_DOUBLE_EQ(48.0, CurveManager::CurveValue(1, 0, 2, 4, 5)); // In-range value
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(1, -3, 0, 2, 3)); // Minimum w
+	EXPECT_DOUBLE_EQ(48.0, CurveManager::CurveValue(1, 1, 2, 4, 5)); // Maximum w
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(1, -2, -1, 2, 3)); // Minimum x
+	EXPECT_DOUBLE_EQ(48.0, CurveManager::CurveValue(1, 0, 7, 4, 5)); // Maximum x
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(1, -2, 0, 0, 3)); // Minimum y
+	EXPECT_DOUBLE_EQ(48.0, CurveManager::CurveValue(1, 0, 2, 5, 5)); // Maximum y
+	EXPECT_DOUBLE_EQ(20.0, CurveManager::CurveValue(1, -2, 0, 2, 0)); // Minimum z
+	EXPECT_DOUBLE_EQ(48.0, CurveManager::CurveValue(1, 0, 2, 4, 7)); // Maximum z
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 25, 40);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(25.0, CurveManager::CurveValue(1, -2, 0, 2, 3)); // Value too small
+	EXPECT_DOUBLE_EQ(40.0, CurveManager::CurveValue(1, 0, 2, 4, 5)); // Value too large
+
+	EXPECT_DOUBLE_EQ(25.0, CurveManager::CurveValue(2, -2, 0, 2, 3)); // Value too small
+	EXPECT_DOUBLE_EQ(40.0, CurveManager::CurveValue(2, 0, 2, 4, 5)); // Value too large
+	EXPECT_DOUBLE_EQ(27.0, CurveManager::CurveValue(2, 0, 1, 2, 3)); // In-range value
+}
