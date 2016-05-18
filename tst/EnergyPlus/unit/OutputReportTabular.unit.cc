@@ -243,6 +243,13 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	EXPECT_EQ( 0.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
 
+	varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 96, indexUnitConv );
+	EXPECT_EQ( "", curUnits );
+	EXPECT_EQ( 1.0, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
 }
 
 
@@ -5733,7 +5740,3 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 	EXPECT_EQ( "", GetUnitSubString( "String with empty unit string at end []" ) );
 	EXPECT_EQ( "", GetUnitSubString( "[] String with empty unit string at beginning" ) );
 }
-
-
-
-

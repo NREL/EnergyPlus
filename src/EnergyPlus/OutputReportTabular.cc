@@ -14243,7 +14243,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 95;
+		UnitConvSize = 96;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14340,6 +14340,7 @@ Label900: ;
 		UnitConv( 93 ).siName = "MJ/m2";
 		UnitConv( 94 ).siName = "MJ/m2";
 		UnitConv( 95 ).siName = "Invalid/Undefined";
+		UnitConv( 96 ).siName = "";
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14436,6 +14437,7 @@ Label900: ;
 		UnitConv( 93 ).ipName = "kBtu/ft2";
 		UnitConv( 94 ).ipName = "kWh/m2";
 		UnitConv( 95 ).ipName = "Invalid/Undefined";
+		UnitConv( 96 ).ipName = "";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14532,6 +14534,7 @@ Label900: ;
 		UnitConv( 93 ).mult = 0.94708628903179 / 10.764961;
 		UnitConv( 94 ).mult = 0.27777777777778;
 		UnitConv( 95 ).mult = 1.0;
+		UnitConv( 96 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14640,7 +14643,7 @@ Label900: ;
 		std::string::size_type const posLBrac = index( inString, '[' ); // left bracket
 		std::string::size_type const posRBrac = index( inString, ']' ); // right bracket
 		//extract the substring with the units
-		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			outUnit = inString.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 		}
 		return outUnit;
@@ -14684,10 +14687,10 @@ Label900: ;
 		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
 		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
 		//extract the substring with the units
-		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
-		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 2 ) ) {
+		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
 		} else {
