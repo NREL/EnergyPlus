@@ -2101,7 +2101,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Cafe VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -2830,7 +2830,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Clean VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -3276,7 +3276,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Conference VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -3706,7 +3706,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Dining VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -4136,7 +4136,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Elevator VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -4566,7 +4566,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Exam VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -5008,7 +5008,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Food Storage VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -5587,7 +5587,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Gas Storage VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -6010,7 +6010,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Imaging VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -6470,7 +6470,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Kitchen VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -6913,7 +6913,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Lab 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -7371,7 +7371,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Lab 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -7838,7 +7838,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Laundry VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -8310,7 +8310,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Lobby VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -8695,7 +8695,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Lounge VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -9104,7 +9104,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Mech 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -9561,7 +9561,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Mech 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -9991,7 +9991,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Office 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -10421,7 +10421,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Office 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -10867,7 +10867,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Office 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -11297,7 +11297,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Office 3 Perimeter 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -11727,7 +11727,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Office 3 Perimeter 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -12173,7 +12173,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Office 3 Perimeter 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -12603,7 +12603,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Patient VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -12988,7 +12988,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Pharmacy VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -13373,7 +13373,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Physical Therapy VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -13782,7 +13782,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Receiving VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -14212,7 +14212,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Reception VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -14577,7 +14577,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Soil VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -14935,7 +14935,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Storage VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -15320,7 +15320,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 1 Waiting VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -15766,7 +15766,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Chapel VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -16151,7 +16151,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Clean 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -16536,7 +16536,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Clean 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -16945,7 +16945,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Corridor VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -17375,7 +17375,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Elevator VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -17821,7 +17821,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Exam 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -18206,7 +18206,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Exam 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -18591,7 +18591,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Exam 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -18992,7 +18992,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Exam 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -19422,7 +19422,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Gift Shop VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -19835,7 +19835,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Imaging 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -20309,7 +20309,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Imaging 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -20783,7 +20783,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Imaging 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -21202,7 +21202,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Lab 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -21631,7 +21631,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Lab 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -22024,7 +22024,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Lockers VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -22419,7 +22419,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Lounge 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -22865,7 +22865,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Lounge 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -23278,7 +23278,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Nurse Station 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -23752,7 +23752,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Nurse Station 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -24137,7 +24137,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Office 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -24567,7 +24567,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Office 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -24952,7 +24952,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Office 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -25398,7 +25398,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Office 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -25926,7 +25926,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Operating VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -26400,7 +26400,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 PACU VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -26830,7 +26830,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Patient 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -27215,7 +27215,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Patient 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -27628,7 +27628,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Procedure 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -28041,7 +28041,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Procedure 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -28471,7 +28471,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Reception VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -28909,7 +28909,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Restroom 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -29357,7 +29357,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Restroom 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -29732,7 +29732,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Soil 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -30107,7 +30107,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Soil 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -30530,7 +30530,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Sterilizing VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -30888,7 +30888,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Storage 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -31236,7 +31236,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Storage 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -31649,7 +31649,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Trauma VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -32093,7 +32093,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Triage VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -32549,7 +32549,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 2 Waiting VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -32934,7 +32934,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Clean VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -33396,7 +33396,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Elevator VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -33781,7 +33781,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Exam VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -34261,7 +34261,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 ICU VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -34719,7 +34719,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Nurse Station 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -35193,7 +35193,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Nurse Station 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -35623,7 +35623,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Nursery VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -36053,7 +36053,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Office VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -36511,7 +36511,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Operating VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -36957,7 +36957,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Patient 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -37403,7 +37403,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Patient 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -37865,7 +37865,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Patient 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -38311,7 +38311,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Patient 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -38720,7 +38720,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Patient Corridor 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -39129,7 +39129,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Patient Corridor 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -39587,7 +39587,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Procedure VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -39952,7 +39952,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Soil VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -40355,7 +40355,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Supply VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -40799,7 +40799,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Triage VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -41239,7 +41239,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 3 Waiting VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -41624,7 +41624,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Clean VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -42086,7 +42086,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Elevator VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -42544,7 +42544,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Nurse Station VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -42974,7 +42974,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Office VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -43420,7 +43420,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Patient 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -43866,7 +43866,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Patient 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -44312,7 +44312,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Patient 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -44758,7 +44758,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Patient 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -45167,7 +45167,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Patient Corridor 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -45576,7 +45576,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Patient Corridor 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -45941,7 +45941,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Soil VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -46344,7 +46344,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 4-6 Supply VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -46729,7 +46729,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Clean VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -47191,7 +47191,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Elevator VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -47649,7 +47649,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Nurse Station VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -48079,7 +48079,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Office VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -48525,7 +48525,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Patient 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -48971,7 +48971,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Patient 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -49417,7 +49417,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Patient 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -49863,7 +49863,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Patient 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -50272,7 +50272,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Patient Corridor 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -50681,7 +50681,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Patient Corridor 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -51046,7 +51046,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Soil VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -51449,7 +51449,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Floor 7 Supply VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -51834,7 +51834,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 1 Core VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -52264,7 +52264,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 1 Perimeter 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -52694,7 +52694,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 1 Perimeter 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -53124,7 +53124,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 1 Perimeter 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -53509,7 +53509,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 2-4 Core VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -53939,7 +53939,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 2-4 Perimeter 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -54369,7 +54369,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 2-4 Perimeter 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -54799,7 +54799,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 2-4 Perimeter 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -55229,7 +55229,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 2-4 Perimeter 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -55614,7 +55614,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 5 Core VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -56044,7 +56044,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 5 Perimeter 1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -56474,7 +56474,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 5 Perimeter 2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -56904,7 +56904,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 5 Perimeter 3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -57356,7 +57356,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     MOB Floor 5 Perimeter 4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}

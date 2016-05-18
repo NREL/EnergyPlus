@@ -6199,7 +6199,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN1_S_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6219,7 +6219,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN2_E_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6239,7 +6239,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN3_N_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6259,7 +6259,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN4_W_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6279,7 +6279,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN5_Core_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6299,7 +6299,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN6_S_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6319,7 +6319,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN7_E_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6339,7 +6339,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN8_N_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6359,7 +6359,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN9_W_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6379,7 +6379,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN10_Core_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 

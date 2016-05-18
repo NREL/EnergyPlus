@@ -2996,7 +2996,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     0.002032,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AutoCalculate,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -3018,7 +3018,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     0.002032,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AutoCalculate,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
@@ -3040,7 +3040,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Zone 3 Reheat Air Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     0.002032,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AutoCalculate,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature {C}
