@@ -124,7 +124,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators )
 
 TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 
 		"OutdoorAir:Node, Test node;",
@@ -425,10 +425,10 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 
 
 TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
-		// small test to demonstrate new boolean argument. 
+		// small test to demonstrate new boolean argument.
 		// shows a simple way to setup sensor on a node, need to call SetupNodeVarsForReporting()
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
 
 		"OutdoorAir:Node, Test node;",
@@ -442,7 +442,7 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 		"Test inside HVAC system iteration Loop,",
 		"InsideHVACSystemIterationLoop,",
 		"Test_InsideHVACSystemIterationLoop;",
-	
+
 		"EnergyManagementSystem:Program,",
 		"Test_InsideHVACSystemIterationLoop,",
 		"set dumm1 = Node_mdot;",
@@ -468,5 +468,27 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 		EXPECT_TRUE( anyRan );
 
 }
+
+
+TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
+
+	using DataGlobals::AnyEnergyManagementSystemInModel;
+
+	std::string const idf_objects = delimited_string( {
+    	"  Output:EnergyManagementSystem,                                                                ",
+		"    Verbose,                 !- Actuator Availability Dictionary Reporting                      ",
+		"    Verbose,                 !- Internal Variable Availability Dictionary Reporting             ",
+		"    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	CheckIfAnyEMS();
+	EXPECT_TRUE( AnyEnergyManagementSystemInModel );
+
+
+}
+
+
 
 
