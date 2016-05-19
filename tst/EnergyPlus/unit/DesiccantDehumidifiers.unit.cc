@@ -2165,7 +2165,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    VAV Sys 1 Main Branch,   !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    OA Sys 1,                !- Component 1 Name",
@@ -3605,7 +3604,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Desiccant Air Loop Main Branch,  !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Desiccant DXSystem OA System,  !- Component 1 Name",
@@ -4773,7 +4771,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Desiccant Air Loop Main Branch,  !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Desiccant DXSystem OA System,  !- Component 1 Name",
@@ -5218,7 +5215,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Heating Supply Inlet Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pump:VariableSpeed,      !- Component 1 Object Type",
 			"    HW Circ Pump,            !- Component 1 Name",
@@ -5227,7 +5223,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Heating Purchased Hot Water Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    DistrictHeating,         !- Component 1 Object Type",
 			"    Purchased Heating,       !- Component 1 Name",
@@ -5236,7 +5231,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Heating Supply Bypass Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Heating Supply Side Bypass,  !- Component 1 Name",
@@ -5250,7 +5244,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Heating Supply Outlet Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Heating Supply Outlet,   !- Component 1 Name",
@@ -5306,7 +5299,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    ZonesHWInletBranch,      !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    ZonesHWInletPipe,        !- Component 1 Name",
@@ -5320,7 +5312,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    ZonesHWOutletBranch,     !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    ZonesHWOutletPipe,       !- Component 1 Name",
@@ -5334,7 +5325,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    RegenCoilHWBranch,       !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    Desiccant Regen Coil,    !- Component 1 Name",
@@ -5360,7 +5350,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    ZonesHWBypassBranch,     !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    ZonesHWBypassPipe,       !- Component 1 Name",

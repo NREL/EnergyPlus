@@ -685,7 +685,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Heating Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HW Circ Pump,            !- Component 1 Name",
@@ -694,7 +693,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Heating Purchased Hot Water Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,       !- Component 1 Name",
@@ -703,7 +701,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Heating Supply Bypass Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Side Bypass,  !- Component 1 Name",
@@ -717,7 +714,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Heating Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Outlet,   !- Component 1 Name",
@@ -745,7 +741,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Reheat Inlet Branch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Reheat Inlet Pipe,       !- Component 1 Name",
@@ -759,7 +754,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Reheat Outlet Branch,    !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Reheat Outlet Pipe,      !- Component 1 Name",
@@ -773,7 +767,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Zone 1 Radiant Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type",
 		"    West Zone Radiant Floor, !- Component 1 Name",
@@ -782,7 +775,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Reheat Bypass Branch,    !- Name",
-		"    0.0018,                  !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Reheat Bypass,           !- Component 1 Name",
@@ -931,7 +923,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Cooling Demand Inlet,    !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Demand Side Inlet Pipe,  !- Component 1 Name",
@@ -952,7 +943,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Zone 1 Cooling Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type",
 		"    West Zone Radiant Floor,   !- Component 1 Name",
@@ -961,7 +951,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Demand Bypass Branch,    !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Demand Side Bypass,      !- Component 1 Name",
@@ -975,7 +964,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Cooling Demand Outlet,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CW Demand Side Outlet Pipe,  !- Component 1 Name",
@@ -989,7 +977,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Cooling Supply Outlet,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Supply Side Outlet Pipe, !- Component 1 Name",
@@ -1003,7 +990,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    CW Pump Branch,          !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    Circ Pump,               !- Component 1 Name",
@@ -1012,7 +998,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Purchased Cooling Branch,!- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    Purchased Cooling,       !- Component 1 Name",
@@ -1021,7 +1006,6 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  Branch,",
 		"    Supply Bypass Branch,    !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Supply Side Bypass,      !- Component 1 Name",

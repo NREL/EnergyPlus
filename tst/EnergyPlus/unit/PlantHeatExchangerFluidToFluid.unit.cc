@@ -233,7 +233,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    USE Heat Pump,           !- Component 1 Name",
@@ -258,7 +257,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Heating Branch, !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE Heat HX, !- Component 1 Name",
@@ -283,7 +281,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Heat Supply Outlet Pipe,  !- Component 1 Name",
@@ -320,7 +317,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Heat Demand Inlet Pipe,  !- Component 1 Name",
@@ -334,7 +330,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Load Profile Branch 1,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,       !- Component 1 Object Type",
 		"    Heat Load Profile 1,     !- Component 1 Name",
@@ -351,7 +346,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Heat Demand Outlet Pipe,  !- Component 1 Name",
@@ -434,7 +428,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    USE Cool Pump,           !- Component 1 Name",
@@ -459,7 +452,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cooling Branch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE Cool HX, !- Component 1 Name",
@@ -484,7 +476,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Cool Supply Outlet Pipe,  !- Component 1 Name",
@@ -521,7 +512,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Cool Demand Inlet Pipe,  !- Component 1 Name",
@@ -535,7 +525,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Load Profile Branch 1,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,       !- Component 1 Object Type",
 		"    Cool Load Profile 1,     !- Component 1 Name",
@@ -552,7 +541,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Cool Demand Outlet Pipe,  !- Component 1 Name",
@@ -638,7 +626,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    TRANSFER Pump,           !- Component 1 Name",
@@ -663,7 +650,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER HX Branch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    SOURCE to TRANSFER HX,   !- Component 1 Name",
@@ -688,7 +674,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TRANSFER Supply Outlet Pipe,  !- Component 1 Name",
@@ -728,7 +713,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TRANSFER Demand Inlet Pipe,  !- Component 1 Name",
@@ -742,7 +726,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand HX Branch 1,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE Heat HX, !- Component 1 Name",
@@ -751,7 +734,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand HX Branch 2,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve ",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE cool HX, !- Component 1 Name",
@@ -760,7 +742,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TRANSFER Demand Outlet Pipe,  !- Component 1 Name",
@@ -859,7 +840,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    SOURCE Pump,             !- Component 1 Name",
@@ -884,7 +864,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Cooling Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    SOURCE Purchased Cooling,!- Component 1 Name",
@@ -899,7 +878,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Heating Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    SOURCE Purchased Heating,!- Component 1 Name",
@@ -914,7 +892,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Supply Outlet Pipe,  !- Component 1 Name",
@@ -951,7 +928,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Demand Inlet Pipe,!- Component 1 Name",
@@ -965,7 +941,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Demand HX Branch, !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    SOURCE to TRANSFER HX,   !- Component 1 Name",
@@ -974,7 +949,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Demand Outlet Pipe,  !- Component 1 Name",
@@ -1337,7 +1311,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    USE Heat Pump,           !- Component 1 Name",
@@ -1362,7 +1335,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Heating Branch, !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE Heat HX, !- Component 1 Name",
@@ -1387,7 +1359,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Heat Supply Outlet Pipe,  !- Component 1 Name",
@@ -1424,7 +1395,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Heat Demand Inlet Pipe,  !- Component 1 Name",
@@ -1438,7 +1408,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Load Profile Branch 1,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,       !- Component 1 Object Type",
 		"    Heat Load Profile 1,     !- Component 1 Name",
@@ -1455,7 +1424,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Heat Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Heat Demand Outlet Pipe,  !- Component 1 Name",
@@ -1538,7 +1506,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    USE Cool Pump,           !- Component 1 Name",
@@ -1563,7 +1530,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cooling Branch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE Cool HX, !- Component 1 Name",
@@ -1588,7 +1554,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Cool Supply Outlet Pipe,  !- Component 1 Name",
@@ -1625,7 +1590,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Cool Demand Inlet Pipe,  !- Component 1 Name",
@@ -1639,7 +1603,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Load Profile Branch 1,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,       !- Component 1 Object Type",
 		"    Cool Load Profile 1,     !- Component 1 Name",
@@ -1656,7 +1619,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    USE Cool Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    USE Cool Demand Outlet Pipe,  !- Component 1 Name",
@@ -1742,7 +1704,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    TRANSFER Pump,           !- Component 1 Name",
@@ -1767,7 +1728,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER HX Branch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    SOURCE to TRANSFER HX,   !- Component 1 Name",
@@ -1792,7 +1752,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TRANSFER Supply Outlet Pipe,  !- Component 1 Name",
@@ -1832,7 +1791,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TRANSFER Demand Inlet Pipe,  !- Component 1 Name",
@@ -1846,7 +1804,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand HX Branch 1,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE Heat HX, !- Component 1 Name",
@@ -1855,7 +1812,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand HX Branch 2,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve ",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    TRANSFER to USE cool HX, !- Component 1 Name",
@@ -1864,7 +1820,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TRANSFER Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TRANSFER Demand Outlet Pipe,  !- Component 1 Name",
@@ -1963,7 +1918,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    SOURCE Pump,             !- Component 1 Name",
@@ -1988,7 +1942,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Cooling Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    SOURCE Purchased Cooling,!- Component 1 Name",
@@ -2003,7 +1956,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Heating Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    SOURCE Purchased Heating,!- Component 1 Name",
@@ -2018,7 +1970,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Supply Outlet Pipe,  !- Component 1 Name",
@@ -2055,7 +2006,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Demand Inlet Pipe,!- Component 1 Name",
@@ -2069,7 +2019,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Demand HX Branch, !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatExchanger:FluidToFluid,  !- Component 1 Object Type",
 		"    SOURCE to TRANSFER HX,   !- Component 1 Name",
@@ -2078,7 +2027,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Demand Outlet Pipe,  !- Component 1 Name",

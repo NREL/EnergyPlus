@@ -1875,7 +1875,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Cooling Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    ChW Circ Pump,           !- Component 1 Name",
@@ -1884,7 +1883,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Cooling Purchased Chilled Water Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    Purchased Cooling,       !- Component 1 Name",
@@ -1893,7 +1891,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Cooling Supply Bypass Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Cooling Supply Side Bypass,  !- Component 1 Name",
@@ -1902,7 +1899,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Cooling Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Cooling Supply Outlet,   !- Component 1 Name",
@@ -1911,7 +1907,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    ZonesChWInletBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesChWInletPipe,       !- Component 1 Name",
@@ -1920,7 +1915,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    ZonesChWOutletBranch,    !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesChWOutletPipe,      !- Component 1 Name",
@@ -1929,7 +1923,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Zone1ChWBranch,          !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    Zone1VentSlabCoolingCoil,!- Component 1 Name",
@@ -1938,7 +1931,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    ZonesChWBypassBranch,    !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesChWBypassPipe,      !- Component 1 Name",
@@ -1947,7 +1939,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Heating Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HW Circ Pump,            !- Component 1 Name",
@@ -1956,7 +1947,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Heating Purchased Hot Water Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,       !- Component 1 Name",
@@ -1965,7 +1955,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Heating Supply Bypass Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Side Bypass,  !- Component 1 Name",
@@ -1974,7 +1963,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Heating Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Outlet,   !- Component 1 Name",
@@ -1983,7 +1971,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    ZonesHWInletBranch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWInletPipe,        !- Component 1 Name",
@@ -1992,7 +1979,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    ZonesHWOutletBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWOutletPipe,       !- Component 1 Name",
@@ -2001,7 +1987,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Zone1HWBranch,           !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    Zone1VentSlabHeatingCoil,!- Component 1 Name",
@@ -2010,7 +1995,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    ZonesHWBypassBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWBypassPipe,       !- Component 1 Name",
@@ -2019,7 +2003,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  Branch,",
 		"    Zone4ChWBranch,          !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    Zone4VentSlabCoolingCoil,!- Component 1 Name",

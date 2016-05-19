@@ -402,7 +402,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     Outside Air System,      !- Component 1 Name

@@ -1916,7 +1916,6 @@
 
   Branch,
     SPACE5-1 Reheat Coil HW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     SPACE5-1 Reheat Coil,    !- Component 1 Name
@@ -2036,7 +2035,6 @@
 
   Branch,
     SPACE1-1 Reheat Coil HW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     SPACE1-1 Reheat Coil,    !- Component 1 Name
@@ -2156,7 +2154,6 @@
 
   Branch,
     SPACE2-1 Reheat Coil HW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     SPACE2-1 Reheat Coil,    !- Component 1 Name
@@ -2276,7 +2273,6 @@
 
   Branch,
     SPACE3-1 Reheat Coil HW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     SPACE3-1 Reheat Coil,    !- Component 1 Name
@@ -2396,7 +2392,6 @@
 
   Branch,
     SPACE4-1 Reheat Coil HW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     SPACE4-1 Reheat Coil,    !- Component 1 Name
@@ -2467,7 +2462,6 @@
 
   Branch,
     VAV Sys 1 Main Branch,   !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV Sys 1 OA System,     !- Component 1 Name
@@ -2595,7 +2589,6 @@
 
   Branch,
     VAV Sys 1 Cooling Coil ChW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     VAV Sys 1 Cooling Coil,  !- Component 1 Name
@@ -2621,7 +2614,6 @@
 
   Branch,
     VAV Sys 1 Heating Coil HW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     VAV Sys 1 Heating Coil,  !- Component 1 Name
@@ -2811,7 +2803,6 @@
 
   Branch,
     Hot Water Loop HW Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Hot Water Loop HW Supply Side Bypass Pipe,  !- Component 1 Name
@@ -2836,7 +2827,6 @@
 
   Branch,
     Hot Water Loop HW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Hot Water Loop HW Supply Pump,  !- Component 1 Name
@@ -2845,7 +2835,6 @@
 
   Branch,
     Hot Water Loop HW Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Hot Water Loop HW Supply Outlet Pipe,  !- Component 1 Name
@@ -2900,7 +2889,6 @@
 
   Branch,
     Hot Water Loop HW Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Hot Water Loop HW Demand Inlet Pipe,  !- Component 1 Name
@@ -2914,7 +2902,6 @@
 
   Branch,
     Hot Water Loop HW Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Hot Water Loop HW Demand Side Bypass Pipe,  !- Component 1 Name
@@ -2928,7 +2915,6 @@
 
   Branch,
     Hot Water Loop HW Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Hot Water Loop HW Demand Outlet Pipe,  !- Component 1 Name
@@ -2968,7 +2954,6 @@
 
   Branch,
     Main Boiler HW Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     Main Boiler,             !- Component 1 Name
@@ -3003,7 +2988,6 @@
 
   Branch,
     Main Chiller ChW Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     Main Chiller,            !- Component 1 Name
@@ -3012,7 +2996,6 @@
 
   Branch,
     Main Chiller CndW Branch,!- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     Main Chiller,            !- Component 1 Name
@@ -3092,7 +3075,6 @@
 
   Branch,
     Main Tower CndW Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     Main Tower,              !- Component 1 Name
@@ -3206,7 +3188,6 @@
 
   Branch,
     Chilled Water Loop ChW Pri Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop ChW Pri Supply Side Bypass Pipe,  !- Component 1 Name
@@ -3232,7 +3213,6 @@
 
   Branch,
     Chilled Water Loop ChW Pri Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Chilled Water Loop ChW Pri Supply Pump,  !- Component 1 Name
@@ -3241,7 +3221,6 @@
 
   Branch,
     Chilled Water Loop ChW Pri Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop ChW Pri Supply Outlet Pipe,  !- Component 1 Name
@@ -3298,7 +3277,6 @@
 
   Branch,
     Chilled Water Loop ChW Sec Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Chilled Water Loop ChW Sec Supply Pump,  !- Component 1 Name
@@ -3307,7 +3285,6 @@
 
   Branch,
     Chilled Water Loop ChW Sec Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop ChW Sec Demand Side Bypass Pipe,  !- Component 1 Name
@@ -3321,7 +3298,6 @@
 
   Branch,
     Chilled Water Loop ChW Sec Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop ChW Sec Demand Outlet Pipe,  !- Component 1 Name
@@ -3435,7 +3411,6 @@
 
   Branch,
     Chilled Water Loop CndW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Chilled Water Loop CndW Supply Pump,  !- Component 1 Name
@@ -3444,7 +3419,6 @@
 
   Branch,
     Chilled Water Loop CndW Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop CndW Supply Outlet Pipe,  !- Component 1 Name
@@ -3458,7 +3432,6 @@
 
   Branch,
     Chilled Water Loop CndW Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop CndW Supply Side Bypass Pipe,  !- Component 1 Name
@@ -3498,7 +3471,6 @@
 
   Branch,
     Chilled Water Loop CndW Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop CndW Demand Inlet Pipe,  !- Component 1 Name
@@ -3512,7 +3484,6 @@
 
   Branch,
     Chilled Water Loop CndW Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop CndW Demand Side Bypass Pipe,  !- Component 1 Name
@@ -3526,7 +3497,6 @@
 
   Branch,
     Chilled Water Loop CndW Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop CndW Demand Outlet Pipe,  !- Component 1 Name

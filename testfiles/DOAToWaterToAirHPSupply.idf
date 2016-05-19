@@ -3485,7 +3485,6 @@ AirLoopHVAC:ReturnPath,
 
 Branch,
     SPACE1-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE1-1 HP Cooling Mode,!- Component 1 Name
@@ -3494,7 +3493,6 @@ Branch,
 
 Branch,
     SPACE1-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE1-1 HP Heating Mode,!- Component 1 Name
@@ -3503,7 +3501,6 @@ Branch,
 
 Branch,
     SPACE2-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE2-1 HP Cooling Mode,!- Component 1 Name
@@ -3512,7 +3509,6 @@ Branch,
 
 Branch,
     SPACE2-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE2-1 HP Heating Mode,!- Component 1 Name
@@ -3521,7 +3517,6 @@ Branch,
 
 Branch,
     SPACE3-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE3-1 HP Cooling Mode,!- Component 1 Name
@@ -3530,7 +3525,6 @@ Branch,
 
 Branch,
     SPACE3-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE3-1 HP Heating Mode,!- Component 1 Name
@@ -3539,7 +3533,6 @@ Branch,
 
 Branch,
     SPACE4-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE4-1 HP Cooling Mode,!- Component 1 Name
@@ -3548,7 +3541,6 @@ Branch,
 
 Branch,
     SPACE4-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE4-1 HP Heating Mode,!- Component 1 Name
@@ -3557,7 +3549,6 @@ Branch,
 
 Branch,
     SPACE5-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE5-1 HP Cooling Mode,!- Component 1 Name
@@ -3566,7 +3557,6 @@ Branch,
 
 Branch,
     SPACE5-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE5-1 HP Heating Mode,!- Component 1 Name
@@ -3575,7 +3565,6 @@ Branch,
 
 Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
@@ -3588,7 +3577,6 @@ Branch,
 
 Branch,
     Condenser Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
@@ -3597,7 +3585,6 @@ Branch,
 
 Branch,
     Condenser Supply GHE Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     GroundHeatExchanger:Vertical,  !- Component 1 Object Type
     Vertical Ground Heat Exchanger,  !- Component 1 Name
@@ -3606,7 +3593,6 @@ Branch,
 
 Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Side Bypass,  !- Component 1 Name
@@ -3615,7 +3601,6 @@ Branch,
 
 Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet, !- Component 1 Name
@@ -3624,7 +3609,6 @@ Branch,
 
 Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
@@ -3633,7 +3617,6 @@ Branch,
 
 Branch,
     Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Side Bypass,  !- Component 1 Name
@@ -3642,7 +3625,6 @@ Branch,
 
 Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name

@@ -1542,7 +1542,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.6,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
@@ -1989,7 +1988,6 @@
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HW Circ Pump,            !- Component 1 Name
@@ -1998,7 +1996,6 @@
 
   Branch,
     Heating Water Heater Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Big Water Heater,        !- Component 1 Name
@@ -2007,7 +2004,6 @@
 
   Branch,
     Heating Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Side Bypass,  !- Component 1 Name
@@ -2016,7 +2012,6 @@
 
   Branch,
     Heating Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Outlet,   !- Component 1 Name
@@ -2025,7 +2020,6 @@
 
   Branch,
     Reheat Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Inlet Pipe,       !- Component 1 Name
@@ -2034,7 +2028,6 @@
 
   Branch,
     Reheat Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Outlet Pipe,      !- Component 1 Name
@@ -2043,7 +2036,6 @@
 
   Branch,
     Supp Heating Coil Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Supp Heating Coil,       !- Component 1 Name
@@ -2052,7 +2044,6 @@
 
   Branch,
     Reheat Bypass Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Bypass,           !- Component 1 Name
@@ -2061,7 +2052,6 @@
 
   Branch,
     Collector Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Collector Circ Pump,     !- Component 1 Name
@@ -2070,7 +2060,6 @@
 
   Branch,
     Collector Water Heater Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Big Water Heater,        !- Component 1 Name
@@ -2079,7 +2068,6 @@
 
   Branch,
     Collector Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Supply Outlet, !- Component 1 Name
@@ -2088,7 +2076,6 @@
 
   Branch,
     Collector Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Inlet Pipe,    !- Component 1 Name
@@ -2097,7 +2084,6 @@
 
   Branch,
     Collector Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Outlet Pipe,   !- Component 1 Name
@@ -2106,7 +2092,6 @@
 
   Branch,
     Collector 1 Collector Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     SolarCollector:FlatPlate:Water,  !- Component 1 Object Type
     Collector 1,             !- Component 1 Name
@@ -2123,7 +2108,6 @@
 
   Branch,
     Collector 2 Collector Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     SolarCollector:FlatPlate:Water,  !- Component 1 Object Type
     Collector 2,             !- Component 1 Name
@@ -2140,7 +2124,6 @@
 
   Branch,
     Collector Bypass Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Bypass,        !- Component 1 Name

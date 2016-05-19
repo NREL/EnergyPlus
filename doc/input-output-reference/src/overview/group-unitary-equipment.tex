@@ -2693,8 +2693,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
 
     BRANCH,
       Gshp Cooling Condenser Branch,  !- Name
-      0,  !- Maximum Flow Rate {m3/s}
-       , !- Pressure Drop Curve Name
+      , !- Pressure Drop Curve Name
       Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Cooling Mode,  !- Component 1 Name
       Water to Air Heat Pump Source Side1 Inlet Node, !- Component 1 Inlet Node Name
@@ -2703,7 +2702,6 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
 
     BRANCH,
       Gshp Heating Condenser Branch,  !- Name
-      0,  !- Maximum Flow Rate {m3/s}
       , !- Pressure Drop Curve Name
       Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Heating Mode,  !- Component 1 Name

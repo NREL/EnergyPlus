@@ -1091,7 +1091,6 @@
 
   Branch,
     Condenser Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
@@ -1100,7 +1099,6 @@
 
   Branch,
     Condenser Supply GHE Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     PipingSystem:Underground:PipeCircuit,  !- Component 1 Object Type
     My Pipe Circuit,         !- Component 1 Name
@@ -1109,7 +1107,6 @@
 
   Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Side Bypass,  !- Component 1 Name
@@ -1123,7 +1120,6 @@
 
   Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet, !- Component 1 Name
@@ -1154,7 +1150,6 @@
 
   Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
@@ -1168,7 +1163,6 @@
 
   Branch,
     Sys 1 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 1 Heat Pump Cooling Mode,  !- Component 1 Name
@@ -1177,7 +1171,6 @@
 
   Branch,
     Sys 1 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 1 Heat Pump Heating Mode,  !- Component 1 Name
@@ -1186,7 +1179,6 @@
 
   Branch,
     Sys 2 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 2 Heat Pump Cooling Mode,  !- Component 1 Name
@@ -1195,7 +1187,6 @@
 
   Branch,
     Sys 2 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 2 Heat Pump Heating Mode,  !- Component 1 Name
@@ -1204,7 +1195,6 @@
 
   Branch,
     Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Side Bypass,  !- Component 1 Name
@@ -1218,7 +1208,6 @@
 
   Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name

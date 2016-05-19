@@ -12283,7 +12283,6 @@
 
   Branch,
     SPLITSYSTEMAC:01 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:01_OA,     !- Component 1 Name
@@ -12296,7 +12295,6 @@
 
   Branch,
     SPLITSYSTEMAC:02 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:02_OA,     !- Component 1 Name
@@ -12309,7 +12307,6 @@
 
   Branch,
     SPLITSYSTEMAC:03 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:03_OA,     !- Component 1 Name
@@ -12322,7 +12319,6 @@
 
   Branch,
     SPLITSYSTEMAC:04 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:04_OA,     !- Component 1 Name
@@ -12335,7 +12331,6 @@
 
   Branch,
     SPLITSYSTEMAC:05 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:05_OA,     !- Component 1 Name
@@ -12348,7 +12343,6 @@
 
   Branch,
     SPLITSYSTEMAC:06 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:06_OA,     !- Component 1 Name
@@ -12361,7 +12355,6 @@
 
   Branch,
     SPLITSYSTEMAC:07 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:07_OA,     !- Component 1 Name
@@ -12374,7 +12367,6 @@
 
   Branch,
     SPLITSYSTEMAC:08 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:08_OA,     !- Component 1 Name
@@ -12387,7 +12379,6 @@
 
   Branch,
     SPLITSYSTEMAC:09 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:09_OA,     !- Component 1 Name
@@ -12400,7 +12391,6 @@
 
   Branch,
     SPLITSYSTEMAC:10 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:10_OA,     !- Component 1 Name
@@ -12413,7 +12403,6 @@
 
   Branch,
     SPLITSYSTEMAC:11 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:11_OA,     !- Component 1 Name
@@ -12426,7 +12415,6 @@
 
   Branch,
     SPLITSYSTEMAC:12 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:12_OA,     !- Component 1 Name
@@ -12439,7 +12427,6 @@
 
   Branch,
     SPLITSYSTEMAC:13 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:13_OA,     !- Component 1 Name
@@ -12452,7 +12439,6 @@
 
   Branch,
     SPLITSYSTEMAC:14 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:14_OA,     !- Component 1 Name
@@ -12465,7 +12451,6 @@
 
   Branch,
     SPLITSYSTEMAC:15 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:15_OA,     !- Component 1 Name
@@ -12478,7 +12463,6 @@
 
   Branch,
     SPLITSYSTEMAC:16 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:16_OA,     !- Component 1 Name
@@ -12491,7 +12475,6 @@
 
   Branch,
     SPLITSYSTEMAC:17 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:17_OA,     !- Component 1 Name
@@ -12504,7 +12487,6 @@
 
   Branch,
     SPLITSYSTEMAC:18 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:18_OA,     !- Component 1 Name
@@ -12517,7 +12499,6 @@
 
   Branch,
     SPLITSYSTEMAC:19 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:19_OA,     !- Component 1 Name
@@ -12530,7 +12511,6 @@
 
   Branch,
     SPLITSYSTEMAC:20 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:20_OA,     !- Component 1 Name
@@ -12543,7 +12523,6 @@
 
   Branch,
     SPLITSYSTEMAC:21 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:21_OA,     !- Component 1 Name
@@ -12556,7 +12535,6 @@
 
   Branch,
     SPLITSYSTEMAC:22 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:22_OA,     !- Component 1 Name
@@ -12569,7 +12547,6 @@
 
   Branch,
     SPLITSYSTEMAC:23 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:23_OA,     !- Component 1 Name
@@ -12582,7 +12559,6 @@
 
   Branch,
     SPLITSYSTEMAC:24 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SPLITSYSTEMAC:24_OA,     !- Component 1 Name
@@ -14769,7 +14745,6 @@
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
@@ -14778,7 +14753,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
@@ -14787,7 +14761,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -14796,7 +14769,6 @@
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name
@@ -14805,7 +14777,6 @@
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -14814,7 +14785,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G SW Apartment Water Equipment,  !- Component 1 Name
@@ -14823,7 +14793,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G NW Apartment Water Equipment,  !- Component 1 Name
@@ -14832,7 +14801,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G NE Apartment Water Equipment,  !- Component 1 Name
@@ -14841,7 +14809,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G N1 Apartment Water Equipment,  !- Component 1 Name
@@ -14850,7 +14817,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G N2 Apartment Water Equipment,  !- Component 1 Name
@@ -14859,7 +14825,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G S1 Apartment Water Equipment,  !- Component 1 Name
@@ -14868,7 +14833,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     G S2 Apartment Water Equipment,  !- Component 1 Name
@@ -14877,7 +14841,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M SW Apartment Water Equipment,  !- Component 1 Name
@@ -14886,7 +14849,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M NW Apartment Water Equipment,  !- Component 1 Name
@@ -14895,7 +14857,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M SE Apartment Water Equipment,  !- Component 1 Name
@@ -14904,7 +14865,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M NE Apartment Water Equipment,  !- Component 1 Name
@@ -14913,7 +14873,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M N1 Apartment Water Equipment,  !- Component 1 Name
@@ -14922,7 +14881,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M N2 Apartment Water Equipment,  !- Component 1 Name
@@ -14931,7 +14889,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M S1 Apartment Water Equipment,  !- Component 1 Name
@@ -14940,7 +14897,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     M S2 Apartment Water Equipment,  !- Component 1 Name
@@ -14949,7 +14905,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T SW Apartment Water Equipment,  !- Component 1 Name
@@ -14958,7 +14913,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 17,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T NW Apartment Water Equipment,  !- Component 1 Name
@@ -14967,7 +14921,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 18,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T SE Apartment Water Equipment,  !- Component 1 Name
@@ -14976,7 +14929,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 19,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T NE Apartment Water Equipment,  !- Component 1 Name
@@ -14985,7 +14937,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 20,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T N1 Apartment Water Equipment,  !- Component 1 Name
@@ -14994,7 +14945,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 21,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T N2 Apartment Water Equipment,  !- Component 1 Name
@@ -15003,7 +14953,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 22,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T S1 Apartment Water Equipment,  !- Component 1 Name
@@ -15012,7 +14961,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 23,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     T S2 Apartment Water Equipment,  !- Component 1 Name
@@ -15021,7 +14969,6 @@
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -15030,7 +14977,6 @@
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name

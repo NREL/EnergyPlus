@@ -1144,7 +1144,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    0.83,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatOnly,  !- Component 1 Object Type
     Gas Furnace 1,           !- Component 1 Name
@@ -1153,7 +1152,6 @@
 
   Branch,
     Air Loop Main Branch 2,  !- Name
-    0.47,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatOnly,  !- Component 1 Object Type
     Gas Furnace 2,           !- Component 1 Name

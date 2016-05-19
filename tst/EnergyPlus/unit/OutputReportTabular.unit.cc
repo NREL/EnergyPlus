@@ -1978,7 +1978,6 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 		"Branch,",
 		"  DOAS Main Branch,        !- Name",
-		"  autosize,                !- Maximum Flow Rate {m3/s}",
 		"  ,                        !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"  DOAS OA System,          !- Component 1 Name",
@@ -2954,7 +2953,6 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 
 		"Branch,",
 		"  DOAS Main Branch,        !- Name",
-		"  autosize,                !- Maximum Flow Rate {m3/s}",
 		"  ,                        !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"  DOAS OA System,          !- Component 1 Name",

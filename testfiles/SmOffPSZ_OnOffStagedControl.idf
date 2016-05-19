@@ -1702,7 +1702,6 @@
 
   Branch,
     Air Loop 1 Main Branch,  !- Name
-    0.71,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
@@ -1723,7 +1722,6 @@
 
   Branch,
     Air Loop 2 Main Branch,  !- Name
-    0.67,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 2,                !- Component 1 Name
@@ -1744,7 +1742,6 @@
 
   Branch,
     Air Loop 3 Main Branch,  !- Name
-    0.79,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 3,                !- Component 1 Name
@@ -1765,7 +1762,6 @@
 
   Branch,
     Air Loop 4 Main Branch,  !- Name
-    0.75,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 4,                !- Component 1 Name

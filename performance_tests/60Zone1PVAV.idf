@@ -31837,7 +31837,6 @@
 
   Branch,
     rm1_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_1_C Reheat Coil,     !- Component 1 Name
@@ -31940,7 +31939,6 @@
 
   Branch,
     rm1_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_3_C Reheat Coil,     !- Component 1 Name
@@ -32043,7 +32041,6 @@
 
   Branch,
     rm1_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_4_C Reheat Coil,     !- Component 1 Name
@@ -32146,7 +32143,6 @@
 
   Branch,
     rm1_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_5_C Reheat Coil,     !- Component 1 Name
@@ -32249,7 +32245,6 @@
 
   Branch,
     rm1_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_6_C Reheat Coil,     !- Component 1 Name
@@ -32352,7 +32347,6 @@
 
   Branch,
     rm1_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_7_C Reheat Coil,     !- Component 1 Name
@@ -32455,7 +32449,6 @@
 
   Branch,
     rm1_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_8_C Reheat Coil,     !- Component 1 Name
@@ -32558,7 +32551,6 @@
 
   Branch,
     rm1_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_9_C Reheat Coil,     !- Component 1 Name
@@ -32661,7 +32653,6 @@
 
   Branch,
     rm1_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_10_C Reheat Coil,    !- Component 1 Name
@@ -32764,7 +32755,6 @@
 
   Branch,
     rm1_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_2_C Reheat Coil,     !- Component 1 Name
@@ -32867,7 +32857,6 @@
 
   Branch,
     rm2_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_1_C Reheat Coil,     !- Component 1 Name
@@ -32970,7 +32959,6 @@
 
   Branch,
     rm2_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_2_C Reheat Coil,     !- Component 1 Name
@@ -33073,7 +33061,6 @@
 
   Branch,
     rm2_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_3_C Reheat Coil,     !- Component 1 Name
@@ -33176,7 +33163,6 @@
 
   Branch,
     rm2_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_4_C Reheat Coil,     !- Component 1 Name
@@ -33279,7 +33265,6 @@
 
   Branch,
     rm2_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_5_C Reheat Coil,     !- Component 1 Name
@@ -33382,7 +33367,6 @@
 
   Branch,
     rm2_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_6_C Reheat Coil,     !- Component 1 Name
@@ -33485,7 +33469,6 @@
 
   Branch,
     rm2_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_7_C Reheat Coil,     !- Component 1 Name
@@ -33588,7 +33571,6 @@
 
   Branch,
     rm2_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_8_C Reheat Coil,     !- Component 1 Name
@@ -33691,7 +33673,6 @@
 
   Branch,
     rm2_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_9_C Reheat Coil,     !- Component 1 Name
@@ -33794,7 +33775,6 @@
 
   Branch,
     rm2_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_10_C Reheat Coil,    !- Component 1 Name
@@ -33897,7 +33877,6 @@
 
   Branch,
     rm3_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_1_C Reheat Coil,     !- Component 1 Name
@@ -34000,7 +33979,6 @@
 
   Branch,
     rm3_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_2_C Reheat Coil,     !- Component 1 Name
@@ -34103,7 +34081,6 @@
 
   Branch,
     rm3_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_3_C Reheat Coil,     !- Component 1 Name
@@ -34206,7 +34183,6 @@
 
   Branch,
     rm3_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_4_C Reheat Coil,     !- Component 1 Name
@@ -34309,7 +34285,6 @@
 
   Branch,
     rm3_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_5_C Reheat Coil,     !- Component 1 Name
@@ -34412,7 +34387,6 @@
 
   Branch,
     rm3_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_6_C Reheat Coil,     !- Component 1 Name
@@ -34515,7 +34489,6 @@
 
   Branch,
     rm3_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_7_C Reheat Coil,     !- Component 1 Name
@@ -34618,7 +34591,6 @@
 
   Branch,
     rm3_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_8_C Reheat Coil,     !- Component 1 Name
@@ -34721,7 +34693,6 @@
 
   Branch,
     rm3_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_9_C Reheat Coil,     !- Component 1 Name
@@ -34824,7 +34795,6 @@
 
   Branch,
     rm3_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_10_C Reheat Coil,    !- Component 1 Name
@@ -34927,7 +34897,6 @@
 
   Branch,
     rm4_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_1_C Reheat Coil,     !- Component 1 Name
@@ -35030,7 +34999,6 @@
 
   Branch,
     rm4_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_2_C Reheat Coil,     !- Component 1 Name
@@ -35133,7 +35101,6 @@
 
   Branch,
     rm4_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_3_C Reheat Coil,     !- Component 1 Name
@@ -35236,7 +35203,6 @@
 
   Branch,
     rm4_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_4_C Reheat Coil,     !- Component 1 Name
@@ -35339,7 +35305,6 @@
 
   Branch,
     rm4_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_5_C Reheat Coil,     !- Component 1 Name
@@ -35442,7 +35407,6 @@
 
   Branch,
     rm4_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_6_C Reheat Coil,     !- Component 1 Name
@@ -35545,7 +35509,6 @@
 
   Branch,
     rm4_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_7_C Reheat Coil,     !- Component 1 Name
@@ -35648,7 +35611,6 @@
 
   Branch,
     rm4_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_8_C Reheat Coil,     !- Component 1 Name
@@ -35751,7 +35713,6 @@
 
   Branch,
     rm4_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_9_C Reheat Coil,     !- Component 1 Name
@@ -35854,7 +35815,6 @@
 
   Branch,
     rm4_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_10_C Reheat Coil,    !- Component 1 Name
@@ -35957,7 +35917,6 @@
 
   Branch,
     rm5_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_1_C Reheat Coil,     !- Component 1 Name
@@ -36060,7 +36019,6 @@
 
   Branch,
     rm5_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_2_C Reheat Coil,     !- Component 1 Name
@@ -36163,7 +36121,6 @@
 
   Branch,
     rm5_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_3_C Reheat Coil,     !- Component 1 Name
@@ -36266,7 +36223,6 @@
 
   Branch,
     rm5_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_4_C Reheat Coil,     !- Component 1 Name
@@ -36369,7 +36325,6 @@
 
   Branch,
     rm5_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_5_C Reheat Coil,     !- Component 1 Name
@@ -36472,7 +36427,6 @@
 
   Branch,
     rm5_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_6_C Reheat Coil,     !- Component 1 Name
@@ -36575,7 +36529,6 @@
 
   Branch,
     rm5_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_7_C Reheat Coil,     !- Component 1 Name
@@ -36678,7 +36631,6 @@
 
   Branch,
     rm5_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_8_C Reheat Coil,     !- Component 1 Name
@@ -36781,7 +36733,6 @@
 
   Branch,
     rm5_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_9_C Reheat Coil,     !- Component 1 Name
@@ -36884,7 +36835,6 @@
 
   Branch,
     rm5_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm5_10_C Reheat Coil,    !- Component 1 Name
@@ -36987,7 +36937,6 @@
 
   Branch,
     rm6_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_1_C Reheat Coil,     !- Component 1 Name
@@ -37090,7 +37039,6 @@
 
   Branch,
     rm6_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_2_C Reheat Coil,     !- Component 1 Name
@@ -37193,7 +37141,6 @@
 
   Branch,
     rm6_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_3_C Reheat Coil,     !- Component 1 Name
@@ -37296,7 +37243,6 @@
 
   Branch,
     rm6_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_4_C Reheat Coil,     !- Component 1 Name
@@ -37399,7 +37345,6 @@
 
   Branch,
     rm6_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_5_C Reheat Coil,     !- Component 1 Name
@@ -37502,7 +37447,6 @@
 
   Branch,
     rm6_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_6_C Reheat Coil,     !- Component 1 Name
@@ -37605,7 +37549,6 @@
 
   Branch,
     rm6_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_7_C Reheat Coil,     !- Component 1 Name
@@ -37708,7 +37651,6 @@
 
   Branch,
     rm6_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_8_C Reheat Coil,     !- Component 1 Name
@@ -37811,7 +37753,6 @@
 
   Branch,
     rm6_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_9_C Reheat Coil,     !- Component 1 Name
@@ -37914,7 +37855,6 @@
 
   Branch,
     rm6_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm6_10_C Reheat Coil,    !- Component 1 Name
@@ -38028,7 +37968,6 @@
 
   Branch,
     PVAV_Sys Main Branch,    !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PVAV_Sys OA System,      !- Component 1 Name
@@ -38526,7 +38465,6 @@
 
   Branch,
     HWdemand1 HW Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HWdemand1 HW Inlet Pipe, !- Component 1 Name
@@ -38540,7 +38478,6 @@
 
   Branch,
     HWdemand1 HW Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HWdemand1 HW Outlet Pipe,!- Component 1 Name
@@ -38554,7 +38491,6 @@
 
   Branch,
     HWdemand1 HW Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HWdemand1 HW Bypass Pipe,!- Component 1 Name
@@ -38641,7 +38577,6 @@
 
   Branch,
     BoilerPlant Boiler Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     BoilerPlant Boiler,      !- Component 1 Name
@@ -38650,7 +38585,6 @@
 
   Branch,
     BoilerPlant HW Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     BoilerPlant HW Supply Side Bypass,  !- Component 1 Name
@@ -38659,7 +38593,6 @@
 
   Branch,
     BoilerPlant HW Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     BoilerPlant HW Supply Outlet,  !- Component 1 Name
@@ -38689,7 +38622,6 @@
 
   Branch,
     BoilerPlant HW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     BoilerPlant HW Circ Pump,!- Component 1 Name

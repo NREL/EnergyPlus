@@ -31961,7 +31961,6 @@
 
   Branch,
     AHU-1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     AHU-1_OA,                !- Component 1 Name
@@ -31986,7 +31985,6 @@
 
   Branch,
     AHU-2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     AHU-2_OA,                !- Component 1 Name
@@ -32631,7 +32629,6 @@
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -32640,7 +32637,6 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -32649,7 +32645,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Anesthesia VAV Box Reheat Coil,  !- Component 1 Name
@@ -32658,7 +32653,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Humid VAV Box Reheat Coil,  !- Component 1 Name
@@ -32667,7 +32661,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 IT Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32676,7 +32669,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 IT Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -32685,7 +32677,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Lobby VAV Box Reheat Coil,  !- Component 1 Name
@@ -32694,7 +32685,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Lobby Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32703,7 +32693,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Locker Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -32712,7 +32701,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 17,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Locker Room Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32721,7 +32709,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 18,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Lounge VAV Box Reheat Coil,  !- Component 1 Name
@@ -32730,7 +32717,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 19,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Med Gas VAV Box Reheat Coil,  !- Component 1 Name
@@ -32739,7 +32725,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Bio Haz VAV Box Reheat Coil,  !- Component 1 Name
@@ -32748,7 +32733,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 20,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 MRI Control Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -32757,7 +32741,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 21,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 MRI Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32766,7 +32749,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 22,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 MRI Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -32775,7 +32757,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 24,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Nourishment VAV Box Reheat Coil,  !- Component 1 Name
@@ -32784,7 +32765,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 25,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Nurse Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32793,7 +32773,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 27,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Nurse Station VAV Box Reheat Coil,  !- Component 1 Name
@@ -32802,7 +32781,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 29,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Office VAV Box Reheat Coil,  !- Component 1 Name
@@ -32811,7 +32789,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Cafe VAV Box Reheat Coil,  !- Component 1 Name
@@ -32820,7 +32797,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 30,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Operating Room 1 VAV Box Reheat Coil,  !- Component 1 Name
@@ -32829,7 +32805,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 31,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Operating Room 2 VAV Box Reheat Coil,  !- Component 1 Name
@@ -32838,7 +32813,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 32,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Operating Room 3 VAV Box Reheat Coil,  !- Component 1 Name
@@ -32847,7 +32821,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 33,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 PACU VAV Box Reheat Coil,  !- Component 1 Name
@@ -32856,7 +32829,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 34,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Pre-Op Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32865,7 +32837,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 35,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Pre-Op Room 1 VAV Box Reheat Coil,  !- Component 1 Name
@@ -32874,7 +32845,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 36,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Pre-Op Room 2 VAV Box Reheat Coil,  !- Component 1 Name
@@ -32883,7 +32853,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 38,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Procedure Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -32892,7 +32861,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 39,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Reception VAV Box Reheat Coil,  !- Component 1 Name
@@ -32901,7 +32869,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Clean VAV Box Reheat Coil,  !- Component 1 Name
@@ -32910,7 +32877,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 40,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Reception Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32919,7 +32885,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 41,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Recovery Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -32928,7 +32893,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 42,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Scheduling VAV Box Reheat Coil,  !- Component 1 Name
@@ -32937,7 +32901,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 43,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Scrub VAV Box Reheat Coil,  !- Component 1 Name
@@ -32946,7 +32909,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 44,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Soil VAV Box Reheat Coil,  !- Component 1 Name
@@ -32955,7 +32917,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 45,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Soil Hold VAV Box Reheat Coil,  !- Component 1 Name
@@ -32964,7 +32925,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 46,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Soil Work VAV Box Reheat Coil,  !- Component 1 Name
@@ -32973,7 +32933,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 47,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Step Down VAV Box Reheat Coil,  !- Component 1 Name
@@ -32982,7 +32941,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 48,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Sterile Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -32991,7 +32949,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 49,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Sterile Storage VAV Box Reheat Coil,  !- Component 1 Name
@@ -33000,7 +32957,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Clean Work VAV Box Reheat Coil,  !- Component 1 Name
@@ -33009,7 +32965,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 51,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Sub-Sterile VAV Box Reheat Coil,  !- Component 1 Name
@@ -33018,7 +32973,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 52,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Utility Hall VAV Box Reheat Coil,  !- Component 1 Name
@@ -33027,7 +32981,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 55,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Vestibule VAV Box Reheat Coil,  !- Component 1 Name
@@ -33036,7 +32989,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 56,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     AHU-1_HeatC,             !- Component 1 Name
@@ -33045,7 +32997,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 57,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     AHU-2_HeatC,             !- Component 1 Name
@@ -33054,7 +33005,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Dictation VAV Box Reheat Coil,  !- Component 1 Name
@@ -33063,7 +33013,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Floor 1 Dressing Room VAV Box Reheat Coil,  !- Component 1 Name
@@ -33072,7 +33021,6 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
@@ -33081,7 +33029,6 @@
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
@@ -33090,7 +33037,6 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -33099,7 +33045,6 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
@@ -33108,7 +33053,6 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
@@ -33626,7 +33570,6 @@
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -33635,7 +33578,6 @@
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -33644,7 +33586,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Anesthesia Water Equipment,  !- Component 1 Name
@@ -33653,7 +33594,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Procedure Room Water Equipment,  !- Component 1 Name
@@ -33662,7 +33602,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Recovery Room Water Equipment,  !- Component 1 Name
@@ -33671,7 +33610,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Step Down Water Equipment,  !- Component 1 Name
@@ -33680,7 +33618,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 2 X-Ray Water Equipment,  !- Component 1 Name
@@ -33689,7 +33626,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 3 Physical Therapy 1 Water Equipment,  !- Component 1 Name
@@ -33698,7 +33634,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 3 Physical Therapy 2 Water Equipment,  !- Component 1 Name
@@ -33707,7 +33642,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 MRI Control Room Water Equipment,  !- Component 1 Name
@@ -33716,7 +33650,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 MRI Room Water Equipment,  !- Component 1 Name
@@ -33725,7 +33658,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Operating Room 1 Water Equipment,  !- Component 1 Name
@@ -33734,7 +33666,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Operating Room 2 Water Equipment,  !- Component 1 Name
@@ -33743,7 +33674,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Operating Room 3 Water Equipment,  !- Component 1 Name
@@ -33752,7 +33682,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 PACU Water Equipment,  !- Component 1 Name
@@ -33761,7 +33690,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Pre-Op Room 1 Water Equipment,  !- Component 1 Name
@@ -33770,7 +33698,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Floor 1 Pre-Op Room 2 Water Equipment,  !- Component 1 Name
@@ -33779,7 +33706,6 @@
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name
@@ -33788,7 +33714,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
@@ -33797,7 +33722,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -33806,7 +33730,6 @@
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
@@ -33815,7 +33738,6 @@
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name

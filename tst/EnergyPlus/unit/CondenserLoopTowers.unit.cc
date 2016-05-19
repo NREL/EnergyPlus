@@ -332,7 +332,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name",
@@ -341,7 +340,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Demand Inlet Pipe,  !- Component 1 Name",
@@ -350,7 +348,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Demand Load Branch 1,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,  !- Component 1 Object Type",
 		"    Load Profile 1,      !- Component 1 Name",
@@ -381,7 +378,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Demand Outlet Pipe,  !- Component 1 Name",
@@ -390,7 +386,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Supply Equipment Branch 1,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    CoolingTower:VariableSpeed:Merkel,  !- Component 1 Object Type",
 		"    TowerWaterSys CoolTower1,!- Component 1 Name",
@@ -399,7 +394,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Supply Equipment Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Supply Equipment Bypass Pipe,  !- Component 1 Name",
@@ -408,7 +402,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Supply Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 		"    TowerWaterSys Pump,      !- Component 1 Name",
@@ -417,7 +410,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    TowerWaterSys Supply Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    TowerWaterSys Supply Outlet Pipe,  !- Component 1 Name",

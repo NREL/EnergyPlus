@@ -2505,7 +2505,6 @@
 
   Branch,
     MainBranch_AirLoop_SouthZone_1stFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_SouthZone_1stFloor,  !- Component 1 Name
@@ -2518,7 +2517,6 @@
 
   Branch,
     MainBranch_AirLoop_NorthZone_1stFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_NorthZone_1stFloor,  !- Component 1 Name
@@ -2531,7 +2529,6 @@
 
   Branch,
     MainBranch_AirLoop_SouthZone_2ndFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_SouthZone_2ndFloor,  !- Component 1 Name
@@ -2544,7 +2541,6 @@
 
   Branch,
     MainBranch_AirLoop_NorthZone_2ndFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_NorthZone_2ndFloor,  !- Component 1 Name

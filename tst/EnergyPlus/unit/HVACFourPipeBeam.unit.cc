@@ -978,7 +978,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CV_1 Air Loop Main Branch,  !- Name",
-		"    AUTOSIZE,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    CV_1_OA,                !- Component 1 Name",
@@ -1122,7 +1121,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CoolSys1 Demand Inlet Pipe,  !- Component 1 Name",
@@ -1146,7 +1144,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Load Branch 1,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    CV_1_CoolC,             !- Component 1 Name",
@@ -1155,7 +1152,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Load Branch 2,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type",
 		"    Zone One 4pipe Beam,  !- Component 1 Name",
@@ -1164,7 +1160,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CoolSys1 Demand Outlet Pipe,  !- Component 1 Name",
@@ -1253,7 +1248,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    SOURCE Pump,             !- Component 1 Name",
@@ -1278,7 +1272,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Cooling Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    SOURCE Purchased Cooling,!- Component 1 Name",
@@ -1293,7 +1286,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Supply Outlet Pipe,  !- Component 1 Name",
@@ -1307,7 +1299,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CoolSys1 Demand Bypass Pipe,  !- Component 1 Name",
@@ -1403,7 +1394,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HeatSys1 Pump,             !- Component 1 Name",
@@ -1428,7 +1418,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Heating Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    HeatSys1 Purchased Heating,!- Component 1 Name",
@@ -1443,7 +1432,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Supply Outlet Pipe,  !- Component 1 Name",
@@ -1469,7 +1457,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Demand Bypass Pipe,  !- Component 1 Name",
@@ -1478,7 +1465,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Demand Inlet Pipe,!- Component 1 Name",
@@ -1493,7 +1479,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Demand Outlet Pipe,  !- Component 1 Name",
@@ -1529,7 +1514,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Load Branch 1,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    CV_1_HeatC,             !- Component 1 Name",
@@ -1538,7 +1522,6 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Load Branch 2,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type",
 		"    Zone One 4pipe Beam,  !- Component 1 Name",

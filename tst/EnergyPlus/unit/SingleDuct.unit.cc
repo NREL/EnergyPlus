@@ -694,7 +694,6 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  Branch,",
 		"    VAV Sys 1 Main Branch,   !- Name",
-		"    autosize,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    OA Sys 1,                !- Component 1 Name",

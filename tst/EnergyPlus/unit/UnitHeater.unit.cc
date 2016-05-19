@@ -866,7 +866,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Heating Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HW Circ Pump,            !- Component 1 Name",
@@ -875,7 +874,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Heating Purchased Hot Water Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,       !- Component 1 Name",
@@ -884,7 +882,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Heating Supply Bypass Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Side Bypass,  !- Component 1 Name",
@@ -898,7 +895,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Heating Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Outlet,   !- Component 1 Name",
@@ -954,7 +950,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    ZonesHWInletBranch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWInletPipe,        !- Component 1 Name",
@@ -968,7 +963,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    ZonesHWOutletBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWOutletPipe,       !- Component 1 Name",
@@ -982,7 +976,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Zone2HWBranch,           !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    Zone2UnitHeatHeatingCoil,!- Component 1 Name",
@@ -991,7 +984,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    ZonesHWBypassBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWBypassPipe,       !- Component 1 Name",

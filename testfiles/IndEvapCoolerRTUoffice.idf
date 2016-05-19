@@ -3838,7 +3838,6 @@
 
   Branch,
     Air Loop Main Branch ZN1,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN1,              !- Component 1 Name
@@ -4164,7 +4163,6 @@
 
   Branch,
     Air Loop Main Branch ZN3,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN3,              !- Component 1 Name
@@ -4490,7 +4488,6 @@
 
   Branch,
     Air Loop Main Branch ZN5,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN5,              !- Component 1 Name
@@ -4816,7 +4813,6 @@
 
   Branch,
     Air Loop Main Branch ZN7,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN7,              !- Component 1 Name
@@ -5142,7 +5138,6 @@
 
   Branch,
     Air Loop Main Branch ZN9,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN9,              !- Component 1 Name
@@ -5468,7 +5463,6 @@
 
   Branch,
     Air Loop Main Branch ZN11,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN11,             !- Component 1 Name
@@ -5794,7 +5788,6 @@
 
   Branch,
     Air Loop Main Branch ZN13,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN13,             !- Component 1 Name
@@ -6120,7 +6113,6 @@
 
   Branch,
     Air Loop Main Branch ZN15,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN15,             !- Component 1 Name
@@ -6446,7 +6438,6 @@
 
   Branch,
     Air Loop Main Branch ZN17,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN17,             !- Component 1 Name
@@ -6772,7 +6763,6 @@
 
   Branch,
     Air Loop Main Branch ZN19,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN19,             !- Component 1 Name

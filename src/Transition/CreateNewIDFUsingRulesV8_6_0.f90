@@ -425,7 +425,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('BRANCH')
                 ObjectName='Branch'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:3)=InArgs(1:3) ! No change
+                OutArgs(1)=InArgs(1) ! No change
+                ! eliminate Max Flow Rate Field
+                OutArgs(2)=InArgs(3)
+                CurArgs=CurArgs-1
                 nodiff=.false.
                 ! eliminate Control Type fields
                 ! Control Type fields are on: 8, 13, 18, 23, ...
@@ -433,7 +436,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 DO WHILE (.TRUE.)
                     I = I + 1
                     CurField = 5*(I-1) + 3
-                    NewField = 4*(I-1) + 3
+                    NewField = 4*(I-1) + 2
                     IF ( CurField > CurArgs ) EXIT
                     OutArgs(NewField+1)=InArgs(CurField+1)  ! Type
                     OutArgs(NewField+2)=InArgs(CurField+2)  ! Name

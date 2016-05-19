@@ -3214,7 +3214,6 @@
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -3223,7 +3222,6 @@
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -3232,7 +3230,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Core_ZN Water Equipment, !- Component 1 Name
@@ -3241,7 +3238,6 @@
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:DX:SingleSpeed:ThermalStorage,  !- Component 1 Object Type
     PSZ-AC:4_CoolC DXCoil,   !- Component 1 Name
@@ -3250,7 +3246,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
@@ -3259,7 +3254,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -3268,7 +3262,6 @@
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
@@ -3277,7 +3270,6 @@
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name
@@ -3853,7 +3845,6 @@
 
   Branch,
     PSZ-AC:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:1_OA,             !- Component 1 Name
@@ -3874,7 +3865,6 @@
 
   Branch,
     PSZ-AC:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:2_OA,             !- Component 1 Name
@@ -3895,7 +3885,6 @@
 
   Branch,
     PSZ-AC:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:3_OA,             !- Component 1 Name
@@ -3916,7 +3905,6 @@
 
   Branch,
     PSZ-AC:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:4_OA,             !- Component 1 Name

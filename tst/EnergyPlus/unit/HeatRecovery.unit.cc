@@ -407,7 +407,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 
 			" Branch,",
 			"   AHU Main Branch, !- Name",
-			" 	autosize, !- Maximum Flow Rate {m3/s}",
 			"	,         !- Pressure Drop Curve Name",
 			"   AirLoopHVAC:OutdoorAirSystem, !- Component 1 Object Type",
 			"   AHU OA system,           !- Component 1 Name",
@@ -3138,7 +3137,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE1-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE1-1 Cooling Coil,   !- Component 1 Name",
@@ -3147,7 +3145,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE1-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE1-1 Heating Coil,   !- Component 1 Name",
@@ -3156,7 +3153,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE2-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE2-1 Cooling Coil,   !- Component 1 Name",
@@ -3165,7 +3161,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE2-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE2-1 Heating Coil,   !- Component 1 Name",
@@ -3174,7 +3169,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE3-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE3-1 Cooling Coil,   !- Component 1 Name",
@@ -3183,7 +3177,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE3-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE3-1 Heating Coil,   !- Component 1 Name",
@@ -3192,7 +3185,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE4-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE4-1 Cooling Coil,   !- Component 1 Name",
@@ -3201,7 +3193,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE4-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE4-1 Heating Coil,   !- Component 1 Name",
@@ -3210,7 +3201,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE5-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE5-1 Cooling Coil,   !- Component 1 Name",
@@ -3219,7 +3209,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE5-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
+
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE5-1 Heating Coil,   !- Component 1 Name",
@@ -3228,7 +3218,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    DOAS Main Branch,        !- Name",
-		"    autosize,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    DOAS OA System,          !- Component 1 Name",
@@ -3253,7 +3242,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    DOAS Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    DOAS Cooling Coil,       !- Component 1 Name",
@@ -3262,7 +3250,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    DOAS Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    DOAS Heating Coil,       !- Component 1 Name",
@@ -3271,7 +3258,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Main Boiler HW Branch,   !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,         !- Component 1 Name",
@@ -3280,7 +3266,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Main Chiller ChW Branch, !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    Purchased Cooling,            !- Component 1 Name",
@@ -3289,7 +3274,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Hot Water Loop HW Supply Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Supply Side Bypass Pipe,  !- Component 1 Name",
@@ -3298,7 +3282,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Hot Water Loop HW Supply Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 		"    Hot Water Loop HW Supply Pump,  !- Component 1 Name",
@@ -3307,7 +3290,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Hot Water Loop HW Supply Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Supply Outlet Pipe,  !- Component 1 Name",
@@ -3316,7 +3298,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Hot Water Loop HW Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Demand Inlet Pipe,  !- Component 1 Name",
@@ -3325,7 +3306,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Hot Water Loop HW Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Demand Side Bypass Pipe,  !- Component 1 Name",
@@ -3334,7 +3314,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Hot Water Loop HW Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Demand Outlet Pipe,  !- Component 1 Name",
@@ -3343,7 +3322,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Chilled Water Loop ChW Supply Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Supply Side Bypass Pipe,  !- Component 1 Name",
@@ -3352,7 +3330,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Chilled Water Loop ChW Supply Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Supply Pump,  !- Component 1 Name",
@@ -3361,7 +3338,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Chilled Water Loop ChW Supply Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Supply Outlet Pipe,  !- Component 1 Name",
@@ -3370,7 +3346,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Chilled Water Loop ChW Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Demand Inlet Pipe,  !- Component 1 Name",
@@ -3379,7 +3354,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Chilled Water Loop ChW Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Demand Side Bypass Pipe,  !- Component 1 Name",
@@ -3388,7 +3362,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    Chilled Water Loop ChW Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Demand Outlet Pipe,  !- Component 1 Name",

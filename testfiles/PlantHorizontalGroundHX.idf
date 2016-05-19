@@ -293,7 +293,6 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
 
   Branch,
     Plant Supply Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
@@ -310,7 +309,6 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
 
   Branch,
     Plant Demand Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile,            !- Component 1 Name

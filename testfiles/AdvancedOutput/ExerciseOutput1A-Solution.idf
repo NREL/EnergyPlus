@@ -1153,7 +1153,6 @@
 
   Branch,
     AHU 1 Main Branch,       !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 1 Object Type
     AHU 1 Furnace with DX Cooling,  !- Component 1 Name

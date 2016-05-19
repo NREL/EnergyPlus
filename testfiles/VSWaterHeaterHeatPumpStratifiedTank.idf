@@ -231,7 +231,6 @@
 
   Branch,
     Water Heater Use Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     DHW Pump,                !- Component 1 Name
@@ -258,7 +257,6 @@
 
   Branch,
     Water Heater Use Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
@@ -591,7 +589,6 @@
 
   Branch,
     Water Heater Use Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Water Heater Use Outlet Pipe,  !- Component 1 Name
@@ -630,7 +627,6 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
@@ -644,7 +640,6 @@
 
   Branch,
     Domestic Hot Water Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Domestic Hot Water,      !- Component 1 Name
@@ -732,7 +727,6 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name

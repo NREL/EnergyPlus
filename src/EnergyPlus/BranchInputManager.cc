@@ -1516,7 +1516,6 @@ namespace BranchInputManager {
 		int NumNodes; // Number of Nodes from NodeInputManager
 
 		Branch( BCount ).Name = Alphas( 1 );
-//		Branch( BCount ).MaxFlowRate = Numbers( 1 );
 		GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
 		if ( PressureCurveType == PressureCurve_Error ) {
 			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );

@@ -2083,7 +2083,6 @@
 
   Branch,
     VAV Sys 1 Main Branch,   !- Name
-    2.5893,                  !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
@@ -2104,7 +2103,6 @@
 
   Branch,
     Desiccant Air Loop Main Branch,  !- Name
-    1.05,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     Desiccant DXSystem OA System,  !- Component 1 Name

@@ -7649,7 +7649,6 @@
 
   Branch,
     VAV WITH REHEAT Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV WITH REHEAT_OA,      !- Component 1 Name
@@ -7908,7 +7907,6 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
@@ -7917,7 +7915,6 @@
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
@@ -7980,7 +7977,6 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -7994,7 +7990,6 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
@@ -8079,7 +8074,6 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -8093,7 +8087,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8102,7 +8095,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8111,7 +8103,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8120,7 +8111,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8129,7 +8119,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8138,7 +8127,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_6 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8147,7 +8135,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_7 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8156,7 +8143,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_8 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8165,7 +8151,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_9 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8174,7 +8159,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_10 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8183,7 +8167,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_11 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8192,7 +8175,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_12 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8201,7 +8183,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_13 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8210,7 +8191,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_14 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8219,7 +8199,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_15 VAV Box Reheat Coil,  !- Component 1 Name
@@ -8228,7 +8207,6 @@
 
   Branch,
     HeatSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     VAV WITH REHEAT_HeatC,   !- Component 1 Name
@@ -8237,7 +8215,6 @@
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -8251,7 +8228,6 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
@@ -8343,7 +8319,6 @@
 
   Branch,
     CoolSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CoolSys1 Pump,           !- Component 1 Name
@@ -8352,7 +8327,6 @@
 
   Branch,
     CoolSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
@@ -8406,7 +8380,6 @@
 
   Branch,
     CoolSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -8420,7 +8393,6 @@
 
   Branch,
     CoolSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Outlet Pipe,  !- Component 1 Name
@@ -8460,7 +8432,6 @@
 
   Branch,
     CoolSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -8474,7 +8445,6 @@
 
   Branch,
     CoolSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     VAV WITH REHEAT_CoolC,   !- Component 1 Name
@@ -8483,7 +8453,6 @@
 
   Branch,
     CoolSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -8497,7 +8466,6 @@
 
   Branch,
     CoolSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Outlet Pipe,  !- Component 1 Name
@@ -8592,7 +8560,6 @@
 
   Branch,
     TowerWaterSys Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     TowerWaterSys Pump,      !- Component 1 Name
@@ -8601,7 +8568,6 @@
 
   Branch,
     TowerWaterSys Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     TowerWaterSys CoolTower, !- Component 1 Name
@@ -8639,7 +8605,6 @@
 
   Branch,
     TowerWaterSys Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -8653,7 +8618,6 @@
 
   Branch,
     TowerWaterSys Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Outlet Pipe,  !- Component 1 Name
@@ -8693,7 +8657,6 @@
 
   Branch,
     TowerWaterSys Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Inlet Pipe,  !- Component 1 Name
@@ -8707,7 +8670,6 @@
 
   Branch,
     TowerWaterSys Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
@@ -8716,7 +8678,6 @@
 
   Branch,
     TowerWaterSys Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name
@@ -8730,7 +8691,6 @@
 
   Branch,
     TowerWaterSys Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Outlet Pipe,  !- Component 1 Name

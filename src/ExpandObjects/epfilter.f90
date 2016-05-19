@@ -8916,7 +8916,6 @@ DO iZone = 1, numCompactZoneVAV
     CALL AddToObjFld('Name', base + vzNameOff,' Reheat Coil HW Branch')
     !save this branch name for later use in plant
     CALL AddToStrList(TRIM(FldVal(base + vzNameOff)) // ' Reheat Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vzNameOff,' Reheat Coil')
@@ -9052,7 +9051,6 @@ DO iZone = 1, numCompactZoneVAV
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + vzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + vzNameOff,' Baseboard Heat')
@@ -9471,7 +9469,6 @@ DO iZone = 1, numCompactZoneFPVAV
     CALL AddToObjFld('Name', base + fpvzNameOff,' Reheat Coil HW Branch')
     !save this branch name for later use in plant
     CALL AddToStrList(TRIM(FldVal(base + fpvzNameOff)) // ' Reheat Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + fpvzNameOff,' Reheat Coil')
@@ -9540,7 +9537,6 @@ DO iZone = 1, numCompactZoneFPVAV
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + fpvzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + fpvzNameOff,' Baseboard Heat')
@@ -9846,7 +9842,6 @@ DO iZone = 1, numCompactZoneHCVAV
     CALL AddToObjFld('Name', base + hcvzNameOff,' Reheat Coil HW Branch')
     !save this branch name for later use in plant
     CALL AddToStrList(TRIM(FldVal(base + hcvzNameOff)) // ' Reheat Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + hcvzNameOff,' Reheat Coil')
@@ -9963,7 +9958,6 @@ DO iZone = 1, numCompactZoneHCVAV
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + hcvzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + hcvzNameOff,' Baseboard Heat')
@@ -10314,7 +10308,6 @@ DO iSys = 1, numCompactSysVAV
   !BRANCH ~ line 224
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
@@ -10809,7 +10802,6 @@ DO iSys = 1, numCompactSysVAV
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Cooling Coil ChW Branch')
   !store for later in the chilled water loop
   CALL AddToStrList(TRIM(FldVal(base + vsAirHandlerNameOff)) // ' Cooling Coil ChW Branch', handleCoolingCoilBranch)
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
 ! MJW 18 Aug 2005 - Switch to Detailed cooling coil model to avoid sizing problem
 ! MJW 27 Jun 2007 - Cooling coil type is a choice now, revert to COIL:WATER:COOLING as the default, sizing is better than it was
@@ -10844,7 +10836,6 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Heating Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + vsAirHandlerNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heating Coil')
@@ -11251,7 +11242,6 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Preheat Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + vsAirHandlerNameOff)) // ' Preheat Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Preheat Coil')
@@ -11686,7 +11676,6 @@ DO iSys = 1, numCompactSysPVAV
   !Object ==> Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     CALL AddToObjStr('Component Object Type','Fan:VariableVolume')
@@ -12498,7 +12487,6 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Heating Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + pvavsAirHandlerNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + pvavsAirHandlerNameOff,' Heating Coil')
@@ -13391,7 +13379,6 @@ DO iZone = 1, numCompactZoneUnit
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + uzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + uzNameOff,' Baseboard Heat')
@@ -13631,7 +13618,6 @@ DO iSys = 1, numCompactSysUnit
   !BRANCH ~ line 97
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     CALL AddToObjStr('Component Object Type','Fan:ConstantVolume')
@@ -14071,7 +14057,6 @@ DO iSys = 1, numCompactSysUnit
     !CURVE:CUBIC ~ line 254
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Heating Coil HW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' Heating Coil')
@@ -14149,7 +14134,6 @@ DO iSys = 1, numCompactSysUnit
         !CURVE:CUBIC ~ line 254
         CALL CreateNewObj('Branch')
         CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Reheat Coil HW Branch')
-        CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
         CALL AddToObjStr('Pressure Drop Curve Name','')
         CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
         CALL AddToObjFld('Component Name', base + usAirHandlerNameOff,' Reheat Coil')
@@ -14662,7 +14646,6 @@ DO iSys = 1, numCompactSysUnitHP
   !Object ==> Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     CALL AddToObjStr('Component Object Type','Fan:ConstantVolume')
@@ -15087,7 +15070,6 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil HW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil')
@@ -15777,7 +15759,6 @@ DO iSys = 1, numCompactSysUnitarySystem
   !Object ==> Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     IF (supFanKind .EQ. sfkVAV) THEN
@@ -17030,7 +17011,6 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Condenser Branch')
       CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Cooling Condenser Branch',handleMixedDemanBranch)
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','0')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
       CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Cooling Coil')
@@ -17046,7 +17026,6 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Coil ChW Branch')
     !store for later in the chilled water loop
     CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Cooling Coil ChW Branch', handleCoolingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF ((coolCoilKind .EQ. ccChWater) .OR. (coolCoilKind .EQ. ccWaterCoilSystemHX)) THEN
       CALL AddToObjStr('Component Object Type','Coil:Cooling:Water')
@@ -17193,7 +17172,6 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Heating Coil HW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Heating Coil')
@@ -17486,7 +17464,6 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Heating Condenser Branch')
     CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Heating Condenser Branch',handleMixedDemanBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','0')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:WaterToAirHeatPump:EquationFit')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Heating Coil')
@@ -17550,7 +17527,6 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Sup Heat Coil HW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjStr('Component Name', TRIM(supHeatCoilObjectName))
@@ -18647,7 +18623,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Name', base + cvzNameOff,' Reheat Coil HW Branch')
       !save this branch name for later use in plant
       CALL AddToStrList(TRIM(FldVal(base + cvzNameOff)) // ' Reheat Coil HW Branch',handleHeatingCoilBranch)
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + cvzNameOff,' Reheat Coil')
@@ -18732,7 +18707,6 @@ DO iZone = 1, numCompactZoneConstVol
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + cvzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + cvzNameOff,' Baseboard Heat')
@@ -19101,7 +19075,6 @@ DO iSys = 1, numCompactSysConstVol
   !***Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     CALL AddToObjStr('Component Object Type','Fan:ConstantVolume')
@@ -19605,7 +19578,6 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heating Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + cvsAirHandlerNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Heating Coil')
@@ -19991,7 +19963,6 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + cvsAirHandlerNameOff)) // ' Preheat Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Preheat Coil')
@@ -20594,7 +20565,6 @@ DO iZone = 1, numCompactZoneDualDuct
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + ddzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + ddzNameOff,' Baseboard Heat')
@@ -21087,7 +21057,6 @@ DO iSys = 1, numCompactSysDualDuct
     !MAIN BRANCH
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (isReturnFanYes) THEN
     IF (isSystemVAV) THEN
@@ -21117,7 +21086,6 @@ DO iSys = 1, numCompactSysDualDuct
   !HOT BRANCH
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Hot Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (hotSupFanPlacement .EQ. sfpBlowThru) THEN
     IF (hotFanKind .EQ. sfkVAV) THEN
@@ -21163,7 +21131,6 @@ DO iSys = 1, numCompactSysDualDuct
   !COLD BRANCH
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Cold Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (coldSupFanPlacement .EQ. sfpBlowThru) THEN
     IF (coldFanKind .EQ. sfkVAV) THEN
@@ -21605,7 +21572,6 @@ DO iSys = 1, numCompactSysDualDuct
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Cooling Coil ChW Branch')
   !store for later in the chilled water loop
   CALL AddToStrList(TRIM(FldVal(base + ddsAirHandlerNameOff)) // ' Cooling Coil ChW Branch', handleCoolingCoilBranch)
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (coolCoilType .EQ. ccChWater) THEN
     CALL AddToObjStr('Component Object Type','Coil:Cooling:Water')
@@ -21643,7 +21609,6 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Heating Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + ddsAirHandlerNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heating Coil')
@@ -22189,7 +22154,6 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Preheat Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + ddsAirHandlerNameOff)) // ' Preheat Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Preheat Coil')
@@ -22859,7 +22823,6 @@ DO iZone = 1, numCompactZoneVRF
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + vrfzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + vrfzNameOff,' Baseboard Heat')
@@ -23019,7 +22982,6 @@ DO iSys = 1, numCompactSysVRF
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + vrfsNameOff,' VRF Condenser Branch')
     CALL AddToStrList(TRIM(FldVal(base + vrfsNameOff)) // ' VRF Condenser Branch',handleMixedDemanBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','0')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','AirConditioner:VariableRefrigerantFlow')
     CALL AddToObjFld('Component Name', base + vrfsNameOff,' VRF Heat Pump')
@@ -23790,7 +23752,6 @@ DO iZone = 1, numCompactFanCoil
   CALL AddToObjFld('Name', base + fczNameOff,' Cooling Coil ChW Branch')
   !store for later in the chilled water loop
   CALL AddToStrList(TRIM(FldVal(base + fczNameOff)) // ' Cooling Coil ChW Branch', handleCoolingCoilBranch)
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (coolCoilKind .EQ. ccChWaterDetailed) THEN
     CALL AddToObjStr('Component Object Type','Coil:Cooling:Water:DetailedGeometry')
@@ -23822,7 +23783,6 @@ DO iZone = 1, numCompactFanCoil
   CALL AddToObjFld('Name', base + fczNameOff,' Heating Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + fczNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
   CALL AddToObjFld('Component Name', base + fczNameOff,' Heating Coil')
@@ -23851,7 +23811,6 @@ DO iZone = 1, numCompactFanCoil
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + fczNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + fczNameOff,' Baseboard Heat')
@@ -24411,7 +24370,6 @@ DO iZone = 1, numCompactBaseboard
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + bbzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + bbzNameOff,' Baseboard Heat')
@@ -24954,7 +24912,6 @@ DO iZone = 1, numCompactPTAC
       !CURVE:CUBIC ~ line 254
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + ptaczNameOff,' PTAC Heating Coil HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + ptaczNameOff,' PTAC Heating Coil')
@@ -24984,7 +24941,6 @@ DO iZone = 1, numCompactPTAC
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + ptaczNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + ptaczNameOff,' Baseboard Heat')
@@ -25623,7 +25579,6 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + pthpzNameOff,' PTHP Supp Heating Coil HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + pthpzNameOff,' PTHP Supp Heating Coil')
@@ -25653,7 +25608,6 @@ DO iZone = 1, numCompactPTHP
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + pthpzNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + pthpzNameOff,' Baseboard Heat')
@@ -25860,7 +25814,6 @@ DO iBoiler = 1, numCompactBoiler
       CALL AddToObjFld('Name', base + blrNameOff,' Mixed Branch')
       CALL AddToStrList(TRIM(FldVal(base + blrNameOff)) // ' Mixed Branch',handleMixedSupplyBranch)
     ENDIF
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpBranch) THEN
       !not using branch pumps so only boiler is on the branch
@@ -25903,7 +25856,6 @@ DO iBoiler = 1, numCompactBoiler
       CALL AddToObjFld('Name', base + blrNameOff,' Mixed Branch')
       CALL AddToStrList(TRIM(FldVal(base + blrNameOff)) // ' Mixed Branch',handleMixedSupplyBranch)
     ENDIF
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpBranch) THEN
       CALL AddToObjStr('Component Object Type','DistrictHeating')
@@ -26029,7 +25981,6 @@ DO iBoiler = 1, numCompactBoilerOR
     CALL AddToObjFld('Name', base + blrorObjNameOff,' Mixed Branch')
     CALL AddToStrList(TRIM(FldVal(base + blrorObjNameOff)) // ' Mixed Branch',handleMixedSupplyBranch)
   ENDIF
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpBranch) THEN
       !not using branch pumps so only boiler is on the branch
@@ -26445,7 +26396,6 @@ IF (isSupplyBypassYes) THEN
 !BRANCH ~ line 104
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Bypass Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Side Bypass Pipe')
@@ -26466,7 +26416,6 @@ IF (isPumpBranch) THEN
   CALL AddToObjFld('Outlet Node Name', base + hwpNameOff,' HW Supply Pipe Outlet',.TRUE.)
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Inlet Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Side Inlet Pipe')
@@ -26514,7 +26463,6 @@ ELSE
     !BRANCH ~line 95
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:ConstantSpeed')
@@ -26589,7 +26537,6 @@ ELSE
     !BRANCH ~line 140
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:VariableSpeed')
@@ -26604,7 +26551,6 @@ END IF
 !BRANCH ~ line 149
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + hwpNameOff,' HW Supply Outlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Supply Outlet Pipe')
@@ -26671,7 +26617,6 @@ END DO
 !BRANCH ~ line 189
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + hwpNameOff,' HW Demand Inlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Demand Inlet Pipe')
@@ -26687,7 +26632,6 @@ CALL AddToObjFld('Outlet Node Name', base + hwpNameOff,' HW Demand Inlet Pipe Ou
 IF (isDemandBypassYes) THEN
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + hwpNameOff,' HW Demand Bypass Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Demand Side Bypass Pipe')
@@ -26702,7 +26646,6 @@ END IF
 !BRANCH ~ line 203
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + hwpNameOff,' HW Demand Outlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + hwpNameOff,' HW Demand Outlet Pipe')
@@ -26913,7 +26856,6 @@ DO iChiller = 1, numCompactChiller
     !BRANCH ~ line 11
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + chlNameOff,' ChW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isBranchPriChwPump) THEN
       CALL AddToObjStr('Component Object Type','DistrictCooling')
@@ -26979,7 +26921,6 @@ DO iChiller = 1, numCompactChiller
     !BRANCH ~line 50
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + chlNameOff,' ChW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isBranchPriChwPump) THEN
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
@@ -27007,7 +26948,6 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Name', base + chlNameOff,' CndW Branch')
       CALL AddToStrList(TRIM(FldVal(base + chlNameOff)) // ' CndW Branch',handleCondenserBranch)
       isChillerWithWaterCooled = .TRUE.
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
@@ -27101,7 +27041,6 @@ DO iChiller = 1, numCompactChiller
     !BRANCH ~ line 132
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + chlNameOff,' ChW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isBranchPriChwPump) THEN
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
@@ -27129,7 +27068,6 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Name', base + chlNameOff,' CndW Branch')
       CALL AddToStrList(TRIM(FldVal(base + chlNameOff)) // ' CndW Branch',handleCondenserBranch)
       isChillerWithWaterCooled = .TRUE.
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
@@ -27221,7 +27159,6 @@ DO iChiller = 1, numCompactChiller
     !BRANCH
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + chlNameOff,' ChW Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isBranchPriChwPump) THEN
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
@@ -27249,7 +27186,6 @@ DO iChiller = 1, numCompactChiller
       CALL AddToObjFld('Name', base + chlNameOff,' CndW Branch')
       CALL AddToStrList(TRIM(FldVal(base + chlNameOff)) // ' CndW Branch',handleCondenserBranch)
       isChillerWithWaterCooled = .TRUE.
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Chiller:Electric:EIR')
       CALL AddToObjFld('Component Name', base + chlNameOff,'')
@@ -27498,7 +27434,6 @@ DO iChiller = 1, numCompactChillerOR
   !BRANCH ~line 50
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + chlorObjNameOff,' ChW Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   IF (.NOT. isBranchPriChwPump) THEN
     CALL AddToObjFld('Component Object Type',base + chlorObjTypeOff,'')
@@ -27526,7 +27461,6 @@ DO iChiller = 1, numCompactChillerOR
     CALL AddToObjFld('Name', base + chlorObjNameOff,' CndW Branch')
     CALL AddToStrList(TRIM(FldVal(base + chlorObjNameOff)) // ' CndW Branch',handleCondenserBranch)
     isChillerWithWaterCooled = .TRUE.
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjFld('Component Object Type',base + chlorObjTypeOff,'')
     CALL AddToObjFld('Component Name', base + chlorObjNameOff,'')
@@ -27774,7 +27708,6 @@ DO iTower = 1, numCompactTower
       CALL AddToObjFld('Name', base + twrNameOff,' Mixed Branch')
       CALL AddToStrList(TRIM(FldVal(base + twrNameOff)) // ' Mixed Branch',handleMixedSupplyBranch)
     ENDIF
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpBranch) THEN
       CALL AddToObjStr('Component Object Type','CoolingTower:SingleSpeed')
@@ -27895,7 +27828,6 @@ DO iTower = 1, numCompactTower
       CALL AddToObjFld('Name', base + twrNameOff,' Mixed Branch')
       CALL AddToStrList(TRIM(FldVal(base + twrNameOff)) // ' Mixed Branch',handleMixedSupplyBranch)
     ENDIF
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpBranch) THEN
       CALL AddToObjStr('Component Object Type','CoolingTower:TwoSpeed')
@@ -28033,7 +27965,6 @@ DO iTower = 1, numCompactTowerOR
     CALL AddToObjFld('Name', base + twrorObjNameOff,' Mixed Branch')
     CALL AddToStrList(TRIM(FldVal(base + twrorObjNameOff)) // ' Mixed Branch',handleMixedSupplyBranch)
   ENDIF
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpBranch) THEN
       !not using branch pumps so only tower is on the branch
@@ -28514,7 +28445,6 @@ END DO
 IF (isChWSupplyBypassYes) THEN
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Bypass Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Side Bypass Pipe')
@@ -28535,7 +28465,6 @@ IF (isChwPrimPumpBranch) THEN
   CALL AddToObjFld('Outlet Node Name', base + cwpNameOff,' ChW Supply Pipe Outlet',.TRUE.)
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Inlet Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Side Inlet Pipe')
@@ -28594,7 +28523,6 @@ ELSE
     !BRANCH ~ line 99
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isChwPrimPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:ConstantSpeed')
@@ -28677,7 +28605,6 @@ ELSE
     !BRANCH ~ line 144
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isChwPrimPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:VariableSpeed')
@@ -28698,7 +28625,6 @@ END IF
 !BRANCH ~ line 153
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + cwpNameOff,' ChW Supply Outlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Supply Outlet Pipe')
@@ -28766,7 +28692,6 @@ END DO
 !BRANCH ~ line 211
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + cwpNameOff,' ChW Demand Inlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 IF (loopPumpConfig .EQ. pumpVarPriConstSec) THEN
   IF (.NOT. isChwSecPumpHeader) THEN
@@ -28891,7 +28816,6 @@ END IF
 IF (isChWDemandBypassYes) THEN
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cwpNameOff,' ChW Demand Bypass Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Demand Side Bypass Pipe')
@@ -28906,7 +28830,6 @@ END IF
 !BRANCH ~ line 225
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + cwpNameOff,' ChW Demand Outlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + cwpNameOff,' ChW Demand Outlet Pipe')
@@ -29118,7 +29041,6 @@ IF (isChillerWithWaterCooled) THEN
     CALL AddToObjFld('Outlet Node Name', base + cwpNameOff,' CndW Supply Pipe Outlet',.TRUE.)
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cwpNameOff,' CndW Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Side Inlet Pipe')
@@ -29177,7 +29099,6 @@ IF (isChillerWithWaterCooled) THEN
     !BRANCH ~ line 337
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cwpNameOff,' CndW Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isCndPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:VariableSpeed')
@@ -29191,7 +29112,6 @@ IF (isChillerWithWaterCooled) THEN
   !BRANCH ~ line 346
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cwpNameOff,' CndW Supply Outlet Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Outlet Pipe')
@@ -29206,7 +29126,6 @@ IF (isChillerWithWaterCooled) THEN
   IF (isCndSupplyBypassYes) THEN
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cwpNameOff,' CndW Supply Bypass Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Supply Side Bypass Pipe')
@@ -29273,7 +29192,6 @@ IF (isChillerWithWaterCooled) THEN
   !BRANCH ~ line 400
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cwpNameOff,' CndW Demand Inlet Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Demand Inlet Pipe')
@@ -29289,7 +29207,6 @@ IF (isChillerWithWaterCooled) THEN
   IF (isCndDemandBypassYes) THEN
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cwpNameOff,' CndW Demand Bypass Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
     CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Demand Side Bypass Pipe')
@@ -29304,7 +29221,6 @@ IF (isChillerWithWaterCooled) THEN
   !BRANCH ~ line 400
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + cwpNameOff,' CndW Demand Outlet Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + cwpNameOff,' CndW Demand Outlet Pipe')
@@ -29733,7 +29649,6 @@ DO iZone = 1, numCompactWaterAirHP
   END IF
   CALL AddToObjFld('Fan Efficiency', base + wahpFanTotEfficiencyOff,'')
   CALL AddToObjFld('Pressure Rise {Pa}', base + wahpFanPressureOff,'')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','autosize')
   CALL AddToObjFld('Motor Efficiency', base + wahpFanMotorEfficiencyOff,'')
   CALL AddToObjStr('Motor in Airstream Fraction','1')
   IF (isDrawThru) THEN
@@ -29877,7 +29792,6 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + wahpNameOff,' WAHP Supp Heating Coil HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Supp Heating Coil')
@@ -29890,7 +29804,6 @@ DO iZone = 1, numCompactWaterAirHP
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + wahpNameOff,' Cooling Condenser Branch')
   CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Cooling Condenser Branch',handleMixedDemanBranch)
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','0')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Cooling Coil')
@@ -29900,7 +29813,6 @@ DO iZone = 1, numCompactWaterAirHP
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + wahpNameOff,' Heating Condenser Branch')
   CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Heating Condenser Branch',handleMixedDemanBranch)
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','0')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Coil:Heating:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Heating Coil')
@@ -29928,7 +29840,6 @@ DO iZone = 1, numCompactWaterAirHP
       !BRANCH (for baseboard)
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + wahpNameOff,' Baseboard Heat HW Branch')
-      CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Component Name', base + wahpNameOff,' Baseboard Heat')
@@ -30384,7 +30295,6 @@ END IF
 IF (isSupplyBypassYes) THEN
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Supply Bypass Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Side Bypass Pipe')
@@ -30405,7 +30315,6 @@ IF (isPumpBranch) THEN
   CALL AddToObjFld('Outlet Node Name', base + mwpNameOff,' Mixed Supply Pipe Outlet',.TRUE.)
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Supply Inlet Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Side Inlet Pipe')
@@ -30453,7 +30362,6 @@ ELSE
     !***Branch
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:ConstantSpeed')
@@ -30519,7 +30427,6 @@ ELSE
     !***Branch
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Supply Inlet Branch')
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF (.NOT. isPumpHeader) THEN
       CALL AddToObjStr('Component Object Type','Pump:VariableSpeed')
@@ -30534,7 +30441,6 @@ END IF
 !***Branch
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Supply Outlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Supply Outlet Pipe')
@@ -30600,7 +30506,6 @@ END DO
 !***Branch
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Inlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Demand Inlet Pipe')
@@ -30615,7 +30520,6 @@ CALL AddToObjFld('Outlet Node Name', base + mwpNameOff,' Mixed Demand Inlet Pipe
 IF (isDemandBypassYes) THEN
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Bypass Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
   CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Demand Side Bypass Pipe')
@@ -30630,7 +30534,6 @@ END IF
 !***Branch
 CALL CreateNewObj('Branch')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Outlet Branch')
-CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
 CALL AddToObjStr('Pressure Drop Curve Name','')
 CALL AddToObjStr('Component Object Type','Pipe:Adiabatic')
 CALL AddToObjFld('Component Name', base + mwpNameOff,' Mixed Demand Outlet Pipe')
@@ -31131,7 +31034,6 @@ DO iSys = 1, numCompactDedOutAir
   !***Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + doasNameOff,' Main Branch')
-  CALL AddToObjStr('Maximum Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Component Name', base + doasNameOff,' OA System')
@@ -31993,7 +31895,6 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil ChW Branch')
     !store for later in the chilled water loop
     CALL AddToStrList(TRIM(FldVal(base + doasNameOff)) // ' Cooling Coil ChW Branch', handleCoolingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF ((coolCoilKind .EQ. ccChWater) .OR. (coolCoilKind .EQ. ccWaterCoilSystemHX)) THEN
       CALL AddToObjStr('Component Object Type','Coil:Cooling:Water')
@@ -32042,7 +31943,6 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Name', base + doasNameOff,' Heating Coil HW Branch')
     !save this branch name for later use in plan
     CALL AddToStrList(TRIM(FldVal(base + doasNameOff)) // ' Heating Coil HW Branch',handleHeatingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + doasNameOff,' Heating Coil')

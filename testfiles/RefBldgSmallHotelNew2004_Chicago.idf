@@ -24319,7 +24319,6 @@
 
   Branch,
     PSZ-HEATCOOL:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:1_OA,       !- Component 1 Name
@@ -24340,7 +24339,6 @@
 
   Branch,
     PSZ-HEATCOOL:10 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:10_OA,      !- Component 1 Name
@@ -24361,7 +24359,6 @@
 
   Branch,
     PSZ-HEATCOOL:11 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:11_OA,      !- Component 1 Name
@@ -24382,7 +24379,6 @@
 
   Branch,
     PSZ-HEATCOOL:12 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:12_OA,      !- Component 1 Name
@@ -24403,7 +24399,6 @@
 
   Branch,
     PSZ-HEATCOOL:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:2_OA,       !- Component 1 Name
@@ -24424,7 +24419,6 @@
 
   Branch,
     PSZ-HEATCOOL:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:3_OA,       !- Component 1 Name
@@ -24445,7 +24439,6 @@
 
   Branch,
     PSZ-HEATCOOL:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:4_OA,       !- Component 1 Name
@@ -24466,7 +24459,6 @@
 
   Branch,
     PSZ-HEATCOOL:5 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:5_OA,       !- Component 1 Name
@@ -24487,7 +24479,6 @@
 
   Branch,
     PSZ-HEATCOOL:6 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:6_OA,       !- Component 1 Name
@@ -24508,7 +24499,6 @@
 
   Branch,
     PSZ-HEATCOOL:7 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:7_OA,       !- Component 1 Name
@@ -24529,7 +24519,6 @@
 
   Branch,
     PSZ-HEATCOOL:8 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:8_OA,       !- Component 1 Name
@@ -24550,7 +24539,6 @@
 
   Branch,
     PSZ-HEATCOOL:9 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:9_OA,       !- Component 1 Name
@@ -26476,7 +26464,6 @@
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -26485,7 +26472,6 @@
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -26494,7 +26480,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom101 Water Equipment,  !- Component 1 Name
@@ -26503,7 +26488,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom209_212 Water Equipment,  !- Component 1 Name
@@ -26512,7 +26496,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom213 Water Equipment,  !- Component 1 Name
@@ -26521,7 +26504,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom214 Water Equipment,  !- Component 1 Name
@@ -26530,7 +26512,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom215_218 Water Equipment,  !- Component 1 Name
@@ -26539,7 +26520,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom219 Water Equipment,  !- Component 1 Name
@@ -26548,7 +26528,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom220_223 Water Equipment,  !- Component 1 Name
@@ -26557,7 +26536,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom224 Water Equipment,  !- Component 1 Name
@@ -26566,7 +26544,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 17,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom301 Water Equipment,  !- Component 1 Name
@@ -26575,7 +26552,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 18,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom302_305 Water Equipment,  !- Component 1 Name
@@ -26584,7 +26560,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 19,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom306_308 Water Equipment,  !- Component 1 Name
@@ -26593,7 +26568,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom102 Water Equipment,  !- Component 1 Name
@@ -26602,7 +26576,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 20,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom309_312 Water Equipment,  !- Component 1 Name
@@ -26611,7 +26584,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 21,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom313 Water Equipment,  !- Component 1 Name
@@ -26620,7 +26592,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 22,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom314 Water Equipment,  !- Component 1 Name
@@ -26629,7 +26600,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 23,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom315_318 Water Equipment,  !- Component 1 Name
@@ -26638,7 +26608,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 24,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom319 Water Equipment,  !- Component 1 Name
@@ -26647,7 +26616,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 25,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom320_323 Water Equipment,  !- Component 1 Name
@@ -26656,7 +26624,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 26,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom324 Water Equipment,  !- Component 1 Name
@@ -26665,7 +26632,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 27,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom401 Water Equipment,  !- Component 1 Name
@@ -26674,7 +26640,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 28,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom402_405 Water Equipment,  !- Component 1 Name
@@ -26683,7 +26648,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 29,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom406_408 Water Equipment,  !- Component 1 Name
@@ -26692,7 +26656,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom103 Water Equipment,  !- Component 1 Name
@@ -26701,7 +26664,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 30,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom409_412 Water Equipment,  !- Component 1 Name
@@ -26710,7 +26672,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 31,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom413 Water Equipment,  !- Component 1 Name
@@ -26719,7 +26680,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 32,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom414 Water Equipment,  !- Component 1 Name
@@ -26728,7 +26688,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 33,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom415_418 Water Equipment,  !- Component 1 Name
@@ -26737,7 +26696,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 34,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom419 Water Equipment,  !- Component 1 Name
@@ -26746,7 +26704,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 35,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom420_423 Water Equipment,  !- Component 1 Name
@@ -26755,7 +26712,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 36,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom424 Water Equipment,  !- Component 1 Name
@@ -26764,7 +26720,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom104 Water Equipment,  !- Component 1 Name
@@ -26773,7 +26728,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom105 Water Equipment,  !- Component 1 Name
@@ -26782,7 +26736,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     LaundryRoomFlr1 Water Equipment,  !- Component 1 Name
@@ -26791,7 +26744,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom201 Water Equipment,  !- Component 1 Name
@@ -26800,7 +26752,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom202_205 Water Equipment,  !- Component 1 Name
@@ -26809,7 +26760,6 @@
 
   Branch,
     SWHSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom206_208 Water Equipment,  !- Component 1 Name
@@ -26818,7 +26768,6 @@
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name
@@ -26827,7 +26776,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
@@ -26836,7 +26784,6 @@
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -26845,7 +26792,6 @@
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
@@ -26854,7 +26800,6 @@
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name

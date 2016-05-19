@@ -3279,7 +3279,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"Branch,",
 		"  Air Loop Main Branch, !- Name",
-		"  1.7, !- Maximum Flow Rate{ m3 / s }",
 		"  , !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
 		"  DXAC Heat Pump 1, !- Component 2 Name",

@@ -189,7 +189,6 @@
 
   Branch,
     Supply Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump,                    !- Component 1 Name
@@ -214,7 +213,6 @@
 
   Branch,
     Heating Branch,          !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
@@ -229,7 +227,6 @@
 
   Branch,
     Supply Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
@@ -266,7 +263,6 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
@@ -280,7 +276,6 @@
 
   Branch,
     Load Profile Branch 1,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
@@ -297,7 +292,6 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name

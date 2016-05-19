@@ -881,7 +881,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Z401 main branch,        !- Name",
-			"    3.209,                   !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Z401 OA Sys,             !- Component 1 Name",
@@ -894,7 +893,6 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Z402 main branch,        !- Name",
-			"    3.209,                   !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Z402 OA Sys,             !- Component 1 Name",

@@ -3005,7 +3005,6 @@
 
   Branch,
     PSZ-AC:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:1_OA,             !- Component 1 Name
@@ -3018,7 +3017,6 @@
 
   Branch,
     PSZ-AC:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:2_OA,             !- Component 1 Name
@@ -3031,7 +3029,6 @@
 
   Branch,
     PSZ-AC:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:3_OA,             !- Component 1 Name
@@ -3044,7 +3041,6 @@
 
   Branch,
     PSZ-AC:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:4_OA,             !- Component 1 Name

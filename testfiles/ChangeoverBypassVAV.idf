@@ -1530,7 +1530,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.75,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,  !- Component 1 Object Type
     GasHeat CBVAV System,    !- Component 1 Name

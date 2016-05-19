@@ -1971,7 +1971,6 @@
 
   Branch,
     AHU 1 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitarySystem,  !- Component 1 Object Type
     AHU 1 DXAC Heat Pump,    !- Component 1 Name
@@ -2248,7 +2247,6 @@
 
   Branch,
     AHU 2 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitarySystem,  !- Component 1 Object Type
     AHU 2 DXAC Heat Pump,    !- Component 1 Name
@@ -2522,7 +2520,6 @@
 
   Branch,
     AHU 3 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitarySystem,  !- Component 1 Object Type
     AHU 3 DXAC Heat Pump,    !- Component 1 Name
@@ -2796,7 +2793,6 @@
 
   Branch,
     AHU 4 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitarySystem,  !- Component 1 Object Type
     AHU 4 DXAC Heat Pump,    !- Component 1 Name
@@ -3070,7 +3066,6 @@
 
   Branch,
     AHU 5 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitarySystem,  !- Component 1 Object Type
     AHU 5 DXAC Heat Pump,    !- Component 1 Name
@@ -3302,7 +3297,6 @@
 
   Branch,
     Plant Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Plant Circ Pump,         !- Component 1 Name
@@ -3311,7 +3305,6 @@
 
   Branch,
     Plant Supply Chiller Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Central Chiller,         !- Component 1 Name
@@ -3320,7 +3313,6 @@
 
   Branch,
     Central Boiler Branch,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     Central Boiler,          !- Component 1 Name
@@ -3329,7 +3321,6 @@
 
   Branch,
     Plant Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Supply Side Bypass,!- Component 1 Name
@@ -3343,7 +3334,6 @@
 
   Branch,
     Plant Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Supply Outlet,     !- Component 1 Name
@@ -3380,7 +3370,6 @@
 
   Branch,
     Plant Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Inlet Pipe, !- Component 1 Name
@@ -3394,7 +3383,6 @@
 
   Branch,
     Gshp Cooling Plant Branch AHU1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU1,  !- Component 1 Name
@@ -3403,7 +3391,6 @@
 
   Branch,
     Gshp Heating Plant Branch AHU1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU1,  !- Component 1 Name
@@ -3412,7 +3399,6 @@
 
   Branch,
     Gshp Cooling Plant Branch AHU2,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU2,  !- Component 1 Name
@@ -3421,7 +3407,6 @@
 
   Branch,
     Gshp Heating Plant Branch AHU2,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU2,  !- Component 1 Name
@@ -3430,7 +3415,6 @@
 
   Branch,
     Gshp Cooling Plant Branch AHU3,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU3,  !- Component 1 Name
@@ -3439,7 +3423,6 @@
 
   Branch,
     Gshp Heating Plant Branch AHU3,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU3,  !- Component 1 Name
@@ -3448,7 +3431,6 @@
 
   Branch,
     Gshp Cooling Plant Branch AHU4,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU4,  !- Component 1 Name
@@ -3457,7 +3439,6 @@
 
   Branch,
     Gshp Heating Plant Branch AHU4,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU4,  !- Component 1 Name
@@ -3466,7 +3447,6 @@
 
   Branch,
     Gshp Cooling Plant Branch AHU5,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU5,  !- Component 1 Name
@@ -3475,7 +3455,6 @@
 
   Branch,
     Gshp Heating Plant Branch AHU5,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU5,  !- Component 1 Name
@@ -3484,7 +3463,6 @@
 
   Branch,
     Plant Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Side Bypass,!- Component 1 Name
@@ -3498,7 +3476,6 @@
 
   Branch,
     Plant Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Outlet Pipe,!- Component 1 Name

@@ -1278,7 +1278,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    0.7551,                  !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 1 Object Type
     TwoSpeed Heat Pump 1,    !- Component 1 Name

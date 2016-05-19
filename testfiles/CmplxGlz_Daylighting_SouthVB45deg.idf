@@ -86253,7 +86253,6 @@
 
   Branch,
     SYS-1 Main Branch,       !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     SYS-1 OA System,         !- Component 1 Name

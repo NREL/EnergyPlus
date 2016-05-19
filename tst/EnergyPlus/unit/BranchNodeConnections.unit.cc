@@ -754,7 +754,6 @@ namespace EnergyPlus {
 
 			"Branch,",
 			"  DOAS Main Branch,        !- Name",
-			"  autosize,                !- Maximum Flow Rate {m3/s}",
 			"  ,                        !- Pressure Drop Curve Name",
 			"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"  DOAS OA System,          !- Component 1 Name",
@@ -1754,7 +1753,6 @@ namespace EnergyPlus {
 
 			"Branch,",
 			"  DOAS Main Branch,        !- Name",
-			"  autosize,                !- Maximum Flow Rate {m3/s}",
 			"  ,                        !- Pressure Drop Curve Name",
 			"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"  DOAS OA System,          !- Component 1 Name",

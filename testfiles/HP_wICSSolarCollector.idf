@@ -1731,7 +1731,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.6,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
@@ -2245,7 +2244,6 @@
 
   Branch,
     Storage Tank Use Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     DHW Loop Pump,           !- Component 1 Name
@@ -2254,7 +2252,6 @@
 
   Branch,
     Storage Tank Tempering Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     TemperingValve,          !- Component 1 Object Type
     DHW Anti-Scald Diverter, !- Component 1 Name
@@ -2287,7 +2284,6 @@
 
   Branch,
     Storage Tank Use Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Storage Tank,            !- Component 1 Name
@@ -2296,7 +2292,6 @@
 
   Branch,
     Storage Tank Use Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Instantaneous Water Heater,  !- Component 1 Name
@@ -2374,7 +2369,6 @@
 
   Branch,
     Coil Bypass Branch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Coil Bypass,             !- Component 1 Name
@@ -2388,7 +2382,6 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
@@ -2402,7 +2395,6 @@
 
   Branch,
     Domestic Hot Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Domestic Hot Water,      !- Component 1 Name
@@ -2455,7 +2447,6 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
@@ -2583,7 +2574,6 @@
 
   Branch,
     Storage Tank Source Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Collector Loop Pump,     !- Component 1 Name
@@ -2608,7 +2598,6 @@
 
   Branch,
     Storage Tank Source Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Storage Tank,            !- Component 1 Name
@@ -2658,7 +2647,6 @@
 
   Branch,
     Storage Tank Source Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Storage Tank Source Outlet Pipe,  !- Component 1 Name
@@ -2697,7 +2685,6 @@
 
   Branch,
     Collector Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Inlet Pipe,    !- Component 1 Name
@@ -2711,7 +2698,6 @@
 
   Branch,
     Collector 1 Branch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     SolarCollector:IntegralCollectorStorage,  !- Component 1 Object Type
     Collector 1,             !- Component 1 Name
@@ -2801,7 +2787,6 @@
 
   Branch,
     Collector Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Outlet Pipe,   !- Component 1 Name

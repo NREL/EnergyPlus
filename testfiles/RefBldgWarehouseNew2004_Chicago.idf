@@ -2280,7 +2280,6 @@
 
   Branch,
     FURNACE_PACU_CAV_1:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV_1:1_OA, !- Component 1 Name
@@ -2293,7 +2292,6 @@
 
   Branch,
     FURNACE_PACU_CAV_2:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV_2:2_OA, !- Component 1 Name

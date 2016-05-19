@@ -2025,7 +2025,6 @@
 
   Branch,
     Steam Coil Bypass Branch,!- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Demand Bypass Pipe,  !- Component 1 Name
@@ -2034,7 +2033,6 @@
 
   Branch,
     Zone3 Steam-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     Zone3PTACHeater,         !- Component 1 Name
@@ -2043,7 +2041,6 @@
 
   Branch,
     Steam Demand 1 Steam Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Demand 1 Steam Inlet Pipe,  !- Component 1 Name
@@ -2052,7 +2049,6 @@
 
   Branch,
     Steam Demand 1 Steam Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Demand 1 Steam Outlet Pipe,  !- Component 1 Name
@@ -2061,7 +2057,6 @@
 
   Branch,
     Steam Boiler Plant Boiler Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:Steam,            !- Component 1 Object Type
     Steam Boiler Plant Boiler,  !- Component 1 Name
@@ -2070,7 +2065,6 @@
 
   Branch,
     Steam Boiler Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Bypass Pipe,!- Component 1 Name
@@ -2079,7 +2073,6 @@
 
   Branch,
     Steam Boiler Plant Steam Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Plant Steam Supply Outlet,  !- Component 1 Name
@@ -2088,7 +2081,6 @@
 
   Branch,
     Steam Boiler Plant Steam Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed:Condensate,  !- Component 1 Object Type
     Steam Boiler Plant Steam Circ Pump,  !- Component 1 Name

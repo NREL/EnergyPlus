@@ -190,7 +190,6 @@
 
   Branch,
     Supply Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump,                    !- Component 1 Name
@@ -215,7 +214,6 @@
 
   Branch,
     Cooling Branch,          !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     PlantComponent:TemperatureSource,  !- Component 1 Object Type
     FluidSource,             !- Component 1 Name
@@ -239,7 +237,6 @@
 
   Branch,
     Supply Bypass Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Bypass Pipe,      !- Component 1 Name
@@ -253,7 +250,6 @@
 
   Branch,
     Supply Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
@@ -271,7 +267,6 @@
 
   Branch,
     Demand Branch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name

@@ -1663,7 +1663,6 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    5.5,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
@@ -1684,7 +1683,6 @@
 
   Branch,
     HW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump 2,                  !- Component 1 Name
@@ -1693,7 +1691,6 @@
 
   Branch,
     Water Heater Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Water Heater 1,          !- Component 1 Name
@@ -1702,7 +1699,6 @@
 
   Branch,
     HW Supply Outlet Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Supply Outlet Pipe,   !- Component 1 Name
@@ -1711,7 +1707,6 @@
 
   Branch,
     HW Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Inlet Pipe,    !- Component 1 Name
@@ -1720,7 +1715,6 @@
 
   Branch,
     HW Coil Branch,          !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Air Loop Heating Coil,   !- Component 1 Name
@@ -1729,7 +1723,6 @@
 
   Branch,
     HW Demand Bypass,        !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Bypass Pipe,   !- Component 1 Name
@@ -1738,7 +1731,6 @@
 
   Branch,
     HW Demand Outlet Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Outlet Pipe,   !- Component 1 Name
@@ -1747,7 +1739,6 @@
 
   Branch,
     Supply Inlet Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump 1,                  !- Component 1 Name
@@ -1756,7 +1747,6 @@
 
   Branch,
     Cooling Branch,          !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Water Heater 1,          !- Component 1 Name
@@ -1769,7 +1759,6 @@
 
   Branch,
     Supply Outlet Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
@@ -1778,7 +1767,6 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
@@ -1787,7 +1775,6 @@
 
   Branch,
     Condenser Branch,        !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Refrigeration:Condenser:WaterCooled,  !- Component 1 Object Type
     MediumTempCondenser,     !- Component 1 Name
@@ -1796,7 +1783,6 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name

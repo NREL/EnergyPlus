@@ -335,7 +335,7 @@
 !      $
 !      1/hr
 !      A
-!      A/V                 
+!      A/V
 !      Ah
 !      Availability
 !      Control
@@ -20110,7 +20110,7 @@ Lights,
   A5 , \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20199,7 +20199,7 @@ ElectricEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20282,7 +20282,7 @@ GasEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20353,7 +20353,7 @@ HotWaterEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20423,7 +20423,7 @@ SteamEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -24295,7 +24295,7 @@ Exterior:Lights,
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -24336,7 +24336,7 @@ Exterior:FuelEquipment,
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -24365,7 +24365,7 @@ Exterior:WaterEquipment,
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -38928,11 +38928,11 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \note fraction of cooling air flow rate
   A3,  \field Air Inlet Node Name
        \type node
-       \note The name of the HVAC system node that is the air inlet node for the 
-       \note terminal unit. This is also the air inlet node for the unit’s fan.  
+       \note The name of the HVAC system node that is the air inlet node for the
+       \note terminal unit. This is also the air inlet node for the unit’s fan.
   A4,  \field Air Outlet Node Name
        \type node
-       \note The name of the HVAC system node that is the air outlet node for the 
+       \note The name of the HVAC system node that is the air outlet node for the
        \note terminal unit. This is also the air outlet node for the unit’s heating
        \note coil’s air outlet node. This node is also a zone inlet node.
   A5,  \field Fan Object Type
@@ -51224,12 +51224,12 @@ Dehumidifier:Desiccant:System,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \note works with gas, electric, hot water and steam heating coils.
-       \note For autosizing the regeneration air heating coil the 
+       \note For autosizing the regeneration air heating coil the
        \note Design Coil Inlet Air Condition used is the outdoor air condition
-       \note if the desiccant system is on the primary air loop, or else if the  
+       \note if the desiccant system is on the primary air loop, or else if the
        \note desiccant system is on outdoor air system then it is the return air
        \note condition. The Design Coil Outlet Air Temperature is the Regeneration
-       \note Inlet Air Setpoint Temperature specified in the input field below.   
+       \note Inlet Air Setpoint Temperature specified in the input field below.
   A10, \field Regeneration Air Heater Name
        \type object-list
        \object-list HeatingCoilName
@@ -52254,7 +52254,7 @@ UnitarySystemPerformance:Multispeed,
        \key Yes
        \key No
        \default No
-       \note Controls coil operation during each HVAC timestep. 
+       \note Controls coil operation during each HVAC timestep.
        \note This choice does not apply to speed 1 operation.
        \note Yes = operate at the highest speed possible without exceeding the current load.
        \note No = allow operation at the average of two adjacent speeds to match the current load.
@@ -56907,12 +56907,6 @@ Branch,
    A1,  \field Name
         \required-field
         \reference Branches
-   N1, \field Maximum Flow Rate
-        \deprecated
-        \default 0
-        \units m3/s
-        \minimum 0
-        \autosizable
    A2, \field Pressure Drop Curve Name
         \type object-list
         \object-list PressureDropCurves
@@ -61701,7 +61695,7 @@ ChillerHeater:Absorption:DirectFired,
           \required-field
           \type node
   A5   ,  \field Condenser Outlet Node Name
-          \note Not required if air-cooled 
+          \note Not required if air-cooled
           \type node
   A6   ,  \field Hot Water Inlet Node Name
           \required-field
@@ -61911,7 +61905,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \required-field
        \type node
   A5 , \field Condenser Outlet Node Name
-       \note Not required if air-cooled 
+       \note Not required if air-cooled
        \type node
   A6 , \field Hot Water Inlet Node Name
        \required-field
@@ -77789,7 +77783,7 @@ ElectricLoadCenter:Generators,
   N60; \field Generator 30 Rated Thermal to Electrical Power Ratio
        \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
        \type real
-       
+
 ElectricLoadCenter:Inverter:Simple,
         \memo Electric power inverter to convert from direct current (DC) to alternating current
         \memo (AC) in an electric load center that contains photovoltaic modules. This input
@@ -78080,7 +78074,7 @@ ElectricLoadCenter:Transformer,
        \default PowerInFromGrid
        \note A transformer can be used to transfer electric energy from utility grid to
        \note building (PowerInFromGrid)or from building on-site generation to
-       \note the grid (PowerOutToGrid) or within a load center to match generation 
+       \note the grid (PowerOutToGrid) or within a load center to match generation
        \note to the facility service main panel (LoadCenterPowerConditioning)
   A4,  \field Zone Name
        \type object-list
@@ -78226,7 +78220,7 @@ ElectricLoadCenter:Transformer,
 
 
 ElectricLoadCenter:Distribution,
-       \memo Describes a subpanel 
+       \memo Describes a subpanel
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
   A1 , \field Name
@@ -78284,11 +78278,11 @@ ElectricLoadCenter:Distribution,
        \note Select method to govern how storage charge and discharge is controlled
        \type choice
        \key TrackFacilityElectricDemandStoreExcessOnSite
-       \note TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand 
+       \note TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand
        \note while accounting for any on-site generation.  Only excess on site generation  gets stored (legacy behavior).
        \default TrackFacilityElectricDemandStoreExcessOnSite
        \key TrackMeterDemandStoreExcessOnSite
-       \note TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar 
+       \note TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar
        \note to TrackFacilityElectricDemandStoreExcessOnSite except that instead of the main facility electric meter, the control is based off of a user-selected meter.
        \key TrackChargeDischargeSchedules
        \note TrackChargeDischargeSchedules indicates that control will follow the charging and discharging power and schedules defined in the fields called Maximum Storage Charge Grid Supply Power,
@@ -78297,7 +78291,7 @@ ElectricLoadCenter:Distribution,
        \note FacilityDemandLeveling indicates that storage control will attempt to control the facility's power demand drawn from the utility service to a prescribed level.
        \note The target utility demand is entered in the fields called Storage Control Utility Demand Limit and Storage Control Utility Demand Limit Fraction Schedule Name
        \note This scheme first accounts for any on-site generation and during times of high use will discharge storage to reduce facility grid demand to meet the target level
-       \note and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level. 
+       \note and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level.
   A11, \field Storage Control Track Meter Name
        \note required when Storage Operation Scheme is set to TrackMeterDemandStoreExcessOnSite.
        \type external-list
@@ -78319,7 +78313,7 @@ ElectricLoadCenter:Distribution,
   N4 , \field Design Storage Control Charge Power
        \note Maximum rate that electric power can be charged into storage.
        \note Storage charging adjusted downward for conversion losses.
-       \note Rate is modified by fractional values in the schedule named in the next field. 
+       \note Rate is modified by fractional values in the schedule named in the next field.
        \note Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
        \type real
        \units W
@@ -78331,7 +78325,7 @@ ElectricLoadCenter:Distribution,
        \object-list ScheduleNames
   N5 , \field Design Storage Control Discharge Power
        \note Maximum rate that electric power can be discharged from storage.
-       \note Rate is modified by fractional values in the schedule named in the next field. 
+       \note Rate is modified by fractional values in the schedule named in the next field.
        \note Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
        \type real
        \units W
@@ -78340,7 +78334,7 @@ ElectricLoadCenter:Distribution,
        \note Required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.
        \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
   N6,  \field Storage Control Utility Demand Target
-       \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses. 
+       \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses.
        \note Required field for FacilityDemandLeveling storage operation scheme
        \type real
        \units W
@@ -78389,7 +78383,7 @@ ElectricLoadCenter:Distribution,
         \object-list UniVariateCurves
         \object-list UniVariateTables
    N3 , \field Ancillary Power Consumed In Standby
-        \note Optional standby power consumed when converter is available but no power is being conditioned. 
+        \note Optional standby power consumed when converter is available but no power is being conditioned.
         \type real
         \units W
    A5 , \field Zone Name
@@ -78401,7 +78395,7 @@ ElectricLoadCenter:Distribution,
         \note fraction of zone heat gains treated as thermal radiation
         \minimum 0.0
         \maximum 1.0
-        
+
 \group Water Systems
 
 WaterUse:Equipment,

@@ -3840,7 +3840,6 @@
 
   Branch,
     SHWSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SHWSys1 Pump,            !- Component 1 Name
@@ -3849,7 +3848,6 @@
 
   Branch,
     SHWSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Stratified,  !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
@@ -3943,7 +3941,6 @@
 
   Branch,
     SHWSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -3957,7 +3954,6 @@
 
   Branch,
     SHWSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Outlet Pipe,  !- Component 1 Name
@@ -4024,7 +4020,6 @@
 
   Branch,
     SHWSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Inlet Pipe,  !- Component 1 Name
@@ -4038,7 +4033,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1SHW_DEFAULT,  !- Component 1 Name
@@ -4047,7 +4041,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2SHW_DEFAULT,  !- Component 1 Name
@@ -4056,7 +4049,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3SHW_DEFAULT,  !- Component 1 Name
@@ -4065,7 +4057,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4SHW_DEFAULT,  !- Component 1 Name
@@ -4074,7 +4065,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5SHW_DEFAULT,  !- Component 1 Name
@@ -4083,7 +4073,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 PTAC heat coil,  !- Component 1 Name
@@ -4092,7 +4081,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 PTAC heat coil,  !- Component 1 Name
@@ -4101,7 +4089,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 PTAC heat coil,  !- Component 1 Name
@@ -4110,7 +4097,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 PTAC heat coil,  !- Component 1 Name
@@ -4119,7 +4105,6 @@
 
   Branch,
     SHWSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 PTAC heat coil,  !- Component 1 Name
@@ -4128,7 +4113,6 @@
 
   Branch,
     SHWSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Bypass Pipe,  !- Component 1 Name
@@ -4142,7 +4126,6 @@
 
   Branch,
     SHWSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Outlet Pipe,  !- Component 1 Name
@@ -4244,7 +4227,6 @@
 
   Branch,
     MICROCHP SENERTECH Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     MICROCHP SENERTECH Pump, !- Component 1 Name
@@ -4253,7 +4235,6 @@
 
   Branch,
     MICROCHP SENERTECH Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Generator:MicroCHP,      !- Component 1 Object Type
     MicroCoGen1,             !- Component 1 Name
@@ -4262,7 +4243,6 @@
 
   Branch,
     SOFC Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Generator:FuelCell:ExhaustGasToWaterHeatExchanger,  !- Component 1 Object Type
     FCT SOFC Exhaust HX,     !- Component 1 Name
@@ -4459,7 +4439,6 @@
 
   Branch,
     MICROCHP SENERTECH Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Supply Equipment Bypass Pipe,  !- Component 1 Name
@@ -4473,7 +4452,6 @@
 
   Branch,
     MICROCHP SENERTECH Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Supply Outlet Pipe,  !- Component 1 Name
@@ -4513,7 +4491,6 @@
 
   Branch,
     MICROCHP SENERTECH Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Demand Inlet Pipe,  !- Component 1 Name
@@ -4527,7 +4504,6 @@
 
   Branch,
     MICROCHP SENERTECH Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Stratified,  !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
@@ -4536,7 +4512,6 @@
 
   Branch,
     MICROCHP SENERTECH Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Demand Bypass Pipe,  !- Component 1 Name
@@ -4550,7 +4525,6 @@
 
   Branch,
     MICROCHP SENERTECH Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Demand Outlet Pipe,  !- Component 1 Name

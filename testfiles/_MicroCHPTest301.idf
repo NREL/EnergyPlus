@@ -577,7 +577,6 @@
 
   Branch,
     Heat Recovery Supply Branch,  !- Name
-    1.50E-04,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Heat Recovery Circ Pump, !- Component 1 Name
@@ -617,7 +616,6 @@
 
   Branch,
     Heat Recovery Demand Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heat Recovery Inlet Pipe,!- Component 1 Name
