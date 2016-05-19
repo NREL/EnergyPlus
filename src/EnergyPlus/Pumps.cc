@@ -1707,6 +1707,7 @@ namespace Pumps {
 		Node( OutletNode ).Press = Node( InletNode ).Press;
 		Node( OutletNode ).Quality = Node( InletNode ).Quality;
 
+		assert(Node( OutletNode ).MassFlowRate == Node( InletNode ).MassFlowRate);
 	}
 
 	//*************************************************************************!
