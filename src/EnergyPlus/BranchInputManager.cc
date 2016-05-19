@@ -1466,7 +1466,7 @@ namespace BranchInputManager {
 					}
 					++BCount;
 
-					GetSingleBranchInput( RoutineName, Count, BCount, Alphas, Numbers, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
+					GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
 
 				}
 
@@ -1492,10 +1492,8 @@ namespace BranchInputManager {
 	void
 	GetSingleBranchInput(
 		std::string const RoutineName,
-		int const Count,
 		int const BCount,
 		Array1D_string &Alphas,
-		Array1D< Real64 > &Numbers,
 		Array1D_string &cAlphaFields,
 		int const NumAlphas,
 		Array1D_int &NodeNums,

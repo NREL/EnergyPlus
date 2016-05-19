@@ -150,7 +150,7 @@ namespace EnergyPlus {
 				}
 				++BCount;
 
-				GetSingleBranchInput( RoutineName, Count, BCount, Alphas, Numbers, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
+				GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
 
 			}
 
@@ -312,7 +312,7 @@ namespace EnergyPlus {
 				}
 				++BCount;
 
-				GetSingleBranchInput( RoutineName, Count, BCount, Alphas, Numbers, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
+				GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
 
 			}
 
