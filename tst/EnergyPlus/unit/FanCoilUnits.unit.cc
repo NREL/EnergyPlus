@@ -80,6 +80,8 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -103,6 +105,8 @@ using namespace EnergyPlus::FanCoilUnits;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::OutputProcessor;
+using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
@@ -2119,4 +2123,91 @@ namespace EnergyPlus {
 		CoilNames.deallocate();
 
 	}
+
+	TEST_F( EnergyPlusFixture, Test_TightenWaterFlowLimits ) {
+
+		int FanCoilNum( 1 );
+		int ZoneNum( 1 );
+		bool FirstHVACIteration( false );
+		bool ErrorsFound( false );
+		Real64 QZnReq( 1000.0 );
+		Real64 QUnitOut( 0.0 );
+
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::StdRhoAir = 1.20;
+		WaterCoils::GetWaterCoilsInputFlag = true;
+		NumCoils = 0;
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+
+		InitializePsychRoutines();
+
+		std::string const idf_objects = delimited_string( {
+			"	Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
+			"	ZoneHVAC:EquipmentConnections, EAST ZONE, Zone1Equipment, Zone1Inlets, Zone1Exhausts, Zone 1 Node, Zone 1 Outlet Node;",
+			"	ZoneHVAC:EquipmentList, Zone1Equipment, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
+			"	OutdoorAir:NodeList, Zone1FCOAIn;",
+			"	OutdoorAir:Mixer, Zone1FanCoilOAMixer, Zone1OAMixOut, Zone1FCOAIn, Zone1FCExh, Zone1FCAirIn;",
+			"   Fan:ConstantVolume, Zone1FanCoilFan, FCAvailSch, 0.5, 75.0, 0.6, 0.9, 1.0, Zone1OAMixOut, Zone1FCFanOut;",
+			"	Schedule:Constant, FCAvailSch, FRACTION, 1;",
+			"	ScheduleTypeLimits, Fraction, 0.0, 1.0, CONTINUOUS;",
+			"   NodeList, Zone1Inlets, Zone1FCAirOut;",
+			"	NodeList, Zone1Exhausts, Zone1FCAirIn;",
+			"	Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, Zone1FCFanOut, Zone1FCCCOut, SimpleAnalysis, CrossFlow;",
+			"	Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FClAirOut, UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
+
+			"	ZoneHVAC:FourPipeFanCoil,",
+			"	Zone1FanCoil, !- Name",
+			"	FCAvailSch, !- Availability Schedule Name",
+			"	MultiSpeedFan, !- Capacity Control Method",
+			"	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
+			"	0.3, !- Low Speed Supply Air Flow Ratio",
+			"	0.6, !- Medium Speed Supply Air Flow Ratio",
+			"	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+			"	FCAvailSch, !- Outdoor Air Schedule Name",
+			"	Zone1FCAirIn, !- Air Inlet Node Name",
+			"	Zone1FCAirOut, !- Air Outlet Node Name",
+			"	OutdoorAir:Mixer, !- Outdoor Air Mixer Object Type",
+			"	Zone1FanCoilOAMixer, !- Outdoor Air Mixer Name",
+			"	Fan:ConstantVolume, !- Supply Air Fan Object Type",
+			"	Zone1FanCoilFan, !- Supply Air Fan Name",
+			"	Coil:Cooling:Water, !- Cooling Coil Object Type",
+			"	Zone1FCCoolCoil, !- Cooling Coil Name",
+			"	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+			"	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
+			"	0.001, !- Cooling Convergence Tolerance",
+			"	Coil:Heating:Water, !- Heating Coil Object Type",
+			"	Zone1FanCoilHeatingCoil, !- Heating Coil Name",
+			"	0.00014, !- Maximum Hot Water Flow Rate { m3 / s }",
+			"	0.0, !- Minimum Hot Water Flow Rate { m3 / s }",
+			"	0.001; !- Heating Convergence Tolerance",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		OutputProcessor::TimeValue.allocate( 2 );
+
+		GetZoneData( ErrorsFound );
+		GetZoneEquipmentData1();
+		ProcessScheduleInput();
+		ScheduleInputProcessed = true;
+		SetPredefinedTables();
+		GetFanInput();
+		GetFanCoilUnits();
+		bool CoolingLoad = true;
+		bool HeatingLoad = false;
+		int ControlledZoneNum = 1;
+		Real64 MinWaterFlow = 0.0;
+		Real64 MaxWaterFlow = 1.5;
+		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = 1.0;
+		FanCoil( FanCoilNum ).CCoilName_Index = 2;
+
+		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+		EXPECT_EQ( MinWaterFlow, 0.0 );
+		EXPECT_NEAR( MaxWaterFlow, 0.000015, 0.0000001 );
+
+	}
+
 }
