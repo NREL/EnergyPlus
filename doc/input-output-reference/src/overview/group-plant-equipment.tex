@@ -3027,7 +3027,7 @@ This required alpha field contains the identifying name for the chiller condense
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-7}
 
-This required alpha field contains the identifying name for the chiller condenser side outlet node.
+This alpha field contains the identifying name for the chiller condenser side outlet node. It is required for WaterCooled chillers but not for AirCooled.
 
 \paragraph{Field: Hot Water Inlet Node Name}\label{field-hot-water-inlet-node-name}
 
@@ -3071,7 +3071,7 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 \paragraph{Field: Cooling Capacity Function of Temperature Curve Name}\label{field-cooling-capacity-function-of-temperature-curve-name-2}
 
-The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). The available cooling capacity is computed as follows:
+The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. The available cooling capacity is computed as follows:
 
 \begin{equation}
 \begin{array}{l}
@@ -3082,7 +3082,7 @@ The CoolCapfT curve represents the fraction of the cooling capacity of the chill
 
 \paragraph{Field: Fuel Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-fuel-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
-The CFIRfT curve represents the fraction of the fuel input to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below).
+The CFIRfT curve represents the fraction of the fuel input to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
 
 \paragraph{Field: Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-fuel-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name}
 
@@ -3097,7 +3097,7 @@ The CFIRfPLR curve represents the fraction of the fuel input to the chiller as t
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-2}
 
-The ElecCoolFT curve represents the fraction of the electricity to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below).
+The ElecCoolFT curve represents the fraction of the electricity to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name-2}
 
@@ -3431,7 +3431,7 @@ This required alpha field contains the identifying name for the chiller condense
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-8}
 
-This required alpha field contains the identifying name for the chiller condenser side outlet node.
+This alpha field contains the identifying name for the chiller condenser side outlet node. It is required for WaterCooled chillers but not for AirCooled.
 
 \paragraph{Field: Hot Water Inlet Node Name}\label{field-hot-water-inlet-node-name-1}
 
@@ -3475,7 +3475,7 @@ The water flow rate at design conditions through the heater side in m\(^{3}\)/s.
 
 \paragraph{Field: Cooling Capacity Function of Temperature Curve Name}\label{field-cooling-capacity-function-of-temperature-curve-name-3}
 
-The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). The available cooling capacity is computed as follows:
+The CoolCapfT curve represents the fraction of the cooling capacity of the chiller as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. The available cooling capacity is computed as follows:
 
 \begin{equation}
 \begin{array}{l}
@@ -3486,7 +3486,7 @@ The CoolCapfT curve represents the fraction of the cooling capacity of the chill
 
 \paragraph{Field: Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-thermal-energy-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
-The TeFIRfT curve represents the fraction of the Thermal Energy Input to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below).
+The TeFIRfT curve represents the fraction of the Thermal Energy Input to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
 
 \paragraph{Field: Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-thermal-energy-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name}
 
@@ -3500,7 +3500,7 @@ CoolElectricPower = NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT\left( {{T_{
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-3}
 
-The CEIRfT curve represents the fraction of the electricity to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below).
+The CEIRfT curve represents the fraction of the electricity to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name-3}
 
