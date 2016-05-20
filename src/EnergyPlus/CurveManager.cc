@@ -2113,6 +2113,9 @@ namespace CurveManager {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
 				ErrorsFound = true;
+				TableData( TableNum ).X1 = 0.;
+				TableData( TableNum ).X2 = 0.;
+				TableData( TableNum ).Y = 0.;
 			} else {
 				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
 					TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
