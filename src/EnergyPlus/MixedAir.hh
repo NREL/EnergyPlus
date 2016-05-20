@@ -610,9 +610,8 @@ namespace MixedAir {
 
 	void
 	CalcMechVentController(
-		int const OAControllerNum,
-		int const AirLoopNum,
-		Real64 & MechVentOutsideAirMinFrac,
+		int const VentMechObjectNum,
+		Real64 & SysSA,
 		Real64 & MechVentOutsideAirFlow
 	);
 

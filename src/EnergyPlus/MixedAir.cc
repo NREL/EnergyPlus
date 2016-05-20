@@ -3438,6 +3438,7 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 OutAirSignal; // Used to set OA mass flow rate
 		Real64 OutAirMinFrac; // Local variable used to calculate min OA fraction
+		int VentMechObjectNum( 0 );
 		Real64 MechVentOutsideAirMinFrac; // fraction of OA specified by mechanical ventilation object
 		Real64 MechVentOutsideAirFlow; // outside air mass flow rate specified by mechanical ventilation object
 		Real64 MinOASchedVal; // value of the minimum outside air schedule
@@ -3461,7 +3462,7 @@ namespace MixedAir {
 		Real64 RecircMassFlowRateAtMinOAFlow; // recirc air mass flow rate at min OA, used for custom economizer control calculation
 		Real64 ReliefMassFlowAtMinOA; // relief air mass flow rate at min OA, used for custom economizer control calculation
 		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
-
+		Real64 SysSA( 0.0 ); // System supply air flow rate
 		MinOASchedVal = 1.0;
 
 		// Assign references
@@ -3530,8 +3531,25 @@ namespace MixedAir {
 		}
 
 		// Get mechanical ventilation
-		int VentMechObjectNum = thisController.VentMechObjectNum;
-		CalcMechVentController(VentMechObjectNum, AirLoopNum, MechVentOutsideAirMinFrac, MechVentOutsideAirFlow );
+		MechVentOutsideAirFlow = 0.0;
+		MechVentOutsideAirMinFrac = 0.0;
+		VentMechObjectNum = thisController.VentMechObjectNum;
+		if ( AirLoopNum > 0 && VentMechObjectNum != 0 ) {
+			// Get system supply air flow rate
+			if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet ) {
+				// if flow rate has been specified by a manager, set it to the specified value
+				// DesSupply and SupFlow are mass flow rate in kg/s
+				SysSA = AirLoopFlow( AirLoopNum ).ReqSupplyFrac * AirLoopFlow( AirLoopNum ).DesSupply;
+			} else {
+				SysSA = AirLoopFlow( AirLoopNum ).SupFlow;
+			}
+			CalcMechVentController( VentMechObjectNum, SysSA, MechVentOutsideAirFlow );
+			MechVentOutsideAirMinFrac = MechVentOutsideAirFlow / AirLoopFlow( AirLoopNum ).DesSupply;
+			if (AirLoopFlow(AirLoopNum).FanPLR > 0.0) {
+				MechVentOutsideAirMinFrac *= AirLoopFlow(AirLoopNum).FanPLR;
+				MechVentOutsideAirFlow *= AirLoopFlow(AirLoopNum).FanPLR;
+			}
+		}
 		//****** use greater of Mechanical Ventilation Outside Air fraction and OutAirMinFrac
 		OutAirMinFrac = max( OutAirMinFrac, MechVentOutsideAirMinFrac );
 
@@ -3931,8 +3949,7 @@ namespace MixedAir {
 	void
 	CalcMechVentController(
 		int const VentMechObjectNum,
-		int const AirLoopNum,
-		Real64 & MechVentOutsideAirMinFrac,
+		Real64 & SysSA,
 		Real64 & MechVentOutsideAirFlow
 	)
 	{
@@ -3968,7 +3985,6 @@ namespace MixedAir {
 		Real64 SysOAuc; // System uncorrected OA flow rate
 		Real64 SysOA; // System supply OA flow rate
 		Real64 SysEv; // System ventilation efficiency
-		Real64 SysSA; // System supply air flow rate
 		Real64 NodeTemp; // node temperature
 		Real64 NodeHumRat; // node humidity ratio
 		Real64 MassFlowRate; // Temporary variable
@@ -4002,70 +4018,137 @@ namespace MixedAir {
 		ZoneOAMin = 0.0;
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
-		MechVentOutsideAirMinFrac = 0.0;
 		MechVentOutsideAirFlow = 0.0;
 
-		if ( AirLoopNum > 0 && VentMechObjectNum != 0 ) {
-			// Apply mechanical ventilation only when it is available/allowed
-			if ( GetCurrentScheduleValue( VentilationMechanical( VentMechObjectNum ).SchPtr ) > 0 ) {
-				//IF (VentilationMechanical(VentMechObjectNum)%SystemOAMethod == SOAM_ZoneSum) THEN
-				// no longer needed due to OA inputs consolidation
-				// keep simple DCV method implemened in E+ 3.0 which sums the zone OA as the system OA
-				//  without considering the zone air distribution effectiveness or system ventilation efficiency
-				//  MechVentOutsideAirFlow = (VentilationMechanical(VentMechObjectNum)%TotAreaOAFlow + &
-				//    VentilationMechanical(VentMechObjectNum)%TotPeopleOAFlow) * StdRhoAir
+		auto & thisMechVentController = VentilationMechanical( VentMechObjectNum );
 
-				//ELSE IF (VentilationMechanical(VentMechObjectNum)%SystemOAMethod == SOAM_IAQP) THEN
-				if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_IAQP ) {
-					// IAQP for CO2 control
-					SysOA = 0.0;
-					for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
-						SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP;
-					}
-					MechVentOutsideAirFlow = SysOA;
-				} else if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_IAQPGC ) {
-					// IAQP for generic contaminant control
-					SysOA = 0.0;
-					for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
-						SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP;
-					}
-					MechVentOutsideAirFlow = SysOA;
-				} else if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_IAQPCOM ) {
-					// IAQP for both CO2 and generic contaminant control
-					SysOA = 0.0;
-					for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
-						SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP;
-					}
-					MechVentOutsideAirFlow = SysOA;
-					SysOA = 0.0;
-					for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
-						SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP;
-					}
-					MechVentOutsideAirFlow = max( SysOA, MechVentOutsideAirFlow );
-				} else {
-					// for system OA methods: Zone_Sum, VRP, CO2 methods
-					// new code for DCV method complying with the VRP defined in ASHRAE Standard 62.1-2010
+		// Apply mechanical ventilation only when it is available/allowed
+		if ( GetCurrentScheduleValue( thisMechVentController.SchPtr ) > 0 ) {
+			if ( thisMechVentController.SystemOAMethod == SOAM_IAQP ) {
+				// IAQP for CO2 control
+				SysOA = 0.0;
+				for ( ZoneIndex = 1; ZoneIndex <= thisMechVentController.NumofVentMechZones; ++ZoneIndex ) {
+					ZoneNum = thisMechVentController.Zone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP;
+				}
+				MechVentOutsideAirFlow = SysOA;
+			} else if ( thisMechVentController.SystemOAMethod == SOAM_IAQPGC ) {
+				// IAQP for generic contaminant control
+				SysOA = 0.0;
+				for ( ZoneIndex = 1; ZoneIndex <= thisMechVentController.NumofVentMechZones; ++ZoneIndex ) {
+					ZoneNum = thisMechVentController.Zone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP;
+				}
+				MechVentOutsideAirFlow = SysOA;
+			} else if ( thisMechVentController.SystemOAMethod == SOAM_IAQPCOM ) {
+				// IAQP for both CO2 and generic contaminant control
+				SysOA = 0.0;
+				for ( ZoneIndex = 1; ZoneIndex <= thisMechVentController.NumofVentMechZones; ++ZoneIndex ) {
+					ZoneNum = thisMechVentController.Zone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP;
+				}
+				MechVentOutsideAirFlow = SysOA;
+				SysOA = 0.0;
+				for ( ZoneIndex = 1; ZoneIndex <= thisMechVentController.NumofVentMechZones; ++ZoneIndex ) {
+					ZoneNum = thisMechVentController.Zone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP;
+				}
+				MechVentOutsideAirFlow = max( SysOA, MechVentOutsideAirFlow );
+			} else {
+				// for system OA methods: Zone_Sum, VRP, CO2 methods
+				// new code for DCV method complying with the VRP defined in ASHRAE Standard 62.1-2010
 
-					// Loop through each zone first to calc uncorrected system OA flow rate
-					SysOAuc = 0.0;
-					SysOA = 0.0;
-					for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
+				// Loop through each zone first to calc uncorrected system OA flow rate
+				SysOAuc = 0.0;
+				SysOA = 0.0;
+				for ( ZoneIndex = 1; ZoneIndex <= thisMechVentController.NumofVentMechZones; ++ZoneIndex ) {
+					ZoneNum = thisMechVentController.Zone( ZoneIndex );
+
+					// Calc the zone OA flow rate based on the people component
+					// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
+					//  Checking DCV flag before calculating zone OA per person
+					if ( thisMechVentController.DCVFlag && thisMechVentController.SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
+						ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * thisMechVentController.ZoneOAPeopleRate( ZoneIndex );
+					} else {
+						ZoneOAPeople = 0.0;
+						for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
+							if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
+							ZoneOAPeople += People( PeopleNum ).NumberOfPeople * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * thisMechVentController.ZoneOAPeopleRate( ZoneIndex );
+						}
+					}
+
+					// Calc the zone OA flow rate based on the floor area component
+					ZoneOAArea = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( ZoneIndex );
+					ZoneOAFlow = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( ZoneIndex );
+					ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
+
+					// Calc the breathing-zone OA flow rate
+					OAIndex = thisMechVentController.ZoneDesignSpecOAObjIndex( ZoneIndex );
+					if ( OAIndex > 0 ) {
+						{ auto const SELECT_CASE_var( OARequirements( OAIndex ).OAFlowMethod );
+						if ( SELECT_CASE_var == OAFlowPPer ) {
+							ZoneOABZ = ZoneOAPeople;
+						} else if ( SELECT_CASE_var == OAFlow ) {
+							ZoneOABZ = ZoneOAFlow;
+						} else if ( SELECT_CASE_var == OAFlowPerArea ) {
+							ZoneOABZ = ZoneOAArea;
+						} else if ( SELECT_CASE_var == OAFlowACH ) {
+							ZoneOABZ = ZoneOAACH;
+						} else if ( SELECT_CASE_var == OAFlowSum ) {
+							ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
+						} else if ( SELECT_CASE_var == OAFlowMax ) {
+							ZoneOABZ = max( ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH );
+						} else {
+							ZoneOABZ = 0.0;
+						}}
+					} else {
+						ZoneOABZ = ZoneOAPeople;
+					}
+
+					if ( thisMechVentController.SystemOAMethod == SOAM_ZoneSum ) {
+						// Sum the zone OA flow rates and done
+						SysOA += ZoneOABZ;
+					} else {
+						// Calc the uncorrected system OA flow rate - VRP and ProportionalControl
+						SysOAuc += ZoneOABZ;
+					}
+				}
+
+				// get system supply air flow rate
+				if ( thisMechVentController.SystemOAMethod == SOAM_VRP || thisMechVentController.SystemOAMethod == SOAM_ProportionalControlSchOcc || thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+
+					// System supply air flow rate is always greater than or equal the system outdoor air flow rate
+					if ( ( SysSA > 0.0 ) && ( SysSA < ( SysOAuc * StdRhoAir ) ) ) SysSA = SysOAuc * StdRhoAir;
+
+					// calc Xs - average outdoor air fraction
+					if ( SysSA > 0.0 ) {
+						Xs = ( SysOAuc * StdRhoAir ) / SysSA;
+					} else {
+						Xs = 0.0;
+					}
+
+					// Loop through each zone again
+					SysEv = 2.0; // starting with a big fraction
+					for ( ZoneIndex = 1; ZoneIndex <= thisMechVentController.NumofVentMechZones; ++ZoneIndex ) {
+						ZoneNum = thisMechVentController.Zone( ZoneIndex );
+						ZoneName = Zone( ZoneNum ).Name;
+						ZoneEquipConfigNum = ZoneNum; // correspondence - 1:1 of ZoneEquipConfig to Zone index
+						ZoneEz = 0.0;
 
 						// Calc the zone OA flow rate based on the people component
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 						//  Checking DCV flag before calculating zone OA per person
-						if ( VentilationMechanical( VentMechObjectNum ).DCVFlag && VentilationMechanical( VentMechObjectNum ).SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
-							ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
+						if ( thisMechVentController.DCVFlag && thisMechVentController.SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
+							ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * thisMechVentController.ZoneOAPeopleRate( ZoneIndex );
 						} else {
 							ZoneOAPeople = 0.0;
+							CO2PeopleGeneration = 0.0;
 							for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
 								if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
-								ZoneOAPeople += People( PeopleNum ).NumberOfPeople * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
+								ZoneOAPeople += People( PeopleNum ).NumberOfPeople * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * thisMechVentController.ZoneOAPeopleRate( ZoneIndex );
+								if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+									CO2PeopleGeneration += People( PeopleNum ).NumberOfPeople * People( PeopleNum ).CO2RateFactor * GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr );
+								}
 							}
 						}
 
@@ -4075,7 +4158,7 @@ namespace MixedAir {
 						ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
 
 						// Calc the breathing-zone OA flow rate
-						OAIndex = VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex( ZoneIndex );
+						OAIndex = thisMechVentController.ZoneDesignSpecOAObjIndex( ZoneIndex );
 						if ( OAIndex > 0 ) {
 							{ auto const SELECT_CASE_var( OARequirements( OAIndex ).OAFlowMethod );
 							if ( SELECT_CASE_var == OAFlowPPer ) {
@@ -4093,339 +4176,250 @@ namespace MixedAir {
 							} else {
 								ZoneOABZ = 0.0;
 							}}
-						} else {
-							ZoneOABZ = ZoneOAPeople;
 						}
 
-						if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ZoneSum ) {
-							// Sum the zone OA flow rates and done
-							SysOA += ZoneOABZ;
+						// use the ventilation rate procedure in ASHRAE Standard 62.1-2007
+						// Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
+						//  First check whether the zone air distribution effectiveness schedule exists, if yes uses it;
+						//   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
+						ZoneADEffSchPtr = thisMechVentController.ZoneADEffSchPtr( ZoneIndex );
+						if ( ZoneADEffSchPtr > 0 ) {
+							// Get schedule value for the zone air distribution effectiveness
+							ZoneEz = GetCurrentScheduleValue( ZoneADEffSchPtr );
 						} else {
-							// Calc the uncorrected system OA flow rate - VRP and ProportionalControl
-							SysOAuc += ZoneOABZ;
+							ZoneLoad = ZoneSysEnergyDemand( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum ).TotalOutputRequired;
+
+							// Zone in cooling mode
+							if ( ZoneLoad < 0.0 ) ZoneEz = thisMechVentController.ZoneADEffCooling( ZoneIndex );
+
+							// Zone in heating mode
+							if ( ZoneLoad > 0.0 ) ZoneEz = thisMechVentController.ZoneADEffHeating( ZoneIndex );
 						}
-					}
-
-					// get system supply air flow rate
-					if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_VRP || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-						// Get system supply air flow rate
-						if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet ) {
-							// if flow rate has been specified by a manager, set it to the specified value
-							// DesSupply and SupFlow are mass flow rate in kg/s
-							SysSA = AirLoopFlow( AirLoopNum ).ReqSupplyFrac * AirLoopFlow( AirLoopNum ).DesSupply;
-						} else {
-							SysSA = AirLoopFlow( AirLoopNum ).SupFlow;
-						}
-
-						// System supply air flow rate is always greater than or equal the system outdoor air flow rate
-						if ( ( SysSA > 0.0 ) && ( SysSA < ( SysOAuc * StdRhoAir ) ) ) SysSA = SysOAuc * StdRhoAir;
-
-						// calc Xs - average outdoor air fraction
-						if ( SysSA > 0.0 ) {
-							Xs = ( SysOAuc * StdRhoAir ) / SysSA;
-						} else {
-							Xs = 0.0;
+						if ( ZoneEz <= 0.0 ) {
+							//Enforce defaults
+							ZoneEz = 1.0;
 						}
 
-						// Loop through each zone again
-						SysEv = 2.0; // starting with a big fraction
-						for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-							ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
-							ZoneName = Zone( ZoneNum ).Name;
-							ZoneEquipConfigNum = ZoneNum; // correspondence - 1:1 of ZoneEquipConfig to Zone index
-							ZoneEz = 0.0;
+						// Calc zone supply OA flow rate
+						if ( thisMechVentController.SystemOAMethod == SOAM_VRP ) {
+							// the VRP case
+							ZoneOA = ZoneOABZ / ZoneEz;
 
-							// Calc the zone OA flow rate based on the people component
-							// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
-							//  Checking DCV flag before calculating zone OA per person
-							if ( VentilationMechanical( VentMechObjectNum ).DCVFlag && VentilationMechanical( VentMechObjectNum ).SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
-								ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
-							} else {
-								ZoneOAPeople = 0.0;
-								CO2PeopleGeneration = 0.0;
-								for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
-									if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
-									ZoneOAPeople += People( PeopleNum ).NumberOfPeople * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
-									if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-										CO2PeopleGeneration += People( PeopleNum ).NumberOfPeople * People( PeopleNum ).CO2RateFactor * GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr );
-									}
-								}
-							}
+						} else if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlSchOcc || thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+							// Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
+							if ( Zone( ZoneNum ).ZoneContamControllerSchedIndex > 0.0 ) {
+								// Check the availability schedule value for ZoneControl:ContaminantController
+								ZoneContamControllerSched = GetCurrentScheduleValue( Zone( ZoneNum ).ZoneContamControllerSchedIndex );
+								if ( ZoneContamControllerSched > 0.0 ) {
+									ZoneOAMin = ZoneOAArea / ZoneEz;
+									ZoneOAMax = ( ZoneOAArea + ZoneOAPeople ) / ZoneEz;
 
-							// Calc the zone OA flow rate based on the floor area component
-							ZoneOAArea = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( ZoneIndex );
-							ZoneOAFlow = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( ZoneIndex );
-							ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
-
-							// Calc the breathing-zone OA flow rate
-							OAIndex = VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex( ZoneIndex );
-							if ( OAIndex > 0 ) {
-								{ auto const SELECT_CASE_var( OARequirements( OAIndex ).OAFlowMethod );
-								if ( SELECT_CASE_var == OAFlowPPer ) {
-									ZoneOABZ = ZoneOAPeople;
-								} else if ( SELECT_CASE_var == OAFlow ) {
-									ZoneOABZ = ZoneOAFlow;
-								} else if ( SELECT_CASE_var == OAFlowPerArea ) {
-									ZoneOABZ = ZoneOAArea;
-								} else if ( SELECT_CASE_var == OAFlowACH ) {
-									ZoneOABZ = ZoneOAACH;
-								} else if ( SELECT_CASE_var == OAFlowSum ) {
-									ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
-								} else if ( SELECT_CASE_var == OAFlowMax ) {
-									ZoneOABZ = max( ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH );
-								} else {
-									ZoneOABZ = 0.0;
-								}}
-							}
-
-							// use the ventilation rate procedure in ASHRAE Standard 62.1-2007
-							// Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
-							//  First check whether the zone air distribution effectiveness schedule exists, if yes uses it;
-							//   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
-							ZoneADEffSchPtr = VentilationMechanical( VentMechObjectNum ).ZoneADEffSchPtr( ZoneIndex );
-							if ( ZoneADEffSchPtr > 0 ) {
-								// Get schedule value for the zone air distribution effectiveness
-								ZoneEz = GetCurrentScheduleValue( ZoneADEffSchPtr );
-							} else {
-								ZoneLoad = ZoneSysEnergyDemand( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum ).TotalOutputRequired;
-
-								// Zone in cooling mode
-								if ( ZoneLoad < 0.0 ) ZoneEz = VentilationMechanical( VentMechObjectNum ).ZoneADEffCooling( ZoneIndex );
-
-								// Zone in heating mode
-								if ( ZoneLoad > 0.0 ) ZoneEz = VentilationMechanical( VentMechObjectNum ).ZoneADEffHeating( ZoneIndex );
-							}
-							if ( ZoneEz <= 0.0 ) {
-								//Enforce defaults
-								ZoneEz = 1.0;
-							}
-
-							// Calc zone supply OA flow rate
-							if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_VRP ) {
-								// the VRP case
-								ZoneOA = ZoneOABZ / ZoneEz;
-
-							} else if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-								// Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
-								if ( Zone( ZoneNum ).ZoneContamControllerSchedIndex > 0.0 ) {
-									// Check the availability schedule value for ZoneControl:ContaminantController
-									ZoneContamControllerSched = GetCurrentScheduleValue( Zone( ZoneNum ).ZoneContamControllerSchedIndex );
-									if ( ZoneContamControllerSched > 0.0 ) {
-										ZoneOAMin = ZoneOAArea / ZoneEz;
-										ZoneOAMax = ( ZoneOAArea + ZoneOAPeople ) / ZoneEz;
-
-										if ( ZoneOAPeople > 0.0 ) {
-											if ( ZoneCO2GainFromPeople( ZoneNum ) > 0.0 ) {
-												if ( Zone( ZoneNum ).ZoneMinCO2SchedIndex > 0.0 ) {
-													// Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
-													// in the ZoneControl:ContaminantController
-													ZoneMinCO2 = GetCurrentScheduleValue( Zone( ZoneNum ).ZoneMinCO2SchedIndex );
-												} else {
-													ZoneMinCO2 = OutdoorCO2;
-												}
-
-												// Calculate zone maximum target CO2 concentration in PPM
-												if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-													ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
-												} else {
-													ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ZoneNum ) * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
-												}
-
-												if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
-													++VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount;
-													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
-														if ( VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount < 2 ) {
-															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
-															ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
-															ShowContinueErrorTimeStamp( "" );
-														} else {
-															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
-														}
-													}
-													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-														if ( VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount < 2 ) {
-															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
-															ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
-															ShowContinueErrorTimeStamp( "" );
-														} else {
-															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
-														}
-													}
-
-													ZoneOA = ZoneOABZ / ZoneEz;
-												} else {
-
-													if ( ZoneAirCO2( ZoneNum ) <= ZoneMinCO2 ) {
-														// Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow rate to
-														// minimum Zone OA flow rate when the zone is unoccupied
-														ZoneOA = ZoneOAMin;
-													} else if ( ZoneAirCO2( ZoneNum ) >= ZoneMaxCO2 ) {
-														// Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow rate to
-														// maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
-														ZoneOA = ZoneOAMax;
-													} else {
-														// Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
-														// set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
-														ZoneOA = ZoneOAMin + ( ZoneOAMax - ZoneOAMin ) * ( ( ZoneAirCO2( ZoneNum ) - ZoneMinCO2 ) / ( ZoneMaxCO2 - ZoneMinCO2 ) );
-													}
-												}
+									if ( ZoneOAPeople > 0.0 ) {
+										if ( ZoneCO2GainFromPeople( ZoneNum ) > 0.0 ) {
+											if ( Zone( ZoneNum ).ZoneMinCO2SchedIndex > 0.0 ) {
+												// Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
+												// in the ZoneControl:ContaminantController
+												ZoneMinCO2 = GetCurrentScheduleValue( Zone( ZoneNum ).ZoneMinCO2SchedIndex );
 											} else {
-												if ( DisplayExtraWarnings ) {
-													++VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount;
-													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
-														if ( VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount < 2 ) {
-															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
-															ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
-															ShowContinueErrorTimeStamp( "" );
-														} else {
-															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
-														}
-													}
-													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-														if ( VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount < 2 ) {
-															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
-															ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
-															ShowContinueErrorTimeStamp( "" );
-														} else {
-															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
-														}
+												ZoneMinCO2 = OutdoorCO2;
+											}
+
+											// Calculate zone maximum target CO2 concentration in PPM
+											if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+												ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+											} else {
+												ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ZoneNum ) * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+											}
+
+											if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
+												++thisMechVentController.CO2MaxMinLimitErrorCount;
+												if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
+													if ( thisMechVentController.CO2MaxMinLimitErrorCount < 2 ) {
+														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + thisMechVentController.Name + "\"." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+														ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueErrorTimeStamp( "" );
+													} else {
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + thisMechVentController.Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", thisMechVentController.CO2MaxMinLimitErrorIndex );
 													}
 												}
+												if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+													if ( thisMechVentController.CO2MaxMinLimitErrorCount < 2 ) {
+														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + thisMechVentController.Name + "\"." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+														ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueErrorTimeStamp( "" );
+													} else {
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + thisMechVentController.Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", thisMechVentController.CO2MaxMinLimitErrorIndex );
+													}
+												}
+
 												ZoneOA = ZoneOABZ / ZoneEz;
+											} else {
+
+												if ( ZoneAirCO2( ZoneNum ) <= ZoneMinCO2 ) {
+													// Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow rate to
+													// minimum Zone OA flow rate when the zone is unoccupied
+													ZoneOA = ZoneOAMin;
+												} else if ( ZoneAirCO2( ZoneNum ) >= ZoneMaxCO2 ) {
+													// Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow rate to
+													// maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
+													ZoneOA = ZoneOAMax;
+												} else {
+													// Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
+													// set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
+													ZoneOA = ZoneOAMin + ( ZoneOAMax - ZoneOAMin ) * ( ( ZoneAirCO2( ZoneNum ) - ZoneMinCO2 ) / ( ZoneMaxCO2 - ZoneMinCO2 ) );
+												}
 											}
 										} else {
-											// ZoneOAPeople is less than or equal to zero
+											if ( DisplayExtraWarnings ) {
+												++thisMechVentController.CO2GainErrorCount;
+												if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
+													if ( thisMechVentController.CO2GainErrorCount < 2 ) {
+														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + thisMechVentController.Name + "\"." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
+														ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueErrorTimeStamp( "" );
+													} else {
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + thisMechVentController.Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Error continues...", thisMechVentController.CO2GainErrorIndex );
+													}
+												}
+												if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+													if ( thisMechVentController.CO2GainErrorCount < 2 ) {
+														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + thisMechVentController.Name + "\"." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
+														ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueErrorTimeStamp( "" );
+													} else {
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + thisMechVentController.Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Error continues...", thisMechVentController.CO2GainErrorIndex );
+													}
+												}
+											}
 											ZoneOA = ZoneOABZ / ZoneEz;
 										}
 									} else {
-										// ZoneControl:ContaminantController is scheduled off (not available)
+										// ZoneOAPeople is less than or equal to zero
 										ZoneOA = ZoneOABZ / ZoneEz;
 									}
 								} else {
-									// "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
+									// ZoneControl:ContaminantController is scheduled off (not available)
 									ZoneOA = ZoneOABZ / ZoneEz;
 								}
-								SysOA = SysOA + ZoneOA;
-							}
-
-							// Get the zone supply air flow rate
-							ZoneSA = 0.0;
-							ZonePA = 0.0;
-							Ep = 1.0;
-							if ( ZoneEquipConfigNum > 0 ) {
-								for ( InNodeIndex = 1; InNodeIndex <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++InNodeIndex ) {
-									// Assume primary air is always stored at the AirDistUnitCool (cooling deck if dual duct)
-									PriNode = ZoneEquipConfig( ZoneEquipConfigNum ).AirDistUnitCool( InNodeIndex ).InNode;
-									if ( PriNode > 0 ) {
-										NodeTemp = Node( PriNode ).Temp;
-										NodeHumRat = Node( PriNode ).HumRat;
-										MassFlowRate = Node( PriNode ).MassFlowRate;
-									} else {
-										MassFlowRate = 0.0;
-									}
-									// total primary air to terminal units of the zone
-									if ( MassFlowRate > 0.0 ) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
-
-									// or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
-									InletNode = ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( InNodeIndex );
-									if ( InletNode > 0 ) {
-										NodeTemp = Node( InletNode ).Temp;
-										NodeHumRat = Node( InletNode ).HumRat; // ZoneAirHumRat(ZoneNum)
-										MassFlowRate = Node( InletNode ).MassFlowRate;
-									} else {
-										MassFlowRate = 0.0;
-									}
-									// total supply air to the zone
-									if ( MassFlowRate > 0.0 ) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
-								}
-
-								// calc zone primary air fraction
-								if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
-								if ( Ep > 1.0 ) Ep = 1.0;
-							}
-
-							// Calc the zone OA fraction = Zone OA flow rate / Zone supply air flow rate
-							if ( ZoneSA > 0.0 ) {
-								ZoneOAFrac = ZoneOA / ZoneSA;
-								// Zone OA fraction cannot be more than 1
-								if ( ZoneOAFrac > 1.0 ) ZoneOAFrac = 1.0;
 							} else {
-								ZoneOAFrac = 0.0;
+								// "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
+								ZoneOA = ZoneOABZ / ZoneEz;
 							}
-
-							// added for TRACE - zone maximum OA fraction - calculate the adjustment factor for the TU/zone supply air flow
-							// only for VRP system OA method
-							ZoneSysEnergyDemand( ZoneEquipConfigNum ).SupplyAirAdjustFactor = 1.0;
-
-							if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_VRP ) {
-								if ( ZoneOAFrac > VentilationMechanical( VentMechObjectNum ).ZoneMaxOAFraction ) {
-									if ( VentilationMechanical( VentMechObjectNum ).ZoneMaxOAFraction > 0.0 ) {
-										ZoneSysEnergyDemand( ZoneEquipConfigNum ).SupplyAirAdjustFactor = ZoneOAFrac / VentilationMechanical( VentMechObjectNum ).ZoneMaxOAFraction;
-									} else {
-										ZoneSysEnergyDemand( ZoneEquipConfigNum ).SupplyAirAdjustFactor = 1.0;
-									}
-
-									// cap zone OA fraction at the maximum specified
-									ZoneOAFrac = VentilationMechanical( VentMechObjectNum ).ZoneMaxOAFraction;
-								}
-							}
-
-							// Zone air secondary recirculation fraction
-							Er = VentilationMechanical( VentMechObjectNum ).ZoneSecondaryRecirculation( ZoneIndex );
-							if ( Er > 0.0 ) {
-								// multi-path ventilation system using VRP
-								Fa = Ep + ( 1.0 - Ep ) * Er;
-								Fb = Ep;
-								Fc = 1.0 - ( 1.0 - ZoneEz ) * ( 1.0 - Er ) * ( 1.0 - Ep );
-
-								// Calc zone ventilation efficiency
-								if ( Fa > 0.0 ) {
-									Evz = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
-								} else {
-									Evz = 1.0;
-								}
-							} else {
-								// single-path ventilation system
-								Evz = 1.0 + Xs - ZoneOAFrac;
-							}
-
-							// calc system ventilation efficiency = Minimum of zone ventilation efficiency
-							if ( Evz < 0.0 ) Evz = 0.0;
-							if ( Evz < SysEv ) SysEv = Evz;
-
-						} // zone loop
-
-						// Calc the system supply OA flow rate counting the system ventilation efficiency
-						if ( SysEv <= 0.0 ) SysEv = 1.0;
-
-						// Calc system outdoor air requirement
-						if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-							SysOA = SysOA / SysEv;
-						} else {
-							SysOA = SysOAuc / SysEv;
+							SysOA = SysOA + ZoneOA;
 						}
-					}
 
-					// Finally calc the system supply OA mass flow rate
-					MechVentOutsideAirFlow = SysOA * StdRhoAir;
+						// Get the zone supply air flow rate
+						ZoneSA = 0.0;
+						ZonePA = 0.0;
+						Ep = 1.0;
+						if ( ZoneEquipConfigNum > 0 ) {
+							for ( InNodeIndex = 1; InNodeIndex <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++InNodeIndex ) {
+								// Assume primary air is always stored at the AirDistUnitCool (cooling deck if dual duct)
+								PriNode = ZoneEquipConfig( ZoneEquipConfigNum ).AirDistUnitCool( InNodeIndex ).InNode;
+								if ( PriNode > 0 ) {
+									NodeTemp = Node( PriNode ).Temp;
+									NodeHumRat = Node( PriNode ).HumRat;
+									MassFlowRate = Node( PriNode ).MassFlowRate;
+								} else {
+									MassFlowRate = 0.0;
+								}
+								// total primary air to terminal units of the zone
+								if ( MassFlowRate > 0.0 ) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
+
+								// or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
+								InletNode = ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( InNodeIndex );
+								if ( InletNode > 0 ) {
+									NodeTemp = Node( InletNode ).Temp;
+									NodeHumRat = Node( InletNode ).HumRat; // ZoneAirHumRat(ZoneNum)
+									MassFlowRate = Node( InletNode ).MassFlowRate;
+								} else {
+									MassFlowRate = 0.0;
+								}
+								// total supply air to the zone
+								if ( MassFlowRate > 0.0 ) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
+							}
+
+							// calc zone primary air fraction
+							if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
+							if ( Ep > 1.0 ) Ep = 1.0;
+						}
+
+						// Calc the zone OA fraction = Zone OA flow rate / Zone supply air flow rate
+						if ( ZoneSA > 0.0 ) {
+							ZoneOAFrac = ZoneOA / ZoneSA;
+							// Zone OA fraction cannot be more than 1
+							if ( ZoneOAFrac > 1.0 ) ZoneOAFrac = 1.0;
+						} else {
+							ZoneOAFrac = 0.0;
+						}
+
+						// added for TRACE - zone maximum OA fraction - calculate the adjustment factor for the TU/zone supply air flow
+						// only for VRP system OA method
+						ZoneSysEnergyDemand( ZoneEquipConfigNum ).SupplyAirAdjustFactor = 1.0;
+
+						if ( thisMechVentController.SystemOAMethod == SOAM_VRP ) {
+							if ( ZoneOAFrac > thisMechVentController.ZoneMaxOAFraction ) {
+								if ( thisMechVentController.ZoneMaxOAFraction > 0.0 ) {
+									ZoneSysEnergyDemand( ZoneEquipConfigNum ).SupplyAirAdjustFactor = ZoneOAFrac / thisMechVentController.ZoneMaxOAFraction;
+								} else {
+									ZoneSysEnergyDemand( ZoneEquipConfigNum ).SupplyAirAdjustFactor = 1.0;
+								}
+
+								// cap zone OA fraction at the maximum specified
+								ZoneOAFrac = thisMechVentController.ZoneMaxOAFraction;
+							}
+						}
+
+						// Zone air secondary recirculation fraction
+						Er = thisMechVentController.ZoneSecondaryRecirculation( ZoneIndex );
+						if ( Er > 0.0 ) {
+							// multi-path ventilation system using VRP
+							Fa = Ep + ( 1.0 - Ep ) * Er;
+							Fb = Ep;
+							Fc = 1.0 - ( 1.0 - ZoneEz ) * ( 1.0 - Er ) * ( 1.0 - Ep );
+
+							// Calc zone ventilation efficiency
+							if ( Fa > 0.0 ) {
+								Evz = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+							} else {
+								Evz = 1.0;
+							}
+						} else {
+							// single-path ventilation system
+							Evz = 1.0 + Xs - ZoneOAFrac;
+						}
+
+						// calc system ventilation efficiency = Minimum of zone ventilation efficiency
+						if ( Evz < 0.0 ) Evz = 0.0;
+						if ( Evz < SysEv ) SysEv = Evz;
+
+					} // zone loop
+
+					// Calc the system supply OA flow rate counting the system ventilation efficiency
+					if ( SysEv <= 0.0 ) SysEv = 1.0;
+
+					// Calc system outdoor air requirement
+					if ( thisMechVentController.SystemOAMethod == SOAM_ProportionalControlSchOcc || thisMechVentController.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+						SysOA = SysOA / SysEv;
+					} else {
+						SysOA = SysOAuc / SysEv;
+					}
 				}
 
-				MechVentOutsideAirMinFrac = MechVentOutsideAirFlow / AirLoopFlow( AirLoopNum ).DesSupply;
-			} else {
-				MechVentOutsideAirMinFrac = 0.0;
-				MechVentOutsideAirFlow = 0.0;
+				// Finally calc the system supply OA mass flow rate
+				MechVentOutsideAirFlow = SysOA * StdRhoAir;
 			}
 
-			if ( AirLoopFlow( AirLoopNum ).FanPLR > 0.0 ) {
-				MechVentOutsideAirMinFrac *= AirLoopFlow( AirLoopNum ).FanPLR;
-				MechVentOutsideAirFlow *= AirLoopFlow( AirLoopNum ).FanPLR;
-			}
+		} else {
+			MechVentOutsideAirFlow = 0.0;
 		}
+
 	}
+
 	void
 	CalcOAMixer( int const OAMixerNum )
 	{
