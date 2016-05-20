@@ -19538,7 +19538,6 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Coil ChW Branch')
     !store for later in the chilled water loop
     CALL AddToStrList(TRIM(FldVal(base + cvsAirHandlerNameOff)) // ' Cooling Coil ChW Branch', handleCoolingCoilBranch)
-    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
     CALL AddToObjStr('Pressure Drop Curve Name','')
     IF ((coolCoilKind .EQ. ccChWater) .OR. (coolCoilKind .EQ. ccWaterCoilSystemHX)) THEN
       CALL AddToObjStr('Component Object Type','Coil:Cooling:Water')
@@ -29649,6 +29648,7 @@ DO iZone = 1, numCompactWaterAirHP
   END IF
   CALL AddToObjFld('Fan Efficiency', base + wahpFanTotEfficiencyOff,'')
   CALL AddToObjFld('Pressure Rise {Pa}', base + wahpFanPressureOff,'')
+  CALL AddToObjStr('Maximum Flow Rate {m3/s}','autosize')
   CALL AddToObjFld('Motor Efficiency', base + wahpFanMotorEfficiencyOff,'')
   CALL AddToObjStr('Motor in Airstream Fraction','1')
   IF (isDrawThru) THEN
