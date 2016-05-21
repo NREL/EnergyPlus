@@ -1875,7 +1875,6 @@ namespace FanCoilUnits {
 		Real64 AirMassFlow; // air mass flow rate [kg/sec]
 		Real64 QUnitOutNoHC; // unit output with no active heating or cooling [W]
 		Real64 QUnitOutMaxC; // unit output with full active cooling [W]
-		Real64 midQUnitOutMaxC; // lower output with 10% of cooling flow rate [W]
 		Real64 QUnitOutMaxH; // unit output with full active heating [W]
 		Real64 QCoilHeatSP; // coil load to the heating setpoint [W]
 		Real64 QCoilCoolSP; // coil load to the cooling setpoint [W]

@@ -2127,12 +2127,10 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, Test_TightenWaterFlowLimits ) {
 
 		int FanCoilNum( 1 );
-		int ZoneNum( 1 );
 		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
-		Real64 QZnReq( 1000.0 );
-		Real64 QUnitOut( 0.0 );
-
+		Real64 QZnReq( -1000.0 );
+		DataPlant::TotNumLoops = 2;
 		DataEnvironment::OutBaroPress = 101325.0;
 		DataEnvironment::StdRhoAir = 1.20;
 		WaterCoils::GetWaterCoilsInputFlag = true;
@@ -2155,7 +2153,7 @@ namespace EnergyPlus {
 			"   NodeList, Zone1Inlets, Zone1FCAirOut;",
 			"	NodeList, Zone1Exhausts, Zone1FCAirIn;",
 			"	Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, Zone1FCFanOut, Zone1FCCCOut, SimpleAnalysis, CrossFlow;",
-			"	Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FClAirOut, UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
+			"	Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
 
 			"	ZoneHVAC:FourPipeFanCoil,",
 			"	Zone1FanCoil, !- Name",
@@ -2196,17 +2194,114 @@ namespace EnergyPlus {
 		SetPredefinedTables();
 		GetFanInput();
 		GetFanCoilUnits();
+
+		PlantLoop.allocate( TotNumLoops );
+		for( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+
+		WaterCoil( 2 ).WaterLoopNum = 1;
+		WaterCoil( 2 ).WaterLoopSide = 1;
+		WaterCoil( 2 ).WaterLoopBranchNum = 1;
+		WaterCoil( 2 ).WaterLoopCompNum = 1;
+
+		WaterCoil( 1 ).WaterLoopNum = 2;
+		WaterCoil( 1 ).WaterLoopSide = 1;
+		WaterCoil( 1 ).WaterLoopBranchNum = 1;
+		WaterCoil( 1 ).WaterLoopCompNum = 1;
+
+		PlantLoop( 2 ).Name = "ChilledWaterLoop";
+		PlantLoop( 2 ).FluidName = "ChilledWater";
+		PlantLoop( 2 ).FluidIndex = 1;
+		PlantLoop( 2 ).FluidName = "WATER";
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = WaterCoil( 2 ).Name;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_Cooling;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 2 ).WaterInletNodeNum;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = WaterCoil( 2 ).WaterOutletNodeNum;
+
+		PlantLoop( 1 ).Name = "HotWaterLoop";
+		PlantLoop( 1 ).FluidName = "HotWater";
+		PlantLoop( 1 ).FluidIndex = 1;
+		PlantLoop( 1 ).FluidName = "WATER";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = WaterCoil( 1 ).Name;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_SimpleHeating;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = WaterCoil( 1 ).WaterOutletNodeNum;
+
 		bool CoolingLoad = true;
 		bool HeatingLoad = false;
 		int ControlledZoneNum = 1;
 		Real64 MinWaterFlow = 0.0;
 		Real64 MaxWaterFlow = 1.5;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = 1.0;
+		Node( FanCoil( FanCoilNum ).AirInNode ).Temp = 24.0;
+		Node( FanCoil( FanCoilNum ).AirInNode ).HumRat = 0.00946;
+		Node( FanCoil( FanCoilNum ).AirInNode ).Enthalpy = 48228.946;
+		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = 0.719999999;
+		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMax = 0.719999999;
+		Node( 6 ).MassFlowRateMaxAvail = 0.6;
+		Node( 5 ).MassFlowRateMaxAvail = 0.6;
 		FanCoil( FanCoilNum ).CCoilName_Index = 2;
+		DataGlobals::BeginEnvrnFlag = true;
+		DataHVACGlobals::ZoneCompTurnFansOn = true; // turn on fan coil unit fan with global instead of using the fan avail schedule
+		DataEnvironment::DayOfYear_Schedule = 1;
+		DataEnvironment::DayOfWeek = 2;
+		DataGlobals::HourOfDay = 1;
+		ProcessScheduleInput();
+		UpdateScheduleValues();
 
+		// fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
+		// When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
+		// This routine is only called when RegulaFalsi returns -1
+		
+		// example usage of function
+		// if( SolFlag == -1 ) {
+		// tighten limits on water flow rate to see if this allows convergence
+		//	CoolingLoad = true;
+		//	HeatingLoad = false;
+		//	TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+
+		// run once to set up fan coil data
 		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
-		EXPECT_EQ( MinWaterFlow, 0.0 );
-		EXPECT_NEAR( MaxWaterFlow, 0.000015, 0.0000001 );
+
+		//full output of fan coil is around -7178 W, MinWaterFlow should be set to 0.15
+		MinWaterFlow = 0.0;
+		MaxWaterFlow = 1.5;
+		QZnReq = -8000.0;
+		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+		EXPECT_NEAR( MinWaterFlow, 0.15, 0.0000001 );
+		EXPECT_NEAR( MaxWaterFlow, 1.50, 0.0000001 );
+
+		// lower output of fan coil is around -715 W, MaxWaterFlow should be 10% of 1.5 = 0.15 and MinWaterFlow should be 1% = 0.015
+		MinWaterFlow = 0.0;
+		MaxWaterFlow = 1.5;
+		QZnReq = -800.0;
+		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+		EXPECT_NEAR( MinWaterFlow, 0.015, 0.0000001 );
+		EXPECT_NEAR( MaxWaterFlow, 0.150, 0.0000001 );
+
+		// lower output of fan coil is around 30 W, MaxWaterFlow should be 1% of 1.5 = 0.015 and MinWaterFlow should be 0.1% = 0.0015
+		MinWaterFlow = 0.0;
+		MaxWaterFlow = 1.5;
+		QZnReq = -10.0;
+		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+		EXPECT_NEAR( MinWaterFlow, 0.0015, 0.0000001 );
+		EXPECT_NEAR( MaxWaterFlow, 0.0150, 0.0000001 );
+
+		// lower output of fan coil is around 105 W, MaxWaterFlow should be 0.1% of 1.5 = 0.0015 and MinWaterFlow should be 0.01% = 0.00015
+		MinWaterFlow = 0.0;
+		MaxWaterFlow = 1.5;
+		QZnReq = 40.0;
+		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+		EXPECT_NEAR( MinWaterFlow, 0.00015, 0.0000001 );
+		EXPECT_NEAR( MaxWaterFlow, 0.00150, 0.0000001 );
+
 
 	}
 
