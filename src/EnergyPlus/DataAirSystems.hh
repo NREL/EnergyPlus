@@ -167,10 +167,6 @@ namespace DataAirSystems {
 		// Members
 		std::string Name; // Name of the branch
 		std::string ControlType; // Control type for the branch (not used)
-		Real64 MinVolFlowRate; // minimum flow rate for the branch (m3/s)
-		Real64 MaxVolFlowRate; // maximum flow rate for the branch (m3/s)
-		Real64 MinMassFlowRate; // minimum mass flow rate for the branch (kg/s)
-		Real64 MaxMassFlowRate; // maximum mass flow rate for the branch (kg/s)
 		int TotalComponents; // Total number of high level components on the branch
 		Array1D_int FirstCompIndex; // Gives the component index in AllComp that corresponds to Comp
 		Array1D_int LastCompIndex; // Gives comp index in AllComp that corresponds to last subcomponent
@@ -186,10 +182,6 @@ namespace DataAirSystems {
 
 		// Default Constructor
 		AirLoopBranchData() :
-			MinVolFlowRate( 0.0 ),
-			MaxVolFlowRate( 0.0 ),
-			MinMassFlowRate( 0.0 ),
-			MaxMassFlowRate( 0.0 ),
 			TotalComponents( 0 ),
 			NodeNumIn( 0 ),
 			NodeNumOut( 0 ),

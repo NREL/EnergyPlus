@@ -1351,7 +1351,7 @@
     TRoo;                    !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-    Shade_Signal,            !- Name
+    yShadeEP,            !- Name
     ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     yShade,                  !- FMU Variable Name
@@ -1359,13 +1359,13 @@
 
 ! EMS program. The first assignments sets the shading status and converts it into the
 !              EnergyPlus signal (i.e., replace 1 by 6).
-!              The second assignment sets yShade to
+!              The second assignment sets yShadeEP to
 !              an EnergyManagementSystem:OutputVariable
 !              which will be read by the external interface.
 
   EnergyManagementSystem:Program,
     Set_Shade_Control_State, !- Name
-    Set Shade_Signal = 6*yShade,  !- Program Line 1
+    Set Shade_Signal = 6*yShadeEP,  !- Program Line 1
     Set Shade_Signal = @MIN 6 Shade_Signal,  !- Program Line 2
     Set Shade_Signal_01 = Shade_Signal+0.1;  !- <none>
 

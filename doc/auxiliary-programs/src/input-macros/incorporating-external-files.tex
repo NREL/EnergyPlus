@@ -28,22 +28,22 @@ Overrides the listing suppression of \textbf{\#\#includesilent}. Used for debugg
 
 Example: Assume the following files contain the indicated lines:
 
-\begin{longtable}[c]{@{}lll@{}}
+\begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Main input file: & First external file: & Second external file: \tabularnewline
+Main input file: & External file: \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Main input file: & First external file: & Second external file: \tabularnewline
+Main input file: & External file: \tabularnewline
 \midrule
 \endhead
 
-input1.inp & file2.inp & file3.inp \tabularnewline
-line 1a & line 2a & line 3a \tabularnewline
-\#\#include file2.inp & line 2b & line 3b \tabularnewline
-line 1b & \#\#include file3.inp & line 3c \tabularnewline
-line 1c & line 2c & line 3d \tabularnewline
+input1.inp & file2.inp \tabularnewline
+line 1a & line 2a \tabularnewline
+\#\#include file2.inp & line 2b \tabularnewline
+line 1b & line 2c \tabularnewline
+line 1c &  \tabularnewline
 \bottomrule
 \end{longtable}
 
