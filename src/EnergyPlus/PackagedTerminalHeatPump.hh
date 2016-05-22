@@ -273,6 +273,7 @@ namespace PackagedTerminalHeatPump {
 		int ErrIndexVar;
 		int ZonePtr; // pointer to a zone served by a fancoil unit
 		int HVACSizingIndex; // index of a HVACSizing object for a fancoil unit
+		bool FirstPass; // used to reset sizing flags
 
 		// end of the additional variables for variable speed water source heat pump
 
@@ -397,7 +398,8 @@ namespace PackagedTerminalHeatPump {
 			ErrIndexCyc( 0 ),
 			ErrIndexVar( 0 ),
 			ZonePtr(0),
-			HVACSizingIndex(0)
+			HVACSizingIndex(0),
+			FirstPass( true )
 		{}
 
 	};

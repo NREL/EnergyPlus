@@ -3825,20 +3825,17 @@ namespace PackagedTerminalHeatPump {
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
 				if( PTUnit( PTUnitNum ).useVSCoilModel ) {
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = TempSize;
-					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, 0.0, 1, 0.0, 0.0, 0.0, 1.0 );
-					TempSize = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, ErrorsFound );
-					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = TempSize;
-					TempSize = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, ErrorsFound );
 					ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+					TempSize = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
 				}
 				PrintFlag = true;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
 				PTUnit( PTUnitNum ).MaxCoolAirVolFlow = TempSize;
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
 
 				PrintFlag = false;
 				SizingMethod = HeatingAirflowSizing;
@@ -3846,20 +3843,17 @@ namespace PackagedTerminalHeatPump {
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
 				if( PTUnit( PTUnitNum ).useVSCoilModel ) {
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = TempSize;
-					ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
 					SimVariableSpeedCoils( PTUnit( PTUnitNum ).DXHeatCoilName, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, 0.0, 1, 0.0, 0.0, 0.0, 1.0 );
-					TempSize = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
-					ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = TempSize;
-					TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
 					ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
+					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+					TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
 				}
 				PrintFlag = true;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
 				PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
 
 				SizingMethod = SystemAirflowSizing;
 				FieldNum = 3; //N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
@@ -5073,6 +5067,25 @@ namespace PackagedTerminalHeatPump {
 		PTUnit( PTUnitNum ).LatCoolEnergy = PTUnit( PTUnitNum ).LatCoolEnergyRate * ReportingConstant;
 		PTUnit( PTUnitNum ).LatHeatEnergy = PTUnit( PTUnitNum ).LatHeatEnergyRate * ReportingConstant;
 		PTUnit( PTUnitNum ).ElecConsumption = PTUnit( PTUnitNum ).ElecPower * ReportingConstant;
+
+		if ( PTUnit( PTUnitNum ).FirstPass ) { // reset sizing flags so other zone equipment can size normally
+
+			if( !SysSizingCalc ) {
+
+				if ( CurZoneEqNum > 0 ) {
+					ZoneEqSizing( CurZoneEqNum ).AirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).Capacity = false;
+					ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
+				}
+				PTUnit( PTUnitNum ).FirstPass = false;
+
+			}
+
+		}
 
 	}
 
