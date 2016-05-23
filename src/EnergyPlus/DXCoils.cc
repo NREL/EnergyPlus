@@ -5546,11 +5546,13 @@ namespace DXCoils {
 		if ( CrankcaseHeaterReportVarFlag ) {
 			if ( AirLoopInputsFilled ) {
 				//     Set report variables for DX cooling coils that will have a crankcase heater (all DX coils not used in a HP AC unit)
-				for ( DXCoilNumTemp = 1; DXCoilNumTemp <= NumDoe2DXCoils + NumDXMulModeCoils; ++DXCoilNumTemp ) {
-					if ( DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower ) {
-						SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNumTemp ).Name );
-						SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNumTemp ).Name, _, "Electric", "COOLING", _, "Plant" );
-						DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower = false;
+				for ( DXCoilNumTemp = 1; DXCoilNumTemp <= NumDXCoils; ++DXCoilNumTemp ) {
+					if ( ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) || ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_CoolingSingleSpeed ) || ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
+						if ( DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower ) {
+							SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNumTemp ).Name );
+							SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNumTemp ).Name, _, "Electric", "COOLING", _, "Plant" );
+							DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower = false;
+						}
 					}
 				}
 				CrankcaseHeaterReportVarFlag = false;
