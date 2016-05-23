@@ -4508,8 +4508,6 @@ namespace SingleDuct {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 4;
 			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:VARIABLEREFRIGERANTFLOW" ) {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 5;
-			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:ENERGYRECOVERYVENTILATOR" ) {
-				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 6;
 			}
 
 			SysATMixer( ATMixerNum ).ZoneHVACUnitName = cAlphaArgs( 3 );
@@ -5103,7 +5101,7 @@ namespace SingleDuct {
 		) {
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine gets the mixed connection type
+		// This subroutine gets the mixer connection type
 
 		// METHODOLOGY EMPLOYED:
 		// na

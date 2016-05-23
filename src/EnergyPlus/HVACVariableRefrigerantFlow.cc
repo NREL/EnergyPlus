@@ -4551,6 +4551,7 @@ namespace HVACVariableRefrigerantFlow {
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
+		int ZoneNum; // current controlled zone index
 		bool UseOccSchFlag; // flag to use occupancy schedule when calculating OA
 		bool UseMinOASchFlag; // flag to use min OA schedule when calculating OA
 
@@ -4963,11 +4964,12 @@ namespace HVACVariableRefrigerantFlow {
 			if ( CurZoneEqNum > 0 ) {
 				if ( VRFTU( VRFTUNum ).ATMixerExists ) {
 					// determine minimum outdoor air flow rate for sizing
-					DSOAPtr = FinalZoneSizing( DataZoneNumber ).ZoneDesignSpecOAIndex;
+					ZoneNum = VRFTU( VRFTUNum ).ZoneNum;
+					DSOAPtr = FinalZoneSizing( ZoneNum ).ZoneDesignSpecOAIndex;
 					if ( DSOAPtr > 0 ) {
 						UseOccSchFlag = true;
 						UseMinOASchFlag = true;
-						ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, DataZoneNumber, UseOccSchFlag, UseMinOASchFlag );
+						ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag );
 					}
 				} else if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow > 0.0 || VRFTU( VRFTUNum ).HeatOutAirVolFlow > 0.0 ) {
 					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( VRFTU( VRFTUNum ).CoolOutAirVolFlow, VRFTU( VRFTUNum ).HeatOutAirVolFlow );
@@ -5718,7 +5720,7 @@ namespace HVACVariableRefrigerantFlow {
 				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
 			}
 		} else {
-			ATMixOutNode = 0;
+			//ATMixOutNode = 0;
 			if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
 		}
 		// if blow through, simulate fan then coils
@@ -7013,6 +7015,7 @@ namespace HVACVariableRefrigerantFlow {
 		using HVACVariableRefrigerantFlow::VRFTU;
 		using MixedAir::SimOAMixer;
 		using Psychrometrics::PsyHFnTdbW;
+		using SingleDuct::SimATMixer;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -7111,12 +7114,11 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
 			SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, false, VRFTU( VRFTUNum ).OAMixerIndex );
 
-			OAMixerNum = FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );
+			OAMixerNum = FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );  // this is not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
 			OAMixNode = OAMixer( OAMixerNum ).MixNode;
 			T_coil_in = Node( OAMixNode ).Temp;
 			W_coil_in = Node( OAMixNode ).HumRat;
 		}
-
 		// Simulate the blow-through fan if there is any
 		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
 			SimulateFanComponents( "", false, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
@@ -9171,6 +9173,7 @@ namespace HVACVariableRefrigerantFlow {
 		using MixedAir::SimOAMixer;
 		using MixedAir::OAMixer;
 		using Psychrometrics::PsyHFnTdbW;
+		using SingleDuct::SimATMixer;
 
 		// REFERENCES:
 		// na
@@ -9257,12 +9260,11 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
 			SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
 
-			OAMixerNum = FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );
+			OAMixerNum = FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );  // this not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
 			OAMixNode = OAMixer( OAMixerNum ).MixNode;
 			Tin = Node( OAMixNode ).Temp;
 			Win = Node( OAMixNode ).HumRat;
 		}
-
 		// Simulate the blow-through fan if there is any
 		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
 			SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );

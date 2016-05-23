@@ -3700,6 +3700,7 @@ namespace PackagedTerminalHeatPump {
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
+		int ZoneNum; // current controlled zone index
 		bool UseOccSchFlag; // flag to use occupancy schedule when calculating OA
 		bool UseMinOASchFlag; // flag to use min OA schedule when calculating OA
 
@@ -4074,11 +4075,12 @@ namespace PackagedTerminalHeatPump {
 		if ( CurZoneEqNum > 0 ) {
 			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
 				// determine minimum outdoor air flow rate for DX coil sizing
-				DSOAPtr = FinalZoneSizing( DataZoneNumber ).ZoneDesignSpecOAIndex;
+				ZoneNum = PTUnit( PTUnitNum ).CtrlZoneNum;
+				DSOAPtr = FinalZoneSizing( ZoneNum ).ZoneDesignSpecOAIndex;
 				if ( DSOAPtr > 0 ) {
 					UseOccSchFlag = true;
 					UseMinOASchFlag = true;
-					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, DataZoneNumber, UseOccSchFlag, UseMinOASchFlag );
+					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag );
 				}
 			} else {
 				ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
@@ -6330,7 +6332,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( PTUnit( PTUnitNum ).ATMixerPriNode ).MassFlowRate = min( Node( PTUnit( PTUnitNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRate );
-				// now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
+				// now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
 				// the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
 				SimATMixer( PTUnit( PTUnitNum ).ATMixerName, FirstHVACIteration, PTUnit( PTUnitNum ).ATMixerIndex );
 			}
