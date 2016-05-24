@@ -365,7 +365,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -695,7 +694,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -1031,7 +1029,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -1447,7 +1444,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -1866,7 +1862,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -1876,7 +1871,6 @@ namespace EnergyPlus {
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOutVRFTU( 0.0 );
 		Real64 QZnReq( 0.0 );
-		int ZoneNum( 1 );
 		int VRFNum( 1 );
 		int VRFTUNum( 1 );
 
@@ -2545,7 +2539,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -2556,7 +2549,6 @@ namespace EnergyPlus {
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOutVRFTU( 0.0 );
 		Real64 QZnReq( 0.0 );
-		int ZoneNum( 1 );
 		int VRFNum( 1 );
 		int VRFTUNum( 1 );
 
@@ -3226,7 +3218,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -3236,7 +3227,6 @@ namespace EnergyPlus {
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOutVRFTU( 0.0 );
 		Real64 QZnReq( 0.0 );
-		int ZoneNum( 1 );
 		int VRFNum( 1 );
 		int VRFTUNum( 1 );
 
@@ -4984,7 +4974,6 @@ namespace EnergyPlus {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		bool HXUnitOn( false );
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -4995,7 +4984,6 @@ namespace EnergyPlus {
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOutVRFTU( 0.0 );
 		Real64 QZnReq( 0.0 );
-		int ZoneNum( 1 );
 		int VRFNum( 1 );
 		int VRFTUNum( 1 );
 
