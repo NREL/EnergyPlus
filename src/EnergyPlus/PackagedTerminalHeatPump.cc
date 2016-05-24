@@ -2013,6 +2013,7 @@ namespace PackagedTerminalHeatPump {
 				} else {
 					errFlag = false;
 					PTUnit( PTUnitNum ).DXHeatCoilIndex = GetCoilIndexVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
+					PTUnit( PTUnitNum ).DXHeatCoilIndexNum = PTUnit( PTUnitNum ).DXHeatCoilIndex;
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -3842,7 +3843,7 @@ namespace PackagedTerminalHeatPump {
 				FieldNum = 2; //N2, \field Supply Air Flow Rate During Heating Operation
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
-				if( PTUnit( PTUnitNum ).useVSCoilModel ) {
+				if( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).DXHeatCoilIndexNum > 0 ) {
 					SimVariableSpeedCoils( PTUnit( PTUnitNum ).DXHeatCoilName, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, 0.0, 1, 0.0, 0.0, 0.0, 1.0 );
 					ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = GetCoilAirFlowRateVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
