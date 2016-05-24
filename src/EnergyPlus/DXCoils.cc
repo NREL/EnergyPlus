@@ -5559,19 +5559,6 @@ namespace DXCoils {
 			} //(AirLoopInputsFilled)THEN
 		} //(CrankcaseHeaterReportVarFlag)THEN
 
-		// Find the companion upstream coil (DX cooling coil) that is used with DX heating coils (Multispeed HP units only)
-		if ( DXCoil( DXCoilNum ).FindCompanionUpStreamCoil ) {
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
-				DXCoil( DXCoilNum ).CompanionUpstreamDXCoil = GetHPCoolingCoilIndex( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoilNum );
-				if ( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil > 0 ) {
-					DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).ReportCoolingCoilCrankcasePower = false;
-					DXCoil( DXCoilNum ).FindCompanionUpStreamCoil = false;
-				}
-			} else {
-				DXCoil( DXCoilNum ).FindCompanionUpStreamCoil = false;
-			}
-		} //IF(DXCoil(DXCoilNum)%FindCompanionUpStreamCoil)THEN
-
 		if ( ! SysSizingCalc && MySizeFlag( DXCoilNum ) ) {
 			// for each coil, do the sizing once.
 			SizeDXCoil( DXCoilNum );
