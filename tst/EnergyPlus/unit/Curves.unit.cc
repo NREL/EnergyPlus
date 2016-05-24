@@ -96,6 +96,7 @@ TEST_F(EnergyPlusFixture, Curves_Linear) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -134,6 +135,7 @@ TEST_F(EnergyPlusFixture, Curves_Linear) {
 	EXPECT_DOUBLE_EQ(24.0, CurveManager::CurveValue(2, 5)); // Value too large
 	EXPECT_DOUBLE_EQ(18.0, CurveManager::CurveValue(2, 2)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_Quadratic) {
@@ -167,6 +169,7 @@ TEST_F(EnergyPlusFixture, Curves_Quadratic) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUADRATIC", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -205,6 +208,7 @@ TEST_F(EnergyPlusFixture, Curves_Quadratic) {
 	EXPECT_DOUBLE_EQ(100.0, CurveManager::CurveValue(2, -100)); // Value too large
 	EXPECT_DOUBLE_EQ(14.0, CurveManager::CurveValue(2, 1)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_Cubic) {
@@ -240,6 +244,7 @@ TEST_F(EnergyPlusFixture, Curves_Cubic) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("CUBIC", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -278,6 +283,7 @@ TEST_F(EnergyPlusFixture, Curves_Cubic) {
 	EXPECT_DOUBLE_EQ(9.0, CurveManager::CurveValue(2, 1)); // Value too large
 	EXPECT_DOUBLE_EQ(6.125, CurveManager::CurveValue(2, 0.5)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_Exponent) {
@@ -311,6 +317,7 @@ TEST_F(EnergyPlusFixture, Curves_Exponent) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -349,6 +356,7 @@ TEST_F(EnergyPlusFixture, Curves_Exponent) {
 	EXPECT_DOUBLE_EQ(10.0, CurveManager::CurveValue(2, 2)); // Value too large
 	EXPECT_DOUBLE_EQ(6.0, CurveManager::CurveValue(2, 1)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_ExponentialDecay) {
@@ -382,6 +390,7 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialDecay) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("EXPONENTIALDECAY", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -420,6 +429,7 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialDecay) {
 	EXPECT_DOUBLE_EQ(10.0, CurveManager::CurveValue(2, 1)); // Value too large
 	EXPECT_DOUBLE_EQ(6.0, CurveManager::CurveValue(2, 0)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_DoubleExponentialDecay) {
@@ -457,6 +467,7 @@ TEST_F(EnergyPlusFixture, Curves_DoubleExponentialDecay) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("DOUBLEEXPONENTIALDECAY", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -494,6 +505,8 @@ TEST_F(EnergyPlusFixture, Curves_DoubleExponentialDecay) {
 	EXPECT_DOUBLE_EQ(6.0, CurveManager::CurveValue(2, -1)); // Value too small
 	EXPECT_DOUBLE_EQ(10.0, CurveManager::CurveValue(2, 1)); // Value too large
 	EXPECT_DOUBLE_EQ(8.0, CurveManager::CurveValue(2, 0)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_Sigmoid) {
@@ -531,6 +544,7 @@ TEST_F(EnergyPlusFixture, Curves_Sigmoid) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("SIGMOID", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -568,6 +582,8 @@ TEST_F(EnergyPlusFixture, Curves_Sigmoid) {
 	EXPECT_DOUBLE_EQ(1.2, CurveManager::CurveValue(2, -5)); // Value too small
 	EXPECT_DOUBLE_EQ(1.5, CurveManager::CurveValue(2, 5)); // Value too large
 	EXPECT_DOUBLE_EQ(1.38745561900026, CurveManager::CurveValue(2, 2)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola1) {
@@ -601,6 +617,7 @@ TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola1) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("RECTANGULARHYPERBOLA1", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -638,6 +655,8 @@ TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola1) {
 	EXPECT_DOUBLE_EQ(5.2, CurveManager::CurveValue(2, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(5.7, CurveManager::CurveValue(2, 2)); // Value too large
 	EXPECT_DOUBLE_EQ(5.6, CurveManager::CurveValue(2, 1)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola2) {
@@ -671,6 +690,7 @@ TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola2) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("RECTANGULARHYPERBOLA2", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -708,6 +728,8 @@ TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola2) {
 	EXPECT_DOUBLE_EQ(5.2, CurveManager::CurveValue(2, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(5.7, CurveManager::CurveValue(2, 2)); // Value too large
 	EXPECT_DOUBLE_EQ(5.6, CurveManager::CurveValue(2, 1)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_Quartic) {
@@ -745,6 +767,7 @@ TEST_F(EnergyPlusFixture, Curves_Quartic) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUARTIC", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -782,6 +805,8 @@ TEST_F(EnergyPlusFixture, Curves_Quartic) {
 	EXPECT_DOUBLE_EQ(8500, CurveManager::CurveValue(2, -10)); // Value too small
 	EXPECT_DOUBLE_EQ(12000, CurveManager::CurveValue(2, 10)); // Value too large
 	EXPECT_DOUBLE_EQ(11885.1881, CurveManager::CurveValue(2, 9.9)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_ExponentialSkewNormal) {
@@ -817,6 +842,7 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialSkewNormal) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("EXPONENTIALSKEWNORMAL", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -855,6 +881,8 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialSkewNormal) {
 	EXPECT_DOUBLE_EQ(2, CurveManager::CurveValue(2, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(3.5, CurveManager::CurveValue(2, 1)); // Value too large
 	EXPECT_DOUBLE_EQ(3.24109670456697, CurveManager::CurveValue(2, 2)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_BiQuadratic) {
@@ -900,6 +928,7 @@ TEST_F(EnergyPlusFixture, Curves_BiQuadratic) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -944,6 +973,8 @@ TEST_F(EnergyPlusFixture, Curves_BiQuadratic) {
 	EXPECT_DOUBLE_EQ(1.5, CurveManager::CurveValue(2, 0, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(4.5, CurveManager::CurveValue(2, 2, -2)); // Value too large
 	EXPECT_DOUBLE_EQ(2.75, CurveManager::CurveValue(2, 0.5, 0)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_BiCubic) {
@@ -997,6 +1028,7 @@ TEST_F(EnergyPlusFixture, Curves_BiCubic) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("BICUBIC", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1042,6 +1074,7 @@ TEST_F(EnergyPlusFixture, Curves_BiCubic) {
 	EXPECT_DOUBLE_EQ(4880.0, CurveManager::CurveValue(2, 4, 6)); // Value too large
 	EXPECT_DOUBLE_EQ(3829.0, CurveManager::CurveValue(2, 3, 6)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_QuadraticLinear) {
@@ -1087,6 +1120,7 @@ TEST_F(EnergyPlusFixture, Curves_QuadraticLinear) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1132,6 +1166,7 @@ TEST_F(EnergyPlusFixture, Curves_QuadraticLinear) {
 	EXPECT_DOUBLE_EQ(700.0, CurveManager::CurveValue(2, 4, 6)); // Value too large
 	EXPECT_DOUBLE_EQ(472.0, CurveManager::CurveValue(2, 3, 6)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_CubicLinear) {
@@ -1177,6 +1212,7 @@ TEST_F(EnergyPlusFixture, Curves_CubicLinear) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("CUBICLINEAR", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1222,6 +1258,7 @@ TEST_F(EnergyPlusFixture, Curves_CubicLinear) {
 	EXPECT_DOUBLE_EQ(480.0, CurveManager::CurveValue(2, 4, 6)); // Value too large
 	EXPECT_DOUBLE_EQ(280.0, CurveManager::CurveValue(2, 3, 6)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_FanPressureRise) {
@@ -1257,6 +1294,7 @@ TEST_F(EnergyPlusFixture, Curves_FanPressureRise) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("FANPRESSURERISE", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1302,6 +1340,7 @@ TEST_F(EnergyPlusFixture, Curves_FanPressureRise) {
 	EXPECT_DOUBLE_EQ(277000, CurveManager::CurveValue(2, 400, 6000)); // Value too large
 	EXPECT_DOUBLE_EQ(28086.83298050514, CurveManager::CurveValue(2, 50, 4000)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_TriQuadratic) {
@@ -1395,6 +1434,7 @@ TEST_F(EnergyPlusFixture, Curves_TriQuadratic) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("TRIQUADRATIC", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1447,6 +1487,7 @@ TEST_F(EnergyPlusFixture, Curves_TriQuadratic) {
 	EXPECT_DOUBLE_EQ(90000.0, CurveManager::CurveValue(2, 2, 4, 6)); // Value too large
 	EXPECT_DOUBLE_EQ(4228.0, CurveManager::CurveValue(2, 0, 4, 3)); // In-range value
 
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_ChillerPartLoadWithLift) {
@@ -1510,6 +1551,7 @@ TEST_F(EnergyPlusFixture, Curves_ChillerPartLoadWithLift) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("CHILLERPARTLOADWITHLIFT", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1561,6 +1603,8 @@ TEST_F(EnergyPlusFixture, Curves_ChillerPartLoadWithLift) {
 	EXPECT_DOUBLE_EQ(400.0, CurveManager::CurveValue(2, 0, 2, 3)); // Value too small
 	EXPECT_DOUBLE_EQ(4000.0, CurveManager::CurveValue(2, 2, 4, 5)); // Value too large
 	EXPECT_DOUBLE_EQ(2913.0, CurveManager::CurveValue(2, 0, 4, 3)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
 
 TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
@@ -1614,6 +1658,7 @@ TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUADLINEAR", CurveManager::GetCurveType(1));
 	EXPECT_EQ("TESTCURVE1", CurveManager::GetCurveName(1));
@@ -1622,7 +1667,7 @@ TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
 	int index = CurveManager::GetCurveCheck("TESTCURVE1", error, "TEST");
 	EXPECT_FALSE(error);
 	EXPECT_EQ(1, index);
-	Real64 min1, max1, min2, max2, min3, max3, min4, max4;
+	Real64 min1, max1, min2, max2, min3, max3; // , min4, max4;
 	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2, min3, max3); //, min4, max4);
 	EXPECT_EQ(-2, min1);
 	EXPECT_EQ(0, max1);
@@ -1670,4 +1715,6 @@ TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
 	EXPECT_DOUBLE_EQ(25.0, CurveManager::CurveValue(2, -2, 0, 2, 3)); // Value too small
 	EXPECT_DOUBLE_EQ(40.0, CurveManager::CurveValue(2, 0, 2, 4, 5)); // Value too large
 	EXPECT_DOUBLE_EQ(27.0, CurveManager::CurveValue(2, 0, 1, 2, 3)); // In-range value
+
+	EXPECT_FALSE(has_err_output());
 }
