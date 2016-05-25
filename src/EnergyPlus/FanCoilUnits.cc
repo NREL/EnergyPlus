@@ -2023,6 +2023,16 @@ namespace FanCoilUnits {
 								ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
 									FanCoil( FanCoilNum ).MaxIterIndexC );
 							}
+						} else if( SolFlag == -2 ) {
+							++FanCoil( FanCoilNum ).LimitErrCountC;
+							if( FanCoil( FanCoilNum ).LimitErrCountC < 2 ) {
+								ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "  Bad cold water mass flow limits" );
+								ShowContinueErrorTimeStamp( "..Water flow rate set to lower limit " );
+							} else{
+								ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name,
+									FanCoil( FanCoilNum ).BadMassFlowLimIndexC );
+							}
 						}
 					} else if ( SolFlag == -2 ) {
 						++FanCoil( FanCoilNum ).LimitErrCountC;
@@ -2135,6 +2145,16 @@ namespace FanCoilUnits {
 									ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name,
 										FanCoil( FanCoilNum ).BadMassFlowLimIndexH );
 								}
+							}
+						} else if( SolFlag == -2 ) {
+							++FanCoil( FanCoilNum ).LimitErrCountH;
+							if( FanCoil( FanCoilNum ).LimitErrCountH < 2 ) {
+								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "  Bad hot water mass flow limits" );
+								ShowContinueErrorTimeStamp( "..Water flow rate set to lower limit " );
+							} else {
+								ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name,
+									FanCoil( FanCoilNum ).BadMassFlowLimIndexH );
 							}
 						}
 					} else {
