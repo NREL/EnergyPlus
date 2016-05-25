@@ -3534,23 +3534,32 @@ namespace MixedAir {
 		OutAirMinFrac = max( OutAirMinFrac, MechVentOutsideAirMinFrac );
 
 		OutAirMinFrac = min( max( OutAirMinFrac, 0.0 ), 1.0 );
+
+		// Apply Minimum Fraction of Outdoor Air Schedule
+		if (thisController.MinOAflowSchPtr > 0) {
+			MinOAflowfracVal = GetCurrentScheduleValue(thisController.MinOAflowSchPtr);
+			MinOAflowfracVal = min(max(MinOAflowfracVal, 0.0), 1.0);
+			OutAirMinFrac = max(MinOAflowfracVal, OutAirMinFrac);
+		}
+
 		// At this point, OutAirMinFrac is still based on AirLoopFlow.DesSupply
 		if ( AirLoopNum > 0 ) {
 			AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * AirLoopFlow( AirLoopNum ).DesSupply;
+
+			// calculate mixed air temp at min OA flow rate
+			ReliefMassFlowAtMinOA = max( AirLoopFlow( AirLoopNum ).MinOutAir - thisController.ExhMassFlow, 0.0 );
+			RecircMassFlowRateAtMinOAFlow = max( Node( thisController.RetNode ).MassFlowRate - ReliefMassFlowAtMinOA, 0.0 );
+			if ( ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir ) > 0.0 ) {
+				RecircTemp = Node( thisController.RetNode ).Temp;
+				MixedAirTempAtMinOAFlow = ( RecircMassFlowRateAtMinOAFlow * RecircTemp + AirLoopFlow( AirLoopNum ).MinOutAir * Node( thisController.OANode ).Temp ) / ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir );
+			} else {
+				MixedAirTempAtMinOAFlow = Node( thisController.RetNode ).Temp;
+			}
+			thisController.MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
 		}
 
 		// Economizer
 		CalcOAEconomizer( OAControllerNum, AirLoopNum, OutAirMinFrac, OASignal, EconomizerOperationFlag, HighHumidityOperationFlag );
-
-		// Changed by Amit for new feature
-		if ( thisController.MinOAflowSchPtr > 0 ) {
-			MinOAflowfracVal = GetCurrentScheduleValue( thisController.MinOAflowSchPtr );
-			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
-			if ( MinOAflowfracVal > OutAirMinFrac ) {
-				OutAirMinFrac = MinOAflowfracVal;
-			}
-			OASignal = max( MinOAflowfracVal, OASignal );
-		}
 
 		if ( thisController.MaxOAflowSchPtr > 0 ) {
 			MaxOAflowfracVal = GetCurrentScheduleValue( thisController.MaxOAflowSchPtr );
@@ -3624,62 +3633,6 @@ namespace MixedAir {
 				AirLoopFlow( AirLoopNum ).MaxOutAir = thisController.MaxOAMassFlowRate;
 			}
 
-			// calculate mixed air temp at min OA flow rate
-			ReliefMassFlowAtMinOA = max( AirLoopFlow( AirLoopNum ).MinOutAir - thisController.ExhMassFlow, 0.0 );
-			RecircMassFlowRateAtMinOAFlow = max( Node( thisController.RetNode ).MassFlowRate - ReliefMassFlowAtMinOA, 0.0 );
-			if ( ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir ) > 0.0 ) {
-				RecircTemp = Node( thisController.RetNode ).Temp;
-				MixedAirTempAtMinOAFlow = ( RecircMassFlowRateAtMinOAFlow * RecircTemp + AirLoopFlow( AirLoopNum ).MinOutAir * Node( thisController.OANode ).Temp ) / ( RecircMassFlowRateAtMinOAFlow + AirLoopFlow( AirLoopNum ).MinOutAir );
-			} else {
-				MixedAirTempAtMinOAFlow = Node( thisController.RetNode ).Temp;
-			}
-			thisController.MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
-
-			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
-			if ( EconomizerOperationFlag ) {
-				if ( thisController.Lockout == LockoutWithHeatingPossible ) {
-					// For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
-					if ( AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus && AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated ) {
-
-						if ( MixedAirTempAtMinOAFlow <= Node( thisController.MixNode ).TempSetPoint ) {
-							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = true;
-							thisController.OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
-							AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
-							AirLoopControlInfo( AirLoopNum ).EconoLockout = true;
-							EconomizerOperationFlag = false ;
-						} else { // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
-							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
-							thisController.HRHeatingCoilActive = 0;
-						} // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
-						AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = false;
-					}
-				}
-			} // if (EconomizerOperationFlag) - close the if because EconomizerOperationFlag may have changed above
-
-			// Check heat exchanger bypass control
-			AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
-			thisController.HeatRecoveryBypassStatus = 0;
-			if ( EconomizerOperationFlag ) {
-				if ( thisController.HeatRecoveryBypassControlType == BypassWhenWithinEconomizerLimits ) {
-					AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-					thisController.HeatRecoveryBypassStatus = 1;
-				} else if ( thisController.HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
-					if ( thisController.OAMassFlow > AirLoopFlow( AirLoopNum ).MinOutAir ) {
-						AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-						thisController.HeatRecoveryBypassStatus = 1;
-					}
-				}
-			}
-
-			// Set the air loop economizer and high humidity control flags.
-			AirLoopControlInfo( AirLoopNum ).EconoActive = EconomizerOperationFlag;
-			AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive = HighHumidityOperationFlag;
-			if ( AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
-				thisController.OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
-				AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
-			}
-
-
 			// MJW - Not sure if this is necessary but keeping it for now
 			if ( AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag && AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
 				// The airloop needs to be simulated again so that the heating coil & HX can be resimulated
@@ -3709,33 +3662,6 @@ namespace MixedAir {
 
 		// Set the relief air flow rate (must be done last to account for changes in OAMassFlow
 		thisController.RelMassFlow = max( thisController.OAMassFlow - thisController.ExhMassFlow, 0.0 );
-
-		// Set economizer report variable and status flag
-		if ( thisController.Econo == NoEconomizer ) {
-			// No economizer
-			thisController.EconomizerStatus = 0;
-			thisControllerInfo.EconoActive = false;
-		} else {
-			// With economizer.
-			if ( EconomizerOperationFlag ) {
-				// Economizer is enabled
-				thisController.EconomizerStatus = 1;
-				thisControllerInfo.EconoActive = true;
-			} else {
-				// Economizer is disabled
-				thisController.EconomizerStatus = 0;
-				thisControllerInfo.EconoActive = false;
-			}
-		}
-
-		// Set high humidity control report variable and status flag
-		if ( HighHumidityOperationFlag ) {
-			thisController.HighHumCtrlStatus = 1;
-			thisControllerInfo.HighHumCtrlActive = true;
-		} else {
-			thisController.HighHumCtrlStatus = 0;
-			thisControllerInfo.HighHumCtrlActive = false;
-		}
 
 		// Save OA fraction for reporting
 		if ( thisController.MixMassFlow > 0 ) {
@@ -4258,7 +4184,29 @@ namespace MixedAir {
 		int SolFla; // Flag of solver
 
 		// Assign references
-		auto & thisController(OAController(OAControllerNum));
+		auto & thisController( OAController( OAControllerNum ) );
+		auto & thisControllerInfo( OAControllerInfo( OAControllerNum ) );
+
+		if ( AirLoopNum > 0 ) {
+			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
+			if ( thisController.Lockout == LockoutWithHeatingPossible ) {
+				// For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
+				if ( AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus && AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated ) {
+
+					if ( thisController.MixedAirTempAtMinOAFlow <= Node( thisController.MixNode ).TempSetPoint ) {
+						AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = true;
+						// thisController.OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+						// AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
+						AirLoopControlInfo( AirLoopNum ).EconoLockout = true;
+						EconomizerOperationFlag = false ;
+					} else {
+						AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
+						thisController.HRHeatingCoilActive = 0;
+					} 
+					AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = false;
+				}
+			}
+		}
 
 		if ( AirLoopNum > 0 ) {
 			AirLoopEconoLockout = AirLoopControlInfo( AirLoopNum ).EconoLockout;
@@ -4274,6 +4222,7 @@ namespace MixedAir {
 		} else {
 			thisController.CoolCoilFreezeCheck = false;
 		}
+
 		if ( std::abs( thisController.RetTemp - thisController.InletTemp ) > SmallTempDiff ) {
 			OutAirSignal = ( thisController.RetTemp - thisController.MixSetTemp ) / ( thisController.RetTemp - thisController.InletTemp );
 			if ( thisController.CoolCoilFreezeCheck ) {
@@ -4430,18 +4379,73 @@ namespace MixedAir {
 			}
 		}
 
-		if (thisController.CoolCoilFreezeCheck) {
-			MaximumOAFracBySetPoint = min(max(MaximumOAFracBySetPoint, 0.0), 1.0);
+		if ( thisController.CoolCoilFreezeCheck ) {
+			MaximumOAFracBySetPoint = min( max( MaximumOAFracBySetPoint, 0.0 ), 1.0 );
 			thisController.MaxOAFracBySetPoint = MaximumOAFracBySetPoint;
-			if (MaximumOAFracBySetPoint < OutAirMinFrac) {
-// MJW - I don't think this is needed here, but not sure				OutAirMinFrac = MaximumOAFracBySetPoint;
-				if (AirLoopNum > 0) AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * thisController.MixMassFlow;
+
+			// This should not be messing with OutAirMinFrac, freeze protection should only limit economizer operation
+			// if (MaximumOAFracBySetPoint < OutAirMinFrac) {
+			// OutAirMinFrac = MaximumOAFracBySetPoint;
+			//	if (AirLoopNum > 0) AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * thisController.MixMassFlow;
+			//}
+			OASignal = max( min( MaximumOAFracBySetPoint, OASignal ), OutAirMinFrac );
+		}
+
+		if ( AirLoopNum > 0 ) {
+
+			// Set the air loop economizer and high humidity control flags.
+			AirLoopControlInfo( AirLoopNum ).EconoActive = EconomizerOperationFlag;
+			AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive = HighHumidityOperationFlag;
+			if ( AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
+				thisController.OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+				AirLoopFlow( AirLoopNum ).OAFrac = thisController.OAMassFlow / thisController.MixMassFlow;
 			}
-			OASignal = min(MaximumOAFracBySetPoint, OASignal);
+
+			// Check heat exchanger bypass control
+			AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
+			thisController.HeatRecoveryBypassStatus = 0;
+			if ( EconomizerOperationFlag ) {
+				if ( thisController.HeatRecoveryBypassControlType == BypassWhenWithinEconomizerLimits ) {
+					AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
+					thisController.HeatRecoveryBypassStatus = 1;
+				} else if ( thisController.HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
+					if ( OASignal > OutAirMinFrac ) {
+						AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
+						thisController.HeatRecoveryBypassStatus = 1;
+					}
+				}
+			}
 		}
 
 		// Night ventilation control overrides economizer and high humidity control.
 		if (AirLoopNightVent) OASignal = 1.0;
+
+		// Set economizer report variable and status flag
+		if ( thisController.Econo == NoEconomizer ) {
+			// No economizer
+			thisController.EconomizerStatus = 0;
+			thisControllerInfo.EconoActive = false;
+		} else {
+			// With economizer.
+			if ( EconomizerOperationFlag ) {
+				// Economizer is enabled
+				thisController.EconomizerStatus = 1;
+				thisControllerInfo.EconoActive = true;
+			} else {
+				// Economizer is disabled
+				thisController.EconomizerStatus = 0;
+				thisControllerInfo.EconoActive = false;
+			}
+		}
+
+		// Set high humidity control report variable and status flag
+		if ( HighHumidityOperationFlag ) {
+			thisController.HighHumCtrlStatus = 1;
+			thisControllerInfo.HighHumCtrlActive = true;
+		} else {
+			thisController.HighHumCtrlStatus = 0;
+			thisControllerInfo.HighHumCtrlActive = false;
+		}
 
 	}
 	void

@@ -259,8 +259,8 @@ namespace MixedAir {
 		int EconomizerOASchedPtr; // schedule to modify outdoor air flow
 		std::string MinOAflowSch; // Name of the Minimum fraction of Design/Mixed Mass of air
 		std::string MaxOAflowSch; // Name of the Maximum fraction of Design/Mixed Mass of air
-		int MinOAflowSchPtr; // Index to the minimum outside air schedule
-		int MaxOAflowSchPtr; // Index to the minimum outside air schedule
+		int MinOAflowSchPtr; // Index to the Minimum Fraction of Outdoor Air Schedule
+		int MaxOAflowSchPtr; // Index to the Maximum Fraction of Outdoor Air Schedule
 		//   Economizer Status, which is currently following the EconomizerOperationFlag, might be something like "Economizer status
 		//   indicates when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded).
 		//   While this status signal indicates favorable conditions for economizer operation, it does not guarantee that the air-side
