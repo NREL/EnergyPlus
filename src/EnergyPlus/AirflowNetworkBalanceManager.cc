@@ -235,6 +235,7 @@ namespace AirflowNetworkBalanceManager {
 	int const ProbNoAction( 0 ); // No action from probability check
 	int const ProbForceChange( 1 ); // Force open or close from probability check
 	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
+	int const NumOfVentCtrTypes( 6 ); // Number of zone level venting control types
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -1064,7 +1065,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( SameString( MultizoneZoneData( i ).VentControl, "CEN15251Adaptive" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_CEN15251;
 				if ( SameString( MultizoneZoneData( i ).VentControl, "NoVent" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Novent;
 
-				if ( MultizoneZoneData( i ).VentCtrNum < 4 ) {
+				if ( MultizoneZoneData( i ).VentCtrNum < NumOfVentCtrTypes ) {
 					if ( NumAlphas >= 4 && ( ! lAlphaBlanks( 4 ) ) ) {
 						MultizoneZoneData( i ).VentingSchName = Alphas( 4 );
 						MultizoneZoneData( i ).VentingSchNum = GetScheduleIndex( MultizoneZoneData( i ).VentingSchName );
