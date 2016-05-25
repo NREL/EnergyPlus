@@ -23849,7 +23849,7 @@ AirflowNetwork:ZoneControl:PressureController,
       \required-field
       \type object-list
       \object-list AFNReliefAirFlowNames
-      \object-list FansZoneExhaustNames
+      \object-list FansZoneExhaust
  A5 , \field Pressure Control Availability Schedule Name
       \note Availability schedule name for pressure controller. Schedule value > 0 means the 
       \note pressure controller is enabled. If this field is blank, then pressure controller is 
