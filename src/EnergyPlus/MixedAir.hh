@@ -616,6 +616,16 @@ namespace MixedAir {
 	);
 
 	void
+	CalcOAEconomizer(
+		int const OAControllerNum,
+		int const AirLoopNum,
+		Real64 const OutAirMinFrac,
+		Real64 & OASignal,
+		bool & EconomizerOperationFlag,
+		bool & HighHumidityOperationFlag
+	);
+
+	void
 	CalcOAMixer( int const OAMixerNum );
 
 	// End of Calculation/Simulation Section of the Module
