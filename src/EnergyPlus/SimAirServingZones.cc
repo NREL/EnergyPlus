@@ -2077,12 +2077,7 @@ namespace SimAirServingZones {
 					// [DC/LBNL] Save previous mass flow rate
 					MassFlowSaved = Node( NodeNumIn ).MassFlowRate;
 
-					if (TurnFansOn && !TurnFansOff) {
-						Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply;
-					}
-					else {
-						Node( NodeNumIn ).MassFlowRate = 0.0;
-					}
+					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply;
 
 					// [DC/LBNL] Detect if air mass flow rate has changed since last air loop simulation
 					if ( Node( NodeNumIn ).MassFlowRate != MassFlowSaved ) {

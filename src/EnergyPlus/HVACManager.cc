@@ -92,6 +92,7 @@
 #include <DisplayRoutines.hh>
 //#include <EarthTube.hh>
 #include <EMSManager.hh>
+#include <Fans.hh>
 #include <General.hh>
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
@@ -106,6 +107,7 @@
 #include <PlantUtilities.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
+#include <Pumps.hh>
 #include <RefrigeratedCase.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
@@ -515,6 +517,8 @@ namespace HVACManager {
 
 			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
 
+			CheckMassBalances();
+
 			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting ) {
@@ -855,7 +859,7 @@ namespace HVACManager {
 			++HVACManageIteration; // Increment the iteration counter
 
 			if ( anyEMSRan && HVACManageIteration <= 2 ) {
-				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice 
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
 				SimAirLoopsFlag = true;
 			}
 
@@ -2724,6 +2728,26 @@ namespace HVACManager {
 		}
 
 	}
+
+	void
+	CheckMassBalances()
+	{
+		using namespace Fans;
+		using namespace Pumps;
+		
+		for (int FanNum = 1; FanNum <= NumFans; ++FanNum) {
+			assert(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate == Fan( FanNum ).InletAirMassFlowRate);
+			assert(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate == Fan( FanNum ).OutletAirMassFlowRate);
+			assert(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate == Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate);
+		}
+
+		for (int PumpNum = 1; PumpNum <= NumPumps; ++PumpNum) {
+			assert(Node( PumpEquip( PumpNum ).OutletNodeNum ).MassFlowRate == Node( PumpEquip( PumpNum ).InletNodeNum ).MassFlowRate);
+		}
+
+
+	}
+
 
 } // HVACManager
 

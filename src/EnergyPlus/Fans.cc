@@ -2504,10 +2504,6 @@ namespace Fans {
 			Node( OutletNode ).GenContam = Node( InletNode ).GenContam;
 		}
 
-		assert(Node( InletNode ).MassFlowRate == Fan( FanNum ).InletAirMassFlowRate);
-		assert(Node( OutletNode ).MassFlowRate == Fan( FanNum ).OutletAirMassFlowRate);
-		assert(Node( InletNode ).MassFlowRate == Node( OutletNode ).MassFlowRate);
-
 	}
 
 	//        End of Update subroutines for the Fan Module
