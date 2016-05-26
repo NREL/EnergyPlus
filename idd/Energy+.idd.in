@@ -67212,7 +67212,7 @@ ThermalStorage:ChilledWater:Mixed,
        \type node
   N8, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   A12, \field Source Side Availability Schedule Name
