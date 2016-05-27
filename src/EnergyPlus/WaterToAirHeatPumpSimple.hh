@@ -351,7 +351,6 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const LatentLoad, // Control zone latent load[W]
 		int const CyclingScheme, // fan operating mode
 		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
-		Real64 const WaterPartLoad,
 		bool const FirstHVACIteration // Iteration flag
 	);
 
@@ -367,8 +366,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const LatentDemand, // Cooling Latent Demand [W]
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
-		Real64 const WaterPartLoad // water part load ratio
+		Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
 	);
 
 	void
@@ -379,8 +377,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
-		Real64 const WaterPartLoad // water part load ratio
+		Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
 	);
 
 	void
