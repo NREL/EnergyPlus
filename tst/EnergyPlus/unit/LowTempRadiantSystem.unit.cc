@@ -1205,3 +1205,36 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	// Test autosized tube length
 	EXPECT_EQ( TubeLengthDes, HydrRadSys( RadSysNum ).TubeLength );
 }
+
+TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
+{
+	SystemType = ConstantFlowSystem;
+	NumOfCFloLowTempRadSys = 0;
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
+	TotalNumOfRadSystems = 0;
+	MySizeFlagCFlo( RadSysNum ) = false;
+	BeginEnvrnFlag = false;
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	BeginTimeStepFlag = false;
+	CFloRadSys( RadSysNum ).VolFlowSchedPtr = 0;
+	CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	CFloRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = 2.0;
+	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
+	CFloRadSys( RadSysNum ).CWLoopNum = 0;
+	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	
+	CFloRadSys( RadSysNum ).CoolingSystem = true;
+	CFloRadSys( RadSysNum ).HeatingSystem = false;
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType );
+	EXPECT_EQ( 3.0, CFloRadSys( RadSysNum ).ChWaterMassFlowRate );
+	EXPECT_EQ( 0.0, CFloRadSys( RadSysNum ).WaterMassFlowRate );
+	
+	CFloRadSys( RadSysNum ).CoolingSystem = false;
+	CFloRadSys( RadSysNum ).HeatingSystem = true;
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType );
+	EXPECT_EQ( 2.0, CFloRadSys( RadSysNum ).HotWaterMassFlowRate );
+	EXPECT_EQ( 0.0, CFloRadSys( RadSysNum ).WaterMassFlowRate );
+}
+

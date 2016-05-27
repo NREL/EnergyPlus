@@ -1945,7 +1945,7 @@ namespace LowTempRadiantSystem {
 
 				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).HotWaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
 
-				SetComponentFlowRate( CFloRadSys( RadSysNum ).HotWaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
+				if ( CFloRadSys( RadSysNum ).HotWaterInNode > 0 ) SetComponentFlowRate( CFloRadSys( RadSysNum ).HotWaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
 			}
 			if ( CFloRadSys( RadSysNum ).CoolingSystem ) {
 				if ( CFloRadSys( RadSysNum ).VolFlowSchedPtr > 0 ) {
@@ -1959,7 +1959,7 @@ namespace LowTempRadiantSystem {
 
 				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).ChWaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
 
-				SetComponentFlowRate( CFloRadSys( RadSysNum ).ChWaterMassFlowRate, CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum );
+				if ( CFloRadSys( RadSysNum ).ColdWaterInNode > 0 ) SetComponentFlowRate( CFloRadSys( RadSysNum ).ChWaterMassFlowRate, CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum );
 			}
 
 		} else if ( SELECT_CASE_var == ElectricSystem ) {
