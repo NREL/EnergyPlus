@@ -4641,7 +4641,7 @@ namespace AirflowNetworkBalanceManager {
 						if ( !WarmupFlag ) {
 							if ( ErrCountVar == 0 ) {
 								++ErrCountVar;
-								ShowWarningError( "Iteration limit exceeded pressure setpoint using an reilief air. Simulation continues." );
+								ShowWarningError( "Iteration limit exceeded pressure setpoint using relief air. Simulation continues." );
 								ShowContinueErrorTimeStamp( "Relief air flow rate = " + RoundSigDigits( ReliefMassFlowRate, 4 ) );
 							} else {
 								++ErrCountVar;
