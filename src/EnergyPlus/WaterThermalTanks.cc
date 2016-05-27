@@ -3157,7 +3157,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = rNumericArgs( 6 );
 
 					if ( ( rNumericArgs( 8 ) > 1 ) || ( rNumericArgs( 8 ) <= 0 ) ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0> to 1)" );
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 8 );
