@@ -225,6 +225,7 @@ if (BUILD_VALIDATION_REPORTS)
   if ( NOT BUILD_FORTRAN )
     message("*** VALIDATION REPORT ERROR : Cannot build validation reports without Fortran targets.  Turn on BUILD_FORTRAN")
   endif()
+  find_package(PythonInterp 3.0 REQUIRED)
   include(ExternalProject)
   ExternalProject_Add(ValidationReports
     DEPENDS energyplus ReadVarsESO Basement Slab
