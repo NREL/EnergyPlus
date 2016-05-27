@@ -66045,7 +66045,7 @@ WaterHeater:Mixed,
        \type node
   N19, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   N20, \field Use Side Design Flow Rate
@@ -66324,7 +66324,7 @@ WaterHeater:Stratified,
        \type node
   N26, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
@@ -67212,7 +67212,7 @@ ThermalStorage:ChilledWater:Mixed,
        \type node
   N8, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   A12, \field Source Side Availability Schedule Name
@@ -67346,7 +67346,7 @@ ThermalStorage:ChilledWater:Stratified,
        \type node
   N13, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
