@@ -9648,7 +9648,7 @@ Output:Variable,*,Facility Total Produced Electric Energy,hourly; !- HVAC Sum [J
   EnergyManagementSystem:Program,
     BatteryControlDemandDemo,
     Set fracSOC = CurntStorageSOC / MaxSOC,
-    Set avgFacilDemand = @trendAverage FacilityElectTrend 288,
+    Set avgFacilDemand = @trendAverage FacilityElectTrend 1008,
     set dischargeRate = 0.0,
     set chargeRate = 0.0,
     set dampenFactor = 0.8,
