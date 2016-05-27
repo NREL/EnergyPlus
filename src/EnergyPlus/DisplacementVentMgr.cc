@@ -460,12 +460,46 @@ namespace DisplacementVentMgr {
 				SurfNum = APos_Door( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
-				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
-				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
+				if ( Surface( SurfNum ).Tilt > 10.0 && Surface( SurfNum ).Tilt < 170.0 ) { // Door Wall
+					Z1 = minval( Surface( SurfNum ).Vertex( { 1, Surface( SurfNum ).Sides } ), &Vector::z );
+					Z2 = maxval( Surface( SurfNum ).Vertex( { 1, Surface( SurfNum ).Sides } ), &Vector::z );
+					ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
+					ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
-				if ( ZInfSurf > LayH ) {
+					if ( ZInfSurf > LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HDoor( Ctd ) = DVHcIn( SurfNum );
+						HAT_MX += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
+						HA_MX += Surface( SurfNum ).Area * HDoor( Ctd );
+					}
+
+					if ( ZSupSurf < LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HDoor( Ctd ) = DVHcIn( SurfNum );
+						HAT_OC += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
+						HA_OC += Surface( SurfNum ).Area * HDoor( Ctd );
+					}
+
+					if ( ZInfSurf <= LayH && ZSupSurf >= LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HLU = DVHcIn( SurfNum );
+						TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HLD = DVHcIn( SurfNum );
+						TmedDV = ( ( ZSupSurf - LayH ) * ZTMX( ZoneNum ) + ( LayH - ZInfSurf ) * ZTOC( ZoneNum ) ) / ( ZSupSurf - ZInfSurf );
+						HDoor( Ctd ) = ( ( LayH - ZInfSurf ) * HLD + ( ZSupSurf - LayH ) * HLU ) / ( ZSupSurf - ZInfSurf );
+						HAT_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLU;
+						HA_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * HLU;
+						HAT_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLD;
+						HA_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * HLD;
+						TempEffBulkAir( SurfNum ) = TmedDV;
+					}
+				}
+
+				if ( Surface( SurfNum ).Tilt <= 10.0 ) { // Door Ceiling
 					TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
 					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
 					HDoor( Ctd ) = DVHcIn( SurfNum );
@@ -473,28 +507,12 @@ namespace DisplacementVentMgr {
 					HA_MX += Surface( SurfNum ).Area * HDoor( Ctd );
 				}
 
-				if ( ZSupSurf < LayH ) {
+				if ( Surface( SurfNum ).Tilt >= 170.0 ) { // Door Floor
 					TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
 					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
 					HDoor( Ctd ) = DVHcIn( SurfNum );
 					HAT_OC += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
 					HA_OC += Surface( SurfNum ).Area * HDoor( Ctd );
-				}
-
-				if ( ZInfSurf <= LayH && ZSupSurf >= LayH ) {
-					TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
-					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
-					HLU = DVHcIn( SurfNum );
-					TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
-					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
-					HLD = DVHcIn( SurfNum );
-					TmedDV = ( ( ZSupSurf - LayH ) * ZTMX( ZoneNum ) + ( LayH - ZInfSurf ) * ZTOC( ZoneNum ) ) / ( ZSupSurf - ZInfSurf );
-					HDoor( Ctd ) = ( ( LayH - ZInfSurf ) * HLD + ( ZSupSurf - LayH ) * HLU ) / ( ZSupSurf - ZInfSurf );
-					HAT_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLU;
-					HA_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * HLU;
-					HAT_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLD;
-					HA_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * HLD;
-					TempEffBulkAir( SurfNum ) = TmedDV;
 				}
 
 				DVHcIn( SurfNum ) = HDoor( Ctd );
