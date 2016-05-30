@@ -873,7 +873,7 @@ namespace PackagedTerminalHeatPump {
 					ErrorsFound = true;
 				} else {
 					errFlag = false;
-					PTUnit( PTUnitNum ).DXHeatCoilIndex = GetCoilIndexVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
+					PTUnit( PTUnitNum ).DXHeatCoilIndexNum = GetCoilIndexVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -940,8 +940,8 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			if ( Alphas( 9 ) == "COIL:HEATING:DX:VARIABLESPEED" && Alphas( 11 ) == "COIL:COOLING:DX:VARIABLESPEED" ) {
-				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
-					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+				if ( PTUnit( PTUnitNum ).DXHeatCoilIndexNum > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
+					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
 					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			}
@@ -1994,7 +1994,7 @@ namespace PackagedTerminalHeatPump {
 					ErrorsFound = true;
 				} else {
 					errFlag = false;
-					PTUnit( PTUnitNum ).DXHeatCoilIndex = GetWtoAHPSimpleCoilIndex( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
+					PTUnit( PTUnitNum ).DXHeatCoilIndexNum = GetWtoAHPSimpleCoilIndex( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -2012,8 +2012,7 @@ namespace PackagedTerminalHeatPump {
 					ErrorsFound = true;
 				} else {
 					errFlag = false;
-					PTUnit( PTUnitNum ).DXHeatCoilIndex = GetCoilIndexVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
-					PTUnit( PTUnitNum ).DXHeatCoilIndexNum = PTUnit( PTUnitNum ).DXHeatCoilIndex;
+					PTUnit( PTUnitNum ).DXHeatCoilIndexNum = GetCoilIndexVariableSpeed( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -2088,14 +2087,12 @@ namespace PackagedTerminalHeatPump {
 
 			// end get water flow mode info
 			if ( Alphas( 9 ) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas( 11 ) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) {
-				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
-					SetSimpleWSHPData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, PTUnit( PTUnitNum ).WaterCyclingMode, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
-					//         CALL SetSimpleWSHPData(PTUnit(PTUnitNum)%WaterCyclingMode, PTUnit(PTUnitNum)%DXHeatCoilIndex,ErrorsFound, &
-					//                                CompanionCoolingCoilNum=PTUnit(PTUnitNum)%DXCoolCoilIndexNum)
+				if ( PTUnit( PTUnitNum ).DXHeatCoilIndexNum > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
+					SetSimpleWSHPData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, PTUnit( PTUnitNum ).WaterCyclingMode, _, PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
 				}
 			} else if ( Alphas( 9 ) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" && Alphas( 11 ) == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) {
-				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
-					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+				if ( PTUnit( PTUnitNum ).DXHeatCoilIndexNum > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
+					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
 					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			} else {
@@ -2995,15 +2992,15 @@ namespace PackagedTerminalHeatPump {
 
 			if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
 
-				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndex, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
+				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 
-				PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).NumOfSpeeds;
+				PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NumOfSpeeds;
 
-				MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).NormSpedLevel );
+				MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NormSpedLevel );
 				for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedHeating; ++Iter ) {
-					PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
+					PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
+					PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
+					PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
 				}
 			}
 			// intialize idle flow
@@ -4458,20 +4455,20 @@ namespace PackagedTerminalHeatPump {
 				if ( OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {
 					{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 					if ( SELECT_CASE_var == PTHPUnit ) {
-						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, On, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PartLoadFrac, OnOffAirFlowRatio );
+						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, On, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PartLoadFrac, OnOffAirFlowRatio );
 						SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
 					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
 						HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
-						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, QZnReq, dZero, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
+						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, QZnReq, dZero, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
 						SaveCompressorPLR = PartLoadFrac;
 					} else {
 					}}
 				} else {
 					{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 					if ( SELECT_CASE_var == PTHPUnit ) {
-						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
+						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
 					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
+						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
 
 					} else {
 					}}
@@ -4497,9 +4494,9 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 				if ( SELECT_CASE_var == PTHPUnit ) {
-					SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
+					SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
 				} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-					SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
+					SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
 
 				} else {
 				}}
@@ -6305,12 +6302,12 @@ namespace PackagedTerminalHeatPump {
 
 		if ( PTUnit( PTUnitNum ).UnitType_Num != PTACUnit ) { // PTHP
 			if ( HeatingLoad ) {
-				SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
+				SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 				SaveCompressorPLR = PartLoadFrac;
 			} else {
 				//   heating coil is off
-				SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio );
+				SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio );
 			}
 		} else { //PTAC
 			if ( HeatingLoad ) {

@@ -171,7 +171,6 @@ namespace PackagedTerminalHeatPump {
 		std::string DXHeatCoilName; // name of DX heating coil
 		std::string DXHeatCoilType; // type of DX heating coil,Coil:DX:HeatingEmpirical
 		int DXHeatCoilType_Num; // numeric equivalent for DX heating coil type
-		int DXHeatCoilIndex; // DX heating coil index number
 		std::string ACHeatCoilName; // name of heating coil for PTAC
 		std::string ACHeatCoilType; // type of heating coil for PTAC
 		Real64 ACHeatCoilCap; // heating coil capacity for PTAC
@@ -310,7 +309,6 @@ namespace PackagedTerminalHeatPump {
 			CondenserNodeNum( 0 ),
 			DXHeatCoilIndexNum( 0 ),
 			DXHeatCoilType_Num( 0 ),
-			DXHeatCoilIndex( 0 ),
 			ACHeatCoilCap( 0.0 ),
 			ACHeatCoilIndex( 0 ),
 			HWCoilAirInletNode( 0 ),
