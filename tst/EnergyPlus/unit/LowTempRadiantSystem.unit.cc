@@ -1208,11 +1208,11 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
 {
+	RadSysNum = 1;
 	SystemType = ConstantFlowSystem;
-	NumOfCFloLowTempRadSys = 0;
+	NumOfCFloLowTempRadSys = 1;
 	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
 	TotalNumOfRadSystems = 0;
-	MySizeFlagCFlo( RadSysNum ) = false;
 	BeginEnvrnFlag = false;
 	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
 	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
@@ -1224,6 +1224,10 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
 	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
 	CFloRadSys( RadSysNum ).CWLoopNum = 0;
 	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = 1.0;
+	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
+	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
+	CFloRadSys( RadSysNum ).MotorEffic = 1.2;
 	
 	CFloRadSys( RadSysNum ).CoolingSystem = true;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
