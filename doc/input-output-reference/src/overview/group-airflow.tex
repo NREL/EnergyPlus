@@ -1375,9 +1375,7 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 The ZoneCrossMixing syntax is ideally suited for two zones that exchange an equal amount of air between each other and do not have any air exchange with other zones. As with Mixing (ref: Mixing), this is a simplified view of interzone airflow in EnergyPlus. The main difference between Mixing and Cross Mixing is that Cross Mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones.
 
-Cross Mixing can be entered once, in one of the mixing zones; or twice, once for each zone. The object should be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
-
-If Delta Temperature = 0.0, Cross Mixing can be entered either once or twice: the effect is exactly the same.
+Cross Mixing can be entered once, in one of the mixing zones; or twice, once for each zone, or multiple times. Each object will be performed at its own control conditions. The object may be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
 
 Cross Mixing is entered using the following syntax.
 

@@ -2133,7 +2133,6 @@ namespace HVACManager {
 		using DataHeatBalance::TotCrossMixing;
 		using DataHeatBalance::Mixing;
 		using DataHeatBalance::CrossMixing;
-		using DataHeatBalance::MVFC;
 		using DataHeatBalance::TotZoneAirBalance;
 		using DataHeatBalance::ZoneAirBalance;
 		using DataHeatBalance::AirBalanceQuadrature;
@@ -2373,16 +2372,16 @@ namespace HVACManager {
 					//           and to recalculate the report variable using end of time step temps and humrats
 					AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, BlankString );
 					CpAir = PsyCpAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0 );
-					ZnAirRpt( ZoneLoop ).MixVolume += MVFC( MixNum ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixVdotCurDensity += MVFC( MixNum ) * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixMass += MVFC( MixNum ) * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixMdot += MVFC( MixNum ) * AirDensity * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += MVFC( MixNum ) * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
-					MixSenLoad( ZoneLoop ) += MVFC( MixNum ) * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( CrossMixing( MixNum ).FromZone ) );
+					ZnAirRpt( ZoneLoop ).MixVolume += CrossMixing( MixNum ).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixVdotCurDensity += CrossMixing( MixNum ).DesiredAirFlowRate * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixMass += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixMdot += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += CrossMixing( MixNum ).DesiredAirFlowRate * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
+					MixSenLoad( ZoneLoop ) += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( CrossMixing( MixNum ).FromZone ) );
 					H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0 );
 					//       MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowZone(ZoneLoop)*(ZoneAirHumRat(ZoneLoop)- &
 					//                     ZoneAirHumRat(CrossMixing(MixNum)%FromZone))*H2OHtOfVap
-					MixLatLoad( ZoneLoop ) += MVFC( MixNum ) * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) * H2OHtOfVap;
+					MixLatLoad( ZoneLoop ) += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) * H2OHtOfVap;
 
 				}
 			}

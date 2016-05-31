@@ -266,7 +266,6 @@ namespace HeatBalanceAirManager {
 
 		// FLOW:
 
-		CrossMixingFlag.dimension( NumOfZones, false );
 		GetAirFlowFlag( ErrorsFound );
 
 		SetZoneMassConservationFlag();
@@ -2294,49 +2293,6 @@ namespace HeatBalanceAirManager {
 
 		}
 
-		// Detect invalid Crossmixings
-		if ( TotCrossMixing > 1 && ! ErrorsFound ) {
-			SVals1.allocate( NumOfTimeStepInHour, 24 );
-			SVals1 = 0.0;
-			SVals2.allocate( NumOfTimeStepInHour, 24 );
-			SVals2 = 0.0;
-			OverLap.dimension( TotCrossMixing, false );
-			for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
-				for ( Loop1 = 1; Loop1 <= TotCrossMixing; ++Loop1 ) {
-
-					if ( Loop == Loop1 ) continue;
-
-					if ( CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).FromZone && CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).ZonePtr ) continue; // Reciprocal cross mixing is OK
-
-					if ( ! ( CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).ZonePtr || CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).FromZone || CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).FromZone || CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).ZonePtr ) ) continue; // Any other overlap is not OK | if the schedules overlap
-
-					for ( JDay = 1; JDay <= 366; ++JDay ) {
-						GetScheduleValuesForDay( CrossMixing( Loop ).SchedPtr, SVals1, JDay );
-						if ( ! any_gt( SVals1, 0.0 ) ) continue;
-						GetScheduleValuesForDay( CrossMixing( Loop1 ).SchedPtr, SVals2, JDay );
-						if ( ! any_gt( SVals2, 0.0 ) ) continue;
-						if ( OverLap( Loop ) && OverLap( Loop1 ) ) continue; // Already problem for these Cross Mixings
-						for ( Hr = 1; Hr <= 24; ++Hr ) {
-							for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-								if ( SVals1( TS, Hr ) == 0.0 || SVals2( TS, Hr ) == 0.0 ) continue;
-								ShowSevereError( RoutineName + "Overlapping Cross Mixings found" );
-								ShowContinueError( "Cross Mixing with receiving zone " + Zone( CrossMixing( Loop ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop ).FromZone ).Name );
-								ShowContinueError( "overlaps with Cross Mixing with receiving zone " + Zone( CrossMixing( Loop1 ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop1 ).FromZone ).Name );
-								OverLap( Loop ) = true;
-								OverLap( Loop1 ) = true;
-								ErrorsFound = true;
-								goto HrLoop_exit;
-							}
-						}
-						HrLoop_exit: ;
-					}
-				}
-			}
-			SVals1.deallocate();
-			SVals2.deallocate();
-			OverLap.deallocate();
-		}
-
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
 		TotRefDoorMixing = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotRefDoorMixing > 0 ) {
@@ -3097,18 +3053,6 @@ namespace HeatBalanceAirManager {
 
 		// FLOW:
 
-		// Do the Begin Simulation initializations
-		if ( FirstCall ) {
-			AllocateAirHeatBalArrays(); // Allocate the Module Arrays
-			FirstCall = false;
-		}
-
-		// Do the Begin Environment initializations
-		if ( BeginEnvrnFlag ) {
-			MVFC = 0.0;
-			MTC = 0.0;
-		}
-
 		// Do the Begin Day initializations
 		if ( BeginDayFlag ) {
 
@@ -3116,50 +3060,6 @@ namespace HeatBalanceAirManager {
 
 		// Do the following initializations (every time step):
 		InitSimpleMixingConvectiveHeatGains();
-
-	}
-
-	void
-	AllocateAirHeatBalArrays()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Liesen
-		//       DATE WRITTEN   February 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine allocates the arrays at execution time
-
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger variable allocation.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// FLOW:
-
-		// Use the total number of zones to allocate variables to avoid a zone number limit
-		MVFC.dimension( NumOfZones, 0.0 );
-		MTC.dimension( NumOfZones, 0.0 );
 
 	}
 
@@ -3211,10 +3111,6 @@ namespace HeatBalanceAirManager {
 		Real64 ZoneMixingFlowSum;  // sum of zone mixing flows for a zone
 		int NumOfMixingObjects;    // number of mixing objects for a receiving zone
 
-		//  Zero out time step variables
-		MTC = 0.0;
-		MVFC = 0.0;
-
 		// Select type of airflow calculation
 
 		{ auto const SELECT_CASE_var( AirFlowFlag );
@@ -3250,8 +3146,6 @@ namespace HeatBalanceAirManager {
 				NZ = CrossMixing( Loop ).ZonePtr;
 				CrossMixing( Loop ).DesiredAirFlowRate = CrossMixing( Loop ).DesignLevel * GetCurrentScheduleValue( CrossMixing( Loop ).SchedPtr );
 				if ( CrossMixing( Loop ).EMSSimpleMixingOn ) CrossMixing( Loop ).DesiredAirFlowRate = CrossMixing( Loop ).EMSimpleMixingFlowRate;
-				MTC( Loop ) = CrossMixing( Loop ).DeltaTemperature;
-				MVFC( Loop ) = CrossMixing( Loop ).DesiredAirFlowRate;
 			}
 
 			//Note - do each Pair a Single time, so must do increment reports for both zones
