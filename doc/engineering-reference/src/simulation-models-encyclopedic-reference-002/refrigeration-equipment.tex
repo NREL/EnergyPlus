@@ -5,10 +5,10 @@
 EnergyPlus can model refrigerated case equipment consisting of a compressor rack, multiple refrigerated cases and walk-in coolers, secondary loop equipment, and~ optional heat reclaim air and water heating coils. The refrigerated case equipment models perform four major functions:
 
 \begin{itemize}
-  \itemi calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack
-  \itemi determine the impact of refrigerated cases and walk-in coolers on zone cooling and dehumidification loads (i.e., case credits), including the effects of HVAC duct configuration
-  \itemi calculate the electric consumption and COP of the compressor rack, and the electric and water (if applicable) consumption related to cooling the compressor rack's condenser.
-  \itemi determine the total amount of heat rejected by the compressor rack's condenser and store this information for use by waste heat recovery models (e.g., using Desuperheater heating coil (object: Coil:Heating:Desuperheater) as an air reheat coil for high humidity control in a supermarket)
+  \item calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack
+  \item determine the impact of refrigerated cases and walk-in coolers on zone cooling and dehumidification loads (i.e., case credits), including the effects of HVAC duct configuration
+  \item calculate the electric consumption and COP of the compressor rack, and the electric and water (if applicable) consumption related to cooling the compressor rack's condenser.
+  \item determine the total amount of heat rejected by the compressor rack's condenser and store this information for use by waste heat recovery models (e.g., using Desuperheater heating coil (object: Coil:Heating:Desuperheater) as an air reheat coil for high humidity control in a supermarket)
 \end{itemize}
 
 The case and walk-in models account for nearly all performance aspects of typical supermarket refrigeration equipment. Refrigerated case and walk-in performance are based on the combined effects of evaporator load, fan operation, lighting, defrost type, and anti-sweat heater operation. Optional air and water heating coils can be modeled to reclaim available waste heat (superheat) from the compressor rack.
