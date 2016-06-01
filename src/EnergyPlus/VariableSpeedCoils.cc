@@ -404,8 +404,7 @@ namespace VariableSpeedCoils {
 		WaterVolFlowAutoSized(false), // Used to report autosizing info for the HPWH DX coil
 		TotalHeatingEnergy(0.0),  //total water heating energy
 		TotalHeatingEnergyRate(0.0), //total WH energy rate
-		bIsDesuperheater(false),//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
-		bIsIHP(false)//whether the coil is a part of IHP
+		bIsDesuperheater(false)//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
 		//end variables for HPWH
 	{}
 
@@ -512,7 +511,9 @@ namespace VariableSpeedCoils {
 	}
 
 	void
-	GetVarSpeedCoilInput()
+	GetVarSpeedCoilInput(
+		bool const IsCallbyIHP //whether calling from an IHP initialization
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1044,7 +1045,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			if (! VarSpeedCoil(DXCoilNum).bIsIHP ) // IHP allows no node inputs for coil
+			if (!IsCallbyIHP) // IHP allows no node inputs for coil
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
@@ -1749,7 +1750,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			if (!VarSpeedCoil(DXCoilNum).bIsIHP) // IHP allows no node inputs for coil
+			if (!IsCallbyIHP) // IHP allows no node inputs for coil
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
@@ -2171,7 +2172,7 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-			if (!VarSpeedCoil(DXCoilNum).bIsIHP) // IHP allows no node inputs for coil
+			if (!IsCallbyIHP) // IHP allows no node inputs for coil
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
@@ -2182,7 +2183,7 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-			if (!VarSpeedCoil(DXCoilNum).bIsIHP) // IHP allows no node inputs for coil
+			if (!IsCallbyIHP) // IHP allows no node inputs for coil
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(7), AlphArray(8), "Water Nodes");
 
 			VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(10);
@@ -5621,7 +5622,8 @@ namespace VariableSpeedCoils {
 	GetCoilIndexVariableSpeed(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
-		bool & ErrorsFound // set to true if problem
+		bool & ErrorsFound, // set to true if problem
+		bool const IsCallbyIHP
 	)
 	{
 
@@ -5646,7 +5648,7 @@ namespace VariableSpeedCoils {
 
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
-			GetVarSpeedCoilInput();
+			GetVarSpeedCoilInput(IsCallbyIHP);
 			//    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
 			GetCoilsInputFlag = false;
 		}

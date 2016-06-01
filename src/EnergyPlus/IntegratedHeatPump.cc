@@ -717,7 +717,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SCCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                          errFlag );
+					                                                                          errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -738,7 +738,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                          errFlag );
+					                                                                          errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -758,7 +758,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                           errFlag );
+					                                                                           errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -778,7 +778,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                            errFlag );
+					                                                                            errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -799,7 +799,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                                 errFlag );
+					                                                                                 errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -820,7 +820,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                               errFlag );
+					                                                                               errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -843,7 +843,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                                 errFlag );
+					                                                                                 errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -863,7 +863,7 @@ namespace EnergyPlus {
 				else {
 					errFlag = false;
 					IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                               errFlag );
+					                                                                               errFlag, true );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -890,32 +890,23 @@ namespace EnergyPlus {
 					OutNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
 					//all the SC air coils have indoor air nodes for cooling
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).bIsIHP = true; 
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).bIsIHP = true;
 
 					InNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
 					OutNode = IntegratedHeatPumps( DXCoilNum ).AirOutletNodeNum;
 					//all the SH air coils have indoor air nodes for heating
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).bIsIHP = true;
 
 					//water node connections
 					InNode = IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum;
 					OutNode = IntegratedHeatPumps( DXCoilNum ).WaterOutletNodeNum;
 					//all the water coils have the same water side node connnections
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).bIsIHP = true;
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).bIsIHP = true;
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).bIsIHP = true;
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode, OutNode );
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).bIsIHP = true;
 
 					//outdoor air node connections
 					//DWH, SCDWH, SHDWH coils have the same outdoor air nodes
@@ -923,13 +914,10 @@ namespace EnergyPlus {
 					OutNode = IntegratedHeatPumps( DXCoilNum ).ODAirOutletNodeNum;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode,
 					             OutNode );//SCDWHCoil has outdoor air nodes
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode,
 					             OutNode );//SCDWHCoil has outdoor air nodes
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode,
 					             OutNode );//SHDWHWHCoil has outdoor air nodes
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).bIsIHP = true;
 
 					IntegratedHeatPumps( DXCoilNum ).NodeConnected = true;
 				};

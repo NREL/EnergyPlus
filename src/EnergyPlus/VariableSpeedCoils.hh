@@ -366,7 +366,6 @@ namespace VariableSpeedCoils {
 		Real64 TotalHeatingEnergy; //total water heating energy
 		Real64 TotalHeatingEnergyRate;//total WH energy rate
 		bool bIsDesuperheater;//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
-		bool bIsIHP;//whether the coil is a part of IHP
 		//end variables for HPWH
 
 		// Default Constructor
@@ -399,7 +398,9 @@ namespace VariableSpeedCoils {
 	);
 
 	void
-	GetVarSpeedCoilInput();
+		GetVarSpeedCoilInput(
+			bool const IsCallbyIHP = false//whether checked by IHP parent
+		);
 
 	// Beginning Initialization Section of the Module
 	//******************************************************************************
@@ -459,7 +460,8 @@ namespace VariableSpeedCoils {
 	GetCoilIndexVariableSpeed(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
-		bool & ErrorsFound // set to true if problem
+		bool & ErrorsFound, // set to true if problem
+		bool const IsCallbyIHP = false//whether checked by IHP parent 
 	);
 
 	Real64
