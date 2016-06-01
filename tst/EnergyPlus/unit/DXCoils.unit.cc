@@ -221,11 +221,6 @@ namespace EnergyPlus {
 		// 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number",
 		// 	" DX Heating Coil Standard Rating Information, , DX Heating coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
-		// Clean up
-		DXCoil.deallocate();
-		DXCoilNumericFields.deallocate();
-		PerfCurve.deallocate();
-
 	}
 	TEST_F( EnergyPlusFixture, DXCoils_Test2 ) {
 		using CurveManager::Quadratic;
@@ -335,10 +330,7 @@ namespace EnergyPlus {
 		// " DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"
 
 		// Clean up
-		DXCoil.deallocate();
-		DXCoilNumericFields.deallocate();
 		UnitarySysEqSizing.deallocate();
-		PerfCurve.deallocate();
 		FinalSysSizing.deallocate();
 		PrimaryAirSystem.deallocate();
 		AirLoopControlInfo.deallocate();
@@ -1029,8 +1021,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
 		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
 
-		// clear
-		DXCoil.deallocate();
 	}
 
 	TEST_F( EnergyPlusFixture, TestDXCoilIndoorOrOutdoor ) {
@@ -1080,8 +1070,6 @@ namespace EnergyPlus {
 		EXPECT_FALSE( DXCoil( 2 ).IsDXCoilInZone );
 		EXPECT_TRUE( DXCoil( 3 ).IsDXCoilInZone );
 
-		// Clean up
-		DXCoil.deallocate();
 	}
 
 	TEST_F( EnergyPlusFixture, TestMultiSpeedWasteHeat )
@@ -1301,9 +1289,6 @@ namespace EnergyPlus {
 		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1, 0 );
 
 		EXPECT_NEAR( 1303.4304, MSHPWasteHeat, 0.001 );
-
-		// clear
-		DXCoil.deallocate();
 
 	}
 
@@ -1646,8 +1631,88 @@ namespace EnergyPlus {
 
 		DataGlobals::SysSizingCalc = false;
 		EnergyPlus::DataAirLoop::AirLoopInputsFilled = false;
-		// clear
-		DXCoil.deallocate( );
 
 	}
+
+	TEST_F( EnergyPlusFixture, BlankDefrostEIRCurveInput ) {
+
+		// tests autosizing evaporatively cooled condenser pump #4802
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"	Schedule:Compact,",
+			"	Always On,            !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+
+			"Curve:Biquadratic,",
+			"	Biquadratic,     !- Name",
+			"	1.0,             !- Coefficient1 Constant",
+			"	0.0,             !- Coefficient2 x",
+			"	0.0,             !- Coefficient3 x**2",
+			"	0.0,             !- Coefficient4 y",
+			"	0.0,             !- Coefficient5 y**2",
+			"	0.0,             !- Coefficient6 x*y",
+			"	12.0,            !- Minimum Value of x",
+			"	23.9,            !- Maximum Value of x",
+			"	18.0,            !- Minimum Value of y",
+			"	46.1,            !- Maximum Value of y",
+			"	,                !- Minimum Curve Output",
+			"	,                !- Maximum Curve Output",
+			"	Temperature,     !- Input Unit Type for X",
+			"	Temperature,     !- Input Unit Type for Y",
+			"	Dimensionless;   !- Output Unit Type",
+
+			"Curve:Quadratic,",
+			"	Quadratic, !- Name",
+			"	0.8,              !- Coefficient1 Constant",
+			"	0.2,              !- Coefficient2 x",
+			"	0.0,              !- Coefficient3 x**2",
+			"	0.5,              !- Minimum Value of x",
+			"	1.5;              !- Maximum Value of x",
+
+			"Coil:Heating:DX:SingleSpeed,",
+			"	BC Heating Coil System HC,  !- Name",
+			"	Always On,               !- Availability Schedule Name",
+			"	autosize,                !- Gross Rated Heating Capacity {W}",
+			"	3.03,                    !- Gross Rated Heating COP {W/W}",
+			"	autosize,                !- Rated Air Flow Rate {m3/s}",
+			"	773.3,                   !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+			"	CoilSystem_Cooling_DX 1 DX Cooling Coil System Outlet Node Name,  !- Air Inlet Node Name",
+			"	CoilSystem_Heating_DX 1 Air Outlet,  !- Air Outlet Node Name",
+			"	Biquadratic,             !- Heating Capacity Function of Temperature Curve Name",
+			"	Quadratic,               !- Heating Capacity Function of Flow Fraction Curve Name",
+			"	Biquadratic,             !- Energy Input Ratio Function of Temperature Curve Name",
+			"	Quadratic,               !- Energy Input Ratio Function of Flow Fraction Curve Name",
+			"	Quadratic,               !- Part Load Fraction Correlation Curve Name",
+			"	Biquadratic,             !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+			"	-8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+			"	,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+			"	5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+			"	0.0,                     !- Crankcase Heater Capacity {W}",
+			"	10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+			"	,                        !- Defrost Strategy",
+			"	,                        !- Defrost Control",
+			"	0.058333,                !- Defrost Time Period Fraction",
+			"	autosize,                !- Resistive Defrost Heater Capacity {W}",
+			"	4;                       !- Region number for calculating HSPF",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ProcessScheduleInput();
+		GetCurveInput();
+		GetDXCoils();
+
+		ASSERT_EQ( 1, NumDXCoils );
+		ASSERT_EQ( DXCoil( 1 ).DefrostStrategy, ReverseCycle );
+		ASSERT_EQ( DXCoil( 1 ).DefrostControl, Timed );
+		ASSERT_EQ( DXCoil( 1 ).DefrostEIRFT, 1 );
+		ASSERT_EQ( DXCoil( 1 ).MaxOATDefrost, 5.0 );
+		ASSERT_EQ( DXCoil( 1 ).DefrostTime, 0.058333 );
+
+	}
+
 }
