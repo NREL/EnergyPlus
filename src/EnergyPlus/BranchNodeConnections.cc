@@ -1871,7 +1871,7 @@ namespace BranchNodeConnections {
 				//  All other values must match
 				AlreadyNoted( Other ) = true;
 
-				if ("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" == CompSets(Count).CType)	{
+				if (CompSets( Count ).CType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" )	{
 					continue; //ignore the error for IHP objects, BOS, 03/2016
 				}
 

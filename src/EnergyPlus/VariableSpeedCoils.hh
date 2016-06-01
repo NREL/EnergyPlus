@@ -366,6 +366,7 @@ namespace VariableSpeedCoils {
 		Real64 TotalHeatingEnergy; //total water heating energy
 		Real64 TotalHeatingEnergyRate;//total WH energy rate
 		bool bIsDesuperheater;//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+		bool bIsIHP;//whether the coil is a part of IHP
 		//end variables for HPWH
 
 		// Default Constructor

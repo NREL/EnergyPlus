@@ -45616,67 +45616,67 @@ Coil:Heating:DX:VariableSpeed,
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
 						
-COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE,
-	   \memo This object is used for air-source integrated heat pump, a collection of its working modes.
+CoilSystem:IntegratedHeatPump:AirSource,
+      \memo This object is used for air-source integrated heat pump, a collection of its working modes.
   A1, \field Name
        \required-field
        \type alpha
        \reference IntegratedHeatPumps
        \note Unique name for this instance of an air-source integrated heat pump.
-  A2, \field Indoor Air Cooling Coil Inlet Node Name
+  A2, \field Air Cooling Coil Inlet Node Name
        \required-field
-       \type alpha
-  A3, \field Indoor Air Heating Coil Inlet Node Name
+       \type node
+  A3, \field Air Heating Coil Inlet Node Name
        \required-field
-       \type alpha
-  A4, \field Indoor Air Outlet Node Name
+       \type node
+  A4, \field Air Outlet Node Name
        \required-field
-       \type alpha
-  A5, \field Condenser Water Inlet Node
+       \type node
+  A5, \field Water Inlet Node Name
        \required-field
-       \type alpha
-  A6, \field Condenser Water Outlet Node
+       \type node
+  A6, \field Water Outlet Node Name
        \required-field
-       \type alpha
-  A7, \field Water Node to Monitor the Supply Hot Water Flow
+       \type node
+  A7, \field Supply Hot Water Flow Sensor Node Name 
        \required-field
-       \type alpha
-  A8, \field Outdoor Air Inlet Node
+       \type node
+  A8, \field Outdoor Air Inlet Node Name
        \required-field
-       \type alpha
-  A9, \field Outdoor Air Outlet Node
+       \type node
+  A9, \field Outdoor Air Outlet Node Name
        \required-field
-       \type alpha
-  A10, \ field Coil Name of Space Cooling Mode
+       \type node
+  A10, \field Space Cooling Coil  Name
        \required-field
        \type object-list
        \object-list CoolingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
-  A11,  \field Coil Name of Space Heating Mode
+  A11, \field Space Heating Coil Name
        \type object-list
        \object-list HeatingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.
-  A12,  \field Coil Name of Dedicated Water Heating Mode
+  A12, \field Dedicated Water Heating Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
-  A13, \field Coil Name of Combined Space Cooling and Water Heating Mode with Full Condensing
+  A13, \field SCWH Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
-  A14, \field Cooling Coil Name of Combined Space Cooling and Water Heating Mode with Desuperheating
+  A14, \field SCDWH Cooling Coil Name
        \type object-list
        \object-list CoolingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
-  A15, \field Water Heating Coil Name of Combined Space Cooling and Water Heating Mode with Desuperheating
+  A15, \field SCDWH Water Heating Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   
-  A16, \field Heating Coil Name of Combined Space Heating and Water Heating Mode with Desuperheating
+  A16, \field SHDWH Heating Coil Name
        \type object-list
        \object-list HeatingCoilsDXVariableSpeed
-	   \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.   
-  A17, \field Water Heating Coil Name of Combined Space Heating and Water Heating Mode with Desuperheating
+       \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.   
+  A17, \field SHDWH Water Heating Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   	   
@@ -45689,7 +45689,7 @@ COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE,
   N2 , \field Ambient Temperature Limit for SCWH Mode
        \type real
        \units C
-       \minimum>20.0
+       \minimum> 20.0
        \default 27.0
        \note Ambient Temperature above which Indoor Overcooling is Allowed during Cooling Operation
   N3 , \field Indoor Temperature above Which WH has Higher Priority
@@ -45725,7 +45725,7 @@ COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE,
        \default 1
        \minimum> 0
        \maximum< 10
-  N9,  \field Maximum Running Time before Allowing Electric Res Heat Use during SHDWH Mode
+  N9,  \field Maximum Running Time before Allowing Electric Resistance Heat Use during SHDWH Mode
        \type real
        \units s
        \minimum> 0.0
@@ -52901,7 +52901,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \type choice
         \key Coil:Heating:DX:SingleSpeed
         \key Coil:Heating:DX:VariableSpeed
-		\key COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+        \key CoilSystem:IntegratedHeatPump:AirSource
         \note  Only works with Coil:Heating:DX:SingleSpeed or
         \note Coil:Heating:DX:VariableSpeed or
 		\note COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
@@ -52918,7 +52918,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \key Coil:Cooling:DX:SingleSpeed
         \key Coil:Cooling:DX:VariableSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
-		\key COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+        \key CoilSystem:IntegratedHeatPump:AirSource
         \note Only works with Coil:Cooling:DX:SingleSpeed or
         \note CoilSystem:Cooling:DX:HeatExchangerAssisted or
         \note Coil:Cooling:DX:VariableSpeed or

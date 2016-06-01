@@ -404,7 +404,8 @@ namespace VariableSpeedCoils {
 		WaterVolFlowAutoSized(false), // Used to report autosizing info for the HPWH DX coil
 		TotalHeatingEnergy(0.0),  //total water heating energy
 		TotalHeatingEnergyRate(0.0), //total WH energy rate
-		bIsDesuperheater(false)//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+		bIsDesuperheater(false),//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+		bIsIHP(false)//whether the coil is a part of IHP
 		//end variables for HPWH
 	{}
 
@@ -435,11 +436,6 @@ namespace VariableSpeedCoils {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages variable-speed Water to Air Heat Pump component simulation.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// N/A
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using FluidProperties::FindGlycol;
@@ -448,18 +444,6 @@ namespace VariableSpeedCoils {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// shut off after compressor cycle off  [s]
-		// part-load ratio = load/total capacity, passed in by the parent object
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // The WatertoAirHP that you are currently loading input into
@@ -470,7 +454,6 @@ namespace VariableSpeedCoils {
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
 			GetVarSpeedCoilInput();
-			//    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
 			GetCoilsInputFlag = false;
 		}
 
@@ -543,9 +526,6 @@ namespace VariableSpeedCoils {
 
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
-
-		// REFERENCES:
-		// n/a
 
 		// Using/Aliasing
 		using namespace InputProcessor;
@@ -1064,7 +1044,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			if ((VarSpeedCoil(DXCoilNum).AirInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).AirOutletNodeNum > 0)) // IHP allows no node inputs for coil
+			if (! VarSpeedCoil(DXCoilNum).bIsIHP ) // IHP allows no node inputs for coil
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
@@ -1769,7 +1749,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			if ((VarSpeedCoil(DXCoilNum).AirInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).AirOutletNodeNum > 0)) // IHP allows no node inputs for coil
+			if (!VarSpeedCoil(DXCoilNum).bIsIHP) // IHP allows no node inputs for coil
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
@@ -2191,7 +2171,7 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-			if ((VarSpeedCoil(DXCoilNum).AirInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).AirOutletNodeNum > 0)) // IHP allows no node inputs for coil
+			if (!VarSpeedCoil(DXCoilNum).bIsIHP) // IHP allows no node inputs for coil
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
@@ -2202,7 +2182,7 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-			if ((VarSpeedCoil(DXCoilNum).WaterInletNodeNum > 0) && (VarSpeedCoil(DXCoilNum).WaterOutletNodeNum > 0)) // IHP allows no node inputs for coil
+			if (!VarSpeedCoil(DXCoilNum).bIsIHP) // IHP allows no node inputs for coil
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(7), AlphArray(8), "Water Nodes");
 
 			VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(10);
@@ -2709,8 +2689,6 @@ namespace VariableSpeedCoils {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataGlobals::SysSizingCalc;
@@ -3102,9 +3080,6 @@ namespace VariableSpeedCoils {
 		// equal to the cooling capacity.  Thus the cooling and
 		// and heating capacities of a DX heat pump system will be identical. In real life the ARI
 		// heating and cooling capacities are close but not identical.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace Psychrometrics;
@@ -3865,32 +3840,6 @@ namespace VariableSpeedCoils {
 			RatedCapCoolSensDes = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal * SHR;
 		} else if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate >= SmallAirVolFlow &&
 			VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
-		/*	RatedAirMassFlowRate = VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW(StdBaroPress,
-				HPWHInletDBTemp, HPInletAirHumRat, RoutineName);
-			RatedInletEnth = PsyHFnTdbW(HPWHInletDBTemp, HPInletAirHumRat);
-			CBFRated = AdjustCBF(VarSpeedCoil(DXCoilNum).MSRatedCBF(NormSpeed),
-				VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(NormSpeed), RatedAirMassFlowRate);
-			if (CBFRated > 0.999) CBFRated = 0.999;
-			AirMassFlowRatio = VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate /
-				VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(NormSpeed);
-
-			if (VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(NormSpeed) > 1.0e-10) {
-				WaterMassFlowRatio = VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate /
-					VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(NormSpeed);
-			}
-			else {
-				WaterMassFlowRatio = 1.0;
-			}
-
-			CalcTotCapSHR_VSWSHP(HPWHInletDBTemp, HPInletAirHumRat,
-				RatedInletEnth, HPWHInletWBTemp,
-				AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate,
-				CBFRated, VarSpeedCoil(DXCoilNum).MSRatedTotCap(NormSpeed),
-				VarSpeedCoil(DXCoilNum).MSCCapFTemp(NormSpeed),
-				VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(NormSpeed),
-				VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(NormSpeed), 0.0, 0, 0, 0,
-				QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1);*/
-
 			SHR = VarSpeedCoil(DXCoilNum).MSRatedSHR(NormSpeed);
 			RatedCapCoolSensDes = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * SHR;
 		} else {
@@ -3905,35 +3854,13 @@ namespace VariableSpeedCoils {
 			if ( RatedCapCoolTotalAutoSized ) {
 				VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = RatedCapCoolSensDes;
 				ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
-				//CALL PreDefTableEntry(pdchCoolCoilSensCap,VarSpeedCoil(DXCoilNum)%Name,VarSpeedCoil(DXCoilNum)%RatedCapCoolSens)
-				//CALL PreDefTableEntry(pdchCoolCoilLatCap,VarSpeedCoil(DXCoilNum)%Name,VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal &
-				//                           - VarSpeedCoil(DXCoilNum)%RatedCapCoolSens)
-				//IF (VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal /= 0.0d0) THEN
-				//  CALL PreDefTableEntry(pdchCoolCoilSHR,VarSpeedCoil(DXCoilNum)%Name,VarSpeedCoil(DXCoilNum)%RatedCapCoolSens &
-				//                           / VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal)
-				//ELSE
-				//  CALL PreDefTableEntry(pdchCoolCoilSHR,VarSpeedCoil(DXCoilNum)%Name,0.0d0)
-				//ENDIF
+
 			} else {
 				// sensible capacity does not have an input field
 				if ( RatedCapCoolSensDes > 0.0 ) {
 					VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = RatedCapCoolSensDes;
 					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes ); //, &
-					//                            'User-Specified Rated Sensible Cooling Capacity [W]', &
-					//                             RatedCapCoolSensUser)
-					//       IF (DisplayExtraWarnings) THEN
-					//       IF ((ABS(RatedCapCoolSensDes - RatedCapCoolSensUser)/RatedCapCoolSensUser) > AutoVsHardSizingThreshold) THEN
-					//          CALL ShowMessage('SizeVarSpeedCoil: Potential issue with equipment sizing for:' &
-					//                      //TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)//' '//TRIM(CurrentObjSubfix))
-					//          CALL ShowContinueError('Coil Name ='//TRIM(VarSpeedCoil(DXCoilNum)%Name))
-					//          CALL ShowContinueError('User-Specified Rated Sensible Cooling Capacity of '// &
-					//                                    TRIM(RoundSigDigits(RatedCapCoolSensUser,2))// ' [W]')
-					//          CALL ShowContinueError('differs from Design Size Rated Sensible Cooling Capacity of ' // &
-					//                                    TRIM(RoundSigDigits(RatedCapCoolSensDes,2))// ' [W]')
-					//          CALL ShowContinueError('This may, or may not, indicate mismatched component sizes.')
-					//          CALL ShowContinueError('Verify that the value entered is intended and is consistent with other components.')
-					//        END IF
-					//        ENDIF
+
 				}
 			}
 			PreDefTableEntry( pdchCoolCoilTotCap, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
@@ -4095,9 +4022,6 @@ namespace VariableSpeedCoils {
 		// once at the actual operating conditions.
 		// Finally, adjust the heat pump outlet conditions based on the PartLoadRatio
 		// and RuntimeFrac.
-
-		// REFERENCES:
-		// n/a
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
@@ -4639,8 +4563,6 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Bo Shen, ORNL
 		//       DATE WRITTEN   12/2014
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the gross cooling capacity of a varaible-speed heat pump water heater evaporator and
@@ -5179,7 +5101,7 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SourceSideMassFlowRate;
 		VarSpeedCoil(DXCoilNum).QWasteHeat = 0.0;
 
-		if (true == VarSpeedCoil(DXCoilNum).bIsDesuperheater)//desuperheater doesn't save power and cooling energy variables
+		if (VarSpeedCoil(DXCoilNum).bIsDesuperheater)//desuperheater doesn't save power and cooling energy variables
 		{
 			//source side is the water side; load side is the air side
 			VarSpeedCoil(DXCoilNum).Power = 0.0;
@@ -5220,9 +5142,6 @@ namespace VariableSpeedCoils {
 		// Simulate the heat pump performance using the coefficients and rated conditions
 		// Finally, adjust the heat pump outlet conditions based on the PartLoadRatio
 		// and RuntimeFrac.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
@@ -5650,12 +5569,6 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 		using InputProcessor::FindItemInList;
@@ -5664,17 +5577,6 @@ namespace VariableSpeedCoils {
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5734,12 +5636,6 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 		using InputProcessor::FindItemInList;
@@ -5747,20 +5643,6 @@ namespace VariableSpeedCoils {
 		// Return value
 		int IndexNum; // returned index of matched coil
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
@@ -5799,12 +5681,6 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// USE STATEMENTS:
 		//  USE FluidProperties, ONLY: FindGlycol
 		// Using/Aliasing
@@ -5813,18 +5689,6 @@ namespace VariableSpeedCoils {
 
 		// Return value
 		Real64 CoilAirFlowRate; // returned air volume flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5884,28 +5748,11 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int PLRNumber; // returned outlet node of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5951,29 +5798,12 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6019,30 +5849,12 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6069,7 +5881,8 @@ namespace VariableSpeedCoils {
 
 	}
 
-	void SetAirNodes(std::string const & CoilName, // must match coil names for the coil type
+	void SetAirNodes(
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		int const InNode,
 		int const OutNode
@@ -6085,26 +5898,8 @@ namespace VariableSpeedCoils {
 		// PURPOSE OF THIS FUNCTION:
 		//pass air side nodes from an IHP parent object to the coil object
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6128,7 +5923,8 @@ namespace VariableSpeedCoils {
 		}
 	}
 
-	void SetWaterNodes(std::string const & CoilName, // must match coil names for the coil type
+	void SetWaterNodes(
+		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound, // set to true if problem
 		int const InNode,
 		int const OutNode
@@ -6138,32 +5934,12 @@ namespace VariableSpeedCoils {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Bo Shen
 		//       DATE WRITTEN   Jan 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		//pass water side nodes from an IHP parent object to the coil object
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6204,29 +5980,11 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns the condenser inlet node.  If
 		// incorrect coil  name is given, ErrorsFound is returned as true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int CondNode; // returned condenser node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6268,29 +6026,11 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns min OAT for compressor operation.  If
 		// incorrect coil  name is given, ErrorsFound is returned as true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 MinOAT; // returned min OAT for compressor operation
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6332,29 +6072,12 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns number of speeds.  If
 		// incorrect coil name is given, ErrorsFound is returned as true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int Speeds; // returned number of speeds
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6396,32 +6119,12 @@ namespace VariableSpeedCoils {
 		// This routine was designed to "push" information from a parent object to
 		// this WSHP coil object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using FluidProperties::FindGlycol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
@@ -6464,25 +6167,12 @@ namespace VariableSpeedCoils {
 		// METHODOLOGY EMPLOYED:
 		// Data is moved from the HP data structure to the HP outlet nodes.
 
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
 		using DataContaminantBalance::Contaminant;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirInletNode;
@@ -6571,8 +6261,6 @@ namespace VariableSpeedCoils {
 		// FUNCTION INFORMATION:
 		//    AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:CalcEffectiveSHR
 		//    DATE WRITTEN   March 2012
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		//    Adjust sensible heat ratio to account for degradation of DX coil latent
@@ -6596,18 +6284,6 @@ namespace VariableSpeedCoils {
 
 		// Return value
 		Real64 SHReff; // Effective sensible heat ratio, includes degradation due to cycling effects
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 Twet; // Nominal time for condensate to begin leaving the coil's condensate drain line
@@ -6764,12 +6440,6 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcTotCapSHR_VSWSHP" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 InletWetBulbCalc; // calculated inlet wetbulb temperature used for finding dry coil point [C]
 		Real64 InletHumRatCalc; // calculated inlet humidity ratio used for finding dry coil point [kg water / kg dry air]
@@ -6916,26 +6586,11 @@ namespace VariableSpeedCoils {
 		// METHODOLOGY EMPLOYED:
 		// Uses relation CBF = exp(-NTU) whereNTU = A0/(m*cp). Relationship models the cooling coil
 		// as a heat exchanger with Cmin/Cmax = 0.
-		// REFERENCES:
-		// na
 
-		// USE STATEMENTS:
-		// na
 
 		// Return value
 		Real64 CBFAdj; // the result - the adjusted coil bypass factor
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 A0; // intermediate variable
@@ -6987,9 +6642,6 @@ namespace VariableSpeedCoils {
 		// When the slopes are equal, then we have located the apparatus dewpoint of the coil at rated
 		// conditions. From this information, coil bypass factor is calculated.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 
@@ -7002,12 +6654,6 @@ namespace VariableSpeedCoils {
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcCBF" );
 		static Real64 SmallDifferenceTest( 0.00000001 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InletAirEnthalpy; // Enthalpy of inlet air to evaporator at given conditions [J/kg]

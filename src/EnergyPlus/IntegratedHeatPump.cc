@@ -314,7 +314,7 @@ namespace EnergyPlus {
 					IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate = 0.0;
 					break;
 				case IHPOperationMode::DWHMode:
-					if ( true == IsCallbyWH )//process when called from water loop
+					if ( IsCallbyWH )//process when called from water loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -386,7 +386,7 @@ namespace EnergyPlus {
 
 					break;
 				case IHPOperationMode::SCWHMatchWHMode:
-					if ( true == IsCallbyWH )//process when called from water loop
+					if ( IsCallbyWH )//process when called from water loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -890,23 +890,32 @@ namespace EnergyPlus {
 					OutNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
 					//all the SC air coils have indoor air nodes for cooling
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).bIsIHP = true; 
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).bIsIHP = true;
 
 					InNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
 					OutNode = IntegratedHeatPumps( DXCoilNum ).AirOutletNodeNum;
 					//all the SH air coils have indoor air nodes for heating
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).bIsIHP = true;
 
 					//water node connections
 					InNode = IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum;
 					OutNode = IntegratedHeatPumps( DXCoilNum ).WaterOutletNodeNum;
 					//all the water coils have the same water side node connnections
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).bIsIHP = true;
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).bIsIHP = true;
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).bIsIHP = true;
 					SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode, OutNode );
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).bIsIHP = true;
 
 					//outdoor air node connections
 					//DWH, SCDWH, SHDWH coils have the same outdoor air nodes
@@ -914,10 +923,13 @@ namespace EnergyPlus {
 					OutNode = IntegratedHeatPumps( DXCoilNum ).ODAirOutletNodeNum;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode,
 					             OutNode );//SCDWHCoil has outdoor air nodes
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode,
 					             OutNode );//SCDWHCoil has outdoor air nodes
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).bIsIHP = true;
 					SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode,
 					             OutNode );//SHDWHWHCoil has outdoor air nodes
+					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).bIsIHP = true;
 
 					IntegratedHeatPumps( DXCoilNum ).NodeConnected = true;
 				};
@@ -1020,7 +1032,7 @@ namespace EnergyPlus {
 				                ", IHP name=" + "AS-IHP" );
 			}
 
-			if ( true == IntegratedHeatPumps( DXCoilNum ).IHPCoilsSized ) { return; }
+			if ( IntegratedHeatPumps( DXCoilNum ).IHPCoilsSized ) { return; }
 
 			//associate SC coil with SH coil
 			SetVarSpeedCoilData( IntegratedHeatPumps( DXCoilNum ).SCCoilIndex, ErrorsFound, _,
@@ -1980,7 +1992,7 @@ namespace EnergyPlus {
 				case IHPOperationMode::SCWHMatchSCMode:
 					IHPCoilIndex = IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex;
 					FlowScale = IntegratedHeatPumps( DXCoilNum ).CoolVolFlowScale;
-					if ( true == IsCallbyWH )//call from water loop
+					if ( IsCallbyWH )//call from water loop
 					{
 						IsResultFlow = true;
 						AirVolFlowRate = VarSpeedCoil( IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex ).AirVolFlowRate;
@@ -1997,7 +2009,7 @@ namespace EnergyPlus {
 				case IHPOperationMode::SCDWHMode:
 					IHPCoilIndex = IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex;
 					FlowScale = IntegratedHeatPumps( DXCoilNum ).CoolVolFlowScale;
-					if ( true == IsCallbyWH ) {
+					if ( IsCallbyWH ) {
 						IsResultFlow = true;
 						AirVolFlowRate = VarSpeedCoil(
 						IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex ).AirVolFlowRate;
@@ -2007,7 +2019,7 @@ namespace EnergyPlus {
 				case IHPOperationMode::SHDWHElecHeatOnMode:
 					IHPCoilIndex = IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilIndex;
 					FlowScale = IntegratedHeatPumps( DXCoilNum ).HeatVolFlowScale;
-					if ( true == IsCallbyWH ) {
+					if ( IsCallbyWH ) {
 						IsResultFlow = true;
 						AirVolFlowRate = VarSpeedCoil(
 						IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilIndex ).AirVolFlowRate;
@@ -2182,7 +2194,7 @@ namespace EnergyPlus {
 					FlowScale = IntegratedHeatPumps( DXCoilNum ).CoolVolFlowScale;
 					Node( IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum ).MassFlowRate =
 					GetWaterVolFlowRateIHP( DXCoilNum, SpeedNum, SpeedRatio, true ) * WaterDensity;
-					if ( true == IsCallbyWH ) {
+					if ( IsCallbyWH ) {
 						IsResultFlow = true;
 						AirMassFlowRate = IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop;
 					}
@@ -2200,7 +2212,7 @@ namespace EnergyPlus {
 					FlowScale = IntegratedHeatPumps( DXCoilNum ).CoolVolFlowScale;
 					Node( IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum ).MassFlowRate =
 					GetWaterVolFlowRateIHP( DXCoilNum, SpeedNum, SpeedRatio, true ) * WaterDensity;
-					if ( true == IsCallbyWH ) {
+					if ( IsCallbyWH ) {
 						IsResultFlow = true;
 						AirMassFlowRate = IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop;
 					}
@@ -2211,7 +2223,7 @@ namespace EnergyPlus {
 					FlowScale = IntegratedHeatPumps( DXCoilNum ).HeatVolFlowScale;
 					Node( IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum ).MassFlowRate =
 					GetWaterVolFlowRateIHP( DXCoilNum, SpeedNum, SpeedRatio, true ) * WaterDensity;
-					if ( true == IsCallbyWH ) {
+					if ( IsCallbyWH ) {
 						IsResultFlow = true;
 						AirMassFlowRate = IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop;
 					}
