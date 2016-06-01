@@ -473,11 +473,7 @@ namespace HeatBalanceAirManager {
 		int i;
 		int Loop;
 		int Loop1;
-		int JDay;
-		int Hr;
 		Array1D_bool RepVarSet;
-		Array1D_bool OverLap;
-		int TS;
 		bool IsNotOK;
 		bool IsBlank;
 		int ZoneNum;
@@ -3049,7 +3045,7 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool FirstCall( true );
+		// na
 
 		// FLOW:
 
