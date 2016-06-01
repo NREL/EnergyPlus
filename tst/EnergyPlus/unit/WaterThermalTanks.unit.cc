@@ -87,9 +87,9 @@ TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 	Real64 SourceMassFlowRate = SourceMassFlowRateOrig;
 	Real64 Qheatpump = 0.0;
 	Real64 Qsource = 0.0;
-	
+
 	// Mixed Tank
-	
+
 	// Test case without HPWH
 	WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
 	// Qsource is non zero and calculated relative to the tank setpoint.
@@ -98,7 +98,7 @@ TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 	EXPECT_DOUBLE_EQ(Qheatpump, 0.0);
 	// SourceMassFlowRate is unchanged
 	EXPECT_DOUBLE_EQ(SourceMassFlowRateOrig, SourceMassFlowRate);
-	
+
 	// Test case with HPWH
 	DeltaT = 5.0;
 	WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
@@ -108,7 +108,7 @@ TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 	EXPECT_DOUBLE_EQ(SourceMassFlowRateOrig * Cp * DeltaT, Qheatpump);
 	// SourceMassFlowRate is zero
 	EXPECT_DOUBLE_EQ(SourceMassFlowRate, 0.0);
-	
+
 }
 
 TEST_F( EnergyPlusFixture, WaterThermalTankData_GetDeadBandTemp )
@@ -1036,4 +1036,31 @@ TEST_F( EnergyPlusFixture, HPWHSizing )
 	EXPECT_EQ( Fans::Fan( 1 ).MaxAirFlowRate, WaterThermalTanks::HPWaterHeater( 1 ).OperatingAirFlowRate );
 	EXPECT_EQ( Fans::Fan( 1 ).MaxAirFlowRate, DXCoils::DXCoil( 1 ).RatedAirVolFlowRate( 1 ) );
 
+}
+
+TEST_F( EnergyPlusFixture, WaterThermalTank_CalcTempIntegral )
+{
+
+	Real64 Ti = 57.22; // Initial tank temperature (C)
+	Real64 Tf = 52.22; // Final tank temperature (C)
+	Real64 Ta = 19.72; // Ambient environment temperature (C)
+	Real64 T1 = 14.44; // Temperature of flow 1 (C)
+	Real64 T2 = 0.00; // Temperature of flow 2 (C)
+	Real64 m = 148.67; // Mass of tank fluid (kg)
+	Real64 Cp = 4183.9; // Specific heat of fluid (J/kg deltaC)
+	Real64 m1 = 0.06761; // Mass flow rate 1 (kg/s)
+	Real64 m2 = 0.00; // Mass flow rate 2 (kg/s)
+	Real64 UA = 5.0; // Heat loss coefficient to ambient environment (W/deltaC)
+	Real64 Q = 0.0; // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+	Real64 t = 269.2; // Time elapsed from Ti to Tf (s)
+
+	EXPECT_NEAR( 14716.6, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t ), 0.1 );
+
+	EXPECT_NEAR( 0.0, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, 0.0 ), 0.1 ); // elapsed time is zero
+
+	EXPECT_NEAR( 15403.6, WaterThermalTanks::CalcTempIntegral( Ti, Ti, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t ), 0.1 ); // final tank temperature same as initial tank temperature
+
+	EXPECT_NEAR( 15461.9, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, 0., 0., 0., 1000.0, t ), 0.1 ); // UA, m1, m2 all zero, Q = 1000W
+
+	EXPECT_NEAR( 14772.5, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, 1000.0, t ), 0.1 ); // Q = 1000W
 }

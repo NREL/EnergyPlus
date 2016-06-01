@@ -102,6 +102,8 @@ namespace DataAirflowNetwork {
 	int const CompTypeNum_HEX( 16 ); // Distribution system heat exchanger
 	int const CompTypeNum_HOP( 17 ); // Horizontal opening component
 	int const CompTypeNum_RVD( 18 ); // Reheat VAV terminal damper
+	int const CompTypeNum_OAF( 19 ); // Distribution system OA 
+	int const CompTypeNum_REL( 20 ); // Distribution system relief air 
 
 	// EPlus component Type
 	int const EPlusTypeNum_SCN( 1 ); // Supply connection
@@ -130,6 +132,9 @@ namespace DataAirflowNetwork {
 
 	int const iWPCCntr_Input( 1 );
 	int const iWPCCntr_SurfAvg( 2 );
+
+	int const PressureCtrlExhaust( 1 );
+	int const PressureCtrlRelief( 2 );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -186,6 +191,9 @@ namespace DataAirflowNetwork {
 	// Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
 	Real64 VAVTerminalRatio( 0.0 ); // The terminal flow ratio when a supply VAV fan reach its max flow rate
 	bool VAVSystem( false ); // This flag is used to represent a VAV system
+	Real64 ExhaustFanMassFlowRate( 0.0 ); // Exhaust fan flow rate used in PressureStat
+	int PressureSetFlag( 0 ); // PressureSet flag
+	Real64 ReliefMassFlowRate( 0.0 ); // OA Mixer relief node flow rate used in PressureStat
 
 	// Object Data
 	Array1D< AirflowNetworkNodeSimuData > AirflowNetworkNodeSimu;
@@ -230,6 +238,9 @@ namespace DataAirflowNetwork {
 	Array1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
 	Array1D< DisSysCompCPDProp > DisSysCompCPDData;
 	Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+	Array1D< PressureControllerProp > PressureControllerData;
+	Array1D< DisSysCompAirflowProp > DisSysCompOutdoorAirData;
+	Array1D< DisSysCompAirflowProp > DisSysCompReliefAirData;
 
 	void
 	clear_state()
