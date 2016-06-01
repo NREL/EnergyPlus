@@ -28,9 +28,96 @@ Additional problems in EnergyPlus can occur if a modeler uses different window m
 This is true for solar and daylighting calculations where incoming solar radiation/daylight from one window is calculated and distributed differently in two models (split flux vs BSDF distribution).
 The implementations of ASHWAT engine has contributed to further confusion, where yet another "similar but now quite the same" window calculation module has been implemented in EnergyPlus.
 Window calculation engine (WCE) will consolidate all three models into one and this will be done through different stages.
-This NFP is proposal of way of linking and integrating WCE into EnergyPlus. 
+This NFP is proposal of way of linking and integrating WCE into EnergyPlus.
+In this stage of WCE consolidation (re-factoring) will include ISO 15099 thermal and optical routines. Later, WCE will include ASHWAT and EN standards as well (at this moment, they are lower priority).
 
 ## E-mail and Conference Call Conclusions
+## E-mail communications
+### Email 1
+####Mike Witte comments and questions (May/31/2016)
+<ol>
+	<li> Several places in the NFP mention re-factoring.  Are you proposing that existing code be refactored with the dual method?  I may not be following the big picture here, but it seems better to leave the existing code as-is and write completely new code to drive the WCE method.
+	<li> There may be some pushback about removing the ASHWAT (*:EquivalentLayer) method.  Can WCE model every combination of layers that are possible with ASHWAT?  A few more sentences to justify this would be  helpeful.
+	<li> Regarding the current limitation of 10 layers in the Construction object, I don't know of any reason why this couldn't be made extensible with no limit on number of layers.  The current code already limits window constructions to 8 layers, so this check could remain in place when the existing window method is selected.
+	<li> What is the proposed timetable?
+</ol>
+
+####Simon reply (May/31/2016)
+
+<ol>
+	<li> Big picture here is to move windows code into separate component, outside of core EnergyPlus code. Idea is that in first few stages we keep dual code so that user(s) can use both. After old code has been totally replaced we can consider removing it. That is why I want to put swich in IDF that will separate these modules.
+	<li> No, I will not remove ASHWAT. It will be part of WCE. However, it is lower in priority list.
+	<li> My comment was regarding to Construction object in IDD (IDF). Construction object in IDD is limited to 10 layers and if user wants to use more then IDD needs to be changed. As for the code, it can handle unlimited number of layers.
+	<li> Timetable is that first three items (heat transfer - ISO15099, spectral averaging and optical properties of layers and IGU) will be done till August, 15th (when EnergyPlus is locked for October release) and if time allows I will try to put optical properties of shading devices.
+</ol>
+
+####Mike's reply (May/31/2016)
+
+1. Big picture here is to move windows code into separate component, outside of core EnergyPlus code. Idea is that in first few stages we keep dual code so that user(s) can use both. After old code has been totally replaced we can consider removing it. That is why I want to put swich in IDF that will separate these modules.
+
+Reply: The question is where inside EnergyPlus the duality happens - at a high level or at lower levels.  We can discuss in more detail on the review call (count me in).
+
+2. No, I will not remove ASHWAT. It will be part of WCE. However, it is lower in priority list.
+
+Reply: Please clarify that in the NFP.
+
+3. My comment was regarding to Construction object in IDD (IDF). Construction object in IDD is limited to 10 layers and if user wants to use more then IDD needs to be changed. As for the code, it can handle unlimited number of layers.
+</ol>
+
+Reply: Just changing the IDD is not enough.  There has to be a least a change to  this line, and this can't simply be unlimited, without some major refactoring.  We could choose a value that we deem large enough initially, but at some point we need to add code to determine the max number of layers early and set this value before it gets used to allocate various arrays, or do some refactoring to be more flexible.
+
+DataHeatBalance.cc
+int const MaxLayersInConstruct( 11 ); // Maximum number of layers allowed in a single construction
+
+
+####Tianzhen comments (May/31/2016)
+
+I suggest a change to your IDD object:
+
+New - 
+```
+WindowsCalculationEngine,
+      \memo This object is used to switch algorithms between built in windows engine 
+      \memo and windows engine as exterior component
+  A1; \field Windows engine
+      \type choice
+      \key BuiltInWindowsModel
+      \key ExternalWindowsModel
+      \default BuiltInWindowsModel
+```
+
+Currently proposed - 
+```
+WindowsCalculationEngine,
+      \memo This object is used to switch algorithms between built in windows engine 
+      \memo and windows engine as exterior component
+  A1; \field Windows engine
+      \type choice
+      \key BuiltInWindowsModel
+```
+
+####Simon's reply (May/31/2016)
+
+only problem with this is that you will have to insert WindowsCalculationEngine object in every file. My idea was to insert object only when you want to use specific engine, otherwise it is default. Also, I did want to use external engine (WCE) as default and you have changed default to be current EnergyPlus windows code. Is that what you wanted?
+
+####Mike's reply (May/31/2016)
+
+There can be a default method without requiring the object to be present.  And I would lean towards making the current method the default initially.  Changing to WCE as the default should happen later.
+
+####Simon's reply (May/31/2016)
+
+Making it explicit is better. Here is what I see how it works: if there is no WindowsCalculationEngine object, use the built-in window code as currently in EnergyPlus; if there is the WindowsCalculationEngine object, use the user setting (if not specified default applies). 
+
+Until we prove results between two approaches are close enough, we should keep existing built-in code as default for compatibility purpose.
+
+####Neal's comment (May/31/2016)
+I will also join the NFP review. I would also suggest that some members of the team attempt to interact with the WCE as a library to test it before integrating directly into EnergyPlus.
+
+I would also like to see a more thorough description of the integration of ASHWAT. There are many capabilities in ASHWAT that are lacking in the other models. If I read this correctly, the goal of WCE is to incorporate the best features of all three models into a single model. I'd like to have a better idea which features are included and which are left out.
+
+####Simon's reply (May/31/2016)
+Thanks! I will update NFP regarding to ASHWAT. In short, it is not planned in first two stages and that is why I left it out. EnergyPlus actually have two window models, ASHWAT and ISO 15099 (I left out model that provides U-value, SHGC and VT). Original implementation that is done by Winkelmann is nothing else but old WINDOW code. As for BSDF models, that is also ISO 15099 but with improved optical calculation distribution (Klems BSDF). So in general I do plan to put all of that into WCE. In general, idea is to separate all calculations related to window properties in separate module (component) so that it can be used by others as well (WINDOW and OPTICS included). Depend on the time and funds in future.
+As for WCE, it does have separate GitHub with unit tests hosted by LBNL. If you want something to implement there, unit tests are must to have. So before going into EnergyPlus, code will be tested separately.
 
 ## Overview
 WCE is currently hosted at LBNL's GitHub repository https://github.com/LBNL-ETA/Windows-CalcEngine as open source module that can calculate thermal and optical properties for fenestration systems. Engine exposes many so far "hidden" calculation procedures that now can be used and also customized/extended according to different user needs. Intention is that all future window and shading models are developed using this open source repository and then shared between different programs.
