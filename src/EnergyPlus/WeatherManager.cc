@@ -3169,7 +3169,7 @@ namespace WeatherManager {
 					curHrWindDir = Wthr.WindDir( Hour );
 					if ( LastHrWindDir < 90 && curHrWindDir > 270. ) {
 						tomorrowWindDirTS = LastHrWindDir * WtPrevHour + ( curHrWindDir - 360. ) * WtNow;
-				    } else if( LastHrWindDir > 270 && curHrWindDir < 90. ){
+					} else if( LastHrWindDir > 270 && curHrWindDir < 90. ){
 						tomorrowWindDirTS = ( LastHrWindDir - 360. ) * WtPrevHour + curHrWindDir * WtNow;
 					} else {
 						tomorrowWindDirTS = LastHrWindDir * WtPrevHour + curHrWindDir * WtNow;
