@@ -3707,7 +3707,6 @@ namespace PackagedTerminalHeatPump {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
-		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
 		// Locals
 		bool IsAutoSize; // Indicator to autosize
@@ -3753,10 +3752,6 @@ namespace PackagedTerminalHeatPump {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
-		int ZoneNum; // current controlled zone index
-		bool UseOccSchFlag; // flag to use occupancy schedule when calculating OA
-		bool UseMinOASchFlag; // flag to use min OA schedule when calculating OA
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -4127,18 +4122,7 @@ namespace PackagedTerminalHeatPump {
 		SetCoilDesFlow( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, PTUnit( PTUnitNum ).MaxHeatAirVolFlow, ErrorsFound );
 
 		if ( CurZoneEqNum > 0 ) {
-			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
-				// determine minimum outdoor air flow rate for DX coil sizing
-				ZoneNum = PTUnit( PTUnitNum ).CtrlZoneNum;
-				DSOAPtr = FinalZoneSizing( ZoneNum ).ZoneDesignSpecOAIndex;
-				if ( DSOAPtr > 0 ) {
-					UseOccSchFlag = true;
-					UseMinOASchFlag = true;
-					ZoneEqSizing( CurZoneEqNum ).OAVolFlow = CalcDesignSpecificationOutdoorAir( DSOAPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag );
-				}
-			} else {
-				ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
-			}
+			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
 		}
 

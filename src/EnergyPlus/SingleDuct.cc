@@ -4508,6 +4508,8 @@ namespace SingleDuct {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 4;
 			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:VARIABLEREFRIGERANTFLOW" ) {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 5;
+			} else if ( cAlphaArgs( 2 ) == "AIRLOOP:UNITARYSYSTEM" ) {
+				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 6;
 			}
 
 			SysATMixer( ATMixerNum ).ZoneHVACUnitName = cAlphaArgs( 3 );

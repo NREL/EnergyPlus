@@ -39650,6 +39650,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.   
    A3, \field ZoneHVAC Terminal Unit Name
        \required-field
