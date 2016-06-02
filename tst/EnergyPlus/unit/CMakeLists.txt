@@ -32,6 +32,7 @@ set( test_src
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DesiccantDehumidifiers.unit.cc
+  DisplacementVentMgr.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EconomicTariff.unit.cc
