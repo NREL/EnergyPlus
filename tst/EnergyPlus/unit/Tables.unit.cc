@@ -801,3 +801,53 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_FALSE(has_err_output());
 }
 
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_MinMaxFailure) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:OneIndependentVariable,",
+		"TestTableMinMax,         !- Name",
+		"Linear,                  !- Curve Type",
+		"LinearInterpolationOfTable,  !- Interpolation Method",
+		",                        !- Minimum Value of X",
+		",                        !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1;                       !- Output Value #2" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(1, CurveManager::NumCurves);
+
+	// Super-simple table without IV min/max
+	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLEMINMAX", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	//Real64 min, max;
+	//CurveManager::GetCurveMinMaxValues(1, min, max);
+	//EXPECT_EQ(0, min);
+	//EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(0.75, CurveManager::CurveValue(1, 0.75)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	EXPECT_FALSE(has_err_output());
+}
+
+

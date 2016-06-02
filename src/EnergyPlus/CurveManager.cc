@@ -380,6 +380,20 @@ namespace CurveManager {
 	void
 	GetCurveInput()
 	{
+		// wrapper for GetInput to allow unit testing when fatal inputs are detected - follow pattern from GetSetPointManagerInputs()
+		bool GetInputErrorsFound = false;
+
+		GetCurveInputData( GetInputErrorsFound );
+
+		if ( GetInputErrorsFound ) {
+			ShowFatalError( "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination." );
+		}
+
+	}
+
+	void
+	GetCurveInputData( bool & ErrorsFound )
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
@@ -459,7 +473,6 @@ namespace CurveManager {
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in renaming.
@@ -2113,6 +2126,9 @@ namespace CurveManager {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
 				ErrorsFound = true;
+				TableData( TableNum ).X1 = 0.;
+				TableData( TableNum ).X2 = 0.;
+				TableData( TableNum ).Y = 0.;
 			} else {
 				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
 					TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
@@ -2517,10 +2533,6 @@ namespace CurveManager {
 				}}
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination." );
 		}
 
 	}
