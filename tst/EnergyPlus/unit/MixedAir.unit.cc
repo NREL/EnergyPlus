@@ -1235,6 +1235,98 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, OAControllerMixedAirSPTest )
+	{
+
+		std::string const idf_objects = delimited_string( {
+
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node;  !- Name",
+
+			"  Schedule:Constant,",
+			"    OAFractionSched,         !- Name",
+			"     ,                       !- Schedule Type Limits Name",
+			"     1;                      !- Hourly value",
+
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,         !- Name",
+			"    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+			"    Outdoor Air Mixer Inlet Node, !- Return Air Node Name",
+			"    Mixed Air Node,          !- Mixed Air Node Name",
+			"    Outside Air Inlet Node,  !- Actuator Node Name",
+			"    0.0,                     !- Minimum Outdoor Air Flow Rate{ m3 / s }",
+			"    1.7,                     !- Maximum Outdoor Air Flow Rate{ m3 / s }",
+			"    NoEconomizer,            !- Economizer Control Type",
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry - Bulb Temperature{ C }",
+			"    ,                        !- Economizer Maximum Limit Enthalpy{ J / kg }",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature{ C }",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    12.5,                    !- Economizer Minimum Limit Dry - Bulb Temperature{ C }",
+			"    NoLockout,               !- Lockout Type",
+			"    FixedMinimum,            !- Minimum Limit Type",
+			"    OAFractionSched,         !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ;                        !- Mechanical Ventilation Controller Name",
+		} );
+
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		AirLoopFlow.allocate( 1 );
+		AirLoopControlInfo.allocate( 1 );
+		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
+
+		GetOAControllerInputs();
+
+		StdRhoAir = 1.2;
+		OAController( 1 ).MixMassFlow = 1.7 * StdRhoAir;
+		OAController( 1 ).MaxOAMassFlowRate = 1.7 * StdRhoAir;
+		AirLoopFlow( 1 ).DesSupply = 1.7 * StdRhoAir;
+		AirLoopFlow( 1 ).ReqSupplyFrac = 1.0;
+		Node( OAController( 1 ).MixNode ).MassFlowRateMaxAvail = AirLoopFlow( 1 ).DesSupply; // set max avail or controller will shut down
+		Node( OAController( 1 ).RetNode ).MassFlowRate = AirLoopFlow( 1 ).DesSupply; // set return flow for mixing calculation (i.e., mix flow = return flow + exhaust flow [0])
+		NumOASystems = 1;
+		OutsideAirSys.allocate( 1 );
+		OutsideAirSys( 1 ).Name = "AIRLOOP OASYSTEM";
+		OutsideAirSys( 1 ).NumControllers = 1;
+		OutsideAirSys( 1 ).ControllerName.allocate( 1 );
+		OutsideAirSys( 1 ).ControllerName( 1 ) = "OA CONTROLLER 1";
+		OutsideAirSys( 1 ).ComponentType.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentType( 1 ) = "OutdoorAir:Mixer";
+		OutsideAirSys( 1 ).ComponentName.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentName( 1 ) = "OAMixer";
+		OAMixer.allocate( 1 );
+		OAMixer( 1 ).Name = "OAMixer";
+		OAMixer( 1 ).InletNode = 2;
+
+		DataHVACGlobals::NumPrimaryAirSys = 1;
+		PrimaryAirSystem.allocate( 1 );
+		PrimaryAirSystem( 1 ).Name = "PrimaryAirLoop";
+		PrimaryAirSystem( 1 ).NumBranches = 1;
+		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = OutsideAirSys( 1 ).Name;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+		// mixed node temperature set point has not yet been set, expect OA controller mixed temp SP to be equal to low temp limit
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( OAController( 1 ).MixSetTemp, OAController( 1 ).TempLowLim );
+
+		// expect OA controller mixed node temp SP to be equal to 0.5 C.
+		Node( 1 ).TempSetPoint = 0.5;
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( OAController( 1 ).MixSetTemp, 0.5 );
+
+		// expect OA controller mixed node temp SP to be less than 0 and equal to -5.0 C.
+		Node( 1 ).TempSetPoint = -5.0;
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( OAController( 1 ).MixSetTemp, -5.0 );
+
+	}
+
 	TEST_F( EnergyPlusFixture, MixedAir_MiscGetsPart1 )
 	{
 		std::string const idf_objects = delimited_string( {
