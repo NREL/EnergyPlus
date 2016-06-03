@@ -1945,6 +1945,9 @@ namespace ReportSizingManager {
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
 					AutosizeDes = FinalSysSizing( CurSysNum ).HeatSupTemp;
+				} else if ( SizingType == DesiccantDehumidifierBFPerfDataFaceVelocitySizing ) {
+					//AutosizeDes = 4.18898 + 0.09015 * DataAirFlowUsedForSizing;
+					AutosizeDes = 4.30551 + 0.01969 * DataAirFlowUsedForSizing;
 				}
 			}
 		} else {

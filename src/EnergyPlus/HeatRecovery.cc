@@ -677,18 +677,18 @@ namespace HeatRecovery {
 			BalDesDehumPerfData( PerfDataNum ).PerfType = cCurrentModuleObject;
 			BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow = rNumericArgs( 1 );
 			// check validity
-			if ( BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow <= 0.0 ) {
-				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
-				ShowContinueError( "Nominal air flow rate must be greater than zero." );
-				ShowContinueError( "... value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow, 6 ) );
-				ErrorsFound = true;
-			}
+			//if ( BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow <= 0.0 ) {
+			//	ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
+			//	ShowContinueError( "Nominal air flow rate must be greater than zero." );
+			//	ShowContinueError( "... value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow, 6 ) );
+			//	ErrorsFound = true;
+			//}
 
 			BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel = rNumericArgs( 2 );
 			// check validity
-			if ( BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel <= 0.0 || BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel > 6.0 ) {
+			if ( BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel > 6.0 ) {
 				ShowSevereError( cCurrentModuleObject + " \"" + BalDesDehumPerfData( PerfDataNum ).Name + "\"" );
-				ShowContinueError( "Nominal air face velocity cannot be less than or equal to zero or greater than 6 m/s." );
+				ShowContinueError( "Nominal air face velocity cannot be greater than 6 m/s." );
 				ShowContinueError( "... value entered = " + RoundSigDigits( BalDesDehumPerfData( PerfDataNum ).NomProcAirFaceVel, 6 ) );
 				ErrorsFound = true;
 			}
@@ -1442,12 +1442,13 @@ namespace HeatRecovery {
 		using DataHVACGlobals::Heating;
 		using DataHVACGlobals::Other;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeHeatRecovery" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1461,6 +1462,13 @@ namespace HeatRecovery {
 		Real64 NomSupAirVolFlowUser;	// Hard-sized supply air flow rate for reproting
 		Real64 NomSecAirVolFlowDes;		// Autosized secondary air flow rate for reporting
 		Real64 NomSecAirVolFlowUser;	// Hard-sized secondary air flow rate for reporting
+		Real64 TempSize; // autosized value of coil input field
+		int BalDesDehumPerfDataIndex;   // index of dehum performance data1 object 
+		int SizingMethod; // integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // true when sizing information is reported in the eio file
+		std::string CompName; // component name
+		std::string	CompType; // component type
+		std::string SizingString; // input field sizing description
 
 		IsAutoSize = false;
 		NomSupAirVolFlowDes = 0.0;
@@ -1597,6 +1605,28 @@ namespace HeatRecovery {
 					}
 				}
 			}
+		}
+
+		if ( ExchCond( ExchNum ).ExchTypeNum == HX_DESICCANT_BALANCED && ExchCond( ExchNum ).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1 ) {
+
+			BalDesDehumPerfDataIndex = ExchCond( ExchNum ).PerfDataIndex;
+
+			PrintFlag = true;
+			CompName = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).Name;
+			CompType = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
+			SizingMethod = SystemAirflowSizing;
+			SizingString = "Nominal Air Flow Rate [m3/s]";
+			TempSize = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow;
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow = TempSize;
+
+			SizingMethod = DesiccantDehumidifierBFPerfDataFaceVelocitySizing;
+			SizingString = "Nominal Air Face Velocity [m/s]";
+			DataAirFlowUsedForSizing = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow;
+			TempSize = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel;
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel = TempSize;
+			DataAirFlowUsedForSizing = 0.0;
 		}
 	}
 
