@@ -65,6 +65,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
@@ -75,8 +76,8 @@ namespace EnergyPlus {
 	{
 
 		int N; // NUMBER OF SURFACES
-		Array1A< Real64 > A; // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		Array2A< Real64 > F; // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+		Array1D< Real64 > A; // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		Array2D< Real64 > F; // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
 		int ZoneNum; // Zone number being fixe
 		Real64 OriginalCheckValue; // check of SUM(F) - N
 		Real64 FixedCheckValue; // check after fixed of SUM(F) - N
@@ -86,8 +87,8 @@ namespace EnergyPlus {
 		
 		N = 3;
 		
-		A.dim( N );
-		F.dim( N, N );
+		A.allocate( N );
+		F.allocate( N, N );
 		
 		A( 1 ) = 1.0;
 		A( 2 ) = 1.0;
@@ -104,10 +105,14 @@ namespace EnergyPlus {
 		F( 3, 3 ) = 0.0;
 		
 		ZoneNum = 1;
+
+		DataHeatBalance::Zone.allocate( ZoneNum );
+		DataHeatBalance::Zone( ZoneNum ).Name = "Test";
 		
 		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
 
 		std::string const error_string = delimited_string( {
+			"   ** Warning ** Surfaces in Zone=\"Test\" do not define an enclosure.",
 			"   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
 			"   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
 			"   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
