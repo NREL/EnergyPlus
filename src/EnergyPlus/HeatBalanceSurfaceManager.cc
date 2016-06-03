@@ -5239,8 +5239,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	bool const useCondFDHTalg( any_eq( HeatTransferAlgosUsed, UseCondFD ) );
 	Converged = false;
+	Real64 debugTempSurfIn1262;
 	while ( ! Converged ) { // Start of main inside heat balance DO loop...
 
+		debugTempSurfIn1262 = TempSurfIn( 1262 );
 		TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
 		CalcInteriorRadExchange( TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside ); // Update the radiation balance
@@ -5301,6 +5303,20 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), TH22, MAT_zone, TempSurfInSat );
 					}
 					//Pre-calculate a few terms
+
+
+					Real64 debugCTFConstInPart = CTFConstInPart( SurfNum );
+					Real64 debugQRadThermInAbs = QRadThermInAbs( SurfNum );
+					Real64 debugQRadSWInAbs = QRadSWInAbs(SurfNum);
+					Real64 debugHConvIn_surf = HConvIn_surf;
+					Real64 debugRefAirTemp = RefAirTemp( SurfNum );
+					Real64 debugQHTRadSysSurf = QHTRadSysSurf( SurfNum );
+					Real64 debugQHWBaseboardSurf = QHWBaseboardSurf( SurfNum );
+					Real64 debugQSteamBaseboardSurf = QSteamBaseboardSurf( SurfNum );
+					Real64 debugQElecBaseboardSurf = QElecBaseboardSurf( SurfNum );
+					Real64 debugNetLWRadToSurf = NetLWRadToSurf( SurfNum ) ;
+
+
 					Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) );
 					Real64 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf + IterDampConst ) );
 					// Calculate the current inside surface temperature
@@ -5705,6 +5721,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							zone.TempOutOfBoundsReported = true;
 						}
 						ShowFatalError( "Program terminates due to preceding condition." );
+					}
+				} else{
+					if ( TH12 < -10000. || TH12 > 10000. ) {
+						ShowFatalError( "The temperature of [" + RoundSigDigits( TH12, 2 ) + "] for =\"" + zone.Name + "\", for surface=\"" + surface.Name + "\" is very far out of bounds during warmup. This may be an indication of a malformed zone." );
 					}
 				}
 			}
