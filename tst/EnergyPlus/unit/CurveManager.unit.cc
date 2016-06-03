@@ -93,7 +93,9 @@ TEST_F(EnergyPlusFixture, Curves_Linear) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
@@ -166,7 +168,9 @@ TEST_F(EnergyPlusFixture, Curves_Quadratic) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUADRATIC", CurveManager::GetCurveType(1));
@@ -241,7 +245,9 @@ TEST_F(EnergyPlusFixture, Curves_Cubic) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("CUBIC", CurveManager::GetCurveType(1));
@@ -314,7 +320,9 @@ TEST_F(EnergyPlusFixture, Curves_Exponent) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(1));
@@ -387,7 +395,9 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialDecay) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("EXPONENTIALDECAY", CurveManager::GetCurveType(1));
@@ -464,7 +474,9 @@ TEST_F(EnergyPlusFixture, Curves_DoubleExponentialDecay) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("DOUBLEEXPONENTIALDECAY", CurveManager::GetCurveType(1));
@@ -541,7 +553,9 @@ TEST_F(EnergyPlusFixture, Curves_Sigmoid) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("SIGMOID", CurveManager::GetCurveType(1));
@@ -614,7 +628,9 @@ TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola1) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("RECTANGULARHYPERBOLA1", CurveManager::GetCurveType(1));
@@ -687,7 +703,9 @@ TEST_F(EnergyPlusFixture, Curves_RectangularHyperbola2) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("RECTANGULARHYPERBOLA2", CurveManager::GetCurveType(1));
@@ -764,7 +782,9 @@ TEST_F(EnergyPlusFixture, Curves_Quartic) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUARTIC", CurveManager::GetCurveType(1));
@@ -839,7 +859,9 @@ TEST_F(EnergyPlusFixture, Curves_ExponentialSkewNormal) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("EXPONENTIALSKEWNORMAL", CurveManager::GetCurveType(1));
@@ -925,7 +947,9 @@ TEST_F(EnergyPlusFixture, Curves_BiQuadratic) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
@@ -1025,7 +1049,9 @@ TEST_F(EnergyPlusFixture, Curves_BiCubic) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("BICUBIC", CurveManager::GetCurveType(1));
@@ -1117,7 +1143,9 @@ TEST_F(EnergyPlusFixture, Curves_QuadraticLinear) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
@@ -1209,7 +1237,9 @@ TEST_F(EnergyPlusFixture, Curves_CubicLinear) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("CUBICLINEAR", CurveManager::GetCurveType(1));
@@ -1291,7 +1321,9 @@ TEST_F(EnergyPlusFixture, Curves_FanPressureRise) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("FANPRESSURERISE", CurveManager::GetCurveType(1));
@@ -1431,7 +1463,9 @@ TEST_F(EnergyPlusFixture, Curves_TriQuadratic) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("TRIQUADRATIC", CurveManager::GetCurveType(1));
@@ -1548,7 +1582,9 @@ TEST_F(EnergyPlusFixture, Curves_ChillerPartLoadWithLift) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("CHILLERPARTLOADWITHLIFT", CurveManager::GetCurveType(1));
@@ -1655,7 +1691,9 @@ TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
-	CurveManager::GetCurveInput();
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData(errorsFound);
+	EXPECT_FALSE(errorsFound);
 	CurveManager::GetCurvesInputFlag = false;
 	ASSERT_EQ(2, CurveManager::NumCurves);
 	EXPECT_EQ("QUADLINEAR", CurveManager::GetCurveType(1));
@@ -1875,9 +1913,9 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
-	bool ErrorsFound = false;
-	CurveManager::GetCurveInputData( ErrorsFound );
-	EXPECT_TRUE( ErrorsFound );
+	bool errorsFound = false;
+	CurveManager::GetCurveInputData( errorsFound );
+	EXPECT_TRUE( errorsFound );
 
 	EXPECT_EQ( 1, CurveManager::NumCurves );
 

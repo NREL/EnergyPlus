@@ -845,7 +845,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_MinMaxFailure) {
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0)); // In-range value
 	EXPECT_DOUBLE_EQ(0.75, CurveManager::CurveValue(1, 0.75)); // In-range value
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
-	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5000)); // Maximum x
 
 	EXPECT_FALSE(has_err_output());
 }
