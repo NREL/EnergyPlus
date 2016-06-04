@@ -183,7 +183,7 @@ static void addfmuInstances(FMU* s){
 	if(fmuLocCoun == arrsize){
 		temp = (FMU**)malloc(sizeof(FMU*) * (DELTA + arrsize));
 		arrsize += DELTA;
-		memcpy(temp, fmuInstances, fmuLocCoun);
+		memcpy(temp, fmuInstances, sizeof(FMU*) * fmuLocCoun);
 		free(fmuInstances);
 		fmuInstances = temp;
 	}
