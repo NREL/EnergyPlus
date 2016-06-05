@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 #ifdef _MSC_VER
-#include "intrin.h"
+#include <intrin.h>
 #endif
 
 #ifdef _MSC_VER
