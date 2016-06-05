@@ -414,6 +414,9 @@ namespace CurveManager {
 	GetCurveInput();
 
 	void
+	GetCurveInputData( bool & ErrorsFound );
+
+	void
 	InitCurveReporting();
 
 	void
