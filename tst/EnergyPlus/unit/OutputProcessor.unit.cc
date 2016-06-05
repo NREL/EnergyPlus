@@ -901,7 +901,7 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-999.9" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -1589,7 +1589,7 @@ namespace EnergyPlus {
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.1 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.1" } ) ) );
@@ -1599,200 +1599,199 @@ namespace EnergyPlus {
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-2 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-002" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.01" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-02" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.01" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-3 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-003" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-03" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.001" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-4 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-004" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-04" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0001" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-5 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-005" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.00001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-05" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.00001" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-6 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-006" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.000001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-06" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.000001" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-7 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-007" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-7" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-07" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-7" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-8 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-008" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-8" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-08" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-8" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-9 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-009" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-9" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-09" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-9" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-10 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-010" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-10" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-10" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-10" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-11 ); } );
-			// this seems to always be low... not 1.0e-11
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,9.999999999999999E-012" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-11" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,9.999999999999999E-12" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-11" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-12 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-012" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-12" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-12" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-12" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-13 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-013" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-13" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-13" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-13" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-14 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-014" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-14" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-14" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-14" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-15 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-015" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-15" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-15" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-15" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-16 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-016" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-16" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-16" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-16" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e-16 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E-016" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1e-16" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E-16" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1e-16" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-19 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-019" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-19" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-19" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-19" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.5 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.5" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 10.0 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e2 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e3 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e4 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e5 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e6 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e7 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e8 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e9 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e10 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e11 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e12 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e13 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000." } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e14 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e15 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000000" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e16 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000000" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e17 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+017" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000000.0" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+17" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000000.0" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e16 ); } );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-10000000000000000" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-10000000000000000.0" } ) ) );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e17 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E+017" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-100000000000000000.0" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E+17" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-100000000000000000.0" } ) ) );
 		#endif
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e25 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+025" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e25" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+25" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e25" } ) ) );
 		#endif
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -3213,8 +3212,8 @@ namespace EnergyPlus {
 				"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"152,999.",
-				"153,999.",
+				"152,999.0",
+				"153,999.0",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3348,9 +3347,9 @@ namespace EnergyPlus {
 
 			compare_eso_stream( delimited_string( {
 				"2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-				"6,100.",
+				"6,100.0",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
-				"6,200.",
+				"6,200.0",
 				"5,365",
 				"37,300.,100.,12,31,24,10,200.,12,31,24,20",
 			} ) );
