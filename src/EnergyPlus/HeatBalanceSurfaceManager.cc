@@ -5582,7 +5582,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				TH11 = TempSurfOut( SurfNum ) = TempSurfOut( SurfNum2 ) = TH( 1, 1, SurfNum2 );
 			}
 
-			TestSurfTempCalcHeatBalanceInsideSurf( TH12, surface, zone, WarmupSurfTemp );
+			if ( ( TH12 > MaxSurfaceTempLimit ) || ( TH12 < MinSurfaceTempLimit ) ) {
+				TestSurfTempCalcHeatBalanceInsideSurf( TH12, surface, zone, WarmupSurfTemp );
+			}
 
 		} // ...end of loop over all surfaces for inside heat balances
 
@@ -5763,8 +5765,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 void
 TestSurfTempCalcHeatBalanceInsideSurf(
 	Real64 TH12,
-	SurfaceData surface,
-	ZoneData zone,
+	SurfaceData & surface,
+	ZoneData & zone,
 	int WarmupSurfTemp
 ){
 	using DataAirflowNetwork::SimulateAirflowNetwork;

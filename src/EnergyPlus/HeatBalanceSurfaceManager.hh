@@ -186,8 +186,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate = _ ); // if pass
 void
 TestSurfTempCalcHeatBalanceInsideSurf(
 	Real64 TH12,
-	DataSurfaces::SurfaceData surface,
-	DataHeatBalance::ZoneData zone,
+	DataSurfaces::SurfaceData & surface,
+	DataHeatBalance::ZoneData & zone,
 	int WarmupSurfTemp
 );
 
