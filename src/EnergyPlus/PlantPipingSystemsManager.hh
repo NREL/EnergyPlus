@@ -94,7 +94,7 @@ namespace PlantPipingSystemsManager {
 	enum class RegionType { Pipe, BasementWall, BasementFloor, XDirection, YDirection, ZDirection, XSide, XSideWall, ZSide, ZSideWall, FloorInside, UnderFloor, HorizInsXSide, HorizInsZSide, VertInsLowerEdge };
 	enum class Direction { PositiveY, NegativeY, PositiveX, NegativeX, PositiveZ, NegativeZ };
 	enum class PartitionType { BasementWall, BasementFloor, Pipe, Slab, XSide, XSideWall, ZSide, ZSideWall, FloorInside, UnderFloor, HorizInsXSide, VertInsLowerEdge, HorizInsZSide };
-	enum class CellType { Unknown, Pipe, GeneralField, GroundSurface, FarfieldBoundary, BasementWall, BasementFloor, BasementCorner, BasementCutaway, Slab, HorizInsulation, VertInsulation, ZoneGroundInterface, SlabOnGradeEdgeInsu };
+	enum class CellType { Unknown, Pipe, GeneralField, GroundSurface, FarfieldBoundary, BasementWall, BasementFloor, BasementCorner, BasementCutaway, Slab, HorizInsulation, VertInsulation, ZoneGroundInterface };
 
 	extern Array1D< Direction > NeighborFieldCells;
 	extern Array1D< Direction > NeighborBoundaryCells;
@@ -414,6 +414,18 @@ namespace PlantPipingSystemsManager {
 		GridRegion()
 		{}
 
+		// Member Constructor
+		GridRegion(
+			Real64 Min,
+			Real64 Max,
+			RegionType thisRegionType,
+			Array1D< Real64 > CellWidths
+		) :
+			Min( Min ),
+			Max( Max ),
+			thisRegionType( thisRegionType ),
+			CellWidths( CellWidths )
+		{}
 	};
 
 	struct TempGridRegionData
@@ -1002,6 +1014,9 @@ namespace PlantPipingSystemsManager {
 		Real64 TotalEnergyUniformHeatFlux = 0.0;
 		Real64 TotalEnergyWeightedHeatFlux = 0.0;
 		Real64 HeatFluxWeightingFactor = 0.0;
+		Array1D< GridRegion > XRegions;
+		Array1D< GridRegion > YRegions;
+		Array1D< GridRegion > ZRegions;
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
@@ -1065,7 +1080,10 @@ namespace PlantPipingSystemsManager {
 			NumDomainCells ( 0 ),
 			NumGroundSurfCells( 0 ),
 			NumInsulationCells( 0 ),
-			NumSlabCells( 0 )
+			NumSlabCells( 0 ),
+			XRegions( { 0, -1 } ),
+			YRegions( { 0, -1 } ),
+			ZRegions( { 0, -1 } )
 		{}
 
 
@@ -1083,12 +1101,12 @@ namespace PlantPipingSystemsManager {
 			int const PartitionsUBound
 		);
 
-		Array1D< GridRegion >
+		void
 		createRegionList(
+			Array1D< GridRegion > & Regions,
 			Array1D< GridRegion > const & ThesePartitionRegions,
 			Real64 const DirExtentMax,
 			RegionType const DirDirection,
-			int const RetValUBound,
 			bool const PartitionsExist,
 			Optional_int BasementWallXIndex = _,
 			Optional_int BasementFloorYIndex = _,
@@ -1119,8 +1137,7 @@ namespace PlantPipingSystemsManager {
 
 		int
 		getCellWidthsCount(
-			RegionType const dir,
-			int const n
+			RegionType const dir
 		);
 
 		void

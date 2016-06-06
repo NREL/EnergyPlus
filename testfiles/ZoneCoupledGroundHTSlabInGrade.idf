@@ -19,7 +19,7 @@
 ! Run Period: Annual simulation
 !
 ! Building: Idealized approximation of simple residential building
-! Floor Area: 100 m2 
+! Floor Area: 100 m2
 ! Number of Stories: 1
 !
 ! Zone Description Details:
@@ -250,7 +250,7 @@ Material:NoMass,
     Construction,
     Floor Construction, !- Name
     Slab Material-Top Layer;    !- Outside Layer
-    
+
     Construction,
     Roof Construction, !- Name
     Roof Layer 1; !- Outside Layer
@@ -479,8 +479,10 @@ SurfaceProperty:OtherSideConditionsModel,
     Yes,        !- Vertical Insulation (Yes/No)
     Insulation, !- Vertical Insulation Name
     1.5,        !- Vertical perimeter insulation depth from surface (m)
-    Hourly;     !- Domain Simulation Interval. (Timestep/Hourly)
-    
+    Hourly,     !- Domain Simulation Interval. (Timestep/Hourly)
+    ,           !- Geometric Mesh Coefficient
+    ;           !- Mesh Density Parameter
+
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,    !- Name of object
     1.8,        !- Soil Thermal Conductivity {W/m-K}
@@ -580,7 +582,7 @@ Output:VariableDictionary,IDF;
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
-Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly; 
+Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly;
 Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly;
 Output:Variable,*,GroundDomain Slab Zone Coupled Surface Heat Flux,hourly;
 Output:Variable,*,GroundDomain Slab Zone Coupled Surface Temperature,hourly;

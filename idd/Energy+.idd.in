@@ -2004,12 +2004,12 @@ Site:GroundDomain:Slab,
         \key Hourly
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
-   N12, \field Geometric Mesh Parameter
+   N12, \field Geometric Mesh Coefficient
         \type real
         \minimum 1.0
         \maximum 2.0
         \default 1.6
-   N13; \field Mesh Density
+   N13; \field Mesh Density Parameter
         \type integer
         \minimum 4
         \default 6
