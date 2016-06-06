@@ -105,6 +105,7 @@ ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_SmallOffice_GenericContam.
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_SmallOffice_HeatRecoveryHXSL.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_SmallOffice_VAV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_Multizone_HorizontalOpening.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_PressureControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_Simple_House.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_Simple_SmallOffice.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowWindowsAndBetweenGlassBlinds.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
