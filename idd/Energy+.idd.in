@@ -15987,7 +15987,6 @@ SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
        \memo EMPD (Effective Moisture Penetration Depth with Conduction Transfer Functions).
        \memo Advanced/Research Usage: CondFD (Conduction Finite Difference)
        \memo Advanced/Research Usage: HAMT (Combined Heat And Moisture Finite Element)
-       \min-fields 3
   A1 , \field Name
        \required-field
        \type alpha
@@ -83020,16 +83019,16 @@ FluidProperties:Saturated,
       \note SpecificHeat Units are J/kg-K
       \note Pressure Units are Pa
       \type choice
-      \key Enthalpy     ! Units are J/kg
-      \key Density      ! Units are kg/m3
-      \key SpecificHeat ! Units are J/kg-K
-      \key Pressure     ! Units are Pa
+      \key Enthalpy
+      \key Density
+      \key SpecificHeat
+      \key Pressure
   A3, \field Fluid Phase
       \note Fluid=saturated fluid
       \note FluidGas=saturated vapor
       \type choice
-      \key Fluid        ! saturated fluid
-      \key FluidGas     ! saturated vapor
+      \key Fluid
+      \key FluidGas
   A4, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -83795,8 +83794,8 @@ FluidProperties:Superheated,
       \note Enthalpy Units are J/kg
       \note Density Units are kg/m3
       \type choice
-      \key Enthalpy     ! Units are J/kg
-      \key Density      ! Units are kg/m3
+      \key Enthalpy
+      \key Density
   A3, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -84570,10 +84569,10 @@ FluidProperties:Concentration,
       \note Conductivity Units are W/m-K
       \note Viscosity Units are N-s/m2
       \type choice
-      \key Density      ! Units are kg/m3
-      \key SpecificHeat ! Units are J/kg-K
-      \key Conductivity ! Units are W/m-K
-      \key Viscosity    ! Units are N-s/m2
+      \key Density
+      \key SpecificHeat
+      \key Conductivity
+      \key Viscosity
   A3, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -96647,7 +96646,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A6, \field Variable or Meter or EMS Variable or Field 2 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A7, \field Aggregation Type for Variable or Meter 2
@@ -96674,7 +96672,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A8, \field Variable or Meter or EMS Variable or Field 3 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A9, \field Aggregation Type for Variable or Meter 3
@@ -96701,7 +96698,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A10,\field Variable or Meter or EMS Variable or Field 4 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A11,\field Aggregation Type for Variable or Meter 4
@@ -96728,7 +96724,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A12,\field Variable or Meter or EMS Variable or Field 5 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A13,\field Aggregation Type for Variable or Meter 5
@@ -96755,7 +96750,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A14,\field Variable or Meter or EMS Variable or Field 6 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A15,\field Aggregation Type for Variable or Meter 6
@@ -96782,7 +96776,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A16,\field Variable or Meter or EMS Variable or Field 7 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A17,\field Aggregation Type for Variable or Meter 7
@@ -96809,7 +96802,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A18,\field Variable or Meter or EMS Variable or Field 8 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A19,\field Aggregation Type for Variable or Meter 8
@@ -96836,7 +96828,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A20,\field Variable or Meter or EMS Variable or Field 9 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A21,\field Aggregation Type for Variable or Meter 9
@@ -96863,7 +96854,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A22,\field Variable or Meter or EMS Variable or Field 10 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A23,\field Aggregation Type for Variable or Meter 10
@@ -96890,7 +96880,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A24,\field Variable or Meter or EMS Variable or Field 11 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A25,\field Aggregation Type for Variable or Meter 11
@@ -96917,7 +96906,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A26,\field Variable or Meter or EMS Variable or Field 12 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A27,\field Aggregation Type for Variable or Meter 12
@@ -96944,7 +96932,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A28,\field Variable or Meter or EMS Variable or Field 13 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A29,\field Aggregation Type for Variable or Meter 13
@@ -96971,7 +96958,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A30,\field Variable or Meter or EMS Variable or Field 14 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A31,\field Aggregation Type for Variable or Meter 14
@@ -96998,7 +96984,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A32,\field Variable or Meter or EMS Variable or Field 15 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A33,\field Aggregation Type for Variable or Meter 15
