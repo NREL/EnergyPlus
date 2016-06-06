@@ -4985,8 +4985,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalance::HAirFD;
 	using DataMoistureBalanceEMPD::MoistEMPDNew;
 	using DataMoistureBalanceEMPD::MoistEMPDFlux;
-	using DataAirflowNetwork::SimulateAirflowNetwork;
-	using DataAirflowNetwork::AirflowNetworkControlSimple;
 
 	using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 	using WindowManager::CalcWindowHeatBalance;
