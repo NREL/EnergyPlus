@@ -445,7 +445,7 @@ namespace Furnaces {
 	// Functions
 
 	void
-		clear_state();
+	clear_state();
 
 	void
 	SimFurnace(
