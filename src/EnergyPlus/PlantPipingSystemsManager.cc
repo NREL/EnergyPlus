@@ -62,7 +62,6 @@
 #include <memory>
 #include <set>
 #include <utility>
-#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -3713,8 +3712,6 @@ namespace PlantPipingSystemsManager {
 		int InsulationYIndex = this->InsulationYIndex;
 		int InsulationZIndex = this->InsulationZIndex;
 
-		std::ofstream static file("grid.csv", std::ofstream::out);
-
 		auto & cells( this->Cells );
 		for ( int X = 0, X_end = this->x_max_index; X <= X_end; ++X ) {
 			for ( int Y = 0, Y_end = this->y_max_index; Y <= Y_end; ++Y ) {
@@ -3973,8 +3970,6 @@ namespace PlantPipingSystemsManager {
 						CartesianPipeCellInformation::ctor( cell.PipeCellData, cell.X_max - cell.X_min, PipeSizing, NumRadialCells, cell.depth(), InsulationThickness, RadialMeshThickness, HasInsulation );
 					}
 
-					file << static_cast<std::underlying_type<CellType>::type>(cell.cellType) << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << cell.X_max - cell.X_min << "," << cell.Y_max - cell.Y_min << "," << cell.Z_max - cell.Z_min << '\n';
-
 				} //'z
 			} //'y
 		} //'x
@@ -3983,7 +3978,6 @@ namespace PlantPipingSystemsManager {
 		this->NumGroundSurfCells = NumGroundSurfaceCells;
 		this->NumInsulationCells = NumInsulationCells;
 
-		file << std::endl;
 	}
 
 	void

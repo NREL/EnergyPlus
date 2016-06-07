@@ -267,7 +267,9 @@
     Yes,                     !- Vertical Insulation (Yes/No)
     Slab Insulation,         !- Vertical Insulation Name
     2,                       !- Vertical perimeter insulation depth from surface (m)
-    Timestep;                !- Domain Simulation Interval. (Timestep/Hourly)
+    Timestep,                !- Domain Simulation Interval. (Timestep/Hourly)
+    ,                        !- Geometric Mesh Coefficient
+    ;                        !- Mesh Density Parameter
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name of object
