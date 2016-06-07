@@ -3372,6 +3372,7 @@ Schedule:Week:Compact,
        \required-field
        \type choice
        \key AllDays
+       \key AllOtherDays
        \key Weekdays
        \key Weekends
        \key Sunday
@@ -3392,6 +3393,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A4 , \field DayType List 2
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3412,6 +3414,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A6 , \field DayType List 3
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3432,6 +3435,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A8 , \field DayType List 4
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3452,6 +3456,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A10, \field DayType List 5
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -24046,6 +24051,7 @@ AirflowNetwork:Distribution:Component:Coil,
       \required-field
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
+      \key Coil:Cooling:DX:TwoSpeed
       \key Coil:Heating:Gas
       \key Coil:Heating:Electric
       \key Coil:Heating:DX:SingleSpeed
@@ -24413,6 +24419,7 @@ Exterior:FuelEquipment,
        \required-field
        \type choice
        \key Electricity
+       \key Water
        \key NaturalGas
        \key PropaneGas
        \key FuelOil#1
@@ -39878,6 +39885,9 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:DualDuct:ConstantVolume
        \key AirTerminal:DualDuct:VAV
        \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+       \key AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
+       \key AirTerminal:SingleDuct:InletSideMixer
+       \key AirTerminal:SingleDuct:SupplySideMixer
        \key AirTerminal:SingleDuct:VAV:Reheat
        \key AirTerminal:SingleDuct:VAV:NoReheat
        \key AirTerminal:SingleDuct:SeriesPIU:Reheat
@@ -39935,6 +39945,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39981,6 +39992,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40023,6 +40035,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40065,6 +40078,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40107,6 +40121,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40149,6 +40164,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40191,6 +40207,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40233,6 +40250,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40275,6 +40293,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40317,6 +40336,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40359,6 +40379,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40401,6 +40422,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40443,6 +40465,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40485,6 +40508,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40527,6 +40551,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40569,6 +40594,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40611,6 +40637,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40653,6 +40680,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -67119,7 +67147,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note proportional to the schedule value.
   A27, \field Tank Element Control Logic
        \type choice
-       \key MutuallyExlcusive
+       \key MutuallyExclusive
        \key Simultaneous
        \default Simultaneous
        \note MutuallyExclusive means that once the tank heating element is active the
@@ -69621,6 +69649,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A3 , \field Control Scheme 1 Name
        \required-field
@@ -69636,6 +69665,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A6 , \field Control Scheme 2 Name
        \type object-list
@@ -69649,6 +69679,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A9 , \field Control Scheme 3 Name
        \type object-list
@@ -69662,6 +69693,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A12, \field Control Scheme 4 Name
        \type object-list
@@ -69675,6 +69707,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A15, \field Control Scheme 5 Name
        \type object-list
@@ -69688,6 +69721,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A18, \field Control Scheme 6 Name
        \type object-list
@@ -69701,6 +69735,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A21, \field Control Scheme 7 Name
        \type object-list
@@ -69714,6 +69749,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A24, \field Control Scheme 8 Name
        \type object-list
@@ -71444,6 +71480,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A3 , \field Availability Manager 1 Name
        \required-field
        \type object-list
@@ -71460,6 +71497,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A5 , \field Availability Manager 2 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71475,6 +71513,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A7 , \field Availability Manager 3 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71490,6 +71529,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A9 , \field Availability Manager 4 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71505,6 +71545,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A11, \field Availability Manager 5 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71520,6 +71561,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A13; \field Availability Manager 6 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -80988,10 +81030,12 @@ Curve:CubicLinear,
   A2,  \field Input Unit Type for X
        \type choice
        \key Dimensionless
+       \key Temperature
        \default Dimensionless
   A3,  \field Input Unit Type for Y
        \type choice
        \key Dimensionless
+       \key Temperature
        \default Dimensionless
   A4;  \field Output Unit Type
        \type choice
@@ -97121,6 +97165,7 @@ Output:Meter,
        \note RunPeriod, Environment, and Annual are the same
        \key Hourly
        \key Daily
+       \key Detailed
        \key Monthly
        \key RunPeriod
        \key Environment
@@ -97363,6 +97408,7 @@ Output:EnvironmentalImpactFactors,
        \key Timestep
        \key Hourly
        \key Daily
+       \key Annual
        \key Monthly
        \key RunPeriod
 
