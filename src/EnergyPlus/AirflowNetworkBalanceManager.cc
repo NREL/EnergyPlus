@@ -134,6 +134,7 @@ namespace AirflowNetworkBalanceManager {
 	using DataGlobals::CurrentTime;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::SecInHour;
+	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataGlobals::DayOfSim;
 	using DataGlobals::TimeStepZone;
@@ -234,6 +235,7 @@ namespace AirflowNetworkBalanceManager {
 	int const ProbNoAction( 0 ); // No action from probability check
 	int const ProbForceChange( 1 ); // Force open or close from probability check
 	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
+	int const NumOfVentCtrTypes( 6 ); // Number of zone level venting control types
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -293,6 +295,10 @@ namespace AirflowNetworkBalanceManager {
 	int IntraZoneNumOfNodes( 0 );
 	int IntraZoneNumOfLinks( 0 );
 	int IntraZoneNumOfZones( 0 );
+
+	int NumOfPressureControllers( 0 ); // number of pressure controllers
+	int NumOfOAFans( 0 ); // number of OutdoorAir fans
+	int NumOfReliefFans( 0 ); // number of OutdoorAir relief fans
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
 	// Name Public routines, optionally name Private routines within this module
@@ -659,6 +665,15 @@ namespace AirflowNetworkBalanceManager {
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "AirflowNetwork:IntraZone:Linkage", TotalArgs, NumAlphas, NumNumbers );
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( "AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers );
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers );
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -1050,7 +1065,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( SameString( MultizoneZoneData( i ).VentControl, "CEN15251Adaptive" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_CEN15251;
 				if ( SameString( MultizoneZoneData( i ).VentControl, "NoVent" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Novent;
 
-				if ( MultizoneZoneData( i ).VentCtrNum < 4 ) {
+				if ( MultizoneZoneData( i ).VentCtrNum < NumOfVentCtrTypes ) {
 					if ( NumAlphas >= 4 && ( ! lAlphaBlanks( 4 ) ) ) {
 						MultizoneZoneData( i ).VentingSchName = Alphas( 4 );
 						MultizoneZoneData( i ).VentingSchNum = GetScheduleIndex( MultizoneZoneData( i ).VentingSchName );
@@ -2910,6 +2925,175 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		// Read Outdoor Airflow object
+		CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
+		NumOfOAFans = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumOfOAFans > 1 ) {
+			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+		}
+		if ( NumOfOAFans > 0 ) {
+			DisSysCompOutdoorAirData.allocate( NumOfOAFans );
+			for ( i = 1; i <= NumOfOAFans; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), DisSysCompOutdoorAirData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+				DisSysCompOutdoorAirData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
+				DisSysCompOutdoorAirData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
+				DisSysCompOutdoorAirData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
+				FanErrorFound = false;
+				if ( lAlphaBlanks( 2 ) ) {
+					if ( AirflowNetworkNumOfStdCndns == 1 ) {
+						DisSysCompOutdoorAirData( i ).StandardT = MultizoneSurfaceStdConditionsCrackData( 1 ).StandardT;
+						DisSysCompOutdoorAirData( i ).StandardP = MultizoneSurfaceStdConditionsCrackData( 1 ).StandardP;
+						DisSysCompOutdoorAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 1 ).StandardW;
+					} else {
+						DisSysCompOutdoorAirData( i ).StandardT = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardT;
+						DisSysCompOutdoorAirData( i ).StandardP = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardP;
+						DisSysCompOutdoorAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
+					}
+				} else {
+					j = FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( { 1, AirflowNetworkNumOfStdCndns } ), AirflowNetworkNumOfStdCndns );
+					if ( j == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+						ErrorsFound = true;
+					} else {
+						DisSysCompOutdoorAirData( i ).StandardT = MultizoneSurfaceStdConditionsCrackData( j ).StandardT;
+						DisSysCompOutdoorAirData( i ).StandardP = MultizoneSurfaceStdConditionsCrackData( j ).StandardP;
+						DisSysCompOutdoorAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( j ).StandardW;
+					}
+				}
+			}
+		}
+
+		// Read Relief Airflow object
+		CurrentModuleObject = "AirflowNetwork:Distribution:Component:ReliefAirFlow";
+		NumOfReliefFans = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumOfReliefFans > 1 ) {
+			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+		}
+		if ( NumOfReliefFans > 0 ) {
+			DisSysCompReliefAirData.allocate( NumOfReliefFans );
+			for ( i = 1; i <= NumOfReliefFans; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), DisSysCompReliefAirData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+				DisSysCompReliefAirData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
+				DisSysCompReliefAirData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
+				DisSysCompReliefAirData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
+				FanErrorFound = false;
+				if ( lAlphaBlanks( 2 ) ) {
+					if ( AirflowNetworkNumOfStdCndns == 1 ) {
+						DisSysCompReliefAirData( i ).StandardT = MultizoneSurfaceStdConditionsCrackData( 1 ).StandardT;
+						DisSysCompReliefAirData( i ).StandardP = MultizoneSurfaceStdConditionsCrackData( 1 ).StandardP;
+						DisSysCompReliefAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 1 ).StandardW;
+					} else {
+						DisSysCompReliefAirData( i ).StandardT = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardT;
+						DisSysCompReliefAirData( i ).StandardP = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardP;
+						DisSysCompReliefAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
+					}
+				} else {
+					j = FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( { 1, AirflowNetworkNumOfStdCndns } ), AirflowNetworkNumOfStdCndns );
+					if ( j == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
+						ErrorsFound = true;
+					} else {
+						DisSysCompReliefAirData( i ).StandardT = MultizoneSurfaceStdConditionsCrackData( j ).StandardT;
+						DisSysCompReliefAirData( i ).StandardP = MultizoneSurfaceStdConditionsCrackData( j ).StandardP;
+						DisSysCompReliefAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( j ).StandardW;
+					}
+				}
+			}
+		}
+
+		// Read PressureController
+		CurrentModuleObject = "AirflowNetwork:ZoneControl:PressureController";
+		NumOfPressureControllers = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumOfPressureControllers > 1 ) {
+			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+		}
+
+		if ( NumOfPressureControllers > 0 ) {
+			PressureControllerData.allocate( NumOfPressureControllers );
+			for ( i = 1; i <= NumOfPressureControllers; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), PressureControllerData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name 
+				PressureControllerData( i ).ZoneName = Alphas( 2 ); // Zone name
+				PressureControllerData( i ).ZoneNum = FindItemInList( Alphas( 2 ), Zone );
+				PressureControllerData( i ).AFNNodeNum = FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
+				if ( PressureControllerData( i ).ZoneNum == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields( 2 ) + " given." );
+					ShowContinueError( "..invalid " + cAlphaFields( 2 ) + " = \"" + PressureControllerData( i ).ZoneName + "\"" );
+					ErrorsFound = true;
+				}
+
+				PressureControllerData( i ).ControlObjectType = Alphas( 3 ); // Control Object Type
+				PressureControllerData( i ).ControlObjectName = Alphas( 4 ); // Control Object Name
+
+				{ auto const SELECT_CASE_var( MakeUPPERCase( Alphas( 3 ) ) );
+				if ( SELECT_CASE_var == "AIRFLOWNETWORK:MULTIZONE:COMPONENT:ZONEEXHAUSTFAN" ) {
+					PressureControllerData( i ).ControlTypeSet = PressureCtrlExhaust;
+				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:RELIEFAIRFLOW" ) {
+					PressureControllerData( i ).ControlTypeSet = PressureCtrlRelief;
+				} else { // Error
+					ShowSevereError( RoutineName + CurrentModuleObject + " object, The entered choice for " + cAlphaFields( 3 ) + " is not valid = \"" + PressureControllerData( i ).Name + "\"" );
+					ShowContinueError( "Valid choices are \"AirflowNetwork:MultiZone:Component:ZoneExhaustFan\",\"AirflowNetwork:Distribution:Component:ReliefAirFlow\"" );
+					ShowContinueError( "The input choice is " + Alphas( 3 ) );
+					ErrorsFound = true;
+				}}
+
+				if ( PressureControllerData( i ).ControlTypeSet == PressureCtrlExhaust ) {
+					if ( FindItemInList( Alphas( 4 ), MultizoneCompExhaustFanData ) == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, an invalid name is given:" );
+						ShowContinueError( ".. invalid " + cAlphaFields( 4 ) + " = \"" + Alphas( 4 ) + "\"." );
+						ErrorsFound = true;
+					}
+				}
+				if ( PressureControllerData( i ).ControlTypeSet == PressureCtrlRelief ) {
+					if ( FindItemInList( Alphas( 4 ), DisSysCompReliefAirData ) == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, an invalid name is given:" );
+						ShowContinueError( ".. invalid " + cAlphaFields( 4 ) + " = \"" + Alphas( 4 ) + "\"." );
+						ErrorsFound = true;
+					}
+				}
+
+				if ( lAlphaBlanks( 5 ) ) {
+					PressureControllerData( i ).AvailSchedPtr = ScheduleAlwaysOn;
+				} else {
+					PressureControllerData( i ).AvailSchedPtr = GetScheduleIndex( Alphas( 5 ) );
+					if ( PressureControllerData( i ).AvailSchedPtr == 0 ) {
+						ShowSevereError( CurrentModuleObject + ", \"" + PressureControllerData( i ).Name + "\" " + cAlphaFields( 5 ) + " not found: " + Alphas( 5 ) );
+						ErrorsFound = true;
+					}
+				}
+				PressureControllerData( i ).PresSetpointSchedPtr = GetScheduleIndex( Alphas( 6 ) );
+				if ( PressureControllerData( i ).PresSetpointSchedPtr == 0 ) {
+					ShowSevereError( CurrentModuleObject + ", \"" + PressureControllerData( i ).Name + "\" " + cAlphaFields( 6 ) + " not found: " + Alphas( 6 ) );
+					ErrorsFound = true;
+				}
+			}
+		}
+
+
 		// Assign numbers of nodes and linkages
 		if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
 			if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
@@ -3028,7 +3212,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		// Start to assembly AirflowNetwork Components
-		AirflowNetworkNumOfComps = AirflowNetworkNumOfDetOpenings + AirflowNetworkNumOfSimOpenings + AirflowNetworkNumOfSurCracks + AirflowNetworkNumOfSurELA + DisSysNumOfLeaks + DisSysNumOfELRs + DisSysNumOfDucts + DisSysNumOfDampers + DisSysNumOfCVFs + DisSysNumOfDetFans + DisSysNumOfCPDs + DisSysNumOfCoils + DisSysNumOfTermUnits + AirflowNetworkNumOfExhFan + DisSysNumOfHXs + AirflowNetworkNumOfHorOpenings;
+		AirflowNetworkNumOfComps = AirflowNetworkNumOfDetOpenings + AirflowNetworkNumOfSimOpenings + AirflowNetworkNumOfSurCracks + AirflowNetworkNumOfSurELA + DisSysNumOfLeaks + DisSysNumOfELRs + DisSysNumOfDucts + DisSysNumOfDampers + DisSysNumOfCVFs + DisSysNumOfDetFans + DisSysNumOfCPDs + DisSysNumOfCoils + DisSysNumOfTermUnits + AirflowNetworkNumOfExhFan + DisSysNumOfHXs + AirflowNetworkNumOfHorOpenings + NumOfOAFans + NumOfReliefFans;
 		AirflowNetworkCompData.allocate( AirflowNetworkNumOfComps );
 
 		for ( i = 1; i <= AirflowNetworkNumOfDetOpenings; ++i ) { // Detailed opening component
@@ -3224,6 +3408,30 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkCompData( i ).EPlusType = "";
 			AirflowNetworkCompData( i ).CompNum = i;
 			AirflowNetworkCompData( i ).EPlusTypeNum = EPlusTypeNum_HEX;
+		}
+
+		j += DisSysNumOfHXs;
+		for ( i = 1 + j; i <= NumOfOAFans + j; ++i ) { // OA fan component
+			n = i - j;
+			AirflowNetworkCompData( i ).Name = DisSysCompOutdoorAirData( n ).Name;
+			AirflowNetworkCompData( i ).CompTypeNum = CompTypeNum_OAF;
+			AirflowNetworkCompData( i ).TypeNum = n;
+			AirflowNetworkCompData( i ).EPlusName = "";
+			AirflowNetworkCompData( i ).EPlusCompName = "";
+			AirflowNetworkCompData( i ).EPlusType = "";
+			AirflowNetworkCompData( i ).CompNum = i;
+		}
+
+		j += NumOfOAFans;
+		for ( i = 1 + j; i <= NumOfReliefFans + j; ++i ) { // OA fan component
+			n = i - j;
+			AirflowNetworkCompData( i ).Name = DisSysCompReliefAirData( n ).Name;
+			AirflowNetworkCompData( i ).CompTypeNum = CompTypeNum_REL;
+			AirflowNetworkCompData( i ).TypeNum = n;
+			AirflowNetworkCompData( i ).EPlusName = "";
+			AirflowNetworkCompData( i ).EPlusCompName = "";
+			AirflowNetworkCompData( i ).EPlusType = "";
+			AirflowNetworkCompData( i ).CompNum = i;
 		}
 
 		// Assign linkage data
@@ -3695,6 +3903,39 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		//Check node assignments using AirflowNetwork:Distribution:Component:OutdoorAirFlow or AirflowNetwork:Distribution:Component:ReliefAirFlow
+		for ( count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count ) {
+			i = AirflowNetworkLinkageData( count ).CompNum;
+			j = AirflowNetworkLinkageData( count ).NodeNums( 1 );
+			k = AirflowNetworkLinkageData( count ).NodeNums( 2 );
+
+			if ( AirflowNetworkCompData( i ).CompTypeNum == CompTypeNum_OAF ) {
+				if ( !SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
+					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( j ).Name + "," );
+					ShowContinueError( "the component type in the first node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( j ).Name );
+					ErrorsFound = true;
+				}
+				if ( !SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
+					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( k ).Name + "," );
+					ShowContinueError( "the component object type in the second node should be AirLoopHVAC:OutdoorAirSystem at " + AirflowNetworkNodeData( k ).Name );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( AirflowNetworkCompData( i ).CompTypeNum == CompTypeNum_REL ) {
+				if ( !SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
+					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( j ).Name + "," );
+					ShowContinueError( "the component object type in the first node should be AirLoopHVAC:OutdoorAirSystem at " + AirflowNetworkNodeData( j ).Name );
+					ErrorsFound = true;
+				}
+				if ( !SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
+					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( k ).Name + "," );
+					ShowContinueError( "the component type in the second node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( k ).Name );
+					ErrorsFound = true;
+				}
+			}
+		}
+
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 		}
@@ -4133,13 +4374,16 @@ namespace AirflowNetworkBalanceManager {
 		// Using/Aliasing
 		using DataHVACGlobals::TurnFansOn;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED after V1.3 release!!!
-
+		using DataHVACGlobals::VerySmallMassFlow;
+		using General::SolveRegulaFalsi;
+		using DataAirLoop::LoopFanOperationMode;
+		using DataAirLoop::LoopOnOffFanPartLoadRatio;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		int const CycFanCycComp( 1 ); // fan cycles with compressor operation
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4155,6 +4399,23 @@ namespace AirflowNetworkBalanceManager {
 		static bool OneTimeFlag( true );
 		static bool ErrorsFound( false );
 		Real64 GlobalOpenFactor;
+		Real64 ZonePressure1;
+		Real64 ZonePressure2;
+		Real64 PressureSet;
+		Array1D< Real64 > Par; // Pressure setpoint
+		Real64 const ErrorToler( 0.00001 );
+		int const MaxIte( 20 );
+		int SolFla;
+		static int ErrCountVar( 0 );
+		static int ErrCountHighPre( 0 );
+		static int ErrCountLowPre( 0 );
+		static int ErrIndexHighPre( 0 );
+		static int ErrIndexVar( 0 );
+		static int ErrIndexLowPre( 0 );
+		Real64 MinExhaustMassFlowrate;
+		Real64 MaxExhaustMassFlowrate;
+		Real64 MinReliefMassFlowrate;
+		Real64 MaxReliefMassFlowrate;
 
 		// Validate supply and return connections
 		if ( OneTimeFlag ) {
@@ -4251,8 +4512,217 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		if ( !Par.allocated( ) ) {
+			Par.allocate( 1 );
+			Par = 0.0;
+		}
+
+		PressureSetFlag = 0;
+
+		if ( NumOfPressureControllers == 1 ) {
+			if ( PressureControllerData( 1 ).AvailSchedPtr == ScheduleAlwaysOn ) {
+				PressureSetFlag = PressureControllerData( 1 ).ControlTypeSet;
+			} else {
+				if ( GetCurrentScheduleValue( PressureControllerData( 1 ).AvailSchedPtr ) > 0.0 ) {
+					PressureSetFlag = PressureControllerData( 1 ).ControlTypeSet;
+				}
+			}
+			if ( PressureSetFlag > 0 ) {
+				PressureSet = GetCurrentScheduleValue( PressureControllerData( 1 ).PresSetpointSchedPtr );
+			}
+		}
+
 		InitAirflowNetworkData();
-		AIRMOV();
+
+		if ( !( PressureSetFlag > 0 && AirflowNetworkFanActivated ) ) {
+			AIRMOV( );
+		} else if ( PressureSetFlag == PressureCtrlExhaust ) {
+			MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
+			MaxExhaustMassFlowrate = Node( DisSysCompOutdoorAirData( 1 ).InletNode ).MassFlowRate;
+			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
+				MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / LoopOnOffFanPartLoadRatio;
+			}
+			ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
+			AIRMOV( );
+			ZonePressure1 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
+			if ( ZonePressure1 <= PressureSet ) {
+				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				if ( !WarmupFlag ) {
+					if ( ErrCountLowPre == 0 ) {
+						++ErrCountLowPre;
+						ShowWarningError( "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure control is unable to perform." );
+						ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure1, 2 ) + "[Pa], Pressure setpoint =" + RoundSigDigits( PressureSet, 2 ) );
+					} else {
+						++ErrCountLowPre;
+						ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to lower zone pressure...", ErrIndexLowPre, ZonePressure1, ZonePressure1 );
+					}
+				}
+			} else {
+				ExhaustFanMassFlowRate = MaxExhaustMassFlowrate;
+				AIRMOV( );
+				ZonePressure2 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
+				if ( ZonePressure2 >= PressureSet ) {
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					if ( !WarmupFlag ) {
+						if ( ErrCountHighPre == 0 ) {
+							++ErrCountHighPre;
+							ShowWarningError( "The calculated pressure with maximum exhaust fan rate is higher than the pressure setpoint. The pressure control is unable to perform." );
+							ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure2, 2 ) + "[Pa], Pressure setpoint = " + RoundSigDigits( PressureSet, 2 ) );
+						} else {
+							++ErrCountHighPre;
+							ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to higher zone pressure...", ErrIndexHighPre, ZonePressure2, ZonePressure2 );
+						}
+					}
+				} else {
+					//	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
+					Par( 1 ) = PressureSet;
+					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par );
+					if ( SolFla == -1 ) {
+						if ( !WarmupFlag ) {
+							if ( ErrCountVar == 0 ) {
+								++ErrCountVar;
+								ShowWarningError( "Iteration limit exceeded pressure setpoint using an exhaust fan. Simulation continues." );
+								ShowContinueErrorTimeStamp( "Exhaust fan flow rate = " + RoundSigDigits( ExhaustFanMassFlowRate, 4 ) );
+							} else {
+								++ErrCountVar;
+								ShowRecurringWarningErrorAtEnd( PressureControllerData( 1 ).Name + "\": Iteration limit warning exceeding pressure setpoint continues...", ErrIndexVar, ExhaustFanMassFlowRate, ExhaustFanMassFlowRate );
+							}
+						}
+					} else if ( SolFla == -2 ) {
+						ShowFatalError( "Zone pressure control failed using an exhaust fan: no solution is reached, for " + PressureControllerData( 1 ).Name );
+					}
+				}
+			}
+		} else { // PressureCtrlRelief - Pressure control type is Relief Flow 
+			MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
+			MaxReliefMassFlowrate = Node( DisSysCompReliefAirData( 1 ).OutletNode ).MassFlowRate;
+			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
+				MaxReliefMassFlowrate = MaxReliefMassFlowrate / LoopOnOffFanPartLoadRatio;
+			}
+			ReliefMassFlowRate = MinReliefMassFlowrate;
+			InitAirflowNetworkData( );
+			AIRMOV( );
+			ZonePressure1 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
+
+			if ( ZonePressure1 <= PressureSet ) {
+				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				if ( !WarmupFlag ) {
+					if ( ErrCountLowPre == 0 ) {
+						++ErrCountLowPre;
+						ShowWarningError( "The calculated pressure with minimum relief air rate is lower than the pressure setpoint. The pressure control is unable to perform." );
+						ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure1, 2 ) + "[Pa], Pressure setpoint =" + RoundSigDigits( PressureSet, 2 ) );
+					} else {
+						++ErrCountLowPre;
+						ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to lower zone pressure...", ErrIndexLowPre, ZonePressure1, ZonePressure1 );
+					}
+				}
+			} else {
+				ReliefMassFlowRate = MaxReliefMassFlowrate;
+				InitAirflowNetworkData( );
+				AIRMOV( );
+				ZonePressure2 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
+				if ( ZonePressure2 >= PressureSet ) {
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					if ( !WarmupFlag ) {
+						if ( ErrCountHighPre == 0 ) {
+							++ErrCountHighPre;
+							ShowWarningError( "The calculated pressure with maximum relief air rate is higher than the pressure setpoint. The pressure control is unable to perform." );
+							ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure2, 2 ) + "[Pa], Pressure setpoint = " + RoundSigDigits( PressureSet, 2 ) );
+						} else {
+							++ErrCountHighPre;
+							ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to higher zone pressure...", ErrIndexHighPre, ZonePressure2, ZonePressure2 );
+						}
+					}
+				} else {
+					//	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
+					Par( 1 ) = PressureSet;
+					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par );
+					if ( SolFla == -1 ) {
+						if ( !WarmupFlag ) {
+							if ( ErrCountVar == 0 ) {
+								++ErrCountVar;
+								ShowWarningError( "Iteration limit exceeded pressure setpoint using relief air. Simulation continues." );
+								ShowContinueErrorTimeStamp( "Relief air flow rate = " + RoundSigDigits( ReliefMassFlowRate, 4 ) );
+							} else {
+								++ErrCountVar;
+								ShowRecurringWarningErrorAtEnd( PressureControllerData( 1 ).Name + "\": Iteration limit warning exceeding pressure setpoint continues...", ErrIndexVar, ReliefMassFlowRate, ReliefMassFlowRate );
+							}
+						}
+					} else if ( SolFla == -2 ) {
+						ShowFatalError( "Zone pressure control failed using relief air: no solution is reached, for " + PressureControllerData( 1 ).Name );
+					}
+				}
+			}
+		}
+
+	}
+
+	Real64
+	AFNPressureResidual(
+		Real64 const ControllerMassFlowRate, // Pressure setpoint
+		Array1< Real64 > const & Par // par(1) = PressureSet
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   April 2016
+		//       MODIFIED       NA
+		//       RE-ENGINEERED  NA
+
+		// PURPOSE OF THIS FUNCTION:
+		//  Calculates residual function ((ZonePressure - PressureSet)/PressureSet)
+
+		// METHODOLOGY EMPLOYED:
+		//  Calls AIRMOV to get the pressure in the controlled zone and calculates the residual as defined above
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		Real64 AFNPressureResidual;
+
+		// Argument array dimensioning
+
+		// Locals
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		//  na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		//  na
+
+		// DERIVED TYPE DEFINITIONS
+		//  na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 PressureSet;
+		Real64 ZonePressure;
+
+		PressureSet = Par( 1 );
+
+		if ( PressureSetFlag == PressureCtrlExhaust ) {
+			ExhaustFanMassFlowRate = ControllerMassFlowRate;
+		}
+
+		if ( PressureSetFlag == PressureCtrlRelief ) {
+			ReliefMassFlowRate = ControllerMassFlowRate;
+		}
+
+		InitAirflowNetworkData( );
+		AIRMOV( );
+
+		ZonePressure = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
+
+		if ( PressureSet != 0.0 ) {
+			AFNPressureResidual = ( ZonePressure - PressureSet ) / PressureSet;
+		} else {
+			AFNPressureResidual = ( ZonePressure - PressureSet );
+		}
+		return AFNPressureResidual;
 
 	}
 
@@ -6992,6 +7462,12 @@ namespace AirflowNetworkBalanceManager {
 						ShowSevereError( RoutineName + NodeID( i ) + " is not defined as an AirflowNetwork:Distribution:Node object." );
 						ErrorsFound = true;
 					} else {
+						if ( NumOfOAFans == 1 && DisSysCompOutdoorAirData( 1 ).InletNode == 0 ) {
+							DisSysCompOutdoorAirData( 1 ).InletNode = GetOAMixerInletNodeNumber( 1 );
+						}
+						if ( NumOfReliefFans == 1 && DisSysCompReliefAirData( 1 ).OutletNode == 0 ) {
+							DisSysCompReliefAirData( 1 ).OutletNode = GetOAMixerInletNodeNumber( 1 );
+						}
 						if ( i == GetOAMixerReliefNodeNumber( 1 ) ) {
 							NodeFound( i ) = true;
 						} else if ( i == GetOAMixerInletNodeNumber( 1 ) ) {

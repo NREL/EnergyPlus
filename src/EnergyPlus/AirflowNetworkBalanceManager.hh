@@ -82,6 +82,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int const VentCtrNum_ZoneLevel; // ZoneLevel control for a heat transfer subsurface
 	extern int const VentCtrNum_AdjTemp; // Temperature venting control based on adjacent zone conditions
 	extern int const VentCtrNum_AdjEnth; // Enthalpy venting control based on adjacent zone conditions
+	extern int const NumOfVentCtrTypes; // Number of zone level venting control types
 
 	// DERIVED TYPE DEFINITIONS:
 	// Report variables
@@ -258,6 +259,12 @@ namespace AirflowNetworkBalanceManager {
 
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number
+
+	Real64
+	AFNPressureResidual(
+		Real64 const ExFanMassFlowRate,
+		Array1< Real64 > const & Par ); // Residual function using Regula Falsi
+
 
 	// derived class or struct
 	struct OccupantVentilationControlProp {

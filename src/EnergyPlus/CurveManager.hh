@@ -103,7 +103,7 @@ namespace CurveManager {
 	extern int const DoubleExponentialDecay;
 	extern int const QuadLinear;
 	extern int const CubicLinear;
-	extern int const ChillerPartLoadCustom;
+	extern int const ChillerPartLoadWithLift;
 
 	// Interpolation Types
 	extern int const LinearInterpolationOfTable;
@@ -143,7 +143,7 @@ namespace CurveManager {
 	extern int const CurveType_DoubleExponentialDecay;
 	extern int const CurveType_QuadLinear;
 	extern int const CurveType_CubicLinear;
-	extern int const CurveType_ChillerPartLoadCustom;
+	extern int const CurveType_ChillerPartLoadWithLift;
 
 	extern Array1D_string const cCurveTypes;
 
