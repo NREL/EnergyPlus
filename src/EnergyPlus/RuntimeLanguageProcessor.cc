@@ -1090,9 +1090,9 @@ namespace RuntimeLanguageProcessor {
 		std::string DuringWarmup;
 
 		// FLOW:
-		if ( ( ! OutputFullEMSTrace ) && ( ! OutputEMSErrors ) ) return;
+		if ( ( ! OutputFullEMSTrace ) && ( ! OutputEMSErrors ) && ( ! seriousErrorFound ) ) return;
 
-		if ( ( OutputEMSErrors ) && ( ! OutputFullEMSTrace ) ) {
+		if ( ( OutputEMSErrors ) && ( ! OutputFullEMSTrace ) && ( ! seriousErrorFound ) ) {
 			//see if error needs to be reported.
 			if ( ReturnValue.Type != ValueError ) return;
 
@@ -1127,7 +1127,9 @@ namespace RuntimeLanguageProcessor {
 		}
 		TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
-		gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+		if ( OutputFullEMSTrace ) {
+			gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+		}
 
 		if ( seriousErrorFound ) { // throw EnergyPlus severe then fatal
 			ShowSevereError( "Problem found in EMS EnergyPlus Runtime Language." );
