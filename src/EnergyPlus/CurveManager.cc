@@ -1996,7 +1996,7 @@ namespace CurveManager {
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
-			}
+			} 
 			// move table data to more compact array to allow interpolation using multivariable lookup table method
 			TableLookup( TableNum ).NumIndependentVars = 1;
 			TableLookup( TableNum ).NumX1Vars = size( PerfCurveTableData( TableNum ).X1 );
