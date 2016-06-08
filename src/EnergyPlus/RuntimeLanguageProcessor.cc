@@ -1127,7 +1127,7 @@ namespace RuntimeLanguageProcessor {
 		}
 		TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
-		if ( OutputFullEMSTrace ) {
+		if ( OutputFullEMSTrace || ( OutputEMSErrors && ( ReturnValue.Type == ValueError ) ) ) {
 			gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
 		}
 
