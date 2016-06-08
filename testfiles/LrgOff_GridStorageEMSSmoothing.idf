@@ -9600,3 +9600,61 @@ Output:Variable,*,Facility Total HVAC Electric Demand Power,hourly; !- HVAC Aver
 Output:Variable,*,Facility Total Electric Demand Power,hourly; !- HVAC Average [W]
 Output:Variable,*,Facility Total Produced Electric Power,hourly; !- HVAC Average [W]
 Output:Variable,*,Facility Total Produced Electric Energy,hourly; !- HVAC Sum [J]
+
+! Begin EMS demo of controlling a big battery to smooth out building demand load factor
+
+  Output:EnergyManagementSystem,
+    Verbose,                 !- Actuator Availability Dictionary Reporting
+    Verbose,                 !- Internal Variable Availability Dictionary Reporting
+    ErrorsOnly;              !- EMS Runtime Language Debug Output Level
+
+  EnergyManagementSystem:Sensor,
+    CurntFacilityElectDemand,!- Name
+    Whole Building,          !- Output:Variable or Output:Meter Index Key Name
+    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
+ 
+  EnergyManagementSystem:Sensor,
+    CurntStorageSOC,
+    Battery,
+    Electric Storage Simple Charge State;
+    
+  EnergyManagementSystem:InternalVariable, 
+    MaxSOC,
+    BATTERY,
+    Electrical Storage Simple Maximum Capacity; ![J] 
+  
+  EnergyManagementSystem:TrendVariable,
+    FacilityElectTrend,      !- Name
+    CurntFacilityElectDemand,!- EMS Variable Name
+    1008;                     !- Number of Timesteps to be Logged 
+  
+  EnergyManagementSystem:Actuator, 
+    dischargeRate,
+    GRID BATTERY LOAD CENTER,
+    Electrical Storage,
+    Power Draw Rate;
+    
+  EnergyManagementSystem:Actuator,
+    chargeRate,
+    GRID BATTERY LOAD CENTER,
+    Electrical Storage,
+    Power Charge Rate;
+  
+  EnergyManagementSystem:ProgramCallingManager,
+    Demand Manager Demonstration,  !- Name
+    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
+    BatteryControlDemandDemo;  !- Program Name 1
+
+  EnergyManagementSystem:Program,
+    BatteryControlDemandDemo,
+    Set fracSOC = CurntStorageSOC / MaxSOC,
+    Set avgFacilDemand = @trendAverage FacilityElectTrend 1008,
+    set dischargeRate = 0.0,
+    set chargeRate = 0.0,
+    set dampenFactor = 0.8,
+    If ( CurntFacilityElectDemand > (avgFacilDemand * 1.05 ) ),
+      set dischargeRate = ( CurntFacilityElectDemand - avgFacilDemand ) * dampenFactor ,
+    ELSEIF ( CurntFacilityElectDemand < (avgFacilDemand * 0.95 ) ),
+      set chargeRate = ( avgFacilDemand - CurntFacilityElectDemand ) * dampenFactor,
+    ENDIF;
+
