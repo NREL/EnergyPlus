@@ -1886,22 +1886,22 @@ namespace CurveManager {
 			}}
 
 			if ( lNumericFieldBlanks( 1 ) ) {
-				PerfCurve( CurveNum ).Var1Min = 99999999999.0;
+				PerfCurve( CurveNum ).Var1Min = -99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
+				PerfCurve( CurveNum ).Var1MinPresent = true;
 			}
 			if ( lNumericFieldBlanks( 2 ) ) {
-				PerfCurve( CurveNum ).Var1Max = -99999999999.0;
+				PerfCurve( CurveNum ).Var1Max = 99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
+				PerfCurve( CurveNum ).Var1MaxPresent = true;
 			}
 
-			if ( ! lNumericFieldBlanks( 1 ) && ! lNumericFieldBlanks( 2 ) ) {
-				if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
-					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Numbers( 1 ), 2 ) + "] > " + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 2 ) + ']' );
-					ErrorsFound = true;
-				}
+			if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Numbers( 1 ), 2 ) + "] > " + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 2 ) + ']' );
+				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
@@ -2066,10 +2066,30 @@ namespace CurveManager {
 				ErrorsFound = true;
 			}}
 
-			PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
-			PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
-			PerfCurve( CurveNum ).Var2Min = Numbers( 3 );
-			PerfCurve( CurveNum ).Var2Max = Numbers( 4 );
+			if( lNumericFieldBlanks( 1 ) ) {
+				PerfCurve( CurveNum ).Var1Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
+				PerfCurve( CurveNum ).Var1MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 2 ) ) {
+				PerfCurve( CurveNum ).Var1Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
+				PerfCurve( CurveNum ).Var1MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 3 ) ) {
+				PerfCurve( CurveNum ).Var2Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Min = Numbers( 3 );
+				PerfCurve( CurveNum ).Var2MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 4 ) ) {
+				PerfCurve( CurveNum ).Var2Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Max = Numbers( 4 );
+				PerfCurve( CurveNum ).Var2MaxPresent = true;
+			}
 
 			if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
@@ -2346,16 +2366,66 @@ namespace CurveManager {
 			} else {
 				TableData( TableNum ).NormalPoint = 1.0;
 			}
-			PerfCurve( CurveNum ).Var1Min = Numbers( 3 );
-			PerfCurve( CurveNum ).Var1Max = Numbers( 4 );
-			PerfCurve( CurveNum ).Var2Min = Numbers( 5 );
-			PerfCurve( CurveNum ).Var2Max = Numbers( 6 );
-			PerfCurve( CurveNum ).Var3Min = Numbers( 7 );
-			PerfCurve( CurveNum ).Var3Max = Numbers( 8 );
-			PerfCurve( CurveNum ).Var4Min = Numbers( 9 );
-			PerfCurve( CurveNum ).Var4Max = Numbers( 10 );
-			PerfCurve( CurveNum ).Var5Min = Numbers( 11 );
-			PerfCurve( CurveNum ).Var5Max = Numbers( 12 );
+			if( lNumericFieldBlanks( 3 ) ) {
+				PerfCurve( CurveNum ).Var1Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Min = Numbers( 3 );
+				PerfCurve( CurveNum ).Var1MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 4 ) ) {
+				PerfCurve( CurveNum ).Var1Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Max = Numbers( 4 );
+				PerfCurve( CurveNum ).Var1MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 5 ) ) {
+				PerfCurve( CurveNum ).Var2Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Min = Numbers( 5 );
+				PerfCurve( CurveNum ).Var2MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 6 ) ) {
+				PerfCurve( CurveNum ).Var2Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Max = Numbers( 6 );
+				PerfCurve( CurveNum ).Var2MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 7 ) ) {
+				PerfCurve( CurveNum ).Var3Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var3Min = Numbers( 7 );
+				PerfCurve( CurveNum ).Var3MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 8 ) ) {
+				PerfCurve( CurveNum ).Var3Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var3Max = Numbers( 8 );
+				PerfCurve( CurveNum ).Var3MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 9 ) ) {
+				PerfCurve( CurveNum ).Var4Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var4Min = Numbers( 9 );
+				PerfCurve( CurveNum ).Var4MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 10 ) ) {
+				PerfCurve( CurveNum ).Var4Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var4Max = Numbers( 10 );
+				PerfCurve( CurveNum ).Var4MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 11 ) ) {
+				PerfCurve( CurveNum ).Var5Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var5Min = Numbers( 11 );
+				PerfCurve( CurveNum ).Var5MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 12 ) ) {
+				PerfCurve( CurveNum ).Var5Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var5Max = Numbers( 12 );
+				PerfCurve( CurveNum ).Var5MaxPresent = true;
+			}
 
 			if ( Numbers( 3 ) > Numbers( 4 ) ) { // error
 				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
@@ -4698,12 +4768,24 @@ Label999: ;
 		{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).InterpolationType );
 		if ( SELECT_CASE_var == LinearInterpolationOfTable ) {
 		} else if ( SELECT_CASE_var == EvaluateCurveToLimits ) {
-			MinX = min( MinX, PerfCurve( CurveNum ).Var1Min );
-			MaxX = max( MaxX, PerfCurve( CurveNum ).Var1Max );
-			MinX2 = min( MinX2, PerfCurve( CurveNum ).Var2Min );
-			MaxX2 = max( MaxX2, PerfCurve( CurveNum ).Var2Max );
-			MinY = min( MinY, PerfCurve( CurveNum ).CurveMin );
-			MaxY = max( MaxY, PerfCurve( CurveNum ).CurveMax );
+			if ( PerfCurve( CurveNum ).Var1MinPresent ) {
+				MinX = PerfCurve( CurveNum ).Var1Min;
+			}
+			if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
+				MaxX = PerfCurve( CurveNum ).Var1Max;
+			}
+			if( PerfCurve( CurveNum ).Var2MinPresent ) {
+				MinX2 = PerfCurve( CurveNum ).Var2Min;
+			}
+			if( PerfCurve( CurveNum ).Var2MaxPresent ) {
+				MaxX2 = PerfCurve( CurveNum ).Var2Max;
+			}
+			if( PerfCurve( CurveNum ).CurveMinPresent ) {
+				MinY = PerfCurve( CurveNum ).CurveMin;
+			}
+			if( PerfCurve( CurveNum ).CurveMaxPresent ) {
+				MaxY = PerfCurve( CurveNum ).CurveMax;
+			}
 		} else {
 		}}
 
