@@ -231,29 +231,14 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear) {
 		"4,                       !- X Value #5",
 		"4,                       !- Output Value #5",
 		"5,                      !- X Value #6",
-		"2;                       !- Output Value #6",
-		"Table:OneIndependentVariable,",
-		"TestTable8,              !- Name",
-		"Linear,                  !- Curve Type",
-		"LinearInterpolationOfTable,  !- Interpolation Method",
-		",                        !- Minimum Value of X",
-		",                        !- Maximum Value of X",
-		",                        !- Minimum Table Output",
-		",                        !- Maximum Table Output",
-		"Dimensionless,           !- Input Unit Type for X",
-		"Dimensionless,           !- Output Unit Type",
-		",                        !- Normalization Reference",
-		"0,                       !- X Value #1",
-		"0,                       !- Output Value #1",
-		"1,                       !- X Value #2",
-		"1;                       !- Output Value #2" });
+		"2;                       !- Output Value #6" });
 
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
 	CurveManager::GetCurvesInputFlag = false;
-	ASSERT_EQ(8, CurveManager::NumCurves);
+	ASSERT_EQ(7, CurveManager::NumCurves);
 
 	// Linear curve type
 	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
@@ -396,12 +381,11 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear) {
 	index = CurveManager::GetCurveCheck("TESTTABLE7", error, "TEST");
 	EXPECT_FALSE(error);
 	EXPECT_EQ(7, index);
-	CurveManager::GetCurveMinMaxValues(7, min, max);
+	//CurveManager::GetCurveMinMaxValues(7, min, max);
 	//EXPECT_EQ(0, min);
 	//EXPECT_EQ(5, max);
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(7));
 
-	/*
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, 0)); // In-range value
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(7, 0.5)); // In-range value
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, -10.0)); // Minimum x
@@ -411,25 +395,6 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear) {
 	EXPECT_FALSE(error);
 	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(7, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(7, 5)); // Value too large
-	*/
-
-	// Super-simple table without IV min/max
-	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(8));
-	EXPECT_EQ("TESTTABLE8", CurveManager::GetCurveName(8));
-	EXPECT_EQ(8, CurveManager::GetCurveIndex("TESTTABLE8"));
-	error = false;
-	index = CurveManager::GetCurveCheck("TESTTABLE8", error, "TEST");
-	EXPECT_FALSE(error);
-	EXPECT_EQ(8, index);
-	CurveManager::GetCurveMinMaxValues(8, min, max);
-	//EXPECT_EQ(0, min);
-	//EXPECT_EQ(5, max);
-	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(8));
-
-//	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(8, 0)); // In-range value
-//	EXPECT_DOUBLE_EQ(0.75, CurveManager::CurveValue(8, 0.75)); // In-range value
-//	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, -10.0)); // Minimum x
-//	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(7, 5000)); // Maximum x
 
 	EXPECT_FALSE(has_err_output());
 }
@@ -488,10 +453,10 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 		"TestTable3,              !- Name",
 		"Quadratic,               !- Curve Type",
 		"LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method",
-		"0,                       !- Minimum Value of X",
-		"5,                       !- Maximum Value of X",
-		",                     !- Minimum Table Output",
-		",                     !- Maximum Table Output",
+		",                        !- Minimum Value of X",
+		",                        !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
 		"Dimensionless,           !- Input Unit Type for X",
 		"Dimensionless,           !- Output Unit Type",
 		",                        !- Normalization Reference",
@@ -509,6 +474,29 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 		"2;                       !- Output Value #6",
 		"Table:OneIndependentVariable,",
 		"TestTable4,              !- Name",
+		"Quadratic,               !- Curve Type",
+		"LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method",
+		"-1,                      !- Minimum Value of X",
+		"10,                      !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable5,              !- Name",
 		"Cubic,                   !- Curve Type",
 		"LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method",
 		"0,                       !- Minimum Value of X",
@@ -531,32 +519,9 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 		"5,                       !- X Value #6",
 		"2;                       !- Output Value #6",
 		"Table:OneIndependentVariable,",
-		"TestTable5,              !- Name",
-		"Quartic,                 !- Curve Type",
-		"LinearInterpolationOfTable,  !- Interpolation Method",
-		"0,                       !- Minimum Value of X",
-		"5,                       !- Maximum Value of X",
-		",                        !- Minimum Table Output",
-		",                        !- Maximum Table Output",
-		"Dimensionless,           !- Input Unit Type for X",
-		"Dimensionless,           !- Output Unit Type",
-		",                        !- Normalization Reference",
-		"0,                       !- X Value #1",
-		"0,                       !- Output Value #1",
-		"1,                       !- X Value #2",
-		"2,                       !- Output Value #2",
-		"2,                       !- X Value #3",
-		"2,                       !- Output Value #3",
-		"3,                       !- X Value #4",
-		"3,                       !- Output Value #4",
-		"4,                       !- X Value #5",
-		"4,                       !- Output Value #5",
-		"5,                       !- X Value #6",
-		"2;                       !- Output Value #6",
-		"Table:OneIndependentVariable,",
 		"TestTable6,              !- Name",
-		"Exponent,                !- Curve Type",
-		"LinearInterpolationOfTable,  !- Interpolation Method",
+		"Quartic,                 !- Curve Type",
+		"LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method",
 		"0,                       !- Minimum Value of X",
 		"5,                       !- Maximum Value of X",
 		",                        !- Minimum Table Output",
@@ -579,9 +544,9 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 		"Table:OneIndependentVariable,",
 		"TestTable7,              !- Name",
 		"Exponent,                !- Curve Type",
-		"LinearInterpolationOfTable,  !- Interpolation Method",
-		",                        !- Minimum Value of X",
-		",                        !- Maximum Value of X",
+		"LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
 		",                        !- Minimum Table Output",
 		",                        !- Maximum Table Output",
 		"Dimensionless,           !- Input Unit Type for X",
@@ -598,29 +563,14 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 		"4,                       !- X Value #5",
 		"4,                       !- Output Value #5",
 		"5,                       !- X Value #6",
-		"2;                       !- Output Value #6",
-		"Table:OneIndependentVariable,",
-		"TestTable8,              !- Name",
-		"Linear,                  !- Curve Type",
-		"LinearInterpolationOfTable,  !- Interpolation Method",
-		",                        !- Minimum Value of X",
-		",                        !- Maximum Value of X",
-		",                        !- Minimum Table Output",
-		",                        !- Maximum Table Output",
-		"Dimensionless,           !- Input Unit Type for X",
-		"Dimensionless,           !- Output Unit Type",
-		",                        !- Normalization Reference",
-		"0,                       !- X Value #1",
-		"0,                       !- Output Value #1",
-		"1,                       !- X Value #2",
-		"1;                       !- Output Value #2" });
+		"2;                       !- Output Value #6" });
 
 	ASSERT_FALSE(process_idf(idf_objects));
 
 	EXPECT_EQ(0, CurveManager::NumCurves);
 	CurveManager::GetCurveInput();
 	CurveManager::GetCurvesInputFlag = false;
-	ASSERT_EQ(8, CurveManager::NumCurves);
+	ASSERT_EQ(7, CurveManager::NumCurves);
 
 	// Linear curve type
 	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
@@ -663,7 +613,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(2, 5)); // Value too large
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(2, 0.5)); // In-range value
 
-	// Quadratic curve type
+	// Quadratic curve type without min or max
 	EXPECT_EQ("QUADRATIC", CurveManager::GetCurveType(3));
 	EXPECT_EQ("TESTTABLE3", CurveManager::GetCurveName(3));
 	EXPECT_EQ(3, CurveManager::GetCurveIndex("TESTTABLE3"));
@@ -677,7 +627,12 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(3));
 
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(3, 0)); // In-range value
-	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(3, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.25, CurveManager::CurveValue(3, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.6875, CurveManager::CurveValue(3, 0.75)); // In-range value
+	EXPECT_DOUBLE_EQ(2.055, CurveManager::CurveValue(3, 2.1)); // In-range value
+	EXPECT_DOUBLE_EQ(2.855, CurveManager::CurveValue(3, 2.9)); // In-range value
+	EXPECT_DOUBLE_EQ(3.9, CurveManager::CurveValue(3, 3.9)); // In-range value
+	EXPECT_DOUBLE_EQ(3.84, CurveManager::CurveValue(3, 4.2)); // In-range value
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(3, -10.0)); // Minimum x
 	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(3, 5000)); // Maximum x
 
@@ -686,8 +641,8 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(3, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(3, 5)); // Value too large
 
-	// Cubic curve type
-	EXPECT_EQ("CUBIC", CurveManager::GetCurveType(4));
+	// Quadratic curve type with extrapolation
+	EXPECT_EQ("QUADRATIC", CurveManager::GetCurveType(4));
 	EXPECT_EQ("TESTTABLE4", CurveManager::GetCurveName(4));
 	EXPECT_EQ(4, CurveManager::GetCurveIndex("TESTTABLE4"));
 	error = false;
@@ -695,22 +650,29 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_FALSE(error);
 	EXPECT_EQ(4, index);
 	CurveManager::GetCurveMinMaxValues(4, min, max);
-	EXPECT_EQ(0, min);
-	EXPECT_EQ(5, max);
+	EXPECT_EQ(-1, min);
+	EXPECT_EQ(10, max);
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(4));
 
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(4, 0)); // In-range value
-	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(4, 0.5)); // In-range value
-	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(4, -10.0)); // Minimum x
-	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(4, 5000)); // Maximum x
+	EXPECT_DOUBLE_EQ(1.25, CurveManager::CurveValue(4, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.6875, CurveManager::CurveValue(4, 0.75)); // In-range value
+	EXPECT_DOUBLE_EQ(2.055, CurveManager::CurveValue(4, 2.1)); // In-range value
+	EXPECT_DOUBLE_EQ(2.855, CurveManager::CurveValue(4, 2.9)); // In-range value
+	EXPECT_DOUBLE_EQ(3.9, CurveManager::CurveValue(4, 3.9)); // In-range value
+	EXPECT_DOUBLE_EQ(3.84, CurveManager::CurveValue(4, 4.2)); // In-range value
+	EXPECT_DOUBLE_EQ(-1.0, CurveManager::CurveValue(4, -0.5)); // Extrapolated value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(4, 6)); // Extrapolated value
+	EXPECT_DOUBLE_EQ(-2.0, CurveManager::CurveValue(4, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(-8.0, CurveManager::CurveValue(4, 5000)); // Maximum x
 
 	CurveManager::SetCurveOutputMinMaxValues(4, error, 0.5, 1.0);
 	EXPECT_FALSE(error);
 	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(4, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(4, 5)); // Value too large
 
-	// Quartic curve type
-	EXPECT_EQ("QUARTIC", CurveManager::GetCurveType(5));
+	// Cubic curve type
+	EXPECT_EQ("CUBIC", CurveManager::GetCurveType(5));
 	EXPECT_EQ("TESTTABLE5", CurveManager::GetCurveName(5));
 	EXPECT_EQ(5, CurveManager::GetCurveIndex("TESTTABLE5"));
 	error = false;
@@ -723,7 +685,8 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(5));
 
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(5, 0)); // In-range value
-	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(5, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.4375, CurveManager::CurveValue(5, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(2.4375, CurveManager::CurveValue(5, 2.5)); // In-range value
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(5, -10.0)); // Minimum x
 	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(5, 5000)); // Maximum x
 
@@ -732,8 +695,8 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(5, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(5, 5)); // Value too large
 
-	// Exponent curve type
-	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(6));
+	// Quartic curve type
+	EXPECT_EQ("QUARTIC", CurveManager::GetCurveType(6));
 	EXPECT_EQ("TESTTABLE6", CurveManager::GetCurveName(6));
 	EXPECT_EQ(6, CurveManager::GetCurveIndex("TESTTABLE6"));
 	error = false;
@@ -746,7 +709,8 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(6));
 
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(6, 0)); // In-range value
-	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(6, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.59375, CurveManager::CurveValue(6, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(3.7472, CurveManager::CurveValue(6, 3.6)); // In-range value
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(6, -10.0)); // Minimum x
 	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(6, 5000)); // Maximum x
 
@@ -755,7 +719,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(6, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(6, 5)); // Value too large
 
-	// Exponent curve type without IV min/max
+	// Exponent curve type
 	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(7));
 	EXPECT_EQ("TESTTABLE7", CurveManager::GetCurveName(7));
 	EXPECT_EQ(7, CurveManager::GetCurveIndex("TESTTABLE7"));
@@ -764,13 +728,13 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_FALSE(error);
 	EXPECT_EQ(7, index);
 	CurveManager::GetCurveMinMaxValues(7, min, max);
-	//EXPECT_EQ(0, min);
-	//EXPECT_EQ(5, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(7));
 
-	/*
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, 0)); // In-range value
-	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(7, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.4375, CurveManager::CurveValue(7, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(2.4375, CurveManager::CurveValue(7, 2.5)); // In-range value
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, -10.0)); // Minimum x
 	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(7, 5000)); // Maximum x
 
@@ -778,25 +742,6 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange) {
 	EXPECT_FALSE(error);
 	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(7, 0)); // Value too small
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(7, 5)); // Value too large
-	*/
-
-	// Super-simple table without IV min/max
-	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(8));
-	EXPECT_EQ("TESTTABLE8", CurveManager::GetCurveName(8));
-	EXPECT_EQ(8, CurveManager::GetCurveIndex("TESTTABLE8"));
-	error = false;
-	index = CurveManager::GetCurveCheck("TESTTABLE8", error, "TEST");
-	EXPECT_FALSE(error);
-	EXPECT_EQ(8, index);
-	CurveManager::GetCurveMinMaxValues(8, min, max);
-	//EXPECT_EQ(0, min);
-	//EXPECT_EQ(5, max);
-	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(8));
-
-	//	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(8, 0)); // In-range value
-	//	EXPECT_DOUBLE_EQ(0.75, CurveManager::CurveValue(8, 0.75)); // In-range value
-	//	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, -10.0)); // Minimum x
-	//	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(7, 5000)); // Maximum x
 
 	EXPECT_FALSE(has_err_output());
 }
@@ -850,4 +795,1101 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_MinMaxFailure) {
 	EXPECT_FALSE(has_err_output());
 }
 
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear_BadMinMax) {
 
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:OneIndependentVariable,",
+		"TestTableMinMax,         !- Name",
+		"Linear,                  !- Curve Type",
+		"LinearInterpolationOfTable,  !- Interpolation Method",
+		"-1,                      !- Minimum Value of X",
+		"6,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1;                       !- Output Value #2" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(1, CurveManager::NumCurves);
+
+	// Super-simple table without IV min/max
+	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLEMINMAX", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	//Real64 min, max;
+	//CurveManager::GetCurveMinMaxValues(1, min, max);
+	//EXPECT_EQ(0, min);
+	//EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -0.25)); // Not really in-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5.5)); // Not really in-range value
+	EXPECT_DOUBLE_EQ(0.75, CurveManager::CurveValue(1, 0.75)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:OneIndependentVariable,",
+		"TestTable1,              !- Name",
+		"Linear,                  !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable2,              !- Name",
+		"Linear,                  !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"0.96,                    !- Minimum Table Output",
+		"1.5,                     !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable3,              !- Name",
+		"Quadratic,               !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable4,              !- Name",
+		"Cubic,                   !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable5,              !- Name",
+		"Quartic,                 !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable6,              !- Name",
+		"Exponent,                !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6",
+		"Table:OneIndependentVariable,",
+		"TestTable7,              !- Name",
+		"Exponent,                !- Curve Type",
+		"LinearInterpolationOfTable,  !- Interpolation Method",
+		",                        !- Minimum Value of X",
+		",                        !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                      !- X Value #6",
+		"2;                       !- Output Value #6" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(7, CurveManager::NumCurves);
+
+	// Linear curve type
+	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min, max;
+	CurveManager::GetCurveMinMaxValues(1, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.9523809523809523, CurveManager::CurveValue(1, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(1.438095238095238, CurveManager::CurveValue(1, 1.0)); // In-range value
+	EXPECT_DOUBLE_EQ(0.9523809523809523, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(3.38095238095238, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.96, 1.5);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.96, CurveManager::CurveValue(1, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.5, CurveManager::CurveValue(1, 5)); // Value too large
+
+	// Linear curve type with min and max
+	EXPECT_EQ("LINEAR", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTTABLE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTTABLE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(0.96, CurveManager::CurveValue(2, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.5, CurveManager::CurveValue(2, 5)); // Value too large
+	EXPECT_DOUBLE_EQ(1.438095238095238, CurveManager::CurveValue(2, 1.0)); // In-range value
+
+	// Quadratic curve type
+	EXPECT_EQ("QUADRATIC", CurveManager::GetCurveType(3));
+	EXPECT_EQ("TESTTABLE3", CurveManager::GetCurveName(3));
+	EXPECT_EQ(3, CurveManager::GetCurveIndex("TESTTABLE3"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE3", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(3, index);
+	CurveManager::GetCurveMinMaxValues(3, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(3));
+
+	EXPECT_NEAR(0.0, CurveManager::CurveValue(3, 0), 1.0e-14); // In-range value
+	EXPECT_DOUBLE_EQ(1.628571428571429, CurveManager::CurveValue(3, 1)); // In-range value
+	EXPECT_NEAR(0.0, CurveManager::CurveValue(3, -10.0), 1.0e-14); // Minimum x
+	EXPECT_NEAR(2.428571428571427, CurveManager::CurveValue(3, 5000), 1.0e-14); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(3, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(3, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(3, 5)); // Value too large
+
+	// Cubic curve type
+	EXPECT_EQ("CUBIC", CurveManager::GetCurveType(4));
+	EXPECT_EQ("TESTTABLE4", CurveManager::GetCurveName(4));
+	EXPECT_EQ(4, CurveManager::GetCurveIndex("TESTTABLE4"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE4", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(4, index);
+	CurveManager::GetCurveMinMaxValues(4, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(4));
+
+	EXPECT_NEAR(0.2222222222222222, CurveManager::CurveValue(4, 0),1.0e-14); // In-range value
+	EXPECT_NEAR(1.317460317460317, CurveManager::CurveValue(4, 1),1.0e-14); // In-range value
+	EXPECT_NEAR(0.2222222222222222, CurveManager::CurveValue(4, -10.0),1.0e-14); // Minimum x
+	EXPECT_NEAR(2.206349206349206, CurveManager::CurveValue(4, 5000),1.0e-14); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(4, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(4, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(4, 5)); // Value too large
+
+	// Quartic curve type
+	EXPECT_EQ("QUARTIC", CurveManager::GetCurveType(5));
+	EXPECT_EQ("TESTTABLE5", CurveManager::GetCurveName(5));
+	EXPECT_EQ(5, CurveManager::GetCurveIndex("TESTTABLE5"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE5", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(5, index);
+	CurveManager::GetCurveMinMaxValues(5, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(5));
+
+	EXPECT_NEAR(0.007936507936507936, CurveManager::CurveValue(5, 0),1.0e-12); // In-range value
+	EXPECT_NEAR(1.96031746031746, CurveManager::CurveValue(5, 1.0),1.0e-12); // In-range value
+	EXPECT_NEAR(0.007936507936507936, CurveManager::CurveValue(5, -10.0), 1.0e-12); // Minimum x
+	EXPECT_NEAR(1.992063492063494, CurveManager::CurveValue(5, 5000),1.0e-12); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(5, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(5, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(5, 5)); // Value too large
+
+	// Exponent curve type
+	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(6));
+	EXPECT_EQ("TESTTABLE6", CurveManager::GetCurveName(6));
+	EXPECT_EQ(6, CurveManager::GetCurveIndex("TESTTABLE6"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE6", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(6, index);
+	CurveManager::GetCurveMinMaxValues(6, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(6));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(6, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(6, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(6, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(6, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(6, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(6, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(6, 5)); // Value too large
+
+	// Exponent curve type without IV min/max
+	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(7));
+	EXPECT_EQ("TESTTABLE7", CurveManager::GetCurveName(7));
+	EXPECT_EQ(7, CurveManager::GetCurveIndex("TESTTABLE7"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE7", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(7, index);
+	//CurveManager::GetCurveMinMaxValues(7, min, max);
+	//EXPECT_EQ(0, min);
+	//EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(7));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(7, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(7, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(7, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(7, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(7, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(7, 5)); // Value too large
+
+	EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_OverwriteLimits) {
+
+  std::string const idf_objects = delimited_string({
+    "Version,8.5;",
+    "Table:OneIndependentVariable,",
+    "TestTableOverwrite,      !- Name",
+    "Linear,                  !- Curve Type",
+    "EvaluateCurveToLimits,   !- Interpolation Method",
+    "0.1,                     !- Minimum Value of X",
+    "4.9,                     !- Maximum Value of X",
+    "1.2,                     !- Minimum Table Output",
+    "2.5,                     !- Maximum Table Output",
+    "Dimensionless,           !- Input Unit Type for X",
+    "Dimensionless,           !- Output Unit Type",
+    ",                        !- Normalization Reference",
+    "0,                       !- X Value #1",
+    "0,                       !- Output Value #1",
+    "1,                       !- X Value #2",
+    "2,                       !- Output Value #2",
+    "2,                       !- X Value #3",
+    "2,                       !- Output Value #3",
+    "3,                       !- X Value #4",
+    "3,                       !- Output Value #4",
+    "4,                       !- X Value #5",
+    "4,                       !- Output Value #5",
+    "5,                       !- X Value #6",
+    "2;                       !- Output Value #6" });
+
+  ASSERT_FALSE(process_idf(idf_objects));
+
+  EXPECT_EQ(0, CurveManager::NumCurves);
+  CurveManager::GetCurveInput();
+  CurveManager::GetCurvesInputFlag = false;
+  ASSERT_EQ(1, CurveManager::NumCurves);
+
+  // Linear curve type, specified min/max
+  EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+  EXPECT_EQ("TESTTABLEOVERWRITE", CurveManager::GetCurveName(1));
+  EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEOVERWRITE"));
+  bool error = false;
+  int index = CurveManager::GetCurveCheck("TESTTABLEOVERWRITE", error, "TEST");
+  EXPECT_FALSE(error);
+  EXPECT_EQ(1, index);
+  Real64 min, max;
+  CurveManager::GetCurveMinMaxValues(1, min, max);
+  EXPECT_EQ(0.1, min); // Fails
+  EXPECT_EQ(4.9, max);  // Fails
+  EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+
+  EXPECT_DOUBLE_EQ(1.2, CurveManager::CurveValue(1, 0.5)); // Value should be too small, fails
+  EXPECT_DOUBLE_EQ(2.5, CurveManager::CurveValue(1, 4)); // Value should be too large, fails
+  EXPECT_DOUBLE_EQ(1.438095238095238, CurveManager::CurveValue(1, 1.0)); // In-range value
+
+  CurveManager::SetCurveOutputMinMaxValues(1, error, 1.2, 2.5);
+  EXPECT_FALSE(error);
+  EXPECT_DOUBLE_EQ(1.2, CurveManager::CurveValue(1, 0.5)); // Value too small
+  EXPECT_DOUBLE_EQ(2.5, CurveManager::CurveValue(1, 4)); // Value too large
+
+  EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_Exponent) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:OneIndependentVariable,",
+		"TestTable,              !- Name",
+		"Exponent,                !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"2;                       !- Output Value #6" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(1, CurveManager::NumCurves);
+
+	// Exponent curve type
+	EXPECT_EQ("EXPONENT", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLE", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLE"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLE", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min, max;
+	CurveManager::GetCurveMinMaxValues(1, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
+	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5)); // Value too large
+
+	EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:TwoIndependentVariables,",
+		"TestTable1,              !- Name",
+		"Biquadratic,             !- Curve Type",
+		"LinearInterpolationOfTable, !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"1,                       !- Minimum Value of Y",
+		"3,                       !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2;                       !- Output Value #12",
+		"Table:TwoIndependentVariables,",
+		"TestTable2,              !- Name",
+		"Bicubic,                 !- Curve Type",
+		"LinearInterpolationOfTable, !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"1,                       !- Minimum Value of Y",
+		"3,                       !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2;                       !- Output Value #12",
+		"Table:TwoIndependentVariables,",
+		"TestTable3,              !- Name",
+		"Triquadratic,            !- Curve Type",
+		"LinearInterpolationOfTable, !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"1,                       !- Minimum Value of Y",
+		"3,                       !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2;                       !- Output Value #12",
+		"Table:TwoIndependentVariables,",
+		"TestTable4,              !- Name",
+		"QuadraticLinear,         !- Curve Type",
+		"LinearInterpolationOfTable, !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"1,                       !- Minimum Value of Y",
+		"3,                       !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2;                       !- Output Value #12",
+		"Table:TwoIndependentVariables,",
+		"TestTable5,              !- Name",
+		"QuadraticLinear,         !- Curve Type",
+		"LinearInterpolationOfTable, !- Interpolation Method",
+		",                        !- Minimum Value of X",
+		",                        !- Maximum Value of X",
+		",                        !- Minimum Value of Y",
+		",                        !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2;                       !- Output Value #12" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(5, CurveManager::NumCurves);
+
+	// BiQuadratic curve type
+	EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(3, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5)); // Value too large
+
+	// BiCubic curve type
+	EXPECT_EQ("BICUBIC", CurveManager::GetCurveType(2));
+	EXPECT_EQ("TESTTABLE2", CurveManager::GetCurveName(2));
+	EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTTABLE2"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE2", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(2, index);
+	CurveManager::GetCurveMinMaxValues(2, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(3, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(2));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(2, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(2, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(2, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(2, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(2, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(2, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(2, 5)); // Value too large
+
+	// TriQuadratic curve type
+	EXPECT_EQ("TRIQUADRATIC", CurveManager::GetCurveType(3));
+	EXPECT_EQ("TESTTABLE3", CurveManager::GetCurveName(3));
+	EXPECT_EQ(3, CurveManager::GetCurveIndex("TESTTABLE3"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE3", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(3, index);
+	CurveManager::GetCurveMinMaxValues(3, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(3, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(3));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(3, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(3, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(3, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(3, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(3, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(3, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(3, 5)); // Value too large
+
+	// QuadraticLinear curve type
+	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(4));
+	EXPECT_EQ("TESTTABLE4", CurveManager::GetCurveName(4));
+	EXPECT_EQ(4, CurveManager::GetCurveIndex("TESTTABLE4"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE4", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(4, index);
+	CurveManager::GetCurveMinMaxValues(4, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(3, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(4));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(4, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(4, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(4, 0.5, 2.5)); // Not really an in-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(4, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(4, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(4, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(4, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(4, 5)); // Value too large
+
+	// QuadraticLinear curve type, no min/max for y
+	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(5));
+	EXPECT_EQ("TESTTABLE5", CurveManager::GetCurveName(5));
+	EXPECT_EQ(5, CurveManager::GetCurveIndex("TESTTABLE5"));
+	error = false;
+	index = CurveManager::GetCurveCheck("TESTTABLE5", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(5, index);
+	CurveManager::GetCurveMinMaxValues(5, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(2, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(5));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(5, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(5, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(5, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(5, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(5, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(5, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(5, 5)); // Value too large
+
+	EXPECT_FALSE(has_err_output());
+}
+
+
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_MinMaxFailure) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:TwoIndependentVariables,",
+		"TestTableMinMax,         !- Name",
+		"QuadraticLinear,         !- Curve Type",
+		"LinearInterpolationOfTable, !- Interpolation Method",
+		",                        !- Minimum Value of X",
+		",                        !- Maximum Value of X",
+		",                        !- Minimum Value of Y",
+		",                        !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2;                       !- Output Value #12" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(1, CurveManager::NumCurves);
+
+	// QuadraticLinear curve type, no min/max for y
+	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLEMINMAX", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(2, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0, 1.5)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5, 1.5)); // Value too large
+
+	EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:TwoIndependentVariables,",
+		"TestTableMinMax,         !- Name",
+		"QuadraticLinear,         !- Curve Type",
+		"EvaluateToLimits,        !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"1,                       !- Minimum Value of Y",
+		"4,                       !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0,                       !- X Value #1",
+		"1,                       !- Y Value #1",
+		"0,                       !- Output Value #1",
+		"1,                       !- X Value #2",
+		"1,                       !- Y Value #2",
+		"2,                       !- Output Value #2",
+		"2,                       !- X Value #3",
+		"1,                       !- Y Value #3",
+		"2,                       !- Output Value #3",
+		"3,                       !- X Value #4",
+		"1,                       !- Y Value #4",
+		"3,                       !- Output Value #4",
+		"4,                       !- X Value #5",
+		"1,                       !- Y Value #5",
+		"4,                       !- Output Value #5",
+		"5,                       !- X Value #6",
+		"1,                       !- Y Value #6",
+		"2,                       !- Output Value #6",
+		"0,                       !- X Value #7",
+		"2,                       !- Y Value #7",
+		"0,                       !- Output Value #7",
+		"1,                       !- X Value #8",
+		"2,                       !- Y Value #8",
+		"2,                       !- Output Value #8",
+		"2,                       !- X Value #9",
+		"2,                       !- Y Value #9",
+		"2,                       !- Output Value #9",
+		"3,                       !- X Value #10",
+		"2,                       !- Y Value #10",
+		"3,                       !- Output Value #10",
+		"4,                       !- X Value #11",
+		"2,                       !- Y Value #11",
+		"4,                       !- Output Value #11",
+		"5,                       !- X Value #12",
+		"2,                       !- Y Value #12",
+		"2,                       !- Output Value #12",
+		"0,                       !- X Value #13",
+		"3,                       !- Y Value #13",
+		"0,                       !- Output Value #13",
+		"1,                       !- X Value #14",
+		"3,                       !- Y Value #14",
+		"2,                       !- Output Value #14",
+		"2,                       !- X Value #15",
+		"3,                       !- Y Value #15",
+		"2,                       !- Output Value #15",
+		"3,                       !- X Value #16",
+		"3,                       !- Y Value #16",
+		"3,                       !- Output Value #16",
+		"4,                       !- X Value #17",
+		"3,                       !- Y Value #17",
+		"4,                       !- Output Value #17",
+		"5,                       !- X Value #18",
+		"3,                       !- Y Value #18",
+		"2;                       !- Output Value #18" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(1, CurveManager::NumCurves);
+
+	// QuadraticLinear curve type, no min/max for y
+	EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLEMINMAX", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(5, max1);
+	EXPECT_EQ(1, min2);
+	EXPECT_EQ(2, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5, 1.5)); // In-range value
+	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(1, 5000)); // Maximum x
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0, 1.5)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5, 1.5)); // Value too large
+
+	EXPECT_FALSE(has_err_output());
+}
