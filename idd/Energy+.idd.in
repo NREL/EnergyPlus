@@ -32852,6 +32852,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference DOAToZonalUnit
         \note Unique name for this packaged terminal air conditioner object.
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -33006,6 +33007,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference DOAToZonalUnit
         \note Unique name for this packaged terminal heat pump object.
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -34174,6 +34176,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \required-field
         \type alpha
         \reference ZoneTerminalUnitNames
+        \reference DOAToZonalUnit
   A2 ,  \field Terminal Unit Availability Schedule
         \type object-list
         \object-list ScheduleNames
@@ -39746,7 +39749,7 @@ AirTerminal:SingleDuct:Mixer,
        \memo a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
-   A2, \field ZoneHVAC Terminal Unit Object Type
+   A2, \field ZoneHVAC Unit Object Type
        \required-field
        \type choice
        \key ZoneHVAC:FourPipeFanCoil
@@ -39756,43 +39759,42 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.   
-   A3, \field ZoneHVAC Terminal Unit Name
+   A3, \field ZoneHVAC Unit Object Name
        \required-field
        \type object-list
        \object-list DOAToZonalUnit
        \note The name of ZoneHVAC equipment to which this terminal mixer will be connected.   
-   A4, \field Terminal Unit Outlet Node Name
+   A4, \field Mixer Outlet Node Name
        \required-field
        \type node
-       \note The name of the primary air (outdoor air) inlet node of the mixer. This will be 
-       \note an outlet node of an AirLoopHVAC:ZoneSplitter, providing the connection to the 
-       \note DOAS system.
-   A5, \field Terminal Unit Primary Air Inlet Node Name
+       \note This is the outlet air node name of the mixer. This will be an inlet air node name 
+       \node of the ZoneHVAC equipment if the connection type in the input field Mixer Connection 
+       \note Type below is InletSide, else this will be inlet air node name of the conditioned zone
+       \node if the connection type in the input field Mixer Connection Type below is SupplySide.
+   A5, \field Mixer Primary Air Inlet Node Name
        \required-field
        \type node
-       \note The name of the secondary air (recirculating air) inlet node of the mixer. This 
-       \note will be the outlet air node name of the ZoneHVAC equipment if the connection type 
-       \note in the input field Terminal Unit Connection Type below is SupplySide, or else this 
-       \note will be exhaust air node name of the zone that is being conditioned if the connection
-       \note type in the input field Terminal Unit Connection Type below is InletSide.
-   A6, \field Terminal Unit Secondary Air Inlet Node Name
+       \note The primary air (treated outdoor air) inlet node name of the mixer. This will be an 
+       \note outlet air node name of an AirLoopHVAC:ZoneSplitter, providing the connection to the 
+       \note DOAS system. 
+   A6, \field Mixer Secondary Air Inlet Node Name
        \required-field
        \type node
-       \note The name of the secondary air (recirculating air) inlet node of the mixer. This will 
-       \note be the outlet air node name of the ZoneHVAC equipment if the connection type in the 
-       \note input field Terminal Unit Connection Type below is SupplySide, or else this will be 
-       \note exhaust air node name of the zone that is being conditioned if the connection type in 
-       \note the input field Terminal Unit Connection Type below is InletSide.
-   A7; \field Terminal Unit Connection Type
+       \note The secondary air (recirculating air) inlet node name of the mixer. This will be 
+       \note the outlet air node name of the ZoneHVAC equipment if the connection type in the 
+       \note input field mixer Connection Type below is SupplySide, or else this will be exhaust
+       \note air node name of the conditioned zone if the connection type in the input field 
+       \note Mixer Connection Type below is InletSide.
+   A7; \field Mixer Connection Type
        \required-field
        \type choice
        \key InletSide
        \key SupplySide  
-       \note This input field allows user to specify the terminal unit mixer connection type. Valid 
-       \note choices are InletSide or SupplySide. This is a required input field. If the connection 
-       \note type selected is InletSide, then the terminal mixer unit is connected on the inlet side 
-       \note of the ZoneHVAC equipment, else if the connection type selected is SupplySide, then the 
-       \note terminal mixer unit is connected at the outlet side of the ZoneHVAC equipment
+       \note This input field allows user to specify the mixer connection type. Valid choices
+       \note are InletSide or SupplySide. This is a required input field. If the mixer connection
+       \note type selected is InletSide, then the mixer is connected on the inlet side of the 
+       \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then 
+       \note the mixer is connected at the outlet side of the ZoneHVAC equipment.   
    
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
@@ -51947,6 +51949,7 @@ AirLoopHVAC:UnitarySystem,
   A1,  \field Name
        \required-field
        \type alpha
+       \reference DOAToZonalUnit
        \note Unique name for the Unitary System.
   A2,  \field Control Type
        \type choice
