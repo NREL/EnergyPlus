@@ -9714,7 +9714,7 @@ namespace OutputReportTabular {
 								windowAreaW += curArea * mult;
 								if ( isConditioned ) windowAreaWcond += curArea * mult;
 							}
-							zoneOpeningArea( zonePt ) += curArea * mult; // total window opening area for each zone (glass plus frame area)
+							zoneOpeningArea( zonePt ) += curArea; // total window opening area for each zone (glass plus frame area)
 							if ( DetailedWWR ) {
 								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
