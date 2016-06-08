@@ -64,10 +64,15 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataSurfaces.hh>
-#include <DataHeatBalance.hh>
 
 namespace EnergyPlus {
+
+namespace DataSurfaces {
+	struct SurfaceData;
+}
+namespace DataHeatBalance {
+	struct ZoneData;
+}
 
 namespace HeatBalanceSurfaceManager {
 
