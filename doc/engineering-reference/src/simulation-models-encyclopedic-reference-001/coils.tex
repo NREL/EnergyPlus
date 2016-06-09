@@ -4370,15 +4370,20 @@ BL\left( {{T_j}} \right) \ge \dot Q_c^{k = 2}\left( {{T_j}} \right)
 For units when operating continuously at maximum compressor speed (k = 2) speed at temperature \emph{T\(_{j}\)}, the delivered heating capacity and electric power inputs are calculated as follows:
 
 \begin{equation}
-\frac{{{e_c}({T_j})}}{N} = \left[ {\dot E_h^{k = 2}({T_j}) \cdot {\delta ^``}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+  \frac{e_c(T_j)}{N} = \left[ \dot{E}_h^{k = 2}(T_j) \cdot \delta''(T_j) \right] \cdot \frac{n_j}{N}
 \end{equation}
 
 \begin{equation}
-\frac{{RH\left( {{T_j}} \right)}}{N}{\rm{ = }}\left\{ {BL\left( {{{\rm{T}}_{\rm{j}}}} \right) - \left[ {{\rm{\dot Q}}_h^{k = 2}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot {{\rm{\delta }}^``}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right]} \right\} \cdot \frac{{{n_j}}}{N}
+  \frac{RH(T_j)}{N} = \left\{ BL(T_j) - \left[\dot{Q}_h^{k = 2}(T_j) \cdot \delta''(T_j) \right] \right\} \cdot \frac{n_j}{N}
 \end{equation}
 
 \begin{equation}
-{\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, < \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}
+\delta''(T_j) = \left\{
+\begin{array}{l}
+  0,\quad \text{if}\,T_j \le T_{\text{off}} \, \text{or} \, \frac{\dot{Q}_h^{k = 2}(T_j)}{\dot{E}_h^{k=2}(T_j)} < 1 \\
+  \frac{1}{2},\quad \text{if}\,T_{\text{off}} < T_j \le T_{\text{on}}\,\text{and}\,\frac{\dot{Q}_h^{k=2}(T_j)}{\dot{E}_h^{k=2}(T_j)} \ge 1 \\
+  1,\quad \text{if}\,T_j > T_{\text{on}} \, \text{and} \, \frac{\dot{Q}_h^{k=2}(T_j)}{\dot{E}_h^{k=2}(T_j)} \ge 1
+\end{array} \right\}
 \end{equation}
 
 X(T\(_{j}\))~~~~~~~~~~~ = ~~~~~~~~~ the heating mode load factor for temperature bin j, (-)
@@ -4389,9 +4394,9 @@ X(T\(_{j}\))~~~~~~~~~~~ = ~~~~~~~~~ the heating mode load factor for temperature
 
 \({\rm{\delta }}\left( {{{\rm{T}}_{\rm{j}}}} \right)\) ~~~~~~~ = ~~~~~~~~~ the heat pump low temperature cut-off factor, (-)
 
-T\(_{off}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, Tj is always greater than T\(_{off}\) and T\(_{on}\)).
+\(T_{off}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, Tj is always greater than T\(_{off}\) and T\(_{on}\)).
 
-T\(_{on}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically turned back on, if applicable, following an automatic shut-off, °C.
+\(T_{on}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically turned back on, if applicable, following an automatic shut-off, °C.
 
 % table 62
 \begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
@@ -6830,15 +6835,13 @@ Calculate the saturated outlet temperature at the outlet enthalpy and check the 
 T_\text{OutletNode, Sat} = T_\text{SAT}\left(h_\text{Outlet}, P_\text{Tot}\right)
 \end{equation}
 
-\begin{lstlisting}
-IF(\(T_\text{OutletNode} > T_\text{OutletNode, Sat}\)) Then
-    \(\omega_\text{OutletNode} > \omega_\text{InletNode}\)
-ELSE
-    (\(T_\text{OutletNode} = T_\text{OutletNode, Sat}\)
-    The coil outlet humidity ratio is determined using psychrometric functions as follows.
-    \(\omega_\text{OutletNode} = \omega\left(T_\text{OutletNode,Sat},h_\text{Outlet}\right)\)
+IF(\(T_\text{OutletNode} > T_\text{OutletNode, Sat}\)) Then \\
+    \(\omega_\text{OutletNode} > \omega_\text{InletNode}\) \\
+ELSE \\
+    (\(T_\text{OutletNode} = T_\text{OutletNode, Sat}\) \\
+    The coil outlet humidity ratio is determined using psychrometric functions as follows. \\
+    \(\omega_\text{OutletNode} = \omega\left(T_\text{OutletNode,Sat},h_\text{Outlet}\right)\) \\
 ENDIF
-\end{lstlisting}
 
 where
 
