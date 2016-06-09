@@ -1448,9 +1448,9 @@ where
 
 \({\dot m_a}\) * is design air mass flow rate, kg/s;*
 
-\emph{ω\(_{o}\) is design outlet humidity ratio, kg-water/kg-air;}
+\(\omega_{o}\) is design outlet humidity ratio, kg-water/kg-air;
 
-\emph{ω\(_{i}\) is design inlet humidity ratio, kg-water/kg-air.}
+\(\omega_{i}\) is design inlet humidity ratio, kg-water/kg-air.
 
 The air mass flow rate and humidity ratios are determined based upon zone design conditions. If the unit is part of zone equipment, then:
 
@@ -1462,20 +1462,13 @@ The air mass flow rate and humidity ratios are determined based upon zone design
 {\omega_i} = Min\left( {OutHumRatAtCoolPea{k_{zone}},OutHumRatAtHeatPea{k_{zone}}} \right)
 \end{equation}
 
-\begin{lstlisting}
-  ${\omega_o} = Max\left( {ZoneHumRatAtCoolPea{k_{zone}},ZoneHumRatAtHeatPea{k_{zone}}} \right)$ 
-\end{lstlisting}
+\begin{equation}
+  {\omega_o} = Max\left( {ZoneHumRatAtCoolPea{k_{zone}},ZoneHumRatAtHeatPea{k_{zone}}} \right)
+\end{equation}
 
 where
 
-\emph{r\(_{a}\) is the density of air at design conditions, kg/s.}
-
-\begin{itemize}
-\item
-  \begin{itemize}
-  \item
-  \end{itemize}
-\end{itemize}
+\(r_{a}\) is the density of air at design conditions, kg/s.
 
 If the unit is part of the central air system, then check if outdoor air system is present. If outdoor air system is part of the air loop and design outdoor air flow rate is greater than zero, then:
 
@@ -1487,9 +1480,9 @@ If the unit is part of the central air system, then check if outdoor air system 
 {\omega_i} = Min\left( {CoolOutHumRa{t_{sys}},HeatOutHumRa{t_{sys}}} \right)
 \end{equation}
 
-\begin{lstlisting}
-  ${\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)$ 
-\end{lstlisting}
+\begin{equation}
+  {\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)
+\end{equation}
 
 Otherwise, air mass flow rate is determined as follows:
 
@@ -1513,7 +1506,7 @@ for duct type = \emph{heating}
 
 for duct type = \emph{other}
 
-\({\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}\) ,
+\({\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}\),
 
 and the humidity ratios are:
 
@@ -1521,9 +1514,9 @@ and the humidity ratios are:
 {\omega_i} = Min\left( {CoolMixHumRa{t_{sys}},HeatMixHumRa{t_{sys}}} \right)
 \end{equation}
 
-\begin{lstlisting}
-  ${\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)$ 
-\end{lstlisting}
+\begin{equation}
+  {\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)
+\end{equation}
 
 \subsection{Cooling Tower Sizing}\label{cooling-tower-sizing}
 
@@ -1623,7 +1616,7 @@ Then we assign the inputs needed for the model.
 
 \emph{T\(_{in,air,wb}\)} = 25.6 \(^{o}\)C (78 \(^{o}\)F design air inlet wetbulb temperature)
 
-\emph{W\(_{in}\)} is calculated from the entering air drybulb and wetbulb.
+\(W_{in}\) is calculated from the entering air drybulb and wetbulb.
 
 The inlet water mass flow rate is just the design volumetric flow rate times the density of water.
 
@@ -1631,11 +1624,11 @@ The inlet water temperature is set slightly differently for the 2 input methods.
 
 \emph{UFactorTimesAreaAndDesignWaterFlowRate}
 
-\emph{T\(_{in,water}\)} = \emph{T\(_{loop,exit,des}\)}+\emph{DT\(_{loop,des}\)}
+\(T_{in,water}\) = \(T_{loop,exit,des}\) + \(DT_{loop,des}\)
 
 \emph{NominalCapacity}
 
-\emph{T\(_{in,water}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design inlet water temperature).
+\(T_{in,water}\) = 35 \(^{o}\)C (95 \(^{o}\)F design inlet water temperature).
 
 We now have all the data needed to obtain UA. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function. In this case it finds the UA that will zero the residual function - the difference between the design tower load and the tower output divided by the design tower load. The residual is calculated in the function \emph{SimpleTowerUAResidual.}
 
@@ -1710,15 +1703,13 @@ Finally
 
 \subsubsection{ElseifPerformance Input Method = NominalCapacitythen}\label{elseifperformance-input-method-nominalcapacitythen}
 
-\begin{lstlisting}
-  ${\dot Q_{fan,nom}} = 0.0105 \bullet {\dot Q_{fluidcooler,nom}}$ 
-\end{lstlisting}
+\begin{equation}
+  {\dot Q_{fan,nom}} = 0.0105 \bullet {\dot Q_{fluidcooler,nom}}
+\end{equation}
 
 Where
 
-\begin{lstlisting}
-  ${\dot Q_{fluidcooler,nom}}$  is provided by the user.
-\end{lstlisting}
+\({\dot Q_{fluidcooler,nom}}\) is provided by the user.
 
 \subsubsection{Design Air Flow Rate}\label{design-air-flow-rate-1}
 
