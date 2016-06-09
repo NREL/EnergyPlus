@@ -6732,7 +6732,20 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		if ( ! ( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
+		if ( !AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) )
+		{
+			for ( i = NumOfNodesMultiZone + NumOfNodesIntraZone + 1; i <= AirflowNetworkNumOfNodes; ++i ) {
+				AirflowNetworkNodeSimu( i ).PZ = 0.0;
+			}
+			for ( i = AirflowNetworkNumOfSurfaces + 1; i <= AirflowNetworkNumOfLinks; ++i ) {
+				AirflowNetworkLinkReport( i ).FLOW = 0.0;
+				AirflowNetworkLinkReport( i ).FLOW2 = 0.0;
+				AirflowNetworkLinkReport( i ).VolFLOW = 0.0;
+				AirflowNetworkLinkReport( i ).VolFLOW2 = 0.0;
+			}
+		}
+		
+		if ( !( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) { // Multizone airflow energy
