@@ -580,6 +580,7 @@ namespace EnergyPlus {
 		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 		NumLines = 0;
 		InitSecretObjects();
+		//InitReferenceObjectsClass();
 		ProcessInputDataFile( *idf_stream );
 
 		ListOfSections.allocate( NumSectionDefs );
@@ -743,6 +744,7 @@ namespace EnergyPlus {
 
 		ProcessingIDD = true;
 		DataSystemVariables::SortedIDD = true;
+		InitReferenceObjectsClass();
 		ProcessDataDicFile( *idd_stream, errors_found );
 		ProcessingIDD = false;
 

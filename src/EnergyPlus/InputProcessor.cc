@@ -342,6 +342,9 @@ namespace InputProcessor {
 		NumRefObjectsPlant = 0;
 		NumRefObjectsCondenser = 0;
 		NumRefObjectsBranch = 0;
+		ObjectListName = std::string();
+		ReferenceObjectsName = std::string();
+		//ObjectRefClass.deallocate();
 	}
 
 	void
@@ -1189,7 +1192,7 @@ namespace InputProcessor {
 				ObjectDef( NumObjectDefs ).ObjectList = true;
 				ObjectDef( NumObjectDefs ).ObjectListPtr = CondenserEquipListType;
 			} else if ( ObjectDef( NumObjectDefs ).Name == "BRANCH" ) { // "BRANCH"
-				//ObjectDef( NumObjectDefs ).ObjectList = true;
+				ObjectDef( NumObjectDefs ).ObjectList = true;
 				ObjectDef( NumObjectDefs ).ObjectListPtr = BranchEquipListType;
 			}
 		}
