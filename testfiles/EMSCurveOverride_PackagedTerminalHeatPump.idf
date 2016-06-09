@@ -139,10 +139,9 @@
     SET WTmp = CoilInletW,   !- Program Line 2
     SET PTmp = Pressure,     !- <none>
     SET MyWB = @TwbFnTdbWPb TTmp WTmp PTmp,  !- <none>
-!    SET IVOne = CoilInletWBT,!- <none>
     SET IVOnea = MyWB,       !- <none>
     SET IVTwo = OAT,         !- <none>
-    SET IVThree = IVOne*IVTwo,  !- <none>
+    SET IVThree = IVOnea*IVTwo,  !- <none>
     SET C1 = 0.942567793d0,  !- <none>
     SET C2 = 0.009543347D0,  !- <none>
     SET C2a = 0.009543347e0, !- <none>

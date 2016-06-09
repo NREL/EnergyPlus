@@ -71645,7 +71645,7 @@
 
   EnergyManagementSystem:ProgramCallingManager,
     Initialize_RE_Variables, !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
+    BeginNewEnvironment,  !- EnergyPlus Model Calling Point
     Initialize;              !- Program Name 1
 
   EnergyManagementSystem:ProgramCallingManager,
@@ -72317,7 +72317,6 @@
 
   EnergyManagementSystem:Program,
     Initialize,              !- Name
-    IF (DayOfYear == 1 && Hour == 0 && DayOfMonth == 1),  !- Program Line 1
     SET Flr_1_Cafe_RE = 0,   !- Program Line 2
     SET Flr_1_Clean_RE = 0,  !- <none>
     SET Flr_1_Conf_RE = 0,   !- <none>
@@ -72597,8 +72596,8 @@
     SET AHU_3_Economize = 0, !- <none>
     SET AHU_4_Economize = 0, !- <none>
     SET AHU_5_Economize = 0, !- <none>
-    SET AHU_6_Economize = 0, !- <none>
-    ENDIF;                   !- <none>
+    SET AHU_6_Economize = 0; !- <none>
+
 
   EnergyManagementSystem:Program,
     Flr_1_Cafe_Coil_Reheat_Energy_Program,  !- Name
