@@ -59632,6 +59632,8 @@ Duct,
        \memo Passes inlet node state variables to outlet node state variables
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2, \field Inlet Node Name
         \required-field
         \type node
@@ -66583,6 +66585,8 @@ WaterHeater:Mixed,
        \reference WaterHeaterMixedNames
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   N1 , \field Tank Volume
        \autosizable
        \type real
@@ -66814,6 +66818,8 @@ WaterHeater:Stratified,
        \reference WaterHeaterStratifiedNames
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field End-Use Subcategory
        \type alpha
        \retaincase
