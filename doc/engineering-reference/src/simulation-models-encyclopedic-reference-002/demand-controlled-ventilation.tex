@@ -4,15 +4,13 @@ ASHRAE Standard 62.1, Ventilation for Acceptable Indoor Air Quality, contains pr
 
 EnergyPlus can model DCV by the ventilation rate procedure (VRP) defined in ASHRAE Standard 62.1-2007/2010 for single and multiple path systems, and the indoor air quality procedure (IAQP) defined in Standard 62. The VRP first calculates the breathing-zone outdoor air flow rate based on two components -- the zone occupant component and the zone floor area component, then it calculates the zone supply outdoor air flow rate considering the zone air distribution effectiveness and secondary recirculation (for mult-path systems only), and finally calculates the system outdoor air flow rate considering the zone diversity and system ventilation efficiency. The user must include the following five objects in their input data file in order to model DCV (using VRP or IAQP):
 
-n~\textbf{AirLoopHVAC:OutdoorAirSystem} to simulate the mixed air box of the air loop
-
-n~\textbf{Controller:MechanicalVentilation} with the DCV flag set to `Yes' to determine the minimum outdoor air flow rate to be provided by the mixed air box
-
-n~\textbf{Controller:OutdoorAir} to control the outside air flow rate introduced via the mixed air box
-
-n~\textbf{DesignSpecification:OutdoorAir} to describe the outdoor air requirements for each zone
-
-n~\textbf{DesignSpecification:ZoneAirDistribution} to describe air distribution effectiveness and secondary recirculation (for multi-path ventilation systems) for each zone
+\begin{itemize}
+  \item \textbf{AirLoopHVAC:OutdoorAirSystem} to simulate the mixed air box of the air loop
+  \item \textbf{Controller:MechanicalVentilation} with the DCV flag set to `Yes' to determine the minimum outdoor air flow rate to be provided by the mixed air box
+  \item \textbf{Controller:OutdoorAir} to control the outside air flow rate introduced via the mixed air box
+  \item \textbf{DesignSpecification:OutdoorAir} to describe the outdoor air requirements for each zone
+  \item \textbf{DesignSpecification:ZoneAirDistribution} to describe air distribution effectiveness and secondary recirculation (for multi-path ventilation systems) for each zone
+\end{itemize}
 
 The outdoor air system (AirLoopHVAC:OutdoorAirSystem) is a subsystem of an AirLoopHVAC which handles the mixed air portion of the primary air system: the system relief air, the outside air inlet, and any components and controllers associated with the system relief air and outside air streams. The inputs for this object are fully described in the EnergyPlus Input Output Reference. Determining the outdoor air ventilation rate and introducing this ventilation via the mixed air box are accomplished by the mechanical ventilation and outdoor air controller objects.
 
@@ -252,11 +250,11 @@ Finally, the relief air flow rate is calculated as the difference between the ou
 
 Like VRP, the user must include the following three objects in their input data file in order to model CO\(_{2}\)-based DCV with IAQP:
 
-n~AirLoopHVAC:OutdoorAirSystem to simulate the mixed air box of the air loop
-
-n~Controller:MechanicalVentilation to determine the minimum outside air flow rate to be provided by the mixed air box
-
-n~Controller:OutdoorAir to control the outside air flow rate introduced via the mixed air box
+\begin{itemize}
+  \item AirLoopHVAC:OutdoorAirSystem to simulate the mixed air box of the air loop
+  \item Controller:MechanicalVentilation to determine the minimum outside air flow rate to be provided by the mixed air box
+  \item Controller:OutdoorAir to control the outside air flow rate introduced via the mixed air box
+\end{itemize}
 
 The outdoor air mass flow rate provided by the air loop is calculated as below:
 
@@ -274,11 +272,11 @@ N = number of zones served by the air loop, which is provided in the input for a
 
 The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO\(_{2}\)-based DCV with Proportional Control:
 
-n~\textbf{AirLoopHVAC:OutdoorAirSystem} to simulate the mixed air box of the air loop
-
-n~\textbf{Controller:MechanicalVentilation} to determine the minimum outside air flow rate to be provided by the mixed air box
-
-n~\textbf{Controller:OutdoorAir} to control the outside air flow rate introduced via the mixed air box
+\begin{itemize}
+  \item \textbf{AirLoopHVAC:OutdoorAirSystem} to simulate the mixed air box of the air loop
+  \item \textbf{Controller:MechanicalVentilation} to determine the minimum outside air flow rate to be provided by the mixed air box
+  \item \textbf{Controller:OutdoorAir} to control the outside air flow rate introduced via the mixed air box
+\end{itemize}
 
 For the i-th zone, the outdoor air mass flow rate provided by the air loop is calculated as below:
 
