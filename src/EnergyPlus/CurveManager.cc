@@ -1996,7 +1996,7 @@ namespace CurveManager {
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
-			}
+			} 
 
 			// if user enters limits that exceed data range, warn that limits are based on table data
 			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
