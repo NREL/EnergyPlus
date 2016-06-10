@@ -1789,7 +1789,7 @@ namespace OutputReportTabular {
 		} else {
 			unitsStyleReturn = unitsStyleNotFound;
 		}
-		return unitsStyleReturn;
+		return unitsStyleInchPound;
 	}
 
 	void
