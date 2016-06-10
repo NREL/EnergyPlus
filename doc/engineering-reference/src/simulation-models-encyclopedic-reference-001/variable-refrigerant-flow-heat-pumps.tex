@@ -1,8 +1,6 @@
 \section{Variable Refrigerant Flow Heat Pumps }\label{variable-refrigerant-flow-heat-pumps}
 
-A Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
-
-There are two common types of VRF systems.
+A Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions. VRF can be divided into two common types:
 
 \begin{itemize}
 \item
@@ -11,17 +9,17 @@ There are two common types of VRF systems.
   Heat Recovery (HR) type: can deliver simultaneous heating and cooling to different zones by transferring heat between the cooling and heating indoor units. This generally occurs in the winter season in medium-sized to large-sized commercial buildings with a substantial core such as computer rooms.
 \end{itemize}
 
-There are two alternative VRF models availabe in EnergyPlus to simulate the energy performance of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems:
+There are two alternative VRF models available in EnergyPlus to simulate the energy performance of VRF:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{System Curve based Model (VRF-SysCurve)}. In this model, a number of system level curves are used to describe the VRF system performance. It corresponds to the \emph{AirConditioner:VariableRefrigerantFlow} object.
+  \textbf{System Curve based Model (VRF-SysCurve)}. In this model, a number of system level curves are used to describe the VRF system performance. It uses the \emph{AirConditioner:VariableRefrigerantFlow} object to describe both the HP and HR systems.
 \item
-  \textbf{Physics based Model (VRF-FluidTCtrl)}. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object.
+  \textbf{Physics based Model (VRF-FluidTCtrl)}. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. It uses the \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HP} object for the HP system and emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR} for the HR system.
 \end{enumerate}
 
-\subsection{Variable Refrigerant Flow Heat Pump Model (System Curve Based Model)}\label{variable-refrigerant-flow-heat-pump-model-system-curve-based-model}
+\subsection{System Curve based VRF Model (VRF-SysCurve)}\label{variable-refrigerant-flow-heat-pump-model-system-curve-based-model}
 
 \subsubsection{Overview}\label{overview-028}
 
@@ -869,19 +867,19 @@ where:
   RTF = \left(  \frac{PLR}{PartLoadFrac} \right) = runtime\;fraction\;of\;the\;heating\;coil
 \end{equation}
 
-\subsection{Variable Refrigerant Flow Heat Pump Model (Physics Based Model)}\label{variable-refrigerant-flow-heat-pump-model-physics-based-model}
+\subsection{Physics based VRF Heat Pump Model (VRF-FluidTCtrl-HP)}\label{VRF-FluidTCtrl-HP}
 
-\subsubsection{Overview}\label{variable-refrigerant-flow-heat-pump-model-physics-based-model:overview}
+\subsubsection{Overview}\label{VRF-FluidTCtrl-HP-overview}
 
-This section describes the Physics based VRF Model (VRF-FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode (either cooling or heating is provided but not simultaneously). 
+This section describes the Physics based VRF Model (VRF-FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode, i.e., either cooling or heating is provided but not simultaneously. 
 
-Compared with the VRF-SysCurve model, VRF-FluidTCtrl model is more physics-based and thus able to consider the dynamics of more operational parameters which is essential for the description of many enhanced control logics (e.g., the adjustment of superheating degrees during small load operations). Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves.
+Compared with the empirical system curves based VRF-SysCurve model, the VRF-FluidTCtrl model adheres to a physics-based development providing the ability to simulate the refrigerant loop performance and consider the dynamics of more operational parameters. This is essential for the representation of many enhanced control logics, e.g., the adjustment of superheating degrees during low load operations. Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves. 
 
 The main features of the VRF-FluidTCtrl model include:
 
 \begin{itemize}
   \item
-    Introduction of separate curves for capacities and power inputs of indoor and outdoor units instead of overall curves for the entire system.
+   Introduction of separate curves for capacities and power inputs of indoor and outdoor units instead of overall curves for the entire system.
  \item
    Allowing of variable evaporating and condensing temperatures in the indoor and outdoor units under various operational conditions.
 \item
@@ -892,11 +890,11 @@ The main features of the VRF-FluidTCtrl model include:
   Development of a physics-based model to calculate thermal loss in the refrigerant piping network (varies with refrigerant flow rate, operational conditions, pipe length, and pipe and insulation materials) instead of a constant correction factor.
 \end{itemize}
 
-These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF-FluidTCtrl-1. Further more, the VRF-FluidTCtrl model enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with invertor technology.
+These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF-FluidTCtrl-1. Moreover, the VRF-FluidTCtrl model enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with inverter technology.
 
 \begin{figure}[hbtp] % figure VRF-FluidTCtrl-1a
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/VRF-FluidTCtrl-1a.png}
+\includegraphics[width=0.45\textwidth, height=0.45\textheight, keepaspectratio=true]{media/VRF-FluidTCtrl-1a.png}
 \caption{Multi-stage control strategy to adjust the system capacity during low load conditions \label{fig:multi-stage-control-strategy-to-adjust-the-system-capacity-during-low-load-conditions}}
 \end{figure}
 
@@ -910,7 +908,7 @@ The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysC
 \caption{Energyplus object connections for VRF-FluidTCtrl model \label{fig:energyplus-object-connections-for-vrf-fluidtctrl-model}}
 \end{figure}
 
-\subsubsection{Model Description}\label{vrf-heat-pump-model description}
+\subsubsection{Model Description}\label{vrf-heat-pump-model-description}
 
 Figures~\ref{fig:vrf-fluid-t-ctrl-2a}, \ref{fig:vrf-fluid-t-ctrl-2b}, \ref{fig:vrf-fluid-t-ctrl-3a}, and \ref{fig:vrf-fluid-t-ctrl-3b} illustrate the overall logic of the VRF-FluidTCtrl algorithms. Detailed calculation procedures and explanations of equations are described in the following sections.
 
@@ -940,9 +938,9 @@ Figures~\ref{fig:vrf-fluid-t-ctrl-2a}, \ref{fig:vrf-fluid-t-ctrl-2b}, \ref{fig:v
 
 The VRF-FluidTCtrl algorithms are described in details below, including the models of both the indoor and outdoor unit(s) of the VRF system. Because of the different control algorithms used in the outdoor unit for cooling and heating modes, the heating and cooling modes are described separately.
 
-\subsubsection{Modeling of the indoor unit (I/U) -- Part I}\label{modeling-of-the-indoor-unit-iu-part-i}
+\paragraph{Modeling of the indoor unit (I/U) -- Part I}\label{modeling-of-the-indoor-unit-iu-part-i}
 
-\paragraph{Step 1.1: Obtaining zonal load/condition information}\label{step-1.1-obtaining-zonal-load-condition-information}
+\textbf{Step 1.1: Obtaining zonal load/condition information}
 
 Obtain the following information for each zone from the zone modules within EnergyPlus: 
 
@@ -959,7 +957,7 @@ Obtain the following information for each zone from the zone modules within Ener
 
 The operation mode of the VRF system can therefore be determined from $Q_{in, sensible}$.
 
-\paragraph{Step 1.2: Calculate I/U required evaporator/condenser temperature}\label{step-1.2-calculate-i-u-required-evaporator-condenser-temperature}
+\textbf{Step 1.2: Calculate I/U required evaporator/condenser temperature}
 
 Evaluate the required coil surface air temperature $T_{fs}$ and the required evaporator/condenser refrigerant temperature $T_{e,req}/{T_{c,req}}$ for each indoor unit. 
 
@@ -1035,7 +1033,7 @@ $SC_{ref}$ reference subcooling degrees for the indoor unit (e.g., 5) (°C)
 
 $Tc_{req}$ required condensing temperature for a specific indoor unit (°C)
 
-\paragraph{Step 1.3: Calculate effective evaporating /condensing temperature}\label{step-1.3-calculate-effective-evaporating-condensing-temperature}
+\textbf{Step 1.3: Calculate effective evaporating /condensing temperature}
 
 There are two refrigerant temperature control strategies for the indoor unit: (1) \emph{ConstantTemp}, (2) \emph{VariableTemp}.
 
@@ -1075,9 +1073,9 @@ $Tc_{min}$ minimum condensing temperature for the indoor unit (e.g. 42) (°C)
 
 $Tc_{max}$ maximum condensing temperature for the indoor unit (e.g. 46) (°C)
 
-\subsubsection{Modeling of the outdoor unit (O/U) - Cooling Mode}\label{modeling-of-the-outdoor-unit-ou-cooling-mode}
+\paragraph{Modeling of the outdoor unit (O/U) - Cooling Mode}\label{modeling-of-the-outdoor-unit-ou-cooling-mode}
 
-\paragraph{Step 2c.1: Piping loss calculation in the cooling mode}\label{step-2c.1-piping-loss-calculation-in-the-cooling-mode}
+\textbf{Step 2c.1: Piping loss calculation in the cooling mode} 
 
 Piping loss occurs when the refrigerant flows through the main pipe connecting the indoor and outdoor units. It includes both the refrigerant pressure drop and heat loss. It affects the VRF system operation in several ways. First, the heat loss creates an extra load to the system and leads to higher energy consumptions. Second, the pressure drop and heat loss changes the operational conditions of the compressor (i.e., compressor suction pressure and compressor suction temperature) and thus affects its operational performance. Therefore, the piping loss calculation is critical for the analysis of the whole system.
 
@@ -1249,7 +1247,7 @@ $k_i$	coefficients for the piping loss calculation
 
 Note that $Q_{pipe}$ is calculated using an assumed $h_{Hexin}$. Its value affects the compressor operation calculations as shown in Step 2c.2~2c.6 and may change the value of condensing temperature $T_c$. This leads to an updated $h_{Hexin}=f(P_c,T_c-SC)$. If the difference between the calculated $h_{Hexin}$ and the assumed $h_{Hexin}$ is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated $h_{Hexin}$.
 
-\paragraph{Step 2c.2: Initialize O/U operation conditions}\label{step-2c.2-initialize-ou-operation-conditions}
+\textbf{Step 2c.2: Initialize O/U operation conditions} 
 
 The compressor operation is coupled with a number operational parameters, which makes it difficult to obtain an analytical solution. In the algorithm, an iterative approach is designed to obtain the energy consumption of the compressor (Step 2c.2 – 2c.6).
 
@@ -1288,7 +1286,7 @@ $Q_{out}$	heat rate released from the outdoor unit (W)
 
 $Q_{pipe}$ 	heat loss through the pipe (W)
 
-\paragraph{Step 2c.3: Calculate O/U effective condensing temperature}\label{step-2c.3-calculate-ou-effective-condensing-temperature}
+\textbf{Step 2c.3: Calculate O/U effective condensing temperature} 
 
  (1) Calculate the required coil surface air temperature ${T_{fs}}'$ for the outdoor unit.
 
@@ -1332,7 +1330,7 @@ $Tc_{req}$ required condensing temperature for the outdoor unit (°C)
 
 $Tc$ effective condensing temperature (°C)
 
-\paragraph{Step 2c.4: Calculate required Loading Index}\label{step-2c.4:-calculate-required-loading-index}
+\textbf{Step 2c.4: Calculate required Loading Index}
 
 Loading Index is used to describe the operational mode of the compressor system. The first index represents minimal capacity operation, while the last index represents full capacity operation. 
 
@@ -1446,7 +1444,7 @@ For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36.
   If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), go to Step 2c.5, otherwise skip Step 2c.5 and directly go to Step 2c. 6.
 \end{enumerate}
 
-\paragraph{Step 2c.5: Modify evaporating temperature to further reduce outdoor unit capacity}\label{step-2c.5-modify-evaporating-temperature-to-further-reduce-outdoor-unit-capacity}
+\textbf{Step 2c.5: Modify evaporating temperature to further reduce outdoor unit capacity} 
 
 If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), it means that the zone cooling load is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(T_e\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
 
@@ -1462,7 +1460,7 @@ If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), i
   \(SH\) can be updated based on the updated \(T_e\) , using the equations shown in Step 1.2.
 \end{enumerate}
 
-\paragraph{Step 2c.6: Calculate the compressor power}\label{step-2c.6-calculate-the-compressor-power}
+\textbf{Step 2c.6: Calculate the compressor power} 
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
@@ -1548,7 +1546,7 @@ Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C \t
   Else, end the iteration and go to Step 2c.7.
 \end{itemize}
 
-\paragraph{Step 2c.7: Total power consumption of the outdoor unit}\label{step-2c.7-total-power-consumption-of-the-outdoor-unit}
+\textbf{Step 2c.7: Total power consumption of the outdoor unit}\label{step-2c.7-total-power-consumption-of-the-outdoor-unit}
 
 Calculate the total electric power consumption by the outdoor unit:
 
@@ -1564,9 +1562,9 @@ Where
 
 \(N_{out}\) total electric power consumption by the outdoor unit (W)
 
-\subsubsection{\texorpdfstring{\emph{Modeling of the outdoor unit (O/U) - Heating Mode}}{Modeling of the outdoor unit (O/U) - Heating Mode}}\label{modeling-of-the-outdoor-unit-ou---heating-mode}
+\paragraph{{Modeling of the outdoor unit (O/U) - Heating Mode}}\label{modeling-of-the-outdoor-unit-ou---heating-mode}
 
-\paragraph{Step 2h.1: Piping loss calculation in the heating mode}\label{step-2h.1-piping-loss-calculation-in-the-heating-mode}
+\textbf{Step 2h.1: Piping loss calculation in the heating mode} 
 
 Similarly to that in the cooling mode, the piping loss analysis in the heating mode needs to address the coupling effect between the piping loss and system operations. However, due to the control strategy difference between the two modes, the piping loss algorithm in the heating mode requires different calculation steps and more numerical iterations, as shown below.
 
@@ -1780,7 +1778,7 @@ Compare the calculated \(h_{Tdi}\) and the one assumed above. If the difference 
 
 Note that \(Q_{pipe}\) is calculated using an assumed \(h_{Hexin}\) at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2\textasciitilde{}2h.6 and may change the value of evaporating temperature \(T_e\) . This leads to an updated \(h_{Hexin} = f(P_e,T_e+SH,N_{comp},G_{tot})\) . If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Hexin}\) .
 
-\paragraph{Step 2h.2: Initialize O/U operation conditions}\label{step-2h.2-initialize-ou-operation-conditions}
+\textbf{Step 2h.2: Initialize O/U operation conditions}
 
 Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h. 2 to Step 2h. 6).
 
@@ -1826,7 +1824,7 @@ Where
 
 \(Q_{pipe}\) heat loss through the pipe (W)
 
-\paragraph{Step 2h.3: Calculate O/U effective evaporating temperature}\label{step-2h.3-calculate-ou-effective-evaporating-temperature}
+\textbf{Step 2h.3: Calculate O/U effective evaporating temperature} 
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
@@ -1893,7 +1891,7 @@ Where
 
 \(Te\) effective evaporating temperature (°C)
 
-\paragraph{Step 2h.4: Calculate required compressor Loading Index}\label{step-2h.4-calculate-required-compressor-loading-index}
+\textbf{Step 2h.4: Calculate required compressor Loading Index}
 
 Calculate the required compressor Loading Index by the following procedures.
 
@@ -1933,8 +1931,6 @@ Where
 An example of resulting capacity for different \(rps\) (at \({T_c}'\) = 36°C and \(T_e\) = 9°C) is presented in Table 3.
 
 Table 3-- evaporative capacity at different Loading Index
-
-
 
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
@@ -1987,7 +1983,7 @@ For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36 \(r
   If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), go to Step 2h. 5; otherwise, skip Step 2h. 5 and go to Step 2h. 6.
 \end{enumerate}
 
-\paragraph{Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity}\label{step-2h.5-modify-evaporating-temperature-to-further-reduce-outdoor-unit-capacity}
+\textbf{Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity}
 
 If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18 \(rps\) ), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(Te\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
 
@@ -2003,7 +1999,7 @@ If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18 \(rps\) ), 
 
 It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the \(Te\) and \(SH\) updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be repeated here.
 
-\paragraph{Step 2h.6: Calculate the compressor power}\label{step-2h.6-calculate-the-compressor-power}
+\textbf{Step 2h.6: Calculate the compressor power}
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
@@ -2047,8 +2043,6 @@ Where
 
 Table~\ref{table:atmospheric-variables-at-two-different} -- Outdoor unit compressor power at different Loading Index
 
-
-
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
 \setcounter{enumi}{1}
@@ -2072,13 +2066,13 @@ Table~\ref{table:atmospheric-variables-at-two-different} -- Outdoor unit compres
   Else, end the iteration and go to Step 2h.7.
 \end{itemize}
 
-\paragraph{Step 2h.7: Total power consumption of the outdoor unit}\label{step-2h.7-total-power-consumption-of-the-outdoor-unit}
+\textbf{Step 2h.7: Total power consumption of the outdoor unit}
 
 Same as that in the cooling mode (Step 2c. 7)
 
-\subsubsection{\texorpdfstring{\emph{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}}{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---cooling-mode}
+\paragraph{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}\label{modeling-of-the-indoor-unit-iu---part-ii---cooling-mode}
 
-\paragraph{Step 3c.1: Update air flow rate for each indoor unit}\label{step-3c.1-update-air-flow-rate-for-each-indoor-unit}
+\textbf{Step 3c.1: Update air flow rate for each indoor unit}
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
@@ -2156,7 +2150,7 @@ Where
   Else, directly go to Step 3c. 3
 \end{itemize}
 
-\paragraph{\texorpdfstring{Step 3c.2: Modify \(SH\) to adjust the indoor unit capacity}{Step 3c.2: Modify SH to adjust the indoor unit capacity}}\label{step-3c.2-modify-sh-to-adjust-the-indoor-unit-capacity}
+\textbf{Step 3c.2: Modify SH to adjust the indoor unit capacity}
 
 Set \(G_a\) at its minimum value (e.g., \(0.7\times\) \(G_{a,rate}\) ).
 
@@ -2170,13 +2164,13 @@ Given \(T_{fs}\) and \(T_e\) , \(SH\) can be determined using the equation shown
   If \(SH\) \textgreater{} 15°C, Set \(SH\) as 15°C. On/Off control strategy may be implemented when needed.
 \end{itemize}
 
-\paragraph{Step 3c. 3: Total power consumption of the indoor unit}\label{step-3c.-3-total-power-consumption-of-the-indoor-unit}
+\textbf{Step 3c. 3: Total power consumption of the indoor unit}
 
 The power consumption of the indoor unit comes from the fan operations. This can be calculated using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
 
-\subsubsection{\texorpdfstring{\emph{Modeling of the indoor unit (I/U) - Part II - Heating Mode}}{Modeling of the indoor unit (I/U) - Part II - Heating Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---heating-mode}
+\paragraph{Modeling of the indoor unit (I/U) - Part II - Heating Mode}\label{modeling-of-the-indoor-unit-iu---part-ii---heating-mode}
 
-\paragraph{Step 3h.1: Update air flow rate for each indoor unit.}\label{step-3h.1-update-air-flow-rate-for-each-indoor-unit.}
+\textbf{Step 3h.1: Update air flow rate for each indoor unit.} 
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -2232,7 +2226,7 @@ Where
   Else, directly go to Step 3h. 3
 \end{itemize}
 
-\paragraph{\texorpdfstring{Step 3h.2: Modify \(SC\) to modify the indoor unit capacity}{Step 3h.2: Modify SC to modify the indoor unit capacity}}\label{step-3h.2-modify-sc-to-modify-the-indoor-unit-capacity}
+\textbf{Step 3h.2: Modify SC to modify the indoor unit capacity}}
 
 Set \(G_a\) at its minimum value (\(0.7\times\) \(G_{a,rate}\) ).
 
@@ -2246,13 +2240,260 @@ Given \(T_{fs}\) and \(T_e\) , \(SC\) can be determined using the equation shown
   If \(SC\) \textgreater{} 20°C, Set \(SC\) as 20°C. On/Off control strategy may be implemented when needed.
 \end{itemize}
 
-\paragraph{Step 3h.3: Total power consumption of the indoor unit}\label{step-3h.3-total-power-consumption-of-the-indoor-unit}
+\textbf{Step 3h.3: Total power consumption of the indoor unit} 
 
 Calculate electric power consumption by the indoor unit using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
 
-\subsubsection{Additional energy consumption by defrost and crankcase heater}\label{additional-energy-consumption-by-defrost-and-crankcase-heater}
+\paragraph{Additional energy consumption by defrost and crankcase heater}\label{additional-energy-consumption-by-defrost-and-crankcase-heater}
 
 There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF-FluidTCtrl model are the same as those in VRF-SysCurve model. Please refer to the VRF-SysCurve section for more details.
+
+
+
+\subsection{Physics based VRF Heat Recovery Model (VRF-FluidTCtrl-HR)}\label{VRF-FluidTCtrl-HR}
+
+\subsubsection{Overview}\label{VRF-FluidTCtrl-HR-overview}
+
+
+\paragraph{Introduction of VRF-HR Systems}\label{Introduction-of-VRF-HR-Systems}
+
+This section introduces the model to simulate the energy performance of Variable Refrigerant Flow (VRF) systems with heat recovery (HR) configurations, which is capable of achieving heat recovery from cooling zones to heating zones and providing simultaneous zone cooling and heating operations. The model is developed for the 3-pipe VRF-HR systems, which are the dominant system configuration in the current VRF-HR market. 
+
+Compared with the VRF-HP system, VRF-HR is more complicated in terms of system configuration and operational controls. Figure~\ref{fig:VRF-HR-Chart-Schematic} shows the schematic chart of a typical 3-pipe VRF-HR system. As can be seen in the figure, it has dedicated refrigerant pipes for suction gas, liquid and discharge gas. To enable simultaneous cooling and heating, complex refrigerant management loop and more system components are implemented, including one additional heat exchanger in the outdoor unit (OU) and multiple Branch Selector (BS) Units. The two heat exchangers in the outdoor unit can work at different evaporator/condenser combinations to enable specific operational modes to handle diverse and changing indoor heating/cooling load requirements. The Four-Way Directional Valves (FWV) and BS units enable the system to provide separate refrigerant piping connections for different operational modes. This leads to varying refrigerant flow directions and different control logics for various operational modes, and therefore specific algorithm is needed for different major operational modes.
+
+\begin{figure}[hbtp] % figure VRF-HR-Chart-Schematic
+\centering
+\includegraphics[width=0.95\textwidth, height=0.95\textheight, keepaspectratio=true]{media/VRF-HR-Chart-Schematic.png}
+\caption{Schematic chart of a 3-pipe VRF-HR system \label{fig:VRF-HR-Chart-Schematic}}
+\end{figure}
+
+
+\paragraph{VRF-HR operational modes}\label{VRF-HR-operational-modes}
+
+Depending on the indoor cooling/heating requirements and the outdoor unit operational states, the operations of the VRF-HR system can be categorized into six modes:
+
+\begin{itemize}
+  \item
+  Mode 1: Cooling load only. No heating load. Both OU heat exchangers operate as condensers.
+  \item
+  Mode 2: Simultaneous heating and cooling. The sum of the zone cooling loads and compressor heat is much larger than the sum of the zone heating loads. Both OU heat exchangers operate as condensers.
+  \item
+  Mode 3: Simultaneous heating and cooling. The sum of the zone cooling loads and compressor heat is slightly larger than the sum of the zone heating loads. One OU heat exchanger operates as a condenser while the other as an evaporator.
+  \item
+  Mode 4: Simultaneous heating and cooling. The sum of the zone cooling loads and compressor heat is slightly smaller than the sum of the zone heating loads. One OU heat exchanger operates as a condenser while the other as an evaporator.
+  \item
+  Mode 5: Simultaneous heating and cooling. The sum of the zone cooling loads and compressor heat is much smaller than the sum of the zone heating loads. Both OU heat exchangers operate as evaporators.
+  \item
+  Mode 6: Heating load only. No cooling load. Both OU heat exchangers operate as evaporators.
+\end{itemize}
+
+\begin{figure}[hbtp] % figure VRF-HR-Chart-HeatBalance
+\centering
+\includegraphics[width=0.95\textwidth, height=0.95\textheight, keepaspectratio=true]{media/VRF-HR-Chart-HeatBalance.png}
+\caption{System-level Heat Balance Diagram for the Six VRF-HR Operational Modes \label{fig:VRF-HR-Chart-HeatBalance}}
+\end{figure}
+
+The system-level heat balance diagram for all the six operational modes are shown in Figure~\ref{fig:VRF-HR-Chart-HeatBalance}. Note that the heat recovery loss (HR loss) only exists in Mode 3 and Mode 4, in which the OU evaporator and condenser run simultaneously. In these modes, the following two items are at similar levels: (a) sum of IU heating loads and IU condenser side piping loss, and (b) sum of IU cooling loads, IU evaporator side piping loss and heat released by the compressor. Take Mode 3 for example, item (b) is higher than item (a), and therefore the system requires the operation of OU condenser to release the extra heat to ensure the system-level heat balance. However, the extra heat is at a relatively low level so that the system needs to release more heat than required via OU condenser and meanwhile runs OU evaporator to ensure the heat balance as well as system reliability. This leads to the presence of HR loss.
+
+
+\paragraph{System operation at various modes}\label{System-operation-at-various-modes}
+
+With the help of FWV and BS units, every operational mode has its own refrigerant piping connections to achieve different refrigerant flow directions, as shown in Figure~\ref{fig:VRF-HR-Chart-Piping}. This leads to different refrigerant operations and piping loss situations, as shown in the Pressure-Enthalpy Diagrams in Figure~\ref{fig:VRF-HR-Chart-EnthalpyPressure}.
+
+Take Mode 3 for instance, the system utilizes one OU heat exchanger as an evaporator and the other as a condenser. The superheated refrigerant coming out of the compressor is divided into two parts. One part passes through the OU condenser within which the refrigerant is condensed and subcooled (segment 2-4’), while the other part passes through the IU condenser to satisfy the indoor heating requirements (segment 3-4). Note that before entering the IU condenser, the second part of the refrigerant flow passes through the main discharge gas pipe connecting the indoor and outdoor units, where the refrigerant pressure drop and heat loss occurs. This leads to extra heating load and a lower condensing temperature level at IU condenser than that at OU condenser. The two parts of refrigerant leaving condensers are then expanded through expansion valves following segment 4”-5/5’ and pass through the IU evaporator (segment 5-6) and OU evaporator (segment 5’-1’). Similarly to the refrigerant passing through the main discharge gas pipe, the refrigerant leaving IU evaporators passes through the main suction gas pipe where the refrigerant pressure drop and heat loss occurs (segment 6-1”). This leads to extra cooling load and a higher evaporating temperature level at IU evaporator than that at OU evaporator. Finally, the refrigerant flow leaving the OU evaporator and that leaving the main discharge gas pipe are combined (segment 1’/1”-1) and enter the compressors for the next cycle. In this regard, the system provides simultaneous heating and cooling to the indoor environment. 
+
+A number of operational parameters are controlled to ensure system heat balance and stable and reliable system operation, including evaporating temperature levels, condensing temperature levels, superheating and sub-cooling degrees, and the refrigerant flow rates at various components. The operational control logics for various modes are different and therefore particular algorithm needs to be designed for different operational modes in the new VRF-HR model.
+
+\begin{figure}[hbtp] % figure VRF-HR-Chart-Piping
+\centering
+\includegraphics[width=0.95\textwidth, keepaspectratio=true]{media/VRF-HR-Chart-Piping.png}
+\caption{Piping diagrams for the six VRF-HR operational modes \label{fig:VRF-HR-Chart-Piping}}
+\end{figure}
+
+\begin{figure}[hbtp] % figure VRF-HR-Chart-EnthalpyPressure
+\centering
+\includegraphics[width=0.95\textwidth, keepaspectratio=true]{media/VRF-HR-Chart-EnthalpyPressure.png}
+\caption{Illustration of the six VRF-HR operational modes on Pressure-Enthalpy diagrams \label{fig:VRF-HR-Chart-EnthalpyPressure}}
+\end{figure}
+
+
+\subsubsection{Model Description}\label{vrf-heat-pump-model-description}
+
+The algorithm of the VRF-HR Cooling Only Mode and Heating Only Mode are the same as those in the VRF-HP Cooling Mode (Figure~\ref{fig:vrf-fluid-t-ctrl-3b}) and Heating Mode (Figure~\ref{fig:vrf-fluid-t-ctrl-3a}), respectively.The holistic logics of the VRF-HR Simultaneous Heating and Cooling Mode are illustrated in Figure~\ref{fig:VRF-HR-AlgorithmOverview-Mode2-5}. In general, the effective evaporating temperature and/or condensing temperature for the indoor units is first determined based on the load requirements and indoor unit configurations. Then the pressure and heat losses through the main pipe are calculated at the given operational conditions. After that, the effective condensing temperature and/or evaporating temperature of the outdoor unit is calculated, taking into account the piping loss. With the above calculations, the compressor speed can be determined using the performance curves describing the evaporative capacity of the system at specific condensing/evaporating temperature combinations at various compressor speeds. Finally, the compressor power at that speed is calculated and the total electric power consumption by the outdoor unit is obtained. Note that particular control logics are designed for various operational modes, and therefore lead to different refrigerant temperature adjustments. Also, note that a number of calculation steps are coupled together, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem.
+
+\begin{figure}[hbtp] % figure VRF-HR-AlgorithmOverview-Mode2-5
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/VRF-HR-AlgorithmOverview-Mode2-5.png}
+\caption{Schematic chart of the new VRF-HR algorithm: Simultaneous Heating and Cooling Mode \label{fig:VRF-HR-AlgorithmOverview-Mode2-5}}
+\end{figure}
+
+Detailed calculation procedures for the VRF-HR Simultaneous Heating and Cooling Mode are summarized as follows.
+
+\textbf{Step 1: Obtaining zonal load/condition information}
+
+The following information for each zone from the zone modules within EnergyPlus are obtained: 
+
+\begin{itemize}
+  \item
+    zone sensible loads $Q_{in, sensible}$
+  \item
+    zone total loads $Q_{in, total}$
+  \item
+    indoor air temperature $T_{in}$
+  \item
+    indoor air humidity ratio $W_{in}$
+\end{itemize}
+
+If there are only zone cooling loads and no zone heating loads, go to the VRF-HR Cooling Only Mode, the algorithms of which is the same as those for the VRF-HP Cooling Mode. If there are only zone heating loads and no zone cooling loads, go to the VRF-HR Heating Only Mode, the algorithms of which is the same as those for the VRF-HP Heating Mode. Otherwise, go to the VRF-HR Simultaneous Heating and Cooling Mode as described below.
+
+\textbf{Step 2: Calculate IU required evaporating temperature and/or the condensing temperature}
+Evaluate the required coil surface air temperature $T_{fs}$ and then the required evaporator refrigerant temperature $T_{e,req}$ for each indoor unit with cooling requirements. Likewise, evaluate the required condenser refrigerant temperature ${T_{c,req}}$ for each indoor unit with heating requirements.
+(Refer to Step 1.2 in the VRF-FluidTCtrl-HP model for more details.)
+
+\textbf{Step 3: Calculate IU effective evaporating temperature $T_e$ and/or the condensing temperature $T_c$}
+There are two refrigerant temperature control strategies for the indoor unit: (1) \emph{ConstantTemp}, (2) \emph{VariableTemp}.
+
+\begin{itemize}
+  \item
+    In the \emph{ConstantTemp} strategy, $T_e$ and $T_c$ are kept at constant values provided by the user.
+  \item
+    In the \emph{VariableTemp} strategy, $T_e$ and $T_c$ are determined using the required evaporating/condensing temperature calculated in Step 2.
+\end{itemize}
+
+(Refer to Step 1.3 in the VRF-FluidTCtrl-HP model for more details.)
+
+\textbf{Step 4: IU condenser side piping loss calculations}
+
+This section calculates the IU condenser side piping loss, which occurs at the High and Low Pressure Gas Pipe where the refrigerant flowing from the OU compressor outlets to the IU condensers. It includes both the refrigerant pressure drop $\Delta{P_{pipe}}$ and heat loss $Q_{pipe}$. Note that the change of compressor operational conditions may lead to different control strategies of the system, which in reverse affects the amount of piping loss. So the piping loss analysis and system performance analysis are coupled together. Numerical iterations are designed to address the coupling effect.
+
+At this step, the compressor discharge saturated temperature $T'_c$ (i.e., saturated vapor temperature corresponding to compressor discharge pressure) can be obtained using the calculated refrigerant pressure drop $\Delta{P_{pipe}}$.
+
+(Refer to Step 2h.1 in the VRF-FluidTCtrl-HP model for more details.)
+
+\textbf{Step 5: IU evaporator side piping loss calculations}
+
+This section calculates the IU evaporator side piping loss, which occurs at Suction Gas Pipe where the refrigerant flowing from the IU evaporators to the OU compressor inlets. Similarly to the IU condenser side piping loss, it includes both the refrigerant pressure drop $\Delta{P_{pipe}}$ and heat loss $Q_{pipe}$. 
+
+At this step, the compressor suction saturated temperature $T'_e$ (i.e., saturated vapor temperature corresponding to compressor suction pressure) can be obtained using the calculated refrigerant pressure drop $\Delta{P_{pipe}}$.
+
+Note that one key input of the IU evaporator side piping loss calculations is the enthalpy of the refrigerant at IU evaporator inlets. It is assumed to be equal to the average enthalpy of the refrigerant at IU condenser outlets, which is obtained in the IU condenser side piping loss calculations.
+
+(Refer to Step 2c.1 in the VRF-FluidTCtrl-HP model for more details.)
+
+\textbf{Step 6: Determine the operational mode for simultaneous heating and cooling operations}
+
+As noted earlier, simultaneous heating and cooling operations include the following modes:
+
+\begin{itemize}
+  \item
+    Mode 2: Cooling dominant w/o HR loss
+  \item
+    Mode 3: Cooling dominant w/ HR loss
+  \item
+    Mode 4: Heating dominant w/ HR loss
+  \item
+    Mode 5: Heating dominant w/o HR loss
+\end{itemize}
+
+This section determines the operational mode based on the load requirements and operational conditions:
+
+a. Calculate the Loading Index $LI_1$ satisfying IU cooling load (Refer to Step 2c.4 in the VRF-FluidTCtrl-HP model for more details.)
+
+b. Calculate the Loading Index $LI_2$ satisfying IU heating load (Refer to Step 2h.4 in the VRF-FluidTCtrl-HP model for more details.)
+
+c. If $LI_1$ $\leq$ $LI_2$, the system operates at Mode 5
+
+d. If $LI_1$ $>$ $LI_2$ and $Te'$ $<$ $T_o$ - $T_{diff}$, the system operates at Mode 2 
+($T_o$: outdoor air dry-bulb temperature; $T_{diff}$: a constant value representing the difference between OU evaporating temperature and outdoor air temperature during simultaneous heating and cooling)
+
+e. If $LI_1$ $>$ $LI_2$ and $Te'$ $\geq$  $T_o$ - $T_{diff}$, the system operates at Mode 3 or 4 (these two modes can be handled by one set of algorithms)
+
+\textbf{Step 7: OU operation analysis at Mode 5}
+
+\emph{\textbf{If $Te'$ $<$ $T_o$ - $T_{diff}$, perform the following procedures:}}
+
+a. Select the compressor speed corresponding to $LI_2$
+
+b. Calculate the compressor power corresponding to $LI_2$ and the previously obtained $T_c$ and $Te'$
+(Refer to Step 2c.6 in the VRF-FluidTCtrl-HP model for more details.)
+
+c. Calculate the evaporative capacity $Cap_{tot,evap}$ provided by the compressor at $LI_2$ and the previously obtained $T_c$ and $Te'$
+(Refer to Step 2c.4 in the VRF-FluidTCtrl-HP model for more details.)
+
+d. Calculate the OU evaporator load $Cap_{ou,evap}$ based on system-level heat balance
+
+e. Obtain the OU fan flow rate $m_air_evap$ corresponding to $Cap_{ou,evap}$, and thus the fan power
+(Refer to Step 2c.3 in the VRF-FluidTCtrl-HP model for more details.)
+
+\emph{\textbf{If $Te'$ $\geq$  $T_o$ - $T_{diff}$, perform the following procedures:}}
+
+a. Select the compressor speed corresponding to $LI_1$
+
+b. Perform iterations between step b-i to identify the compressor Loading Index and power consumption.
+
+c. Initialized compressor power $Ncomp_{ini}$
+
+c.1 For the 1st iteration step, calculate $Ncomp$ = $f_{pow,comp}$( $T_c$, $T_o$ – 5, $LI_2$)
+
+c.2 For the following iteration steps, update $Ncomp$ = ($Ncomp_{ini}$ + $Ncomp_{new}$)/2
+
+d. Calculate the OU evaporator load $Cap_{ou,evap}$ based on system-level heat balance
+
+e. Obtain the OU evaporating temperature $Te'$ level using $Cap_{ou,evap}$ and the rated air flow rate
+(Refer to Step 2c.3 in the VRF-FluidTCtrl-HP model for more details.)
+
+f. Update $T_e$ level and IU evaporator side piping loss, corresponding to $Te'$ update
+
+g. Identify the compressor Loading Index $LI_{new}$ to provide sufficient evaporative capacity $Cap_{tot,evap}$ at updated $Te'$ level
+(Refer to Step 2c.4 in the VRF-FluidTCtrl-HP model for more details.)
+
+h. Calculate the compressor power $Ncomp_{new}$ corresponding to $LI_{new}$ and the updated $Te'$
+(Refer to Step 2c.6 in the VRF-FluidTCtrl-HP model for more details.)
+
+i. Compare $Ncomp_{new}$ and $Ncomp_{ini}$. Start a new round of iteration if the difference is greater than the tolerance.
+
+\textbf{Step 8: OU operation analysis at Mode 2}
+
+a. Select the compressor speed corresponding to $LI_1$
+
+b. Calculate the compressor power corresponding to $LI_1$ and the previously obtained $T_c$ and $Te'$
+(Refer to Step 2c.6 in the VRF-FluidTCtrl-HP model for more details.)
+
+c. Calculate the evaporative capacity $Cap_{tot,evap}$ provided by the compressor at $LI_1$ and the previously obtained $T_c$ and $Te'$
+(Refer to Step 2c.4 in the VRF-FluidTCtrl-HP model for more details.)
+
+d. Calculate the OU condenser load $Cap_{ou,cond}$ based on system-level heat balance
+
+e. Obtain the OU fan flow rate $m_{air,cond}$ corresponding to $Cap_{ou,cond}$, and thus the fan power
+
+\textbf{Step 9: OU operation analysis at Mode 3 or 4}
+
+a. Select the compressor speed corresponding to $LI_1$
+
+b. Perform iterations between step b-e to identify the updated $Te'$ level within the range of $T_o$-5 and the original $Te'$.
+
+c. Calculate the evaporative capacity $Cap_{tot,evap}$ provided by the compressor at $LI_1$ and the previously obtained $T_c$ and assumed $Te'$
+(Refer to Step 2c.4 in the VRF-FluidTCtrl-HP model for more details.)
+
+d. Calculate the OU evaporator load $Cap_{tot,evap}$ at assumed $Te'$ level and rated fan flow rate
+(Refer to Step 2h.3 in the VRF-FluidTCtrl-HP model for more details.)
+
+e. Perform iterations to identify the updated $Te'$ level to ensure the heat balance for the b. and c. calculations
+
+f. Update $T_e$ level and IU evaporator side piping loss, corresponding to $Te'$ update
+
+g. Calculate the compressor power corresponding to $LI_1$ and the updated $Te'$
+(Refer to Step 2c.6 in the VRF-FluidTCtrl-HP model for more details.)
+
+h. Calculate the OU condenser load $Cap_{ou,cond}$ based on system-level heat balance
+
+i. Obtain the OU fan flow rate $m_{air,cond}$ corresponding to $Cap_{ou,cond}$, and thus the fan power
+
+\textbf{Step 10: Modify IU operational parameters for capacity adjustments}
+
+The air flow rate and $SH$/$SC$ value of each indoor unit can be manipulated to adjust the cooling/heating capacity.
+(Refer to Step 3c and 3h in the VRF-FluidTCtrl-HP model for more details.)
+
 
 \subsection{Zone Terminal Unit List}\label{zone-terminal-unit-list}
 
@@ -2264,8 +2505,10 @@ The zone terminal unit list identifies the terminal units that are connected to 
 \caption{Zone Terminal List connections in EnergyPlus objects \protect \label{fig:zone-terminal-list-connections-in-energyplus}}
 \end{figure}
 
-\subsubsection{References}\label{references-051}
+\subsection{References}\label{references-051}
 
-Raustad R. A variable refrigerant flow heat pump computer model in EnergyPlus, ASHRAE Transactions (2013), 119 (1):1--9.
+R. Raustad. A variable refrigerant flow heat pump computer model in EnergyPlus, ASHRAE Transactions (2013), 119 (1):1-9.
 
-Hong T, Sun K, Zhang R, Hinokuma R, Kasahara S, Yura Y. Development and Validation of a New VRF Model in EnergyPlus. ASHRAE Winter Conference.
+T. Hong, K. Sun, R. Zhang, R. Hinokuma, S. Kasahara, Y. Yura. Development and validation of a new variable refrigerant flow system model in EnergyPlus, Energy Build. 117 (2015): 399–411.
+
+T. Hong, R. Zhang, K. Sun. Development, Validation and Performance Evaluation of VRF Heat Recovery Systems. LBNL Report, 2016.
