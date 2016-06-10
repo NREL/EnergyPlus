@@ -72,9 +72,12 @@ namespace FaultsManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
-	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP), added fouling coil fault
-	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults
-	//       MODIFIED       Apr. 2015 Rongpeng Zhang, added fouling air filter fault
+	//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
+	//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
+	//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
+	//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
+	//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
+	//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -105,7 +108,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 9 );
+	int const NumFaultTypes( 13 );
 
 	// FaultTypeEnum
 	int const iFault_TemperatureSensorOffset_OutdoorAir( 101 );
@@ -117,36 +120,73 @@ namespace FaultsManager {
 	int const iFault_ThermostatOffset( 107 );
 	int const iFault_HumidistatOffset( 108 );
 	int const iFault_Fouling_AirFilter( 109 );
+	int const iFault_TemperatureSensorOffset_ChillerSupplyWater( 110 );
+	int const iFault_TemperatureSensorOffset_CondenserSupplyWater( 111 );
+	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 112 );
+	int const iFault_Fouling_Tower( 113 );
 
 	// Types of faults under Group Operational Faults in IDD
-	//  1. Temperature sensor offset
-	//  2. Humidity sensor offset
-	//  3. Enthalpy sensor offset
-	//  4. Fouling coils
-	//  5. Thermostat offset
-	//  6. Humidistat offset
-	//  7. Fouling air filter
+	//  1. Temperature sensor offset (FY14)
+	//  2. Humidity sensor offset (FY14)
+	//  3. Enthalpy sensor offset (FY14)
+	//  4. Fouling coils (FY14)
+	//  5. Thermostat offset (FY15)
+	//  6. Humidistat offset (FY15)
+	//  7. Fouling air filter (FY15)
+	//  8. Chiller Supply Water Temperature Sensor Offset (FY16)
+	//  9. Condenser Supply Water Temperature Sensor Offset (FY16)
+	//  10. Cooling Tower Scaling (FY16)
+	//  11. Coil Supply Air Temperature Sensor Offset (FY16)
 	// coming ...
-	//  8. Fouling: chillers, boilers, cooling towers
-	//  9. Damper leakage: return air, outdoor air
-	//  10. Blockage: pipe
-	//  11. Meter: air flow, water flow
-	//  12. CO2 sensor
-	//  13. Pressure sensor offset
-	//  14. more
+	//  Fouling: chillers, boilers, cooling towers
+	//  Damper leakage: return air, outdoor air
+	//  Blockage: pipe
+	//  Meter: air flow, water flow
+	//  CO2 sensor
+	//  Pressure sensor offset
+	//  more
 
-	Array1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset", "FaultModel:HumidistatOffset", "FaultModel:Fouling:AirFilter" } );
+	Array1D_string const cFaults( 
+	NumFaultTypes, 
+	{ "FaultModel:TemperatureSensorOffset:OutdoorAir", 
+	"FaultModel:HumiditySensorOffset:OutdoorAir", 
+	"FaultModel:EnthalpySensorOffset:OutdoorAir", 
+	"FaultModel:TemperatureSensorOffset:ReturnAir", 
+	"FaultModel:EnthalpySensorOffset:ReturnAir", 
+	"FaultModel:Fouling:Coil", 
+	"FaultModel:ThermostatOffset", 
+	"FaultModel:HumidistatOffset", 
+	"FaultModel:Fouling:AirFilter",
+	"FaultModel:TemperatureSensorOffset:ChillerSupplyWater",
+	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
+	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
+	"FaultModel:Fouling:tower"
+	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
 	//      'FaultModel:Blockage:Branch                   ', &
 	//      'FaultModel:Fouling:Chiller                   ', &
 	//      'FaultModel:Fouling:Boiler                    ', &
-	//      'FaultModel:Fouling:CoolingTower              ', &
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	Array1D_int const iFaultTypeEnums(NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset, iFault_Fouling_AirFilter });
+	Array1D_int const iFaultTypeEnums(
+	NumFaultTypes, 
+	{ iFault_TemperatureSensorOffset_OutdoorAir, 
+	iFault_HumiditySensorOffset_OutdoorAir, 
+	iFault_EnthalpySensorOffset_OutdoorAir, 
+	iFault_TemperatureSensorOffset_ReturnAir, 
+	iFault_EnthalpySensorOffset_ReturnAir, 
+	iFault_Fouling_Coil, 
+	iFault_ThermostatOffset, 
+	iFault_HumidistatOffset, 
+	iFault_Fouling_AirFilter,
+	iFault_TemperatureSensorOffset_ChillerSupplyWater,
+	iFault_TemperatureSensorOffset_CondenserSupplyWater,
+	iFault_TemperatureSensorOffset_CoilSupplyAir,
+	iFault_Fouling_Tower
+	});
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
@@ -154,7 +194,11 @@ namespace FaultsManager {
 	int NumFaultyThermostat( 0 ); // Total number of faulty thermostat with offset
 	int NumFaultyHumidistat( 0 ); // Total number of faulty humidistat with offset
 	int NumFaultyAirFilter( 0 ); // Total number of fouled air filters
-
+	int NumFaultyChillerSWTSensor( 0 );  // Total number of faulty Chillers Supply Water Temperature Sensor
+	int NumFaultyCondenserSWTSensor( 0 );  // Total number of faulty Condenser Supply Water Temperature Sensor
+	int NumFaultyTowerScaling( 0 );  // Total number of faulty Towers with Scaling
+	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
+	
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
@@ -163,6 +207,10 @@ namespace FaultsManager {
 	Array1D< FaultProperties > FaultsThermostatOffset;
 	Array1D< FaultProperties > FaultsHumidistatOffset;
 	Array1D< FaultProperties > FaultsFouledAirFilters;
+	Array1D< FaultProperties > FaultsChillerSWTSensor;
+	Array1D< FaultProperties > FaultsCondenserSWTSensor;
+	Array1D< FaultProperties > FaultsTowerScaling;
+	Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions
 
@@ -173,7 +221,12 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Tianzhen Hong
 		//       DATE WRITTEN   August 2013
-		//       MODIFIED
+		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
+		//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
+		//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
+		//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
+		//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
+		//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -219,15 +272,19 @@ namespace FaultsManager {
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
 
-		int i;
-		int j; 	//Number of fault objects of type 101-105
-		int jFoulingCoil; //Number of fault objects of type 106: fouling coil
-		int jFaultyThermostat; //Number of fault objects of type 107: faulty thermostat
-		int jFaultyHumidistat; //Number of fault objects of type 108: faulty humidistat
-		int jFaultyAirFilter; //Number of fault objects of type 109: fouled air filter
-		int jj;
+		int i; // Index to fault type
 		int iFaults;
-		std::string cFault1;
+		int jj; // Index to fault object
+		int j = 0; //Number of fault objects of type 101-105
+		int jFault_FoulingCoil = 0; //Index to fault objects of type 106: fouling coil
+		int jFault_Thermostat = 0; //Index to fault objects of type 107: faulty thermostat
+		int jFault_Humidistat = 0; //Index to fault objects of type 108: faulty humidistat
+		int jFault_AirFilter = 0; //Index to fault objects of type 109: fouled air filter
+		int jFault_TemperatureSensorOffset_ChillerSupplyWater = 0; //Index to fault objects of type 110: chiller SWT sensor offset
+		int jFault_TemperatureSensorOffset_CondenserSupplyWater = 0; //Index to fault objects of type 111: condenser SWT sensor offset
+		int jFault_TemperatureSensorOffset_CoilSupplyAir = 0; //Index to fault objects of type 112: coil SAT sensor offset
+		int jFault_Fouling_Tower = 0; //Index to fault objects of type 113: tower scaling
+		std::string cFault_str;
 
 		if ( RunMeOnceFlag ) return;
 
@@ -238,15 +295,24 @@ namespace FaultsManager {
 			NumFaults += iFaults;
 		}
 
-		// Coil fouling is the 6th fault
+		// 6th fault: Coil fouling 
 		NumFouledCoil = GetNumObjectsFound( cFaults( 6 ) );
-		// Faulty thermostat is the 7th fault
+		// 7th fault: Faulty thermostat
 		NumFaultyThermostat = GetNumObjectsFound( cFaults( 7 ) );
-		// Faulty humidistat is the 8th fault
+		// 8th fault: Faulty humidistat 
 		NumFaultyHumidistat = GetNumObjectsFound( cFaults( 8 ) );
-		// Fouled air filter is the 9th fault
+		// 9th fault: Fouled air filter
 		NumFaultyAirFilter = GetNumObjectsFound( cFaults( 9 ) );
-
+		// 10th fault: Faulty Chillers Supply Water Temperature Sensor 
+		NumFaultyChillerSWTSensor = GetNumObjectsFound( cFaults( 10 ) );
+		// 11th fault: Faulty Condenser Supply Water Temperature Sensor
+		NumFaultyCondenserSWTSensor = GetNumObjectsFound( cFaults( 11 ) ); 
+		// 12th fault: Faulty Towers with Scaling
+		NumFaultyTowerScaling = GetNumObjectsFound( cFaults( 12 ) );
+		// 13th fault: Faulty Coil Supply Air Temperature Sensor
+		NumFaultyCoilSATSensor = GetNumObjectsFound( cFaults( 13 ) );  
+	
+	
 		if ( NumFaults > 0 ) {
 			AnyFaultsInModel = true;
 		} else {
@@ -258,40 +324,39 @@ namespace FaultsManager {
 			return;
 		}
 
-		// read faults input
+		// allocate fault array
 		Faults.allocate( NumFaults );
 		FouledCoils.allocate( NumFouledCoil );
 		FaultsThermostatOffset.allocate( NumFaultyThermostat );
 		FaultsHumidistatOffset.allocate( NumFaultyHumidistat );
 		FaultsFouledAirFilters.allocate( NumFaultyAirFilter );
+		FaultsChillerSWTSensor.allocate( NumFaultyChillerSWTSensor );
+		FaultsCondenserSWTSensor.allocate( NumFaultyCondenserSWTSensor );
+		FaultsTowerScaling.allocate( NumFaultyTowerScaling );
+		FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 
-		j = 0;
-		jFoulingCoil = 0;
-		jFaultyThermostat = 0;
-		jFaultyHumidistat = 0;
-		jFaultyAirFilter = 0;
-
+		// read faults input
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
-			cFault1 = cFaults( i ); // fault object string
-			iFaults = GetNumObjectsFound( cFault1 );
+			cFault_str = cFaults( i ); // fault object string
+			iFaults = GetNumObjectsFound( cFault_str );
 
 			for ( jj = 1; jj <= iFaults; ++jj ) {
-				GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				GetObjectItem( cFault_str, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( SameString( cFault1, "FaultModel:Fouling:AirFilter" ) ) { // For Fault_type 109: Fouled Air Filters
-					++jFaultyAirFilter;
+				if ( SameString( cFault_str, "FaultModel:Fouling:AirFilter" ) ) { // For Fault_type 109: Fouled Air Filters
+					++jFault_AirFilter;
 
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultType = cFault1;
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultTypeEnum = iFaultTypeEnums( i );
-					FaultsFouledAirFilters( jFaultyAirFilter ).Name = cAlphaArgs( 1 );
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultType = cFault_str;
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultTypeEnum = iFaultTypeEnums( i );
+					FaultsFouledAirFilters( jFault_AirFilter ).Name = cAlphaArgs( 1 );
 
 					// Informatin of the fan associated with the fouling air filter
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 2 );
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanType = cAlphaArgs( 2 );
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
 					// Check whether the specified fan exsits in the fan list
 					if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+						ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 
@@ -299,204 +364,204 @@ namespace FaultsManager {
 					for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
 						if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
 							Fans::Fan( FanNum ).FaultyFilterFlag = true;
-							Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
+							Fans::Fan( FanNum ).FaultyFilterIndex = jFault_AirFilter;
 							break;
 						}
 					}
 
 					// Fault availability schedule
-					FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedule = cAlphaArgs( 4 );
+					FaultsFouledAirFilters( jFault_AirFilter ).AvaiSchedule = cAlphaArgs( 4 );
 					if ( lAlphaFieldBlanks( 4 ) ) {
-						FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedPtr = -1; // returns schedule value of 1
+						FaultsFouledAirFilters( jFault_AirFilter ).AvaiSchedPtr = -1; // returns schedule value of 1
 					} else {
-						FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
-						if ( FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+						FaultsFouledAirFilters( jFault_AirFilter ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+						if ( FaultsFouledAirFilters( jFault_AirFilter ).AvaiSchedPtr == 0 ) {
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Fan pressure increase fraction schedule
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSche = cAlphaArgs( 5 );
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterPressFracSche = cAlphaArgs( 5 );
 					if ( lAlphaFieldBlanks( 5 ) ) {
-						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr = -1; // returns schedule value of 1
+						FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterPressFracSchePtr = -1; // returns schedule value of 1
 					} else {
-						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
-						if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterPressFracSchePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
+						if ( FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterPressFracSchePtr == 0 ) {
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Fan curve describing the relationship between fan pressure rise and air flow rate
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurve = cAlphaArgs( 6 );
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr = GetCurveIndex( cAlphaArgs( 6 ) );
-					if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr == 0 ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurve = cAlphaArgs( 6 );
+					FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurvePtr = GetCurveIndex( cAlphaArgs( 6 ) );
+					if ( FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurvePtr == 0 ) {
+						ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 )  + "\"" );
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" not found."  );
 						ErrorsFound = true;
 					}
 
 					// Check whether the specified fan curve covers the design operational point of the fan
-					if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName, FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr ) ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
+					if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName, FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurvePtr ) ) {
+						ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 )  + "\"" );
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not cover "  );
-						ShowContinueError( "the operational point of Fan " + FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName  );
+						ShowContinueError( "the operational point of Fan " + FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName  );
 						ErrorsFound = true;
 					}
 
 					//In the fan object, calculate by each time-step: 1) pressure inc value; 2) air flow rate decrease value ......
 
-				} else if ( SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
-					++jFaultyHumidistat;
+				} else if ( SameString( cFault_str, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
+					++jFault_Humidistat;
 
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultType = cFault1;
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultTypeEnum = iFaultTypeEnums( i );
-					FaultsHumidistatOffset( jFaultyHumidistat ).Name = cAlphaArgs( 1 );
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
+					FaultsHumidistatOffset( jFault_Humidistat ).FaultType = cFault_str;
+					FaultsHumidistatOffset( jFault_Humidistat ).FaultTypeEnum = iFaultTypeEnums( i );
+					FaultsHumidistatOffset( jFault_Humidistat ).Name = cAlphaArgs( 1 );
+					FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
+					FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
-					if ( SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+					if ( SameString( FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
 					// For Humidistat Offset Type: ThermostatOffsetDependent
 
 						// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
 						if ( lAlphaFieldBlanks( 6 ) ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 6 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 6 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
 							ErrorsFound = true;
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).FaultyThermostatName = cAlphaArgs( 6 );
+							FaultsHumidistatOffset( jFault_Humidistat ).FaultyThermostatName = cAlphaArgs( 6 );
 						}
 
 					} else {
 					// For Humidistat Offset Type: ThermostatOffsetIndependent
 
 						// Availability schedule
-						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 4 );
+						FaultsHumidistatOffset( jFault_Humidistat ).AvaiSchedule = cAlphaArgs( 4 );
 						if ( lAlphaFieldBlanks( 4 ) ) {
-							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = -1; // returns schedule value of 1
+							FaultsHumidistatOffset( jFault_Humidistat ).AvaiSchedPtr = -1; // returns schedule value of 1
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
-							if ( FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr == 0 ) {
-								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+							FaultsHumidistatOffset( jFault_Humidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+							if ( FaultsHumidistatOffset( jFault_Humidistat ).AvaiSchedPtr == 0 ) {
+								ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 						}
 
 						// Severity schedule
-						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedule = cAlphaArgs( 5 );
+						FaultsHumidistatOffset( jFault_Humidistat ).SeveritySchedule = cAlphaArgs( 5 );
 						if ( lAlphaFieldBlanks( 5 ) ) {
-							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = -1; // returns schedule value of 1
+							FaultsHumidistatOffset( jFault_Humidistat ).SeveritySchedPtr = -1; // returns schedule value of 1
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 5 ) );
-							if ( FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr == 0 ) {
-								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+							FaultsHumidistatOffset( jFault_Humidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 5 ) );
+							if ( FaultsHumidistatOffset( jFault_Humidistat ).SeveritySchedPtr == 0 ) {
+								ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 						}
 
 						// Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
 						if ( lNumericFieldBlanks( 1 ) ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cNumericFieldNames( 1 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\"." );
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\": " + cNumericFieldNames( 1 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\"." );
 							ErrorsFound = true;
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).Offset = rNumericArgs( 1 );
+							FaultsHumidistatOffset( jFault_Humidistat ).Offset = rNumericArgs( 1 );
 						}
 
 					}
 
 
-				} else if ( SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
-					++jFaultyThermostat;
+				} else if ( SameString( cFault_str, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
+					++jFault_Thermostat;
 
-					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
-					FaultsThermostatOffset( jFaultyThermostat ).FaultTypeEnum = iFaultTypeEnums( i );
-					FaultsThermostatOffset( jFaultyThermostat ).Name = cAlphaArgs( 1 );
-					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 2 );
+					FaultsThermostatOffset( jFault_Thermostat ).FaultType = cFault_str;
+					FaultsThermostatOffset( jFault_Thermostat ).FaultTypeEnum = iFaultTypeEnums( i );
+					FaultsThermostatOffset( jFault_Thermostat ).Name = cAlphaArgs( 1 );
+					FaultsThermostatOffset( jFault_Thermostat ).FaultyThermostatName = cAlphaArgs( 2 );
 
 					// Availability schedule
-					FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedule = cAlphaArgs( 3 );
+					FaultsThermostatOffset( jFault_Thermostat ).AvaiSchedule = cAlphaArgs( 3 );
 					if ( lAlphaFieldBlanks( 3 ) ) {
-						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = -1; // returns schedule value of 1
+						FaultsThermostatOffset( jFault_Thermostat ).AvaiSchedPtr = -1; // returns schedule value of 1
 					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+						FaultsThermostatOffset( jFault_Thermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+						if ( FaultsThermostatOffset( jFault_Thermostat ).AvaiSchedPtr == 0 ) {
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Severity schedule
-					FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedule = cAlphaArgs( 4 );
+					FaultsThermostatOffset( jFault_Thermostat ).SeveritySchedule = cAlphaArgs( 4 );
 					if ( lAlphaFieldBlanks( 4 ) ) {
-						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = -1; // returns schedule value of 1
+						FaultsThermostatOffset( jFault_Thermostat ).SeveritySchedPtr = -1; // returns schedule value of 1
 					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
-						if ( FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+						FaultsThermostatOffset( jFault_Thermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+						if ( FaultsThermostatOffset( jFault_Thermostat ).SeveritySchedPtr == 0 ) {
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Reference offset value is required
 					if ( lNumericFieldBlanks( 1 ) ) {
-						ShowSevereError( cFault1 + " = \"" + cNumericFieldNames( 1 ) + "\" cannot be blank." );
+						ShowSevereError( cFault_str + " = \"" + cNumericFieldNames( 1 ) + "\" cannot be blank." );
 						ErrorsFound = true;
 					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).Offset = rNumericArgs( 1 );
+						FaultsThermostatOffset( jFault_Thermostat ).Offset = rNumericArgs( 1 );
 					}
 
-				} else if ( SameString( cFault1, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
-					++jFoulingCoil;
+				} else if ( SameString( cFault_str, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
+					++jFault_FoulingCoil;
 
-					FouledCoils( jFoulingCoil ).FaultType = cFault1;
-					FouledCoils( jFoulingCoil ).FaultTypeEnum = iFaultTypeEnums( i );
-					FouledCoils( jFoulingCoil ).Name = cAlphaArgs( 1 );
-					FouledCoils( jFoulingCoil ).FouledCoilName = cAlphaArgs( 2 );
+					FouledCoils( jFault_FoulingCoil ).FaultType = cFault_str;
+					FouledCoils( jFault_FoulingCoil ).FaultTypeEnum = iFaultTypeEnums( i );
+					FouledCoils( jFault_FoulingCoil ).Name = cAlphaArgs( 1 );
+					FouledCoils( jFault_FoulingCoil ).FouledCoilName = cAlphaArgs( 2 );
 
 					// Availability schedule
-					FouledCoils( jFoulingCoil ).AvaiSchedule = cAlphaArgs( 3 );
+					FouledCoils( jFault_FoulingCoil ).AvaiSchedule = cAlphaArgs( 3 );
 					if ( lAlphaFieldBlanks( 3 ) ) {
-						FouledCoils( jFoulingCoil ).AvaiSchedPtr = -1; // returns schedule value of 1
+						FouledCoils( jFault_FoulingCoil ).AvaiSchedPtr = -1; // returns schedule value of 1
 					} else {
-						FouledCoils( jFoulingCoil ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( FouledCoils( jFoulingCoil ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+						FouledCoils( jFault_FoulingCoil ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+						if ( FouledCoils( jFault_FoulingCoil ).AvaiSchedPtr == 0 ) {
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Severity schedule
-					FouledCoils( jFoulingCoil ).SeveritySchedule = cAlphaArgs( 4 );
+					FouledCoils( jFault_FoulingCoil ).SeveritySchedule = cAlphaArgs( 4 );
 					if ( lAlphaFieldBlanks( 4 ) ) {
-						FouledCoils( jFoulingCoil ).SeveritySchedPtr = -1; // returns schedule value of 1
+						FouledCoils( jFault_FoulingCoil ).SeveritySchedPtr = -1; // returns schedule value of 1
 					} else {
-						FouledCoils( jFoulingCoil ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
-						if ( FouledCoils( jFoulingCoil ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+						FouledCoils( jFault_FoulingCoil ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+						if ( FouledCoils( jFault_FoulingCoil ).SeveritySchedPtr == 0 ) {
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
 					if ( SELECT_CASE_var == "FOULEDUARATED" ) {
-						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
+						FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 
 					} else if ( SELECT_CASE_var == "FOULINGFACTOR" ) {
-						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_FoulingFactor;
+						FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_FoulingFactor;
 
 					} else {
-						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
+						FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 					}}
 
-					FouledCoils( jFoulingCoil ).UAFouled = rNumericArgs( 1 );
-					FouledCoils( jFoulingCoil ).Rfw = rNumericArgs( 2 );
-					FouledCoils( jFoulingCoil ).Rfa = rNumericArgs( 3 );
-					FouledCoils( jFoulingCoil ).Aout = rNumericArgs( 4 );
-					FouledCoils( jFoulingCoil ).Aratio = rNumericArgs( 5 );
+					FouledCoils( jFault_FoulingCoil ).UAFouled = rNumericArgs( 1 );
+					FouledCoils( jFault_FoulingCoil ).Rfw = rNumericArgs( 2 );
+					FouledCoils( jFault_FoulingCoil ).Rfa = rNumericArgs( 3 );
+					FouledCoils( jFault_FoulingCoil ).Aout = rNumericArgs( 4 );
+					FouledCoils( jFault_FoulingCoil ).Aratio = rNumericArgs( 5 );
 
 				} else { // For Fault_type 101-105, which are of the same input structure
 					++j;
-					Faults( j ).FaultType = cFault1;
+					Faults( j ).FaultType = cFault_str;
 					Faults( j ).FaultTypeEnum = iFaultTypeEnums( i );
 
 					Faults( j ).Name = cAlphaArgs( 1 );
@@ -507,7 +572,7 @@ namespace FaultsManager {
 					} else {
 						Faults( j ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( Faults( j ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -519,7 +584,7 @@ namespace FaultsManager {
 					} else {
 						Faults( j ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( Faults( j ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+							ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
@@ -527,7 +592,7 @@ namespace FaultsManager {
 					Faults( j ).ControllerType = cAlphaArgs( 4 );
 					// check controller type
 					if ( lAlphaFieldBlanks( 4 ) ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+						ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
 						ErrorsFound = true;
 					} else {
 						{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
@@ -543,7 +608,7 @@ namespace FaultsManager {
 					Faults( j ).ControllerName = cAlphaArgs( 5 );
 					// check controller name
 					if ( lAlphaFieldBlanks( 5 ) ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+						ShowSevereError( cFault_str + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
 						ErrorsFound = true;
 					}
 

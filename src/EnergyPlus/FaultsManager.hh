@@ -99,23 +99,31 @@ namespace FaultsManager {
 	extern int const iFault_ThermostatOffset;
 	extern int const iFault_HumidistatOffset;
 	extern int const iFault_Fouling_AirFilter;
+	extern int const iFault_TemperatureSensorOffset_ChillerSupplyWater;
+	extern int const iFault_TemperatureSensorOffset_CondenserSupplyWater;
+	extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
+	extern int const iFault_Fouling_Tower;
 
 	// Types of faults under Group Operational Faults in IDD
-	//  1. Temperature sensor offset
-	//  2. Humidity sensor offset
-	//  3. Enthalpy sensor offset
-	//  4. Fouling coils
-	//  5. Thermostat offset
-	//  6. Humidistat offset
-	//  7. Fouling air filter
+	//  1. Temperature sensor offset (FY14)
+	//  2. Humidity sensor offset (FY14)
+	//  3. Enthalpy sensor offset (FY14)
+	//  4. Fouling coils (FY14)
+	//  5. Thermostat offset (FY15)
+	//  6. Humidistat offset (FY15)
+	//  7. Fouling air filter (FY15)
+	//  8. Chiller Supply Water Temperature Sensor Offset (FY16)
+	//  9. Condenser Supply Water Temperature Sensor Offset (FY16)
+	//  10. Cooling Tower Scaling (FY16)
+	//  11. Coil Supply Air Temperature Sensor Offset (FY16)
 	// coming ...
-	//  8. Fouling: chillers, boilers, cooling towers
-	//  9. Damper leakage: return air, outdoor air
-	//  10. Blockage: pipe
-	//  11. Meter: air flow, water flow
-	//  12. CO2 sensor
-	//  13. Pressure sensor offset
-	//  14. more
+	//  Fouling: chillers, boilers, cooling towers
+	//  Damper leakage: return air, outdoor air
+	//  Blockage: pipe
+	//  Meter: air flow, water flow
+	//  CO2 sensor
+	//  Pressure sensor offset
+	//  more
 
 	extern Array1D_string const cFaults;
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
@@ -137,6 +145,11 @@ namespace FaultsManager {
 	extern int NumFaultyThermostat; // Total number of faulty thermostat with offset
 	extern int NumFaultyHumidistat; // Total number of faulty humidistat with offset
 	extern int NumFaultyAirFilter;  // Total number of fouled air filters
+	extern int NumFaultyAirFilter;  // Total number of fouled air filters
+	extern int NumFaultyChillerSWTSensor;  // Total number of faulty Chillers Supply Water Temperature Sensor
+	extern int NumFaultyCondenserSWTSensor;  // Total number of faulty Condenser Supply Water Temperature Sensor
+	extern int NumFaultyTowerScaling;  // Total number of faulty Towers with Scaling
+	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -225,6 +238,11 @@ namespace FaultsManager {
 	extern Array1D< FaultProperties > FaultsThermostatOffset;
 	extern Array1D< FaultProperties > FaultsHumidistatOffset;
 	extern Array1D< FaultProperties > FaultsFouledAirFilters;
+	extern Array1D< FaultProperties > FaultsFouledAirFilters;
+	extern Array1D< FaultProperties > FaultsChillerSWTSensor;
+	extern Array1D< FaultProperties > FaultsCondenserSWTSensor;
+	extern Array1D< FaultProperties > FaultsTowerScaling;
+	extern Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions
 
