@@ -580,7 +580,6 @@ namespace EnergyPlus {
 		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 		NumLines = 0;
 		InitSecretObjects();
-		//InitReferenceObjectsClass();
 		ProcessInputDataFile( *idf_stream );
 
 		ListOfSections.allocate( NumSectionDefs );

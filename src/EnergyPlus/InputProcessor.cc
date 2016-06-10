@@ -344,7 +344,6 @@ namespace InputProcessor {
 		NumRefObjectsBranch = 0;
 		ObjectListName = std::string();
 		ReferenceObjectsName = std::string();
-		//ObjectRefClass.deallocate();
 	}
 
 	void
@@ -2975,10 +2974,7 @@ namespace InputProcessor {
 								ReplacementName = trimmed( name_str );
 								ObsoleteObject = true;
 							}
-						} else if ( has_prefix( UCInputLine, "\\OBJECT-LIST" ) ) {
-							   ObjectList = true;
-							   FieldsObjectList = true;
-						}
+						} 
 						break;
 					case 'R':
 						if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
