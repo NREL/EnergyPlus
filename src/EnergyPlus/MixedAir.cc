@@ -3535,13 +3535,6 @@ namespace MixedAir {
 
 		OutAirMinFrac = min( max( OutAirMinFrac, 0.0 ), 1.0 );
 
-		// Apply Minimum Fraction of Outdoor Air Schedule
-		if (thisController.MinOAflowSchPtr > 0) {
-			MinOAflowfracVal = GetCurrentScheduleValue(thisController.MinOAflowSchPtr);
-			MinOAflowfracVal = min(max(MinOAflowfracVal, 0.0), 1.0);
-			OutAirMinFrac = max(MinOAflowfracVal, OutAirMinFrac);
-		}
-
 		// At this point, OutAirMinFrac is still based on AirLoopFlow.DesSupply
 		if ( AirLoopNum > 0 ) {
 			AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * AirLoopFlow( AirLoopNum ).DesSupply;
@@ -3560,6 +3553,14 @@ namespace MixedAir {
 
 		// Economizer
 		CalcOAEconomizer( OAControllerNum, AirLoopNum, OutAirMinFrac, OASignal, EconomizerOperationFlag, HighHumidityOperationFlag );
+
+		// Apply Minimum Fraction of Outdoor Air Schedule
+		if ( thisController.MinOAflowSchPtr > 0 ) {
+			MinOAflowfracVal = GetCurrentScheduleValue( thisController.MinOAflowSchPtr );
+			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
+			OutAirMinFrac = max( MinOAflowfracVal, OutAirMinFrac );
+			OASignal = max( MinOAflowfracVal, OASignal );
+		}
 
 		if ( thisController.MaxOAflowSchPtr > 0 ) {
 			MaxOAflowfracVal = GetCurrentScheduleValue( thisController.MaxOAflowSchPtr );
