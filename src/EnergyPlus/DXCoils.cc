@@ -5546,29 +5546,18 @@ namespace DXCoils {
 		if ( CrankcaseHeaterReportVarFlag ) {
 			if ( AirLoopInputsFilled ) {
 				//     Set report variables for DX cooling coils that will have a crankcase heater (all DX coils not used in a HP AC unit)
-				for ( DXCoilNumTemp = 1; DXCoilNumTemp <= NumDoe2DXCoils + NumDXMulModeCoils; ++DXCoilNumTemp ) {
-					if ( DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower ) {
-						SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNumTemp ).Name );
-						SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNumTemp ).Name, _, "Electric", "COOLING", _, "Plant" );
-						DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower = false;
+				for ( DXCoilNumTemp = 1; DXCoilNumTemp <= NumDXCoils; ++DXCoilNumTemp ) {
+					if ( ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) || ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_CoolingSingleSpeed ) || ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
+						if ( DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower ) {
+							SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNumTemp ).Name );
+							SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNumTemp ).Name, _, "Electric", "COOLING", _, "Plant" );
+							DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower = false;
+						}
 					}
 				}
 				CrankcaseHeaterReportVarFlag = false;
 			} //(AirLoopInputsFilled)THEN
 		} //(CrankcaseHeaterReportVarFlag)THEN
-
-		// Find the companion upstream coil (DX cooling coil) that is used with DX heating coils (Multispeed HP units only)
-		if ( DXCoil( DXCoilNum ).FindCompanionUpStreamCoil ) {
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
-				DXCoil( DXCoilNum ).CompanionUpstreamDXCoil = GetHPCoolingCoilIndex( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoilNum );
-				if ( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil > 0 ) {
-					DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).ReportCoolingCoilCrankcasePower = false;
-					DXCoil( DXCoilNum ).FindCompanionUpStreamCoil = false;
-				}
-			} else {
-				DXCoil( DXCoilNum ).FindCompanionUpStreamCoil = false;
-			}
-		} //IF(DXCoil(DXCoilNum)%FindCompanionUpStreamCoil)THEN
 
 		if ( ! SysSizingCalc && MySizeFlag( DXCoilNum ) ) {
 			// for each coil, do the sizing once.

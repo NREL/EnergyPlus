@@ -808,7 +808,7 @@ The value of the air mass flow coefficient,\({C_Q}\) , in the crack air flow equ
 
 \paragraph{Field: Air Mass Flow Exponent}\label{field-air-mass-flow-exponent}
 
-The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65.
+The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65.
 
 \paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions}
 
@@ -1027,7 +1027,7 @@ The value of the air mass flow coefficient, \({C_{Q,\;unit\;length}}\) , in the 
 
 \paragraph{Field: Air Mass Flow Exponent When Opening is Closed}\label{field-air-mass-flow-exponent-when-opening-is-closed-1}
 
-The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65.
+The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65.
 
 \paragraph{Field: Sloping Plane Angle}\label{field-sloping-plane-angle}
 
@@ -1067,7 +1067,7 @@ The value of the air mass flow coefficient, \({C_{Q,\;unit\;length}}\) , in the 
 
 \paragraph{Field: Air Mass Flow Exponent When Opening is Closed}\label{field-air-mass-flow-exponent-when-opening-is-closed-2}
 
-The value of the exponent,* n\emph{, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient} (deltaP)\^{}Air Mass Flow Exponent.
+The value of the exponent, n\emph{, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient} (deltaP)\^{}Air Mass Flow Exponent.
 
 \paragraph{Field: Minimum Density Difference for Two-Way Flow}\label{field-minimum-density-difference-for-two-way-flow}
 
@@ -1141,7 +1141,7 @@ The value of the air mass flow coefficient,\({C_Q}\) , in the crack air flow equ
 
 \paragraph{Field: Air Mass Flow Exponent When the Zone Exhaust Fan is Off}\label{field-air-mass-flow-exponent-when-the-zone-exhaust-fan-is-off}
 
-The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the fan is off.
+The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the fan is off.
 
 \paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions-1}
 
@@ -1379,11 +1379,59 @@ AirlowNetwork:OccupantVentilationControl,
   ClosingProbabilitySch;   !- Closing Probability Schedule Name
 \end{lstlisting}
 
+\subsection{AirflowNetwork:ZoneControl:PressureController}\label{airflowNetworkzonecontrolpressureoontroller} 
+
+The AirflowNetwork:ZoneControl:PressureController object is used to control a zone to a specified indoor level of pressure using the AirflowNetwork model. The specified pressure setpoint is used to calculate the required zone exhaust fan flow rate in a controlled zone or relief air flow rate in an AirLoop.
+
+The object has a similar function as ZoneControl:Thermostat. When an AirLoop serves multiple zones, the controlled zone will reach the specified setpoint, while other zones will not be controlled precisely.
+
+\subsubsection{Inputs}\label{inputs-AFN-pressure-control}
+
+\paragraph{Field: Name}\label{field-name-AFN-pressure-control}
+
+Unique identifying name for the AirflowNetwork:ZoneControl:PressureController.
+
+\paragraph{ Field: Control Zone Name}\label{field-control-zone-name}
+
+Name of the zone that is being controlled.
+
+\paragraph{ Field: Control Object Type}\label{field-control-object-type}
+
+This field specifies the control type to be used for pressure control. Available control types are:
+AirflowNetwork:MultiZone:Component:ZoneExhaustFan and AirflowNetwork:Distribution:Component:ReliefAirFlow.
+
+\paragraph{ Field: Control Object Name}\label{field-control-name}
+
+The corresponding control object name. 
+
+\paragraph{ Field: Pressure Control Availability Schedule Name}\label{field-pressure-control-availability-schedule-name}
+
+This field contains the name of a schedule that determines whether or not the AirflowNetwork:ZoneControl:PressureController is available. When the schedule value is zero, the AirflowNetwork:ZoneControl:PressureController is bypassed (not available to operate). When the schedule value is greater than zero, the AirflowNetwork:ZoneControl:PressureController is available to perform pressure control. When AirflowNetwork:Distribution:Component:ZoneExhaustFan in entered in the Control Object Type field, the model will calculate the required zone exhaust fan airflow rate to reach the pressure setpoint. When an AirflowNetwork:Distribution:Component:ReliefAirFlow is entered in the Control Object Type field, the model will calculate the central relief flow rate in an outdoor air mixer. If this field is left blank, the schedule has a value of 1 for all time periods. Schedule values must be between 0 and 1.
+
+\paragraph{ Field: Pressure Setpoint Schedule Name}\label{field-pressure-setpoint-schedule-name}
+
+This field contains the name of a schedule that contains the zone air pressure setpoint as a function of time. The units for pressure setpoint are Pascal. The setpoint values in the schedule must be between -50 and 100 Pascal. 
+
+An IDF example is provided below:
+
+\begin{lstlisting}
+
+AirflowNetwork:ZoneControl:PressureController,
+  Pressure Controller1,           !- Name
+  EAST ZONE,                      !- Controlled Zone Name
+  AirflowNetwork:MultiZone:Component:ZoneExhaustFan, !- Control Object type
+  East Zone Exhaust Fan,          !- Control Object Name
+  PressureAvailSchedule,          !- Pressure Control Availability Schedule Name
+  PressureSetpointSchedule;       !- Pressure Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{AirflowNetwork with RoomAir Models}\label{airflownetwork-roomair-models}
+
 The next two objects of AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage are used with RoomAir:Node:AirflowNetwork objects together to simulate multiple internal airflows via multiple intrazone nodes and linkages in a thermal zone. The mixed-air assumption for zone air conditions is not always appropriate. EnergyPlus includes several RoomAir models that can model the implications for different flow patterns on variations in temperature within the zone. However none of them are generalized enough for different types of air flow situations and none are coupled tightly with AirflowNetwork. A general RoomAir model based on pressure network solver will allow modeling a variety of spaces types not currently covered by existing models such as tall spaces.
 
 Recent advancements have been made to AirflowNetwork to model large horizontal openings. This new development makes AirflowNetwork useful for not only modeling air movement between zones (and outdoors), but also within individual thermal zones.
 
-The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. It should be pointed out that the new model works when the MultizoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationCOntrol object. The model cannot work with other choices.
+The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. It should be pointed out that the new model works when the MultizoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationControl object. The model cannot work with other choices.
 
 \subsection{AirflowNetwork:Intrazone:Node}\label{airflownetworkintrazonenode}
 
@@ -2078,6 +2126,116 @@ An IDF example is provided below:
 AirflowNetwork:Distribution:Component:ConstantPressureDrop,
    SupplyCPDComp, ! Name of Constant Pressure Drop Component
    1.0;           ! Pressure Difference Across the Component [Pa]
+\end{lstlisting}
+
+\subsection{AirflowNetwork:Distribution:Component:OutdoorAirFlow}\label{airflowNetworkdistributioncomponentoutdoorairflow}
+
+The AirflowNetwork:Distribution:Component:OutdoorAirFlow object is used to allow the AirflowNetwork model to include the outdoor air flow rate in the airflow network. When the outdoor air mass flow rate is greater than zero, the airflow network model treats this object as a constant volume fan and the flow rate is provided by the Controller:OutdoorAir object. When there is no outdoor air flow rate, the model treats this object as a crack and a power law is assumed. 
+
+\subsubsection{Inputs}\label{inputs-AFN-outdoorairflow}
+
+\paragraph{Field: Name}\label{field-name-outdoorairflow}
+
+This is the name for this instance of the AirflowNetwork:Distribution:Component:OutdoorAirFlow object.
+
+\paragraph{Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions}\label{field-air-mass-flow-coefficient-when-no-outdoor-air-flow-at-reference-conditions}
+
+The value of the air mass flow coefficient, \({C_Q}\), in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
+
+\paragraph{Field: Air Mass Flow Exponent When No Outdoor Air Flow}\label{field-air-mass-flow-exponent-when-no-outdoor-air-flow}
+
+The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
+
+\paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions}
+
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
+
+IDF examples are provided below:
+
+\begin{lstlisting}
+
+AirflowNetwork:MultiZone:Component:OutdoorAirFlow,
+  OAFlow,                  !- Name
+  0.01,                    !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
+  0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
+
+AirflowNetwork:Distribution:Node,
+  OA System Node,          !- Name
+  ,                        !- Component Name or Node Name
+  AirLoopHVAC:OutdoorAirSystem,  !- Component Object Type or Node Type
+  3.0;                     !- Node Height {m}
+
+AirflowNetwork:Distribution:Node,
+  OA Inlet Node,           !- Name
+  Outside Air Inlet Node,  !- Component Name or Node Name
+  OAMixerOutdoorAirStreamNode,  !- Component Object Type or Node Type
+  1.5;                     !- Node Height {m}
+
+AirflowNetwork:Distribution:Linkage,
+  OASystemFanLink,         !- Name
+  OA Inlet Node,           !- Node 1 Name
+  OA System Node,          !- Node 2 Name
+  OAFlow;                  !- Component Name
+
+\end{lstlisting}
+
+\subsection{AirflowNetwork:Distribution:Component:ReliefAirFlow}\label{airflowNetworkdistributioncomponentreliefairflow}
+
+The AirflowNetwork:Distribution:Component:ReliefAirFlow object is used to allow the AirflowNetwork model to perform pressure control by varying the amount of relief air flow rate between 0 and the flow rate specified by the Controller:OutdoorAir object. When the outdoor air mass flow rate is greater than zero, the airflow network model treats this object as a constant volume fan and the flow rate is varied to reach pressure control. When there is no outdoor air flow rate, the model treats this object as a crack and a power law is assumed. 
+
+\subsubsection{Inputs}\label{inputs-AFN-reliefairflow}
+
+\paragraph{Field: Name}\label{field-name-reliefairflow}
+
+This is the name for this instance of the AirflowNetwork:Distribution:Component:ReliefAirFlow object.
+
+\paragraph{Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions}\label{field-air-mass-flow-coefficient-when-no-outdoor-air-flow-at-reference-conditions}
+
+The value of the air mass flow coefficient, \({C_Q}\), in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
+
+\paragraph{Field: Air Mass Flow Exponent When No Outdoor Air Flow}\label{field-air-mass-flow-exponent-when-no-outdoor-air-flow}
+
+The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
+
+\paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions}
+
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
+
+IDF examples are provided below:
+
+\begin{lstlisting}
+
+AirflowNetwork:ZoneControl:PressureController,
+  Pressure Controller1,           !- Name
+  EAST ZONE,                      !- Controlled Zone Name
+  AirflowNetwork:Distribution:Component:ReliefAirFlow,  !- Control Object type
+  ReliefFlow,                     !- Control Name
+  PressureAvailSchedule,          !- Pressure Control Availability Schedule Name
+  PressureSetpointSchedule;       !- Pressure Setpoint Schedule Name
+
+AirflowNetwork:MultiZone:Component:ReliefAirFlow,
+  ReliefFlow,                     !- Name
+  0.01,                           !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
+  0.667;                          !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
+
+AirflowNetwork:Distribution:Node,
+  OA System Node,                 !- Name
+  ,                               !- Component Name or Node Name
+  AirLoopHVAC:OutdoorAirSystem,   !- Component Object Type or Node Type
+  3.0;                            !- Node Height {m}
+
+AirflowNetwork:Distribution:Node,
+  OA Inlet Node,                  !- Name
+  Outside Air Inlet Node,         !- Component Name or Node Name
+  OAMixerOutdoorAirStreamNode,    !- Component Object Type or Node Type
+  1.5;                            !- Node Height {m}
+
+AirflowNetwork:Distribution:Linkage,
+  OASystemFanLink,                !- Name
+  OA System Node,                 !- Node 1 Name
+  OA Inlet Node,                  !- Node 2 Name
+  ReliefFlow;                     !- Component Name
+
 \end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Linkage}\label{airflownetworkdistributionlinkage}
