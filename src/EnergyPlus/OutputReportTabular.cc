@@ -9511,6 +9511,9 @@ namespace OutputReportTabular {
 		Array1D< Real64> zoneOpeningArea;
 		zoneOpeningArea.allocate( NumOfZones );
 		zoneOpeningArea = 0.0;
+		Array1D< Real64> zoneGlassArea;
+		zoneGlassArea.allocate( NumOfZones );
+		zoneGlassArea = 0.0;
 
 		// all arrays are in the format: (row, columnm)
 		if ( displayTabularVeriSum ) {
@@ -9714,7 +9717,8 @@ namespace OutputReportTabular {
 								windowAreaW += curArea * mult;
 								if ( isConditioned ) windowAreaWcond += curArea * mult;
 							}
-							zoneOpeningArea( zonePt ) += curArea; // total window opening area for each zone (glass plus frame area)
+							zoneOpeningArea( zonePt ) += curArea * Surface( iSurf ).Multiplier; // total window opening area for each zone (glass plus frame area)
+							zoneGlassArea( zonePt ) += Surface( iSurf ).GrossArea * Surface( iSurf ).Multiplier;
 							if ( DetailedWWR ) {
 								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
@@ -9960,7 +9964,7 @@ namespace OutputReportTabular {
 				tableBody( 5, iZone ) = RealToStr( mult, 2 );
 				tableBody( 6, iZone ) = RealToStr( Zone( iZone ).ExtGrossWallArea * m2_unitConv, 2 );
 				tableBody( 7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
-				tableBody( 8, iZone) = RealToStr(Zone(iZone).ExtWindowArea * m2_unitConv, 2);
+				tableBody( 8, iZone ) = RealToStr( zoneGlassArea(iZone) * m2_unitConv, 2 );
 				tableBody( 9, iZone ) = RealToStr( zoneOpeningArea(iZone) * m2_unitConv, 2 );
 				// lighting density
 				totLightPower = 0.0;
@@ -10013,7 +10017,7 @@ namespace OutputReportTabular {
 					zstVolume( grandTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( grandTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( grandTotal ) += mult * zoneGlassArea( iZone );
 					zstOpeningArea( grandTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( grandTotal ) += mult * totLightPower;
 					zstPeople( grandTotal ) += mult * totNumPeople;
@@ -10023,7 +10027,7 @@ namespace OutputReportTabular {
 					zstVolume( notpartTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( notpartTotal ) += mult * zoneGlassArea( iZone );
 					zstOpeningArea( notpartTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
@@ -10034,7 +10038,7 @@ namespace OutputReportTabular {
 					zstVolume( condTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( condTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( condTotal ) += mult * zoneGlassArea( iZone );
 					zstOpeningArea( condTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( condTotal ) += mult * totLightPower;
 					zstPeople( condTotal ) += mult * totNumPeople;
@@ -10044,7 +10048,7 @@ namespace OutputReportTabular {
 					zstVolume( uncondTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( uncondTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( uncondTotal ) += mult * zoneGlassArea( iZone );
 					zstOpeningArea( uncondTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( uncondTotal ) += mult * totLightPower;
 					zstPeople( uncondTotal ) += mult * totNumPeople;
@@ -10054,7 +10058,7 @@ namespace OutputReportTabular {
 					zstVolume( notpartTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( notpartTotal ) += mult * zoneGlassArea( iZone );
 					zstOpeningArea( notpartTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
