@@ -240,7 +240,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 	EXPECT_EQ( 0, indexUnitConv );
 	EXPECT_EQ( "", curUnits );
-	EXPECT_EQ( 0.0, curConversionFactor );
+	EXPECT_EQ( 1.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
 
 	varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";

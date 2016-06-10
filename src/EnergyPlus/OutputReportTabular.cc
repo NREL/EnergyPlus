@@ -14243,7 +14243,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 96;
+		UnitConvSize = 104;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14341,6 +14341,14 @@ Label900: ;
 		UnitConv( 94 ).siName = "MJ/m2";
 		UnitConv( 95 ).siName = "Invalid/Undefined";
 		UnitConv( 96 ).siName = "";
+		UnitConv( 97 ).siName = "W/C";
+		UnitConv( 98 ).siName = "DAY";
+		UnitConv( 99 ).siName = "MIN";
+		UnitConv( 100 ).siName = "HR/WK";
+		UnitConv( 101 ).siName = "$";
+		UnitConv( 102 ).siName = "$/UNIT ENERGY";
+		UnitConv( 103 ).siName = "KW";
+		UnitConv( 104 ).siName = "KGWATER/KGDRYAIR";
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14438,6 +14446,14 @@ Label900: ;
 		UnitConv( 94 ).ipName = "kWh/m2";
 		UnitConv( 95 ).ipName = "Invalid/Undefined";
 		UnitConv( 96 ).ipName = "";
+		UnitConv( 97 ).ipName = "Btu/h-F";
+		UnitConv( 98 ).ipName = "DAY";
+		UnitConv( 99 ).ipName = "MIN";
+		UnitConv( 100 ).ipName = "HR/WK";
+		UnitConv( 101 ).ipName = "$";
+		UnitConv( 102 ).ipName = "$/unit energy";
+		UnitConv( 103 ).ipName = "kW";
+		UnitConv( 104 ).ipName = "lbWater/lbDryAir";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14535,6 +14551,14 @@ Label900: ;
 		UnitConv( 94 ).mult = 0.27777777777778;
 		UnitConv( 95 ).mult = 1.0;
 		UnitConv( 96 ).mult = 1.0;
+		UnitConv( 97 ).mult = 1.8987;
+		UnitConv( 98 ).mult = 1.0;
+		UnitConv( 99 ).mult = 1.0;
+		UnitConv( 100 ).mult = 1.0;
+		UnitConv( 101 ).mult = 1.0;
+		UnitConv( 102 ).mult = 1.0;
+		UnitConv( 103 ).mult = 1.0;
+		UnitConv( 104 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14686,10 +14710,12 @@ Label900: ;
 		std::string::size_type posRBrac = index( stringInUpper, ']' ); // right bracket
 		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
 		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
+		bool noBrackets = true;
 		//extract the substring with the units
 		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
+			noBrackets = false;
 		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
@@ -14752,7 +14778,16 @@ Label900: ;
 		// For debugging only
 		//CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
 		//IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // IntToStr(foundConv) )
+
 		unitConvIndex = selectedConv;
+
+		// Add warning if units not found. Exclude stirngs without square brackets, or Rating metrics that are inheirently IP (e.g. SEER, IEER, EER, IPLV)
+		if (unitConvIndex == 0 && ! noBrackets && unitSIOnly != "BTU/W-H") {
+			ShowWarningError("Unable to find a unit conversion from " + stringInWithSI + " into IP units");
+			ShowContinueError("Applying default conversion factor of 1.0");
+			ShowContinueError("Please report to https://github.com/NREL/EnergyPlus/issues");
+		}
+
 	}
 
 
@@ -14936,7 +14971,7 @@ Label900: ;
 			offset = UnitConv( unitConvIndex ).offset;
 			IPunit = UnitConv( unitConvIndex ).ipName;
 		} else {
-			multiplier = 0.0;
+			multiplier = 1.0;
 			offset = 0.0;
 			IPunit = "";
 		}
