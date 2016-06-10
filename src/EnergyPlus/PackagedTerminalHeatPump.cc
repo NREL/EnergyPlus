@@ -2851,7 +2851,6 @@ namespace PackagedTerminalHeatPump {
 		int i; // Loop index
 		int Iter; // speed iteration count
 		int PTObjectIndex;
-		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int CtrlZoneNum; // the controlled zone index (index of ZoneEquipConfig)
 
 		InNode = PTUnit( PTUnitNum ).AirInNode;
@@ -2980,16 +2979,19 @@ namespace PackagedTerminalHeatPump {
 			MySizeFlag( PTUnitNum ) = false;
 		}
 
+		RhoAir = StdRhoAir;
+		PTUnit( PTUnitNum ).MaxCoolAirMassFlow = RhoAir * PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+		PTUnit( PTUnitNum ).MaxHeatAirMassFlow = RhoAir * PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+
 		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 && ! MySizeFlag( PTUnitNum ) ) {
 
 			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
 
-			MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NormSpedLevel );
 			for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedCooling; ++Iter ) {
-				PTUnit( PTUnitNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
-				PTUnit( PTUnitNum ).CoolMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
 				PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedCooling );
+				PTUnit( PTUnitNum ).CoolVolumeFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxCoolAirVolFlow * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter );
+				PTUnit( PTUnitNum ).CoolMassFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxCoolAirMassFlow * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter );
 			}
 
 			if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
@@ -2998,11 +3000,10 @@ namespace PackagedTerminalHeatPump {
 
 				PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).NumOfSpeeds;
 
-				MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).NormSpedLevel );
 				for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedHeating; ++Iter ) {
-					PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
 					PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
+					PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxHeatAirVolFlow * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter );
+					PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxHeatAirMassFlow * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter );
 				}
 			}
 			// intialize idle flow
@@ -3120,7 +3121,6 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 						PTUnit( PTUnitNum ).IdleVolumeAirRate = PTUnit( PTUnitNum ).FanVolFlow;
 					}
-					RhoAir = StdRhoAir;
 					// set the mass flow rates from the reset volume flow rates
 					for ( i = 1; i <= NumOfSpeedCooling; ++i ) {
 						PTUnit( PTUnitNum ).CoolMassFlowRate( i ) = RhoAir * PTUnit( PTUnitNum ).CoolVolumeFlowRate( i );
@@ -6476,10 +6476,10 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		if ( HeatingLoad && ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) ) {
-			CompOnFlowRatio = 1.0;
-			CompOnMassFlow = PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-			MSHPMassFlowRateLow = PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-			MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
+			CompOnMassFlow = PTUnit( PTUnitNum ).CoolMassFlowRate( PTUnit( PTUnitNum ).NumOfSpeedCooling );
+			CompOnFlowRatio = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( PTUnit( PTUnitNum ).NumOfSpeedCooling );
+			MSHPMassFlowRateLow = PTUnit( PTUnitNum ).CoolMassFlowRate( PTUnit( PTUnitNum ).NumOfSpeedCooling );
+			MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).CoolMassFlowRate( PTUnit( PTUnitNum ).NumOfSpeedCooling );
 			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
 			if ( CompOffFlowRatio > 0.0 ) {
 				FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
@@ -6490,28 +6490,27 @@ namespace PackagedTerminalHeatPump {
 			if ( present( SpeedNum ) ) {
 				if ( HeatingLoad ) {
 					if ( SpeedNum == 1 ) {
+						CompOnMassFlow = PTUnit( PTUnitNum ).HeatMassFlowRate( SpeedNum );
 						CompOnFlowRatio = PTUnit( PTUnitNum ).MSHeatingSpeedRatio( SpeedNum );
-						CompOnMassFlow = CompOnFlowRatio * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
-						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).MSHeatingSpeedRatio( 1 ) * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
-						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).MSHeatingSpeedRatio( 1 ) * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
+						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).HeatMassFlowRate( 1 );
+						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).HeatMassFlowRate( 1 );
 					} else if ( SpeedNum > 1 ) {
+						CompOnMassFlow = SpeedRatio * PTUnit( PTUnitNum ).HeatMassFlowRate( SpeedNum ) + ( 1.0 - SpeedRatio ) * PTUnit( PTUnitNum ).HeatMassFlowRate( SpeedNum - 1 );
 						CompOnFlowRatio = SpeedRatio * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( SpeedNum ) + ( 1.0 - SpeedRatio ) * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( SpeedNum - 1 );
-						CompOnMassFlow = CompOnFlowRatio * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
-						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).MSHeatingSpeedRatio( SpeedNum - 1 ) * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
-						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).MSHeatingSpeedRatio( SpeedNum ) * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
+						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).HeatMassFlowRate( SpeedNum - 1 );
+						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).HeatMassFlowRate( SpeedNum );
 					}
 				} else if ( PTUnit( PTUnitNum ).HeatCoolMode == CoolingMode ) {
 					if ( SpeedNum == 1 ) {
+						CompOnMassFlow = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum );
 						CompOnFlowRatio = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum );
-						CompOnMassFlow = CompOnFlowRatio * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( 1 ) * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( 1 ) * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
+						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).CoolMassFlowRate( 1 );
+						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).CoolMassFlowRate( 1 );
 					} else if ( SpeedNum > 1 ) {
+						CompOnMassFlow = SpeedRatio * PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum ) + ( 1.0 - SpeedRatio ) * PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum - 1 );
 						CompOnFlowRatio = SpeedRatio * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum ) + ( 1.0 - SpeedRatio ) * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum - 1 );
-						CompOnMassFlow = CompOnFlowRatio * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum - 1 ) * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum ) * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
-					}
+						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum - 1 );
+						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum );					}
 				}
 			}
 
@@ -6519,14 +6518,14 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil && present( SpeedNum ) ) {
 				if ( PTUnit( PTUnitNum ).AirFlowControl == UseCompressorOnFlow && CompOnMassFlow > 0.0 ) {
 					if ( SpeedNum == 1 ) { //LOWEST SPEED USE IDLE FLOW
-						CompOffFlowRatio = PTUnit( PTUnitNum ).IdleSpeedRatio;
 						CompOffMassFlow = PTUnit( PTUnitNum ).IdleMassFlowRate;
+						CompOffFlowRatio = PTUnit( PTUnitNum ).IdleSpeedRatio;
 					} else if ( PTUnit( PTUnitNum ).LastMode == HeatingMode ) {
+						CompOffMassFlow = PTUnit( PTUnitNum ).HeatMassFlowRate( SpeedNum );
 						CompOffFlowRatio = PTUnit( PTUnitNum ).MSHeatingSpeedRatio( SpeedNum );
-						CompOffMassFlow = CompOffFlowRatio * PTUnit( PTUnitNum ).MaxHeatAirMassFlow;
 					} else {
+						CompOffMassFlow = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum );
 						CompOffFlowRatio = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum );
-						CompOffMassFlow = CompOffFlowRatio * PTUnit( PTUnitNum ).MaxCoolAirMassFlow;
 					}
 				}
 			}
