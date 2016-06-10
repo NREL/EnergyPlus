@@ -11644,7 +11644,7 @@ namespace HVACVariableRefrigerantFlow {
 			Ref_Coe_v3 = ( VRF( VRFCond ).EvaporatingTemp + Pipe_SH_merged + 273.15 ) / 344.39; 
 			
 			Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2 + 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2 - 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2 * Ref_Coe_v3 + 21.58;
-			if( Pipe_viscosity_ref <= 0 ) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa?) at T=353.15 K, P=2MPa
+			if( Pipe_viscosity_ref <= 0 ) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
 			Pipe_v_ref  = Pipe_m_ref / ( Pi * pow_2( VRF( VRFCond ).RefPipDiaSuc ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + Pipe_SH_merged, max( min( Pevap, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 			Pipe_Num_Re = Pipe_m_ref / ( Pi * pow_2( VRF( VRFCond ).RefPipDiaSuc ) * 0.25 ) * VRF( VRFCond ).RefPipDiaSuc / Pipe_viscosity_ref * 1000000;
@@ -11798,7 +11798,7 @@ namespace HVACVariableRefrigerantFlow {
 			Ref_Coe_v2 = Pipe_h_IU_in / 383.5510343;
 			Ref_Coe_v3 = ( Pipe_T_IU_in + 273.15 ) / 344.39;
 			Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2+ 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2- 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2* Ref_Coe_v3 + 21.58;
-			if( Pipe_viscosity_ref <= 0 ) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa?) at T=353.15 K, P=2MPa
+			if( Pipe_viscosity_ref <= 0 ) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
 			Pipe_v_ref = Pipe_m_ref / ( Pi * pow_2( VRF( VRFCond ).RefPipDiaDis ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_IU_in, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 			Pipe_Num_Re = Pipe_m_ref / ( Pi * pow_2( VRF( VRFCond ).RefPipDiaDis ) * 0.25 ) * VRF( VRFCond ).RefPipDiaDis / Pipe_viscosity_ref * 1000000;
