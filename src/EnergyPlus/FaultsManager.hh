@@ -88,6 +88,7 @@ namespace FaultsManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int const NumFaultTypes;
+	extern int const NumFaultTypesEconomizer;
 
 	// FaultTypeEnum
 	extern int const iFault_TemperatureSensorOffset_OutdoorAir;
@@ -139,8 +140,9 @@ namespace FaultsManager {
 
 	extern Array1D_int const iFaultTypeEnums;
 
-	extern bool AnyFaultsInModel; // True if there are operationla faults in the model
+	extern bool AnyFaultsInModel; // True if there are operational faults in the model
 	extern int NumFaults; // Number of faults (include multiple faults of same type) in the model
+	extern int NumFaultyEconomizer; // Total number of faults related with the economizer
 	extern int NumFouledCoil; // Total number of fouled coils
 	extern int NumFaultyThermostat; // Total number of faulty thermostat with offset
 	extern int NumFaultyHumidistat; // Total number of faulty humidistat with offset
@@ -233,7 +235,7 @@ namespace FaultsManager {
 	};
 
 	// Object Data
-	extern Array1D< FaultProperties > Faults;
+	extern Array1D< FaultProperties > FaultsEconomizer;
 	extern Array1D< FaultProperties > FouledCoils;
 	extern Array1D< FaultProperties > FaultsThermostatOffset;
 	extern Array1D< FaultProperties > FaultsHumidistatOffset;
