@@ -362,6 +362,32 @@ namespace AirflowNetworkSolver {
 	);
 
 	void
+	AFEOAF(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const i, // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	);
+
+	void
+	AFEREL(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const i, // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	);
+
+	void
 	GenericCrack(
 		Real64 & coef, // Flow coefficient
 		Real64 const expn, // Flow exponent
