@@ -72,6 +72,7 @@
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -11134,6 +11135,7 @@ namespace HVACUnitarySystem {
 		// Using/Aliasing
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
+		using General::SafeDivide;
 		using PlantUtilities::SafeCopyPlantNode;
 
 		// Locals
@@ -11176,14 +11178,25 @@ namespace HVACUnitarySystem {
 			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
-			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) HeatRecOutletTemp = UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp;
+			// coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the coil
+			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) {
+				HeatRecOutletTemp = UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp;
+				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
+			}
 		} else {
 			HeatRecOutletTemp = HeatRecInletTemp;
+			QHeatRec = 0.0;
 		}
 
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );
 		// changed outputs
 		Node( HeatRecOutNode ).Temp = HeatRecOutletTemp;
+
+		// where does outlet node enthalpy get calculated? I can't find where water components set the outlet node enthalpy.
+//		Node( HeatRecOutNode ).Enthalpy = HeatRecInletEnth + SafeDivide( QHeatRec, HeatRecMassFlowRate );
+
+		// try to force another iteration to pass water temps around the loop. Didn't work.		
+//		if( abs( HeatRecOutletTemp - UnitarySystem( UnitarySysNum ).HeatRecoveryOutletTemp ) > DataConvergParams::PlantTemperatureToler ) DataHVACGlobals::SimPlantLoopsFlag = true;
 
 		UnitarySystem( UnitarySysNum ).HeatRecoveryRate = QHeatRec;
 		UnitarySystem( UnitarySysNum ).HeatRecoveryEnergy = UnitarySystem( UnitarySysNum ).HeatRecoveryRate * ReportingConstant;
