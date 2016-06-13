@@ -2342,7 +2342,7 @@ namespace RuntimeLanguageProcessor {
 						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too small a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
 					}
 					ReturnValue.Type = ValueError;
-						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
 						seriousErrorFound = true;
 					}
 				}
