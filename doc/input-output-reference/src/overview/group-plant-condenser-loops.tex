@@ -4,9 +4,11 @@
 
 The main elements of the PlantLoop syntax are described in further detail below. A map of how the input for this portion of the HVAC input fits together is provided in the following diagram.
 
-!{[}PlantLoopSyntax (media/image135.png)
-
-Figure 73. Plant Loop Input Syntax Map
+\begin{figure}[hbtp] % fig 73
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image135.png}
+\caption{Plant Loop Input Syntax Map \protect \label{fig:plant-loop-input-syntax-map}}
+\end{figure}
 
 \subsubsection{Inputs}\label{inputs-035}
 
@@ -306,9 +308,11 @@ This output is available for every component on every branch in a plant (or cond
 
 The condenser loop input is very similar to that for the plant loop. As of version 7, the two loops are modeled the same way and inside the program all condenser loops are just plant loops. (In future versions of the program, this CondenserLoop object might be deprecated and these loops will be described using the PlantLoop object.)~ The main differences are the applicable components and operation schemes. This is depicted in the following diagram.
 
-!{[}CondenserLoopSyntax (media/image136.png)
-
-Figure 74. Condenser Loop Input Syntax Map
+\begin{figure}[hbtp] % fig 74
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image136.png}
+\caption{Condenser Loop Input Syntax Map \protect \label{fig:condenser-loop-input-syntax-map}}
+\end{figure}
 
 \subsubsection{Inputs}\label{inputs-1-032}
 
