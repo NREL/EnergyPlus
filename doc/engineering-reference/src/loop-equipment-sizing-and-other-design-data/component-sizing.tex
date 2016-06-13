@@ -356,15 +356,11 @@ The outlet air humidity ratio depends on whether the coil is in the outside air 
 \tightlist
 \item
   If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit, then:
+\item
+  Get the dewpoint temperature at W$_{air,in,des}$: $T_{dp,in} = \text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$
+\item
+  If T$_{dp,in}$ < = T$_{w,in,des}$ set W$_{air,out,des}$ = W$_{air,in,des}$. Otherwise set W$_{air,out,des}$ = min(PsyWFnTdbRhPb(T$_{air,out,des}$,0.9,P$_{air,std}$),W$_{air,in,des}$)
 \end{itemize}
-
-\begin{lstlisting}
--   Get the dewpoint temperature at W$_{air,in,des}$: $T_{dp,in} = \text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$
-\end{lstlisting}
-
-\begin{lstlisting}
--   If T$_{dp,in}$ < = T$_{w,in,des}$ set W$_{air,out,des}$ = W$_{air,in,des}$. Otherwise set W$_{air,out,des}$ = min(PsyWFnTdbRhPb(T$_{air,out,des}$,0.9,P$_{air,std}$),W$_{air,in,des}$)
-\end{lstlisting}
 
 \subsubsection{Design Inlet Water Temperature - System Coils}\label{design-inlet-water-temperature---system-coils}
 
