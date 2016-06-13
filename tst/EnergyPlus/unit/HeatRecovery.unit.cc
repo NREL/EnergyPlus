@@ -3890,3 +3890,56 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
 
 }
+
+TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
+	
+	int ExchNum( 1 );
+	int BalDesDehumPerfDataIndex( 1 );
+	Real64 FaceVelocity;
+	Real64 SysVolFlow;
+
+	SysSizingRunDone = true;
+	DataSizing::NumSysSizInput = 1;
+	DataSizing::SysSizInput.allocate( NumSysSizInput );
+	DataSizing::CurSysNum = 1; // primary air system
+	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurZoneEqNum = 0; // size it based on system
+	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
+
+	// initialize sizing required variables
+	ExchCond.allocate( ExchNum );
+	ExchCond( ExchNum ).ExchTypeNum = HX_DESICCANT_BALANCED;
+	ExchCond( ExchNum ).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
+	ExchCond( ExchNum ).NomSupAirVolFlow = AutoSize;
+	ExchCond( ExchNum ).PerfDataIndex = BalDesDehumPerfDataIndex;
+
+	BalDesDehumPerfData.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).Name = "DehumPerformanceData";
+
+	// autosize nominal vol flow and face velocity
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow = AutoSize;
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel = AutoSize;
+
+	// initialize sizing variables
+	DataSizing::CurDuctType = DataHVACGlobals::Main;
+	FinalSysSizing.allocate( CurSysNum );
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+
+	// initialize UnitarySysEqSizing capacity flag to false; not unitary system
+	UnitarySysEqSizing.allocate( CurSysNum );
+	UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+	UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+
+	// calc heat recovery sizing
+	SizeHeatRecovery( ExchNum );
+	
+	// test autosized nominal vol flow rate
+	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
+
+	// size nominal face velocity
+	SysVolFlow = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow;
+	FaceVelocity = 4.30551 + 0.01969 * SysVolFlow;
+
+	// test autosized face velocity
+	EXPECT_EQ( FaceVelocity, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel ); // m/s
+}
