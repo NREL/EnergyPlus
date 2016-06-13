@@ -5421,7 +5421,15 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 					} else { // Movable insulation present
 
-						if ( construct.SourceSinkPresent && calcHeatBalanceInsideSurfFirstTime ) ShowSevereError( "Movable insulation is not valid with embedded sources/sinks" );
+						if ( construct.SourceSinkPresent ) {
+							
+						    ShowSevereError( "Interior movable insulation is not valid with embedded sources/sinks" );
+							ShowContinueError( "Construction " + construct.Name + "contains an internal source or sink but also uses" );
+							ShowContinueError( "interior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name + " for a surface with that construction." );
+							ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accomodate this combination." );
+							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+							
+						}
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );
 
@@ -6064,7 +6072,11 @@ CalcOutsideSurfTemp(
 
 		if ( MovInsulPresent ) {
 			// Note: if movable insulation is ever added back in correctly, the heat balance equations above must be fixed
-			ShowFatalError( "Movable insulation is not allowed on a radiant system surface at this time" );
+			ShowSevereError( "Exterior movable insulation is not valid with embedded sources/sinks" );
+			ShowContinueError( "Construction " + construct.Name + "contains an internal source or sink but also uses" );
+			ShowContinueError( "exterior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name + " for a surface with that construction." );
+			ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accomodate this combination." );
+			ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
 
 		} else {
 			Real64 const RadSysDiv( 1.0 / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ) );
