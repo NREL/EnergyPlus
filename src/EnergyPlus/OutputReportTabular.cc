@@ -9511,6 +9511,7 @@ namespace OutputReportTabular {
 		Array1D< Real64> zoneOpeningArea;
 		zoneOpeningArea.allocate( NumOfZones );
 		zoneOpeningArea = 0.0;
+
 		Array1D< Real64> zoneGlassArea;
 		zoneGlassArea.allocate( NumOfZones );
 		zoneGlassArea = 0.0;
