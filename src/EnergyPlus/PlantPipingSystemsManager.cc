@@ -259,7 +259,6 @@ namespace PlantPipingSystemsManager {
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
-		using DataGlobals::TimeStepZoneSec;
 		using DataGlobals::SecInHour;
 		using DataGlobals::AnyBasementsInModel;
 		using DataGlobals::OutputFileInits;
@@ -2764,7 +2763,6 @@ namespace PlantPipingSystemsManager {
 		Array1D< Real64 > XBoundaryPoints;
 		Array1D< Real64 > YBoundaryPoints;
 		Array1D< Real64 > ZBoundaryPoints;
-		int RegionListCount;
 		int BoundaryListCount;
 		bool XPartitionsExist;
 		bool YPartitionsExist;
@@ -3478,7 +3476,7 @@ namespace PlantPipingSystemsManager {
 
 				if ( i == ThesePartitionRegions.l1() ) { // First partition
 					// Create region to left of partition
-					auto & tempRegion( GridRegion( 0.0, thisPartition.Min, DirDirection, tempCellWidths ) );
+					auto tempRegion( GridRegion( 0.0, thisPartition.Min, DirDirection, tempCellWidths ) );
 					cellCountUpToNow += this->getCellWidthsCount( DirDirection );
 					++regionIndex;
 					this->getCellWidths( tempRegion, tempRegion.thisRegionType );
@@ -3486,7 +3484,7 @@ namespace PlantPipingSystemsManager {
 				} else { // All other partitions
 					// Create region to left of partition
 					auto & leftPartition( ThesePartitionRegions( i - 1 ) );
-					auto & tempRegion( GridRegion( leftPartition.Max, thisPartition.Min, DirDirection, tempCellWidths ) );
+					auto tempRegion( GridRegion( leftPartition.Max, thisPartition.Min, DirDirection, tempCellWidths ) );
 					cellCountUpToNow += this->getCellWidthsCount( DirDirection );
 					++regionIndex;
 					this->getCellWidths( tempRegion, tempRegion.thisRegionType );
@@ -3494,7 +3492,7 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Create region for this partition
-				auto & tempRegion( GridRegion( thisPartition.Min, thisPartition.Max, thisPartition.thisRegionType, tempCellWidths ) );
+				auto tempRegion( GridRegion( thisPartition.Min, thisPartition.Max, thisPartition.thisRegionType, tempCellWidths ) );
 				++cellCountUpToNow;
 				++regionIndex;
 				this->getCellWidths( tempRegion, tempRegion.thisRegionType );
@@ -3537,7 +3535,7 @@ namespace PlantPipingSystemsManager {
 
 			// Create final region
 			auto & thisPartition( ThesePartitionRegions( ThesePartitionRegions.u1() ) );
-			auto & tempRegion( GridRegion( thisPartition.Max, DirExtentMax, DirDirection, tempCellWidths ) );
+			auto tempRegion( GridRegion( thisPartition.Max, DirExtentMax, DirDirection, tempCellWidths ) );
 			cellCountUpToNow += this->getCellWidthsCount( DirDirection );
 			++regionIndex;
 			this->getCellWidths( tempRegion, tempRegion.thisRegionType );
@@ -3545,7 +3543,7 @@ namespace PlantPipingSystemsManager {
 
 		} else {
 			// Need to create a region anyway if no partitions exist
-			auto & tempRegion( GridRegion( 0.0, DirExtentMax, DirDirection, tempCellWidths ) );
+			auto tempRegion( GridRegion( 0.0, DirExtentMax, DirDirection, tempCellWidths ) );
 			cellCountUpToNow += this->getCellWidthsCount( DirDirection );
 			++regionIndex;
 			this->getCellWidths( tempRegion, tempRegion.thisRegionType );
