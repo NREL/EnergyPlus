@@ -11155,7 +11155,6 @@ namespace HVACUnitarySystem {
 		Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
 		Real64 CpHeatRec; // Heat reclaim water inlet specIFic heat [J/kg-K]
-		Real64 HeatRecInletEnth; // Heat reclaim water inlet enthalpy [J/kg]
 		Real64 ReportingConstant;
 
 		ReportingConstant = TimeStepSys * SecInHour;
@@ -11166,7 +11165,6 @@ namespace HVACUnitarySystem {
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
-		HeatRecInletEnth = Node( HeatRecInNode ).Enthalpy;
 
 		// Set heat recovery mass flow rates
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
@@ -11180,7 +11178,7 @@ namespace HVACUnitarySystem {
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
 			// coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the coil
 			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) {
-				HeatRecOutletTemp = UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp;
+				HeatRecOutletTemp = max( HeatRecInletTemp, UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp );
 				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
 			}
 		} else {
@@ -11191,12 +11189,6 @@ namespace HVACUnitarySystem {
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );
 		// changed outputs
 		Node( HeatRecOutNode ).Temp = HeatRecOutletTemp;
-
-		// where does outlet node enthalpy get calculated? I can't find where water components set the outlet node enthalpy.
-//		Node( HeatRecOutNode ).Enthalpy = HeatRecInletEnth + SafeDivide( QHeatRec, HeatRecMassFlowRate );
-
-		// try to force another iteration to pass water temps around the loop. Didn't work.		
-//		if( abs( HeatRecOutletTemp - UnitarySystem( UnitarySysNum ).HeatRecoveryOutletTemp ) > DataConvergParams::PlantTemperatureToler ) DataHVACGlobals::SimPlantLoopsFlag = true;
 
 		UnitarySystem( UnitarySysNum ).HeatRecoveryRate = QHeatRec;
 		UnitarySystem( UnitarySysNum ).HeatRecoveryEnergy = UnitarySystem( UnitarySysNum ).HeatRecoveryRate * ReportingConstant;
