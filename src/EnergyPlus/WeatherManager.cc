@@ -3105,7 +3105,7 @@ namespace WeatherManager {
 				Wthr.LiquidPrecip( Hour ) = TomorrowLiquidPrecip( 1, Hour );
 			}
 
-			if ( ! LastHourSet ) {
+			if ( !LastHourSet ) {
 				// For first day of weather, all time steps of the first hour will be
 				// equal to the first hour's value.
 				LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp( 24 );
@@ -3193,33 +3193,33 @@ namespace WeatherManager {
 				LastHrLiquidPrecip = Wthr.LiquidPrecip( Hour );
 
 			} // End of Hour Loop
+		}
 
-			if ( Environment( Environ ).WP_Type1 != 0 ) {
-				{ auto const SELECT_CASE_var( WPSkyTemperature( Environment( Environ ).WP_Type1 ).CalculationType );
+		if ( Environment( Environ ).WP_Type1 != 0 ) {
+			{ auto const SELECT_CASE_var( WPSkyTemperature( Environment( Environ ).WP_Type1 ).CalculationType );
 
-				if ( SELECT_CASE_var == WP_ScheduleValue ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
-				} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
-					for ( Hour = 1; Hour <= 24; ++Hour ) {
-						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
-						}
+			if ( SELECT_CASE_var == WP_ScheduleValue ) {
+				GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
+			} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
+				GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
+				for ( Hour = 1; Hour <= 24; ++Hour ) {
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 					}
+				}
 
-				} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
-					for ( Hour = 1; Hour <= 24; ++Hour ) {
-						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
-						}
+			} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
+				GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
+				for ( Hour = 1; Hour <= 24; ++Hour ) {
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 					}
+				}
 
-				} else {
+			} else {
 
-				}}
+			}}
 
-			}
 		}
 
 	}
