@@ -351,6 +351,33 @@ namespace MixedAir {
 			HighHumCtrlActive( false )
 		{}
 
+		void
+		CalcOAController(
+			int const AirLoopNum
+		);
+
+		void
+		CalcOAEconomizer(
+			int const AirLoopNum,
+			Real64 const OutAirMinFrac,
+			Real64 & OASignal,
+			bool & EconomizerOperationFlag,
+			bool & HighHumidityOperationFlag
+		);
+
+		void
+		SizeOAController();
+
+		void
+		UpdateOAController();
+
+		void
+		Checksetpoints(
+			Real64 const OutAirMinFrac, // Local variable used to calculate min OA fraction
+			Real64 & OutAirSignal, // Used to set OA mass flow rate
+			bool & EconomizerOperationFlag // logical used to show economizer status
+		);
+
 	};
 
 	struct VentilationMechanicalProps // Derived type for Ventilation:Mechanical data
@@ -607,26 +634,10 @@ namespace MixedAir {
 	//******************************************************************************
 
 	void
-	CalcOAController(
-		int const OAControllerNum,
-		int const AirLoopNum
-	);
-
-	void
 	CalcMechVentController(
 		int const VentMechObjectNum,
 		Real64 & SysSA,
 		Real64 & MechVentOutsideAirFlow
-	);
-
-	void
-	CalcOAEconomizer(
-		int const OAControllerNum,
-		int const AirLoopNum,
-		Real64 const OutAirMinFrac,
-		Real64 & OASignal,
-		bool & EconomizerOperationFlag,
-		bool & HighHumidityOperationFlag
 	);
 
 	void
@@ -638,9 +649,6 @@ namespace MixedAir {
 	// Beginning Sizing Section of the Module
 	//******************************************************************************
 
-	void
-	SizeOAController( int const OAControllerNum );
-
 	// End of Sizing Section of the Module
 	//******************************************************************************
 
@@ -648,16 +656,10 @@ namespace MixedAir {
 	//******************************************************************************
 
 	void
-	UpdateOAController( int const OAControllerNum );
-
-	void
 	UpdateOAMixer( int const OAMixerNum );
 
 	void
 	ReportOAMixer( int const OAMixerNum ); // unused1208
-
-	void
-	ReportOAController( int const OAControllerNum ); // unused1208
 
 	// End of Sizing Section of the Module
 	//******************************************************************************
@@ -765,14 +767,6 @@ namespace MixedAir {
 		bool & IsNotOK, // Pass through to VerifyName
 		bool & IsBlank, // Pass through to VerifyName
 		std::string const & SourceID // Pass through to VerifyName
-	);
-
-	void
-	Checksetpoints(
-		int const OAControllerNum, // index to OA controller
-		Real64 const OutAirMinFrac, // Local variable used to calculate min OA fraction
-		Real64 & OutAirSignal, // Used to set OA mass flow rate
-		bool & EconomizerOperationFlag // logical used to show economizer status
 	);
 
 	int
