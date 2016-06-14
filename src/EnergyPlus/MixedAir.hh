@@ -282,6 +282,8 @@ namespace MixedAir {
 		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
 		int MixedAirSPMNum; // index of mixed air setpoint manager
 		bool CoolCoilFreezeCheck; // if true, cooling coil freezing is prevented by recalculating the amount of OA
+		bool EconoActive; // if true economizer is active
+		bool HighHumCtrlActive; // if true high humidity control is active
 
 		// Default Constructor
 		OAControllerProps() :
@@ -344,7 +346,9 @@ namespace MixedAir {
 			DemandLimitFlowRate( 0.0 ),
 			MaxOAFracBySetPoint( 0 ),
 			MixedAirSPMNum( 0 ),
-			CoolCoilFreezeCheck( false )
+			CoolCoilFreezeCheck( false ),
+			EconoActive( false ),
+			HighHumCtrlActive( false )
 		{}
 
 	};

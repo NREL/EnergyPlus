@@ -2028,7 +2028,6 @@ namespace MixedAir {
 			NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
 			NumOAControllers += NumERVControllers;
 			OAController.allocate( NumOAControllers );
-			OAControllerInfo.allocate( NumOAControllers );
 			AllocateOAControllersFlag = false;
 		}
 
@@ -3451,7 +3450,6 @@ namespace MixedAir {
 
 		// Assign references
 		auto & thisController( OAController( OAControllerNum ) );
-		auto & thisControllerInfo( OAControllerInfo( OAControllerNum ) );
 		if ( AirLoopNum > 0 ) {
 			AirLoopCyclingFan = ( AirLoopControlInfo( AirLoopNum ).FanOpMode == CycFanCycCoil );
 		} else {
@@ -3473,8 +3471,8 @@ namespace MixedAir {
 			thisController.HighHumCtrlStatus = 0; // high humdity control status for reporting
 			thisController.OAFractionRpt = 0.0; // actual OA fraction for reporting
 
-			thisControllerInfo.EconoActive = false; // DataAirLoop variable (OA Controllers)
-			thisControllerInfo.HighHumCtrlActive = false; // DataAirLoop variable (OA Controllers)
+			thisController.EconoActive = false; // DataAirLoop variable (OA Controllers)
+			thisController.HighHumCtrlActive = false; // DataAirLoop variable (OA Controllers)
 
 			// also reset air loop data for use by other routines
 			if ( AirLoopNum > 0 ) {
@@ -4186,7 +4184,6 @@ namespace MixedAir {
 
 		// Assign references
 		auto & thisController( OAController( OAControllerNum ) );
-		auto & thisControllerInfo( OAControllerInfo( OAControllerNum ) );
 
 		if ( AirLoopNum > 0 ) {
 			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
@@ -4425,27 +4422,27 @@ namespace MixedAir {
 		if ( thisController.Econo == NoEconomizer ) {
 			// No economizer
 			thisController.EconomizerStatus = 0;
-			thisControllerInfo.EconoActive = false;
+			thisController.EconoActive = false;
 		} else {
 			// With economizer.
 			if ( EconomizerOperationFlag ) {
 				// Economizer is enabled
 				thisController.EconomizerStatus = 1;
-				thisControllerInfo.EconoActive = true;
+				thisController.EconoActive = true;
 			} else {
 				// Economizer is disabled
 				thisController.EconomizerStatus = 0;
-				thisControllerInfo.EconoActive = false;
+				thisController.EconoActive = false;
 			}
 		}
 
 		// Set high humidity control report variable and status flag
 		if ( HighHumidityOperationFlag ) {
 			thisController.HighHumCtrlStatus = 1;
-			thisControllerInfo.HighHumCtrlActive = true;
+			thisController.HighHumCtrlActive = true;
 		} else {
 			thisController.HighHumCtrlStatus = 0;
-			thisControllerInfo.HighHumCtrlActive = false;
+			thisController.HighHumCtrlActive = false;
 		}
 
 	}

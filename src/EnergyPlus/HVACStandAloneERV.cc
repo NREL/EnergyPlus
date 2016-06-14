@@ -1068,7 +1068,7 @@ namespace HVACStandAloneERV {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ERVStandAlone_Num;
 		using MixedAir::SimOAController;
-		using DataAirLoop::OAControllerInfo;
+		using MixedAir::OAController;
 
 		// Locals
 		static Array1D_bool MySizeFlag;
@@ -1180,7 +1180,7 @@ namespace HVACStandAloneERV {
 
 			if ( GetCurrentScheduleValue( StandAloneERV( StandAloneERVNum ).SupplyAirFanSchPtr ) > 0 || ( ZoneCompTurnFansOn && ! ZoneCompTurnFansOff ) ) {
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					if ( OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
+					if ( OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
 						Node( SupInletNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignSAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxSupAirMassFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
 					} else {
 						Node( SupInletNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignSAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxSupAirMassFlow );
@@ -1196,7 +1196,7 @@ namespace HVACStandAloneERV {
 
 			if ( GetCurrentScheduleValue( StandAloneERV( StandAloneERVNum ).ExhaustAirFanSchPtr ) > 0 ) {
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					if ( OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
+					if ( OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
 						Node( ExhInNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignEAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxExhAirMassFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
 					} else {
 						Node( ExhInNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignEAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxExhAirMassFlow );
@@ -1522,7 +1522,7 @@ namespace HVACStandAloneERV {
 		using Psychrometrics::PsyHFnTdbW;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using General::RoundSigDigits;
-		using DataAirLoop::OAControllerInfo;
+		using MixedAir::OAController;
 		using DataHeatBalance::ZoneAirMassFlow;
 
 		// Locals
@@ -1565,8 +1565,8 @@ namespace HVACStandAloneERV {
 
 		// Get stand alone ERV's controller economizer and high humidity control status
 		if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-			EconomizerFlag = OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).EconoActive;
-			HighHumCtrlFlag = OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive;
+			EconomizerFlag = OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).EconoActive;
+			HighHumCtrlFlag = OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive;
 		} else {
 			EconomizerFlag = false;
 			HighHumCtrlFlag = false;
