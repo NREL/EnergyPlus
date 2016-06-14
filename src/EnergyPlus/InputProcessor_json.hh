@@ -1,5 +1,5 @@
-#ifndef InputProcessor_hh_INCLUDED
-#define InputProcessor_hh_INCLUDED
+//#ifndef InputProcessor_hh_INCLUDED
+//#define InputProcessor_hh_INCLUDED
 
 // C++ Headers
 #include <iosfwd>
@@ -18,13 +18,14 @@
 #include <DataGlobals.hh>
 #include <UtilityRoutines.hh>
 
-#ifndef IdfParser_hh_INCLUDED
-#define IdfParser_hh_INCLUDED
+//#ifndef IdfParser_hh_INCLUDED
+//#define IdfParser_hh_INCLUDED
 
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <fstream>
+#include "InputProcessor_json.hh"
 #include "nlohmann/json/src/json.hpp"
 
 using json = nlohmann::json;
