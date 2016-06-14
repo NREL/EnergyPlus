@@ -68,13 +68,19 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataRuntimeLanguage;
+using namespace EnergyPlus::PlantUtilities;
 using namespace ObjexxFCL;
 
 TEST_F( EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators )
@@ -124,7 +130,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators )
 
 TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 
 		"OutdoorAir:Node, Test node;",
@@ -145,10 +151,10 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 		"EnergyManagementSystem:ProgramCallingManager,",
 		"Dual Setpoint Test Manager,  !- Name",
 		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
-		"DualSetpiontTestControl;  !- Program Name 1",
+		"DualSetpointTestControl;  !- Program Name 1",
 
 		"EnergyManagementSystem:Program,",
-		"DualSetpiontTestControl,",
+		"DualSetpointTestControl,",
 		"Set TempSetpointLo = 16.0,",
 		"Set TempSetpointHi  = 20.0;",
 
@@ -171,6 +177,337 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
 
 		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
+
+}
+
+TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlowRate ) {
+
+		// test EMS actuator for Plant Component
+		// test SetActuatedBranchFlowRate for expected response
+
+		std::string const idf_objects = delimited_string( { 
+		" EnergyManagementSystem:Actuator,",
+		"  CoilActuator,          !- Name",
+		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
+		"  Plant Component Coil:Heating:Water,    !- Actuated Component Type",
+		"  On/Off Supervisory;    !- Actuated Component Control Type",
+
+		" EnergyManagementSystem:ProgramCallingManager,",
+		"  Supervisory Control Manager,  !- Name",
+		"  BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+		"  HeatCoilController;  !- Program Name 1",
+
+		" EnergyManagementSystem:Program,",
+		"  HeatCoilController,",
+		"  Set CoilActuator = 0.0;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		// sets number of EMS objects
+		EMSManager::CheckIfAnyEMS();
+
+		// allows NodeSetpoint and AvailabilityManagers actuators to be setup
+		EMSManager::FinishProcessingUserInput = true;
+
+		// set up plant loop
+		DataPlant::TotNumLoops = 1;
+		PlantLoop.allocate( 1 );
+		PlantLoop( 1 ).Name = "MyPlant";
+		for ( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+		// create 2 components on a single branch to simulate water flow control for entire branch
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 2 );
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 41; // Coil:Heating:Water
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "Zone1FanCoilHeatingCoil";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).TypeOf_Num = 21; // Pipe:Adiabatic
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).Name = "Pipe";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumIn = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 3;
+		PlantCondLoopOperation::SetupPlantEMSActuators();
+
+		// set flow, max and maxavail on the nodes
+		Node.allocate( 3 );
+		Real64 NodeMdot( 1.5 );
+		Node( 1 ).MassFlowRate = NodeMdot;
+		Node( 1 ).MassFlowRateMax = NodeMdot;
+		Node( 1 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 1 ).MassFlowRateRequest = NodeMdot;
+		Node( 2 ).MassFlowRate = NodeMdot;
+		Node( 2 ).MassFlowRateMax = NodeMdot;
+		Node( 2 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 2 ).MassFlowRateRequest = NodeMdot;
+		Node( 3 ).MassFlowRate = NodeMdot;
+		Node( 3 ).MassFlowRateMax = NodeMdot;
+		Node( 3 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 3 ).MassFlowRateRequest = NodeMdot;
+
+		bool anyRan;
+		// set up EMS
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+
+		//set dummy EMS value
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
+
+		// dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
+
+		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+
+		// expect node data to represent full flow
+		// SetActuatedBranchFlowRate( CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
+		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		SetActuatedBranchFlowRate( NodeMdot, 2, 1, 1, 1, false );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
+	
+		//set dummy EMS value
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
+
+		// dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan );
+
+		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 1.0, 0.000001 );
+		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		SetActuatedBranchFlowRate( NodeMdot, 2, 1, 1, 1, false );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
+
+		// dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
+		// override flag should also be true
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
+
+		EXPECT_TRUE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+
+		// expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
+		SetActuatedBranchFlowRate( NodeMdot, 1, 1, 1, 1, false );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, 0.0 );
+		SetActuatedBranchFlowRate( NodeMdot, 2, 1, 1, 1, false );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, 0.0 );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, 0.0 );
+
+}
+
+TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate ) {
+
+		// test EMS actuator for Plant Component
+		// test SetComponentFlowRate for expected response
+
+		std::string const idf_objects = delimited_string( { 
+		" EnergyManagementSystem:Actuator,",
+		"  CoilActuator,          !- Name",
+		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
+		"  Plant Component Coil:Heating:Water,    !- Actuated Component Type",
+		"  On/Off Supervisory;    !- Actuated Component Control Type",
+
+		" EnergyManagementSystem:ProgramCallingManager,",
+		"  Supervisory Control Manager,  !- Name",
+		"  BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+		"  HeatCoilController;  !- Program Name 1",
+
+		" EnergyManagementSystem:Program,",
+		"  HeatCoilController,",
+		"  Set CoilActuator = 0.0;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		// sets number of EMS objects
+		EMSManager::CheckIfAnyEMS();
+
+		// allows NodeSetpoint and AvailabilityManagers actuators to be setup
+		EMSManager::FinishProcessingUserInput = true;
+
+		// set up plant loop
+		DataPlant::TotNumLoops = 1;
+		PlantLoop.allocate( 1 );
+		PlantLoop( 1 ).Name = "MyPlant";
+		for ( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+		// create 2 components on a single branch to simulate water flow control for entire branch
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 2 );
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 41; // Coil:Heating:Water
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "Zone1FanCoilHeatingCoil";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).TypeOf_Num = 21; // Pipe:Adiabatic
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).Name = "Pipe";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumIn = 2;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 3;
+		PlantCondLoopOperation::SetupPlantEMSActuators();
+
+		// set flow, max and maxavail on the nodes
+		Node.allocate( 3 );
+		Real64 NodeMdot( 1.5 );
+		Node( 1 ).MassFlowRate = NodeMdot;
+		Node( 1 ).MassFlowRateMax = NodeMdot;
+		Node( 1 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 1 ).MassFlowRateRequest = NodeMdot;
+		Node( 2 ).MassFlowRate = NodeMdot;
+		Node( 2 ).MassFlowRateMax = NodeMdot;
+		Node( 2 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 2 ).MassFlowRateRequest = NodeMdot;
+		Node( 3 ).MassFlowRate = NodeMdot;
+		Node( 3 ).MassFlowRateMax = NodeMdot;
+		Node( 3 ).MassFlowRateMaxAvail = NodeMdot;
+		Node( 3 ).MassFlowRateRequest = NodeMdot;
+
+		bool anyRan;
+		// set up EMS
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+		//set dummy EMS value
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
+
+		// dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
+
+		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+
+		// expect node data to represent full flow
+		// SetComponentFlowRate( CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
+		SetComponentFlowRate( NodeMdot, 1, 2, 1, 1, 1, 1 );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		SetComponentFlowRate( NodeMdot, 2, 3, 1, 1, 1, 1 );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
+	
+		//set dummy EMS value
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
+
+		// dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan );
+
+		EXPECT_FALSE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 1.0, 0.000001 );
+
+		// expect node data to represent full flow
+		SetComponentFlowRate( NodeMdot, 1, 2, 1, 1, 1, 1 );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		SetComponentFlowRate( NodeMdot, 2, 3, 1, 1, 1, 1 );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
+
+		// dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
+		// override flag should also be true
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
+
+		EXPECT_TRUE(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideOn );
+		EXPECT_NEAR(PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue, 0.0, 0.000001 );
+		Real64 tempNodeMdot( NodeMdot );
+
+		// expect node data to represent no flow. Max, MaxAvail, and Request are not changed
+		SetComponentFlowRate( tempNodeMdot, 1, 2, 1, 1, 1, 1 );
+		EXPECT_EQ(Node( 1 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 1 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		tempNodeMdot = NodeMdot;
+		SetComponentFlowRate( tempNodeMdot, 2, 3, 1, 1, 1, 1 );
+		EXPECT_EQ(Node( 2 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 2 ).MassFlowRateRequest, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRate, 0.0 );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
+		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
 
 }
 
@@ -425,10 +762,10 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 
 
 TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
-		// small test to demonstrate new boolean argument. 
+		// small test to demonstrate new boolean argument.
 		// shows a simple way to setup sensor on a node, need to call SetupNodeVarsForReporting()
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
 
 		"OutdoorAir:Node, Test node;",
@@ -442,7 +779,7 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 		"Test inside HVAC system iteration Loop,",
 		"InsideHVACSystemIterationLoop,",
 		"Test_InsideHVACSystemIterationLoop;",
-	
+
 		"EnergyManagementSystem:Program,",
 		"Test_InsideHVACSystemIterationLoop,",
 		"set dumm1 = Node_mdot;",
@@ -468,5 +805,27 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 		EXPECT_TRUE( anyRan );
 
 }
+
+
+TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
+
+	using DataGlobals::AnyEnergyManagementSystemInModel;
+
+	std::string const idf_objects = delimited_string( {
+    	"  Output:EnergyManagementSystem,                                                                ",
+		"    Verbose,                 !- Actuator Availability Dictionary Reporting                      ",
+		"    Verbose,                 !- Internal Variable Availability Dictionary Reporting             ",
+		"    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	CheckIfAnyEMS();
+	EXPECT_TRUE( AnyEnergyManagementSystemInModel );
+
+
+}
+
+
 
 

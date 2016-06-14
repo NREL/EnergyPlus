@@ -1289,7 +1289,10 @@ namespace SetPointManager {
 	ManageSetPoints();
 
 	void
-	GetSetPointManagerInputs();
+	GetSetPointManagerInputs(); // wrapper for GetInput to accomodate unit testing
+
+	void
+	GetSetPointManagerInputData( bool & ErrorsFound );
 
 	void
 	VerifySetPointManagers( bool & ErrorsFound ); // flag to denote node conflicts in input. !unused1208
