@@ -3166,19 +3166,7 @@ namespace WeatherManager {
 					TomorrowOutDewPointTemp( TS, Hour ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
 					TomorrowOutRelHum( TS, Hour ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
 					TomorrowWindSpeed( TS, Hour ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
-					curHrWindDir = Wthr.WindDir( Hour );
-					if ( LastHrWindDir < 90 && curHrWindDir > 270. ) {
-						tomorrowWindDirTS = LastHrWindDir * WtPrevHour + ( curHrWindDir - 360. ) * WtNow;
-					} else if( LastHrWindDir > 270 && curHrWindDir < 90. ){
-						tomorrowWindDirTS = ( LastHrWindDir - 360. ) * WtPrevHour + curHrWindDir * WtNow;
-					} else {
-						tomorrowWindDirTS = LastHrWindDir * WtPrevHour + curHrWindDir * WtNow;
-					}
-					if ( tomorrowWindDirTS < 0. ){
-						TomorrowWindDir( TS, Hour ) = tomorrowWindDirTS + 360.;
-					} else{
-						TomorrowWindDir( TS, Hour ) = tomorrowWindDirTS;
-					}
+					TomorrowWindDir( TS, Hour ) = interpolateWindDirection( LastHrWindDir, WtPrevHour, Wthr.WindDir( Hour ), WtNow );
 					TomorrowHorizIRSky( TS, Hour ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
 					if ( Environment( Environ ).WP_Type1 == 0 ) {
 						TomorrowSkyTemp( TS, Hour ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
@@ -3236,6 +3224,29 @@ namespace WeatherManager {
 
 		}
 
+	}
+
+
+	Real64
+	interpolateWindDirection(
+		Real64 const prevHrWindDir,
+		Real64 const prevHrWeight,
+		Real64 const curHrWindDir,
+		Real64 const curHrWeight
+	)
+	{
+		Real64 interpolatedWindDir = 0.;
+		if ( prevHrWindDir < 90 && curHrWindDir > 270. ) {
+			interpolatedWindDir = prevHrWindDir * prevHrWeight + ( curHrWindDir - 360. ) * curHrWeight;
+		} else if ( prevHrWindDir > 270 && curHrWindDir < 90. ){
+			interpolatedWindDir = ( prevHrWindDir - 360. ) * prevHrWeight + curHrWindDir * curHrWeight;
+		} else {
+			interpolatedWindDir = prevHrWindDir * prevHrWeight + curHrWindDir * curHrWeight;
+		}
+		if ( interpolatedWindDir < 0. ){
+			interpolatedWindDir += 360.;
+		}
+		return interpolatedWindDir;
 	}
 
 	void
