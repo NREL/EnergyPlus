@@ -1893,3 +1893,70 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits) {
 
 	EXPECT_FALSE(has_err_output());
 }
+
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits2) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Table:TwoIndependentVariables,",
+		"TestTable1,              !- Name",
+		"BiQuadratic,             !- Curve Type",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
+		"0,                       !- Minimum Value of X",
+		"5,                       !- Maximum Value of X",
+		"0,                       !- Minimum Value of Y",
+		"4,                       !- Maximum Value of Y",
+		",                        !- Minimum Table Output",
+		",                        !- Maximum Table Output",
+		"Dimensionless,           !- Input Unit Type for X",
+		"Dimensionless,           !- Input Unit Type for Y",
+		"Dimensionless,           !- Output Unit Type",
+		",                        !- Normalization Reference",
+		"0.0, 0.0, 0.0,           !- X Value, Y Value, Output Value #1",
+		"1.0, 1.0, 2.0,           !- X Value, Y Value, Output Value #2",
+		"2.0, 0.0, 2.0,           !- X Value, Y Value, Output Value #3",
+		"3.0, 1.0, 3.0,           !- X Value, Y Value, Output Value #4",
+		"4.0, 0.0, 4.0,           !- X Value, Y Value, Output Value #5",
+		"5.0, 2.0, 2.0,           !- X Value, Y Value, Output Value #6",
+		"5.0, 1.0, 1.0,           !- X Value, Y Value, Output Value #7",
+		"6.0, 1.0, 0.0,           !- X Value, Y Value, Output Value #8",
+		"5.0, 1.0, 1.5,           !- X Value, Y Value, Output Value #9",
+		"4.0, 1.0, 4.0;           !- X Value, Y Value, Output Value #10" });
+
+	ASSERT_FALSE(process_idf(idf_objects));
+
+	EXPECT_EQ(0, CurveManager::NumCurves);
+	CurveManager::GetCurveInput();
+	CurveManager::GetCurvesInputFlag = false;
+	ASSERT_EQ(1, CurveManager::NumCurves);
+
+	// QuadraticLinear curve type, no min/max for y
+	EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
+	EXPECT_EQ("TESTTABLE1", CurveManager::GetCurveName(1));
+	EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLE1"));
+	bool error = false;
+	int index = CurveManager::GetCurveCheck("TESTTABLE1", error, "TEST");
+	EXPECT_FALSE(error);
+	EXPECT_EQ(1, index);
+	Real64 min1, max1, min2, max2;
+	CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
+	EXPECT_EQ(0, min1);
+	EXPECT_EQ(6, max1);
+	EXPECT_EQ(0, min2);
+	EXPECT_EQ(4, max2);
+	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+
+	EXPECT_DOUBLE_EQ(-0.40430482838859316, CurveManager::CurveValue(1, 0, 0)); // In-range value
+	EXPECT_NEAR(2.7755053810354879, CurveManager::CurveValue(1, 0.5, 1.5),1.0e-13); // In-range value
+	EXPECT_DOUBLE_EQ(-0.40430482838859316, CurveManager::CurveValue(1, -10, 0.0)); // Minimum x
+	EXPECT_DOUBLE_EQ(1.9569517161140251, CurveManager::CurveValue(1, 10, 0.0)); // Maximum x
+	EXPECT_DOUBLE_EQ(-0.40430482838859316, CurveManager::CurveValue(1, 0, -5000)); // Minimum y
+	EXPECT_DOUBLE_EQ(15.046829552065159, CurveManager::CurveValue(1, 0, 5000)); // Maximum y
+
+	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.5, 1.0);
+	EXPECT_FALSE(error);
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0, 1.5)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5, 1.5)); // Value too large
+
+	EXPECT_FALSE(has_err_output());
+}
