@@ -1461,11 +1461,13 @@ namespace OutdoorAirUnit {
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
-				if ( OutAirUnit( OAUnitNum ).ExtFan ) SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
 			} else if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-				if ( OutAirUnit( OAUnitNum ).ExtFan ) SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+			}
+			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 			}
 
 		} else { // System On
@@ -1502,6 +1504,7 @@ namespace OutdoorAirUnit {
 
 			if ( OutAirUnit( OAUnitNum ).FanPlace == BlowThru ) {
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 				DesOATemp = Node( SFanOutletNode ).Temp;
 			} else if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
 				DesOATemp = Node( OutsideAirNode ).Temp;
@@ -1562,10 +1565,14 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).FanCorTemp = ( Node( OutletNode ).Temp - OutAirUnit( OAUnitNum ).CompOutSetTemp );
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 
 				OutAirUnit( OAUnitNum ).FanEffect = false;
 			}
-			if ( OutAirUnit( OAUnitNum ).ExtFan ) SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
+			}
 		} // ...end of system ON/OFF IF-THEN block
 
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
@@ -1611,8 +1618,6 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).LatCoolingRate = 0.0;
 			OutAirUnit( OAUnitNum ).LatHeatingRate = LatLoadMet;
 		}
-
-		OutAirUnit( OAUnitNum ).ElecFanRate = FanElecPower;
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;

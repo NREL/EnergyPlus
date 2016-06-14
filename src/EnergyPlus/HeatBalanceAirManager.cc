@@ -2795,18 +2795,18 @@ namespace HeatBalanceAirManager {
 			}
 			// Set up zone air mass balance output variables
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
 				if ( ZoneAirMassFlow.BalanceMixing && ( ( MassConservation( ZoneNum ).NumSourceZonesMixingObject + MassConservation( ZoneNum ).NumReceivingZonesMixingObject ) > 0 ) ) {
-					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
 				}
 				if ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) {
 					if ( ZoneAirMassFlow.InfiltrationZoneType == AllZones || (MassConservation( ZoneNum ).NumSourceZonesMixingObject > 0 ) ) {
 						if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
-							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( Infiltration( Loop ).ZonePtr ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( Mixing( Loop ).ZonePtr ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( ZoneNum ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
 						}
 					}
 				}
