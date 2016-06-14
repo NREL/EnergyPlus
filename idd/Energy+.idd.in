@@ -59498,6 +59498,8 @@ PipingSystem:Underground:PipeCircuit,
         \reference validPlantEquipmentNames
         \reference-class-name validCondenserEquipmentTypes
         \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    N1,  \field Pipe Thermal Conductivity
         \required-field
         \type real
@@ -67988,6 +67990,8 @@ ThermalStorage:ChilledWater:Stratified,
        \type alpha
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Tank Volume
        \required-field
        \type real

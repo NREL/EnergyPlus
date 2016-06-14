@@ -1784,8 +1784,6 @@ namespace EnergyPlus {
 			LineItem.Alphas.allocate( MaxAlphaArgsFound );
 			LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
 
-			InitReferenceObjectsClass();
-
 			bool end_of_file( false );
 			bool blank_line( false );
 			std::string::size_type current_pos;
@@ -1804,11 +1802,11 @@ namespace EnergyPlus {
 			EXPECT_EQ( "BRANCH", ObjectRefClass( 3 ).Name );
 			EXPECT_EQ( BranchEquipListType, ObjectRefClass( 3 ).RefObjType );
 
-			std::string const objectList_name( "BRANCH" );
+			std::string const objectList_name( "BRANCH" );			
 			auto index = FindItemInSortedList( objectList_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 			
-			EXPECT_EQ( "BRANCH", ObjectDef( index ).Name );
+			EXPECT_EQ( objectList_name, ObjectDef( index ).Name );
 			EXPECT_TRUE( ObjectDef( index ).ObjectListFields( 4 ) );
 			EXPECT_TRUE( ObjectDef( index ).ObjectListFields( 9 ) );
 			EXPECT_TRUE( ObjectDef( index ).ObjectListFields( 14 ) );
