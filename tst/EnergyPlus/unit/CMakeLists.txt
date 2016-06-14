@@ -25,6 +25,7 @@ set( test_src
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
+  CurveManager.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc

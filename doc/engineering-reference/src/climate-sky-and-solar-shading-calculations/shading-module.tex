@@ -574,7 +574,7 @@ DBZone(ZoneNum) = BTOTZone - BABSZone{\rm{    [}}{{\rm{m}}^{\rm{2}}}]
 
 where
 
-\emph{BTOTZone} = total beam solar incident on the zone's exterior windows that is transmitted as beam or diffuse.\protect\hyperlink{ux5fftn1}{{[}1{]}}
+\emph{BTOTZone} = total beam solar incident on the zone's exterior windows that is transmitted as beam or diffuse.\footnote{For beam incident on an exterior window we have the following: For transparent glass with no shade or blind there is only beam-to-beam transmission. For diffusing glass, or if a window shade is in place, there is only beam-to-diffuse transmission. If a window blind is in place there is beam-to-diffuse transmission, and, depending on slat angle, solar profile angle, etc., there can also be beam-to-beam transmission.}
 
 \emph{BABSZone =} total beam solar absorbed inside the zone.
 
@@ -584,7 +584,7 @@ where
 BTOTZone = \sum\limits_{i = 1}^{{N_{extwin}}} {TBmAl{l_i}*SunlitFrac{t_i}*CosIn{c_i}*Are{a_i}*InOutprojSLFracMul{t_i}}
 \end{equation}
 
-\emph{+ Diffuse entering zone from beam reflected by window inside reveal surfaces\protect\hyperlink{ux5fftn2}{\textbf{{[}2{]}}}}
+\emph{+ Diffuse entering zone from beam reflected by window inside reveal surfaces\footnote{See ``Beam Solar Reflection from Window Reveal Surfaces.''}}
 
 \emph{+ Diffuse transmitted by windows from beam reflected by outside reveal surfaces}
 
@@ -604,7 +604,7 @@ Here,
 
 \emph{BABSZone} is given by the following sum (see Figure~\ref{fig:vertical-section-through-a-two-zone-building}):
 
-\emph{BABSZone} = ~ \emph{Beam absorbed by opaque inside surfaces\protect\hyperlink{ux5fftn3}{\textbf{{[}3{]}}}}
+\emph{BABSZone} = ~ \emph{Beam absorbed by opaque inside surfaces}\footnote{If Solar Distribution = FullInteriorAndExterior in the Building object, the program calculates where beam solar from exterior windows falls inside the zone. Otherwise, all beam solar is assumed to fall on the floor.}
 
 \emph{~~~~~~~~~~~~~~~~~~~~~~~ + Beam transmitted through the zone's interior windows +}
 
@@ -637,7 +637,7 @@ where
 
 \paragraph{Interior Beam Radiation}\label{interior-beam-radiation}
 
-The inside beam solar irradiance factor\protect\hyperlink{ux5fftn4}{{[}4{]}} in is given by:
+The inside beam solar irradiance factor\footnote{For the purposes of the surface heat balance calculation, any beam solar radiation absorbed by a surface is assumed to be uniformly distributed over the surface even though in reality it is likely to be concentrated in one or more discrete patches on the surface.} in is given by:
 
 \(AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}}\) where
 
@@ -647,7 +647,7 @@ The inside beam solar irradiance factor\protect\hyperlink{ux5fftn4}{{[}4{]}} in 
 
 \emph{CosInc\(_{i}\)} = cosine of angle of incidence of beam on exterior window \emph{i}
 
-\emph{TBm\(_{i}\)} = beam-to-beam transmittance of exterior window* i\emph{at}CosInc\(_{i}\)* \protect\hyperlink{ux5fftn5}{{[}5{]}}
+\emph{TBm\(_{i}\)} = beam-to-beam transmittance of exterior window \(i\) at \(CosInc_{i}\)\footnote{\emph{TBm\(_{i}\)}is zero if the window has diffusing glass or a shade. \emph{TBm\(_{i}\)} can be \textgreater{} 0 if a blind is present and the slat angle, solar profile angle, etc., are such that some beam passes between the slats.}
 
 \emph{Aoverlap\(_{i}\)(SurfNum)} = beam solar irradiated area of surface \emph{SurfNum} projected back onto the plane of exterior window \emph{i} (the \emph{Aoverlap}'s for an exterior window sum up to the glazed area of the window). These overlap areas (Figure~\ref{fig:vertical-section-through-a-two-zone-building}) are determined with the EnergyPlus shadowing routines by considering a zone's exterior window as a ``sending'' surface and the inside faces of the zone's other surfaces as ``receiving'' surfaces (see ``Shading Module''). The overlap areas for a particular exterior window depend on the sun position, the geometry of the window, the geometry of the interior surfaces, and the location of the window with respect to the interior surfaces.
 
