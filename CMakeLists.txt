@@ -199,6 +199,7 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/AppGPostProcess PROJECT AppGPostProcess NO_EXTERNAL_INSTALL )
 endif()
 
 if( BUILD_PACKAGE )
@@ -210,25 +211,25 @@ if( BUILD_PACKAGE )
     message( SEND_ERROR "Git not found while building package, error")
   endif()
 
-  if ( NOT EXISTS "${CMAKE_BINARY_DIR}/BuildSupport" ) 
+  if ( NOT EXISTS "${CMAKE_BINARY_DIR}/BuildSupport" )
     message( STATUS "Cloning EnergyPlusBuildSupport: Please wait, this can take several minutes" )
-    execute_process(COMMAND "${GIT_EXECUTABLE}" "clone" "https://github.com/NREL/EnergyPlusBuildSupport" "${CMAKE_BINARY_DIR}/BuildSupport" 
-	            ERROR_QUIET 
-		    OUTPUT_QUIET 
-		    RESULT_VARIABLE GIT_RESULT 
+    execute_process(COMMAND "${GIT_EXECUTABLE}" "clone" "https://github.com/NREL/EnergyPlusBuildSupport" "${CMAKE_BINARY_DIR}/BuildSupport"
+	            ERROR_QUIET
+		    OUTPUT_QUIET
+		    RESULT_VARIABLE GIT_RESULT
 		    OUTPUT_VARIABLE GIT_OUTPUT)
   else()
     message( STATUS "Updating EnergyPlusBuildSupport: Please wait, this can take a few seconds" )
-    execute_process(COMMAND "${GIT_EXECUTABLE}" "pull" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/BuildSupport" 
+    execute_process(COMMAND "${GIT_EXECUTABLE}" "pull" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/BuildSupport"
 	            ERROR_QUIET
 		    OUTPUT_QUIET
-	            RESULT_VARIABLE GIT_RESULT 
+	            RESULT_VARIABLE GIT_RESULT
 		    OUTPUT_VARIABLE GIT_OUTPUT )
   endif()
   if("${GIT_RESULT}" EQUAL 0)
-    message( STATUS "Local BuildSupport clone updated and ready" ) 
-  else()  
-	  message( SEND_ERROR "GIT ERROR OCCURED: ${GIT_RESULT}; ${GIT_OUTPUT}" ) 
+    message( STATUS "Local BuildSupport clone updated and ready" )
+  else()
+	  message( SEND_ERROR "GIT ERROR OCCURED: ${GIT_RESULT}; ${GIT_OUTPUT}" )
   endif()
 
   if( BUILD_FORTRAN )
