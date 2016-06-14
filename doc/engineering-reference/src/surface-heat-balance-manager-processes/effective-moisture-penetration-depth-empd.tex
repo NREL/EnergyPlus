@@ -14,18 +14,18 @@ The EMPD concept is based on the assumption of cyclical variations in humidity, 
 \int_{{t_1}}^{{t_2}} {\frac{{du}}{{dt }}} dt  = 0
 \end{equation}
 
-This is generally a reasonable assumption for buildings, with daily internal latent gains. The EMPD model uses a thin material layer of constant thickness at each material surface. The moisture content is assumed constant across this thickness, termed the *surface penetration depth* ($d_{EMPD,surf}$). For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
+This is generally a reasonable assumption for buildings, with daily internal latent gains. The EMPD model uses a thin material layer of constant thickness at each material surface. The moisture content is assumed constant across this thickness, termed the \emph{surface penetration depth} ($d_{EMPD,surf}$). For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
 
 \begin{equation}
-u = a \cdot \phi^b + c \cdot \phi^d
+u = a \phi^b + c \phi^d
 \end{equation}
 
 where $a$, $b$, $c$, and $d$ are fitting parameters and phi is relative humidity.
 
-This surface layer exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density ($\rho_v$) through the material's sorption curve:
+This surface layer (1) exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density ($\rho_v$) through the material's sorption curve:
 
 \begin{equation}
-rho_{v,surflayer} = \frac {rho_{air} \cdot 0.622 \cdot u_{surflayer}} {\frac{du}{d\phi} \frac{P}{P_{sat}} - u_{surflayer}}
+\rho_{v1} = \frac {0.622 \rho_{air} u_{1}} {\frac{du}{d\phi} \frac{P}{P_{sat}} - u_{1}}
 \end{equation}
 
 where
@@ -38,16 +38,16 @@ $P_{sat}$ = saturated vapor pressure
 
 $\rho_{air}$ = dry-air density
 
-The moisture flux between the material and the zone air is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
+The moisture flux between the material and the zone air $j_{zone}$ is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
 
 \begin{equation}
-Flux_{zone} = \frac{\rho_{v,surflayer} - \rho_{v,zoneair}}{R_{MT,surflayer} + R_{MT,coating} + R_{MT,BL}}
+j_{zone} = \frac{\rho_{v1} - \rho_{v,zoneair}}{R_{MT1} + R_{MT,coating} + R_{MT,BL}}
 \end{equation}
 
 The surface layer resistance is calculated with:
 
 \begin{equation}
-R_{MT,surflayer} = \frac{d_{EMPD,surf}} {2 \bar R_{water} T \delta_{perm}}
+R_{MT,1} = \frac{d_{EMPD,1}} {2 \bar R_{water} T \delta_{perm}}
 \end{equation}
 
 where
@@ -78,22 +78,22 @@ Finally, the boundary layer mass-transfer resistance is calculated by converting
 R_{MT,BL} = \frac{\rho_{air} Cp_{air}}{h_{conv}}
 \end{equation}
 
-Behind the surface layer is a deep layer of thickness $d_{EMPD,deep}$. The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
+Behind the surface layer is a deep layer of thickness $d_{EMPD,2}$. The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
 
 \begin{equation}
-Flux_{deep} = \frac {\rho_{v,surflayer} - \rho_{v,deeplayer}} {R_{MT,deeplayer}}
+j_{2} = \frac {\rho_{v,1} - \rho_{v,2}} {R_{MT,2}}
 \end{equation}
 
-where $R_{MT,deeplayer}$ is:
+where $R_{MT,2}$ is:
 
 \begin{equation}
-R_{MT,deeplayer} = \frac {d_{EMPD,surf} + d_{EMPD,deep}} {2 \bar R_{water} T \delta_{perm} }
+R_{MT,2} = \frac {d_{EMPD,1} + d_{EMPD,2}} {2 \bar R_{water} T \delta_{perm} }
 \end{equation}
 
-These moisture fluxes are used to update the moisture content (or equivalent RH, $\phi$) of the surface and deep layers:
+These moisture fluxes are used to update the moisture content (or equivalent RH, $\phi$) of each layer:
 
 \begin{equation}
-\phi_{deeplayer}(t) = \frac {\phi_{deeplayer}(t-TimeStep) + Flux_{deep} \cdot TimeStep} {\rho_{matl} d_{EMPD,deep} \frac {du}{d\phi}}
+\phi_{2}(t) = \frac {\phi_{2}(t-\delta t) + Flux_{deep} \cdot TimeStep} {\rho_{matl} d_{EMPD,deep} \frac {du}{d\phi}}
 \end{equation}
 
 where
@@ -114,7 +114,7 @@ The equivalent RH and equivalent vapor density are related with:
 \phi_{deeplayer} = \frac {\rho_{v,deeplayer} \bar R_{water}} {P_{sat}(T)}
 \end{equation}
 
-The zone flux is used, along with the area of the particular surface, to update the zone humidity ratio, as discussed in (*Moisture Predictor-Corrector* section).
+The zone flux is used, along with the area of the particular surface, to update the zone humidity ratio, as discussed in \ref{moisture-predictor-corrector}.
 
 The zone flux is also used to calculate the sensible heat released (during adsorption) or absorbed (during desorption) at the material surface:
 

@@ -571,9 +571,7 @@ namespace MoistureBalanceEMPDManager {
 
 		// Calculate new surface layer RH using mass balance on surface layer
 		RH_surf_layer = RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
-		if (SurfNum == 194) {
-			std::cout << mass_flux_surf_layer << " " << mass_flux_deep_layer << " " << mass_flux_zone << std::endl;
-		}
+
 		// Calculate new deep layer RH using mass balance on deep layer (unless depth <= 0).
 		if (material.EMPDDeepDepth <= 0.0) {
 			RH_deep_layer = RH_deep_layer_old;
