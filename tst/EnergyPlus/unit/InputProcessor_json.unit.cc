@@ -198,7 +198,7 @@ namespace EnergyPlus {
 
 		TEST_F( InputProcessorFixture, processIDD )
 		{
-			using namespace InputProcessor;
+			InputProcessor IP;
 			std::string const idd_objects = delimited_string({
 				"Output:SQLite,",
 				"       \\memo Output from EnergyPlus can be written to an SQLite format file.",

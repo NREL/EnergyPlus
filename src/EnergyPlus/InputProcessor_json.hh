@@ -161,14 +161,11 @@ public:
 
 #endif
 
-
-
-namespace EnergyPlus {
-
-namespace InputProcessor {
-
+class InputProcessor {
+public:
+   IdfParser idf_parser;
+   State state;
 	// Using/Aliasing
-
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const ObjectDefAllocInc; // Starting number of Objects allowed in IDD as well as the increment
@@ -1254,8 +1251,6 @@ namespace InputProcessor {
 	std::string
 	IPTrimSigDigits( int const IntegerValue );
 
-} // InputProcessor
-
-} // EnergyPlus
+}; // InputProcessor
 
 #endif

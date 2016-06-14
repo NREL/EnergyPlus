@@ -55,7 +55,7 @@ endif()
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
 option( BUILD_PACKAGE "Build package" OFF )
-option( BUILD_TESTING "Build testing targets" OFF )
+option( BUILD_TESTING "Build testing targets" ON )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )

@@ -1,64 +1,13 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
-// The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
-// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
-// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
-// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
-// worldwide license in the Software to reproduce, distribute copies to the public, prepare
-// derivative works, and perform publicly and display publicly, and to permit others to do so.
-//
-// Redistribution and use in source and binary forms, with or without modification, are permitted
-// provided that the following conditions are met:
-//
-// (1) Redistributions of source code must retain the above copyright notice, this list of
-//     conditions and the following disclaimer.
-//
-// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
-//     conditions and the following disclaimer in the documentation and/or other materials
-//     provided with the distribution.
-//
-// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
-//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
-//     used to endorse or promote products derived from this software without specific prior
-//     written permission.
-//
-// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
-//     without changes from the version obtained under this License, or (ii) Licensee makes a
-//     reference solely to the software portion of its product, Licensee must refer to the
-//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
-//     obtained under this License and may not use a different name for the software. Except as
-//     specifically required in this Section (4), Licensee shall not use in a company name, a
-//     product name, in advertising, publicity, or other promotional activities any name, trade
-//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
-
 // C++ Headers
 #include <algorithm>
 #include <istream>
+#include "include/IdfParser.hh"
+#include <iostream>
+#include <fstream>
+#include <unordered_map>
+#include "include/nlohmann/json/src/json.hpp"
+#include <fstream>
+#include <iostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
@@ -80,9 +29,663 @@
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
 
-namespace EnergyPlus {
+using json = nlohmann::json;
 
-namespace InputProcessor {
+json IdfParser::decode( std::string const & idf, json const & schema ) {
+   bool success = true;
+   return decode( idf, schema, success );
+}
+
+json IdfParser::decode( std::string const & idf, json const & schema, bool & success ) {
+   json root;
+   success = true;
+   if ( idf.empty() ) return root;
+
+   size_t index = 0;
+   root = parse_idf( idf, index, success, schema );
+   return root;
+}
+
+std::string IdfParser::encode(json const &root, json const &schema) {
+   std::string encoded;
+
+   for (auto obj = root.begin(); obj != root.end(); ++obj) {
+      const auto &legacy_idd = schema["properties"][obj.key()]["legacy_idd"]["fields"];
+      for (auto obj_in = obj.value().begin(); obj_in != obj.value().end(); ++obj_in) {
+         encoded += obj.key();
+         int skipped_fields = 0;
+         for (int i = 0; i < legacy_idd.size(); i++) {
+            std::string entry = legacy_idd[i];
+            if (obj_in.value().find(entry) == obj_in.value().end()) {
+               if (entry == "name") encoded += ",\n  " + obj_in.key();
+               else skipped_fields++;
+               continue;
+            }
+            for (int j = 0; j < skipped_fields; j++) encoded += ",\n  ";
+            skipped_fields = 0;
+            encoded += ",\n  ";
+            auto const &val = obj_in.value()[entry];
+            if (val.is_string()) encoded += val.get<std::string>();
+            else encoded += std::to_string(val.get<double>());
+         }
+
+         if (obj_in.value().find("extensions") == obj_in.value().end()) {
+            encoded += ";\n\n";
+            continue;
+         }
+
+         auto &extensions = obj_in.value()["extensions"];
+         for (int extension_i = 0; extension_i < extensions.size(); extension_i++) {
+            auto &cur_extension_obj = extensions[extension_i];
+            auto &extensible = schema["properties"][obj.key()]["legacy_idd"]["extensibles"];
+            for (int i = 0; i < extensible.size(); i++) {
+               std::string tmp = extensible[i];
+               if (cur_extension_obj.find(tmp) == cur_extension_obj.end()) {
+                  skipped_fields++;
+                  continue;
+               }
+               for (int j = 0; j < skipped_fields; j++) encoded += ",\n  ";
+               skipped_fields = 0;
+               encoded += ",\n  ";
+               if (cur_extension_obj[tmp].is_string()) encoded += cur_extension_obj[tmp];
+               else encoded += std::to_string(cur_extension_obj[tmp].get<double>());
+            }
+         }
+         encoded += ";\n\n";
+      }
+   }
+   return encoded;
+}
+
+json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
+   json root;
+   Token token;
+
+   while (true) {
+      token = look_ahead( idf, index );
+      if ( token == Token::END ) {
+         break;
+      } else if ( token == Token::NONE ) {
+         success = false;
+         return root;
+      } else if ( token == Token::EXCLAMATION ) {
+         eat_comment( idf, index );
+      } else {
+         std::string obj_name = parse_string(idf, index, success);
+         for (char &c : obj_name) c = (char) toupper(c);
+         auto tmp_umit = case_insensitive_keys.find(obj_name);
+         if (tmp_umit != case_insensitive_keys.end()) {
+            obj_name = tmp_umit->second;
+         } else {
+            print_out_line_error(idf, false);
+            while (token != Token::SEMICOLON) token = next_token(idf, index);
+            continue;
+         }
+         json obj_loc = schema["properties"][obj_name];
+         json loc = obj_loc["legacy_idd"];
+         json obj = parse_object(idf, index, success, loc, obj_loc);
+         if (!success) print_out_line_error(idf, true);
+         std::string name = "";
+         if (!obj.is_null()) {
+            if (obj.find("name") != obj.end()) {
+               name = obj["name"].get<std::string>();
+               obj.erase("name");
+            }
+         }
+         root[obj_name][name] = obj;
+      }
+   }
+
+   return root;
+}
+
+json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
+                              json const & loc, json const & obj_loc ) {
+   json obj;
+   Token token;
+   int legacy_idd_index = 0;
+   success = true;
+
+   while (true) {
+      token = look_ahead(idf, index);
+      if (token == Token::NONE) {
+         success = false;
+         return obj;
+      } else if (token == Token::COMMA) {
+         next_token(idf, index);
+         token = look_ahead(idf, index);
+         if (Token::EXCLAMATION == token) {
+            eat_comment(idf, index);
+         }
+         token = look_ahead(idf, index);
+         if (Token::COMMA == token) {
+            legacy_idd_index++;
+         } else if (Token::SEMICOLON == token) {
+            next_token(idf, index);
+            break;
+         }
+      } else if (token == Token::SEMICOLON) {
+         next_token(idf, index);
+         break;
+      } else if (token == Token::EXCLAMATION) {
+         eat_comment(idf, index);
+      } else if (legacy_idd_index >= loc["fields"].size()) {
+         json extensions;
+         while (1) {
+            if (loc.find("extensibles") == loc.end()) {
+               success = false;
+               return obj;
+            }
+            json const &ex_loc = loc["extensibles"];
+            json single_extension;
+            for (int i = 0; i < ex_loc.size(); i++) {
+               std::string field = ex_loc[i];
+               json val = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"]["extensions"]["items"]["properties"][field]);
+               if (success) single_extension[field] = val;
+               else success = true;
+               token = look_ahead(idf, index);
+               if (token == Token::COMMA) {
+                  next_token(idf, index);
+                  token = look_ahead(idf, index);
+                  if (token == Token::EXCLAMATION) eat_comment(idf, index);
+               } else if (token == Token::SEMICOLON) {
+                  next_token(idf, index);
+                  extensions.push_back(single_extension);
+                  obj["extensions"] = extensions;
+                  return obj;
+               }
+            }
+            extensions.push_back(single_extension);
+         }
+      } else {
+         std::string field;
+         field = loc["fields"][legacy_idd_index];
+         auto it = obj_loc.find("patternProperties");
+         if (it == obj_loc.end()) {
+            if (obj_loc.find("properties") != obj_loc.end()) {
+               obj[field] = parse_value(idf, index, success, obj_loc["properties"][field]);
+            } else {
+               std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
+            }
+            legacy_idd_index++;
+            continue;
+         }
+         auto const &tmp = obj_loc["patternProperties"][".*"]["properties"];
+         if (tmp.find(field) == tmp.end()) {
+            if (field == "name") obj[field] = parse_string(idf, index, success);
+            else std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
+         } else {
+            obj[field] = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"][field]);
+         }
+         if (!success) return obj;
+         legacy_idd_index++;
+      }
+   }
+   return obj;
+}
+
+json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
+   size_t save_i = index;
+   eat_whitespace(idf, save_i);
+   json val;
+   bool is_double = false, is_sign = false, is_scientific = false;
+   std::string num_str, numeric = "-+.eE0123456789";
+
+   while (numeric.find_first_of(idf[save_i]) != std::string::npos) {
+      num_str += idf[save_i];
+      if (idf[save_i] == '.') {
+         if (is_double) {
+            success = false;
+            return val;
+         }
+         is_double = true;
+      } else if (idf[save_i] == '-' || idf[save_i] == '+') {
+         if (is_sign && !is_scientific) {
+            success = false;
+            return val;
+         }
+         is_sign = true;
+      } else if (idf[save_i] == 'e' || idf[save_i] == 'E') {
+         if (is_scientific) {
+            success = false;
+            return val;
+         }
+         is_scientific = true;
+      }
+      save_i++;
+   }
+
+   assert(!num_str.empty());
+   Token token = look_ahead(idf, save_i);
+   if (token != Token::SEMICOLON && token != Token::COMMA) {
+      success = false;
+      return val;
+   }
+   if (is_double) {
+      val = stod(num_str, 0);
+   } else {
+      try {
+         val = stoi(num_str, 0);
+      } catch (std::exception e){
+         val = stoll(num_str, 0);
+      }
+   }
+   index = save_i;
+   return val;
+}
+
+json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc) {
+   json value;
+   switch ( look_ahead( idf, index ) ) {
+      case Token::STRING: {
+         value = parse_string( idf, index, success );
+         if (field_loc.find("enum") != field_loc.end()) {
+            for (auto &s : field_loc["enum"]) {
+               if (icompare(s, value.get<std::string>())) {
+                  value = s;
+                  break;
+               }
+            }
+         } else if (icompare(value.get<std::string>(), "Autosize") || icompare(value.get<std::string>(), "Autocalculate")) {
+            value = field_loc["anyOf"][1]["enum"][0];
+         }
+         return value;
+      }
+      case Token::NUMBER: {
+         size_t save_line_index = index_into_cur_line;
+         size_t save_line_num = cur_line_num;
+         value = parse_number(idf, index, success);
+         if (!success) {
+            cur_line_num = save_line_num;
+            index_into_cur_line = save_line_index;
+            success = true;
+            value = parse_string(idf, index, success);
+            return value;
+         }
+         return value;
+      }
+      case Token::NONE: case Token::END: case Token::EXCLAMATION:
+      case Token::COMMA: case Token::SEMICOLON:
+         break;
+   }
+   success = false;
+   return value;
+}
+
+std::string IdfParser::parse_string( std::string const & idf, size_t & index, bool & success) {
+   eat_whitespace( idf, index );
+
+   std::string s;
+   char c;
+
+   bool complete = false;
+   while ( !complete ) {
+      if ( index == idf.size() ) {
+         complete = true;
+         break;
+      }
+
+      c = idf[ index ];
+      increment_both_index(index, index_into_cur_line);
+      if ( c == ',' ) {
+         complete = true;
+         decrement_both_index(index, index_into_cur_line);
+         break;
+      } else if ( c == ';' ) {
+         complete = true;
+         decrement_both_index(index, index_into_cur_line);
+         break;
+      } else if ( c == '!' ) {
+         complete = true;
+         decrement_both_index(index, index_into_cur_line);
+         break;
+      } else if ( c == '\\' ) {
+         if ( index == idf.size() ) break;
+         char next_c = idf[ index ];
+         increment_both_index(index, index_into_cur_line);
+         if ( next_c == '"' ) {
+            s += '"';
+         } else if ( next_c== '\\' ) {
+            s += '\\';
+         } else if ( next_c == '/' ) {
+            s += '/';
+         } else if ( next_c == 'b' ) {
+            s += '\b';
+         } else if ( next_c == 't' ) {
+            s += '\t';
+         } else if ( next_c == 'n' ) {
+            complete = false;
+            break;
+         } else if ( next_c == 'r' ) {
+            complete = false;
+            break;
+         } else {
+            s += c;
+            s += next_c;
+         }
+      } else {
+         s += c;
+      }
+   }
+
+   if ( !complete ) {
+      success = false;
+      return std::string();
+   }
+
+   return rtrim(s);
+}
+
+void IdfParser::increment_both_index(size_t &index, size_t &line_index) {
+   index++;
+   line_index++;
+}
+
+void IdfParser::decrement_both_index(size_t &index, size_t &line_index) {
+   index--;
+   line_index--;
+}
+
+void IdfParser::print_out_line_error(std::string const &idf, bool obj_found) {
+   if (obj_found) std::cout << "error: \"extra field(s)\" ";
+   else std::cout << "error: \"obj not found in schema\" ";
+   std::cout << "at line number " << cur_line_num << " (index " << index_into_cur_line << ")\n";
+   std::cout << "Line: ";
+   while (idf[beginning_of_line_index++] != '\n') std::cout << idf[beginning_of_line_index];
+   std::cout << std::endl;
+}
+
+void IdfParser::eat_whitespace( std::string const & idf, size_t & index) {
+   while (index < idf.size()) {
+      switch( idf[ index ] ) {
+         case ' ': case '\r': case '\t':
+            increment_both_index(index, index_into_cur_line);
+            continue;
+         case '\n':
+            increment_both_index(index, cur_line_num);
+            beginning_of_line_index = index;
+            index_into_cur_line = 0;
+            continue;
+         default:
+            return;
+      }
+   }
+}
+
+void IdfParser::eat_comment( std::string const & idf, size_t & index) {
+   while ( true ) {
+      if ( index == idf.size() ) break;
+      if ( idf[ index ] == '\n' ) {
+         increment_both_index(index, cur_line_num);
+         index_into_cur_line = 0;
+         beginning_of_line_index = index;
+         break;
+      }
+      increment_both_index(index, index_into_cur_line);
+   }
+}
+
+IdfParser::Token IdfParser::look_ahead( std::string const & idf, size_t index) {
+   size_t save_index = index;
+   size_t save_line_num = cur_line_num;
+   size_t save_line_index = index_into_cur_line;
+   Token token = next_token(idf, save_index);
+   cur_line_num = save_line_num;
+   index_into_cur_line = save_line_index;
+   return token;
+}
+
+IdfParser::Token IdfParser::next_token( std::string const & idf, size_t & index) {
+   eat_whitespace( idf, index );
+
+   if ( index == idf.size() ) {
+      return Token::END;
+   }
+
+   char const c = idf[ index ];
+   increment_both_index(index, index_into_cur_line);
+   switch (c) {
+      case '!':
+         return Token::EXCLAMATION;
+      case ',':
+         return Token::COMMA;
+      case ';':
+         return Token::SEMICOLON;
+      default:
+         static std::string const search_chars( "-:.#/\\[]{}_@$%^&*()|+=<>?'\"~" );
+         static std::string const numeric( ".-+0123456789" );
+         if (numeric.find_first_of(c) != std::string::npos) {
+            return Token::NUMBER;
+         } else if ( isalnum( c ) || ( std::string::npos != search_chars.find_first_of(c) ) ) {
+            return Token::STRING;
+         }
+         break;
+   }
+   decrement_both_index(index, index_into_cur_line);
+   return Token::NONE;
+}
+
+State::State(json parsed_schema) {
+   schema = parsed_schema;
+   stack.push_back(schema);
+   json &loc = stack.back()["required"];
+   for (auto &s : loc) root_required.emplace(s.get<std::string>(), false);
+}
+
+void State::traverse (json::parse_event_t &event, json &parsed, unsigned line_num, unsigned line_index) {
+   switch (event) {
+      case json::parse_event_t::object_start: {
+         if (is_in_extensibles or stack.back().find("patternProperties") == stack.back().end()) {
+            if (stack.back().find("properties") != stack.back().end())
+               stack.push_back(stack.back()["properties"]);
+         } else {
+            stack.push_back(stack.back()["patternProperties"][".*"]);
+            if (stack.back().find("required") != stack.back().end()) {
+               auto &loc = stack.back()["required"];
+               obj_required.clear();
+               for (auto &s : loc) obj_required.emplace(s.get<std::string>(), false);
+            }
+         }
+         last_seen_event = event;
+         break;
+      }
+
+      case json::parse_event_t::value: {
+         validate(parsed, line_num, line_index);
+         if (does_key_exist) stack.pop_back();
+         does_key_exist = true;
+         last_seen_event = event;
+         break;
+      }
+
+      case json::parse_event_t::key: {
+         std::string key = parsed;
+         prev_line_index = line_index;
+         prev_key_len = (unsigned) key.size() + 3;
+         if (need_new_object_name) {
+            cur_obj_name = key;
+            cur_obj_count = 0;
+            need_new_object_name = false;
+            if (cur_obj_name.find("Parametric:") != std::string::npos) {
+               errors.push_back("You must run Parametric Preprocesor for \"" + cur_obj_name + "\" at line " +
+                                std::to_string(line_num + 1));
+            } else if (cur_obj_name.find("Template") != std::string::npos) {
+               errors.push_back("You must run the ExpandObjects program for \"" + cur_obj_name + "\" at line " +
+                                std::to_string(line_num + 1));
+            }
+         }
+
+         if (stack.back().find("properties") == stack.back().end() and key != "") {
+            if (stack.back().find(key) != stack.back().end()) {
+               stack.push_back(stack.back()[key]);
+            } else {
+               errors.push_back("Key \"" + key + "\" in object \"" + cur_obj_name + "\" at line "
+                                + std::to_string(line_num) + " (index " + std::to_string(line_index) +
+                                ") not found in schema");
+               does_key_exist = false;
+            }
+         }
+
+
+         if (!is_in_extensibles) {
+            auto req = obj_required.find(key);
+            if (req != obj_required.end())
+               req->second = true; // required field is now accounted for, for this specific object
+            req = root_required.find(key);
+            if (req != root_required.end()) req->second = true; // root_required field is now accounted for
+         } else {
+            auto req = extensible_required.find(key);
+            if (req != extensible_required.end()) req->second = true;
+         }
+
+         last_seen_event = event;
+         break;
+      }
+
+      case json::parse_event_t::array_start: {
+         stack.push_back(stack.back()["items"]);
+         if (stack.back().find("required") != stack.back().end()) {
+            auto &loc = stack.back()["required"];
+            extensible_required.clear();
+            for (auto &s : loc) extensible_required.emplace(s.get<std::string>(), false);
+         }
+         is_in_extensibles = true;
+         last_seen_event = event;
+         break;
+      }
+
+      case json::parse_event_t::array_end: {
+         stack.pop_back();
+         stack.pop_back();
+         is_in_extensibles = false;
+         last_seen_event = event;
+         break;
+      }
+
+      case json::parse_event_t::object_end: {
+         if (is_in_extensibles) {
+            for (auto &it : extensible_required) {
+               if (!it.second) {
+                  errors.push_back(
+                        "Required extensible field \"" + it.first + "\" in object \"" + cur_obj_name
+                        + "\" ending at line " + std::to_string(line_num) + " (index "
+                        + std::to_string(line_index) + ") was not provided");
+               }
+               it.second = false;
+            }
+         } else if (last_seen_event != json::parse_event_t::object_end) {
+            cur_obj_count++;
+            for (auto &it : obj_required) {
+               if (!it.second) {
+                  errors.push_back(
+                        "Required field \"" + it.first + "\" in object \"" + cur_obj_name
+                        + "\" ending at line " + std::to_string(line_num) + " (index "
+                        + std::to_string(line_index) + ") was not provided");
+               }
+               it.second = false;
+            }
+         } else { // must be at the very end of an object now
+            if (cur_obj_name != "Version") stack.pop_back();
+            const auto &loc = stack.back();
+            if (loc.find("minProperties") != loc.end() && cur_obj_count < loc["minProperties"].get<unsigned>()) {
+               errors.push_back(
+                     "minProperties for object \"" + cur_obj_name + "\" at line " + std::to_string(line_num) +
+                     " was not met");
+            }
+            if (loc.find("maxProperties") != loc.end() && cur_obj_count > loc["maxProperties"].get<unsigned>()) {
+               errors.push_back(
+                     "maxProperties for object \"" + cur_obj_name + "\" at line " + std::to_string(line_num) +
+                     " was exceeded");
+            }
+            obj_required.clear();
+            extensible_required.clear();
+            need_new_object_name = true;
+         }
+         stack.pop_back();
+         last_seen_event = event;
+         break;
+      }
+   }
+   if (!stack.size()) {
+      for (auto &it: root_required) {
+         if (!it.second) {
+            errors.push_back("Required object \"" + it.first + "\" was not provided in input file");
+         }
+      }
+   }
+}
+
+void State::validate(json &parsed, unsigned line_num, unsigned line_index) {
+   auto &loc = stack.back();
+
+   if (loc.find("enum") != loc.end()) {
+      int i;
+      auto const &enum_array = loc["enum"];
+      if (parsed.is_string()) {
+         for (i = 0; i < enum_array.size(); i++) {
+            if (icompare(enum_array[i], parsed.get<std::string>())) {
+               break;
+            }
+         }
+         if (i == enum_array.size()) {
+            errors.push_back("In object \"" + cur_obj_name + "\" at line " + std::to_string(line_num)
+                             + ": \"" + parsed.get<std::string>() + "\" was not found in the enum");
+         }
+      } else {
+         for (i = 0; i < enum_array.size(); i++) {
+            if (enum_array[i] == parsed.get<int>()) break;
+         }
+         if (i == enum_array.size()) {
+            errors.push_back("In object \"" + cur_obj_name + "\" at line " + std::to_string(line_num)
+                             + ": \"" + std::to_string(parsed.get<int>()) + "\" was not found in the enum");
+         }
+      }
+   }
+   else if (parsed.is_number()) {
+      double val = parsed;
+      if(loc.find("anyOf") != loc.end()) {
+         loc = loc["anyOf"][0];
+      }
+      if (loc.find("minimum") != loc.end()) {
+         if (loc.find("exclusiveMinimum") != loc.end() && val <= loc["minimum"].get<double>()) {
+            add_error("exmin", val, line_num, prev_line_index + prev_key_len);
+         } else if (val < loc["minimum"].get<double>()) {
+            add_error("min", val, line_num, prev_line_index + prev_key_len);
+         }
+      }
+      if (loc.find("maximum") != loc.end()) {
+         if (loc.find("exclusiveMaximum") != loc.end() && val >= loc["maximum"].get<double>()) {
+            add_error("exmax", val, line_num, prev_line_index + prev_key_len);
+         } else if (val > loc["maximum"].get<double>()) {
+            add_error("max", val, line_num, prev_line_index + prev_key_len);
+         }
+      }
+      if (loc.find("type") != loc.end() && loc["type"] != "number") {
+         warnings.push_back("In object \"" + cur_obj_name + "\" at line " + std::to_string(line_num)
+                            + ", type == " + loc["type"].get<std::string>()
+                            + " but parsed value = " + std::to_string(val));
+      }
+   }
+   else if (parsed.is_string()) {
+      if (loc.find("anyOf") != loc.end()) {
+         int i;
+         for (i = 0; i < loc["anyOf"].size(); i++) {
+            if (loc["anyOf"][i].find("type") != loc["anyOf"][i].end() && loc["anyOf"][i]["type"] == "string") break;
+         }
+         if (i == loc["anyOf"].size()) {
+            warnings.push_back("type == string was not found in anyOf in object \"" + cur_obj_name
+                               + "\" at line " + std::to_string(line_num));
+         }
+      }
+      else {
+         if (loc.find("type") != loc.end() && loc["type"] != "string") {
+            errors.push_back("In object \"" + cur_obj_name + "\", at line " + std::to_string(line_num) + ": type needs to be string");
+         }
+      }
+   }
+}
+
+
 	// Module containing the input processor routines
 
 	// MODULE INFORMATION:
@@ -6264,6 +6867,4 @@ namespace InputProcessor {
 
 	}
 
-} // InputProcessor
 
-} // EnergyPlus
