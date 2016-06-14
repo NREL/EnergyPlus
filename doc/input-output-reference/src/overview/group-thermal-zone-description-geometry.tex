@@ -2588,7 +2588,7 @@ This will output a temperature for the back face of the layer. The layer back fa
 
 The various output variables related to surface heat transfer are organized around the inside and outside face of each surface. The zone heat balance model draws energy balances at each side, or face, of a surface and so each surface essentially has two sets of results. The inside face is the side of a heat transfer surface that faces toward the thermal zone. The outside face is the side of a heat transfer surface that faces away from the thermal zone, typically facing outdoors. The Key Value for these is generally the user-defined name of the surface.
 
-\subsubsection{\texorpdfstring{Surface Inside Face Heat Balance Calculation Iteration Count {[]}}{Surface Inside Face Heat Balance Calculation Iteration Count }}\label{surface-inside-face-heat-balance-calculation-iteration-count}
+\subsubsection{Surface Inside Face Heat Balance Calculation Iteration Count {[]}}\label{surface-inside-face-heat-balance-calculation-iteration-count}
 
 This output is the number of iterations used in a part of the solution for surface heat transfer that accounts for thermal radiation heat transfer between zone surfaces. This is simply a counter on the iteration loop for inside face surface modeling. There is only one instance of this output in a given run and the Key Value is ``Simulation.''
 
@@ -2730,7 +2730,7 @@ The outdoor wind speed calculated at the height above ground of the surface cent
 
 The outside area of an exterior surface that is illuminated by (unreflected) beam solar radiation.
 
-\subsubsection{\texorpdfstring{Surface Outside Face Sunlit Fraction {[]}}{Surface Outside Face Sunlit Fraction }}\label{surface-outside-face-sunlit-fraction}
+\subsubsection{Surface Outside Face Sunlit Fraction {[]}}\label{surface-outside-face-sunlit-fraction}
 
 The fraction of the outside area of an exterior surface that is illuminated by (unreflected) beam solar radiation. Equals Surface Outside Face Sunlit Area divided by total surface area.
 
@@ -2807,15 +2807,15 @@ The solar beam radiation incident on the outside of an exterior surface that ari
 
 The solar diffuse radiation incident on the outside of an exterior surface that arises from beam-to-diffuse reflection from building shades or building surfaces. This value will be non-zero only if ``Reflections'' option is chosen in the BUILDING object.
 
-\subsubsection{\texorpdfstring{Surface Outside Face Beam Solar Incident Angle Cosine Value {[]}}{Surface Outside Face Beam Solar Incident Angle Cosine Value }}\label{surface-outside-face-beam-solar-incident-angle-cosine-value}
+\subsubsection{Surface Outside Face Beam Solar Incident Angle Cosine Value {[]}}\label{surface-outside-face-beam-solar-incident-angle-cosine-value}
 
 The cosine of the angle of incidence of (unreflected) beam solar radiation on the outside of an exterior surface. The value varies from 0.0 for beam parallel to the surface (incidence angle = 90\(^{O}\)) to 1.0 for beam perpendicular to the surface (incidence angle = 0\(^{O}\)). Negative values indicate the sun is behind the surface, i.e the surface does not see the sun.
 
-\subsubsection{\texorpdfstring{Surface Anisotropic Sky Multiplier {[]}}{Surface Anisotropic Sky Multiplier }}\label{surface-anisotropic-sky-multiplier}
+\subsubsection{Surface Anisotropic Sky Multiplier {[]}}\label{surface-anisotropic-sky-multiplier}
 
 This is the view factor multiplier for diffuse sky irradiance on exterior surfaces taking into account the anisotropic radiance of the sky. The diffuse sky irradiance on a surface is given by Anisotropic Sky Multiplier * Diffuse Solar Irradiance.
 
-\subsubsection{\texorpdfstring{Surface Window BSDF Beam Direction Number {[]}}{Surface Window BSDF Beam Direction Number }}\label{surface-window-bsdf-beam-direction-number}
+\subsubsection{Surface Window BSDF Beam Direction Number {[]}}\label{surface-window-bsdf-beam-direction-number}
 
 \subsubsection{Surface Window BSDF Beam Phi Angle {[}rad{]}}\label{surface-window-bsdf-beam-phi-angle-rad}
 
@@ -3023,15 +3023,15 @@ The combined beam and diffuse solar that first entered adjacent zones through ex
 
 The sum of the Surface Window Transmitted Diffuse Solar Radiation Rate (see definition above) from all interior windows in a zone.
 
-\subsubsection{\texorpdfstring{Surface Window System Solar Transmittance {[]}}{Surface Window System Solar Transmittance }}\label{surface-window-system-solar-transmittance}
+\subsubsection{Surface Window System Solar Transmittance {[]}}\label{surface-window-system-solar-transmittance}
 
 Effective solar transmittance of an exterior window, including effect of shading device, if present. Equal to ``Surface Window Transmitted Solar Radiation Rate'' divided by total exterior beam plus diffuse solar radiation incident on the window (excluding frame, if present).
 
-\subsubsection{\texorpdfstring{Surface Window System Solar Absorptance {[]}}{Surface Window System Solar Absorptance }}\label{surface-window-system-solar-absorptance}
+\subsubsection{Surface Window System Solar Absorptance {[]}}\label{surface-window-system-solar-absorptance}
 
 Effective solar absorptance of an exterior window, including effect of shading device, if present. Equal to ``Window Solar Absorbed: All Glass Layers'' plus ``Window Solar Absorbed: Shading Device'' divided by total exterior beam plus diffuse solar radiation incident on window (excluding frame, if present)
 
-\subsubsection{\texorpdfstring{Surface Window System Solar Reflectance {[]}}{Surface Window System Solar Reflectance }}\label{surface-window-system-solar-reflectance}
+\subsubsection{Surface Window System Solar Reflectance {[]}}\label{surface-window-system-solar-reflectance}
 
 Effective solar reflectance of an exterior window, including effect of shading device, if present. Equal to: {[}1.0 -- ``Surface Window System Solar Transmittance'' -- ``Surface Window System Solar Absorptance''{]}.
 
@@ -3137,19 +3137,19 @@ For a window \emph{with an interior shading device}, this heat flow is equal to:
   {[}Conduction through the window frame and divider, if present{]}
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Surface Window Glazing Beam to Beam Solar Transmittance {[]}}{Surface Window Glazing Beam to Beam Solar Transmittance }}\label{surface-window-glazing-beam-to-beam-solar-transmittance}
+\subsubsection{Surface Window Glazing Beam to Beam Solar Transmittance {[]}}\label{surface-window-glazing-beam-to-beam-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on the glass of an exterior window that is transmitted through the glazing as beam radiation. This is for the base window without shading. Takes into account the angle of incidence of beam solar radiation on the glass.
 
-\subsubsection{\texorpdfstring{Surface Window Glazing Beam to Diffuse Solar Transmittance {[]}}{Surface Window Glazing Beam to Diffuse Solar Transmittance }}\label{surface-window-glazing-beam-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Glazing Beam to Diffuse Solar Transmittance {[]}}\label{surface-window-glazing-beam-to-diffuse-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on the glazing of an exterior window that is transmitted through the glazing as diffuse radiation.
 
-\subsubsection{\texorpdfstring{Surface Window Glazing Diffuse to Diffuse Solar Transmittance {[]}}{Surface Window Glazing Diffuse to Diffuse Solar Transmittance }}\label{surface-window-glazing-diffuse-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Glazing Diffuse to Diffuse Solar Transmittance {[]}}\label{surface-window-glazing-diffuse-to-diffuse-solar-transmittance}
 
 The fraction of exterior diffuse solar radiation incident on the glass of an exterior window that is transmitted through the glass assuming that the window has no shading device. It is assumed that incident diffuse solar is transmitted only as diffuse with no beam component.
 
-\subsubsection{\texorpdfstring{Surface Window Model Solver Iteration Count {[]}}{Surface Window Model Solver Iteration Count }}\label{surface-window-model-solver-iteration-count}
+\subsubsection{Surface Window Model Solver Iteration Count {[]}}\label{surface-window-model-solver-iteration-count}
 
 The number of iterations needed by the window-layer heat balance solution to converge.
 
@@ -3207,7 +3207,7 @@ Diffuse solar radiation reflected from inside reveal surfaces onto the frame sur
 
 Diffuse solar radiation reflected from inside reveal surfaces onto the glazing surfaces of a window, in Watts.
 
-\subsubsection{\texorpdfstring{Surface Window Inside Face Glazing Condensation Status {[]}}{Surface Window Inside Face Glazing Condensation Status }}\label{surface-window-inside-face-glazing-condensation-status}
+\subsubsection{Surface Window Inside Face Glazing Condensation Status {[]}}\label{surface-window-inside-face-glazing-condensation-status}
 
 A value of 1 means that moisture condensation will occur on the innermost glass face of an exterior window (i.e., on the glass face in contact with the zone air). Otherwise the value is 0. The condition for condensation is glass inside face temperature \textless{} zone air dewpoint temperature.
 
@@ -3222,15 +3222,15 @@ For airflow exterior windows, in which forced air passes between adjacent glass 
 
 As for regular windows, the value will also be 1 if condensation occurs on the innermost glass face.
 
-\subsubsection{\texorpdfstring{Surface Window Inside Face Frame Condensation Status {[]}}{Surface Window Inside Face Frame Condensation Status }}\label{surface-window-inside-face-frame-condensation-status}
+\subsubsection{Surface Window Inside Face Frame Condensation Status {[]}}\label{surface-window-inside-face-frame-condensation-status}
 
 If an exterior window has a frame and the value of this flag is 1, condensation will occur on the inside surface of the frame. The condition for condensation is frame inside surface temperature \textless{} zone air dewpoint temperature.
 
-\subsubsection{\texorpdfstring{Surface Window Inside Face Divider Condensation Status {[]}}{Surface Window Inside Face Divider Condensation Status }}\label{surface-window-inside-face-divider-condensation-status}
+\subsubsection{Surface Window Inside Face Divider Condensation Status {[]}}\label{surface-window-inside-face-divider-condensation-status}
 
 If an exterior window has a divider and the value of this flag is 1, condensation will occur on the inside surface of the divider. The condition for condensation is divider inside surface temperature \textless{} zone air dewpoint temperature.
 
-\subsubsection{\texorpdfstring{Surface Shading Device Is On Time Fraction {[]}}{Surface Shading Device Is On Time Fraction }}\label{surface-shading-device-is-on-time-fraction}
+\subsubsection{Surface Shading Device Is On Time Fraction {[]}}\label{surface-shading-device-is-on-time-fraction}
 
 The fraction of time that a shading device is on an exterior window. For a particular simulation timestep, the value is 0.0 if the shading device is off (or there is no shading device) and the value is 1.0 if the shading device is on. (It is assumed that the shading device, if present, is either on or off for the entire timestep.) If the shading device is switchable glazing, a value of 0.0 means that the glazing is in the unswitched (light colored) state, and a value of 1.0 means that the glazing is in the switched (dark colored) state.
 
@@ -3240,43 +3240,43 @@ For a time interval longer a timestep, this is the fraction of the time interval
 
 For an exterior window with a blind, this is the angle in degrees between the glazing outward normal and the blind slat angle outward normal, where the outward normal points away from the front face of the slat. The slat angle varies from 0 to 180 deg. If the slat angle is 0 deg or 180 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 90 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. See illustrations under WindowMaterial:Blind. For blinds with a fixed slat angle, the value reported here will be constant.
 
-\subsubsection{\texorpdfstring{Surface Window Blind Beam to Beam Solar Transmittance {[]}}{Surface Window Blind Beam to Beam Solar Transmittance }}\label{surface-window-blind-beam-to-beam-solar-transmittance}
+\subsubsection{Surface Window Blind Beam to Beam Solar Transmittance {[]}}\label{surface-window-blind-beam-to-beam-solar-transmittance}
 
 For an exterior window with a blind, this is the fraction of exterior beam solar radiation incident on the blind that is transmitted through the blind as beam solar radiation when the blind is isolated (i.e., as though the window glass were not present). Depends on various factors, including slat angle, width, separation, and thickness, and horizontal solar profile angle (for blinds with horizontal slats) or vertical solar profile angle (for blinds with vertical slats). The transmittance value reported here will be non-zero only when some beam solar can pass through the blind without hitting the slats.
 
-\subsubsection{\texorpdfstring{Surface Window Blind Beam to Diffuse Solar Transmittance {[]}}{Surface Window Blind Beam to Diffuse Solar Transmittance }}\label{surface-window-blind-beam-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Blind Beam to Diffuse Solar Transmittance {[]}}\label{surface-window-blind-beam-to-diffuse-solar-transmittance}
 
 For an exterior window with a blind, the fraction of exterior beam solar radiation incident on the blind that is transmitted through the blind as diffuse solar radiation when the blind is isolated (i.e., as though the window glass were not present). Depends on various factors, including slat angle, width, separation, thickness and reflectance, and horizontal solar profile angle (for blinds with horizontal slats) or vertical solar profile angle (for blinds with vertical slats).
 
-\subsubsection{\texorpdfstring{Surface Window Blind Diffuse to Diffuse Solar Transmittance {[]}}{Surface Window Blind Diffuse to Diffuse Solar Transmittance }}\label{surface-window-blind-diffuse-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Blind Diffuse to Diffuse Solar Transmittance {[]}}\label{surface-window-blind-diffuse-to-diffuse-solar-transmittance}
 
 For an exterior window with a blind, the fraction of exterior diffuse solar radiation incident on the blind that is transmitted through the blind as diffuse solar radiation when the blind is isolated (i.e., as though the window glass were not present). Depends on various factors, including slat angle, width, separation, thickness and reflectance. For blinds with a fixed slat angle the transmittance value reported here will be constant.
 
-\subsubsection{\texorpdfstring{Surface Window Blind and Glazing System Beam Solar Transmittance {[]}}{Surface Window Blind and Glazing System Beam Solar Transmittance }}\label{surface-window-blind-and-glazing-system-beam-solar-transmittance}
+\subsubsection{Surface Window Blind and Glazing System Beam Solar Transmittance {[]}}\label{surface-window-blind-and-glazing-system-beam-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on an exterior window with a blind (excluding window frame, if present) that is transmitted through the blind/glass system as beam solar radiation. Depends on various factors, including type of glass; solar incidence angle; slat angle, width, separation, and thickness; and horizontal solar profile angle (for blinds with horizontal slats) or vertical solar profile angle (for blinds with vertical slats).
 
-\subsubsection{\texorpdfstring{Surface Window Blind and Glazing System Diffuse Solar Transmittance {[]}}{Surface Window Blind and Glazing System Diffuse Solar Transmittance }}\label{surface-window-blind-and-glazing-system-diffuse-solar-transmittance}
+\subsubsection{Surface Window Blind and Glazing System Diffuse Solar Transmittance {[]}}\label{surface-window-blind-and-glazing-system-diffuse-solar-transmittance}
 
 The fraction of exterior diffuse solar radiation incident on an exterior window with a blind (excluding window frame, if present) that is transmitted through the blind/glass system as diffuse solar radiation. Depends on various factors, including type of glass and slat angle, width, separation, thickness and reflectance. For blinds with a fixed slat angle the transmittance value reported here will be constant.
 
-\subsubsection{\texorpdfstring{Surface Window Screen Beam to Beam Solar Transmittance {[]}}{Surface Window Screen Beam to Beam Solar Transmittance }}\label{surface-window-screen-beam-to-beam-solar-transmittance}
+\subsubsection{Surface Window Screen Beam to Beam Solar Transmittance {[]}}\label{surface-window-screen-beam-to-beam-solar-transmittance}
 
 For an exterior window with a screen, this is the fraction of exterior beam solar radiation incident on the screen that is transmitted through the screen as beam solar radiation when the screen is isolated (i.e., as though the window glass were not present). Depends on various factors, including the screen reflectance and the relative angle of the incident beam with respect to the screen. This value will include the amount of inward reflection of solar beam off the screen material surface if the user specifies this modeling option (i.e., Material: WindowScreen, field Reflected Beam Transmittance Accounting Method = Model as Direct Beam).
 
-\subsubsection{\texorpdfstring{Surface Window Screen Beam to Diffuse Solar Transmittance{[]}}{Surface Window Screen Beam to Diffuse Solar Transmittance}}\label{surface-window-screen-beam-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Screen Beam to Diffuse Solar Transmittance{[]}}\label{surface-window-screen-beam-to-diffuse-solar-transmittance}
 
 For an exterior window with a screen, the fraction of exterior beam solar radiation incident on the screen that is transmitted through the screen as diffuse solar radiation when the screen is isolated (i.e., as though the window glass were not present). Depends on various factors, including the screen reflectance and the relative angle of the incident beam with respect to the screen. This value is the amount of inward reflection of solar beam off the screen material surface if the user specifies this modeling option (i.e., Material: WindowScreen, field Reflected Beam Transmittance Accounting Method = Model as Diffuse); otherwise, this value will be zero.
 
-\subsubsection{\texorpdfstring{Surface Window Screen Diffuse to Diffuse Solar Transmittance{[]}}{Surface Window Screen Diffuse to Diffuse Solar Transmittance}}\label{surface-window-screen-diffuse-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Screen Diffuse to Diffuse Solar Transmittance{[]}}\label{surface-window-screen-diffuse-to-diffuse-solar-transmittance}
 
 For an exterior window with a screen, the fraction of exterior diffuse solar radiation incident on the screen that is transmitted through the screen as diffuse solar radiation when the screen is isolated (i.e., as though the window glass were not present). Depends on various factors including screen material geometry and reflectance. This value is calculated as an average, constant For a window with a screen, this value consists of diffuse radiation transmitted through the screen (gaps between the screen material) and diffuse radiation from diffuse-to-diffuse reflection from the screen material. For a window with a screen, this value consists of diffuse radiation transmitted through the screen (gaps between the screen material) and diffuse radiation from diffuse-to-diffuse reflection from the screen material.
 
-\subsubsection{\texorpdfstring{Surface Window Screen and Glazing System Beam Solar Transmittance{[]}}{Surface Window Screen and Glazing System Beam Solar Transmittance}}\label{surface-window-screen-and-glazing-system-beam-solar-transmittance}
+\subsubsection{Surface Window Screen and Glazing System Beam Solar Transmittance{[]}}\label{surface-window-screen-and-glazing-system-beam-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on an exterior window with a screen (excluding window frame, if present) that is transmitted through the screen/glass system as beam solar radiation. Depends on various factors, including the screen reflectance and the relative angle of the incident beam with respect to the screen. This value will include the amount of inward reflection of solar beam off the screen material surface if the user specifies this modeling option (i.e., Material: WindowScreen, field Reflected Beam Transmittance Accounting Method = Model as Direct Beam).
 
-\subsubsection{\texorpdfstring{Surface Window Screen and Glazing System Diffuse Solar Transmittance {[]}}{Surface Window Screen and Glazing System Diffuse Solar Transmittance }}\label{surface-window-screen-and-glazing-system-diffuse-solar-transmittance}
+\subsubsection{Surface Window Screen and Glazing System Diffuse Solar Transmittance {[]}}\label{surface-window-screen-and-glazing-system-diffuse-solar-transmittance}
 
 The fraction of exterior diffuse solar radiation incident on an exterior window with a screen (excluding window frame, if present) that is transmitted through the screen/glass system as diffuse solar radiation. Depends on various factors including screen material geometry and reflectance.
 
@@ -3286,7 +3286,7 @@ The fraction of exterior diffuse solar radiation incident on an exterior window 
 
 The beam solar radiation transmitted through an interior window. Calculated only if Solar Distribution = FullInteriorAndExterior in your Building input. The origin of this radiation is beam solar that enters through an exterior window in a zone and then passes through an interior window into the adjacent zone. The amount of this radiation depends on several factors, including sun position, intensity of beam solar incident on the exterior window (including effects of shadowing, if present), relative position of the exterior and interior window, and the size and transmittance of the windows. Note that if there are two or more exterior windows in a zone, then beam solar from one or more of them may pass through the same interior window. Likewise, if there are more than two or more interior windows in a zone then beam solar from a single exterior window may pass through one or more of the interior windows. There are both rate and energy versions of the output.
 
-\subsubsection{\texorpdfstring{Surface Storm Window On Off Status {[]}}{Surface Storm Window On Off Status }}\label{surface-storm-window-on-off-status}
+\subsubsection{Surface Storm Window On Off Status {[]}}\label{surface-storm-window-on-off-status}
 
 Indicates whether a storm window glass layer is present (ref: StormWindow object). The value is \textbf{0} if the storm window glass layer is off, \textbf{1} if it is on, and \textbf{--1} if the window does not have an associated storm window. Applicable only to exterior windows and glass doors.
 
@@ -3376,11 +3376,11 @@ The overall properties (U-factor/SHGC/VT) of the thermochromic windows at differ
 
 \subsubsection{Switchable Window Outputs}\label{switchable-window-outputs}
 
-\subsubsection{\texorpdfstring{Surface Window Switchable Glazing Switching Factor{[]}}{Surface Window Switchable Glazing Switching Factor}}\label{surface-window-switchable-glazing-switching-factor}
+\subsubsection{Surface Window Switchable Glazing Switching Factor{[]}}\label{surface-window-switchable-glazing-switching-factor}
 
 The switching factor (tint level) of the switchable window: 0 means no switching -- clear state; 1 means fully switched -- dark state.
 
-\subsubsection{\texorpdfstring{Surface Window Switchable Glazing Visible Transmittance{[]}}{Surface Window Switchable Glazing Visible Transmittance}}\label{surface-window-switchable-glazing-visible-transmittance}
+\subsubsection{Surface Window Switchable Glazing Visible Transmittance{[]}}\label{surface-window-switchable-glazing-visible-transmittance}
 
 The visible transmittance of the switchable window.
 

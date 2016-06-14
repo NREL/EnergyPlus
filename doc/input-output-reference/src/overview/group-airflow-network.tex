@@ -2539,25 +2539,25 @@ Average surface mass flow rate = (Surface mass flow rate during on cycle * Part-
 
 This is the AirflowNetwork linkage average mass flow rate in kg/s in the direction from Node 2 to Node 1 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used in the air distribution system. The average mass flow rate is weighted by the system fan part-load ratio using the calculated air mass flow rates during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
 
-\paragraph{\texorpdfstring{AFN Linkage Node 1 to Node 2 Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 1 to Node 2 Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-1-to-node-2-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 1 to Node 2 Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-1-to-node-2-volume-flow-rate-m3s}
 
 This is the AirflowNetwork linkage volume flow rate output in m\(^{3}\)/s in the direction from the Node 1 to Node 2. It is defined in the same manner as AFN Linkage Node 1 to Node 2 Mass Flow Rate.
 
 When a Fan:OnOff object is used, the air volume flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air volume flow rates when the fan is off are zero for the distribution system air linkage objects. The air volume flow rates for the AirflowNetwork:MultiZone:Surface object are reported in different output variables (below).
 
-\paragraph{\texorpdfstring{AFN Linkage Node 2 to Node 1 Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 2 to Node 1 Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-2-to-node-1-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 2 to Node 1 Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-2-to-node-1-volume-flow-rate-m3s}
 
 This is the AirflowNetwork linkage volume flow rate output in m\(^{3}\)/s in the direction from Node 2 to Node 1. It is defined in the same manner as AFN Linkage Node 2 to Node 1 Mass Flow Rate.
 
 When a Fan:OnOff object is used, the air volume flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air volume flow rates when the fan is off are zero for the distribution system air linkage objects. The air volume flow rates for the AirflowNetwork:MultiZone:Surface object are reported in different output variables (below).
 
-\paragraph{\texorpdfstring{AFN Linkage Node 1 to 2 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 1 to 2 Average Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-1-to-2-average-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 1 to 2 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-1-to-2-average-volume-flow-rate-m3s}
 
 This is the AirflowNetwork linkage average volume flow rate in m\(^{3}\)/s in the direction from Node 1 to Node 2 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used. The average volume flow rate is weighted by the system fan part-load ratio using the calculated air volume flow rates during the fan on and off periods for the system timestep.
 
 Average surface volume flow rate = (Surface volume flow rate during on cycle * Part-load ratio) + Surface volume flow rate during off cycle * (1.0 -- Part-load ratio)
 
-\paragraph{\texorpdfstring{AFN Linkage Node 2 to 1 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 2 to 1 Average Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-2-to-1-average-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 2 to 1 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-2-to-1-average-volume-flow-rate-m3s}
 
 This is the AirflowNetwork linkage average volume flow rate in m\(^{3}\)/s in the direction from Node 2 to Node 1 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used. The average volume flow rate is weighted by the system fan part-load ratio using the calculated air volume flow rates during the fan on and off periods for the system timestep.
 
@@ -2581,11 +2581,11 @@ This is the pressure difference across a linkage in Pa for the AirflowNetwork:Mu
 
 This is the pressure difference across a linkage in Pa for the AirflowNetwork:MultiZone:Surface objects only when the air distribution system fan is not operating (OFF). This output is only available when a Fan:OnOff object is used. Even if the fan part-load ratio is equal to 1.0, the pressure difference calculated as if the fan were not operating (OFF) is reported.
 
-\paragraph{\texorpdfstring{AFN Surface Venting Window or Door Opening Factor {[]}}{AFN Surface Venting Window or Door Opening Factor }}\label{afn-surface-venting-window-or-door-opening-factor}
+\paragraph{AFN Surface Venting Window or Door Opening Factor {[]}}\label{afn-surface-venting-window-or-door-opening-factor}
 
 The current time-step value of the venting opening factor for a particular window or door. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:MultiZone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, ``Opening Factor Multiplier for AirflowNetwork Venting Modulation''). For example, if~ the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5x0.7 = 0.35.
 
-\paragraph{\texorpdfstring{AFN Surface Venting Window or Door Opening Modulation Multiplier~ {[]}}{AFN Surface Venting Window or Door Opening Modulation Multiplier~ }}\label{afn-surface-venting-window-or-door-opening-modulation-multiplier}
+\paragraph{AFN Surface Venting Window or Door Opening Modulation Multiplier~ {[]}}\label{afn-surface-venting-window-or-door-opening-modulation-multiplier}
 
 This is the multiplier on a window or door opening factor when venting modulation is in effect. See ``Modulation of Openings'' under AirflowNetwork:MultiZone:Zone for a description of how the multiplier is determined.
 
@@ -2618,7 +2618,7 @@ NoVent & No & -1.0 \tabularnewline
 
 The time-step value of the venting setpoint temperature for the zone to which the surface belongs. This setpoint is determined from the Vent Temperature Schedule input (ref: AirflowNetwork:MultiZone:Zone).
 
-\paragraph{\texorpdfstring{AFN Surface Venting Availability Status {[]}}{AFN Surface Venting Availability Status }}\label{afn-surface-venting-availability-status}
+\paragraph{AFN Surface Venting Availability Status {[]}}\label{afn-surface-venting-availability-status}
 
 A value of 1.0 means venting through the surface can occur if venting control conditions are satisfied. A value of 0.0 means venting through the surface cannot occur under any circumstances. This value is determined by the Venting Availability Schedule input (ref: AirflowNetwork:MultiZone:Zone or AirflowNetwork:MultiZone:Surface).
 
@@ -2914,7 +2914,7 @@ This is a sum of mass flow rates from adjacent zones or outdoors multiplied by t
 
 The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:
 
-\paragraph{\texorpdfstring{AFN Surface Venting Window or Door Opening Factor at Previous Time Step {[]}}{AFN Surface Venting Window or Door Opening Factor at Previous Time Step }}\label{afn-surface-venting-window-or-door-opening-factor-at-previous-time-step}
+\paragraph{AFN Surface Venting Window or Door Opening Factor at Previous Time Step {[]}}\label{afn-surface-venting-window-or-door-opening-factor-at-previous-time-step}
 
 The value of the venting opening factor for a particular window or door at the previous time step. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:MultiZone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, ``Opening Factor Multiplier for AirflowNetwork Venting Modulation''). For example, if the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5*0.7 = 0.35.
 
@@ -2926,19 +2926,19 @@ This output is the opening elapsed time in the units of minutes since the window
 
 This output is the opening elapsed time in the units of minutes since the windows closed.
 
-\paragraph{\texorpdfstring{AFN Surface Opening Status at Previous Time Step {[]}}{AFN Surface Opening Status at Previous Time Step }}\label{afn-surface-opening-status-at-previous-time-step}
+\paragraph{AFN Surface Opening Status at Previous Time Step {[]}}\label{afn-surface-opening-status-at-previous-time-step}
 
 This is the window or door opening factor control status at the previous time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.
 
-\paragraph{\texorpdfstring{AFN Surface Opening Status {[]}}{AFN Surface Opening Status }}\label{afn-surface-opening-status}
+\paragraph{AFN Surface Opening Status {[]}}\label{afn-surface-opening-status}
 
 This is the window or door opening factor control status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.
 
-\paragraph{\texorpdfstring{AFN Surface Opening Probability Status {[]}}{AFN Surface Opening Probability Status }}\label{afn-surface-opening-probability-status}
+\paragraph{AFN Surface Opening Probability Status {[]}}\label{afn-surface-opening-probability-status}
 
 This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 
-\paragraph{\texorpdfstring{AFN Surface Closing Probability Status {[]}}{AFN Surface Closing Probability Status }}\label{afn-surface-closing-probability-status}
+\paragraph{AFN Surface Closing Probability Status {[]}}\label{afn-surface-closing-probability-status}
 
 This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 

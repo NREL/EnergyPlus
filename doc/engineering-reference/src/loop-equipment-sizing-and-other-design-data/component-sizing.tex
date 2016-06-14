@@ -137,7 +137,7 @@ where \(\dot{V}_{cc,air}\) is calculated above in the Initial Calculations secti
 
 To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperatures and humidity ratios. The inlet and outlet conditions depend on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
 
-\paragraph{\texorpdfstring{\textbf{Coil in outside air stream}:}{Coil in outside air stream:}}\label{coil-in-outside-air-stream}
+\paragraph{\textbf{Coil in outside air stream}:}\label{coil-in-outside-air-stream}
 
 \begin{itemize}
 \item
@@ -150,7 +150,7 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
   \(W_{air,out,des} = W_{sys,precool}\) (the specified Precool Design Humidity Ratio from the System:Sizing object)
 \end{itemize}
 
-\paragraph{\texorpdfstring{\textbf{Coil in main air stream, no preconditioning of outside air} }{Coil in main air stream, no preconditioning of outside air }}\label{coil-in-main-air-stream-no-preconditioning-of-outside-air}
+\paragraph{\textbf{Coil in main air stream, no preconditioning of outside air} }\label{coil-in-main-air-stream-no-preconditioning-of-outside-air}
 
 \begin{itemize}
 \item
@@ -163,7 +163,7 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
   \(W_{air,out,des} = W_{sup,cool}\) (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 \end{itemize}
 
-\paragraph{\texorpdfstring{\textbf{Coil in main air stream, outside air preconditioned} }{Coil in main air stream, outside air preconditioned }}\label{coil-in-main-air-stream-outside-air-preconditioned}
+\paragraph{\textbf{Coil in main air stream, outside air preconditioned} }\label{coil-in-main-air-stream-outside-air-preconditioned}
 
 The oustide air fraction is calculated as (where V\(_{cc,air}\) is calculated as above)
 
@@ -220,7 +220,7 @@ The enthalpies are given by:
 \end{equation}
 Where the inputs to those functions are the coil inlet design conditions. For coils in terminal units these are set at the system level to the system design supply air temperature. For zonal units they are set to design return air, mixed air, or outside air as appropriate to the unit. T\(_{air,out,des}\) is set to the zone cooling design supply air temperature as specified in the \emph{Zone:Sizing} inputs. W\(_{air,out,des}\) is set to the zone cooling design supply air humidity ratio as specified in the \emph{Zone:Sizing} inputs.
 
-\subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - System Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - System Coils}}\label{design-water-flow-rate-m3s---system-coils}
+\subsubsection{Design Water Flow Rate (m\(^{3}\)/s) - System Coils}\label{design-water-flow-rate-m3s---system-coils}
 
 The design water volumetric flow rate is calculated using:
 
@@ -230,7 +230,7 @@ The design water volumetric flow rate is calculated using:
 
 Where \(\Delta T_{w,des}\) is just the \emph{Loop Design Temperature Difference} user input from \emph{Sizing:Plant} (if the coil is in the outside air stream, 1/2 the \emph{Loop Design Temperature Difference} is used). The design coil load \emph{Load\(_{coil,des}\)} is calculated from:
 
-\subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - Zone Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - Zone Coils}}\label{design-water-flow-rate-m3s---zone-coils}
+\subsubsection{Design Water Flow Rate (m\(^{3}\)/s) - Zone Coils}\label{design-water-flow-rate-m3s---zone-coils}
 
 If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit or an ZoneHVAC:FourPipeFanCoil, the chilled water flow rate is passed down from the terminal unit or fan coil sizing calculations. Otherwise the flow is set to:
 
