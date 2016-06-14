@@ -652,6 +652,184 @@ namespace HVACVariableRefrigerantFlow {
 			SCHigh( 0.0 ),
 			VRFOperationSimPath( 0.0 )
 		{}
+		
+		public:
+		
+			// Begin of Methods for New VRF Model: Fluid Temperature Control
+			//******************************************************************************
+			void 
+			CalcVRFCondenser_FluidTCtrl();
+			
+			void
+			CalcVRFIUTeTc_FluidTCtrl();
+	
+			void
+			VRFOU_TeTc(
+				int const OperationMode, // Flag for hex operation
+				Real64 const Q_coil,// // OU coil heat release at cooling mode or heat extract at heating mode [W]
+				Real64 const SHSC, // SH at cooling or SC at heating [C]
+				Real64 const m_air, // OU coil air mass flow rate [kg/s]
+				Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
+				Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
+				Real64 const OutdoorPressure, // Outdoor air pressure (Pa)
+				Real64 & T_coil_surf, // Air temperature at coil surface [C]
+				Real64 & TeTc // VRF Tc at cooling mode, or Te at heating mode [C]
+			);
+			
+			Real64
+			VRFOU_FlowRate(
+				int const OperationMode, // Flag for hex operation
+				Real64 const TeTc, // VRF Tc at cooling mode, or Te at heating mode [C]
+				Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
+				Real64 const Q_coil, // absolute value of OU coil heat release or heat extract [W]
+				Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
+				Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
+			);
+			
+			Real64
+			VRFOU_Cap(
+				int const OperationMode, // Flag for hex operation
+				Real64 const TeTc, // VRF Tc at cooling mode, or Te at heating mode [C]
+				Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
+				Real64 const m_air, // OU coil air mass flow rate [kg/s]
+				Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
+				Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
+			);
+			
+			Real64
+			VRFOU_SCSH(
+				int const OperationMode, // Mode 0 for running as evaporator, 1 for condenser
+				Real64 const Q_coil,// // OU coil heat release at cooling mode or heat extract at heating mode [W]
+				Real64 const TeTc, // VRF Tc at cooling mode, or Te at heating mode [C]
+				Real64 const m_air, // OU coil air mass flow rate [kg/s]
+				Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
+				Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
+				Real64 const OutdoorPressure // Outdoor air pressure [Pa]
+			);
+
+			Real64
+			VRFOU_CapModFactor(
+				Real64 const h_comp_in_real, // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
+				Real64 const h_evap_in_real, // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
+				Real64 const P_evap_real, // Evaporative pressure at real conditions [Pa]
+				Real64 const T_comp_in_real, // Temperature of the refrigerant at the compressor inlet at real conditions [C]
+				Real64 const T_comp_in_rate, // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
+				Real64 const T_cond_out_rate // Temperature of the refrigerant at the condensor outlet at rated conditions [C]
+			);
+			
+			void
+			VRFOU_TeModification(
+				Real64 const Te_up, // Upper bound of Te during iteration, i.e., Te before reduction [C]
+				Real64 const Te_low, // Lower bound of Te during iteration, i.e., the given suction temperature Te' [C]
+				Real64 const Pipe_h_IU_in, // Piping Loss Algorithm Parameter: enthalpy of IU at inlet [kJ/kg]  
+				Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature [C]
+				Real64 & Te_update, // Updated Te that can generate the required Tsuction [C]
+				Real64 & Pe_update, // Piping Loss Algorithm Parameter: evaporating pressure assumed for iterations [Pa]
+				Real64 & Pipe_m_ref, // Piping Loss Algorithm Parameter: Refrigerant mass flow rate [kg/s]
+				Real64 & Pipe_h_IU_out, // Piping Loss Algorithm Parameter: enthalpy of IU at outlet [kJ/kg]
+				Real64 & Pipe_SH_merged // Piping Loss Algorithm Parameter: Average SH after the indoor units [C]
+			);
+	
+			void
+			VRFOU_CalcCompC(
+				Real64 TU_load, // Indoor unit cooling load [W]
+				Real64 T_suction, // Compressor suction temperature Te' [C]
+				Real64 T_discharge, // Compressor discharge temperature Tc' [C]
+				Real64 P_suction, // Compressor suction pressure Pe' [Pa]
+				Real64 Pipe_T_comp_in, // Refrigerant temperature at compressor inlet (after piping loss) [C]
+				Real64 Pipe_h_comp_in, // Enthalpy after piping loss (compressor inlet) [kJ/kg]
+				Real64 Pipe_h_IU_in, // Enthalpy of IU at inlet [kJ/kg]
+				Real64 Pipe_Q, // Piping Loss Algorithm Parameter: Heat loss [W]
+				Real64 MaxOutdoorUnitTc, // The maximum temperature that Tc can be at heating mode [C]
+				Real64 & OUCondHeatRelease, // Condenser heat release (cooling mode) [W]
+				Real64 & CompSpdActual, // Actual compressor running speed [rps]
+				Real64 & Ncomp // Compressor power [W]
+			);
+			
+			void
+			VRFOU_CalcCompH(
+				Real64 TU_load, // Indoor unit cooling load [W]
+				Real64 T_suction, // Compressor suction temperature Te' [C]
+				Real64 T_discharge, // Compressor discharge temperature Tc' [C]
+				Real64 Pipe_h_out_ave, // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
+				Real64 IUMaxCondTemp, // VRV IU condensing temperature, max among all indoor units [C]
+				Real64 MinOutdoorUnitTe, // The minimum temperature that Te can be at cooling mode (only used for calculating Min capacity)
+				Real64 Tfs, // Temperature of the air at the coil surface [C]]
+				Real64 Pipe_Q, // Piping Loss Algorithm Parameter: Heat loss [W]
+				Real64 & OUEvapHeatExtract, // Condenser heat release (cooling mode) [W]
+				Real64 & CompSpdActual, // Actual compressor running speed [rps]
+				Real64 & Ncomp // Compressor power [W]
+			);
+	
+			void
+			VRFHR_OU_HR_Mode(
+				Real64 const h_IU_evap_in, // enthalpy of IU evaporator at inlet [kJ/kg] 
+				Real64 const h_comp_out, // enthalpy of refrigerant at compressor outlet [kJ/kg] 
+				Real64 const Q_c_TU_PL, // IU evaporator load, including piping loss [W]
+				Real64 const Q_h_TU_PL, // IU condenser load, including piping loss [W]
+				Real64 const Tdischarge, // VRF Compressor discharge refrigerant temperature [C]
+				Real64 & Tsuction, // VRF compressor suction refrigerant temperature [C]
+				Real64 & Te_update, // updated evaporating temperature, only updated when Tsuction is updated [C]
+				Real64 & h_comp_in, // enthalpy of refrigerant at compressor inlet [kJ/kg] 
+				Real64 & h_IU_PLc_out, // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
+				Real64 & Pipe_Q_c, // IU evaporator side piping loss [W]
+				Real64 & Q_c_OU, // OU evaporator load [W]
+				Real64 & Q_h_OU, // OU condenser load [W]
+				Real64 & m_ref_IU_evap, // mass flow rate of Refrigerant through IU evaporators [kg/s]
+				Real64 & m_ref_OU_evap, // mass flow rate of Refrigerant through OU evaporator [kg/s]
+				Real64 & m_ref_OU_cond, // mass flow rate of Refrigerant through OU condenser [kg/s]
+				Real64 & N_fan_OU, // outdoor unit fan power [W]
+				Real64 & CompSpdActual, // Actual compressor running speed [rps]
+				Real64 & Ncomp // compressor power [W]
+			);
+			
+			void
+			VRFOU_CompSpd(
+				Real64 const Q_req, // Required capacity [W]
+				int const Q_type, // Required capacity type: 0 for evaporator, 1 for condenser
+				Real64 const T_suction, // Compressor suction temperature Te' [C]
+				Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
+				Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+				Real64 const h_comp_in, // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+				Real64 & CompSpdActual // Actual compressor running speed [rps]
+			);
+	
+			void
+			VRFOU_CompCap(
+				int const CompSpdActual, // Given compressor speed
+				Real64 const T_suction, // Compressor suction temperature Te' [C]
+				Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
+				Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+				Real64 const h_comp_in, // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+				Real64 & Q_c_tot, // Compressor evaporative capacity [W]
+				Real64 & Ncomp // Compressor power [W]
+			);
+	
+			void
+			VRFOU_PipeLossC(
+				Real64 const Pipe_m_ref, // Refrigerant mass flow rate [kg/s]
+				Real64 const Pevap, // VRF evaporating pressure [Pa]
+				Real64 const Pipe_h_IU_out, // Enthalpy of IU at outlet [kJ/kg]
+				Real64 const Pipe_SH_merged, // Average super heating degrees after the indoor units [C]
+				Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature (C)
+				Real64 & Pipe_Q, // unit part load ratio
+				Real64 & Pipe_DeltP, // ratio of compressor ON airflow to AVERAGE airflow over timestep
+				Real64 & Pipe_h_comp_in // Piping Loss Algorithm Parameter: Enthalpy after piping loss (compressor inlet) [kJ/kg]
+			);
+			
+			void
+			VRFOU_PipeLossH(
+				Real64 const Pipe_m_ref, // Refrigerant mass flow rate [kg/s]
+				Real64 const Pcond, // VRF condensing pressure [Pa]
+				Real64 const Pipe_h_IU_in, // Enthalpy of IU at outlet [kJ/kg]
+				Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature (C)
+				Real64 & Pipe_Q, // unit part load ratio
+				Real64 & Pipe_DeltP, // ratio of compressor ON airflow to AVERAGE airflow over timestep
+				Real64 & Pipe_h_comp_out // Piping Loss Algorithm Parameter: Enthalpy before piping loss (compressor outlet) [kJ/kg]
+			);
+	
+	
+	
 
 	};
 
@@ -672,7 +850,7 @@ namespace HVACVariableRefrigerantFlow {
 		Array1D_bool HRCoolRequest; // defines a cooling load on VRFTerminalUnits when QZnReq > 0
 		Array1D_bool CoolingCoilAvailable; // cooling coil availability scheduled on
 		Array1D_bool HeatingCoilAvailable; // cooling coil availability scheduled on
-		Array1D_int CoolingCoilAvailSchPtr; // cooilng coil availability schedule index
+		Array1D_int CoolingCoilAvailSchPtr; // cooling coil availability schedule index
 		Array1D_int HeatingCoilAvailSchPtr; // heating coil availability schedule index
 
 		// Default Constructor
@@ -739,7 +917,7 @@ namespace HVACVariableRefrigerantFlow {
 		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
 		Real64 TerminalUnitSensibleRate; // sensible cooling/heating rate of VRF terminal unit (W)
-		Real64 TerminalUnitLatentRate; // latent dehumidificatino/humidification rate of VRF terminal unit (W)
+		Real64 TerminalUnitLatentRate; // latent dehumidification/humidification rate of VRF terminal unit (W)
 		Real64 TotalCoolingRate; // report variable for total cooling rate (W)
 		Real64 TotalHeatingRate; // report variable for total heating rate (W)
 		Real64 SensibleCoolingRate; // report variable for sensible cooling rate (W)
@@ -832,6 +1010,45 @@ namespace HVACVariableRefrigerantFlow {
 			HVACSizingIndex( 0 )
 		{}
 
+		public:
+			
+			// Methods for New VRF Model: Fluid Temperature Control 
+			//******************************************************************************
+			// Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are not member functions of this class.
+			
+			void
+			CalcVRFIUVariableTeTc( 
+				int const VRFTUNum, // Index to VRF terminal unit
+				Real64 & EvapTemp, // evaporating temperature
+				Real64 & CondTemp  // condensing temperature 
+			);
+				
+			void
+			ControlVRF_FluidTCtrl(
+				int const VRFTUNum, // Index to VRF terminal unit
+				Real64 const QZnReq, // Index to zone number
+				bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+				Real64 & PartLoadRatio, // unit part load ratio
+				Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+			);
+			
+			void
+			CalcVRF_FluidTCtrl(
+				int const VRFTUNum, // Index to VRF terminal unit
+				bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+				Real64 const PartLoadRatio, // compressor part load fraction
+				Real64 & LoadMet, // load met by unit (W)
+				Real64 & OnOffAirFlowRatio, // ratio of ON air flow to average air flow
+				Optional< Real64 > LatOutputProvided = _ // delivered latent capacity (W)
+			);
+			
+			Real64
+			CalVRFTUAirFlowRate_FluidTCtrl(
+				int const VRFTUNum, // Index to VRF terminal unit
+				Real64 PartLoadRatio, // part load ratio of the coil 
+				bool FirstHVACIteration // FirstHVACIteration flag
+			);
+	
 	};
 
 
@@ -1030,260 +1247,28 @@ namespace HVACVariableRefrigerantFlow {
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
-	
-	// Begin of Methods for New VRF Model: Fluid Temperature Control
+	// Begin of Methods for New VRF Model: Fluid Temperature Control 
 	//******************************************************************************
-	void
-	CalcVRFIUTeTc_FluidTCtrl(
-		int const IndexVRFCondenser // index to VRF Outdoor Unit
-	);
-	
-	void
-	CalcVRFIUVariableTeTc(
-		int const VRFTUNum, // the number of the VRF TU to be simulated
-		Real64 & EvapTemp, // evaporating temperature
-		Real64 & CondTemp  // condensing temperature 
-	);
-		
-	void
-	ControlVRF_FluidTCtrl(
-		int const VRFTUNum, // Index to VRF terminal unit
-		Real64 const QZnReq, // Index to zone number
-		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-		Real64 & PartLoadRatio, // unit part load ratio
-		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
-	);
-	
-	void
-	CalcVRF_FluidTCtrl(
-		int const VRFTUNum, // Unit index in VRF terminal unit array
-		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-		Real64 const PartLoadRatio, // compressor part load fraction
-		Real64 & LoadMet, // load met by unit (W)
-		Real64 & OnOffAirFlowRatio, // ratio of ON air flow to average air flow
-		Optional< Real64 > LatOutputProvided = _ // delivered latent capacity (W)
-	);
-
-	void
-	CalcVRFCondenser_FluidTCtrl(
-		int const VRFCond, // index to VRF condenser
-		bool const FirstHVACIteration // flag for first time through HVAC system simulation
-	);
-	
-	Real64
-	CalVRFTUAirFlowRate_FluidTCtrl(
-		int VRFTUNum, // TU index
-		Real64 PartLoadRatio, // part load ratio of the coil 
-		bool FirstHVACIteration // FirstHVACIteration flag
-	);
-	
 	Real64
 	VRFTUAirFlowResidual_FluidTCtrl(
 		Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU 
 		Array1< Real64 > const & Par // par(1) = VRFTUNum
 	);
+		
+	Real64
+	VRFOUTeResidual_FluidTCtrl(
+		Real64 const Te, // outdoor unit evaporating temperature 
+		Array1< Real64 > const & Par // par(1) = VRFTUNum
+	);
 	
 	Real64 
 	CompResidual_FluidTCtrl( 
-		Real64 const Te, // Outdoor unit evaporating temperature
-		Array1< Real64 > const & Par // Array of parameters
+		Real64 const T_suc, // Compressor suction temperature Te' [C]
+		Array1< Real64 > const & Par // parameters
 	);
 	
-	void
-	VRFOU_TeTc(
-		int const VRFCond, // Index to VRF outdoor unit
-		int const OperationMode, // Flag for hex operation
-		Real64 const Q_coil,// // OU coil heat release at cooling mode or heat extract at heating mode [W]
-		Real64 const SHSC, // SH at cooling or SC at heating [C]
-		Real64 const m_air, // OU coil air mass flow rate [kg/s]
-		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
-		Real64 const OutdoorPressure, // Outdoor air pressure (Pa)
-		Real64 & T_coil_surf, // Air temperature at coil surface [C]
-		Real64 & TeTc // VRF Tc at cooling mode, or Te at heating mode [C]
-	);
-	
-	Real64
-	VRFOU_Cap(
-		int const VRFCond, // Index to VRF outdoor unit
-		int const OperationMode, // Flag for hex operation
-		Real64 const TeTc, // VRF Tc at cooling mode, or Te at heating mode [C]
-		Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
-		Real64 const m_air, // OU coil air mass flow rate [kg/s]
-		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
-	);
-	
-	Real64
-	VRFOU_FlowRate(
-		int const VRFCond, // Index to VRF outdoor unit
-		int const OperationMode, // Flag for hex operation
-		Real64 const TeTc, // VRF Tc at cooling mode, or Te at heating mode [C]
-		Real64 const SHSC, // SC for OU condenser or SH for OU evaporator [C]
-		Real64 const Q_coil, // absolute value of OU coil heat release or heat extract [W]
-		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
-	);
-	
-	Real64
-	VRFOU_SCSH(
-		int const VRFCond, // Index to VRF outdoor unit
-		int const OperationMode, // Mode 0 for running as evaporator, 1 for condenser
-		Real64 const Q_coil,// // OU coil heat release at cooling mode or heat extract at heating mode [W]
-		Real64 const TeTc, // VRF Tc at cooling mode, or Te at heating mode [C]
-		Real64 const m_air, // OU coil air mass flow rate [kg/s]
-		Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
-		Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
-		Real64 const OutdoorPressure // Outdoor air pressure [Pa]
-	);
-	
-	Real64
-	VRFOU_CapModFactor(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const h_comp_in_real, // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
-		Real64 const h_evap_in_real, // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
-		Real64 const P_evap_real, // Evaporative pressure at real conditions [Pa]
-		Real64 const T_comp_in_real, // Temperature of the refrigerant at the compressor inlet at real conditions [C]
-		Real64 const T_comp_in_rate, // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
-		Real64 const T_cond_out_rate // Temperature of the refrigerant at the condensor outlet at rated conditions [C]
-	);
-	
-	void
-	VRFOU_TeModification(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const Te_up, // Upper bound of Te during iteration, i.e., Te before reduction [C]
-		Real64 const Te_low, // Lower bound of Te during iteration, i.e., the given suction temperature Te' [C]
-		Real64 const Pipe_h_IU_in, // Piping Loss Algorithm Parameter: enthalpy of IU at inlet [kJ/kg]  
-		Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature [C]
-		Real64 & Te_update, // Updated Te that can generate the required Tsuction [C]
-		Real64 & Pe_update, // Piping Loss Algorithm Parameter: evaporating pressure assumed for iterations [Pa]
-		Real64 & Pipe_m_ref, // Piping Loss Algorithm Parameter: Refigerant mass flow rate [kg/s]
-		Real64 & Pipe_h_IU_out, // Piping Loss Algorithm Parameter: enthalpy of IU at outlet [kJ/kg]
-		Real64 & Pipe_SH_merged // Piping Loss Algorithm Parameter: Average SH after the indoor units [C]
-	);
-	
-	void
-	VRFOU_CompSpd(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const Q_req, // Required capacity [W]
-		int const Q_type, // Required capacity type: 0 for evaporator, 1 for condenser
-		Real64 const T_suction, // Compressor suction temperature Te' [C]
-		Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
-		Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-		Real64 const h_comp_in, // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-		Real64 & CompSpdActual // Actual compressor running speed [rps]
-	);
-	
-	void
-	VRFOU_CompCap(
-		int const VRFCond, // Index to VRF outdoor unit
-		int const CompSpdActual, // Given compressor speed
-		Real64 const T_suction, // Compressor suction temperature Te' [C]
-		Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
-		Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-		Real64 const h_comp_in, // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-		Real64 & Q_c_tot, // Compressor evaporative capacity [W]
-		Real64 & Ncomp // Compressor power [W]
-	);
-	
-	void
-	VRFOU_CalcCompC(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 TU_load, // Indoor unit cooling load [W]
-		Real64 T_suction, // Compressor suction temperature Te' [C]
-		Real64 T_discharge, // Compressor discharge temperature Tc' [C]
-		Real64 P_suction, // Compressor suction pressure Pe' [Pa]
-		Real64 Pipe_T_comp_in, // Refrigerant temperature at comparessor inlet (after piping loss) [C]
-		Real64 Pipe_h_comp_in, // Enthalpy after piping loss (comparessor inlet) [kJ/kg]
-		Real64 Pipe_h_IU_in, // Enthalpy of IU at inlet [kJ/kg]
-		Real64 Pipe_Q, // Piping Loss Algorithm Parameter: Heat loss [W]
-		Real64 MaxOutdoorUnitTc, // The maximum temperature that Tc can be at heating mode [C]
-		Real64 & OUCondHeatRelease, // Condenser heat release (cooling mode) [W]
-		Real64 & CompSpdActual, // Actual compressor running speed [rps]
-		Real64 & Ncomp // Compressor power [W]
-	);
-	
-	void
-	VRFOU_CalcCompH(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 TU_load, // Indoor unit cooling load [W]
-		Real64 T_suction, // Compressor suction temperature Te' [C]
-		Real64 T_discharge, // Compressor discharge temperature Tc' [C]
-		Real64 Pipe_h_out_ave, // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
-		Real64 IUMaxCondTemp, // VRV IU condensing temperature, max among all indoor units [C]
-		Real64 MinOutdoorUnitTe, // The minimum temperature that Te can be at cooling mode (only used for calculating Min capacity)
-		Real64 Tfs, // Temperature of the air at the coil surface [C]]
-		Real64 Pipe_Q, // Piping Loss Algorithm Parameter: Heat loss [W]
-		Real64 & OUEvapHeatExtract, // Condenser heat release (cooling mode) [W]
-		Real64 & CompSpdActual, // Actual compressor running speed [rps]
-		Real64 & Ncomp // Compressor power [W]
-	);
-	
-	void
-	VRFOU_CalcComp_HR(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const Q_c_OU, // OU evaporator load [W]
-		Real64 const Q_c_TU_PL, // IU evaporator load, including piping loss [W]
-		Real64 const Pipe_Q_c, // IU condenser side piping loss [W]
-		Real64 const T_discharge, // Compressor discharge temperature Tc' [C]
-		Real64 const h_IU_evap_in, // Enthalpy of IU at inlet [kJ/kg]
-		Real64 & T_comp_in, // Refrigerant temperature at compressor inlet (after piping loss) [C]
-		Real64 & h_comp_in, // Enthalpy after piping loss (compressor inlet) [kJ/kg]
-		Real64 & T_suction, // Compressor suction temperature Te' [C]
-		Real64 & CompSpdActual, // Actual compressor running speed [rps]
-		Real64 & Ncomp // Compressor power [W]
-	);
-	
-	void
-	VRFHR_OU_HR_Mode(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const h_IU_evap_in, // enthalpy of IU evaporator at inlet [kJ/kg] 
-		Real64 const h_comp_out, // enthalpy of refrigerant at compressor outlet [kJ/kg] 
-		Real64 const Q_c_TU_PL, // IU evaporator load, including piping loss [W]
-		Real64 const Q_h_TU_PL, // IU condenser load, including piping loss [W]
-		Real64 const Tdischarge, // VRF Compressor discharge refrigerant temperature [C]
-		Real64 & Tsuction, // VRF compressor suction refrigerant temperature [C]
-		Real64 & Te_update, // updated evaporating temperature, only updated when Tsuction is updated [C]
-		Real64 & h_comp_in, // enthalpy of refrigerant at compressor inlet [kJ/kg] 
-		Real64 & h_IU_PLc_out, // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
-		Real64 & Pipe_Q_c, // IU evaporator side piping loss [W]
-		Real64 & Q_c_OU, // OU evaporator load [W]
-		Real64 & Q_h_OU, // OU condenser load [W]
-		Real64 & m_ref_IU_evap, // mass flow rate of Refrigerant through IU evaporators [kg/s]
-		Real64 & m_ref_OU_evap, // mass flow rate of Refrigerant through OU evaporator [kg/s]
-		Real64 & m_ref_OU_cond, // mass flow rate of Refrigerant through OU condenser [kg/s]
-		Real64 & N_fan_OU, // outdoor unit fan power [W]
-		Real64 & CompSpdActual, // Actual compressor running speed [rps]
-		Real64 & Ncomp // compressor power [W]
-	);
-	
-	void
-	VRFOU_PipeLossC(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const Pipe_m_ref, // Refigerant mass flow rate [kg/s]
-		Real64 const Pevap, // VRF evaporating pressure [Pa]
-		Real64 const Pipe_h_IU_out, // Enthalpy of IU at outlet [kJ/kg]
-		Real64 const Pipe_SH_merged, // Average super heating degrees after the indoor units [C]
-		Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature (C)
-		Real64 & Pipe_Q, // unit part load ratio
-		Real64 & Pipe_DeltP, // ratio of compressor ON airflow to AVERAGE airflow over timestep
-		Real64 & Pipe_h_comp_in // Piping Loss Algorithm Parameter: Enthalpy after piping loss (comparessor inlet) [kJ/kg]
-	);
-	
-	void
-	VRFOU_PipeLossH(
-		int const VRFCond, // Index to VRF outdoor unit
-		Real64 const Pipe_m_ref, // Refigerant mass flow rate [kg/s]
-		Real64 const Pcond, // VRF condensing pressure [Pa]
-		Real64 const Pipe_h_IU_in, // Enthalpy of IU at outlet [kJ/kg]
-		Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature (C)
-		Real64 & Pipe_Q, // unit part load ratio
-		Real64 & Pipe_DeltP, // ratio of compressor ON airflow to AVERAGE airflow over timestep
-		Real64 & Pipe_h_comp_out // Piping Loss Algorithm Parameter: Enthalpy before piping loss (comparessor outlet) [kJ/kg]
-	);
-	
-	// End of Methods for New VRF Model: Fluid Temperature Control
-	// *****************************************************************************
+	// End of Methods for New VRF Model: Fluid Temperature Control 
+	//******************************************************************************
 
 } // HVACVariableRefrigerantFlow
 

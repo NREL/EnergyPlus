@@ -128,26 +128,19 @@ using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 	
-
+	
 	//*****************VRF-FluidTCtrl Model
 	TEST_F( EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor ) {
 		//   PURPOSE OF THIS TEST:
 		//   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
 		
-		// Inputs_general		
+		// Inputs_general
 		int const FlagCondMode( 0 ); // Flag for running as condenser [-]
 		int const FlagEvapMode( 1 ); // Flag for running as evaporator [-]
 		bool ErrorsFound( false );        // function returns true on error
-		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration
-		int VRFCond( 1 );                 // index to VRF condenser
-		int VRFTUNum( 1 );                // index to VRF terminal unit
-		int NumTUList = 1;
-		int EquipPtr( 1 );                // index to equipment list
-		int CurZoneNum( 1 );              // index to zone
-		int ZoneInletAirNode( 0 );        // zone inlet node number
-		Real64 DefrostWatts( 0.0 );       // calculation of VRF defrost power [W]
-		Real64 SysOutputProvided( 0.0 );  // function returns sensible capacity [W]
-		Real64 LatOutputProvided( 0.0 );  // function returns latent capacity [W]
+		int NumTUList( 1 ); // number of TU List
+		int VRFCond( 1 ); // index to VRF condenser
+		int TUListNum ( 1 ); // index to VRF TU list
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
@@ -1640,13 +1633,11 @@ namespace EnergyPlus {
 		
 		// Allocate
 		TerminalUnitList.allocate( NumTUList );
-		int TUListNum = 1;
-		int TUNum = 1;
 		VRF( VRFCond ).ZoneTUListPtr = TUListNum;
 		TerminalUnitList( TUListNum ).NumTUInList = NumTUList;
 
 		// Run and Check: VRFHR_OU_HR_Mode
-		{				
+		{
 			//   Test the method VRFOU_CalcCompH, which determines the operational mode of the VRF-HR system, given the terminal unit side load conditions. 
 			//   Compressor and OU hex performance are analysed for each mode.
 			
@@ -1673,7 +1664,7 @@ namespace EnergyPlus {
 			DataEnvironment::OutDryBulbTemp = 10.35;
 
 			// Run
-			VRFHR_OU_HR_Mode( VRFCond, h_IU_evap_in, h_comp_out, Q_c_TU_PL, Q_h_TU_PL, Tdischarge, Tsuction, Te_update, h_comp_in, h_IU_PLc_out, Pipe_Q_c, Q_c_OU, Q_h_OU, 
+			VRF( VRFCond ).VRFHR_OU_HR_Mode( h_IU_evap_in, h_comp_out, Q_c_TU_PL, Q_h_TU_PL, Tdischarge, Tsuction, Te_update, h_comp_in, h_IU_PLc_out, Pipe_Q_c, Q_c_OU, Q_h_OU, 
 			m_ref_IU_evap, m_ref_OU_evap, m_ref_OU_cond, N_fan_OU, CompSpdActual, Ncomp );
 
 			//Test
@@ -1687,7 +1678,7 @@ namespace EnergyPlus {
 		}
 
 		// Run and Check: VRFOU_CapModFactor
-		{				
+		{
 			//   Test the method VRFOU_CapModFactor, which calculates capacity modification factor for the compressors at Outdoor Unit. 
 			//   This factor is used to modify the system evaporative capacity, by describing
 			//   the difference between rated conditions and real conditions.
@@ -1702,7 +1693,7 @@ namespace EnergyPlus {
 			Real64 C_cap_operation; 
 
 			// Run
-			C_cap_operation = VRFOU_CapModFactor( VRFCond, h_comp_in_real, h_evap_in_real, P_evap_real, T_comp_in_real, T_comp_in_rate, T_cond_out_rate );
+			C_cap_operation = VRF( VRFCond ).VRFOU_CapModFactor( h_comp_in_real, h_evap_in_real, P_evap_real, T_comp_in_real, T_comp_in_rate, T_cond_out_rate );
 						
 			//Test
 			EXPECT_NEAR( 0.879, C_cap_operation, 0.005 );
@@ -1711,7 +1702,7 @@ namespace EnergyPlus {
 		
 		
 		// Run and Check: VRFOU_CompSpd
-		{				
+		{
 			//   Test the method VRFOU_CompSpd, which calculates the compressor speed at given 
 			//   operational conditions to meet the evaporator or condenser capacity provided.
 			
@@ -1727,8 +1718,8 @@ namespace EnergyPlus {
 			Real64 CompSpdActual; // Actual compressor running speed [rps]
 
 			// Run
-			VRFOU_CompSpd( VRFCond, Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual );
-						
+			VRF( VRFCond ).VRFOU_CompSpd( Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual );
+			
 			//Test
 			EXPECT_NEAR( 1298, CompSpdActual, 1 );
 			}
@@ -1745,7 +1736,7 @@ namespace EnergyPlus {
 			Real64 CompSpdActual; // Actual compressor running speed [rps]
 
 			// Run
-			VRFOU_CompSpd( VRFCond, Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual );
+			VRF( VRFCond ).VRFOU_CompSpd( Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual );
 						
 			//Test
 			EXPECT_NEAR( 950, CompSpdActual, 1 );
@@ -1753,7 +1744,7 @@ namespace EnergyPlus {
 		}
 		
 		// Run and Check: VRFOU_CompCap
-		{				
+		{
 			//   Test the method VRFOU_CompCap, which calculates the compressor performance (power and capacity) 
 			//   at given compressor speed and operational conditions.
 			
@@ -1767,15 +1758,15 @@ namespace EnergyPlus {
 			Real64 Ncomp; // Compressor power [W]
 
 			// Run
-			VRFOU_CompCap( VRFCond, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp );
-						
+			VRF( VRFCond ).VRFOU_CompCap( CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp );
+			
 			//Test
 			EXPECT_NEAR( 6971, Q_c_tot, 1 );
 			EXPECT_NEAR( 1601, Ncomp, 1 );
 		}
 		
 		// Run and Check: VRFOU_CalcComp
-		{				
+		{
 			//   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it sepcifies
 			//   the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the specified 
 			//   speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load conditions.
@@ -1796,7 +1787,7 @@ namespace EnergyPlus {
 
 
 			// Run
-			VRFOU_CalcCompH( VRFCond, TU_load, T_suction, T_discharge, Pipe_h_out_ave, IUMaxCondTemp, MinOutdoorUnitTe, Tfs, Pipe_Q, OUEvapHeatExtract, CompSpdActual, Ncomp );
+			VRF( VRFCond ).VRFOU_CalcCompH( TU_load, T_suction, T_discharge, Pipe_h_out_ave, IUMaxCondTemp, MinOutdoorUnitTe, Tfs, Pipe_Q, OUEvapHeatExtract, CompSpdActual, Ncomp );
 
 			//Test
 			EXPECT_NEAR( 5110, OUEvapHeatExtract, 1 );
@@ -1818,7 +1809,7 @@ namespace EnergyPlus {
 		int VRFCond = 1;
 		VRF.allocate( NumVRFCondenser );
 		
-		// Inputs_general		
+		// Inputs_general
 		int const FlagCondMode( 0 ); // Flag for running as condenser [-]
 		int const FlagEvapMode( 1 ); // Flag for running as evaporator [-]
 		Real64 OutDryBulbTemp; // Temperature of outdoor air [C]
@@ -1832,7 +1823,6 @@ namespace EnergyPlus {
 		Real64 Q_c_OU; // OU evaporator heat exchange rate [W]
 		Real64 m_air; // OU coil air mass flow rate [kg/s]
 		Real64 temp; // OU coil air mass flow rate [kg/s]
-		Real64 C_OU_HexRatio = 0.44; //0.3
 
 		// Inputs_VRF configurations
 		VRF( VRFCond ).RateBFOUCond = 0.05;
@@ -1844,12 +1834,12 @@ namespace EnergyPlus {
 		VRF( VRFCond ).C2Tc	= -0.091;
 		VRF( VRFCond ).C3Tc	= 0.075;
 
-		// Preprocess
+		// Pre-process
 		DataEnvironment::OutBaroPress = OutBaroPress;
 		InitializePsychRoutines();
 
 		// Run and Check: VRFOU_Cap
-		{				
+		{
 		//   Test the method VRFOU_Cap, which determines the VRF OU heat transfer rate, given refrigerant side temperature, 
 		//   i.e., condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
 			{
@@ -1863,7 +1853,7 @@ namespace EnergyPlus {
 			Tdischarge = 36;
 
 			// Run
-			Q_h_OU = VRFOU_Cap( VRFCond, FlagCondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat );
+			Q_h_OU = VRF( VRFCond ).VRFOU_Cap( FlagCondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat );
 			
 			//Test
 			EXPECT_NEAR( 27551, Q_h_OU, 10 );
@@ -1880,7 +1870,7 @@ namespace EnergyPlus {
 			Tsuction = -3;
 
 			// Run
-			Q_c_OU = VRFOU_Cap( VRFCond, FlagEvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat );
+			Q_c_OU = VRF( VRFCond ).VRFOU_Cap( FlagEvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat );
 
 			//Test
 			EXPECT_NEAR( 24456, Q_c_OU, 10 );
@@ -1889,7 +1879,7 @@ namespace EnergyPlus {
 		}
 
 		// Run and Check: VRFOU_FlowRate
-		{				
+		{
 		//   Test the method VRFOU_Cap, which calculates the outdoor unit fan flow rate, given VRF OU load and refrigerant side temperature, i.e., 
 		//   condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
 			{
@@ -1903,7 +1893,7 @@ namespace EnergyPlus {
 			Tdischarge = 36;
 
 			// Run
-			m_air = VRFOU_FlowRate( VRFCond, FlagCondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat );
+			m_air = VRF( VRFCond ).VRFOU_FlowRate( FlagCondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat );
 			
 			//Test
 			EXPECT_NEAR( 3.6, m_air, 0.01 );
@@ -1920,7 +1910,7 @@ namespace EnergyPlus {
 			Tsuction = -3;
 
 			// Run
-			m_air = VRFOU_FlowRate( VRFCond, FlagEvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat );
+			m_air = VRF( VRFCond ).VRFOU_FlowRate( FlagEvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat );
 
 			//Test
 			EXPECT_NEAR( 3.6, m_air, 0.01 );
@@ -1929,7 +1919,7 @@ namespace EnergyPlus {
 		}
 		
 		// Run and Check: VRFOU_TeTc
-		{				
+		{
 		//   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature  
 		//   at cooling mode, or evaporating temperature at heating mode, given the coil heat   
 		//   release/extract amount and air side parameters.
@@ -1944,7 +1934,7 @@ namespace EnergyPlus {
 			SC = 1;
 
 			// Run
-			VRFOU_TeTc( VRFCond, FlagCondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress,temp, Tdischarge );
+			VRF( VRFCond ).VRFOU_TeTc( FlagCondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress,temp, Tdischarge );
 			
 			//Test
 			EXPECT_NEAR( 36, Tdischarge, 0.05 );
@@ -1962,7 +1952,7 @@ namespace EnergyPlus {
 			Tsuction = -3;
 
 			// Run
-			VRFOU_TeTc( VRFCond, FlagEvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress,temp, Tsuction );
+			VRF( VRFCond ).VRFOU_TeTc( FlagEvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress,temp, Tsuction );
 
 			//Test
 			EXPECT_NEAR( -3, Tsuction, 0.05 );
@@ -1971,7 +1961,7 @@ namespace EnergyPlus {
 		}
 		
 		// Run and Check: VRFOU_SCSH
-		{				
+		{
 		//   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature  
 		//   at cooling mode, or evaporating temperature at heating mode, given the coil heat   
 		//   release/extract amount and air side parameters.
@@ -1986,7 +1976,7 @@ namespace EnergyPlus {
 			Tdischarge = 36;
 
 			// Run
-			SC = VRFOU_SCSH( VRFCond, FlagCondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress );
+			SC = VRF( VRFCond ).VRFOU_SCSH( FlagCondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress );
 			
 			//Test
 			EXPECT_NEAR( 1, SC, 0.01 );
@@ -2003,7 +1993,7 @@ namespace EnergyPlus {
 			Tsuction = -3;
 
 			// Run
-			SH = VRFOU_SCSH( VRFCond, FlagEvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress );
+			SH = VRF( VRFCond ).VRFOU_SCSH( FlagEvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress );
 
 			//Test
 			EXPECT_NEAR( 1, SH, 0.01 );
@@ -2310,7 +2300,7 @@ namespace EnergyPlus {
 		VRF( IndexVRFCondenser ).CondTempFixed = 5;
 
 		// Run and Check
-		CalcVRFIUTeTc_FluidTCtrl( IndexVRFCondenser );
+		VRF( IndexVRFCondenser ).CalcVRFIUTeTc_FluidTCtrl();
 
 		EXPECT_EQ( VRF( IndexVRFCondenser ).IUEvaporatingTemp, 3 );
 		EXPECT_EQ( VRF( IndexVRFCondenser ).IUCondensingTemp, 5 );
