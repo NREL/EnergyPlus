@@ -211,18 +211,25 @@ if( BUILD_PACKAGE )
   endif()
 
   if ( NOT EXISTS "${CMAKE_BINARY_DIR}/BuildSupport" ) 
-    message( STATUS "Cloning EnergyPlusBuildSupport: Please wait, this can take a few minutes" )
-    execute_process(COMMAND "${GIT_EXECUTABLE}" "clone" "https://github.com/NREL/EnergyPlusBuildSupport" "${CMAKE_BINARY_DIR}/BuildSupport" )
+    message( STATUS "Cloning EnergyPlusBuildSupport: Please wait, this can take several minutes" )
+    execute_process(COMMAND "${GIT_EXECUTABLE}" "clone" "https://github.com/NREL/EnergyPlusBuildSupport" "${CMAKE_BINARY_DIR}/BuildSupport" 
+	            ERROR_QUIET 
+		    OUTPUT_QUIET 
+		    RESULT_VARIABLE GIT_RESULT 
+		    OUTPUT_VARIABLE GIT_OUTPUT)
   else()
     message( STATUS "Updating EnergyPlusBuildSupport: Please wait, this can take a few seconds" )
-    execute_process(COMMAND "${GIT_EXECUTABLE} pull" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/BuildSupport" RESULT_VARIABLE GIT_RESULT OUTPUT_VARIABLE GIT_OUTPUT )
+    execute_process(COMMAND "${GIT_EXECUTABLE}" "pull" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/BuildSupport" 
+	            ERROR_QUIET
+		    OUTPUT_QUIET
+	            RESULT_VARIABLE GIT_RESULT 
+		    OUTPUT_VARIABLE GIT_OUTPUT )
   endif()
-  #if(${GIT_RESULT} EQUAL 0)
-  #  message( STATUS "Local BuildSupport clone updated and ready" ) 
-  #else()  
-	  #    message( SEND_ERROR "Git exited with a failure code, aborting configure" )
-	  #   message( SEND_ERROR ${GIT_OUTPUT} ) 
-	  #endif()
+  if("${GIT_RESULT}" EQUAL 0)
+    message( STATUS "Local BuildSupport clone updated and ready" ) 
+  else()  
+	  message( SEND_ERROR "GIT ERROR OCCURED: ${GIT_RESULT}; ${GIT_OUTPUT}" ) 
+  endif()
 
   if( BUILD_FORTRAN )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
