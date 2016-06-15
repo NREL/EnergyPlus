@@ -155,6 +155,11 @@ namespace PackagedTerminalHeatPump {
 	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
+	namespace {
+		// clear_state variables
+		static bool MyOneTimeFlag( true ); // initialization flag
+	}
+
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	// Compressor operation
@@ -211,6 +216,12 @@ namespace PackagedTerminalHeatPump {
 	Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
+	void
+	clear_state()
+	{
+		MyOneTimeFlag = true;
+	}
+
 
 	void
 	SimPackagedTerminalUnit(
@@ -2828,8 +2839,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 RhoAir; // air density at InNode
 		Real64 PartLoadFrac; // compressor part load fraction
 		Real64 CoilMaxVolFlowRate; // water or steam max volumetric water flow rate
-		static bool MyOneTimeFlag( true ); // initialization flag
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
 		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time

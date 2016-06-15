@@ -350,6 +350,7 @@ namespace EnergyPlus {
 		OutputReportTabular::clear_state();
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
+		PackagedTerminalHeatPump::clear_state();
 		PlantCondLoopOperation::clear_state();
 		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();

@@ -422,6 +422,9 @@ namespace PackagedTerminalHeatPump {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimPackagedTerminalUnit(
 		std::string const & CompName, // name of the packaged terminal heat pump
 		int const ZoneNum, // number of zone being served
