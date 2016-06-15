@@ -4523,11 +4523,14 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 	int ZoneNum; // Zone number the current surface is attached to
 	int OPtr;
 	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
+	bool MovInsulErrorFlag; // Movable Insulation error flag
 
 	// FUNCTION DEFINITIONS:
 	// na
 
 	// FLOW:
+	MovInsulErrorFlag = false;
+	
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 		// Need to transfer any source/sink for a surface to the local array.  Note that
 		// the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
@@ -4725,7 +4728,10 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			}
 
 			// Call the outside surface temp calculation and pass the necessary terms
-			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt );
+			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
+				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+			}
 
 			// This ends the calculations for this surface and goes on to the next SurfNum
 
@@ -4765,7 +4771,9 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					CalcExteriorVentedCavity( SurfNum );
 				}
 
-				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt );
+				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+				
 			} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 				if ( Surface( SurfNum ).ExtCavityPresent ) {
 					CalcExteriorVentedCavity( SurfNum );
@@ -4870,7 +4878,11 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 			}
 
-			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt );
+			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
+				
+				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+			}
 
 		} else { // for interior or other zone surfaces
 
@@ -5898,7 +5910,8 @@ CalcOutsideSurfTemp(
 	int const ZoneNum, // Zone number the current surface is attached to
 	int const ConstrNum, // Construction index for the current surface
 	Real64 const HMovInsul, // "Convection" coefficient of movable insulation
-	Real64 const TempExt // Exterior temperature boundary condition
+	Real64 const TempExt, // Exterior temperature boundary condition
+	bool & ErrorFlag // Error flag for movable insulation problem
 )
 {
 
@@ -6076,7 +6089,8 @@ CalcOutsideSurfTemp(
 			ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
 			ShowContinueError( "exterior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name + " for a surface with that construction." );
 			ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
-			ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+			ErrorFlag = true;
+			return;
 
 		} else {
 			Real64 const RadSysDiv( 1.0 / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ) );
