@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <fstream>
 #include "InputProcessor_json.hh"
-#include "nlohmann/json/src/json.hpp"
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
