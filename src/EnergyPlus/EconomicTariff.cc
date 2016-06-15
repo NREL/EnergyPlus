@@ -3970,6 +3970,7 @@ namespace EconomicTariff {
 		int unitConvIndex( 0 );
 		Real64 perAreaUnitConv( 0.0 );
 		std::string perAreaUnitName;
+		std::string test_str;
 
 		// compute floor area if no ABUPS
 		if ( buildingConditionedFloorArea == 0.0 ) {
@@ -3982,6 +3983,8 @@ namespace EconomicTariff {
 			LookupSItoIP( SIunit, unitConvIndex, perAreaUnitName );
 			perAreaUnitConv = ConvertIP( unitConvIndex, 1.0 );
 		} else {
+			SIunit = "[~~$~~/m2]";
+			LookupSItoIP( SIunit, unitConvIndex, test_str );
 			perAreaUnitName = "[~~$~~/m2]";
 			perAreaUnitConv = 1.0;
 		}

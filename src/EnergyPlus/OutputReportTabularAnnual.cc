@@ -684,6 +684,9 @@ namespace EnergyPlus {
 					OutputReportTabular::GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 				}
 				else { //just do the Joule conversion
+					std::string test_str;
+					varNameWithUnits =  fldStIt->m_variMeter + '[' + fldStIt->m_varUnits + ']';
+					OutputReportTabular::LookupSItoIP( varNameWithUnits, indexUnitConv, test_str );
 					//if units is in Joules, convert if specified
 					if ( fldStIt->m_varUnits == "J" ) {
 						curUnits = energyUnitsString;
@@ -1294,6 +1297,9 @@ namespace EnergyPlus {
 				OutputReportTabular::GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 			}
 			else { //just do the Joule conversion
+				std::string test_str;
+				varNameWithUnits = fldStIt->m_variMeter + '[' + fldStIt->m_varUnits + ']';
+				OutputReportTabular::LookupSItoIP( varNameWithUnits, indexUnitConv, test_str );
 				//if units is in Joules, convert if specified
 				if ( fldStIt->m_varUnits == "J" ) {
 					curUnits = energyUnitsString;

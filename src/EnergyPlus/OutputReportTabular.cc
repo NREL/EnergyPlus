@@ -224,7 +224,7 @@ namespace OutputReportTabular {
 
 	static std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
 	static std::string const BlankString;
-
+	static std::string test_str;
 	//MODULE VARIABLE DECLARATIONS:
 
 	// The Binned table type is different and only references one variable and its structure is very
@@ -1789,7 +1789,7 @@ namespace OutputReportTabular {
 		} else {
 			unitsStyleReturn = unitsStyleNotFound;
 		}
-		return unitsStyleInchPound;
+		return unitsStyleReturn;
 	}
 
 	void
@@ -3645,6 +3645,7 @@ namespace OutputReportTabular {
 									LookupSItoIP( origName, indexUnitConv, curName );
 								} else {
 									curName = OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).units + ']';
+									LookupSItoIP( curName, indexUnitConv, test_str );
 								}
 								if ( OutputTableBinned( iInput ).scheduleIndex == 0 ) {
 									tbl_stream << "<a href=\"#" << MakeAnchorName( curName, BinObjVarID( curTable ).namesOfObj ) << "\">" << BinObjVarID( curTable ).namesOfObj << "</a>   |  \n";
@@ -6402,6 +6403,8 @@ namespace OutputReportTabular {
 						LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 						GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 					} else { //just do the Joule conversion
+						varNameWithUnits = MonthlyColumns( curCol ).varName + '[' + MonthlyColumns( curCol ).units + ']';
+						LookupSItoIP( varNameWithUnits, indexUnitConv, test_str );
 						//if units is in Joules, convert if specified
 						if ( SameString( MonthlyColumns( curCol ).units, "J" ) ) {
 							curUnits = energyUnitsString;
@@ -6743,6 +6746,7 @@ namespace OutputReportTabular {
 				curIntervalStart = ConvertIP( indexUnitConv, OutputTableBinned( iInObj ).intervalStart );
 				curIntervalSize = ConvertIPdelta( indexUnitConv, OutputTableBinned( iInObj ).intervalSize );
 			} else {
+				LookupSItoIP( curNameWithSIUnits, indexUnitConv, test_str );
 				curNameAndUnits = curNameWithSIUnits;
 				curIntervalStart = OutputTableBinned( iInObj ).intervalStart;
 				curIntervalSize = OutputTableBinned( iInObj ).intervalSize;
@@ -8230,6 +8234,7 @@ namespace OutputReportTabular {
 				if ( unitsStyle == unitsStyleInchPound ) {
 					LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 				}
+				LookupSItoIP( curNameWithSIUnits, indexUnitConv, test_str );
 				columnHead( 1 ) = curNameAndUnits;
 
 				rowHead( 1 ) = "Tolerance for Zone Heating Setpoint Not Met Time";
@@ -9176,6 +9181,8 @@ namespace OutputReportTabular {
 			m2_unitConv = ConvertIP( unitConvIndex, 1.0 );
 			rowHead( 10 ) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
 		} else {
+			SIunit = "[m2]";
+			LookupSItoIP( SIunit, unitConvIndex, test_str );
 			rowHead( 10 ) = "Cost Per Conditioned Building Area (~~$~~/m2)";
 			m2_unitConv = 1.0;
 		}
@@ -9304,6 +9311,7 @@ namespace OutputReportTabular {
 					tableBody( 5, item ) = RealToStr( CostLineItem( item ).ValuePer, 2 );
 				}
 			} else {
+				LookupSItoIP( CostLineItem( item ).Units, unitConvIndex, test_str );
 				tableBody( 3, item ) = RealToStr( CostLineItem( item ).Qty, 2 );
 				tableBody( 4, item ) = CostLineItem( item ).Units;
 				tableBody( 5, item ) = RealToStr( CostLineItem( item ).ValuePer, 2 );
@@ -9526,6 +9534,14 @@ namespace OutputReportTabular {
 				LookupSItoIP( SIunit, unitConvIndex, Wm2_unitName );
 				Wm2_unitConv = ConvertIP( unitConvIndex, 1.0 );
 			} else {
+				SIunit = "[m]";
+				LookupSItoIP( SIunit, unitConvIndex, test_str );
+				SIunit = "[m2]";
+				LookupSItoIP( SIunit, unitConvIndex, test_str );
+				SIunit = "[m3]";
+				LookupSItoIP( SIunit, unitConvIndex, test_str );
+				SIunit = "[W/m2]";
+				LookupSItoIP( SIunit, unitConvIndex, test_str );
 				m_unitName = "[m]";
 				m_unitConv = 1.0;
 				m2_unitName = "[m2]";
@@ -10338,9 +10354,11 @@ namespace OutputReportTabular {
 									LookupSItoIP( colTagWithSI, indexUnitConv, curColTag );
 									colUnitConv( countColumn ) = indexUnitConv;
 								} else if (unitsStyle == unitsStyleJtoKWH){
+									LookupSItoIP( colTagWithSI, indexUnitConv, test_str );
 									LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
 									colUnitConv(countColumn) = indexUnitConv;
 								} else {
+									LookupSItoIP( colTagWithSI, indexUnitConv, test_str );
 									curColTag = colTagWithSI;
 									colUnitConv( countColumn ) = 0;
 								}
@@ -10384,6 +10402,7 @@ namespace OutputReportTabular {
 										tableBody( colCurrent, rowCurrent ) = tableEntry( lTableEntry ).charEntry;
 									}
 								} else {
+									LookupSItoIP( tableEntry( lTableEntry + 1 ).charEntry, columnUnitConv, test_str );
 									tableBody( colCurrent, rowCurrent ) = tableEntry( lTableEntry ).charEntry;
 								}
 							}
@@ -10560,6 +10579,7 @@ namespace OutputReportTabular {
 						LookupSItoIP( curColHeadWithSI, indexUnitConv, curColHead );
 						colUnitConv( jUnique ) = indexUnitConv;
 					} else {
+						LookupSItoIP( curColHeadWithSI, indexUnitConv, test_str );
 						curColHead = curColHeadWithSI;
 						colUnitConv( jUnique ) = 0;
 					}
