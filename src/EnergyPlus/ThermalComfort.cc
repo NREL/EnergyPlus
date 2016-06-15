@@ -835,7 +835,14 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).CloSurfTemp = CloSurfTemp;
 
 			// Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
-			PPD = 100.0 - 95.0 * std::exp( -0.03353 * pow_4( PMV ) - 0.2179 * pow_2( PMV ) );
+
+			Real64 expTest1 = -0.03353 * pow_4( PMV ) - 0.2179 * pow_2( PMV );
+			if ( expTest1 > EXP_LowerLimit ){
+				PPD = 100.0 - 95.0 * std::exp( expTest1 );
+			} else {
+				PPD = 100.0;
+			}
+
 			if ( PPD < 0.0 ) {
 				PPD = 0.0;
 			} else if ( PPD > 100.0 ) {

@@ -95,6 +95,8 @@ namespace DataAirflowNetwork {
 	extern int const CompTypeNum_HEX; // Distribution system heat exchanger
 	extern int const CompTypeNum_HOP; // Horizontal opening component
 	extern int const CompTypeNum_RVD; // Reheat VAV terminal damper
+	extern int const CompTypeNum_OAF; // Distribution system OA 
+	extern int const CompTypeNum_REL; // Distribution system relief air 
 
 	// EPlus component Type
 	extern int const EPlusTypeNum_SCN; // Supply connection
@@ -123,6 +125,9 @@ namespace DataAirflowNetwork {
 
 	extern int const iWPCCntr_Input;
 	extern int const iWPCCntr_SurfAvg;
+
+	extern int const PressureCtrlExhaust;
+	extern int const PressureCtrlRelief;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -179,6 +184,9 @@ namespace DataAirflowNetwork {
 	// Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
 	extern Real64 VAVTerminalRatio; // The terminal flow ratio when a supply VAV fan reach its max flow rate
 	extern bool VAVSystem; // This flag is used to represent a VAV system
+	extern Real64 ExhaustFanMassFlowRate; // Exhaust fan flow rate used in PressureStat
+	extern int PressureSetFlag; // PressureSet flag
+	extern Real64 ReliefMassFlowRate; // OA Mixer relief node flow rate used in PressureStat
 
 	// Types
 
@@ -441,8 +449,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of large detailed opening component
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		std::string TypeName; // Name of Large vertical opening type
 		int LVOType; // Large vertical opening type number
 		Real64 LVOValue; // Extra crack length for LVO type 1 with multiple openable parts,
@@ -515,8 +523,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of large simple opening component
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 MinRhoDiff; // Minimum density difference for two-way flow
 		Real64 DischCoeff; // Discharge coefficient at full opening
 		Real64 OpenFactor; // Opening factor
@@ -536,8 +544,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of large horizontal opening component
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 Slope; // Sloping plane angle
 		Real64 DischCoeff; // Discharge coefficient at full opening
 
@@ -573,8 +581,8 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of crack component
 		std::string ExternalNodeNames; // Name of external node.Not requird for internal surface
-		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed
-		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed
+		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data
 		Real64 StandardP; // Standard borometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
@@ -619,8 +627,8 @@ namespace DataAirflowNetwork {
 		std::string Name; // Name of exhaust fan component
 		Real64 FlowRate; // mass flow rate
 		int SchedPtr; // Schedule pointer
-		Real64 FlowCoef; // Air Mass Flow Coefficient
-		Real64 FlowExpo; // Air Mass Flow exponent
+		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data
 		Real64 StandardP; // Standard borometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
@@ -779,8 +787,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of component leak
-		Real64 FlowCoef; // Air Mass Flow Coefficient
-		Real64 FlowExpo; // Air Mass Flow exponent
+		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 
 		// Default Constructor
 		DisSysCompLeakProp() :
@@ -912,8 +920,8 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of constant volume fan component
-		Real64 FlowCoef; // Coefficient for linear initialization
-		Real64 FlowExpo; // Turbulent flow coefficient
+		Real64 FlowCoef; // Coefficient for linear initialization [kg/s at 1Pa]
+		Real64 FlowExpo; // Turbulent flow coefficient [dimensionless]
 		Real64 RhoAir; // Reference air density
 		Real64 Qfree; // Free delivery flow at P=0
 		Real64 Pshut; // Shutoff pressure at Q=0
@@ -1088,6 +1096,57 @@ namespace DataAirflowNetwork {
 			DetOpenNum( 0 ),
 			ConnectionFlag( 0 ),
 			VAVTermDamper( false )
+		{}
+
+	};
+
+	struct PressureControllerProp
+	{
+		// Members
+		std::string Name; // Provide a unique object name
+		std::string ZoneName; // Name of the zone that is being controlled
+		int ZoneNum; // Zone number
+		int AFNNodeNum; // AFN node number
+		std::string ControlObjectType; // The control type to be used for pressure control
+		std::string ControlObjectName; // Corresponding control type name
+		int ControlTypeSet; // Control type set to be used for pressure control
+		int AvailSchedPtr; // Availability schedule pointer
+		int PresSetpointSchedPtr; // Pressure setpoint schedule pointer
+
+		// Default Constructor
+		PressureControllerProp( ) :
+			ZoneNum( 0 ),
+			AFNNodeNum( 0 ),
+			ControlTypeSet( 0 ),
+			AvailSchedPtr( 0 ),
+			PresSetpointSchedPtr( 0 )
+		{}
+
+	};
+
+	struct DisSysCompAirflowProp // OA fan component
+	{
+		// Members
+		std::string Name; // Name of exhaust fan component
+		int SchedPtr; // Schedule pointer
+		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
+		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
+		Real64 StandardT; // Standard temperature for crack data [C]
+		Real64 StandardP; // Standard borometric pressure for crack data [Pa]
+		Real64 StandardW; // Standard humidity ratio for crack data [kg/kg]
+		int InletNode; // Inlet node number
+		int OutletNode; // Outlet node number
+
+		// Default Constructor
+		DisSysCompAirflowProp( ) :
+			SchedPtr( 0 ),
+			FlowCoef( 0.0 ),
+			FlowExpo( 0.0 ),
+			StandardT( 0.0 ),
+			StandardP( 0.0 ),
+			StandardW( 0.0 ),
+			InletNode( 0 ),
+			OutletNode( 0 )
 		{}
 
 	};
@@ -1369,6 +1428,9 @@ namespace DataAirflowNetwork {
 	extern Array1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
 	extern Array1D< DisSysCompCPDProp > DisSysCompCPDData;
 	extern Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+	extern Array1D< PressureControllerProp > PressureControllerData;
+	extern Array1D< DisSysCompAirflowProp > DisSysCompOutdoorAirData;
+	extern Array1D< DisSysCompAirflowProp > DisSysCompReliefAirData;
 
 	void
 	clear_state();

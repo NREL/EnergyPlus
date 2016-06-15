@@ -36,8 +36,8 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-finite.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-kusuda.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-xing.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/exterior-naturally-vented-cavity.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/green-roof-model-ecoroof.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/exterior-naturally-vented-cavity.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/green-roof-model-ecoroof.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations/climate-calculations.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations/design-week-specification.tex

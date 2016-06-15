@@ -293,6 +293,7 @@ namespace PlantUtilities {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeDiagSetup( true );
+		bool EMSLoadOverride;
 		static Array1D_bool NodeErrorMsgIssued;
 		static bool NullPlantErrorMsgIssued;
 		Real64 MdotOldRequest; // initial value of mass flow
@@ -325,8 +326,10 @@ namespace PlantUtilities {
 		// FLOW:
 
 		MdotOldRequest = Node( InletNode ).MassFlowRateRequest;
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & comp( loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType == DemandOpSchemeType ) {
+		if ( comp.CurOpSchemeType == DemandOpSchemeType ) {
 			// store flow request on inlet node
 
 			Node( InletNode ).MassFlowRateRequest = CompFlow;
@@ -362,25 +365,38 @@ namespace PlantUtilities {
 		}
 
 		//Set loop flow rate
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowUnlocked ) {
+		if ( loop_side.FlowLock == FlowUnlocked ) {
 			if ( PlantLoop( LoopNum ).MaxVolFlowRate == AutoSize ) { //still haven't sized the plant loop
 				Node( OutletNode ).MassFlowRate = CompFlow;
 				Node( InletNode ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 			} else { //bound the flow by Min/Max available and hardware limits
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).FlowCtrl == ControlType_SeriesActive ) {
+				if ( comp.FlowCtrl == ControlType_SeriesActive ) {
 					// determine highest flow request for all the components on the branch
 					SeriesBranchHighFlowRequest = 0.0;
 					SeriesBranchHardwareMaxLim = Node( InletNode ).MassFlowRateMax;
 					SeriesBranchHardwareMinLim = 0.0;
 					SeriesBranchMaxAvail = Node( InletNode ).MassFlowRateMaxAvail;
 					SeriesBranchMinAvail = 0.0;
-					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompNum ) {
-						CompInletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompNum ).NodeNumIn;
+
+					// inserting EMS On/Off Supervisory control here to series branch constraint and assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+
+					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
+						CompInletNodeNum = comp.NodeNumIn;
 						SeriesBranchHighFlowRequest = max( Node( CompInletNodeNum ).MassFlowRateRequest, SeriesBranchHighFlowRequest );
 						SeriesBranchHardwareMaxLim = min( Node( CompInletNodeNum ).MassFlowRateMax, SeriesBranchHardwareMaxLim );
 						SeriesBranchHardwareMinLim = max( Node( CompInletNodeNum ).MassFlowRateMin, SeriesBranchHardwareMinLim );
 						SeriesBranchMaxAvail = min( Node( CompInletNodeNum ).MassFlowRateMaxAvail, SeriesBranchMaxAvail );
 						SeriesBranchMinAvail = max( Node( CompInletNodeNum ).MassFlowRateMinAvail, SeriesBranchMinAvail );
+
+						// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+						auto & thisComp( loop_side.Branch( BranchIndex ).Comp( CompNum ) );
+						if ( thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						SeriesBranchHardwareMaxLim = 0.0;
 					}
 
 					//take higher of branch max flow request and this new flow request
@@ -395,9 +411,9 @@ namespace PlantUtilities {
 					if ( CompFlow < MassFlowTolerance ) CompFlow = 0.0;
 					Node( OutletNode ).MassFlowRate = CompFlow;
 					Node( InletNode ).MassFlowRate = Node( OutletNode ).MassFlowRate;
-					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompNum ) {
-						CompInletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompNum ).NodeNumIn;
-						CompOutletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompNum ).NodeNumOut;
+					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
+						CompInletNodeNum = comp.NodeNumIn;
+						CompOutletNodeNum = comp.NodeNumOut;
 						Node( CompInletNodeNum ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 						Node( CompOutletNodeNum ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 					}
@@ -407,39 +423,38 @@ namespace PlantUtilities {
 					Node( OutletNode ).MassFlowRate = max( Node( InletNode ).MassFlowRateMin, Node( OutletNode ).MassFlowRate );
 					Node( OutletNode ).MassFlowRate = min( Node( OutletNode ).MassFlowRateMaxAvail, Node( OutletNode ).MassFlowRate );
 					Node( OutletNode ).MassFlowRate = min( Node( InletNode ).MassFlowRateMax, Node( OutletNode ).MassFlowRate );
+
+					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+
+					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
+						// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+						auto & thisComp( loop_side.Branch( BranchIndex ).Comp( CompNum ) );
+						if ( thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						Node( OutletNode ).MassFlowRate = 0.0;
+					}
+
 					if ( Node( OutletNode ).MassFlowRate < MassFlowTolerance ) Node( OutletNode ).MassFlowRate = 0.0;
 					CompFlow = Node( OutletNode ).MassFlowRate;
 					Node( InletNode ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 				}
 
 			}
-		} else if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowLocked ) {
+		} else if ( loop_side.FlowLock == FlowLocked ) {
 			Node( OutletNode ).MassFlowRate = Node( InletNode ).MassFlowRate;
 			CompFlow = Node( OutletNode ).MassFlowRate;
-			//    IF (((CompFlow - Node(OutletNode)%MassFlowRateMaxAvail) > MassFlowTol) .OR. &
-			//        ((Node(OutletNode)%MassFlowRateMinAvail - CompFlow) > MassFlowTol)) THEN
-			//      IF ( .NOT. NodeErrorMsgIssued(InletNode)) THEN
-			//        CALL ShowSevereError('SetComponentFlowRate: Flow rate is out of range') !DEBUG error...should never get here
-			//        CALL ShowContinueErrorTimeStamp(' ')
-			//        CALL ShowContinueError('Component flow rate [kg/s] = '//TRIM(RoundSigDigits(CompFlow,8)) )
-			//        CALL ShowContinueError('Node maximum flow rate available [kg/s] = ' &
-			//                                 //TRIM(RoundSigDigits(Node(OutletNode)%MassFlowRateMaxAvail,8)) )
-			//        CALL ShowContinueError('Node minimum flow rate available [kg/s] = '&
-			//                                 //TRIM(RoundSigDigits(Node(OutletNode)%MassFlowRateMinAvail,8)) )
-			//        CALL ShowContinueError('Component named = ' &
-			//                             //TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%Name) )
-			//        NodeErrorMsgIssued(InletNode) = .TRUE.
-			//      ENDIF
-			//   !   CALL ShowFatalError('SetComponentFlowRate: out of range flow rate problem caused termination')
-			//    ENDIF
 		} else {
 			ShowFatalError( "SetComponentFlowRate: Flow lock out of range" ); //DEBUG error...should never get here
 		}
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType == DemandOpSchemeType ) {
+		if ( comp.CurOpSchemeType == DemandOpSchemeType ) {
 			if ( ( MdotOldRequest > 0.0 ) && ( CompFlow > 0.0 ) ) { // sure that not coming back from a no flow reset
 				if ( std::abs( MdotOldRequest - Node( InletNode ).MassFlowRateRequest ) > MassFlowTolerance ) { //demand comp changed its flow request
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimLoopSideNeeded = true;
+					loop_side.SimLoopSideNeeded = true;
 				}
 			}
 		}
@@ -501,6 +516,7 @@ namespace PlantUtilities {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum;
 		Real64 MdotOldRequest;
+		bool EMSLoadOverride;
 
 		// FLOW:
 
@@ -529,6 +545,20 @@ namespace PlantUtilities {
 					a_node.MassFlowRate = max( a_node.MassFlowRateMinAvail, CompFlow );
 					a_node.MassFlowRate = max( a_node.MassFlowRateMin, a_node.MassFlowRate );
 					// add MassFlowRateMin hardware constraints
+
+					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+					// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+					for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+						auto const & comp( branch.Comp( CompNum ) );
+						if ( comp.EMSLoadOverrideOn && comp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						a_node.MassFlowRate = 0.0;
+						a_node.MassFlowRateRequest = 0.0;
+					}
+
 					a_node.MassFlowRate = min( a_node.MassFlowRateMaxAvail, a_node.MassFlowRate );
 					a_node.MassFlowRate = min( a_node.MassFlowRateMax, a_node.MassFlowRate );
 					if ( a_node.MassFlowRate < MassFlowTolerance ) a_node.MassFlowRate = 0.0;
