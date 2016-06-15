@@ -64,7 +64,84 @@ Testing will include:
 
 ## Input Output Reference Documentation ##
 
-I will update this in the LATEX documentation for your review.
+### OtherEquipment
+
+Other Equipment object is provided as an additional source for heat gains or losses directly to the zone.  That is to say, a loss can be entered by putting a negative value into the Design Level field(s). Note, too, that this object does not have an end-use component – gains or losses do not show up in the bottom energy lines (except as influencing overall zone gains or losses).
+
+#### Inputs
+
+##### Field: Name
+
+The name of the OtherEquipment object.
+
+##### Field: Fuel Use Type
+
+This field designates the appropriate meter for the equipment. Valid fuel types are: Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
+
+##### Field: Zone or ZoneList Name
+
+This field is the name of the thermal zone (ref: Zone) and attaches a particular other equipment statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this other equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of other in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+
+##### Field: Schedule Name
+
+This field is the name of the schedule that modifies the design level parameter for other equipment (see Design Level Calculation Method field and related subsequent fields). The schedule values can be any positive number. The actual energy input for other equipment in a zone as defined by this statement is the product of the design level field and the value of the schedule specified by name in this field.
+
+##### Field: Design Level Calculation Method
+
+This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal other equipment level in the Zone. The key/choices are:
+
+-   EquipmentLevel
+
+With this choice, the method used will be a straight insertion of the other equipment level (Watts) for the Zone.  (The Design Level field should be filled.)
+
+-   Watts/Area or Power/Area
+
+With this choice, the method used will be a factor per floor area of the zone. (The Power per Zone Floor Area field should be filled).
+
+-   Watts/Person or Power/Person
+
+With this choice, the method used will be a factor of equipment level (watts) per person. (The Power per Person field should be filled).
+
+##### Field: Design Level
+
+This field (in Watts) is typically used to represent the maximum energy input to other equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the other equipment design level could be a “diversity factor” applied to a schedule of real numbers. This value can be negative to denote a loss. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
+
+##### Field: Power per Zone Floor Area
+
+This factor (watts/m<sup>2</sup>) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss. The choice from the method field should be “**Watts/Area**” or “**Power/Area**”.
+
+##### Field: Power per Person
+
+This factor (watts/person) is used, along with the number of occupants (people) to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss. The choice from the method field should be “**Watts/Person**” or “**Power/Person**”.
+
+##### Heat Gains/Losses from Other Equipment:
+
+The fuel input to the equipment ultimately appears as heat that contributes to zone loads. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Fraction Latent, Fraction Radiant and Fraction Lost. A fourth, defined as the fraction of the heat from other equipment convected to the zone air, is calculated by the program as:
+
+$$f\_{\\rm{convected}} = 1.0 - (\\rm{Fraction Latent} + \\rm{Fraction Radiant} + \\rm{Fraction Lost})$$
+
+You will get an error message if $\\rm{Fraction Latent} + \\rm{Fraction Radiant} + \\rm{Fraction Lost}$ exceeds 1.0.
+
+##### Field: Fraction Latent
+
+This field is a decimal number between 0.0 and 1.0 and is used to characterize the amount of latent heat given off by other equipment in a zone. The number specified in this field will be multiplied by the total energy consumed by other equipment to give the amount of latent energy produced by the other equipment. This energy affects the moisture balance within the zone.
+
+##### Field: Fraction Radiant
+
+This field is a decimal number between 0.0 and 1.0 and is used to characterize the amount of long-wave radiant heat being given off by other equipment in a zone. The number specified in this field will be multiplied by the total energy consumed by other equipment to give the amount of long wavelength radiation gain from other equipment in a zone.
+
+##### Field: Fraction Lost
+
+This field is a decimal number between 0.0 and 1.0 and is used to characterize the amount of “lost” heat being given off by other equipment in a zone. The number specified in this field will be multiplied by the total energy consumed by other equipment to give the amount of heat which is “lost” and does not impact the zone energy balances. This might correspond to input energy converted to mechanical work or heat that is vented to the atmosphere.
+
+##### Field: Carbon Dioxide Generation Rate
+
+This numeric input field specifies carbon dioxide generation rate with units of m3/s-W. The default value of 0.0 assumes the equipment is fully vented to outdoors. The maximum value for this input field is 3.45E-7 m3/s-W.
+
+##### Field: End-Use Subcategory
+
+Allows you to specify a user-defined end-use subcategory, e.g., “Cooking”, “Clothes Drying”, etc. A new meter for reporting is created for each unique subcategory  (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the “General” end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table. The following special tags will also place the end-use in specific rows in the LEED Summary table EAp2-4/5. Performance Rating Method Compliance: Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
+
 
 ## Input Description ##
 
