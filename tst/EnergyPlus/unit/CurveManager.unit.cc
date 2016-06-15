@@ -417,8 +417,8 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		Real64 min1, max1, min2, max2;
 		CurveManager::GetCurveMinMaxValues( 1, min1, max1, min2, max2 );
 		EXPECT_EQ( 12.77778, min1 ); // Minimum Value of X
-		EXPECT_EQ( 23.88889, max1 );  // Maximum Value of X
-		EXPECT_EQ( 18.0, min2 ); // Minimum Value of Y
+		EXPECT_EQ( 19.44448943, max1 );  // Maximum Value of X
+		EXPECT_EQ( 36.0, min2 ); // Minimum Value of Y
 		EXPECT_EQ( 46.11111, max2 );  // Maximum Value of Y
 		EXPECT_EQ( ( 15000.0 / 25000.0 ), CurveManager::PerfCurve( 1 ).CurveMin );
 		EXPECT_EQ( ( 40000.0 / 25000.0 ), CurveManager::PerfCurve( 1 ).CurveMax );
@@ -448,10 +448,10 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		EXPECT_EQ( 2, index );
 
 		CurveManager::GetCurveMinMaxValues( 2, min1, max1, min2, max2 );
-		EXPECT_EQ( -99999999999.0, min1 ); // Minimum Value of X defaults to low number
-		EXPECT_EQ( 99999999999.0, max1 );  // Maximum Value of X defaults to high number
-		EXPECT_EQ( -99999999999.0, min2 ); // Minimum Value of Y defaults to low number
-		EXPECT_EQ( 99999999999.0, max2 );  // Maximum Value of Y defaults to high number
+		EXPECT_EQ( 12.77778, min1 ); // Minimum Value of X defaults to lower limit
+		EXPECT_EQ( 19.44448943, max1 );  // Maximum Value of X defaults to upper limit
+		EXPECT_EQ( 36.0, min2 ); // Minimum Value of Y defaults to lower limit
+		EXPECT_EQ( 46.11111, max2 );  // Maximum Value of Y defaults to upper limit
 		EXPECT_EQ( 0.0, CurveManager::PerfCurve( 2 ).CurveMin );
 		EXPECT_EQ( 0.0, CurveManager::PerfCurve( 2 ).CurveMax );
 		EXPECT_EQ( CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum( 2 ) );
@@ -549,10 +549,10 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
     EXPECT_EQ(1, index);
     Real64 min1, max1, min2, max2;
     CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
-    EXPECT_EQ(-99999999999.0, min1); // uses large negative number as lower limit. CurveValue will test against lower boundary and use aray minimum
-    EXPECT_EQ(99999999999.0, max1);  // uses large positive number as upper limit. CurveValue will test against upper boundary and use aray maximum
-    EXPECT_EQ(-99999999999.0, min2);  // uses large negative number as lower limit. CurveValue will test against lower boundary and use aray minimum
-    EXPECT_EQ(99999999999.0, max2);  // uses large positive number as upper limit. CurveValue will test against upper boundary and use aray maximum
+    EXPECT_EQ(0.0, min1); // CurveValue will test against lower boundary and use aray minimum
+    EXPECT_EQ(5.0, max1);  // CurveValue will test against upper boundary and use aray maximum
+    EXPECT_EQ(1.0, min2);  // CurveValue will test against lower boundary and use aray minimum
+    EXPECT_EQ(2.0, max2);  // CurveValue will test against upper boundary and use aray maximum
     EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
 
     EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5)); // In-range value
@@ -691,10 +691,10 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     EXPECT_EQ(1, index);
     Real64 min1, max1, min2, max2;
     CurveManager::GetCurveMinMaxValues(1, min1, max1, min2, max2);
-    EXPECT_EQ(-1.0, min1); // user entered value is retained, however, CurveValue will test against lower array boundary and use aray minimum
-    EXPECT_EQ(6.0, max1);  // user entered value is retained, however, CurveValue will test against upper array boundary and use aray maximum
-    EXPECT_EQ(-0.5, min2);  // user entered value is retained, however, CurveValue will test against lower array boundary and use aray minimum
-    EXPECT_EQ(4.5, max2);  // user entered value is retained, however, CurveValue will test against upper array boundary and use aray maximum
+    EXPECT_EQ(0.0, min1); // user entered value is retained, however, CurveValue will test against lower array boundary and use aray minimum
+    EXPECT_EQ(5.0, max1);  // user entered value is retained, however, CurveValue will test against upper array boundary and use aray maximum
+    EXPECT_EQ(1.0, min2);  // user entered value is retained, however, CurveValue will test against lower array boundary and use aray minimum
+    EXPECT_EQ(2, max2);  // user entered value is retained, however, CurveValue will test against upper array boundary and use aray maximum
     EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
 
     EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5)); // In-range value
@@ -724,7 +724,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     EXPECT_EQ(1.0, min1); // user entered value is retained and used since it's greater than lower array boundary
     EXPECT_EQ(4.0, max1);  // user entered value is retained and used since it's less than upper array boundary
     EXPECT_EQ(1.5, min2);  // user entered value is retained and used since it's greater than lower array boundary
-    EXPECT_EQ(3.5, max2);  // user entered value is retained and used since it's less than upper array boundary
+    EXPECT_EQ(2.0, max2);  // user entered value is NOT retained since it's greater than upper array boundary
     EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(2));
 
     EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(2, 0, 1.5)); // In-range value, result is based on tighten Minimum X Value limit
