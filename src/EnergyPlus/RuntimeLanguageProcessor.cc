@@ -2172,6 +2172,12 @@ namespace RuntimeLanguageProcessor {
 				Operand( OperandNum ) = ErlExpression( ExpressionNum ).Operand( OperandNum );
 				if ( Operand( OperandNum ).Type == ValueExpression ) {
 					Operand( OperandNum ) = EvaluateExpression( Operand( OperandNum ).Expression, seriousErrorFound ); //recursive call
+					// check if recursive call found an error in nested expression, want to preserve error message from that
+					if ( seriousErrorFound ) {
+						ReturnValue.Type = ValueError;
+						ReturnValue.Error = Operand( OperandNum ).Error;
+					}
+
 				} else if ( Operand( OperandNum ).Type == ValueVariable ) {
 					if ( ErlVariable( Operand( OperandNum ).Variable ).Value.initialized ) { // check that value has been initialized
 						Operand( OperandNum ) = ErlVariable( Operand( OperandNum ).Variable ).Value;
