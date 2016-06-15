@@ -3235,18 +3235,18 @@ namespace WeatherManager {
 		Real64 const curHrWeight
 	)
 	{
-		Real64 interpolatedWindDir = 0.;
-		if ( prevHrWindDir < 90 && curHrWindDir > 270. ) {
-			interpolatedWindDir = prevHrWindDir * prevHrWeight + ( curHrWindDir - 360. ) * curHrWeight;
-		} else if ( prevHrWindDir > 270 && curHrWindDir < 90. ){
-			interpolatedWindDir = ( prevHrWindDir - 360. ) * prevHrWeight + curHrWindDir * curHrWeight;
+		assert( (prevHrWeight + curHrWeight) ==  1.0);
+		Real64 changeAngle = curHrWindDir - prevHrWindDir;
+		Real64 changeAngleAdj = ( changeAngle < 0. ) ? changeAngle + 360. : changeAngle;
+		Real64 interpolatedWindDirAdj = 0.;
+		if ( changeAngleAdj <= 180. ){
+			interpolatedWindDirAdj = curHrWeight * changeAngleAdj;
 		} else {
-			interpolatedWindDir = prevHrWindDir * prevHrWeight + curHrWindDir * curHrWeight;
+			interpolatedWindDirAdj = curHrWeight * changeAngleAdj + 180.;
 		}
-		if ( interpolatedWindDir < 0. ){
-			interpolatedWindDir += 360.;
-		}
-		return interpolatedWindDir;
+		Real64 interpolatedWindDir = prevHrWindDir + interpolatedWindDirAdj;
+		Real64 interpolatedWindDirIn360 = ( interpolatedWindDir >= 360. ) ? interpolatedWindDir - 360 : interpolatedWindDir;
+		return interpolatedWindDirIn360;
 	}
 
 	void
