@@ -119,6 +119,17 @@ I would also like to see a more thorough description of the integration of ASHWA
 Thanks! I will update NFP regarding to ASHWAT. In short, it is not planned in first two stages and that is why I left it out. EnergyPlus actually have two window models, ASHWAT and ISO 15099 (I left out model that provides U-value, SHGC and VT). Original implementation that is done by Winkelmann is nothing else but old WINDOW code. As for BSDF models, that is also ISO 15099 but with improved optical calculation distribution (Klems BSDF). So in general I do plan to put all of that into WCE. In general, idea is to separate all calculations related to window properties in separate module (component) so that it can be used by others as well (WINDOW and OPTICS included). Depend on the time and funds in future.
 As for WCE, it does have separate GitHub with unit tests hosted by LBNL. If you want something to implement there, unit tests are must to have. So before going into EnergyPlus, code will be tested separately.
 
+###Conference call (June/9/2016)
+Participants: Mike Witte, Daniel Macumber, Kyle Benne, Charlie Curcija, Simon Vidanovic
+
+Comments and conclusions:
+
+We have agreed to try new approach where WCE will be automatically downloaded from LBNLs GitHub.
+It would have been nice to implement engine in a way so that it can be easily used from OpenStudio.
+One possibility is to create separate library of routines within EnergyPlus itself and use it from there.
+
+It would have been worth to remove number of layers limit from EnergyPlus while implementing this engine.
+
 ## Overview
 WCE is currently hosted at LBNL's GitHub repository https://github.com/LBNL-ETA/Windows-CalcEngine as open source module that can calculate thermal and optical properties for fenestration systems. Engine exposes many so far "hidden" calculation procedures that now can be used and also customized/extended according to different user needs. Intention is that all future window and shading models are developed using this open source repository and then shared between different programs.
 
