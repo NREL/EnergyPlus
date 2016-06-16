@@ -729,36 +729,6 @@ namespace MixedAir {
 	CheckControllerLists( bool & ErrFound );
 
 	void
-	SetOAControllerData(
-		int const OACtrlNum, // Number of OA Controller
-		bool & ErrorsFound, // Set to true if certain errors found
-		Optional_string Name = _, // Name of Controller
-		Optional_string ControllerType = _, // Controller Type
-		Optional_int ControllerType_Num = _, // Parameter equivalent of Controller Type
-		Optional_string LockoutType = _, // Lock out type
-		Optional_bool FixedMin = _, // Fixed Minimum or Proportional Minimum
-		Optional< Real64 > TempLim = _, // Temperature Limit
-		Optional< Real64 > TempLowLim = _, // Temperature Lower Limit
-		Optional< Real64 > EnthLim = _, // Enthalpy Limit
-		Optional< Real64 > DPTempLim = _, // Dew Point Temperature Limit
-		Optional_int EnthalpyCurvePtr = _, // Electronic Enthalpy Limit Curve Index
-		Optional< Real64 > MaxOA = _, // Maximum outside air flow (m3/sec)
-		Optional< Real64 > MinOA = _, // Minimum outside air flow (m3/sec)
-		Optional_string EconoType = _, // EconoType = No Economizer,Differential Enthalpy, Differential Dry bulb,
-		Optional_int MixNode = _, // Controlled node (mixed air node)
-		Optional_int OANode = _, // Actuated node (outside air node)
-		Optional_int InletNode = _, // Inlet Air Node for into Mixer  (BTG Nov 2004)
-		Optional_int RelNode = _, // Relief Air Node Number
-		Optional_int RetNode = _, // Return Air Node Number
-		Optional_int HumidistatZoneNum = _, // Zone number where humidistat is located
-		Optional< Real64 > HighRHOAFlowRatio = _, // Ratio of outside air flow to maximum outside air flow rate for high RH
-		Optional_bool ModifyDuringHighOAMoisture = _, // TRUE if modify air flow is allowed during high OA humrat conditions
-		Optional_int NodeNumofHumidistatZone = _, // actual node number of controlled zone
-		Optional_int EconomizerOASchedPtr = _, // Time of day schedule for increasing outdoor air
-		Optional_string BypassType = _ // ActivateBypassAtMinOAFlow, SetOAFlowRate
-	);
-
-	void
 	CheckOAControllerName(
 		std::string const & OAControllerName, // proposed name
 		int const NumCurrentOAControllers, // Count on number of controllers
