@@ -2006,6 +2006,12 @@ namespace CurveManager {
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
+				if ( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( PerfCurveTableData( TableNum ).X1 );
+				}
+				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( PerfCurveTableData( TableNum ).X1 );
+				}
 			} 
 
 			// if user enters limits that exceed data range, warn that limits are based on table data
@@ -2015,14 +2021,20 @@ namespace CurveManager {
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( cNumericFieldNames( 1 ) + " exceeds the data range and will not be used." );
 						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 1 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 					}
+				} else {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 				}
 				if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var1Max > maxval( TableData( TableNum ).X1 ) ) {
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( cNumericFieldNames( 2 ) + " exceeds the data range and will not be used." );
 						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 2 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 					}
+				} else {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 				}
 			}
 
@@ -2294,6 +2306,18 @@ namespace CurveManager {
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
+				if ( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+				if ( !PerfCurve( CurveNum ).Var2MinPresent ) {
+					PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
+				}
+				if ( !PerfCurve( CurveNum ).Var2MaxPresent ) {
+					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
+				}
 			}
 
 			// if user enters limits that exceed data range, warn that limits are based on table data
@@ -2303,28 +2327,40 @@ namespace CurveManager {
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( cNumericFieldNames( 1 ) + " exceeds the data range and will not be used." );
 						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 1 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 					}
+				} else {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 				}
 				if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var1Max > maxval( TableData( TableNum ).X1 ) ) {
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( cNumericFieldNames( 2 ) + " exceeds the data range and will not be used." );
 						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 2 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 					}
+				} else {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 				}
 				if ( PerfCurve( CurveNum ).Var2MinPresent ) {
 					if ( PerfCurve( CurveNum ).Var2Min < minval( TableData( TableNum ).X2 ) ) {
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( cNumericFieldNames( 3 ) + " exceeds the data range and will not be used." );
 						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 3 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X2 ), 6 ) );
+						PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
 					}
+				} else {
+					PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
 				}
 				if ( PerfCurve( CurveNum ).Var2MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var2Max > maxval( TableData( TableNum ).X2 ) ) {
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 						ShowContinueError( cNumericFieldNames( 4 ) + " exceeds the data range and will not be used." );
 						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 4 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X2 ), 6 ) );
+						PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
 					}
+				} else {
+					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
 				}
 			}
 
