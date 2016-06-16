@@ -203,11 +203,11 @@ namespace FaultsManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	Array1D< FaultProperties > FaultsEconomizer;
+	Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	Array1D< FaultProperties > FouledCoils;
 	Array1D< FaultProperties > FaultsThermostatOffset;
 	Array1D< FaultProperties > FaultsHumidistatOffset;
-	Array1D< FaultProperties > FaultsFouledAirFilters;
+	Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	Array1D< FaultProperties > FaultsChillerSWTSensor;
 	Array1D< FaultProperties > FaultsCondenserSWTSensor;
 	Array1D< FaultProperties > FaultsTowerScaling;
@@ -272,8 +272,6 @@ namespace FaultsManager {
 		Array1D_string cAlphaFieldNames( 10 );
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
-
-		int i; // Index to fault type
 		std::string cFaultCurrentObject;
 
 		if ( RunFaultMgrOnceFlag ) return;
@@ -400,7 +398,7 @@ namespace FaultsManager {
 			}
 
 			// Check whether the specified fan curve covers the design operational point of the fan
-			if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName, FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurvePtr ) ) {
+			if ( !FaultsFouledAirFilters( jFault_AirFilter ).CheckFaultyAirFilterFanCurve() ) {
 				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 )  + "\"" );
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not cover "  );
 				ShowContinueError( "the operational point of Fan " + FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName  );
@@ -642,10 +640,7 @@ namespace FaultsManager {
 	}
 
 	bool
-	CheckFaultyAirFilterFanCurve(
-		std::string const & FanName, // name of the fan
-		int const FanCurvePtr      // pointer of the fan curve
-	)
+	FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -668,7 +663,7 @@ namespace FaultsManager {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using namespace Fans;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -686,6 +681,9 @@ namespace FaultsManager {
 		Real64 FanDeltaPress;     // Design Delta Pressure Across the Fan [Pa]
 		Real64 FanDeltaPressCal;  // Calculated Delta Pressure Across the Fan [Pa]
 		bool   FanFound;          // Whether the fan is found or not
+		
+		std::string const FanName = this->FaultyAirFilterFanName; // name of the fan
+		int const FanCurvePtr = this->FaultyAirFilterFanCurvePtr; // pointer of the fan curve
 
 		// FLOW
 
@@ -706,7 +704,7 @@ namespace FaultsManager {
 
 		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );
 
-		return ( ( FanDeltaPressCal > 0.95*FanDeltaPress ) && ( FanDeltaPressCal < 1.05*FanDeltaPress ) );
+		return ( ( FanDeltaPressCal > 0.95 * FanDeltaPress ) && ( FanDeltaPressCal < 1.05 * FanDeltaPress ) );
 	}
 
 } // FaultsManager

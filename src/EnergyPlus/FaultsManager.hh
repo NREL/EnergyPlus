@@ -157,17 +157,14 @@ namespace FaultsManager {
 
 	// Types
 
-	struct FaultProperties // Derived type for operational faults
+	struct FaultProperties // Base Class for operational faults
 	{
 		// Members
 		std::string Name;
 		std::string FaultType; // Fault type
 		std::string AvaiSchedule; // Availability schedule
 		std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
-		std::string ControllerType; // Controller type
-		int ControllerTypeEnum;
-		std::string ControllerName; // Controller name
-		int ControllerID; // Point to a controller associated with the fault
+		
 		Real64 Offset; // offset, + means sensor reading is higher than actual value
 		bool Status; // for future use
 		int AvaiSchedPtr;
@@ -187,25 +184,12 @@ namespace FaultsManager {
 		std::string FaultyHumidistatName; // The faulty humidistat name
 		std::string FaultyHumidistatType; // The faulty humidistat type
 
-		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
-		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
-		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
-		int         FaultyAirFilterFanCurvePtr;      // The index to the curve
-		std::string FaultyAirFilterPressFracSche;    // Schedule describing variations of the fan pressure rise
-		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule
-		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
-		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
-
 		// Default Constructor
-		FaultProperties() :
+		FaultProperties():
 			Name( "" ),
 			FaultType( "" ),
 			AvaiSchedule( "" ),
 			SeveritySchedule( "" ),
-			ControllerType( "" ),
-			ControllerTypeEnum( 0 ),
-			ControllerName( "" ),
-			ControllerID( 0 ),
 			Offset( 0.0 ),
 			Status( false ),
 			AvaiSchedPtr( 0 ),
@@ -221,26 +205,62 @@ namespace FaultsManager {
 			Aratio( 0.0 ),
 			FaultyThermostatName( "" ),
 			FaultyHumidistatName( "" ),
-			FaultyHumidistatType( "" ),
+			FaultyHumidistatType( "" )
+		{}
+
+	};
+	
+	struct FaultPropertiesEconomizer : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
+	{
+		// Members
+		int ControllerTypeEnum;
+		int ControllerID; // Point to a controller associated with the fault
+		std::string ControllerType; // Controller type
+		std::string ControllerName; // Controller name
+	
+		// Default Constructor
+		FaultPropertiesEconomizer():
+			ControllerTypeEnum( 0 ),
+			ControllerID( 0 ),
+			ControllerType( "" ),
+			ControllerName( "" )
+		{}
+	};
+	
+	struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
+	{
+		// Members
+		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
+		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
+		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
+		std::string FaultyAirFilterPressFracSche;    // Schedule describing variations of the fan pressure rise
+		int         FaultyAirFilterFanCurvePtr;      // The index to the curve
+		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule
+		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
+		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
+	
+		// Default Constructor
+		FaultPropertiesAirFilter():
 			FaultyAirFilterFanName( "" ),
 			FaultyAirFilterFanType( "" ),
 			FaultyAirFilterFanCurve( "" ),
-			FaultyAirFilterFanCurvePtr( 0 ),
 			FaultyAirFilterPressFracSche( "" ),
+			FaultyAirFilterFanCurvePtr( 0 ),
 			FaultyAirFilterPressFracSchePtr( 0 ),
 			FaultyAirFilterFanPressInc( 0.0 ),
 			FaultyAirFilterFanFlowDec( 0.0 )
 		{}
-
+		
+		public:
+			bool CheckFaultyAirFilterFanCurve();
 	};
-
+	
 	// Object Data
-	extern Array1D< FaultProperties > FaultsEconomizer;
+	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	extern Array1D< FaultProperties > FouledCoils;
 	extern Array1D< FaultProperties > FaultsThermostatOffset;
 	extern Array1D< FaultProperties > FaultsHumidistatOffset;
-	extern Array1D< FaultProperties > FaultsFouledAirFilters;
-	extern Array1D< FaultProperties > FaultsFouledAirFilters;
+	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	extern Array1D< FaultProperties > FaultsChillerSWTSensor;
 	extern Array1D< FaultProperties > FaultsCondenserSWTSensor;
 	extern Array1D< FaultProperties > FaultsTowerScaling;
@@ -250,12 +270,6 @@ namespace FaultsManager {
 
 	void
 	CheckAndReadFaults();
-
-	bool
-	CheckFaultyAirFilterFanCurve(
-		std::string const & CompName, // name of the fan
-		int const FanCurvePtr       // pointer of the fan curve
-	);
 
 } // FaultsManager
 

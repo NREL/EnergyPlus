@@ -100,6 +100,7 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFi
 
 	NumFans = 2;
 	Fan.allocate( NumFans );
+	FaultsFouledAirFilters.allocate( NumFans );
 
 	// Inputs: fan curve
 	CurveNum = 1;
@@ -115,25 +116,32 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFi
 	PerfCurve( CurveNum ).Var1Min = 7.0;
 	PerfCurve( CurveNum ).Var1Max = 21.0;
 
-	// Inputs: fans
+	// Inputs:
 	FanNum = 1;
 	Fan( FanNum ).FanName = "Fan_1";
 	Fan( FanNum ).FanType = "Fan:VariableVolume";
 	Fan( FanNum ).MaxAirFlowRate = 18.194;
 	Fan( FanNum ).DeltaPress = 1017.59;
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanName = "Fan_1";
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanCurvePtr = CurveNum;
 
 	FanNum = 2;
 	Fan( FanNum ).FanName = "Fan_2";
 	Fan( FanNum ).FanType = "Fan:VariableVolume";
 	Fan( FanNum ).MaxAirFlowRate = 18.194;
 	Fan( FanNum ).DeltaPress = 1017.59 * 1.2;
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanName = "Fan_2";
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanCurvePtr = CurveNum;
+	;
 
 	// Run and Check
 	// (1)The rated operational point of Fan_1 falls on the fan curve
-	TestRestult = CheckFaultyAirFilterFanCurve( "Fan_1", CurveNum );
+	FanNum = 1;
+	TestRestult = FaultsFouledAirFilters( FanNum ).CheckFaultyAirFilterFanCurve();
 	EXPECT_TRUE( TestRestult );
 	// (2)The rated operational point of Fan_2 does not fall on the fan curve
-	TestRestult = CheckFaultyAirFilterFanCurve( "Fan_2", CurveNum );
+	FanNum = 2;
+	TestRestult = FaultsFouledAirFilters( FanNum ).CheckFaultyAirFilterFanCurve();
 	EXPECT_FALSE( TestRestult );
 
 	// Clean up
