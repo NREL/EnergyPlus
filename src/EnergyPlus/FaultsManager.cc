@@ -575,6 +575,7 @@ namespace FaultsManager {
 			for ( int jj = 1; jj <= NumFaultsTemp; ++jj ) {
 				GetObjectItem( cFaultCurrentObject, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				
+				++j;
 				FaultsEconomizer( j ).FaultType = cFaultCurrentObject;
 				FaultsEconomizer( j ).FaultTypeEnum = iFaultTypeEnums( i );
 
