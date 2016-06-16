@@ -145,69 +145,44 @@ If multiple air-conditioning components are attached to a zone, the components a
 For each full air loop there should be 1 supply air path for each primary air system outlet (i.e.~1 for single duct systems,~ 2 for dual duct systems). For each full air loop there should be one return air path. The supply air paths consist of any combination of zone splitters and zone supply air plenums as long as it forms a tree structure with the supply air path inlet node the root and the air terminal unit inlet nodes as the leaves. The return air path configuration is limited to a single mixer; there may be multiple return plenums.
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Loop over all the supply air paths.
+  \item
+    Loop over all the supply air paths.
+    \begin{enumerate}
+      \item
+        Loop over each component (supply plenum or zone splitter) on the supply air path and simulate each component. The components are simulated in input order.
+    \end{enumerate}
+  \item
+    Loop over all the controlled zones.
+    \begin{enumerate}
+      \item
+        Set the required system output.
+      \item
+        Loop over the components serving the zone in the user prioritized order.
+        \begin{enumerate}
+          \item
+            Simulate each component.
+          \item
+            Increment the required system output.
+        \end{enumerate}
+    \end{enumerate}
+  \item
+    Loop over all the supply air paths
+    \begin{enumerate}
+      \item
+        Loop over the components on each supply air path in reverse input order. This reverse order simulation passes the air terminal units inlet mass flows back upstream to the return air path inlet node.
+      \item
+        Check to see if the supply air path inlet node mass flow rate has changed. If it has set the \emph{SimAir} flag to \emph{true}. This signals the HVAC manager that the supply-side of the air loop needs to be resimulated.
+    \end{enumerate}
+  \item
+    Calculate the zone air flow mass balance -- the zone inlet and exhaust mass flow rates are summed and the zone node and return air node mass flow rates are determined by a mass balance for each zone.
+  \item
+    Calculate the conditions at each zone return air node. Here energy not included in the zone energy balance such as light-heat-to-return-air is added to the return nodes of the controlled zones.
+  \item
+    Loop over all of the return air paths.
+    \begin{enumerate}
+      \item
+        Loop over each component (return plenum or zone mixer) on the return air path and simulate each component.
+    \end{enumerate}
 \end{enumerate}
-
-\begin{lstlisting}
-a.  Loop over each component (supply plenum or zone splitter) on the supply air path and simulate each component. The components are simulated in input order.
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  Loop over all the controlled zones.
-\end{enumerate}
-
-\begin{lstlisting}
-a.  Set the required system output.
-\end{lstlisting}
-
-\begin{lstlisting}
-b.  Loop over the components serving the zone in the user prioritized order.
-\end{lstlisting}
-
-\begin{lstlisting}
-    i.  Simulate each component.
-\end{lstlisting}
-
-\begin{lstlisting}
-    ii. Increment the required system output.
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
-\item
-  Loop over all the supply air paths
-\end{enumerate}
-
-\begin{lstlisting}
-a.  Loop over the components on each supply air path in reverse input order. This reverse order simulation passes the air terminal units inlet mass flows back upstream to the return air path inlet node.
-\end{lstlisting}
-
-\begin{lstlisting}
-b.  Check to see if the supply air path inlet node mass flow rate has changed. If it has set the *SimAir* flag to *true*. This signals the HVAC manager that the supply-side of the air loop needs to be resimulated.
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{3}
-\item
-  Calculate the zone air flow mass balance -- the zone inlet and exhaust mass flow rates are summed and the zone node and return air node mass flow rates are determined by a mass balance for each zone.
-\item
-  Calculate the conditions at each zone return air node. Here energy not included in the zone energy balance such as light-heat-to-return-air is added to the return nodes of the controlled zones.
-\item
-  Loop over all of the return air paths.
-\end{enumerate}
-
-\begin{lstlisting}
-a.  Loop over each component (return plenum or zone mixer) on the return air path and simulate each component.
-\end{lstlisting}
 
 This completes a single simulation sequence of all the zone equipment.
