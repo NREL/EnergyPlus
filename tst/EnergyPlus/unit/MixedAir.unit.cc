@@ -535,6 +535,7 @@ namespace EnergyPlus {
 		People( 1 ).Name = "WestPeople";
 		People( 1 ).ZonePtr = 1;
 		People( 1 ).NumberOfPeople = 3;
+		Zone( 1 ).TotOccupants = 3;
 		Schedule( 4 ).CurrentValue = 1.0;
 		ZoneCO2GainFromPeople.allocate( 1 );
 		ZoneCO2GainFromPeople( 1 ) = 3.82E-8;
