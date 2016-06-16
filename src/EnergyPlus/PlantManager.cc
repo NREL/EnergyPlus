@@ -875,7 +875,7 @@ namespace PlantManager {
 					OutletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 					OutletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 
-					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).MaxVolFlowRate, TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); // Why is this Vdot and not mdot?
+					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 					TempLoop.Branch( BranchNum ).Comp.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 

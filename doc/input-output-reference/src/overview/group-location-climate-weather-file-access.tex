@@ -243,7 +243,7 @@ Optical depth for diffuse radiation, used only when Solar Model Indicator is ASH
 
 \paragraph{Field: Sky Clearness}\label{field-sky-clearness}
 
-If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the ``clearness'' value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level. Values greated than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this ``sky clearness'' does not have the same meaning as output variable ``Site Daylighting Model Sky Clearness''.
+If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the ``clearness'' value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level. Values greater than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this ``sky clearness'' does not have the same meaning as output variable ``Site Daylighting Model Sky Clearness''.
 
 IDF Examples:
 
@@ -358,7 +358,7 @@ This schedule value is active when any Design Day objects have / use the humidit
 
 \paragraph{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[}C{]}}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value-c}
 
-This schedule value is active when any Design Day objects have / use the drybulb temperature range modifier chedule option. For those objects that don't have this option, the value will be displayed as -999.
+This schedule value is active when any Design Day objects have / use the drybulb temperature range modifier schedule option. For those objects that don't have this option, the value will be displayed as -999.
 
 \paragraph{Sizing Period Site Sky Temperature Schedule Value {[}deltaC{]}}\label{sizing-period-site-sky-temperature-schedule-value-deltac}
 
@@ -509,7 +509,7 @@ The RunPeriod object describes the elements necessary to create a weather file s
 
 \paragraph{Field: Name}\label{field-name-4-015}
 
-This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appened to this name in tabular/summary reports.
+This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appended to this name in tabular/summary reports.
 
 \paragraph{Field: Begin Month}\label{field-begin-month-1}
 
@@ -613,7 +613,7 @@ The RunPeriod:CustomRange object describes the elements necessary to use a speci
 
 \paragraph{Field: Name}\label{field-name-5-012}
 
-This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appened to this name in tabular/summary reports.
+This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appended to this name in tabular/summary reports.
 
 \paragraph{Field: Begin Month}\label{field-begin-month-2}
 
@@ -771,7 +771,7 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 \subsection{WeatherProperty:SkyTemperature}\label{weatherpropertyskytemperature}
 
-Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using horizontal infrared radiation from sky, cloudiness factors and current temperaure. The algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to override the internal calculations. Much of the literature describes the sky temperature as relative to either drybulb or dewpoint temperature.
+Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using horizontal infrared radiation from sky, cloudiness factors and current temperature. The algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to override the internal calculations. Much of the literature describes the sky temperature as relative to either drybulb or dewpoint temperature.
 
 \subsubsection{Inputs}\label{inputs-8-011}
 
@@ -791,7 +791,7 @@ An example of IDF usage (with DesignDay):
 
 \begin{lstlisting}
 SizingPeriod:DesignDay,
-  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
+  DENVER_STAPLETON Ann Clg 1% Sky Temperature modifier,  !- Name
   32.6,              !- Maximum Dry-Bulb Temperature {C}
   15.2,              !- Daily Temperature Range {deltaC}
   15.5,              !- Humidity Indicating Conditions at Maximum Dry-Bulb
@@ -811,7 +811,7 @@ SizingPeriod:DesignDay,
   temp range deltas; !- Dry-Bulb Temperature Range Modifier Schedule Name
 
 WeatherProperty:SkyTemperature,
-  DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier, !- Name
+  DENVER_STAPLETON Ann Clg 1% Sky Temperature modifier, !- Name
   ScheduleValue,     !- Calculation Type
   DaySchedule5;      !- Schedule Name
 
@@ -848,7 +848,7 @@ The \textbf{Site:WeatherStation} object is useful when working with a custom wea
 \begin{longtable}[c]{@{}lll@{}}
 \caption{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005). \label{table:wind-speed-profile-coefficients-ashrae}} \tabularnewline
 \toprule 
-Terrain Description & Exponent & Bounhary Layer Thickness (m) \tabularnewline
+Terrain Description & Exponent & Boundary Layer Thickness (m) \tabularnewline
 \midrule
 \endfirsthead
 
@@ -1015,7 +1015,7 @@ Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 
 \subsection{Site:GroundTemperature:Undisturbed:FiniteDifference}\label{sitegroundtemperatureundisturbedfinitedifference}
 
-Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring ``undisturbed'' ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground tempeatures are cached for retrieval during the rest of the simulation.
+Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring ``undisturbed'' ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground temperatures are cached for retrieval during the rest of the simulation.
 
 \subsubsection{Inputs}\label{inputs-14-007}
 
@@ -1665,7 +1665,7 @@ A set of schedules for site precipitation have been developed for USA weather lo
 \right.
 \end{equation}
 
-The values were inserted on hour by hour basis for the month based on the observations. Then each month was rescaled to meet the average precipitation for the month based on the 30-year average (1971-2000) provided by the NOAA/NCDC. Therefore, the flags in the EPW file match the precipitation schedules for the USA. Note that summing the average monthly precipitation values will not give you the average yearly precipitiation. The resulting value may be lower or higher than the average yearly value.
+The values were inserted on hour by hour basis for the month based on the observations. Then each month was rescaled to meet the average precipitation for the month based on the 30-year average (1971-2000) provided by the NOAA/NCDC. Therefore, the flags in the EPW file match the precipitation schedules for the USA. Note that summing the average monthly precipitation values will not give you the average yearly precipitation. The resulting value may be lower or higher than the average yearly value.
 
 Once the typical rainfall pattern and rates are scheduled, the Site:Precipitation object provides a method of shifting the total rainfall up or down for design purposes. Wetter or drier conditions can be modeled by changing the Design Annual Precipitation although the timing of precipitation throughout the year will not be changed.
 
@@ -1985,7 +1985,7 @@ The Site Simple Factor Model Ground Temperature is reported in degrees C -- this
 
 \paragraph{Site Outdoor Air Enthalpy {[}J/kg{]}}\label{site-outdoor-air-enthalpy-jkg}
 
-Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb Temperatureand the Site Outdoor Air Humidity Ratio. It is reported in J/kg.
+Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb Temperature and the Site Outdoor Air Humidity Ratio. It is reported in J/kg.
 
 \paragraph{Site Outdoor Air Density {[}kg/m3{]}}\label{site-outdoor-air-density-kgm3}
 
@@ -2044,7 +2044,7 @@ This field shows when daylight saving time (1 = yes, 0 = no) is in effect. Thoug
 
 \paragraph{\texorpdfstring{Site Day Type Index {[]}}{Site Day Type Index }}\label{site-day-type-index}
 
-This field shows what ``day type'' the current day is. Daytypes are (1 = Sunday, 2 = Monday, etc.) with Holiday = 8, SummerDesignDay = 9, WinterDesignDay = 10, CustomDay1 = 11, CustomDay2 = 12. Though shown as an average variable, this value is only set on a daily basis.
+This field shows what ``day type'' the current day is. Day types are (1 = Sunday, 2 = Monday, etc.) with Holiday = 8, SummerDesignDay = 9, WinterDesignDay = 10, CustomDay1 = 11, CustomDay2 = 12. Though shown as an average variable, this value is only set on a daily basis.
 
 \paragraph{Site Mains Water Temperature {[}C{]}}\label{site-mains-water-temperature-c}
 
@@ -2054,7 +2054,7 @@ The value of the Water Mains Temperature is reported in C following the calculat
 
 \paragraph{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m-1}
 
-The rate and quantity of precipitation at the site. These outputs are only available if a Site Precipication object is used. Precipitation is measured in meters.
+The rate and quantity of precipitation at the site. These outputs are only available if a Site Precipitation object is used. Precipitation is measured in meters.
 
 \paragraph{Water System Roof Irrigation Scheduled Depth{[}m{]}}\label{water-system-roof-irrigation-scheduled-depthm}
 
