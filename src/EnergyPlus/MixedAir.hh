@@ -361,7 +361,6 @@ namespace MixedAir {
 			int const AirLoopNum,
 			Real64 const OutAirMinFrac,
 			Real64 & OASignal,
-			bool & EconomizerOperationFlag,
 			bool & HighHumidityOperationFlag
 		);
 
@@ -396,9 +395,9 @@ namespace MixedAir {
 		Real64 ZoneMaxOAFraction; // Zone maximum outdoor air fraction
 		Array1D< Real64 > ZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for each zone
 		Array1D< Real64 > ZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for each zone
-		Array1D< Real64 > ZoneOAFlow; // OA Flow Rate (m3/s/zone) for each zone
-		Array1D< Real64 > ZoneOAACH; // OA ACH (m3/s/volume) for each zone
-		Array1D_int Zone; // Zones requiring mechanical ventilation
+		Array1D< Real64 > ZoneOAFlowRate; // OA Flow Rate (m3/s/zone) for each zone
+		Array1D< Real64 > ZoneOAACHRate; // OA ACH (m3/s/volume) for each zone
+		Array1D_int VentMechZone; // Zones requiring mechanical ventilation
 		Array1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
 		// for each zone in zone list
 		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
@@ -440,6 +439,12 @@ namespace MixedAir {
 			CO2GainErrorCount( 0 ),
 			CO2GainErrorIndex( 0 )
 		{}
+
+		void
+		CalcMechVentController(
+			Real64 & SysSA,
+			Real64 & MechVentOutsideAirFlow
+		);
 
 	};
 
@@ -632,13 +637,6 @@ namespace MixedAir {
 
 	// Beginning Calculation Section of the Module
 	//******************************************************************************
-
-	void
-	CalcMechVentController(
-		int const VentMechObjectNum,
-		Real64 & SysSA,
-		Real64 & MechVentOutsideAirFlow
-	);
 
 	void
 	CalcOAMixer( int const OAMixerNum );
