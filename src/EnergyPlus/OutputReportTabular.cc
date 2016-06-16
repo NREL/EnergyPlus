@@ -14263,7 +14263,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 113;
+		UnitConvSize = 114;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14378,6 +14378,7 @@ Label900: ;
 		UnitConv( 111 ).siName = "PPM";
 		UnitConv( 112 ).siName = "RAD";
 		UnitConv( 113 ).siName = "REV/MIN";
+		UnitConv( 114 ).siName = "NM";
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14492,6 +14493,7 @@ Label900: ;
 		UnitConv( 111 ).ipName = "ppm";
 		UnitConv( 112 ).ipName = "rad";
 		UnitConv( 113 ).ipName = "rev/min";
+		UnitConv( 114 ).ipName = "lbf-ft";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14606,6 +14608,7 @@ Label900: ;
 		UnitConv( 111 ).mult = 1.0;
 		UnitConv( 112 ).mult = 1.0;
 		UnitConv( 113 ).mult = 1.0;
+		UnitConv( 114 ).mult = 0.737562149277;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
