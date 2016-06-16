@@ -58,11 +58,12 @@
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
+#include <ChillerReformulatedEIR.hh>
+#include <CurveManager.hh>
 #include <DataPrecisionGlobals.hh>
+#include <Fans.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
-#include <CurveManager.hh>
-#include <Fans.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -387,18 +388,36 @@ namespace FaultsManager {
 			}
 
 			// Chiller check
-			{ auto const SELECT_CASE_var( MakeUPPERCase( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType ) );
-				// Check whether the chiller name and chiller type match each other
-				// Link the chiller with the fault model
+			{ auto const SELECT_CASE_VAR( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType );
 				
-				if( SELECT_CASE_VAR == "Chiller:Electric" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:Electric:EIR" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:Electric:ReformulatedEIR" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:ConstantCOP" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:EngineDriven" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:CombustionTurbine" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:Absorption" ) {
-				} else if( SELECT_CASE_VAR == "Chiller:Absorption:Indirect" ) {
+				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerReformulatedEIR::GetInputREIR ) {
+						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
+						ChillerReformulatedEIR::GetInputREIR = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller ) != 1 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						for ( int ChillerNum = 1; ChillerNum <= ChillerReformulatedEIR::NumElecReformEIRChillers; ++ChillerNum ) {
+							if ( SameString( ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).Name, FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName ) ) {
+								ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
+								ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+								break;
+							}
+						}
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
 				}
 			}
 			
