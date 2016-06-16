@@ -994,11 +994,18 @@ This is a factor that corrects for the presence of dirt on the glass. The progra
 Representative values of the dirt correction factor are shown in Table~\ref{table:dirt-correction-factors}.
 
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Dirt Correction Factors \protect \label{table:dirt-correction-factors}} \\
-\toprule 
+\caption{Dirt Correction Factors \label{table:dirt-correction-factors}} \\
+\toprule
+Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
+                 & Vertical & 45$^{o}$ & Horizontal \\ \midrule
+\endfirsthead
+
+\caption[]{Dirt Correction Factors} \\
+\toprule
 Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
                  & Vertical & 45$^{o}$ & Horizontal \\ \midrule
 \endhead
+
 Non-industrial & 0.9 & 0.8 & 0.7 \\
 Industrial & 0.7 & 0.6 & 0.5 \\
 Very Dirty & 0.6 & 0.5 & 0.4 \\

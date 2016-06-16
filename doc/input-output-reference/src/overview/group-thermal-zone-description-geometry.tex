@@ -2131,7 +2131,7 @@ This surface class is used for subsurfaces, which can be of five different types
 
 This is a unique name associated with the heat transfer subsurface. It may be used in other places as a reference (e.g.~as the opposing subsurface of an interzone window or door).
 
-\paragraph{Field: Surface Type}\label{field-surface-type-1}
+\paragraph{Field: Surface Type}\label{field-surface-type-2016-06-16}
 
 The choices for Surface Type are Window, Door, GlassDoor, TubularDaylightDome, and TubularDaylightDiffuser. Doors are assumed to be opaque (do not transmit solar radiation) whereas the other surface types do transmit solar radiation. Windows and Glass Doors are treated identically in the calculation of conduction heat transfer, solar gain, daylighting, etc. A Window or GlassDoor, but not a Door, can have a movable interior, exterior or between-glass shading device, such as blinds (ref: WindowMaterial:Blind object), and can have a frame and/or a divider (ref: WindowProperty:FrameAndDivider object). TubularDaylightDomes and TubularDaylightDomes are specialized subsurfaces for use with the DaylightingDevice:Tubular object to simulate Tubular Daylighting Devices (TDDs). TubularDaylightDomes and TubularDaylightDomes cannot have shades, screens or blinds. In the following, the term ``window'' applies to Window, GlassDoor, TubularDaylightDome, and TubularDaylightDome, if not otherwise explicitly mentioned.
 
