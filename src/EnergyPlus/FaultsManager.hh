@@ -280,13 +280,26 @@ namespace FaultsManager {
 			bool CheckFaultyAirFilterFanCurve();
 	};
 	
+	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+	{
+		// Members
+		std::string ChillerType; // Chiller type
+		std::string ChillerName; // Chiller name
+	
+		// Default Constructor
+		FaultPropertiesChillerSWT():
+			ChillerType( "" ),
+			ChillerName( "" )
+		{}
+	};
+	
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
 	extern Array1D< FaultPropertiesThermostat > FaultsThermostatOffset;
 	extern Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
-	extern Array1D< FaultProperties > FaultsChillerSWTSensor;
+	extern Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
 	extern Array1D< FaultProperties > FaultsCondenserSWTSensor;
 	extern Array1D< FaultProperties > FaultsTowerScaling;
 	extern Array1D< FaultProperties > FaultsCoilSATSensor;

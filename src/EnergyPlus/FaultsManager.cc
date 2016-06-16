@@ -187,7 +187,7 @@ namespace FaultsManager {
 	iFault_Fouling_Tower
 	});
 
-	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
+	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
 	
 	int NumFaultyEconomizer( 0 ); // Total number of faults related with the economizer
@@ -208,7 +208,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesThermostat > FaultsThermostatOffset;
 	Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
-	Array1D< FaultProperties > FaultsChillerSWTSensor;
+	Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
 	Array1D< FaultProperties > FaultsCondenserSWTSensor;
 	Array1D< FaultProperties > FaultsTowerScaling;
 	Array1D< FaultProperties > FaultsCoilSATSensor;
@@ -279,7 +279,7 @@ namespace FaultsManager {
 		// check number of faults
 		NumFaults = 0;
 		NumFaultyEconomizer = 0;
-		for ( int NumFaultsTemp = 0, i = 1; i <= 9; ++i ){ //@@ i <= NumFaultTypes
+		for ( int NumFaultsTemp = 0, i = 1; i <= 10; ++i ){ //@@ i <= NumFaultTypes
 			NumFaultsTemp = GetNumObjectsFound( cFaults( i ) );
 			NumFaults += NumFaultsTemp;
 			
@@ -335,6 +335,75 @@ namespace FaultsManager {
 		if( NumFaultyTowerScaling > 0 ) FaultsTowerScaling.allocate( NumFaultyTowerScaling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 
+		// read faults input of Fault_type 110: Chiller SWT Sensor Offset
+		for ( int jFault_ChillerSWT = 1; jFault_ChillerSWT <= NumFaultyChillerSWTSensor; ++jFault_ChillerSWT ) {
+
+			cFaultCurrentObject = cFaults( 10 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_ChillerSWT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).FaultType = cFaultCurrentObject;
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).FaultTypeEnum = iFault_TemperatureSensorOffset_ChillerSupplyWater;
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsChillerSWTSensor( jFault_ChillerSWT ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsChillerSWTSensor( jFault_ChillerSWT ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsChillerSWTSensor( jFault_ChillerSWT ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsChillerSWTSensor( jFault_ChillerSWT ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsChillerSWTSensor( jFault_ChillerSWT ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsChillerSWTSensor( jFault_ChillerSWT ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// offset - degree of fault
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).Offset = rNumericArgs( 1 );
+			
+			// Chiller type
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Chiller name
+			FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Chiller check
+			{ auto const SELECT_CASE_var( MakeUPPERCase( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType ) );
+				// Check whether the chiller name and chiller type match each other
+				// Link the chiller with the fault model
+				
+				if( SELECT_CASE_VAR == "Chiller:Electric" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:Electric:EIR" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:Electric:ReformulatedEIR" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:ConstantCOP" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:EngineDriven" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:CombustionTurbine" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:Absorption" ) {
+				} else if( SELECT_CASE_VAR == "Chiller:Absorption:Indirect" ) {
+				}
+			}
+			
+		}
+		
 		// read faults input of Fault_type 109: Fouled Air Filters
 		for ( int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter ) {
 
@@ -345,11 +414,11 @@ namespace FaultsManager {
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultTypeEnum = iFault_Fouling_AirFilter;
 			FaultsFouledAirFilters( jFault_AirFilter ).Name = cAlphaArgs( 1 );
 
-			// Informatin of the fan associated with the fouling air filter
+			// Information of the fan associated with the fouling air filter
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanType = cAlphaArgs( 2 );
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
-			// Check whether the specified fan exsits in the fan list
+			// Check whether the specified fan exists in the fan list
 			if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
 				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
