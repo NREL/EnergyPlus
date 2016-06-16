@@ -2007,10 +2007,10 @@ namespace CurveManager {
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
 				if ( !PerfCurve( CurveNum ).Var1MinPresent ) {
-					PerfCurve( CurveNum ).Var1Min = minval( PerfCurveTableData( TableNum ).X1 );
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 				}
 				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
-					PerfCurve( CurveNum ).Var1Max = maxval( PerfCurveTableData( TableNum ).X1 );
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 				}
 			} 
 
@@ -2034,6 +2034,16 @@ namespace CurveManager {
 						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 					}
 				} else {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+			}
+
+			// if user does not enter limits, set to min/max in table
+			if( PerfCurve( CurveNum ).InterpolationType == LagrangeInterpolationLinearExtrapolation ) {
+				if( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if( !PerfCurve( CurveNum ).Var1MaxPresent ) {
 					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 				}
 			}
@@ -2360,6 +2370,21 @@ namespace CurveManager {
 						PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
 					}
 				} else {
+					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
+				}
+			}
+			// if user does not enter limits, set to min/max in table
+			if( PerfCurve( CurveNum ).InterpolationType == LagrangeInterpolationLinearExtrapolation ) {
+				if( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+				if( !PerfCurve( CurveNum ).Var2MinPresent ) {
+					PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
+				}
+				if( !PerfCurve( CurveNum ).Var2MaxPresent ) {
 					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
 				}
 			}
