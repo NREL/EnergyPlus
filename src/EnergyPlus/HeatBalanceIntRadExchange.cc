@@ -79,7 +79,7 @@
 #include <DataViewFactorInformation.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>
@@ -189,7 +189,6 @@ namespace HeatBalanceIntRadExchange {
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using namespace DataTimings;
 		using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
-		using InputProcessor::SameString;
 
 		// Argument array dimensioning
 
@@ -479,9 +478,9 @@ namespace HeatBalanceIntRadExchange {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
+
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 
@@ -532,7 +531,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
-		NumZonesWithUserFbyS = GetNumObjectsFound( cCurrentModuleObject );
+		NumZonesWithUserFbyS = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		MaxNumOfZoneSurfaces = 0;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -788,9 +787,9 @@ namespace HeatBalanceIntRadExchange {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
+
+
+
 		using General::TrimSigDigits;
 
 		// Argument array dimensioning
@@ -820,12 +819,12 @@ namespace HeatBalanceIntRadExchange {
 		//unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
 		NoUserInputF = true;
-		UserFZoneIndex = GetObjectItemNum( "ZoneProperty:UserViewFactors", ZoneName );
+		UserFZoneIndex = InputProcessor::GetObjectItemNum( "ZoneProperty:UserViewFactors", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			NoUserInputF = false;
 
-			GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < 3 * pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
@@ -871,10 +870,10 @@ namespace HeatBalanceIntRadExchange {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::FindItemInList;
+
+
+
+
 		using General::TrimSigDigits;
 
 		// Argument array dimensioning
@@ -904,7 +903,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1D_string ZoneSurfaceNames;
 
 		NoUserInputF = true;
-		UserFZoneIndex = GetObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
+		UserFZoneIndex = InputProcessor::GetObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			ZoneSurfaceNames.allocate( N );
@@ -913,7 +912,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 			NoUserInputF = false;
 
-			GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
@@ -925,8 +924,8 @@ namespace HeatBalanceIntRadExchange {
 			numinx1 = 0;
 
 			for ( index = 2; index <= NumAlphas; index += 2 ) {
-				inx1 = FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
-				inx2 = FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
+				inx1 = InputProcessor::FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
+				inx2 = InputProcessor::FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
 				if ( inx1 == 0 ) {
 					ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name." );
 					ShowContinueError( "...Surface name=\"" + cAlphaArgs( index ) + "\", not in this zone." );

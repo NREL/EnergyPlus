@@ -82,7 +82,7 @@
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -257,11 +257,11 @@ namespace PipeHeatTransfer {
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
+
+
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -304,11 +304,11 @@ namespace PipeHeatTransfer {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "Pipe:Indoor";
-		NumOfPipeHTInt = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTInt = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Outdoor";
-		NumOfPipeHTExt = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTExt = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Underground";
-		NumOfPipeHTUG = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTUG = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
 		// allocate data structures
@@ -321,11 +321,11 @@ namespace PipeHeatTransfer {
 		for ( PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem ) {
 			++Item;
 			// get the object name
-			GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -335,7 +335,7 @@ namespace PipeHeatTransfer {
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			PipeHT( Item ).ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -372,7 +372,7 @@ namespace PipeHeatTransfer {
 			if ( SELECT_CASE_var == "ZONE" ) {
 				PipeHT( Item ).EnvironmentPtr = ZoneEnv;
 				PipeHT( Item ).EnvrZone = cAlphaArgs( 6 );
-				PipeHT( Item ).EnvrZonePtr = FindItemInList( cAlphaArgs( 6 ), Zone );
+				PipeHT( Item ).EnvrZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 6 ), Zone );
 				if ( PipeHT( Item ).EnvrZonePtr == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -432,11 +432,11 @@ namespace PipeHeatTransfer {
 		for ( PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem ) {
 			++Item;
 			// get the object name
-			GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -446,7 +446,7 @@ namespace PipeHeatTransfer {
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			PipeHT( Item ).ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -522,11 +522,11 @@ namespace PipeHeatTransfer {
 
 			++Item;
 			// get the object name
-			GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -536,7 +536,7 @@ namespace PipeHeatTransfer {
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			PipeHT( Item ).ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -568,9 +568,9 @@ namespace PipeHeatTransfer {
 
 			// Solar inclusion flag
 			// A6,  \field Sun Exposure
-			if ( SameString( cAlphaArgs( 5 ), "SUNEXPOSED" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "SUNEXPOSED" ) ) {
 				PipeHT( Item ).SolarExposed = true;
-			} else if ( SameString( cAlphaArgs( 5 ), "NOSUN" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "NOSUN" ) ) {
 				PipeHT( Item ).SolarExposed = false;
 			} else {
 				ShowSevereError( "GetPipesHeatTransfer: invalid key for sun exposure flag for " + cAlphaArgs( 1 ) );
@@ -598,7 +598,7 @@ namespace PipeHeatTransfer {
 			// Also get the soil material name
 			// A7,  \field Soil Material
 			PipeHT( Item ).SoilMaterial = cAlphaArgs( 6 );
-			PipeHT( Item ).SoilMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material );
+			PipeHT( Item ).SoilMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 6 ), Material );
 			if ( PipeHT( Item ).SoilMaterialNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + PipeHT( Item ).SoilMaterial );
 				ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item ).Name );
@@ -837,7 +837,7 @@ namespace PipeHeatTransfer {
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
 		using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
-		using InputProcessor::SameString;
+
 		using ScheduleManager::GetCurrentScheduleValue;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;

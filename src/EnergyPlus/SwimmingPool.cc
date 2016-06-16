@@ -89,7 +89,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -271,12 +271,12 @@ namespace SwimmingPool {
 		using BranchNodeConnections::TestCompSet;
 		using DataHeatBalance::Construct;
 		using General::TrimSigDigits;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::VerifyName;
+
+
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using DataSurfaces::Surface;
@@ -330,7 +330,7 @@ namespace SwimmingPool {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		GetObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -347,7 +347,7 @@ namespace SwimmingPool {
 		lNumericBlanks.allocate( MaxNumbers );
 		lNumericBlanks = true;
 
-		NumSwimmingPools = GetNumObjectsFound( "SwimmingPool:Indoor" );
+		NumSwimmingPools = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor" );
 		CheckEquipName.allocate( NumSwimmingPools );
 		CheckEquipName = true;
 
@@ -359,11 +359,11 @@ namespace SwimmingPool {
 		CurrentModuleObject = "SwimmingPool:Indoor";
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Pool, Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), Pool, Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -373,7 +373,7 @@ namespace SwimmingPool {
 			Pool( Item ).SurfaceName = Alphas( 2 );
 			Pool( Item ).SurfacePtr = 0;
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-				if ( SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
+				if ( InputProcessor::SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
 					Pool( Item ).SurfacePtr = SurfNum;
 					break;
 				}

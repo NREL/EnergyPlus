@@ -76,7 +76,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -249,7 +249,7 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -302,7 +302,7 @@ namespace IceThermalStorage {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
+			IceStorageNum = InputProcessor::FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
 				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
@@ -862,10 +862,10 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
+
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using namespace ScheduleManager;
 		using BranchNodeConnections::TestCompSet;
@@ -896,8 +896,8 @@ namespace IceThermalStorage {
 		ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
 		//LOAD ARRAYS WITH IceStorage DATA
-		NumIceStorages = GetNumObjectsFound( cIceStorageSimple ); // by ZG
-		NumDetIceStorages = GetNumObjectsFound( cIceStorageDetailed );
+		NumIceStorages = InputProcessor::GetNumObjectsFound( cIceStorageSimple ); // by ZG
+		NumDetIceStorages = InputProcessor::GetNumObjectsFound( cIceStorageDetailed );
 
 		IceStorageTypeMap.allocate( NumIceStorages + NumDetIceStorages );
 		CheckEquipName.allocate( NumIceStorages + NumDetIceStorages );
@@ -910,10 +910,10 @@ namespace IceThermalStorage {
 		cCurrentModuleObject = cIceStorageSimple;
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
-			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -931,9 +931,9 @@ namespace IceThermalStorage {
 
 			// Get Ice Thermal Storage Type
 			IceStorage( IceNum ).ITSType = cAlphaArgs( 2 );
-			if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
+			if ( InputProcessor::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilInternal;
-			} else if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
+			} else if ( InputProcessor::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilExternal;
 			} else {
 				ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -1006,10 +1006,10 @@ namespace IceThermalStorage {
 
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
-			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1109,9 +1109,9 @@ namespace IceThermalStorage {
 			}
 
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
-			if ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
+			if ( InputProcessor::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
+			} else if ( ( InputProcessor::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );

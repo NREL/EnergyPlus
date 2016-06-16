@@ -71,7 +71,7 @@
 #include <DataRoomAirModel.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -106,7 +106,6 @@ namespace MundtSimMgr {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using InputProcessor::SameString;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -383,7 +382,7 @@ namespace MundtSimMgr {
 
 						AirNodeFoundFlag = false;
 						for ( AirNodeNum = AirNodeBeginNum; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
-							if ( SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
+							if ( InputProcessor::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
 								LineNode( NodeNum, MundtZoneIndex ).ClassType = AirNode( AirNodeNum ).ClassType;
 								LineNode( NodeNum, MundtZoneIndex ).AirNodeName = AirNode( AirNodeNum ).Name;
 								LineNode( NodeNum, MundtZoneIndex ).Height = AirNode( AirNodeNum ).Height;

@@ -92,7 +92,7 @@
 #include <DElightManagerF.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -4050,8 +4050,8 @@ namespace DaylightingManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
+
+
 		// RJH DElight Modification Begin
 		using namespace DElightManagerF; // Module for managing DElight subroutines
 		// RJH DElight Modification End
@@ -4098,7 +4098,7 @@ namespace DaylightingManager {
 
 		ErrorsFound = false;
 		cCurrentModuleObject = "Daylighting:Controls";
-		TotDaylightingDetailed = GetNumObjectsFound( cCurrentModuleObject );
+		TotDaylightingDetailed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotDaylightingDetailed > 0 ) {
 			GetDaylightingParametersDetaild( TotDaylightingDetailed, ErrorsFound );
 			GetLightWellData( ErrorsFound );
@@ -4209,7 +4209,7 @@ namespace DaylightingManager {
 		}
 
 		// RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
-		TotDaylightingDElight = GetNumObjectsFound( "Daylighting:DELight:Controls" );
+		TotDaylightingDElight = InputProcessor::GetNumObjectsFound( "Daylighting:DELight:Controls" );
 		if ( TotDaylightingDElight > 0 ) {
 			dLatitude = Latitude;
 			DisplayString( "Calculating DElight Daylighting Factors" );
@@ -4275,9 +4275,9 @@ namespace DaylightingManager {
 
 		// TH 6/3/2010, added to report daylight factors
 		cCurrentModuleObject = "Output:DaylightFactors";
-		NumReports = GetNumObjectsFound( cCurrentModuleObject );
+		NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumReports > 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( has_prefix( cAlphaArgs( 1 ), "SIZINGDAYS" ) ) {
 				DFSReportSizingDays = true;
 			} else if ( has_prefix( cAlphaArgs( 1 ), "ALLSHADOWCALCULATIONDAYS" ) ) {
@@ -4316,10 +4316,10 @@ namespace DaylightingManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
+
+
+
+
 		using DataStringGlobals::CharSpace;
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharTab;
@@ -4392,7 +4392,7 @@ namespace DaylightingManager {
 
 		// Get and initialize illuminance map objects
 		cCurrentModuleObject = "Output:IlluminanceMap";
-		TotIllumMaps = GetNumObjectsFound( cCurrentModuleObject );
+		TotIllumMaps = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		IllumMap.allocate( TotIllumMaps );
 		IllumMapCalc.allocate( TotIllumMaps );
@@ -4400,9 +4400,9 @@ namespace DaylightingManager {
 
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-				GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
-				IllumMap( MapNum ).Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
+				IllumMap( MapNum ).Zone = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 
 				if ( IllumMap( MapNum ).Zone == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -4450,13 +4450,13 @@ namespace DaylightingManager {
 			} // MapNum
 
 			cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-			MapStyleIn = GetNumObjectsFound( cCurrentModuleObject );
+			MapStyleIn = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( MapStyleIn == 0 ) {
 				cAlphaArgs( 1 ) = "COMMA";
 				MapColSep = CharComma; //comma
 			} else if ( MapStyleIn == 1 ) {
-				GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ) == "COMMA" ) {
 					MapColSep = CharComma; //comma
 				} else if ( cAlphaArgs( 1 ) == "TAB" ) {
@@ -4495,9 +4495,9 @@ namespace DaylightingManager {
 		for ( Loop1 = 1; Loop1 <= TotDaylightingDetailed; ++Loop1 ) {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
-			GetObjectItem( cCurrentModuleObject, Loop1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
-			ZoneFound = FindItemInList( cAlphaArgs( 1 ), Zone );
+			ZoneFound = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
 				ErrorsFound = true;
@@ -5060,9 +5060,9 @@ namespace DaylightingManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
+
+
+
 		using General::RoundSigDigits;
 
 		// Locals
@@ -5089,14 +5089,14 @@ namespace DaylightingManager {
 
 		// Get the total number of Light Well objects
 		cCurrentModuleObject = "DaylightingDevice:LightWell";
-		TotLightWells = GetNumObjectsFound( cCurrentModuleObject );
+		TotLightWells = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotLightWells == 0 ) return;
 
 		for ( loop = 1; loop <= TotLightWells; ++loop ) {
 
-			GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			SurfNum = FindItemInList( cAlphaArgs( 1 ), Surface );
+			SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Surface );
 			if ( SurfNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" not found." );
 			}
@@ -9993,8 +9993,7 @@ Label903: ;
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
-		using DataDaylighting::ZoneDaylight;
+				using DataDaylighting::ZoneDaylight;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10022,8 +10021,8 @@ Label903: ;
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( InputProcessor::GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			transformPlane = cAlphas( 1 );

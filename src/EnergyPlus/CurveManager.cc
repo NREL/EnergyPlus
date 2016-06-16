@@ -76,7 +76,7 @@
 #include <DataSystemVariables.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 
@@ -419,11 +419,11 @@ namespace CurveManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::FindItemInList;
+
+
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
 		//  USE DataGlobals, ONLY: DisplayExtraWarnings, OutputFileInits
@@ -504,29 +504,29 @@ namespace CurveManager {
 
 		// Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-		NumBiQuad = GetNumObjectsFound( "Curve:Biquadratic" );
-		NumCubic = GetNumObjectsFound( "Curve:Cubic" );
-		NumQuartic = GetNumObjectsFound( "Curve:Quartic" );
-		NumQuad = GetNumObjectsFound( "Curve:Quadratic" );
-		NumQLinear = GetNumObjectsFound( "Curve:QuadLinear" );
-		NumQuadLinear = GetNumObjectsFound( "Curve:QuadraticLinear" );
-		NumCubicLinear = GetNumObjectsFound( "Curve:CubicLinear" );
-		NumLinear = GetNumObjectsFound( "Curve:Linear" );
-		NumBicubic = GetNumObjectsFound( "Curve:Bicubic" );
-		NumTriQuad = GetNumObjectsFound( "Curve:Triquadratic" );
-		NumExponent = GetNumObjectsFound( "Curve:Exponent" );
-		NumMultVarLookup = GetNumObjectsFound( "Table:MultiVariableLookup" );
-		NumFanPressRise = GetNumObjectsFound( "Curve:FanPressureRise" ); //cpw22Aug2010
-		NumExpSkewNorm = GetNumObjectsFound( "Curve:ExponentialSkewNormal" ); //cpw22Aug2010
-		NumSigmoid = GetNumObjectsFound( "Curve:Sigmoid" ); //cpw22Aug2010
-		NumRectHyper1 = GetNumObjectsFound( "Curve:RectangularHyperbola1" ); //cpw22Aug2010
-		NumRectHyper2 = GetNumObjectsFound( "Curve:RectangularHyperbola2" ); //cpw22Aug2010
-		NumExpDecay = GetNumObjectsFound( "Curve:ExponentialDecay" ); //cpw22Aug2010
-		NumDoubleExpDecay = GetNumObjectsFound( "Curve:DoubleExponentialDecay" ); //ykt July 2011
-		NumChillerPartLoadWithLift = GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
+		NumBiQuad = InputProcessor::GetNumObjectsFound( "Curve:Biquadratic" );
+		NumCubic = InputProcessor::GetNumObjectsFound( "Curve:Cubic" );
+		NumQuartic = InputProcessor::GetNumObjectsFound( "Curve:Quartic" );
+		NumQuad = InputProcessor::GetNumObjectsFound( "Curve:Quadratic" );
+		NumQLinear = InputProcessor::GetNumObjectsFound( "Curve:QuadLinear" );
+		NumQuadLinear = InputProcessor::GetNumObjectsFound( "Curve:QuadraticLinear" );
+		NumCubicLinear = InputProcessor::GetNumObjectsFound( "Curve:CubicLinear" );
+		NumLinear = InputProcessor::GetNumObjectsFound( "Curve:Linear" );
+		NumBicubic = InputProcessor::GetNumObjectsFound( "Curve:Bicubic" );
+		NumTriQuad = InputProcessor::GetNumObjectsFound( "Curve:Triquadratic" );
+		NumExponent = InputProcessor::GetNumObjectsFound( "Curve:Exponent" );
+		NumMultVarLookup = InputProcessor::GetNumObjectsFound( "Table:MultiVariableLookup" );
+		NumFanPressRise = InputProcessor::GetNumObjectsFound( "Curve:FanPressureRise" ); //cpw22Aug2010
+		NumExpSkewNorm = InputProcessor::GetNumObjectsFound( "Curve:ExponentialSkewNormal" ); //cpw22Aug2010
+		NumSigmoid = InputProcessor::GetNumObjectsFound( "Curve:Sigmoid" ); //cpw22Aug2010
+		NumRectHyper1 = InputProcessor::GetNumObjectsFound( "Curve:RectangularHyperbola1" ); //cpw22Aug2010
+		NumRectHyper2 = InputProcessor::GetNumObjectsFound( "Curve:RectangularHyperbola2" ); //cpw22Aug2010
+		NumExpDecay = InputProcessor::GetNumObjectsFound( "Curve:ExponentialDecay" ); //cpw22Aug2010
+		NumDoubleExpDecay = InputProcessor::GetNumObjectsFound( "Curve:DoubleExponentialDecay" ); //ykt July 2011
+		NumChillerPartLoadWithLift = InputProcessor::GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
 
-		NumOneVarTab = GetNumObjectsFound( "Table:OneIndependentVariable" );
-		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
+		NumOneVarTab = InputProcessor::GetNumObjectsFound( "Table:OneIndependentVariable" );
+		NumTwoVarTab = InputProcessor::GetNumObjectsFound( "Table:TwoIndependentVariables" );
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
 					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
@@ -539,12 +539,12 @@ namespace CurveManager {
 		if ( NumLookupTables > 0 ) TableLookup.allocate( NumLookupTables );
 
 		if ( NumOneVarTab > 0 ) {
-			GetObjectDefMaxArgs( "Table:OneIndependentVariable", TotalArgs, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "Table:OneIndependentVariable", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
 		if ( NumTwoVarTab > 0 ) {
-			GetObjectDefMaxArgs( "Table:TwoIndependentVariables", TotalArgs, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "Table:TwoIndependentVariables", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
@@ -561,18 +561,18 @@ namespace CurveManager {
 		// Loop over biquadratic curves and load data
 		CurrentModuleObject = "Curve:Biquadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -634,18 +634,18 @@ namespace CurveManager {
 		// Loop over ChillerPartLoadWithLift curves and load data //zrp_Aug2014
 		CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
 		for ( CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -713,18 +713,18 @@ namespace CurveManager {
 		// Loop over cubic curves and load data
 		CurrentModuleObject = "Curve:Cubic";
 		for ( CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -771,18 +771,18 @@ namespace CurveManager {
 		// Loop over quadrinomial curves and load data
 		CurrentModuleObject = "Curve:Quartic";
 		for ( CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -830,18 +830,18 @@ namespace CurveManager {
 		// Loop over quadratic curves and load data
 		CurrentModuleObject = "Curve:Quadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -887,18 +887,18 @@ namespace CurveManager {
 		// Loop over quadratic-linear curves and load data
 		CurrentModuleObject = "Curve:QuadraticLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -958,18 +958,18 @@ namespace CurveManager {
 		// Loop over cubic-linear curves and load data
 		CurrentModuleObject = "Curve:CubicLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1029,18 +1029,18 @@ namespace CurveManager {
 		// Loop over linear curves and load data
 		CurrentModuleObject = "Curve:Linear";
 		for ( CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1084,18 +1084,18 @@ namespace CurveManager {
 		// Loop over bicubic curves and load data
 		CurrentModuleObject = "Curve:Bicubic";
 		for ( CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1159,18 +1159,18 @@ namespace CurveManager {
 		// Loop over Triquadratic curves and load data
 		CurrentModuleObject = "Curve:Triquadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1267,18 +1267,18 @@ namespace CurveManager {
 		// Loop over quad linear curves and load data
 		CurrentModuleObject = "Curve:QuadLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1363,18 +1363,18 @@ namespace CurveManager {
 		// Loop over Exponent curves and load data
 		CurrentModuleObject = "Curve:Exponent";
 		for ( CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1414,18 +1414,18 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
 		CurrentModuleObject = "Curve:FanPressureRise";
 		for ( CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1470,18 +1470,18 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Exponential Skew Normal curves and load data
 		CurrentModuleObject = "Curve:ExponentialSkewNormal";
 		for ( CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1529,18 +1529,18 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Sigmoid curves and load data
 		CurrentModuleObject = "Curve:Sigmoid";
 		for ( CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1589,18 +1589,18 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Rectangular Hyperbola Type 1 curves and load data
 		CurrentModuleObject = "Curve:RectangularHyperbola1";
 		for ( CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1647,18 +1647,18 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Rectangular Hyperbola Type 2 curves and load data
 		CurrentModuleObject = "Curve:RectangularHyperbola2";
 		for ( CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1705,18 +1705,18 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Exponential Decay curves and load data
 		CurrentModuleObject = "Curve:ExponentialDecay";
 		for ( CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1763,18 +1763,18 @@ namespace CurveManager {
 		// ykt July,2011 Loop over DoubleExponential Decay curves and load data
 		CurrentModuleObject = "Curve:DoubleExponentialDecay";
 		for ( CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1825,7 +1825,7 @@ namespace CurveManager {
 		// Loop over one variable tables and load data
 		CurrentModuleObject = "Table:OneIndependentVariable";
 		for ( CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = ( NumNumbers - 5 ) / 2;
@@ -1833,14 +1833,14 @@ namespace CurveManager {
 			TableData( TableNum ).Y.allocate( NumTableEntries );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -2009,7 +2009,7 @@ namespace CurveManager {
 		// Loop over two variable tables and load data
 		CurrentModuleObject = "Table:TwoIndependentVariables";
 		for ( CurveIndex = 1; CurveIndex <= NumTwoVarTab; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = ( NumNumbers - 7 ) / 3;
@@ -2018,14 +2018,14 @@ namespace CurveManager {
 			TableData( TableNum ).Y.allocate( NumTableEntries );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -2264,19 +2264,19 @@ namespace CurveManager {
 		CurrentModuleObject = "Table:MultiVariableLookup";
 		TableNum = NumTables;
 		for ( CurveIndex = 1; CurveIndex <= NumMultVarLookup; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -4893,7 +4893,6 @@ Label999: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 
 		// Return value
 		bool IsCurveInputTypeValid;
@@ -4913,22 +4912,22 @@ Label999: ;
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 		if ( len( InInputType ) > 0 ) {
-			if ( SameString( InInputType, "DIMENSIONLESS" ) ) {
+			if ( InputProcessor::SameString( InInputType, "DIMENSIONLESS" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "TEMPERATURE" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "TEMPERATURE" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "PRESSURE" ) ) { //cpw22Aug2010
+			} else if ( InputProcessor::SameString( InInputType, "PRESSURE" ) ) { //cpw22Aug2010
 				IsCurveInputTypeValid = true; //cpw22Aug2010
 				// CR8124 Glazer - Need to use volumetricflow and massflow not just flow
-				//  ELSEIF (SameString(InInputType,'FLOW')) THEN
+				//  ELSEIF (InputProcessor::SameString(InInputType,'FLOW')) THEN
 				//    IsCurveInputTypeValid = .TRUE.
-			} else if ( SameString( InInputType, "VOLUMETRICFLOW" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "VOLUMETRICFLOW" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "MASSFLOW" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "MASSFLOW" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "POWER" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "POWER" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "DISTANCE" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "DISTANCE" ) ) {
 				IsCurveInputTypeValid = true;
 			} else {
 				IsCurveInputTypeValid = false;
@@ -4958,7 +4957,6 @@ Label999: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 
 		// Return value
 		bool IsCurveOutputTypeValid;
@@ -4978,15 +4976,15 @@ Label999: ;
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( SameString( InOutputType, "DIMENSIONLESS" ) ) {
+		if ( InputProcessor::SameString( InOutputType, "DIMENSIONLESS" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( SameString( InOutputType, "PRESSURE" ) ) { //cpw22Aug2010
+		} else if ( InputProcessor::SameString( InOutputType, "PRESSURE" ) ) { //cpw22Aug2010
 			IsCurveOutputTypeValid = true; //cpw22Aug2010
-		} else if ( SameString( InOutputType, "TEMPERATURE" ) ) {
+		} else if ( InputProcessor::SameString( InOutputType, "TEMPERATURE" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( SameString( InOutputType, "CAPACITY" ) ) {
+		} else if ( InputProcessor::SameString( InOutputType, "CAPACITY" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( SameString( InOutputType, "POWER" ) ) {
+		} else if ( InputProcessor::SameString( InOutputType, "POWER" ) ) {
 			IsCurveOutputTypeValid = true;
 		} else {
 			IsCurveOutputTypeValid = false;
@@ -5145,13 +5143,12 @@ Label999: ;
 		// Given a curve name, returns the curve index
 
 		// METHODOLOGY EMPLOYED:
-		// uses FindItemInList to search the curve array for the curve name
+		// uses InputProcessor::FindItemInList( to search the curve array for the curve name
 
 		// REFERENCES:
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int GetCurveIndex;
@@ -5179,7 +5176,7 @@ Label999: ;
 		}
 
 		if ( NumCurves > 0 ) {
-			GetCurveIndex = FindItemInList( CurveName, PerfCurve );
+			GetCurveIndex = InputProcessor::FindItemInList( CurveName, PerfCurve );
 		} else {
 			GetCurveIndex = 0;
 		}
@@ -5380,10 +5377,10 @@ Label999: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
+
+
+
+
 		using namespace DataIPShortCuts;
 		//  USE PlantPressureSystem, ONLY: PlantPressureCurveData, PressureCurve
 
@@ -5413,20 +5410,20 @@ Label999: ;
 		int CurveNum;
 		int CurveFound;
 
-		NumPressure = GetNumObjectsFound( CurveObjectName );
+		NumPressure = InputProcessor::GetNumObjectsFound( CurveObjectName );
 		PressureCurve.allocate( NumPressure );
 		for ( CurveNum = 1; CurveNum <= NumPressure; ++CurveNum ) {
-			GetObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PressureCurve, CurveNum - 1, IsNotOK, IsBlank, CurveObjectName + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), PressureCurve, CurveNum - 1, IsNotOK, IsBlank, CurveObjectName + " Name" );
 			if ( IsNotOK ) {
 				ErrsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Performance Curves as well.
 			if ( NumCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PerfCurve );
+				CurveFound = InputProcessor::FindItemInList( Alphas( 1 ), PerfCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetPressureCurveInput: " + CurveObjectName + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Performance Curves. Names must be unique across all curves." );
@@ -5482,7 +5479,7 @@ Label999: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		//  USE CurveManager,   ONLY : GetCurveIndex, GetCurveType
 		using DataBranchAirLoopPlant::PressureCurve_None;
 		using DataBranchAirLoopPlant::PressureCurve_Pressure;
@@ -5543,7 +5540,7 @@ Label999: ;
 		//Then try to retrieve a pressure curve object
 		if ( allocated( PressureCurve ) ) {
 			if ( size( PressureCurve ) > 0 ) {
-				TempCurveIndex = FindItemInList( PressureCurveName, PressureCurve );
+				TempCurveIndex = InputProcessor::FindItemInList( PressureCurveName, PressureCurve );
 			} else {
 				TempCurveIndex = 0;
 			}

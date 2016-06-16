@@ -65,7 +65,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
@@ -151,7 +151,7 @@ namespace HVACDuct {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -177,7 +177,7 @@ namespace HVACDuct {
 
 		// Get the duct component index
 		if ( CompIndex == 0 ) {
-			DuctNum = FindItemInList( CompName, Duct );
+			DuctNum = InputProcessor::FindItemInList( CompName, Duct );
 			if ( DuctNum == 0 ) {
 				ShowFatalError( "SimDuct: Component not found=" + CompName );
 			}
@@ -225,9 +225,9 @@ namespace HVACDuct {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using namespace DataIPShortCuts;
@@ -256,15 +256,15 @@ namespace HVACDuct {
 		bool IsBlank; // Flag for blank name
 
 		cCurrentModuleObject = "Duct";
-		NumDucts = GetNumObjectsFound( cCurrentModuleObject );
+		NumDucts = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		Duct.allocate( NumDucts );
 		CheckEquipName.dimension( NumDucts, true );
 
 		for ( DuctNum = 1; DuctNum <= NumDucts; ++DuctNum ) {
-			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Duct, DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Duct, DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

@@ -68,7 +68,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantComponent.hh>
@@ -195,9 +195,9 @@ namespace Pipes {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
+
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -230,19 +230,19 @@ namespace Pipes {
 		bool IsBlank; // Flag for blank name
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		NumWaterPipes = GetNumObjectsFound( "Pipe:Adiabatic" );
-		NumSteamPipes = GetNumObjectsFound( "Pipe:Adiabatic:Steam" );
+		NumWaterPipes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Pipe:Adiabatic" );
+		NumSteamPipes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Pipe:Adiabatic:Steam" );
 		NumLocalPipes = NumWaterPipes + NumSteamPipes;
 		LocalPipe.allocate( NumLocalPipes );
 
 		cCurrentModuleObject = "Pipe:Adiabatic";
 		for ( PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum ) {
 			PipeNum = PipeWaterNum;
-			GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeWaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeWaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -260,11 +260,11 @@ namespace Pipes {
 
 		for ( PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum ) {
 			++PipeNum;
-			GetObjectItem( cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeWaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeWaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

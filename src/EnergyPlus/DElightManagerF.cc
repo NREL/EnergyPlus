@@ -78,7 +78,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <OutputReportPredefined.hh>
 #include <UtilityRoutines.hh>
@@ -145,9 +145,9 @@ namespace DElightManagerF {
 		using namespace DataSurfaces; // Gives access to Surface data
 		using namespace DataStringGlobals; // Gives access to Program Path and Current Time/Date
 		using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
+
+
+
 		using namespace DataDaylighting;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
@@ -263,15 +263,15 @@ namespace DElightManagerF {
 		SinBldgRelNorth = std::sin( - BuildingAzimuth * DegToRadians );
 
 		// Get the set of Daylighting:DElight objects
-		int const iNumDElightObjs = GetNumObjectsFound( cModuleObjectDElight ); // Counter for Daylighting:DElight objects
+		int const iNumDElightObjs = InputProcessor::GetNumObjectsFound( cModuleObjectDElight ); // Counter for Daylighting:DElight objects
 
 		// Loop through the Daylighting:DElight objects checking for a host Zone
 		for ( int iDElight = 1; iDElight <= iNumDElightObjs; ++iDElight ) {
 
 			// Get the data items for the current DElight object
-			GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
+			InputProcessor::GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
 
-			int const izone = FindItemInList( AlphaArrayDElight( 2 ), Zone );
+			int const izone = InputProcessor::FindItemInList( AlphaArrayDElight( 2 ), Zone );
 			if ( izone == 0 ) {
 				ShowSevereError( "DElightInputGenerator: Illegal Zone Name=" + AlphaArrayDElight( 2 ) );
 				ShowContinueError( "..in Daylighting:DElight, User Supplied DElight Zone Name=" + AlphaArrayDElight( 1 ) );
@@ -282,14 +282,14 @@ namespace DElightManagerF {
 				iNumRefPts = 0;
 
 				// Get the set of all Daylighting:DElight:Reference Point objects in the IDF
-				int const iTotNumDElightRefPtObjs = GetNumObjectsFound( cModuleObjectRefPt );
+				int const iTotNumDElightRefPtObjs = InputProcessor::GetNumObjectsFound( cModuleObjectRefPt );
 
 				// Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
 				rTotalZoneFraction = 0.0; // init Zone Fraction accumulator
 				for ( int irefpt = 1; irefpt <= iTotNumDElightRefPtObjs; ++irefpt ) {
 
 					// Get the data items for the current DElight Reference Point object
-					GetObjectItem( cModuleObjectRefPt, irefpt, AlphaArrayRefPt, NumAlphasRefPt, RealNumArrayRefPt, NumNumsRefPt, IOSTAT );
+					InputProcessor::GetObjectItem( cModuleObjectRefPt, irefpt, AlphaArrayRefPt, NumAlphasRefPt, RealNumArrayRefPt, NumNumsRefPt, IOSTAT );
 
 					// Is this RefPt hosted by current DElight Zone?
 					if ( AlphaArrayRefPt( 2 ) == AlphaArrayDElight( 1 ) ) {
@@ -359,7 +359,7 @@ namespace DElightManagerF {
 		}
 
 		// Get the number of input Complex Fenestration objects for reference throughout this subroutine
-		int const iNumDElightCFS = GetNumObjectsFound( cModuleObjectCFS );
+		int const iNumDElightCFS = InputProcessor::GetNumObjectsFound( cModuleObjectCFS );
 
 		// Zone Data Section
 		gio::write( unit, Format_903 ) << iNumDElightZones;
@@ -368,9 +368,9 @@ namespace DElightManagerF {
 		for ( int iDElight = 1; iDElight <= iNumDElightObjs; ++iDElight ) {
 
 			// Get the data items for the current DElight object
-			GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
+			InputProcessor::GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
 
-			int const izone = FindItemInList( AlphaArrayDElight( 2 ), Zone );
+			int const izone = InputProcessor::FindItemInList( AlphaArrayDElight( 2 ), Zone );
 			if ( izone != 0 ) {
 
 				rLightLevel = GetDesignLightingLevelForZone( izone );
@@ -457,7 +457,7 @@ namespace DElightManagerF {
 									for ( int iCFS = 1; iCFS <= iNumDElightCFS; ++iCFS ) {
 
 										// Get the data items for the current CFS object
-										GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
+										InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
 
 										// Is the current Window Surface a Doppelganger?
 										if ( Surface( iwndo ).Name == AlphaArrayCFS( 4 ) ) {
@@ -490,7 +490,7 @@ namespace DElightManagerF {
 										for ( int iCFS = 1; iCFS <= iNumDElightCFS; ++iCFS ) {
 
 											// Get the data items for the current CFS object
-											GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
+											InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
 
 											// Is the current Window Surface a Doppelganger?
 											if ( Surface( iwndo2 ).Name == AlphaArrayCFS( 4 ) ) {
@@ -544,7 +544,7 @@ namespace DElightManagerF {
 						for ( int iCFS = 1; iCFS <= iNumDElightCFS; ++iCFS ) {
 
 							// Get the data items for the current CFS object
-							GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
+							InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
 
 							// Does the current Opaque Bounding Surface host the current CFS object?
 							if ( Surface( isurf ).Name == AlphaArrayCFS( 3 ) ) {
@@ -561,7 +561,7 @@ namespace DElightManagerF {
 						for ( int iCFS = 1; iCFS <= iNumDElightCFS; ++iCFS ) {
 
 							// Get the data items for the current CFS object
-							GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
+							InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
 
 							// Does the current Opaque Bounding Surface host the current CFS object?
 							if ( Surface( isurf ).Name == AlphaArrayCFS( 3 ) ) {
@@ -615,13 +615,13 @@ namespace DElightManagerF {
 				iNumRefPts = 0;
 
 				// Get the set of all Daylighting:DElight:Reference Point objects
-				int const iTotNumDElightRefPtObjs = GetNumObjectsFound( cModuleObjectRefPt );
+				int const iTotNumDElightRefPtObjs = InputProcessor::GetNumObjectsFound( cModuleObjectRefPt );
 
 				// Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
 				for ( int irefpt = 1; irefpt <= iTotNumDElightRefPtObjs; ++irefpt ) {
 
 					// Get the data items for the current DElight Reference Point object
-					GetObjectItem( cModuleObjectRefPt, irefpt, AlphaArrayRefPt, NumAlphasRefPt, RealNumArrayRefPt, NumNumsRefPt, IOSTAT );
+					InputProcessor::GetObjectItem( cModuleObjectRefPt, irefpt, AlphaArrayRefPt, NumAlphasRefPt, RealNumArrayRefPt, NumNumsRefPt, IOSTAT );
 
 					// Is this RefPt hosted by current DElight Zone?
 					if ( AlphaArrayRefPt( 2 ) == AlphaArrayDElight( 1 ) ) {
@@ -784,8 +784,7 @@ namespace DElightManagerF {
 		// USE STATEMENTS:
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
-		using DataDaylighting::ZoneDaylight;
+				using DataDaylighting::ZoneDaylight;
 		using DataSurfaces::WorldCoordSystem;
 		using DataSurfaces::AspectTransform;
 
@@ -805,8 +804,8 @@ namespace DElightManagerF {
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( InputProcessor::GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			if ( cAlphas( 1 ) != "XY" ) {
@@ -883,7 +882,7 @@ namespace DElightManagerF {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Robert J. Hitchcock
 		//       DATE WRITTEN   August 2003
-		//       MODIFIED       From MakeUPPERCase function by Linda K. Lawrie
+		//       MODIFIED       From InputProcessor::MakeUPPERCase( function by Linda K. Lawrie
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:

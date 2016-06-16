@@ -75,7 +75,7 @@
 #include <DataRuntimeLanguage.hh>
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 
 #if defined( _WIN32 ) && _MSC_VER < 1900
@@ -1555,7 +1555,7 @@ namespace General {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::ProcessNumber;
+
 		using namespace DataStringGlobals;
 
 		// Locals
@@ -1578,7 +1578,7 @@ namespace General {
 		int TokenMonth;
 		int TokenWeekday;
 
-		FstNum = int( ProcessNumber( String, errFlag ) );
+		FstNum = int( InputProcessor::ProcessNumber( String, errFlag ) );
 		DateType = -1;
 		if ( ! errFlag ) {
 			// Entered single number, do inverse JDay
@@ -1646,8 +1646,7 @@ namespace General {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::ProcessNumber;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1728,17 +1727,17 @@ namespace General {
 			} else if ( Loop == 2 ) {
 				// Field must be Day Month or Month Day (if both numeric, mon / day)
 				InternalError = false;
-				NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
+				NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
 				if ( errFlag ) {
 					// Month day, but first field is not numeric, 2nd must be
-					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( errFlag ) {
 						ShowSevereError( "Invalid date field=" + String );
 						InternalError = true;
 					} else {
 						TokenDay = NumField2;
 					}
-					TokenMonth = FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
+					TokenMonth = InputProcessor::FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
 					ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 					if ( ! InternalError ) {
 						DateType = 1;
@@ -1747,7 +1746,7 @@ namespace General {
 					}
 				} else {
 					// Month Day, first field was numeric, if 2nd is, then it's month<num> day<num>
-					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( ! errFlag ) {
 						TokenMonth = NumField1;
 						TokenDay = NumField2;
@@ -1759,7 +1758,7 @@ namespace General {
 						}
 					} else { // 2nd field was not numeric.  Must be Month
 						TokenDay = NumField1;
-						TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+						TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
 						ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 						if ( ! InternalError ) {
 							DateType = 1;
@@ -1772,16 +1771,16 @@ namespace General {
 			} else if ( Loop == 3 ) {
 				// Field must be some combination of <num> Weekday Month (if WkDayInMonth true)
 				if ( WkDayInMonth ) {
-					NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
 					if ( ! errFlag ) { // the expected result
 						TokenDay = NumField1;
-						TokenWeekday = FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+						TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 						if ( TokenWeekday == 0 ) {
-							TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-							TokenWeekday = FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+							TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 						} else {
-							TokenMonth = FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+							TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 							if ( TokenMonth == 0 ) InternalError = true;
 						}
 						DateType = 2;
@@ -1791,13 +1790,13 @@ namespace General {
 						if ( Fields( 1 ) == "LA" ) {
 							DateType = 3;
 							NumTokens = 3;
-							TokenWeekday = FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenWeekday == 0 ) {
-								TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-								TokenWeekday = FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+								TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+								TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 								if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 							} else {
-								TokenMonth = FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+								TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 								if ( TokenMonth == 0 ) InternalError = true;
 							}
 						} else { // error....
@@ -1805,9 +1804,9 @@ namespace General {
 						}
 					}
 				} else { // mm/dd/yyyy or yyyy/mm/dd
-					NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
-					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
-					NumField3 = int( ProcessNumber( Fields( 3 ), errFlag ) );
+					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField3 = int( InputProcessor::ProcessNumber( Fields( 3 ), errFlag ) );
 					DateType = 1;
 					// error detection later..
 					if ( NumField1 > 100 ) {
@@ -3065,12 +3064,12 @@ namespace General {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetNumSectionsFound;
-		using InputProcessor::SameString;
+
+
+
+
+
+
 		using DataRuntimeLanguage::OutputFullEMSTrace;
 		using DataRuntimeLanguage::OutputEMSErrors;
 		using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
@@ -3128,9 +3127,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:List";
 
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3171,9 +3170,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3203,7 +3202,7 @@ namespace General {
 				}}
 			}
 
-			RepNum = GetNumSectionsFound( "Report Variable Dictionary" );
+			RepNum = InputProcessor::GetNumSectionsFound( "Report Variable Dictionary" );
 			if ( RepNum > 0 ) {
 				VarDict = true;
 				VarDictOption1 = "REGULAR";
@@ -3212,9 +3211,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:VariableDictionary";
 
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				VarDict = true;
 				VarDictOption1 = cAlphaArgs( 1 );
 				VarDictOption2 = cAlphaArgs( 2 );
@@ -3222,9 +3221,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:Constructions";
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( has_prefix( cAlphaArgs( 1 ), "CONSTRUCT" ) ) {
 					Constructions = true;
 				} else if ( has_prefix( cAlphaArgs( 1 ), "MAT" ) ) {
@@ -3240,9 +3239,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:EnergyManagementSystem";
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				EMSoutput = true;
 
@@ -3319,9 +3318,9 @@ namespace General {
 			}
 
 			//    cCurrentModuleObject='Output:Schedules'
-			//    NumReports=GetNumObjectsFound(cCurrentModuleObject)
+			//    NumReports=InputProcessor::GetNumObjectsFound(cCurrentModuleObject)
 			//    DO RepNum=1,NumReports
-			//      CALL GetObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
+			//      CALL InputProcessor::GetObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
 			//                     AlphaBlank=lAlphaFieldBlanks,NumBlank=lNumericFieldBlanks,  &
 			//                     AlphaFieldNames=cAlphaFieldNames,NumericFieldNames=cNumericFieldNames)
 			//      SchRpt=.TRUE.
@@ -3335,11 +3334,11 @@ namespace General {
 		// Process the Scan Request
 		DoReport = false;
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( reportName ) );
+		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( reportName ) );
 		if ( SELECT_CASE_var == "CONSTRUCTIONS" ) {
 			if ( present( ReportKey ) ) {
-				if ( SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
-				if ( SameString( ReportKey, "Materials" ) ) DoReport = Materials;
+				if ( InputProcessor::SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
+				if ( InputProcessor::SameString( ReportKey, "Materials" ) ) DoReport = Materials;
 			}
 		} else if ( SELECT_CASE_var == "VIEWFACTORINFO" ) {
 			DoReport = ViewFactorInfo;
@@ -3352,7 +3351,7 @@ namespace General {
 			//     DoReport=SchRpt
 			//      IF (PRESENT(Option1)) Option1=SchRptOption
 		} else if ( SELECT_CASE_var == "SURFACES" ) {
-			{ auto const SELECT_CASE_var1( MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
+			{ auto const SELECT_CASE_var1( InputProcessor::MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
 			if ( SELECT_CASE_var1 == "COSTINFO" ) {
 				DoReport = CostInfo;
 			} else if ( SELECT_CASE_var1 == "DXF" ) {
@@ -3418,7 +3417,6 @@ namespace General {
 
 		// Using/Aliasing
 		using DataGlobals::MaxNameLength;
-		using InputProcessor::FindItemInList;
 
 		// Argument array dimensioning
 
@@ -3451,7 +3449,7 @@ namespace General {
 			TooLong = true;
 		}
 
-		int FoundItem = FindItemInList( ResultName, ItemNames, NumItems );
+		int FoundItem = InputProcessor::FindItemInList( ResultName, ItemNames, NumItems );
 
 		if ( FoundItem != 0 ) {
 			ShowSevereError( calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered." );

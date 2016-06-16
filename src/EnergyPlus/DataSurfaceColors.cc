@@ -60,7 +60,7 @@
 #include <DataSurfaceColors.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -151,7 +151,6 @@ namespace DataSurfaceColors {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem; // case insensitive Find
 
 		// Return value
 		bool WasSet;
@@ -172,7 +171,7 @@ namespace DataSurfaceColors {
 		int found;
 
 		WasSet = false;
-		found = FindItem( String, colorkeys, NumColors );
+		found = InputProcessor::FindItem( String, colorkeys, NumColors );
 
 		if ( found != 0 ) {
 			if ( present( ColorType ) ) {
@@ -218,9 +217,8 @@ namespace DataSurfaceColors {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -249,11 +247,11 @@ namespace DataSurfaceColors {
 
 		DXFcolorno = defaultcolorno;
 		// first see if there is a scheme name
-		numptr = GetObjectItemNum( CurrentModuleObject, SchemeName );
+		numptr = InputProcessor::GetObjectItemNum( CurrentModuleObject, SchemeName );
 
 		if ( numptr > 0 ) {
 
-			GetObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
+			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
 
 			cAlphas.allocate( NumAlphas );
 			cAlphaFields.allocate( NumAlphas );
@@ -265,7 +263,7 @@ namespace DataSurfaceColors {
 			cAlphas( {1,NumAlphas} ) = "";
 			rNumerics( {1,numNumbers} ) = 0.0;
 
-			GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			for ( numargs = 1; numargs <= numNumbers; ++numargs ) {
 				numptr = rNumerics( numargs ); // set to integer
 				if ( lNumericBlanks( numargs ) ) {

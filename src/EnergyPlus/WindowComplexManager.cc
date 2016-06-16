@@ -82,7 +82,7 @@
 #include <DataSystemVariables.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <PierceSurface.hh>
 #include <Psychrometrics.hh>
 #include <TARCOGGassesParams.hh>
@@ -2988,7 +2988,6 @@ namespace WindowComplexManager {
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using General::InterpSw;
-		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
 		using DataGlobals::StefanBoltzmann;
 		using TARCOGGassesParams::maxgas;

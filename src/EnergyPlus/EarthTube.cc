@@ -73,7 +73,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -222,10 +222,10 @@ namespace EarthTube {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
+
+
+
+
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using General::RoundSigDigits;
@@ -258,15 +258,15 @@ namespace EarthTube {
 		ZnRptET.allocate( NumOfZones );
 
 		cCurrentModuleObject = "ZoneEarthtube";
-		TotEarthTube = GetNumObjectsFound( cCurrentModuleObject );
+		TotEarthTube = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		EarthTubeSys.allocate( TotEarthTube );
 
 		for ( Loop = 1; Loop <= TotEarthTube; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Zone Name
-			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
+			EarthTubeSys( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( EarthTubeSys( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + " not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;

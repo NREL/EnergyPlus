@@ -7273,8 +7273,8 @@ Format](http://rfc7159.net/rfc7159)
          // TODO variables for line num, line_index
          unsigned get_line_num() { return line_num; }
          unsigned get_line_index() { return line_index; }
-         unsigned set_line_index(unsigned num) { line_index = num; }
-         unsigned set_line_num(unsigned num) { line_num = num; }
+         void set_line_index(unsigned num) { line_index = num; }
+         void set_line_num(unsigned num) { line_num = num; }
 
          enum class token_type
          {
@@ -8620,8 +8620,8 @@ Format](http://rfc7159.net/rfc7159)
       public:
          unsigned get_line_num() { return m_lexer.get_line_num(); }
          unsigned get_line_index() { return m_lexer.get_line_index(); }
-         unsigned set_line_index(unsigned num) { m_lexer.set_line_index(num); }
-         unsigned set_line_num(unsigned num) { m_lexer.set_line_num(num); }
+         void set_line_index(unsigned num) { m_lexer.set_line_index(num); }
+         void set_line_num(unsigned num) { m_lexer.set_line_num(num); }
 
          /// constructor for strings
          parser(const string_t& s, parser_callback_t cb = nullptr) noexcept

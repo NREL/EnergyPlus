@@ -80,7 +80,7 @@
 #include <DataSurfaces.hh>
 #include <General.hh>
 #include <HeatBalanceMovableInsulation.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -343,9 +343,9 @@ namespace HeatBalFiniteDiffManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
+
+
+
 		using DataHeatBalance::MaxAllowedDelTempCondFD;
 		using DataHeatBalance::CondFDRelaxFactor;
 		using DataHeatBalance::CondFDRelaxFactorInput;
@@ -385,8 +385,8 @@ namespace HeatBalFiniteDiffManager {
 		// user settings for numerical parameters
 		cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
-		if ( GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( InputProcessor::GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
 
@@ -416,8 +416,8 @@ namespace HeatBalFiniteDiffManager {
 
 		} // settings object
 
-		pcMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" );
-		vcMat = GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
+		pcMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChange" );
+		vcMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
 
 		MaterialFD.allocate( TotMaterials );
 
@@ -429,10 +429,10 @@ namespace HeatBalFiniteDiffManager {
 			for ( Loop = 1; Loop <= pcMat; ++Loop ) {
 
 				//Call Input Get routine to retrieve material data
-				GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				//Load the material derived type from the input data.
-				MaterNum = FindItemInList( MaterialNames( 1 ), Material );
+				MaterNum = InputProcessor::FindItemInList( MaterialNames( 1 ), Material );
 				if ( MaterNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 					ErrorsFound = true;
@@ -503,10 +503,10 @@ namespace HeatBalFiniteDiffManager {
 			for ( Loop = 1; Loop <= vcMat; ++Loop ) {
 
 				//Call Input Get routine to retrieve material data
-				GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				//Load the material derived type from the input data.
-				MaterNum = FindItemInList( MaterialNames( 1 ), Material );
+				MaterNum = InputProcessor::FindItemInList( MaterialNames( 1 ), Material );
 				if ( MaterNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 					ErrorsFound = true;

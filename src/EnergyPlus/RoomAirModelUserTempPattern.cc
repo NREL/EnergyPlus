@@ -78,7 +78,7 @@
 #include <DataZoneEquipment.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
@@ -290,7 +290,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::ZTAV;
-		using InputProcessor::FindItem;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -342,7 +341,7 @@ namespace RoomAirModelUserTempPattern {
 		// Using/Aliasing
 		using DataSurfaces::ZoneMeanAirTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::FindItem;
+
 		using OutputReportTabular::IntToStr;
 		using General::FindNumberInList;
 
@@ -1028,7 +1027,7 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::TempTstatAir;
 		using DataHeatBalFanSys::SysDepZoneLoads;
 		using DataHeatBalFanSys::ZoneLatentGain;
-		using InputProcessor::FindItem;
+
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;

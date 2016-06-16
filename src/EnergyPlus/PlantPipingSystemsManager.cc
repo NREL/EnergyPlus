@@ -86,7 +86,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -202,7 +202,7 @@ namespace PlantPipingSystemsManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
+
 		using DataGlobals::AnySlabsInModel;
 
 		// Locals
@@ -213,7 +213,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int numSlabsCheck;
 
-		numSlabsCheck = GetNumObjectsFound( ObjName_ZoneCoupled_Slab );
+		numSlabsCheck = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Slab );
 
 		if ( numSlabsCheck > 0 ) {
 			AnySlabsInModel = true;
@@ -244,7 +244,7 @@ namespace PlantPipingSystemsManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
+
 		using DataGlobals::AnyBasementsInModel;
 
 		// Locals
@@ -254,7 +254,7 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int const numBasementsCheck( GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
+		int const numBasementsCheck( InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Basement ) );
 
 		AnyBasementsInModel = ( numBasementsCheck > 0 );
 
@@ -285,7 +285,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -310,7 +310,7 @@ namespace PlantPipingSystemsManager {
 
 		// Look for circuit index
 		if ( EqNum == 0 ) {
-			CircuitNum = FindItemInList( EquipName, PipingSystemCircuits );
+			CircuitNum = InputProcessor::FindItemInList( EquipName, PipingSystemCircuits );
 			if ( CircuitNum == 0 ) {
 				// Catch any bad names before crashing
 				ShowFatalError( RoutineName + ": Piping circuit requested not found=" + EquipName );
@@ -514,9 +514,9 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
+
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -554,20 +554,20 @@ namespace PlantPipingSystemsManager {
 		std::string ThisSegmentName;
 
 		// Read number of objects and allocate main data structures - first domains
-		NumGeneralizedDomains = GetNumObjectsFound( ObjName_ug_GeneralDomain );
-		NumHorizontalTrenches = GetNumObjectsFound( ObjName_HorizTrench );
-		NumZoneCoupledDomains = GetNumObjectsFound( ObjName_ZoneCoupled_Slab );
-		NumBasements = GetNumObjectsFound( ObjName_ZoneCoupled_Basement );
+		NumGeneralizedDomains = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ug_GeneralDomain );
+		NumHorizontalTrenches = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_HorizTrench );
+		NumZoneCoupledDomains = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Slab );
+		NumBasements = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Basement );
 		TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
 		PipingSystemDomains.allocate( TotalNumDomains );
 
 		// then circuits
-		NumPipeCircuits = GetNumObjectsFound( ObjName_Circuit );
+		NumPipeCircuits = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_Circuit );
 		TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
 		PipingSystemCircuits.allocate( TotalNumCircuits );
 
 		// then segments
-		NumPipeSegmentsInInput = GetNumObjectsFound( ObjName_Segment );
+		NumPipeSegmentsInInput = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_Segment );
 		NumSegmentsInHorizontalTrenches = GetNumSegmentsForHorizontalTrenches( NumHorizontalTrenches );
 		TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
 		PipingSystemSegments.allocate( TotalNumSegments );
@@ -597,7 +597,7 @@ namespace PlantPipingSystemsManager {
 			for ( ThisCircuitPipeSegmentCounter = PipingSystemCircuits( CircuitCtr ).PipeSegmentNames.l1(); ThisCircuitPipeSegmentCounter <= PipingSystemCircuits( CircuitCtr ).PipeSegmentNames.u1(); ++ThisCircuitPipeSegmentCounter ) {
 
 				ThisSegmentName = PipingSystemCircuits( CircuitCtr ).PipeSegmentNames( ThisCircuitPipeSegmentCounter );
-				ThisSegmentIndex = FindItemInList( ThisSegmentName, PipingSystemSegments );
+				ThisSegmentIndex = InputProcessor::FindItemInList( ThisSegmentName, PipingSystemSegments );
 				if ( ThisSegmentIndex > 0 ) {
 					PipingSystemCircuits( CircuitCtr ).PipeSegmentIndeces( ThisCircuitPipeSegmentCounter ) = ThisSegmentIndex;
 					PipingSystemSegments( ThisSegmentIndex ).ParentCircuitIndex = CircuitCtr;
@@ -619,7 +619,7 @@ namespace PlantPipingSystemsManager {
 
 			// validate pipe domain-circuit name-to-index references
 			for ( CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr ) {
-				CircuitIndex = FindItemInList( PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ), PipingSystemCircuits );
+				CircuitIndex = InputProcessor::FindItemInList( PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ), PipingSystemCircuits );
 				PipingSystemDomains( DomainNum ).CircuitIndeces( CircuitCtr ) = CircuitIndex;
 				PipingSystemCircuits( CircuitIndex ).ParentDomainIndex = DomainNum;
 			}
@@ -696,7 +696,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
+
 		using namespace DataIPShortCuts;
 
 		// Return value
@@ -720,7 +720,7 @@ namespace PlantPipingSystemsManager {
 		for ( HorizontalCtr = 1; HorizontalCtr <= NumHorizontalTrenches; ++HorizontalCtr ) {
 
 			// Set up all the inputs for this domain object
-			GetObjectItem( ObjName_HorizTrench, HorizontalCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( ObjName_HorizTrench, HorizontalCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			NumPipesInThisHorizontal = rNumericArgs( 3 );
 
@@ -760,10 +760,10 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
+
+
+
+
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
 		using General::TrimSigDigits;
@@ -791,13 +791,13 @@ namespace PlantPipingSystemsManager {
 		for ( DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum ) {
 
 			// Set up all the inputs for this domain object
-			GetObjectItem( ObjName_ug_GeneralDomain, DomainNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( ObjName_ug_GeneralDomain, DomainNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemDomains, DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemDomains, DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -884,9 +884,9 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 14 ) / 100.0;
 
 			// check if there is a basement
-			if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 7 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HasBasement = true;
-			} else if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).HasBasement = false;
 			} else {
 				IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), "Must enter either yes or no.", ErrorsFound );
@@ -918,9 +918,9 @@ namespace PlantPipingSystemsManager {
 
 				// check for dimension shift
 				CurIndex = 8;
-				if ( SameString( cAlphaArgs( CurIndex ), "YES" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( CurIndex ), "YES" ) ) {
 					PipingSystemDomains( DomainNum ).BasementZone.ShiftPipesByWidth = true;
-				} else if ( SameString( cAlphaArgs( CurIndex ), "NO" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( CurIndex ), "NO" ) ) {
 					PipingSystemDomains( DomainNum ).BasementZone.ShiftPipesByWidth = false;
 				} else {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Must enter either yes or no.", ErrorsFound );
@@ -929,7 +929,7 @@ namespace PlantPipingSystemsManager {
 				// get boundary condition model names and indices --error check
 				CurIndex = 9;
 				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
-				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
+				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = InputProcessor::FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 				} else {
@@ -944,7 +944,7 @@ namespace PlantPipingSystemsManager {
 
 				CurIndex = 10;
 				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
-				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
+				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = InputProcessor::FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 				} else {
@@ -1011,10 +1011,10 @@ namespace PlantPipingSystemsManager {
 			// na
 
 			// Using/Aliasing
-			using InputProcessor::GetObjectItem;
-			using InputProcessor::FindItemInList;
-			using InputProcessor::SameString;
-			using InputProcessor::VerifyName;
+
+
+
+
 			using namespace DataIPShortCuts;
 			using DataSurfaces::OSCM;
 			using General::TrimSigDigits;
@@ -1097,14 +1097,14 @@ namespace PlantPipingSystemsManager {
 				++DomainCtr;
 
 				// Read all the inputs for this domain object
-				GetObjectItem( ObjName_ZoneCoupled_Slab, ZoneCoupledDomainCtr, cAlphaArgs,
+				InputProcessor::GetObjectItem( ObjName_ZoneCoupled_Slab, ZoneCoupledDomainCtr, cAlphaArgs,
 					NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				// Get the name, validate
 				Domain( ZoneCoupledDomainCtr ).ObjName = cAlphaArgs( 1 );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, ZoneCoupledDomainCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Slab + " Name" );
+				InputProcessor::VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, ZoneCoupledDomainCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Slab + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1128,9 +1128,9 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 11 );
 
 				// Set flag for slab in-grade or slab on-grade
-				if ( SameString( cAlphaArgs( 5 ), "INGRADE" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 5 ), "INGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = true;
-				} else if ( SameString( cAlphaArgs( 5 ), "ONGRADE" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "ONGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = false;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + "=" + cAlphaArgs( 5 ) );
@@ -1141,7 +1141,7 @@ namespace PlantPipingSystemsManager {
 				// Get slab material properties
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
 					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 6 );
-					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
+					PipingSystemDomains( DomainCtr ).SlabMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
@@ -1156,9 +1156,9 @@ namespace PlantPipingSystemsManager {
 
 				// set flag for horizontal insulation
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
-					if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+					if ( InputProcessor::SameString( cAlphaArgs( 7 ), "NO" ) ) {
 						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-					} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "YES" ) ) {
 						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + "=" + cAlphaArgs( 7 ) );
@@ -1170,7 +1170,7 @@ namespace PlantPipingSystemsManager {
 				// Get horizontal insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).HorizInsPresentFlag ) {
 					Domain( ZoneCoupledDomainCtr ).HorizInsMaterial = cAlphaArgs( 8 );
-					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
+					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
 						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
@@ -1183,7 +1183,7 @@ namespace PlantPipingSystemsManager {
 					}
 
 					// Set flag for horizontal insulation extents
-					if ( SameString( cAlphaArgs( 9 ), "PERIMETER" ) ) {
+					if ( InputProcessor::SameString( cAlphaArgs( 9 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
 						// Horizontal insulation perimeter width
 						if ( Domain( ZoneCoupledDomainCtr ).HorizInsWidth > 0.0 ) {
@@ -1193,7 +1193,7 @@ namespace PlantPipingSystemsManager {
 							ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
 							ErrorsFound = true;
 						}
-					} else if ( SameString( cAlphaArgs( 9 ), "FULL" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
@@ -1203,9 +1203,9 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// set flag for vertical insulation
-				if ( SameString( cAlphaArgs( 10 ), "NO" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 10 ), "NO" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = false;
-				} else if ( SameString( cAlphaArgs( 10 ), "YES" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 10 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = true;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
@@ -1216,7 +1216,7 @@ namespace PlantPipingSystemsManager {
 				// Get vertical insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).VertInsPresentFlag ) {
 					Domain( ZoneCoupledDomainCtr ).VertInsMaterial = cAlphaArgs( 11 );
-					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 11 ), Material, TotMaterials );
+					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 11 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).VertInsMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
 						ShowContinueError( "Found in: " + Domain( ZoneCoupledDomainCtr ).ObjName );
@@ -1242,9 +1242,9 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).PerimeterOffset = Domain( ZoneCoupledDomainCtr ).PerimeterOffset;
 
 				// Set simulation interval flag
-				if ( SameString( cAlphaArgs( 12 ), "TIMESTEP" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 12 ), "TIMESTEP" ) ) {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
-				} else if ( SameString( cAlphaArgs( 12 ), "HOURLY" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 12 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 12 ) + "=" + cAlphaArgs( 12 ) );
@@ -1262,7 +1262,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Name = Domain( ZoneCoupledDomainCtr ).ObjName;
 
 				// get boundary condition model names and indices -- error check
-				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM );
+				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = InputProcessor::FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM );
 				if ( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 4 ), cAlphaArgs( 4 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 					ErrorsFound = true;
@@ -1369,11 +1369,11 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
-		using InputProcessor::MakeUPPERCase;
+
+
+
+
+
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
 		using General::TrimSigDigits;
@@ -1441,14 +1441,14 @@ namespace PlantPipingSystemsManager {
 			++DomainNum;
 
 			// Read all the inputs for this domain object
-			GetObjectItem( ObjName_ZoneCoupled_Basement, BasementCtr, cAlphaArgs,
+			InputProcessor::GetObjectItem( ObjName_ZoneCoupled_Basement, BasementCtr, cAlphaArgs,
 				NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			Domain( BasementCtr ).ObjName = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, BasementCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Basement + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, BasementCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Basement + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1495,7 +1495,7 @@ namespace PlantPipingSystemsManager {
 			// get boundary condition model names and indices --error check
 			CurIndex = 4;
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
-			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
+			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = InputProcessor::FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 			} else {
@@ -1513,7 +1513,7 @@ namespace PlantPipingSystemsManager {
 
 			CurIndex = 8;
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
-			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
+			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = InputProcessor::FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 				ErrorsFound = true;
@@ -1558,9 +1558,9 @@ namespace PlantPipingSystemsManager {
 
 			// set flag for horizontal insulation
 			// Check cAlphaArgs value
-			if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = false;
-			} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = true;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + "=" + cAlphaArgs( 5 ) );
@@ -1571,7 +1571,7 @@ namespace PlantPipingSystemsManager {
 			// Get horizontal insulation material properties
 			if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
 				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 6 );
-				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
+				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).HorizInsMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
@@ -1584,7 +1584,7 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Set flag for horizontal insulation extents
-				if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = false;
 					// Horizontal insulation perimeter width
 					if ( Domain( BasementCtr ).HorizInsWidth > 0.0 ) {
@@ -1594,7 +1594,7 @@ namespace PlantPipingSystemsManager {
 						ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + "=" + cAlphaArgs( 7 ) );
@@ -1604,9 +1604,9 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// set flag for vertical insulation
-			if ( SameString( cAlphaArgs( 9 ), "NO" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = false;
-			} else if ( SameString( cAlphaArgs( 9 ), "YES" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = true;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
@@ -1627,7 +1627,7 @@ namespace PlantPipingSystemsManager {
 				}
 
 				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 10 );
-				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material, TotMaterials );
+				PipingSystemDomains( DomainNum ).VertInsMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 10 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).VertInsMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
 					ShowContinueError( "Found in: " + PipingSystemDomains( DomainNum ).Name );
@@ -1641,9 +1641,9 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Set simulation interval flag
-			if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
 				PipingSystemDomains( DomainNum ).SimTimestepFlag = true;
-			} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
@@ -1729,8 +1729,8 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
 		using namespace DataIPShortCuts;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1757,13 +1757,13 @@ namespace PlantPipingSystemsManager {
 		for ( PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter ) {
 
 			// Read all the inputs for this pipe circuit
-			GetObjectItem( ObjName_Circuit, PipeCircuitCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( ObjName_Circuit, PipeCircuitCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits, PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits, PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1858,8 +1858,8 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -1881,13 +1881,13 @@ namespace PlantPipingSystemsManager {
 		for ( SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr ) {
 
 			// Read all inputs for this pipe segment
-			GetObjectItem( ObjName_Segment, SegmentCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( ObjName_Segment, SegmentCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemSegments, SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemSegments, SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1947,8 +1947,8 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
 		using namespace DataIPShortCuts;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
@@ -2046,13 +2046,13 @@ namespace PlantPipingSystemsManager {
 			++CircuitCtr;
 
 			// Read all inputs for this pipe segment
-			GetObjectItem( ObjName_HorizTrench, HorizontalGHXCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( ObjName_HorizTrench, HorizontalGHXCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HGHX, &HorizontalTrenchData::ObjName, HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), HGHX, &HorizontalTrenchData::ObjName, HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";

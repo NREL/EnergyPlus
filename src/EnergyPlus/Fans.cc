@@ -77,7 +77,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -143,7 +143,6 @@ namespace Fans {
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyTdbFnHW;
 	using Psychrometrics::PsyCpAirFnWTdb;
-	using InputProcessor::SameString;
 
 	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
@@ -231,7 +230,7 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -257,7 +256,7 @@ namespace Fans {
 		}
 
 		if ( CompIndex == 0 ) {
-			FanNum = FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
+			FanNum = InputProcessor::FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
 			if ( FanNum == 0 ) {
 				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );
 			}
@@ -341,8 +340,7 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using NodeInputManager::GetOnlySingleNode;
+				using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
 		using BranchNodeConnections::TestCompSet;
 
@@ -399,41 +397,41 @@ namespace Fans {
 		// Flow
 		MaxAlphas = 0;
 		MaxNumbers = 0;
-		NumSimpFan = GetNumObjectsFound( "Fan:ConstantVolume" );
+		NumSimpFan = InputProcessor::GetNumObjectsFound( "Fan:ConstantVolume" );
 		if ( NumSimpFan > 0 ) {
-			GetObjectDefMaxArgs( "Fan:ConstantVolume", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "Fan:ConstantVolume", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumVarVolFan = GetNumObjectsFound( "Fan:VariableVolume" );
+		NumVarVolFan = InputProcessor::GetNumObjectsFound( "Fan:VariableVolume" );
 		if ( NumVarVolFan > 0 ) {
-			GetObjectDefMaxArgs( "Fan:VariableVolume", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "Fan:VariableVolume", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumOnOff = GetNumObjectsFound( "Fan:OnOff" );
+		NumOnOff = InputProcessor::GetNumObjectsFound( "Fan:OnOff" );
 		if ( NumOnOff > 0 ) {
-			GetObjectDefMaxArgs( "Fan:OnOff", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "Fan:OnOff", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumZoneExhFan = GetNumObjectsFound( "Fan:ZoneExhaust" );
+		NumZoneExhFan = InputProcessor::GetNumObjectsFound( "Fan:ZoneExhaust" );
 		if ( NumZoneExhFan > 0 ) {
-			GetObjectDefMaxArgs( "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumNightVentPerf = GetNumObjectsFound( "FanPerformance:NightVentilation" );
+		NumNightVentPerf = InputProcessor::GetNumObjectsFound( "FanPerformance:NightVentilation" );
 		if ( NumNightVentPerf > 0 ) {
-			GetObjectDefMaxArgs( "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
 		// cpw22Aug2010 Added get max alphas and numbers for ComponentModel fan
-		NumCompModelFan = GetNumObjectsFound( "Fan:ComponentModel" );
+		NumCompModelFan = InputProcessor::GetNumObjectsFound( "Fan:ComponentModel" );
 		if ( NumCompModelFan > 0 ) {
-			GetObjectDefMaxArgs( "Fan:ComponentModel", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "Fan:ComponentModel", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
@@ -455,7 +453,7 @@ namespace Fans {
 		for ( SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum ) {
 			FanNum = SimpFanNum;
 			cCurrentModuleObject = "Fan:ConstantVolume";
-			GetObjectItem( cCurrentModuleObject, SimpFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, SimpFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -463,7 +461,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -509,7 +507,7 @@ namespace Fans {
 		for ( VarVolFanNum = 1; VarVolFanNum <= NumVarVolFan; ++VarVolFanNum ) {
 			FanNum = NumSimpFan + VarVolFanNum;
 			cCurrentModuleObject = "Fan:VariableVolume";
-			GetObjectItem( cCurrentModuleObject, VarVolFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, VarVolFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -517,7 +515,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -543,9 +541,9 @@ namespace Fans {
 				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 			Fan( FanNum ).MaxAirFlowRateIsAutosizable = true;
-			if ( SameString( cAlphaArgs( 3 ), "Fraction" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Fraction" ) ) {
 				Fan( FanNum ).FanMinAirFracMethod = MinFrac;
-			} else if ( SameString( cAlphaArgs( 3 ), "FixedFlowRate" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "FixedFlowRate" ) ) {
 				Fan( FanNum ).FanMinAirFracMethod = FixedMin;
 			} else {
 				ShowSevereError( cAlphaFieldNames( 3 ) + " should be either Fraction or FixedFlowRate." );
@@ -582,7 +580,7 @@ namespace Fans {
 		for ( ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum ) {
 			FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
 			cCurrentModuleObject = "Fan:ZoneExhaust";
-			GetObjectItem( cCurrentModuleObject, ExhFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, ExhFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -590,7 +588,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -702,7 +700,7 @@ namespace Fans {
 		for ( OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum ) {
 			FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
 			cCurrentModuleObject = "Fan:OnOff";
-			GetObjectItem( cCurrentModuleObject, OnOffFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, OnOffFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -710,7 +708,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -767,7 +765,7 @@ namespace Fans {
 		} // end Number of Simple  ON-OFF FAN Loop
 
 		cCurrentModuleObject = "FanPerformance:NightVentilation";
-		NumNightVentPerf = GetNumObjectsFound( cCurrentModuleObject );
+		NumNightVentPerf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumNightVentPerf > 0 ) {
 			NightVentPerf.allocate( NumNightVentPerf );
@@ -783,10 +781,10 @@ namespace Fans {
 		}
 		// input the night ventilation performance objects
 		for ( NVPerfNum = 1; NVPerfNum <= NumNightVentPerf; ++NVPerfNum ) {
-			GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), NightVentPerf, &NightVentPerfData::FanName, NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), NightVentPerf, &NightVentPerfData::FanName, NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -818,7 +816,7 @@ namespace Fans {
 			FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + CompModelFanNum;
 
 			cCurrentModuleObject = "Fan:ComponentModel";
-			GetObjectItem( cCurrentModuleObject, CompModelFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, CompModelFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -826,7 +824,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -995,7 +993,6 @@ namespace Fans {
 		using DataAirLoop::AirLoopControlInfo;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1029,7 +1026,7 @@ namespace Fans {
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumFans; ++Loop ) {
-				if ( ! SameString( Fan( Loop ).FanType, "Fan:ZoneExhaust" ) ) continue;
+				if ( ! InputProcessor::SameString( Fan( Loop ).FanType, "Fan:ZoneExhaust" ) ) continue;
 				if ( CheckZoneEquipmentList( Fan( Loop ).FanType, Fan( Loop ).FanName ) ) continue;
 				ShowSevereError( "InitFans: Fan=[" + Fan( Loop ).FanType + ',' + Fan( Loop ).FanName + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
@@ -2594,7 +2591,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2615,7 +2611,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		FanIndex = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName );
@@ -2751,7 +2747,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2773,7 +2768,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		FanIndex = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
 				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\"." );
@@ -2817,7 +2812,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 DesignVolumeFlowRate; // returned flow rate of matched fan
@@ -2846,7 +2840,7 @@ namespace Fans {
 		if ( present( FanIndex ) ) {
 			DesignVolumeFlowRate = Fan( FanIndex ).MaxAirFlowRate;
 		} else {
-			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+			WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 			if ( WhichFan != 0 ) {
 				DesignVolumeFlowRate = Fan( WhichFan ).MaxAirFlowRate;
 			} else {
@@ -2887,7 +2881,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched fan
@@ -2913,7 +2906,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).InletNodeNum;
 		} else {
@@ -2952,7 +2945,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched fan
@@ -2978,7 +2970,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).OutletNodeNum;
 		} else {
@@ -3017,7 +3009,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int FanAvailSchPtr; // returned availability schedule pointer of matched fan
@@ -3043,7 +3034,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			FanAvailSchPtr = Fan( WhichFan ).AvailSchedPtrNum;
 		} else {
@@ -3082,7 +3073,6 @@ namespace Fans {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int FanSpeedRatioCurveIndex; // index to fan speed ratio curve object
@@ -3114,11 +3104,11 @@ namespace Fans {
 				FanType = Fan( WhichFan ).FanType;
 				FanName = Fan( WhichFan ).FanName;
 			} else {
-				WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+				WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 				IndexIn = WhichFan;
 			}
 		} else {
-			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+			WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		}
 
 		if ( WhichFan != 0 ) {
@@ -3161,7 +3151,6 @@ namespace Fans {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3185,7 +3174,7 @@ namespace Fans {
 		}
 
 		if ( FanNum == 0 ) {
-			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+			WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		} else {
 			WhichFan = FanNum;
 		}

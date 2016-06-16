@@ -78,7 +78,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
@@ -330,7 +330,7 @@ namespace HVACControllers {
 
 		// Using/Aliasing
 		using namespace DataSystemVariables;
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowLocked;
@@ -369,7 +369,7 @@ namespace HVACControllers {
 		}
 
 		if ( ControllerIndex == 0 ) {
-			ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+			ControlNum = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 			if ( ControlNum == 0 ) {
 				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 			}
@@ -565,11 +565,11 @@ namespace HVACControllers {
 		using DataSystemVariables::TrackAirLoopEnvFlag;
 		using DataSystemVariables::TraceAirLoopEnvFlag;
 		using DataSystemVariables::TraceHVACControllerEnvFlag;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::SameString;
+
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using DataAirSystems::PrimaryAirSystem;
@@ -626,7 +626,7 @@ namespace HVACControllers {
 		// be retrieved by name as they are needed.
 
 		CurrentModuleObject = "Controller:WaterCoil";
-		NumSimpleControllers = GetNumObjectsFound( CurrentModuleObject );
+		NumSimpleControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		NumControllers = NumSimpleControllers;
 
 		// Allocate stats data structure for each air loop and controller if needed
@@ -649,7 +649,7 @@ namespace HVACControllers {
 		RootFinders.allocate( NumControllers );
 		CheckEquipName.dimension( NumControllers, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -660,11 +660,11 @@ namespace HVACControllers {
 		// Now find and load all of the simple controllers.
 		if ( NumSimpleControllers > 0 ) {
 			for ( Num = 1; Num <= NumSimpleControllers; ++Num ) {
-				GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -685,9 +685,9 @@ namespace HVACControllers {
 					ShowSevereError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio." );
 					ErrorsFound = true;
 				}}
-				if ( SameString( AlphArray( 3 ), "Normal" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 3 ), "Normal" ) ) {
 					ControllerProps( Num ).Action = iNormalAction;
-				} else if ( SameString( AlphArray( 3 ), "Reverse" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 3 ), "Reverse" ) ) {
 					ControllerProps( Num ).Action = iReverseAction;
 				} else if ( lAlphaBlanks( 3 ) ) {
 					ControllerProps( Num ).Action = 0;
@@ -3406,8 +3406,7 @@ Label100: ;
 		// Using/Aliasing
 		using DataAirSystems::PrimaryAirSystem;
 		using DataHVACGlobals::NumPrimaryAirSys;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3438,7 +3437,7 @@ Label100: ;
 				// first see how many are water coil controllers
 				WaterCoilContrlCount = 0; //init
 				for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
-					if ( SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
+					if ( InputProcessor::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 						++WaterCoilContrlCount;
 					}
 				}
@@ -3448,9 +3447,9 @@ Label100: ;
 					ContrlSensedNodeNums = 0;
 					SensedNodeIndex = 0;
 					for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
-						if ( SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
+						if ( InputProcessor::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 							++SensedNodeIndex;
-							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
+							foundControl = InputProcessor::FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
 							if ( foundControl > 0 ) {
 								ContrlSensedNodeNums( 1, SensedNodeIndex ) = ControllerProps( foundControl ).SensedNode;
 							}
@@ -3576,7 +3575,6 @@ Label100: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -3599,7 +3597,7 @@ Label100: ;
 		}
 
 		NodeNotFound = true;
-		ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		ControlNum = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControlNum > 0 && ControlNum <= NumControllers ) {
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;

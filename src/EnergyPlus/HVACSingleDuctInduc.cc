@@ -80,7 +80,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -186,7 +186,7 @@ namespace HVACSingleDuctInduc {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using DataSizing::TermUnitIU;
 		using General::TrimSigDigits;
 
@@ -213,7 +213,7 @@ namespace HVACSingleDuctInduc {
 
 		// Get the induction unit index
 		if ( CompIndex == 0 ) {
-			IUNum = FindItemInList( CompName, IndUnit );
+			IUNum = InputProcessor::FindItemInList( CompName, IndUnit );
 			if ( IUNum == 0 ) {
 				ShowFatalError( "SimIndUnit: Induction Unit not found=" + CompName );
 			}
@@ -283,11 +283,11 @@ namespace HVACSingleDuctInduc {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -343,13 +343,13 @@ namespace HVACSingleDuctInduc {
 
 		// find the number of each type of induction unit
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
-		NumFourPipes = GetNumObjectsFound( CurrentModuleObject );
+		NumFourPipes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		NumIndUnits = NumFourPipes;
 		// allocate the data structures
 		IndUnit.allocate( NumIndUnits );
 		CheckEquipName.dimension( NumIndUnits, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -361,12 +361,12 @@ namespace HVACSingleDuctInduc {
 		// loop over Series PIUs; get and load the input data
 		for ( IUIndex = 1; IUIndex <= NumFourPipes; ++IUIndex ) {
 
-			GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IUNum = IUIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), IndUnit, IUNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), IndUnit, IUNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -393,7 +393,7 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).OutAirNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 5 ) );
 
 			IndUnit( IUNum ).HCoilType = Alphas( 6 ); // type (key) of heating coil
-			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				IndUnit( IUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
 			}
 
@@ -413,9 +413,9 @@ namespace HVACSingleDuctInduc {
 
 			IndUnit( IUNum ).CCoilType = Alphas( 8 ); // type (key) of cooling coil
 
-			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) ) {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-			} else if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			} else if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 			}
 
@@ -537,7 +537,7 @@ namespace HVACSingleDuctInduc {
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
-		using InputProcessor::SameString;
+
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -637,7 +637,7 @@ namespace HVACSingleDuctInduc {
 			OutletNode = IndUnit( IUNum ).OutAirNode;
 			IndRat = IndUnit( IUNum ).InducRatio;
 			// set the mass flow rates from the input volume flow rates
-			if ( SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 				IndUnit( IUNum ).MaxTotAirMassFlow = RhoAir * IndUnit( IUNum ).MaxTotAirVolFlow;
 				IndUnit( IUNum ).MaxPriAirMassFlow = IndUnit( IUNum ).MaxTotAirMassFlow / ( 1.0 + IndRat );
 				IndUnit( IUNum ).MaxSecAirMassFlow = IndRat * IndUnit( IUNum ).MaxTotAirMassFlow / ( 1.0 + IndRat );
@@ -683,7 +683,7 @@ namespace HVACSingleDuctInduc {
 		if ( FirstHVACIteration ) {
 			// check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
 			if ( GetCurrentScheduleValue( IndUnit( IUNum ).SchedPtr ) > 0.0 && Node( PriNode ).MassFlowRate > 0.0 ) {
-				if ( SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 					Node( PriNode ).MassFlowRate = IndUnit( IUNum ).MaxPriAirMassFlow;
 					Node( SecNode ).MassFlowRate = IndUnit( IUNum ).MaxSecAirMassFlow;
 				}
@@ -693,7 +693,7 @@ namespace HVACSingleDuctInduc {
 			}
 			// reset the max and min avail flows
 			if ( GetCurrentScheduleValue( IndUnit( IUNum ).SchedPtr ) > 0.0 && Node( PriNode ).MassFlowRateMaxAvail > 0.0 ) {
-				if ( SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 					Node( PriNode ).MassFlowRateMaxAvail = IndUnit( IUNum ).MaxPriAirMassFlow;
 					Node( PriNode ).MassFlowRateMinAvail = IndUnit( IUNum ).MaxPriAirMassFlow;
 					Node( SecNode ).MassFlowRateMaxAvail = IndUnit( IUNum ).MaxSecAirMassFlow;
@@ -732,8 +732,7 @@ namespace HVACSingleDuctInduc {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
-		using WaterCoils::SetCoilDesFlow;
+				using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		//  USE BranchInputManager,  ONLY: MyPlantSizingIndex
@@ -838,7 +837,7 @@ namespace HVACSingleDuctInduc {
 			} else {
 				CheckZoneSizing( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name );
 
-				if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", IndUnit( IUNum ).HCoil, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", IndUnit( IUNum ).HCoil, ErrorsFound );
@@ -910,7 +909,7 @@ namespace HVACSingleDuctInduc {
 			} else {
 				CheckZoneSizing( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name );
 
-				if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) || SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) || InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, ErrorsFound );
@@ -979,10 +978,10 @@ namespace HVACSingleDuctInduc {
 			TermUnitSizing( CurZoneEqNum ).DesHeatingLoad = IndUnit( IUNum ).DesHeatingLoad;
 			// save the induction ratio for use in subsequent sizing calcs
 			TermUnitSizing( CurZoneEqNum ).InducRat = IndUnit( IUNum ).InducRatio;
-			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				SetCoilDesFlow( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
 			}
-			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 				SetCoilDesFlow( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
 			}
 		}
@@ -1429,7 +1428,6 @@ namespace HVACSingleDuctInduc {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		bool YesNo; // True if found
@@ -1456,7 +1454,7 @@ namespace HVACSingleDuctInduc {
 
 		YesNo = false;
 		if ( NumIndUnits > 0 ) {
-			ItemNum = FindItemInList( CompName, IndUnit, &IndUnitData::MixerName );
+			ItemNum = InputProcessor::FindItemInList( CompName, IndUnit, &IndUnitData::MixerName );
 			if ( ItemNum > 0 ) YesNo = true;
 		}
 

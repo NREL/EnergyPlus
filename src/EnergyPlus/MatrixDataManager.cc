@@ -67,7 +67,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -147,9 +147,9 @@ namespace MatrixDataManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
 
@@ -180,7 +180,7 @@ namespace MatrixDataManager {
 		int NumElements;
 
 		cCurrentModuleObject = "Matrix:TwoDimension";
-		NumTwoDimMatrix = GetNumObjectsFound( cCurrentModuleObject );
+		NumTwoDimMatrix = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		NumMats = NumTwoDimMatrix;
 
@@ -188,11 +188,11 @@ namespace MatrixDataManager {
 
 		MatNum = 0;
 		for ( MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex ) {
-			GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++MatNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MatData, MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), MatData, MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -247,13 +247,12 @@ namespace MatrixDataManager {
 
 		// METHODOLOGY EMPLOYED:
 		// inputs name of matrix and returns integer index
-		// currently uses FindItemInList which is case sensitive
+		// currently uses InputProcessor::FindItemInList( which is case sensitive
 
 		// REFERENCES:
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int MatrixIndexPtr; // Function result
@@ -278,7 +277,7 @@ namespace MatrixDataManager {
 		}
 
 		if ( NumMats > 0 ) {
-			MatrixIndexPtr = FindItemInList( MatrixName, MatData );
+			MatrixIndexPtr = InputProcessor::FindItemInList( MatrixName, MatData );
 		} else {
 			MatrixIndexPtr = 0;
 		}

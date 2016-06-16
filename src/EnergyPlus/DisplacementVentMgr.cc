@@ -80,7 +80,7 @@
 #include <DataSurfaces.hh>
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -303,8 +303,7 @@ namespace DisplacementVentMgr {
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-		using namespace InputProcessor;
-		using ScheduleManager::GetScheduleIndex;
+				using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals
@@ -613,14 +612,13 @@ namespace DisplacementVentMgr {
 		// REFERENCES:
 		// Model developed by Paul Linden (UCSD), G. Carrilho da Graca (UCSD) and P. Haves (LBL).
 		// Work funded by the California Energy Comission. More information on the model can found in:
-		// "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graça, Ph.D. thesis UCSD. December 2003.
+		// "Simplified Models for Heat Transfer in Rooms" G. Carrilho da GraÃ§a, Ph.D. thesis UCSD. December 2003.
 
 		// Using/Aliasing
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-		using namespace InputProcessor;
-		using ScheduleManager::GetScheduleIndex;
+				using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;

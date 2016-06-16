@@ -74,7 +74,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -189,7 +189,7 @@ namespace HVACDXHeatPumpSystem {
 		using DXCoils::SimDXCoil;
 		using General::TrimSigDigits;
 		using DataAirLoop::AirLoopControlInfo;
-		using InputProcessor::FindItemInList;
+
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 
 		// Locals
@@ -232,7 +232,7 @@ namespace HVACDXHeatPumpSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
+			DXSystemNum = InputProcessor::FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );
 			}
@@ -319,8 +319,7 @@ namespace HVACDXHeatPumpSystem {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using NodeInputManager::GetOnlySingleNode;
+				using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -366,12 +365,12 @@ namespace HVACDXHeatPumpSystem {
 		// Flow
 
 		CurrentModuleObject = "CoilSystem:Heating:DX";
-		NumDXHeatPumpSystems = GetNumObjectsFound( CurrentModuleObject );
+		NumDXHeatPumpSystems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		DXHeatPumpSystem.allocate( NumDXHeatPumpSystems );
 		CheckEquipName.dimension( NumDXHeatPumpSystems, true );
 
-		GetObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -383,11 +382,11 @@ namespace HVACDXHeatPumpSystem {
 		// Get the data for the DX Cooling System
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 
-			GetObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXHeatPumpSystem, DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), DXHeatPumpSystem, DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -404,13 +403,13 @@ namespace HVACDXHeatPumpSystem {
 				}
 			}
 
-			if ( SameString( Alphas( 3 ), "Coil:Heating:DX:SingleSpeed" ) ) {
+			if ( InputProcessor::SameString( Alphas( 3 ), "Coil:Heating:DX:SingleSpeed" ) ) {
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType = Alphas( 3 );
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType_Num = CoilDX_HeatingEmpirical;
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilName = Alphas( 4 );
-			} else if ( SameString( Alphas( 3 ), "Coil:Heating:DX:VariableSpeed" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 3 ), "Coil:Heating:DX:VariableSpeed" ) ) {
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType = Alphas( 3 );
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
@@ -612,7 +611,7 @@ namespace HVACDXHeatPumpSystem {
 		// Using/Aliasing
 		using namespace ScheduleManager;
 		using DataHVACGlobals::TempControlTol;
-		using InputProcessor::FindItemInList;
+
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;

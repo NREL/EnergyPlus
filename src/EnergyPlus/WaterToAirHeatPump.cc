@@ -75,7 +75,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -198,7 +198,7 @@ namespace WaterToAirHeatPump {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 		using FluidProperties::FindGlycol;
 
@@ -230,7 +230,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( CompIndex == 0 ) {
-			HPNum = FindItemInList( CompName, WatertoAirHP );
+			HPNum = InputProcessor::FindItemInList( CompName, WatertoAirHP );
 			if ( HPNum == 0 ) {
 				ShowFatalError( "WaterToAir HP not found=" + CompName );
 			}
@@ -290,8 +290,7 @@ namespace WaterToAirHeatPump {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using namespace NodeInputManager;
+				using namespace NodeInputManager;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::CheckFluidPropertyName;
 		using FluidProperties::FindGlycol;
@@ -337,8 +336,8 @@ namespace WaterToAirHeatPump {
 
 		// FLOW
 
-		NumCool = GetNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" );
-		NumHeat = GetNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" );
+		NumCool = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" );
+		NumHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" );
 		NumWatertoAirHPs = NumCool + NumHeat;
 		HPNum = 0;
 
@@ -353,10 +352,10 @@ namespace WaterToAirHeatPump {
 			CheckEquipName.dimension( NumWatertoAirHPs, true );
 		}
 
-		GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
@@ -373,12 +372,12 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -480,12 +479,12 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -925,7 +924,7 @@ namespace WaterToAirHeatPump {
 		using Psychrometrics::PsyTsatFnHPb;
 		using General::RoundSigDigits;
 		using General::SolveRegulaFalsi;
-		using InputProcessor::SameString;
+
 		using DataPlant::PlantLoop;
 
 		// Locals
@@ -1585,7 +1584,7 @@ namespace WaterToAirHeatPump {
 		//  USE DataZoneEnergyDemands
 		using General::RoundSigDigits;
 		using General::SolveRegulaFalsi;
-		using InputProcessor::SameString;
+
 		using DataPlant::PlantLoop;
 
 		// Locals
@@ -2354,7 +2353,6 @@ namespace WaterToAirHeatPump {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int IndexNum; // returned index of matched coil
@@ -2381,7 +2379,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, WatertoAirHP );
+		IndexNum = InputProcessor::FindItemInList( CoilName, WatertoAirHP );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -2419,8 +2417,7 @@ namespace WaterToAirHeatPump {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
@@ -2447,10 +2444,10 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
-			WhichCoil = FindItemInList( CoilName, WatertoAirHP );
+		if ( InputProcessor::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || InputProcessor::SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
+			WhichCoil = InputProcessor::FindItemInList( CoilName, WatertoAirHP );
 			if ( WhichCoil != 0 ) {
-				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
+				if ( InputProcessor::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
 					CoilCapacity = WatertoAirHP( WhichCoil ).HeatingCapacity;
 				} else {
 					CoilCapacity = WatertoAirHP( WhichCoil ).CoolingCapacity;
@@ -2497,7 +2494,6 @@ namespace WaterToAirHeatPump {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched coil
@@ -2524,7 +2520,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
+		WhichCoil = InputProcessor::FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirInletNodeNum;
 		}
@@ -2566,7 +2562,6 @@ namespace WaterToAirHeatPump {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched coil
@@ -2593,7 +2588,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
+		WhichCoil = InputProcessor::FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirOutletNodeNum;
 		}

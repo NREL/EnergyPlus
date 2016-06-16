@@ -82,7 +82,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -212,7 +212,7 @@ namespace PoweredInductionUnits {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using DataSizing::TermUnitPIU;
 		using General::TrimSigDigits;
 
@@ -241,7 +241,7 @@ namespace PoweredInductionUnits {
 
 		// Get the powered induction unit index
 		if ( CompIndex == 0 ) {
-			PIUNum = FindItemInList( CompName, PIU );
+			PIUNum = InputProcessor::FindItemInList( CompName, PIU );
 			if ( PIUNum == 0 ) {
 				ShowFatalError( "SimPIU: PIU Unit not found=" + CompName );
 			}
@@ -313,10 +313,10 @@ namespace PoweredInductionUnits {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using FluidProperties::FindRefrigerant;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -362,8 +362,8 @@ namespace PoweredInductionUnits {
 		// FLOW
 		// find the number of each type of fan coil unit
 		SteamMessageNeeded = true;
-		NumSeriesPIUs = GetNumObjectsFound( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
-		NumParallelPIUs = GetNumObjectsFound( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
+		NumSeriesPIUs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
+		NumParallelPIUs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
 		NumPIUs = NumSeriesPIUs + NumParallelPIUs;
 		// allocate the data structures
 		PIU.allocate( NumPIUs );
@@ -374,12 +374,12 @@ namespace PoweredInductionUnits {
 
 			cCurrentModuleObject = "AirTerminal:SingleDuct:SeriesPIU:Reheat";
 
-			GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -403,12 +403,12 @@ namespace PoweredInductionUnits {
 			PIU( PIUNum ).MinPriAirFlowFrac = rNumericArgs( 3 );
 
 			PIU( PIUNum ).HCoilType = cAlphaArgs( 9 ); // type (key) of heating coil
-			if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 				PIU( PIUNum ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
@@ -418,7 +418,7 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 					SteamMessageNeeded = false;
 				}
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Electric;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
@@ -491,12 +491,12 @@ namespace PoweredInductionUnits {
 
 			cCurrentModuleObject = "AirTerminal:SingleDuct:ParallelPIU:Reheat";
 
-			GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex + NumSeriesPIUs;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -519,12 +519,12 @@ namespace PoweredInductionUnits {
 			PIU( PIUNum ).MinPriAirFlowFrac = rNumericArgs( 3 );
 			PIU( PIUNum ).FanOnFlowFrac = rNumericArgs( 4 );
 			PIU( PIUNum ).HCoilType = cAlphaArgs( 9 ); // type (key) of heating coil
-			if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 				PIU( PIUNum ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
@@ -534,7 +534,7 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 					SteamMessageNeeded = false;
 				}
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Electric;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
@@ -869,8 +869,7 @@ namespace PoweredInductionUnits {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
-		using WaterCoils::SetCoilDesFlow;
+				using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;
@@ -1149,7 +1148,7 @@ namespace PoweredInductionUnits {
 				}
 			} else {
 				CheckZoneSizing( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name );
-				if ( SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+				if ( InputProcessor::SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", PIU( PIUNum ).HCoil, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", PIU( PIUNum ).HCoil, ErrorsFound );
@@ -1213,7 +1212,7 @@ namespace PoweredInductionUnits {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", PIU( PIUNum ).MaxVolHotWaterFlow );
 				}
 			} else {
-				if ( SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Steam" ) ) {
+				if ( InputProcessor::SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Steam" ) ) {
 
 					CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", PIU( PIUNum ).HCoil, ErrorsFound );
 					CoilSteamOutletNode = GetCoilSteamOutletNode( "Coil:Heating:Steam", PIU( PIUNum ).HCoil, ErrorsFound );
@@ -1814,7 +1813,6 @@ namespace PoweredInductionUnits {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		bool YesNo; // True if found
@@ -1841,7 +1839,7 @@ namespace PoweredInductionUnits {
 
 		YesNo = false;
 		if ( NumPIUs > 0 ) {
-			ItemNum = FindItemInList( CompName, PIU, &PowIndUnitData::MixerName );
+			ItemNum = InputProcessor::FindItemInList( CompName, PIU, &PowIndUnitData::MixerName );
 			if ( ItemNum > 0 ) YesNo = true;
 		}
 
@@ -1870,7 +1868,6 @@ namespace PoweredInductionUnits {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

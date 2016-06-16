@@ -66,7 +66,7 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -194,8 +194,7 @@ namespace OutAirNodeManager {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using namespace NodeInputManager;
+				using namespace NodeInputManager;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -239,8 +238,8 @@ namespace OutAirNodeManager {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 
-		NumOutAirInletNodeLists = GetNumObjectsFound( "OutdoorAir:NodeList" );
-		NumOutsideAirNodeSingles = GetNumObjectsFound( "OutdoorAir:Node" );
+		NumOutAirInletNodeLists = InputProcessor::GetNumObjectsFound( "OutdoorAir:NodeList" );
+		NumOutsideAirNodeSingles = InputProcessor::GetNumObjectsFound( "OutdoorAir:Node" );
 		NumOutsideAirNodes = 0;
 		ErrorsFound = false;
 		NextFluidStreamNum = 1;
@@ -249,13 +248,13 @@ namespace OutAirNodeManager {
 		CurSize = 100;
 		TmpNums.dimension( CurSize, 0 );
 
-		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
 
-		GetObjectDefMaxArgs( "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -270,7 +269,7 @@ namespace OutAirNodeManager {
 			// Loop over all outside air inlet nodes in the input and count them
 			CurrentModuleObject = "OutdoorAir:NodeList";
 			for ( OutAirInletNodeListNum = 1; OutAirInletNodeListNum <= NumOutAirInletNodeLists; ++OutAirInletNodeListNum ) {
-				GetObjectItem( CurrentModuleObject, OutAirInletNodeListNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, OutAirInletNodeListNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				for ( AlphaNum = 1; AlphaNum <= NumAlphas; ++AlphaNum ) {
 					ErrInList = false;
@@ -305,7 +304,7 @@ namespace OutAirNodeManager {
 			// Loop over all single outside air nodes in the input
 			CurrentModuleObject = "OutdoorAir:Node";
 			for ( OutsideAirNodeSingleNum = 1; OutsideAirNodeSingleNum <= NumOutsideAirNodeSingles; ++OutsideAirNodeSingleNum ) {
-				GetObjectItem( CurrentModuleObject, OutsideAirNodeSingleNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, OutsideAirNodeSingleNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				ErrInList = false;
 				//  To support HVAC diagram, every outside inlet node must have a unique fluid stream number

@@ -61,7 +61,7 @@
 // EnergyPlus Headers
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 
 namespace EnergyPlus {
 
@@ -314,7 +314,6 @@ namespace DataGlobalConstants {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
 
 		// Return value
 		int ResourceTypeNum;
@@ -336,7 +335,7 @@ namespace DataGlobalConstants {
 
 		ResourceTypeNum = 0;
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( ResourceTypeChar ) );
+		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ResourceTypeChar ) );
 
 		if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) ) {
 			ResourceTypeNum = iRT_Electricity;

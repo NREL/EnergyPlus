@@ -63,7 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
@@ -219,10 +219,10 @@ namespace ExteriorEnergyUse {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
+
+
+
+
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleMaxValue;
@@ -261,11 +261,11 @@ namespace ExteriorEnergyUse {
 		Real64 SchMin; // Min value of schedule for item
 		static Real64 sumDesignLevel( 0.0 ); // for predefined report of design level total
 
-		NumExteriorLights = GetNumObjectsFound( "Exterior:Lights" );
+		NumExteriorLights = InputProcessor::GetNumObjectsFound( "Exterior:Lights" );
 		ExteriorLights.allocate( NumExteriorLights );
 
-		NumFuelEq = GetNumObjectsFound( "Exterior:FuelEquipment" );
-		NumWtrEq = GetNumObjectsFound( "Exterior:WaterEquipment" );
+		NumFuelEq = InputProcessor::GetNumObjectsFound( "Exterior:FuelEquipment" );
+		NumWtrEq = InputProcessor::GetNumObjectsFound( "Exterior:WaterEquipment" );
 		ExteriorEquipment.allocate( NumFuelEq + NumWtrEq );
 
 		NumExteriorEqs = 0;
@@ -274,10 +274,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:Lights";
 		for ( Item = 1; Item <= NumExteriorLights; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorLights, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExteriorLights, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -309,9 +309,9 @@ namespace ExteriorEnergyUse {
 			}
 			if ( lAlphaFieldBlanks( 3 ) ) {
 				ExteriorLights( Item ).ControlMode = ScheduleOnly;
-			} else if ( SameString( cAlphaArgs( 3 ), "ScheduleNameOnly" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "ScheduleNameOnly" ) ) {
 				ExteriorLights( Item ).ControlMode = ScheduleOnly;
-			} else if ( SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
 				ExteriorLights( Item ).ControlMode = AstroClockOverride;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
@@ -350,10 +350,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -420,10 +420,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -504,7 +504,6 @@ namespace ExteriorEnergyUse {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -524,67 +523,67 @@ namespace ExteriorEnergyUse {
 		FuelTypeString = "";
 
 		//Select the correct Number for the associated ascii name for the fuel type
-		if ( SameString( FuelTypeAlpha, "Electricity" ) || SameString( FuelTypeAlpha, "Electric" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Electricity" ) || InputProcessor::SameString( FuelTypeAlpha, "Electric" ) ) {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
 		}
-		if ( SameString( FuelTypeAlpha, "Gas" ) || SameString( FuelTypeAlpha, "NaturalGas" ) ) {
-			if ( SameString( FuelTypeAlpha, "Gas" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Gas" ) || InputProcessor::SameString( FuelTypeAlpha, "NaturalGas" ) ) {
+			if ( InputProcessor::SameString( FuelTypeAlpha, "Gas" ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
 				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"NaturalGas\"." );
 			}
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
 		}
-		if ( SameString( FuelTypeAlpha, "Coal" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Coal" ) ) {
 			FuelTypeNumber = CoalUse;
 			FuelTypeString = "Coal";
 		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
 			FuelTypeNumber = FuelOil1Use;
 			FuelTypeString = "FuelOil#1";
 		}
-		if ( SameString( FuelTypeAlpha, "PropaneGas" ) || SameString( FuelTypeAlpha, "LPG" ) ) {
-			if ( SameString( FuelTypeAlpha, "LPG" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "PropaneGas" ) || InputProcessor::SameString( FuelTypeAlpha, "LPG" ) ) {
+			if ( InputProcessor::SameString( FuelTypeAlpha, "LPG" ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
 				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"PropaneGas\"." );
 			}
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";
 		}
-		if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Gasoline" ) ) {
 			FuelTypeNumber = GasolineUse;
 			FuelTypeString = "Gasoline";
 		}
-		if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Diesel" ) ) {
 			FuelTypeNumber = DieselUse;
 			FuelTypeString = "Diesel";
 		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
 			FuelTypeNumber = FuelOil2Use;
 			FuelTypeString = "FuelOil#2";
 		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel1";
 		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel2";
 		}
-		if ( SameString( FuelTypeAlpha, "Water" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Water" ) ) {
 			FuelTypeNumber = WaterUse;
 			FuelTypeString = "Water";
 		}
-		if ( SameString( FuelTypeAlpha, "Steam" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Steam" ) ) {
 			FuelTypeNumber = SteamUse;
 			FuelTypeString = "Steam";
 		}
-		if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
 			FuelTypeNumber = DistrictCoolUse;
 			FuelTypeString = "DistrictCooling";
 		}
-		if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
 			FuelTypeNumber = DistrictHeatUse;
 			FuelTypeString = "DistrictHeating";
 		}

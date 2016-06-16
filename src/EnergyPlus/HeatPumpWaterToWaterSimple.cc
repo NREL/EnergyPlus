@@ -69,7 +69,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -198,7 +198,7 @@ namespace HeatPumpWaterToWaterSimple {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
@@ -226,7 +226,7 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		if ( InitLoopEquip ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP );
+			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum != 0 ) { // if 0, fall through to next
 				if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
 					MinCap = 0.0;
@@ -299,9 +299,9 @@ namespace HeatPumpWaterToWaterSimple {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -338,8 +338,8 @@ namespace HeatPumpWaterToWaterSimple {
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumCoolCoil = GetNumObjectsFound( HPEqFitCoolingUC );
-		NumHeatCoil = GetNumObjectsFound( HPEqFitHeatingUC );
+		NumCoolCoil = InputProcessor::GetNumObjectsFound( HPEqFitCoolingUC );
+		NumHeatCoil = InputProcessor::GetNumObjectsFound( HPEqFitHeatingUC );
 		NumGSHPs = NumCoolCoil + NumHeatCoil;
 
 		if ( NumGSHPs <= 0 ) {
@@ -358,10 +358,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -410,10 +410,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -522,7 +522,7 @@ namespace HeatPumpWaterToWaterSimple {
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
 		using DataPlant::PlantLoop;
-		using InputProcessor::SameString;
+
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;

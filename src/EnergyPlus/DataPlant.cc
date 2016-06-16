@@ -65,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -508,7 +508,7 @@ namespace DataPlant {
 		// na
 		// Using/Aliasing
 		using namespace DataGlobals;
-		using InputProcessor::SameString;
+
 		using General::RoundSigDigits;
 		using BranchInputManager::AuditBranches;
 
@@ -556,7 +556,7 @@ namespace DataPlant {
 					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
 						auto & this_component( this_branch.Comp( CompCtr ) );
 						if ( this_component.TypeOf_Num == CompType ) {
-							if ( SameString( CompName, this_component.Name ) ) {
+							if ( InputProcessor::SameString( CompName, this_component.Name ) ) {
 								FoundCompName = true;
 								if ( present( InletNodeNumber ) ) {
 									if ( InletNodeNumber > 0 ) {
@@ -969,7 +969,7 @@ namespace DataPlant {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using DataSizing::NumPltSizInput;
 		using DataSizing::PlantSizData;
 		using DataSizing::PlantSizingData;
@@ -1017,7 +1017,7 @@ namespace DataPlant {
 
 		if ( MyPltLoopNum > 0 ) {
 			if ( NumPltSizInput > 0 ) {
-				MyPltSizNum = FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
+				MyPltSizNum = InputProcessor::FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 			}
 			if ( MyPltSizNum == 0 ) {
 				if ( PrintErrorFlag ) {

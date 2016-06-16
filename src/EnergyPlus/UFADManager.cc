@@ -81,7 +81,7 @@
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
@@ -688,8 +688,7 @@ namespace UFADManager {
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-		using namespace InputProcessor;
-		using ScheduleManager::GetScheduleIndex;
+				using ScheduleManager::GetScheduleIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

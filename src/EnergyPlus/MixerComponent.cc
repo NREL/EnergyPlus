@@ -67,7 +67,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -172,7 +172,7 @@ namespace MixerComponent {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 		// USE STATEMENTS:
 		// na
@@ -205,7 +205,7 @@ namespace MixerComponent {
 
 		// Find the correct MixerNumber
 		if ( CompIndex == 0 ) {
-			MixerNum = FindItemInList( CompName, MixerCond, &MixerConditions::MixerName );
+			MixerNum = InputProcessor::FindItemInList( CompName, MixerCond, &MixerConditions::MixerName );
 			if ( MixerNum == 0 ) {
 				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + CompName );
 			}
@@ -259,10 +259,10 @@ namespace MixerComponent {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using General::TrimSigDigits;
 
@@ -301,12 +301,12 @@ namespace MixerComponent {
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-		NumMixers = GetNumObjectsFound( CurrentModuleObject );
+		NumMixers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumMixers > 0 ) MixerCond.allocate( NumMixers );
 		CheckEquipName.dimension( NumMixers, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		lAlphaBlanks.dimension( NumAlphas, true );
@@ -315,11 +315,11 @@ namespace MixerComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( MixerNum = 1; MixerNum <= NumMixers; ++MixerNum ) {
-			GetObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MixerCond, &MixerConditions::MixerName, MixerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), MixerCond, &MixerConditions::MixerName, MixerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -727,7 +727,6 @@ namespace MixerComponent {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -748,7 +747,7 @@ namespace MixerComponent {
 			GetZoneMixerIndexInputFlag = false;
 		}
 
-		MixerIndex = FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );
+		MixerIndex = InputProcessor::FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );
 		if ( MixerIndex == 0 ) {
 			if ( ! ThisObjectType.empty() ) {
 				ShowSevereError( ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName );

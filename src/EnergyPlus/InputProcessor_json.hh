@@ -1,5 +1,5 @@
-//#ifndef InputProcessor_hh_INCLUDED
-//#define InputProcessor_hh_INCLUDED
+#ifndef InputProcessor_hh_INCLUDED
+#define InputProcessor_hh_INCLUDED
 
 // C++ Headers
 #include <iosfwd>
@@ -25,7 +25,6 @@
 #include <vector>
 #include <unordered_map>
 #include <fstream>
-#include "InputProcessor_json.hh"
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
@@ -160,14 +159,14 @@ public:
 	}
 };
 
-#endif
+namespace EnergyPlus {
 
 class InputProcessor {
 public:
-   IdfParser idf_parser;
-   State state;
-	// Using/Aliasing
-	// Data
+	json jdf;
+
+
+	/*
 	//MODULE PARAMETER DEFINITIONS
 	extern int const ObjectDefAllocInc; // Starting number of Objects allowed in IDD as well as the increment
 	// when max is reached
@@ -186,13 +185,6 @@ public:
 	extern std::string const Blank;
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
-
-	// DERIVED TYPE DEFINITIONS
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
 
 	//Integer Variables for the Module
 	extern int NumObjectDefs; // Count of number of object definitions found in the IDD
@@ -224,9 +216,6 @@ public:
 	extern bool ProcessingIDD; // True when processing IDD, false when processing IDF
 	extern std::ostream * echo_stream; // Internal stream used for input file echoing (used for performance)
 
-	//Real Variables for Module
-	//na
-
 	//Character Variables for Module
 	extern std::string InputLine;
 	extern Array1D_string ListOfSections;
@@ -252,6 +241,8 @@ public:
 	extern bool ExtensibleObject; // Set to true when ReadInputLine has an extensible object
 	extern int ExtensibleNumFields; // set to number when ReadInputLine has an extensible object
 	extern Array1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
+
+	*/
 
 	//Derived Types Variables
 
@@ -415,12 +406,12 @@ public:
 	};
 
 	// Object Data
-	extern Array1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
-	extern Array1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
-	extern Array1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
-	extern LineDefinition LineItem; // Description of current record
-	extern Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
-	extern Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
+	// extern Array1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
+	// extern Array1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
+	// extern Array1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
+	// extern LineDefinition LineItem; // Description of current record
+	// extern Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
+	// extern Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
 
 	// Functions
 
@@ -473,6 +464,7 @@ public:
 	void
 	ValidateSectionsInput();
 
+	static
 	int
 	GetNumSectionsFound( std::string const & SectionWord );
 
@@ -485,6 +477,7 @@ public:
 		int & NuminList
 	);
 
+	static
 	int
 	GetNumObjectsFound( std::string const & ObjectWord );
 
@@ -495,7 +488,8 @@ public:
 		int & LastRecord
 	);
 
-	void
+	static
+	void 
 	GetObjectItem(
 		std::string const & Object,
 		int const Number,
@@ -510,6 +504,8 @@ public:
 		Optional< Array1_string > NumericFieldNames = _
 	);
 
+	
+	static
 	int
 	GetObjectItemNum(
 		std::string const & ObjType, // Object Type (ref: IDD Objects)
@@ -571,6 +567,7 @@ public:
 		int & NumNewArgsLimit // Number of the parameters after extension
 	);
 
+	static
 	Real64
 	ProcessNumber(
 		std::string const & String,
@@ -587,6 +584,7 @@ public:
 		int & ErrLevel
 	);
 
+	static
 	int
 	FindItemInList(
 		std::string const & String,
@@ -594,6 +592,7 @@ public:
 		int const NumItems
 	);
 
+	static
 	inline
 	int
 	FindItemInList(
@@ -604,6 +603,7 @@ public:
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
+	static
 	int
 	FindItemInList(
 		std::string const & String,
@@ -611,6 +611,7 @@ public:
 		int const NumItems
 	);
 
+	static
 	inline
 	int
 	FindItemInList(
@@ -622,6 +623,7 @@ public:
 	}
 
 	template< typename A >
+	static
 	inline
 	int
 	FindItemInList(
@@ -637,6 +639,7 @@ public:
 	}
 
 	template< typename A >
+	static	
 	inline
 	int
 	FindItemInList(
@@ -648,6 +651,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs and operator[i] and elements need Name
+	static
 	inline
 	int
 	FindItemInList(
@@ -663,6 +667,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and elements need Name
+	static
 	inline
 	int
 	FindItemInList(
@@ -674,6 +679,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs operator[i] and value_type
+	static
 	inline
 	int
 	FindItemInList(
@@ -690,6 +696,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and value_type
+	static
 	inline
 	int
 	FindItemInList(
@@ -701,6 +708,7 @@ public:
 		return FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
 	}
 
+	static
 	int
 	FindItemInSortedList(
 		std::string const & String,
@@ -709,6 +717,7 @@ public:
 	);
 
 	inline
+	static
 	int
 	FindItemInSortedList(
 		std::string const & String,
@@ -719,6 +728,7 @@ public:
 	}
 
 	template< typename A >
+	static
 	inline
 	int
 	FindItemInSortedList(
@@ -748,6 +758,7 @@ public:
 	}
 
 	template< typename A >
+	static
 	inline
 	int
 	FindItemInSortedList(
@@ -759,6 +770,7 @@ public:
 	}
 
 	template < typename InputIterator >
+	static
 	inline
 	int
 	FindItem(
@@ -781,6 +793,7 @@ public:
 	}
 
 	template < typename InputIterator >
+	static
 	inline
 	int
 	FindItem(
@@ -803,6 +816,7 @@ public:
 	}
 
 	template < typename InputIterator >
+	static
 	inline
 	int
 	FindItem(
@@ -814,6 +828,7 @@ public:
 		return FindItem( first, last, str, is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{} );
 	}
 
+	static
 	int
 	FindItem(
 		std::string const & String,
@@ -822,6 +837,7 @@ public:
 	);
 
 	inline
+	static
 	int
 	FindItem(
 		std::string const & String,
@@ -831,6 +847,7 @@ public:
 		return FindItem( String, ListOfItems, ListOfItems.isize() );
 	}
 
+	static
 	int
 	FindItem(
 		std::string const & String,
@@ -839,6 +856,7 @@ public:
 	);
 
 	inline
+	static
 	int
 	FindItem(
 		std::string const & String,
@@ -849,6 +867,7 @@ public:
 	}
 
 	template< typename A >
+	static
 	inline
 	int
 	FindItem(
@@ -866,6 +885,7 @@ public:
 	}
 
 	template< typename A >
+	static
 	inline
 	int
 	FindItem(
@@ -877,6 +897,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
+	static
 	inline
 	int
 	FindItem(
@@ -894,6 +915,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
+	static
 	inline
 	int
 	FindItem(
@@ -905,6 +927,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
+	static
 	inline
 	int
 	FindItem(
@@ -923,6 +946,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
+	static
 	inline
 	int
 	FindItem(
@@ -934,6 +958,7 @@ public:
 		return FindItem( String, ListOfItems, name_p, ListOfItems.isize() );
 	}
 
+	static
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
 
@@ -944,6 +969,7 @@ public:
 	typedef char const * c_cstring;
 
 	inline
+	static
 	bool
 	SameString( std::string const & s, std::string const & t )
 	{
@@ -952,6 +978,7 @@ public:
 	}
 
 	inline
+	static
 	bool
 	SameString( std::string const & s, c_cstring const & t )
 	{
@@ -960,6 +987,7 @@ public:
 	}
 
 	inline
+	static
 	bool
 	SameString( c_cstring const & s, std::string const & t )
 	{
@@ -968,6 +996,7 @@ public:
 	}
 
 	inline
+	static
 	bool
 	SameString( c_cstring const & s, c_cstring const & t )
 	{
@@ -976,6 +1005,7 @@ public:
 	}
 
 	template < typename InputIterator >
+	static
 	inline
 	void
 	VerifyName(
@@ -1002,6 +1032,7 @@ public:
 		}
 	}
 
+	static
 	void
 	VerifyName(
 		std::string const & NameToVerify,
@@ -1012,6 +1043,7 @@ public:
 		std::string const & StringToDisplay
 	);
 
+	static
 	void
 	VerifyName(
 		std::string const & NameToVerify,
@@ -1023,6 +1055,7 @@ public:
 	);
 
 	template< typename A >
+	static
 	inline
 	void
 	VerifyName(
@@ -1053,6 +1086,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
+	static
 	inline
 	void
 	VerifyName(
@@ -1083,6 +1117,7 @@ public:
 	}
 
 	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
+	static
 	inline
 	void
 	VerifyName(
@@ -1168,6 +1203,7 @@ public:
 		int & MinNumFields // Minimum Number of Fields to be returned to Get routines
 	);
 
+	static
 	void
 	GetObjectDefMaxArgs(
 		std::string const & ObjectWord, // Object for definition
@@ -1190,6 +1226,7 @@ public:
 	void
 	ReportOrphanRecordObjects();
 
+	static
 	void
 	InitSecretObjects();
 
@@ -1253,5 +1290,6 @@ public:
 	IPTrimSigDigits( int const IntegerValue );
 
 }; // InputProcessor
+}
 
 #endif

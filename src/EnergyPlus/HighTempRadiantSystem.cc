@@ -79,7 +79,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -202,7 +202,7 @@ namespace HighTempRadiantSystem {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -229,7 +229,7 @@ namespace HighTempRadiantSystem {
 
 		// Find the correct ZoneHVAC:HighTemperatureRadiant
 		if ( CompIndex == 0 ) {
-			RadSysNum = FindItemInList( CompName, HighTempRadSys );
+			RadSysNum = InputProcessor::FindItemInList( CompName, HighTempRadSys );
 			if ( RadSysNum == 0 ) {
 				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + CompName );
 			}
@@ -286,12 +286,12 @@ namespace HighTempRadiantSystem {
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
+
+
+
+
 		using ScheduleManager::GetScheduleIndex;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
@@ -336,7 +336,7 @@ namespace HighTempRadiantSystem {
 
 		// FLOW:
 		// Initializations and allocations
-		NumOfHighTempRadSys = GetNumObjectsFound( "ZoneHVAC:HighTemperatureRadiant" );
+		NumOfHighTempRadSys = InputProcessor::GetNumObjectsFound( "ZoneHVAC:HighTemperatureRadiant" );
 
 		HighTempRadSys.allocate( NumOfHighTempRadSys );
 		CheckEquipName.allocate( NumOfHighTempRadSys );
@@ -349,7 +349,7 @@ namespace HighTempRadiantSystem {
 		// Obtain all of the user data related to high temperature radiant systems...
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
 
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			HighTempRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HighTempRadSysNumericFields( Item ).FieldNames = "";
@@ -357,7 +357,7 @@ namespace HighTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HighTempRadSys, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), HighTempRadSys, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -377,7 +377,7 @@ namespace HighTempRadiantSystem {
 			}
 
 			HighTempRadSys( Item ).ZoneName = cAlphaArgs( 3 );
-			HighTempRadSys( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
+			HighTempRadSys( Item ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( HighTempRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -388,7 +388,7 @@ namespace HighTempRadiantSystem {
 
 
 			// Determine High Temp Radiant heating design capacity sizing method
-			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 				HighTempRadSys( Item ).HeatingCapMethod = HeatingDesignCapacity;
 
 				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
@@ -404,7 +404,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 				HighTempRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
@@ -425,7 +425,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				HighTempRadSys( Item ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -446,13 +446,13 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( cAlphaArgs( 5 ), cNaturalGas ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), cNaturalGas ) ) {
 				HighTempRadSys( Item ).HeaterType = Gas;
-			} else if ( SameString( cAlphaArgs( 5 ), cElectricity ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), cElectricity ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
-			} else if ( SameString( cAlphaArgs( 5 ), cGas ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), cGas ) ) {
 				HighTempRadSys( Item ).HeaterType = Gas;
-			} else if ( SameString( cAlphaArgs( 5 ), cElectric ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), cElectric ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
@@ -525,17 +525,17 @@ namespace HighTempRadiantSystem {
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 6 ), cMATControl ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMATControl ) ) {
 				HighTempRadSys( Item ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cMRTControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMRTControl ) ) {
 				HighTempRadSys( Item ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cOperativeControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cOperativeControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cMATSPControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMATSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = MATSPControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cMRTSPControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMRTSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = MRTSPControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cOperativeSPControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cOperativeSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeSPControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
@@ -585,7 +585,7 @@ namespace HighTempRadiantSystem {
 			AllFracsSummed = HighTempRadSys( Item ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= HighTempRadSys( Item ).TotSurfToDistrib; ++SurfNum ) {
 				HighTempRadSys( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 7 );
-				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface );
+				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface );
 				HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
 				// Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
 				if ( HighTempRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) {

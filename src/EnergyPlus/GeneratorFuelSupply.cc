@@ -74,7 +74,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -157,10 +157,9 @@ namespace GeneratorFuelSupply {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound; // might also use FindItemInList
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
+
+
+
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
@@ -200,7 +199,7 @@ namespace GeneratorFuelSupply {
 
 		if ( MyOneTimeFlag ) {
 			cCurrentModuleObject = "Generator:FuelSupply";
-			NumGeneratorFuelSups = GetNumObjectsFound( cCurrentModuleObject );
+			NumGeneratorFuelSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumGeneratorFuelSups <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -210,11 +209,11 @@ namespace GeneratorFuelSupply {
 			FuelSupply.allocate( NumGeneratorFuelSups );
 
 			for ( FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum ) {
-				GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelSupply, FuelSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( AlphArray( 1 ), FuelSupply, FuelSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -222,9 +221,9 @@ namespace GeneratorFuelSupply {
 
 				FuelSupply( FuelSupNum ).Name = AlphArray( 1 );
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
-				if ( SameString( "TemperatureFromAirNode", AlphArray( 2 ) ) ) {
+				if ( InputProcessor::SameString( "TemperatureFromAirNode", AlphArray( 2 ) ) ) {
 					FuelSupply( FuelSupNum ).FuelTempMode = FuelInTempFromNode;
-				} else if ( SameString( "Scheduled", AlphArray( 2 ) ) ) {
+				} else if ( InputProcessor::SameString( "Scheduled", AlphArray( 2 ) ) ) {
 					FuelSupply( FuelSupNum ).FuelTempMode = FuelInTempSchedule;
 				} else {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
@@ -253,9 +252,9 @@ namespace GeneratorFuelSupply {
 
 				for ( auto & e : FuelSupply ) e.CompPowerLossFactor = NumArray( 1 );
 
-				if ( SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGaseousConstituents;
-				} else if ( SameString( AlphArray( 6 ), "LiquidGeneric" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 6 ), "LiquidGeneric" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGenericLiquid;
 				} else {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + AlphArray( 6 ) );
@@ -340,8 +339,7 @@ namespace GeneratorFuelSupply {
 		// USE STATEMENTS:
 		// na
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::FindItem;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -703,7 +701,7 @@ namespace GeneratorFuelSupply {
 			for ( i = 1; i <= FuelSupply( FuelSupplyNum ).NumConstituents; ++i ) {
 
 				thisName = FuelSupply( FuelSupplyNum ).ConstitName( i );
-				thisGasID = FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
+				thisGasID = InputProcessor::FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
 				FuelSupply( FuelSupplyNum ).GasLibID( i ) = thisGasID;
 
 				if ( thisGasID == 0 ) {

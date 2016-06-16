@@ -85,7 +85,7 @@
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -272,7 +272,7 @@ namespace VentilatedSlab {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqVentedSlab;
 
@@ -300,7 +300,7 @@ namespace VentilatedSlab {
 
 		// Find the correct VentilatedSlabInput
 		if ( CompIndex == 0 ) {
-			Item = FindItemInList( CompName, VentSlab );
+			Item = InputProcessor::FindItemInList( CompName, VentSlab );
 			if ( Item == 0 ) {
 				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
 			}
@@ -354,12 +354,12 @@ namespace VentilatedSlab {
 		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
@@ -427,7 +427,7 @@ namespace VentilatedSlab {
 		// Figure out how many Ventilated Slab Systems there are in the input file
 
 		SteamMessageNeeded = true;
-		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -438,7 +438,7 @@ namespace VentilatedSlab {
 		// make sure data is gotten for surface lists
 		BaseNum = GetNumberOfSurfListVentSlab();
 
-		NumOfVentSlabs = GetNumObjectsFound( CurrentModuleObject );
+		NumOfVentSlabs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		// Allocate the local derived type and do one-time initializations for all parts of it
 
 		VentSlab.allocate( NumOfVentSlabs );
@@ -447,14 +447,14 @@ namespace VentilatedSlab {
 
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) { // Begin looping over the entire ventilated slab systems found in the input file...
 
-			GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			VentSlabNumericFields( Item ).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentSlab, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), VentSlab, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -473,7 +473,7 @@ namespace VentilatedSlab {
 			}
 
 			VentSlab( Item ).ZoneName = cAlphaArgs( 3 );
-			VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
+			VentSlab( Item ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( VentSlab( Item ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
@@ -485,8 +485,8 @@ namespace VentilatedSlab {
 
 			VentSlab( Item ).SurfListName = cAlphaArgs( 4 );
 			SurfListNum = 0;
-			//    IF (NumOfSlabLists > 0) SurfListNum = FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
-			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = FindItemInList( VentSlab( Item ).SurfListName, SlabList );
+			//    IF (NumOfSlabLists > 0) SurfListNum = InputProcessor::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
+			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = InputProcessor::FindItemInList( VentSlab( Item ).SurfListName, SlabList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				VentSlab( Item ).NumOfSurfaces = SlabList( SurfListNum ).NumOfSurfaces;
 				VentSlab( Item ).ZName.allocate( VentSlab( Item ).NumOfSurfaces );
@@ -522,7 +522,7 @@ namespace VentilatedSlab {
 				VentSlab( Item ).SurfaceFlowFrac.allocate( VentSlab( Item ).NumOfSurfaces );
 				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
 				VentSlab( Item ).SurfaceName( 1 ) = VentSlab( Item ).SurfListName;
-				VentSlab( Item ).SurfacePtr( 1 ) = FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface );
+				VentSlab( Item ).SurfacePtr( 1 ) = InputProcessor::FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface );
 				VentSlab( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( VentSlab( Item ).SurfacePtr( 1 ) == 0 ) {
@@ -628,11 +628,11 @@ namespace VentilatedSlab {
 			}
 
 			// System Configuration:
-			if ( SameString( cAlphaArgs( 8 ), "SlabOnly" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 8 ), "SlabOnly" ) ) {
 				VentSlab( Item ).SysConfg = SlabOnly;
-			} else if ( SameString( cAlphaArgs( 8 ), "SlabAndZone" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "SlabAndZone" ) ) {
 				VentSlab( Item ).SysConfg = SlabAndZone;
-			} else if ( SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
 				VentSlab( Item ).SysConfg = SeriesSlabs;
 			} else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
@@ -645,21 +645,21 @@ namespace VentilatedSlab {
 			VentSlab( Item ).CoreLength = rNumericArgs( 5 );
 			VentSlab( Item ).CoreNumbers = rNumericArgs( 6 );
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 4 ) ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Diameter is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 5 ) ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Length is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 6 ) ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Numbers is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
@@ -667,19 +667,19 @@ namespace VentilatedSlab {
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 9 ), OutsideAirDryBulbTemperature ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), OutsideAirDryBulbTemperature ) ) {
 				VentSlab( Item ).ControlType = ODBControl;
-			} else if ( SameString( cAlphaArgs( 9 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), OutsideAirWetBulbTemperature ) ) {
 				VentSlab( Item ).ControlType = OWBControl;
-			} else if ( SameString( cAlphaArgs( 9 ), OperativeTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), OperativeTemperature ) ) {
 				VentSlab( Item ).ControlType = OPTControl;
-			} else if ( SameString( cAlphaArgs( 9 ), MeanAirTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), MeanAirTemperature ) ) {
 				VentSlab( Item ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 9 ), MeanRadiantTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), MeanRadiantTemperature ) ) {
 				VentSlab( Item ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), SlabSurfaceTemperature ) ) {
 				VentSlab( Item ).ControlType = SURControl;
-			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
 				VentSlab( Item ).ControlType = DPTZControl;
 			} else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
@@ -985,9 +985,9 @@ namespace VentilatedSlab {
 					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						VentSlab( Item ).CCoilType = Cooling_CoilHXAssisted;
 						GetHXCoilTypeAndName( cAlphaArgs( 30 ), cAlphaArgs( 31 ), ErrorsFound, VentSlab( Item ).CCoilPlantType, VentSlab( Item ).CCoilPlantName );
-						if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+						if ( InputProcessor::SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+						} else if ( InputProcessor::SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
 							ShowSevereError( "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" + VentSlab( Item ).Name + "\", invalid" );
@@ -1043,7 +1043,7 @@ namespace VentilatedSlab {
 
 			VentSlab( Item ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 34 )) {
-				VentSlab( Item ).HVACSizingIndex = FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing );
+				VentSlab( Item ).HVACSizingIndex = InputProcessor::FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing );
 				if (VentSlab( Item ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 34 ) + " = " + cAlphaArgs( 34 ) + " not found." );
 					ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " = " + VentSlab( Item ).Name );
@@ -1463,8 +1463,7 @@ namespace VentilatedSlab {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
-		using WaterCoils::SetCoilDesFlow;
+				using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;

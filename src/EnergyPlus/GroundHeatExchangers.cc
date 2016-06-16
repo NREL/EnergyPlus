@@ -76,7 +76,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -1267,10 +1267,10 @@ namespace GroundHeatExchangers {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
+
+
+
+
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -1306,8 +1306,8 @@ namespace GroundHeatExchangers {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 
-		numVerticalGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Vertical" );
-		numSlinkyGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
+		numVerticalGLHEs = InputProcessor::GetNumObjectsFound( "GroundHeatExchanger:Vertical" );
+		numSlinkyGLHEs = InputProcessor::GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
 
 		allocated = false;
 
@@ -1328,7 +1328,7 @@ namespace GroundHeatExchangers {
 			checkEquipName.dimension( numVerticalGLHEs, true );
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				isNotOK = false;
 				isBlank = false;
@@ -1343,7 +1343,7 @@ namespace GroundHeatExchangers {
 				}
 
 				//get object name
-				VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
 
 				// Deallocate temporary array when no longer needed
 				tmpNames.deallocate();
@@ -1473,7 +1473,7 @@ namespace GroundHeatExchangers {
 			checkEquipName.dimension( numSlinkyGLHEs, true );
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				isNotOK = false;
 				isBlank = false;
@@ -1488,7 +1488,7 @@ namespace GroundHeatExchangers {
 				}
 
 				//get object name
-				VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
 
 				// Deallocate temporary array when no longer needed
 				tmpNames.deallocate();
@@ -1521,9 +1521,9 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).pipeOutDia = rNumericArgs( 8 );
 				slinkyGLHE( GLHENum ).pipeThick = rNumericArgs( 9 );
 
-				if ( SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
 					slinkyGLHE( GLHENum ).verticalConfig = true;
-				} else if ( SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
 					slinkyGLHE( GLHENum ).verticalConfig = false;
 				}
 

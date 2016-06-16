@@ -83,7 +83,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -2169,7 +2169,6 @@ namespace WindowManager {
 		using DataHeatBalSurface::QdotRadOutRep;
 		using DataHeatBalSurface::QdotRadOutRepPerArea;
 		//unused0909  USE DataEnvironment, ONLY: CurMnDyHr
-		using InputProcessor::SameString;
 		using WindowComplexManager::CalcComplexWindowThermal;
 		using WindowEquivalentLayer::EQLWindowSurfaceHeatBalance;
 
@@ -2920,7 +2919,6 @@ namespace WindowManager {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdbFnHW;
-		using InputProcessor::SameString;
 		using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
 
 		// Locals
@@ -4113,7 +4111,6 @@ namespace WindowManager {
 
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4240,7 +4237,6 @@ namespace WindowManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 
 		// Argument array dimensioning
 		TGapNew.dim( 2 );
@@ -7545,7 +7541,6 @@ namespace WindowManager {
 
 		// USE STATEMENTS:na
 		// Using/Aliasing
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:na
@@ -7725,7 +7720,6 @@ namespace WindowManager {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -7788,11 +7782,11 @@ namespace WindowManager {
 					//     Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
 					SurfaceScreens( ScreenNum ).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt( Material( MatNum ).Trans );
 
-					if ( SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
+					if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = DoNotModel;
-					} else if ( SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
+					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDirectBeam;
-					} else if ( SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
+					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDiffuse;
 					}
 
@@ -8875,8 +8869,7 @@ Label99999: ;
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		//USE DataGlobals ,    ONLY: AnyEnergyManagementSystemInModel
+				//USE DataGlobals ,    ONLY: AnyEnergyManagementSystemInModel
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8914,7 +8907,7 @@ Label99999: ;
 
 		// Step 1 - check whether there is custom solar or visible spectrum
 		cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-		NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
+		NumSiteSpectrum = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		// no custom spectrum data, done!
 		if ( NumSiteSpectrum == 0 ) {
@@ -8928,15 +8921,15 @@ Label99999: ;
 			ErrorsFound = true;
 		}
 
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 			// use default spectrum data, done!
-			if ( SameString( cAlphaArgs( 2 ), "Default" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Default" ) ) {
 				RunMeOnceFlag = true;
 				return;
 			}
@@ -8946,7 +8939,7 @@ Label99999: ;
 			cVisibleSpectrum = cAlphaArgs( 4 );
 
 			cCurrentModuleObject = "Site:SpectrumData";
-			NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
+			NumSiteSpectrum = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
 				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;
@@ -8955,7 +8948,7 @@ Label99999: ;
 			cAlphaArgs.deallocate();
 			rNumericArgs.deallocate();
 
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
 			rNumericArgs.dimension( NumNumbers, 0.0 );
 
@@ -8963,8 +8956,8 @@ Label99999: ;
 			iVisibleSpectrum = 0;
 			for ( Loop = 1; Loop <= NumSiteSpectrum; ++Loop ) {
 				// Step 2 - read user-defined spectrum data
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
-				if ( SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * nume ) {
@@ -8983,7 +8976,7 @@ Label99999: ;
 						}
 					}
 				}
-				if ( SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
 					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {

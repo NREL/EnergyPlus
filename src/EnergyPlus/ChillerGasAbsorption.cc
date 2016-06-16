@@ -80,7 +80,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -184,7 +184,7 @@ namespace ChillerGasAbsorption {
 		// PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
-		using InputProcessor::FindItemInList;
+
 		using CurveManager::CurveValue;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
@@ -199,7 +199,7 @@ namespace ChillerGasAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, GasAbsorber );
+			ChillNum = InputProcessor::FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -299,10 +299,9 @@ namespace ChillerGasAbsorption {
 		// This routine will get the input
 		// required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
 
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -323,7 +322,7 @@ namespace ChillerGasAbsorption {
 
 		//FLOW
 		cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-		NumGasAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
+		NumGasAbsorbers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGasAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
@@ -341,11 +340,11 @@ namespace ChillerGasAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				Get_ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -393,7 +392,7 @@ namespace ChillerGasAbsorption {
 			if ( GasAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
 				GasAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
 			} else {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -417,9 +416,9 @@ namespace ChillerGasAbsorption {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				Get_ErrorsFound = false;
 			}
-			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = false;
-			} else if ( SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
@@ -428,9 +427,9 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
 			// Assign Other Paramters
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
-			} else if ( SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;

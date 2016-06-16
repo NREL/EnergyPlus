@@ -70,7 +70,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <UtilityRoutines.hh>
@@ -187,10 +187,10 @@ namespace ReturnAirPathManager {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
+
+
+
+
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
@@ -212,7 +212,7 @@ namespace ReturnAirPathManager {
 			return;
 		}
 		cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-		NumReturnAirPaths = GetNumObjectsFound( cCurrentModuleObject );
+		NumReturnAirPaths = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		if ( NumReturnAirPaths > 0 ) {
 
@@ -220,11 +220,11 @@ namespace ReturnAirPathManager {
 
 			for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
-				GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( cAlphaArgs( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -246,7 +246,7 @@ namespace ReturnAirPathManager {
 
 				for ( CompNum = 1; CompNum <= ReturnAirPath( PathNum ).NumOfComponents; ++CompNum ) {
 
-					if ( ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) || ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ) {
+					if ( ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) || ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ) {
 
 						ReturnAirPath( PathNum ).ComponentType( CompNum ) = cAlphaArgs( Counter );
 						ReturnAirPath( PathNum ).ComponentName( CompNum ) = cAlphaArgs( Counter + 1 );
@@ -255,8 +255,8 @@ namespace ReturnAirPathManager {
 							ShowContinueError( "In AirLoopHVAC:ReturnPath =" + ReturnAirPath( PathNum ).Name );
 							ErrorsFound = true;
 						}
-						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
-						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
+						if ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
+						if ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
 					} else {
 						ShowSevereError( "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs( Counter ) );
 						ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath( PathNum ).Name );

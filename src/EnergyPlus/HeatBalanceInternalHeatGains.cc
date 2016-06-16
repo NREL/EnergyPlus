@@ -63,7 +63,7 @@
 #include <HeatBalanceInternalHeatGains.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -106,8 +106,7 @@ SetupZoneInternalGain(
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataHeatBalance;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::SameString;
+
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -132,11 +131,11 @@ SetupZoneInternalGain(
 
 	FoundIntGainsType = false;
 	FoundDuplicate = false;
-	UpperCaseObjectType = MakeUPPERCase( cComponentObject );
-	UpperCaseObjectName = MakeUPPERCase( cComponentName );
+	UpperCaseObjectType = InputProcessor::MakeUPPERCase( cComponentObject );
+	UpperCaseObjectName = InputProcessor::MakeUPPERCase( cComponentName );
 
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
-	if ( ! SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
+	if ( ! InputProcessor::SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
 		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain" );
 		ShowContinueError( "Object type character = " + cComponentObject );
 		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );

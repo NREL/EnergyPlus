@@ -98,7 +98,7 @@
 #include <EconomicLifeCycleCost.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
@@ -154,8 +154,7 @@ namespace OutputReportTabular {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using namespace InputProcessor;
-	using DataGlobals::BigNumber;
+		using DataGlobals::BigNumber;
 	using DataGlobals::ZoneTSReporting;
 	using DataGlobals::HVACTSReporting;
 	using DataGlobals::KindOfSim;
@@ -792,7 +791,7 @@ namespace OutputReportTabular {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		MonthlyInputCount = GetNumObjectsFound( CurrentModuleObject );
+		MonthlyInputCount = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( MonthlyInputCount > 0 ) {
 			WriteTabularFiles = true;
 			// if not a run period using weather do not create reports
@@ -801,15 +800,15 @@ namespace OutputReportTabular {
 				return;
 			}
 		}
-		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 		for ( int TabNum = 1, TabNum_end = MonthlyInputCount; TabNum <= TabNum_end; ++TabNum ) { // MonthlyInputCount is modified in the loop
-			GetObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::GetObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = false;
 			if ( TabNum - 1 > 0 ) {
-				VerifyName( AlphArray( 1 ), MonthlyInput, &MonthlyInputType::name, TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( AlphArray( 1 ), MonthlyInput, &MonthlyInputType::name, TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "RTMBLANK";
@@ -823,31 +822,31 @@ namespace OutputReportTabular {
 			for ( jField = 2; jField <= NumAlphas; jField += 2 ) {
 				curAggString = AlphArray( jField + 1 );
 				// set accumulator values to default as appropriate for aggregation type
-				if ( SameString( curAggString, "SumOrAverage" ) ) {
+				if ( InputProcessor::SameString( curAggString, "SumOrAverage" ) ) {
 					curAggType = aggTypeSumOrAvg;
-				} else if ( SameString( curAggString, "Maximum" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "Maximum" ) ) {
 					curAggType = aggTypeMaximum;
-				} else if ( SameString( curAggString, "Minimum" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "Minimum" ) ) {
 					curAggType = aggTypeMinimum;
-				} else if ( SameString( curAggString, "ValueWhenMaximumOrMinimum" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "ValueWhenMaximumOrMinimum" ) ) {
 					curAggType = aggTypeValueWhenMaxMin;
-				} else if ( SameString( curAggString, "HoursZero" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "HoursZero" ) ) {
 					curAggType = aggTypeHoursZero;
-				} else if ( SameString( curAggString, "HoursNonzero" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "HoursNonzero" ) ) {
 					curAggType = aggTypeHoursNonZero;
-				} else if ( SameString( curAggString, "HoursPositive" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "HoursPositive" ) ) {
 					curAggType = aggTypeHoursPositive;
-				} else if ( SameString( curAggString, "HoursNonpositive" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "HoursNonpositive" ) ) {
 					curAggType = aggTypeHoursNonPositive;
-				} else if ( SameString( curAggString, "HoursNegative" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "HoursNegative" ) ) {
 					curAggType = aggTypeHoursNegative;
-				} else if ( SameString( curAggString, "HoursNonnegative" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "HoursNonnegative" ) ) {
 					curAggType = aggTypeHoursNonNegative;
-				} else if ( SameString( curAggString, "SumOrAverageDuringHoursShown" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "SumOrAverageDuringHoursShown" ) ) {
 					curAggType = aggTypeSumOrAverageHoursShown;
-				} else if ( SameString( curAggString, "MaximumDuringHoursShown" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "MaximumDuringHoursShown" ) ) {
 					curAggType = aggTypeMaximumDuringHoursShown;
-				} else if ( SameString( curAggString, "MinimumDuringHoursShown" ) ) {
+				} else if ( InputProcessor::SameString( curAggString, "MinimumDuringHoursShown" ) ) {
 					curAggType = aggTypeMinimumDuringHoursShown;
 				} else {
 					curAggType = aggTypeSumOrAvg;
@@ -1092,7 +1091,7 @@ namespace OutputReportTabular {
 				//#ifdef ITM_KEYCACHE
 				// Noel comment:  First time in this TabNum/ColNum loop, let's save the results
 				//  of GetVariableKeyCountandType & GetVariableKeys.
-				curVariMeter = MakeUPPERCase( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).variMeter );
+				curVariMeter = InputProcessor::MakeUPPERCase( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).variMeter );
 				// call the key count function but only need count during this pass
 				GetVariableKeyCountandType( curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar );
 				//    IF (KeyCount > maxKeyCount) THEN
@@ -1120,7 +1119,7 @@ namespace OutputReportTabular {
 				//      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) = IndexesForKeyVar(iKey)  !noel
 				//    ENDDO
 				//#else
-				//    curVariMeter = MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+				//    curVariMeter = InputProcessor::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
 				//    ! call the key count function but only need count during this pass
 				//    CALL GetVariableKeyCountandType(curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
 				//    ALLOCATE(NamesOfKeys(KeyCount))
@@ -1131,12 +1130,12 @@ namespace OutputReportTabular {
 				for ( iKey = 1; iKey <= KeyCount; ++iKey ) {
 					found = 0;
 					// set a flag if environment variables are found
-					if ( SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ), "ENVIRONMENT" ) ) {
+					if ( InputProcessor::SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ), "ENVIRONMENT" ) ) {
 						environmentKeyFound = true;
 						found = -1; //so not counted in list of unique keys
 					}
 					for ( jUnique = 1; jUnique <= UniqueKeyCount; ++jUnique ) {
-						if ( SameString( UniqueKeyNames( jUnique ), MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ) ) ) {
+						if ( InputProcessor::SameString( UniqueKeyNames( jUnique ), MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ) ) ) {
 							found = jUnique;
 							break;
 						}
@@ -1213,7 +1212,7 @@ namespace OutputReportTabular {
 				//       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
 				//    ENDDO
 				//#else
-				//    curVariMeter = MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+				//    curVariMeter = InputProcessor::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
 				//    ! call the key count function but only need count during this pass
 				//    CALL GetVariableKeyCountandType(curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
 				//    ALLOCATE(NamesOfKeys(KeyCount))
@@ -1240,12 +1239,12 @@ namespace OutputReportTabular {
 				for ( iKey = 1; iKey <= KeyCount; ++iKey ) {
 					found = 0;
 					// set a flag if environment variables are found
-					if ( SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ), "ENVIRONMENT" ) ) {
+					if ( InputProcessor::SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ), "ENVIRONMENT" ) ) {
 						environmentKeyFound = true;
 						found = -1; //so not counted in list of unique keys
 					}
 					for ( jUnique = 1; jUnique <= UniqueKeyCount; ++jUnique ) {
-						if ( SameString( UniqueKeyNames( jUnique ), MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ) ) ) {
+						if ( InputProcessor::SameString( UniqueKeyNames( jUnique ), MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ) ) ) {
 							found = jUnique;
 							break;
 						}
@@ -1306,7 +1305,7 @@ namespace OutputReportTabular {
 					//       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
 					//    ENDDO
 					//#else
-					//    curVariMeter = MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+					//    curVariMeter = InputProcessor::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
 					//    ! call the key count function but only need count during this pass
 					//    CALL GetVariableKeyCountandType(curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
 					//    ALLOCATE(NamesOfKeys(KeyCount))
@@ -1315,7 +1314,7 @@ namespace OutputReportTabular {
 					//#endif
 
 					if ( KeyCount == 1 ) { // first test if KeyCount is one to avoid referencing a zero element array
-						if ( SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( 1 ), "ENVIRONMENT" ) ) {
+						if ( InputProcessor::SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( 1 ), "ENVIRONMENT" ) ) {
 							environmentKeyFound = true;
 						}
 					}
@@ -1326,7 +1325,7 @@ namespace OutputReportTabular {
 						// search through the keys for the currently active key "UniqueKeyNames(kUniqueKey)"
 						found = 0;
 						for ( iKey = 1; iKey <= KeyCount; ++iKey ) {
-							if ( SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ), UniqueKeyNames( kUniqueKey ) ) ) {
+							if ( InputProcessor::SameString( MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey ), UniqueKeyNames( kUniqueKey ) ) ) {
 								found = iKey;
 								break;
 							}
@@ -1468,13 +1467,13 @@ namespace OutputReportTabular {
 		Array1D_string objNames;
 		Array1D_int objVarIDs;
 
-		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 
 		timeInYear = 0.0; //intialize the time in year counter
 		// determine size of array that holds the IDF description
-		OutputTableBinnedCount = GetNumObjectsFound( CurrentModuleObject );
+		OutputTableBinnedCount = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		OutputTableBinned.allocate( OutputTableBinnedCount );
 		if ( OutputTableBinnedCount > 0 ) {
 			WriteTabularFiles = true;
@@ -1488,7 +1487,7 @@ namespace OutputReportTabular {
 		BinResultsIntervalCount = 0;
 		BinResultsTableCount = 0;
 		for ( iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj ) {
-			GetObjectItem( CurrentModuleObject, iInObj, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OutputTableBinned( iInObj ).keyValue = AlphArray( 1 );
 			OutputTableBinned( iInObj ).varOrMeter = AlphArray( 2 );
 			//if a schedule has been specified assign
@@ -1503,7 +1502,7 @@ namespace OutputReportTabular {
 			}
 			//validate the kind of variable - not used internally except for validation
 			if ( len( AlphArray( 4 ) ) > 0 ) {
-				if ( ! ( SameString( AlphArray( 4 ), "ENERGY" ) || SameString( AlphArray( 4 ), "DEMAND" ) || SameString( AlphArray( 4 ), "TEMPERATURE" ) || SameString( AlphArray( 4 ), "FLOWRATE" ) ) ) {
+				if ( ! ( InputProcessor::SameString( AlphArray( 4 ), "ENERGY" ) || InputProcessor::SameString( AlphArray( 4 ), "DEMAND" ) || InputProcessor::SameString( AlphArray( 4 ), "TEMPERATURE" ) || InputProcessor::SameString( AlphArray( 4 ), "FLOWRATE" ) ) ) {
 					ShowWarningError( "In " + CurrentModuleObject + " named " + AlphArray( 1 ) + " the Variable Type was not energy, demand, temperature, or flowrate." );
 				}
 			}
@@ -1566,7 +1565,7 @@ namespace OutputReportTabular {
 				// scan through the keys and look for the user specified key
 				found = 0;
 				for ( iTable = 1; iTable <= OutputTableBinned( iInObj ).numTables; ++iTable ) {
-					if ( SameString( objNames( iTable ), OutputTableBinned( iInObj ).keyValue ) ) {
+					if ( InputProcessor::SameString( objNames( iTable ), OutputTableBinned( iInObj ).keyValue ) ) {
 						found = iTable;
 						break;
 					}
@@ -1663,11 +1662,11 @@ namespace OutputReportTabular {
 		Array1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 
-		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 
-		NumTabularStyle = GetNumObjectsFound( CurrentModuleObject );
+		NumTabularStyle = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 		if ( NumTabularStyle == 0 ) {
 			AlphArray( 1 ) = "COMMA";
@@ -1676,53 +1675,53 @@ namespace OutputReportTabular {
 			del( 1 ) = CharComma; //comma
 			unitsStyle = unitsStyleNone;
 		} else if ( NumTabularStyle == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// ColumnSeparator
-			if ( SameString( AlphArray( 1 ), "Comma" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 1 ), "Comma" ) ) {
 				numStyles = 1;
 				TableStyle( 1 ) = tableStyleComma;
 				del( 1 ) = CharComma; //comma
-			} else if ( SameString( AlphArray( 1 ), "Tab" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "Tab" ) ) {
 				numStyles = 1;
 				TableStyle( 1 ) = tableStyleTab;
 				del( 1 ) = CharTab; //tab
-			} else if ( SameString( AlphArray( 1 ), "Fixed" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "Fixed" ) ) {
 				numStyles = 1;
 				TableStyle( 1 ) = tableStyleFixed;
 				del( 1 ) = CharSpace; // space
-			} else if ( SameString( AlphArray( 1 ), "HTML" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "HTML" ) ) {
 				numStyles = 1;
 				TableStyle( 1 ) = tableStyleHTML;
 				del( 1 ) = CharSpace; //space - this is not used much for HTML output
-			} else if ( SameString( AlphArray( 1 ), "XML" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "XML" ) ) {
 				numStyles = 1;
 				TableStyle( 1 ) = tableStyleXML;
 				del( 1 ) = CharSpace; //space - this is not used much for XML output
-			} else if ( SameString( AlphArray( 1 ), "CommaAndHTML" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "CommaAndHTML" ) ) {
 				numStyles = 2;
 				TableStyle( 1 ) = tableStyleComma;
 				del( 1 ) = CharComma; //comma
 				TableStyle( 2 ) = tableStyleHTML;
 				del( 2 ) = CharSpace; //space - this is not used much for HTML output
-			} else if ( SameString( AlphArray( 1 ), "CommaAndXML" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "CommaAndXML" ) ) {
 				numStyles = 2;
 				TableStyle( 1 ) = tableStyleComma;
 				del( 1 ) = CharComma; //comma
 				TableStyle( 2 ) = tableStyleXML;
 				del( 2 ) = CharSpace; //space - this is not used much for XML output
-			} else if ( SameString( AlphArray( 1 ), "TabAndHTML" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "TabAndHTML" ) ) {
 				numStyles = 2;
 				TableStyle( 1 ) = tableStyleTab;
 				del( 1 ) = CharTab; //tab
 				TableStyle( 2 ) = tableStyleHTML;
 				del( 2 ) = CharSpace; //space - this is not used much for HTML output
-			} else if ( SameString( AlphArray( 1 ), "XMLandHTML" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "XMLandHTML" ) ) {
 				numStyles = 2;
 				TableStyle( 1 ) = tableStyleXML;
 				del( 1 ) = CharSpace; //space - this is not used much for XML output
 				TableStyle( 2 ) = tableStyleHTML;
 				del( 2 ) = CharSpace; //space - this is not used much for HTML output
-			} else if ( SameString( AlphArray( 1 ), "All" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 1 ), "All" ) ) {
 				numStyles = 5;
 				TableStyle( 1 ) = tableStyleComma;
 				del( 1 ) = CharComma; //comma
@@ -1776,15 +1775,15 @@ namespace OutputReportTabular {
 	SetUnitsStyleFromString( std::string const & unitStringIn )
 	{
 		int unitsStyleReturn;
-		if ( SameString( unitStringIn, "None" ) ) {
+		if ( InputProcessor::SameString( unitStringIn, "None" ) ) {
 			unitsStyleReturn = unitsStyleNone;
-		} else if ( SameString( unitStringIn, "JTOKWH" ) ) {
+		} else if ( InputProcessor::SameString( unitStringIn, "JTOKWH" ) ) {
 			unitsStyleReturn = unitsStyleJtoKWH;
-		} else if ( SameString( unitStringIn, "JTOMJ" ) ) {
+		} else if ( InputProcessor::SameString( unitStringIn, "JTOMJ" ) ) {
 			unitsStyleReturn = unitsStyleJtoMJ;
-		} else if ( SameString( unitStringIn, "JTOGJ" ) ) {
+		} else if ( InputProcessor::SameString( unitStringIn, "JTOGJ" ) ) {
 			unitsStyleReturn = unitsStyleJtoGJ;
-		} else if ( SameString( unitStringIn, "INCHPOUND" ) ) {
+		} else if ( InputProcessor::SameString( unitStringIn, "INCHPOUND" ) ) {
 			unitsStyleReturn = unitsStyleInchPound;
 		} else {
 			unitsStyleReturn = unitsStyleNotFound;
@@ -1854,16 +1853,16 @@ namespace OutputReportTabular {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumTabularPredefined = GetNumObjectsFound( CurrentModuleObject );
+		NumTabularPredefined = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumTabularPredefined == 1 ) {
 			// find out how many fields since the object is extensible
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			// allocate the temporary arrays for the call to get the filed
 			AlphArray.allocate( NumAlphas );
 			// don't really need the NumArray since not expecting any numbers but the call requires it
 			NumArray.dimension( NumNums, 0.0 );
 			// get the object
-			GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			// default all report flags to false (do not get produced)
 			displayTabularBEPS = false;
 			// initialize the names of the predefined monthly report titles
@@ -1871,82 +1870,82 @@ namespace OutputReportTabular {
 			// loop through the fields looking for matching report titles
 			for ( iReport = 1; iReport <= NumAlphas; ++iReport ) {
 				nameFound = false;
-				if ( SameString( AlphArray( iReport ), "ABUPS" ) ) {
+				if ( InputProcessor::SameString( AlphArray( iReport ), "ABUPS" ) ) {
 					displayTabularBEPS = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "AnnualBuildingUtilityPerformanceSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AnnualBuildingUtilityPerformanceSummary" ) ) {
 					displayTabularBEPS = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "BEPS" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "BEPS" ) ) {
 					displayTabularBEPS = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "ComponentCostEconomicsSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "ComponentCostEconomicsSummary" ) ) {
 					displayTabularCompCosts = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "InputVerificationandResultsSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "InputVerificationandResultsSummary" ) ) {
 					displayTabularVeriSum = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "IVRS" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "IVRS" ) ) {
 					displayTabularVeriSum = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "ComponentSizingSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "ComponentSizingSummary" ) ) {
 					displayComponentSizing = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "CSS" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "CSS" ) ) {
 					displayComponentSizing = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "SurfaceShadowingSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "SurfaceShadowingSummary" ) ) {
 					displaySurfaceShadowing = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "SHAD" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "SHAD" ) ) {
 					displaySurfaceShadowing = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "DemandEndUseComponentsSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "DemandEndUseComponentsSummary" ) ) {
 					displayDemandEndUse = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "AdaptiveComfortSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AdaptiveComfortSummary" ) ) {
 					displayAdaptiveComfort = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "SourceEnergyEndUseComponentsSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "SourceEnergyEndUseComponentsSummary" ) ) {
 					displaySourceEnergyEndUseSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
 					displayZoneComponentLoadSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "LEEDSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "LEEDSummary" ) ) {
 					displayLEEDSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "LifeCycleCostReport" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "LifeCycleCostReport" ) ) {
 					displayLifeCycleCostReport = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "TariffReport" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "TariffReport" ) ) {
 					displayTariffReport = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "EconomicResultSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "EconomicResultSummary" ) ) {
 					displayEconomicResultSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummary" ) ) {
 					WriteTabularFiles = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
@@ -1963,7 +1962,7 @@ namespace OutputReportTabular {
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
 					}
-				} else if ( SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
 					WriteTabularFiles = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
@@ -1982,13 +1981,13 @@ namespace OutputReportTabular {
 					}
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
-				} else if ( SameString( AlphArray( iReport ), "AllMonthly" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllMonthly" ) ) {
 					WriteTabularFiles = true;
 					for ( jReport = 1; jReport <= numNamedMonthly; ++jReport ) {
 						namedMonthly( jReport ).show = true;
 					}
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "AllSummaryAndMonthly" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryAndMonthly" ) ) {
 					WriteTabularFiles = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
@@ -2008,7 +2007,7 @@ namespace OutputReportTabular {
 					for ( jReport = 1; jReport <= numNamedMonthly; ++jReport ) {
 						namedMonthly( jReport ).show = true;
 					}
-				} else if ( SameString( AlphArray( iReport ), "AllSummaryMonthlyAndSizingPeriod" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryMonthlyAndSizingPeriod" ) ) {
 					WriteTabularFiles = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
@@ -2033,12 +2032,12 @@ namespace OutputReportTabular {
 				}
 				// check the reports that are predefined and are created by OutputReportPredefined
 				for ( jReport = 1; jReport <= numReportName; ++jReport ) {
-					if ( SameString( AlphArray( iReport ), reportName( jReport ).name ) ) {
+					if ( InputProcessor::SameString( AlphArray( iReport ), reportName( jReport ).name ) ) {
 						WriteTabularFiles = true;
 						reportName( jReport ).show = true;
 						nameFound = true;
 					}
-					if ( SameString( AlphArray( iReport ), reportName( jReport ).abrev ) ) {
+					if ( InputProcessor::SameString( AlphArray( iReport ), reportName( jReport ).abrev ) ) {
 						WriteTabularFiles = true;
 						reportName( jReport ).show = true;
 						nameFound = true;
@@ -2046,7 +2045,7 @@ namespace OutputReportTabular {
 				}
 				// check if the predefined monthly reports are used
 				for ( jReport = 1; jReport <= numNamedMonthly; ++jReport ) {
-					if ( SameString( AlphArray( iReport ), namedMonthly( jReport ).title ) ) {
+					if ( InputProcessor::SameString( AlphArray( iReport ), namedMonthly( jReport ).title ) ) {
 						namedMonthly( jReport ).show = true;
 						WriteTabularFiles = true;
 						nameFound = true;
@@ -2262,25 +2261,25 @@ namespace OutputReportTabular {
 		bool isFound;
 
 		isFound = false;
-		NumTabularPredefined = GetNumObjectsFound( CurrentModuleObject );
+		NumTabularPredefined = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumTabularPredefined == 1 ) {
 			// find out how many fields since the object is extensible
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			// allocate the temporary arrays for the call to get the filed
 			AlphArray.allocate( NumAlphas );
 			// don't really need the NumArray since not expecting any numbers but the call requires it
 			NumArray.dimension( NumNums, 0.0 );
 			// get the object
-			GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			// loop through the fields looking for matching report titles
 			for ( iReport = 1; iReport <= NumAlphas; ++iReport ) {
-				if ( SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
+				if ( InputProcessor::SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
 					isFound = true;
 				}
-				if ( SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
+				if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
 					isFound = true;
 				}
-				if ( SameString( AlphArray( iReport ), "AllSummaryMonthlyAndSizingPeriod" ) ) {
+				if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryMonthlyAndSizingPeriod" ) ) {
 					isFound = true;
 				}
 			}
@@ -2394,7 +2393,7 @@ namespace OutputReportTabular {
 			ShowFatalError( "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits( numNamedMonthly ) + "] does not match number in DataOutputs=[" + RoundSigDigits( NumMonthlyReports ) + "]." );
 		} else {
 			for ( xcount = 1; xcount <= numNamedMonthly; ++xcount ) {
-				if ( ! SameString( MonthlyNamedReports( xcount ), namedMonthly( xcount ).title ) ) {
+				if ( ! InputProcessor::SameString( MonthlyNamedReports( xcount ), namedMonthly( xcount ).title ) ) {
 					ShowSevereError( "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput." );
 					ShowContinueError( "first mismatch at ORT [" + RoundSigDigits( numNamedMonthly ) + "] =\"" + namedMonthly( xcount ).title + "\"." );
 					ShowContinueError( "same location in DO =\"" + MonthlyNamedReports( xcount ) + "\"." );
@@ -5239,7 +5238,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const degChar( "°" );
+		static std::string const degChar( "Â°" );
 
 		// LineTypes for reading the stat file
 		int const StatisticsLine( 1 );
@@ -5360,9 +5359,9 @@ namespace OutputReportTabular {
 						coolingDesignlinepassed = true;
 						lineType = coolingConditionsLine;
 					}
-				} else if ( has( lineIn, "(standard) heating degree-days (18.3°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) heating degree-days (18.3Â°C baseline)" ) ) {
 					lineType = stdHDDLine;
-				} else if ( has( lineIn, "(standard) cooling degree-days (10°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) cooling degree-days (10Â°C baseline)" ) ) {
 					lineType = stdCDDLine;
 
 				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
@@ -5373,15 +5372,15 @@ namespace OutputReportTabular {
 					lineType = maxDewPointLine;
 				} else if ( has( lineIn, "Minimum Dew Point" ) ) {
 					lineType = minDewPointLine;
-				} else if ( has( lineIn, "(wthr file) heating degree-days (18°C baseline)" ) || has( lineIn, "heating degree-days (18°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) heating degree-days (18Â°C baseline)" ) || has( lineIn, "heating degree-days (18Â°C baseline)" ) ) {
 					lineType = wthHDDLine;
-				} else if ( has( lineIn, "(wthr file) cooling degree-days (10°C baseline)" ) || has( lineIn, "cooling degree-days (10°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) cooling degree-days (10Â°C baseline)" ) || has( lineIn, "cooling degree-days (10Â°C baseline)" ) ) {
 					lineType = wthCDDLine;
 				}
 				// these not part of big if/else because sequential
 				if ( lineType == KoppenDes1Line && isKoppen ) lineType = KoppenDes2Line;
 				if ( lineType == KoppenLine && isKoppen ) lineType = KoppenDes1Line;
-				if ( has( lineIn, "(Köppen classification)" ) ) lineType = KoppenLine;
+				if ( has( lineIn, "(KÃ¶ppen classification)" ) ) lineType = KoppenLine;
 				if ( lineType == AshStdDes2Line ) lineType = AshStdDes3Line;
 				if ( lineType == AshStdDes1Line ) lineType = AshStdDes2Line;
 				if ( lineType == AshStdLine ) lineType = AshStdDes1Line;
@@ -5392,7 +5391,7 @@ namespace OutputReportTabular {
 					PreDefTableEntry( pdchWthrVal, "Reference", lineIn.substr( 15 ) );
 				} else if ( SELECT_CASE_var == LocationLine ) { // Location -- SAN_FRANCISCO CA USA
 					PreDefTableEntry( pdchWthrVal, "Site:Location", lineIn.substr( 11 ) );
-				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
+				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37Â° 37'} {W 122Â° 22'} {GMT -8.0 Hours}
 					// find the {}
 					sposlt = index( lineIn, '{' );
 					eposlt = index( lineIn, '}' );
@@ -5556,11 +5555,11 @@ namespace OutputReportTabular {
 							}
 						}
 					}
-				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
+				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10Â°C baseline)
 					storeASHRAEHDD = lineIn.substr( 2, 4 );
-				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
+				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3Â°C baseline)
 					storeASHRAECDD = lineIn.substr( 2, 4 );
-				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
+				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6Â°C on Jul  9
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5583,7 +5582,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
+				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8Â°C on Jan  7
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5606,7 +5605,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
+				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6Â°C on Aug  4
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5629,7 +5628,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
+				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9Â°C on Dec 31
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5652,84 +5651,84 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
+				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10Â°C baseline)
 					if ( storeASHRAEHDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65Â°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3Â°C)", storeASHRAEHDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65Â°F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3Â°C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
+						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65Â°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18Â°C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn.substr( 2, 4 ) );
 					}
 					PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
 				}
-				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
+				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18Â°C baseline)
 					if ( storeASHRAECDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50Â°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10Â°C)", storeASHRAECDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50Â°F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10Â°C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
+						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50Â°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10Â°C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn.substr( 2, 4 ) );
 					}
-				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (Köppen classification)
+				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (KÃ¶ppen classification)
 					if ( ! has( lineIn, "not shown" ) ) {
 						isKoppen = true;
 						if ( lineIn[ 18 ] == '"' ) { // two character classification
-							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 2 ) );
+							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr( 16, 2 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 3 ) );
+							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr( 16, 3 ) );
 						}
 					} else {
 						isKoppen = false;
-						PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
+						PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr( 2 ) );
 					}
-				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
+				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25Â°)
 					if ( isKoppen ) {
-						PreDefTableEntry( pdchWthrVal, "Köppen Description", lineIn.substr( 2 ) );
+						PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Description", lineIn.substr( 2 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenDes2Line ) { // - Unbearably humid periods in summer, but passive cooling is possible
 					if ( isKoppen ) {
 						if ( len( lineIn ) > 3 ) { // avoid blank lines
 							if ( lineIn.substr( 2, 2 ) != "**" ) { // avoid line with warning
-								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
+								PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr( 2 ) );
 							} else {
-								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
+								PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", "" );
 							}
 						} else {
-							PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
+							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", "" );
 						}
 					}
 				} else if ( ( SELECT_CASE_var == AshStdLine ) || ( SELECT_CASE_var == AshStdDes1Line ) || ( SELECT_CASE_var == AshStdDes2Line ) || ( SELECT_CASE_var == AshStdDes3Line ) ) {
@@ -6403,7 +6402,7 @@ namespace OutputReportTabular {
 						GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 					} else { //just do the Joule conversion
 						//if units is in Joules, convert if specified
-						if ( SameString( MonthlyColumns( curCol ).units, "J" ) ) {
+						if ( InputProcessor::SameString( MonthlyColumns( curCol ).units, "J" ) ) {
 							curUnits = energyUnitsString;
 							curConversionFactor = energyUnitsConversionFactor;
 							curConversionOffset = 0.0;
@@ -6491,31 +6490,31 @@ namespace OutputReportTabular {
 						if ( MonthlyColumns( curCol ).avgSum == isSum ) {
 							curUnits += "/s";
 						}
-						if ( SameString( curUnits, "J/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "J/s" ) ) {
 							curUnits = "W";
 						}
 						//CR7783 fix
-						if ( SameString( curUnits, "kWh/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "kWh/s" ) ) {
 							curUnits = "W";
 							curConversionFactor *= 3600000.0;
 						}
-						if ( SameString( curUnits, "GJ/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "GJ/s" ) ) {
 							curUnits = "kW";
 							curConversionFactor *= 1000000.0;
 						}
-						if ( SameString( curUnits, "MJ/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "MJ/s" ) ) {
 							curUnits = "kW";
 							curConversionFactor *= 1000.0;
 						}
-						if ( SameString( curUnits, "therm/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "therm/s" ) ) {
 							curUnits = "kBtu/h";
 							curConversionFactor *= 360000.0;
 						}
-						if ( SameString( curUnits, "kBtu/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "kBtu/s" ) ) {
 							curUnits = "kBtu/h";
 							curConversionFactor *= 3600.0;
 						}
-						if ( SameString( curUnits, "ton-hrs/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "ton-hrs/s" ) ) {
 							curUnits = "ton";
 							curConversionFactor *= 3600.0;
 						}
@@ -6545,31 +6544,31 @@ namespace OutputReportTabular {
 						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
 							curUnits += "/s";
 						}
-						if ( SameString( curUnits, "J/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "J/s" ) ) {
 							curUnits = "W";
 						}
 						//CR7783 fix
-						if ( SameString( curUnits, "kWh/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "kWh/s" ) ) {
 							curUnits = "W";
 							curConversionFactor *= 3600000.0;
 						}
-						if ( SameString( curUnits, "GJ/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "GJ/s" ) ) {
 							curUnits = "kW";
 							curConversionFactor *= 1000000.0;
 						}
-						if ( SameString( curUnits, "MJ/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "MJ/s" ) ) {
 							curUnits = "kW";
 							curConversionFactor *= 1000.0;
 						}
-						if ( SameString( curUnits, "therm/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "therm/s" ) ) {
 							curUnits = "kBtu/h";
 							curConversionFactor *= 360000.0;
 						}
-						if ( SameString( curUnits, "kBtu/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "kBtu/s" ) ) {
 							curUnits = "kBtu/h";
 							curConversionFactor *= 3600.0;
 						}
-						if ( SameString( curUnits, "ton-hrs/s" ) ) {
+						if ( InputProcessor::SameString( curUnits, "ton-hrs/s" ) ) {
 							curUnits = "ton";
 							curConversionFactor *= 3600.0;
 						}
@@ -7588,19 +7587,19 @@ namespace OutputReportTabular {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 							subCatName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub );
-							if ( SameString( subCatName, "Fans - Parking Garage" ) || SameString( subCatName, "Fans-Parking Garage" ) ) {
+							if ( InputProcessor::SameString( subCatName, "Fans - Parking Garage" ) || InputProcessor::SameString( subCatName, "Fans-Parking Garage" ) ) {
 								if ( jEndUse == 7 ) { //fans
 									leedFansParkFromFan( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								} else {
 									leedFansParkFromExtFuelEquip( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								}
-							} else if ( SameString( subCatName, "Interior Lighting - Process" ) || SameString( subCatName, "Interior Lighting-Process" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Interior Lighting - Process" ) || InputProcessor::SameString( subCatName, "Interior Lighting-Process" ) ) {
 								leedIntLightProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( SameString( subCatName, "Cooking" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Cooking" ) ) {
 								leedCook( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( SameString( subCatName, "Industrial Process" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Industrial Process" ) ) {
 								leedIndProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( SameString( subCatName, "Elevators and Escalators" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Elevators and Escalators" ) ) {
 								leedElevEsc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 							}
 						}
@@ -8883,19 +8882,19 @@ namespace OutputReportTabular {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 							subCatName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub );
-							if ( SameString( subCatName, "Fans - Parking Garage" ) || SameString( subCatName, "Fans-Parking Garage" ) ) {
+							if ( InputProcessor::SameString( subCatName, "Fans - Parking Garage" ) || InputProcessor::SameString( subCatName, "Fans-Parking Garage" ) ) {
 								if ( jEndUse == 7 ) { //fans
 									leedFansParkFromFan( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								} else {
 									leedFansParkFromExtFuelEquip( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 								}
-							} else if ( SameString( subCatName, "Interior Lighting - Process" ) || SameString( subCatName, "Interior Lighting-Process" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Interior Lighting - Process" ) || InputProcessor::SameString( subCatName, "Interior Lighting-Process" ) ) {
 								leedIntLightProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( SameString( subCatName, "Cooking" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Cooking" ) ) {
 								leedCook( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( SameString( subCatName, "Industrial Process" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Industrial Process" ) ) {
 								leedIndProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( SameString( subCatName, "Elevators and Escalators" ) ) {
+							} else if ( InputProcessor::SameString( subCatName, "Elevators and Escalators" ) ) {
 								leedElevEsc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
 							}
 						}
@@ -9630,7 +9629,7 @@ namespace OutputReportTabular {
 			totPlugProcess = 0.0;
 			kOpaque = 0;
 
-			DetailedWWR = ( GetNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
+			DetailedWWR = ( InputProcessor::GetNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
 
 			if ( DetailedWWR ) {
 				gio::write( OutputFileDebug, fmtA ) << "======90.1 Classification [>=60 & <=120] tilt = wall==================";
@@ -10371,8 +10370,8 @@ namespace OutputReportTabular {
 								//finally assign the entry to the place in the table body
 								if ( unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH ) {
 									columnUnitConv = colUnitConv( colCurrent );
-									if ( SameString( subTable( jSubTable ).name, "SizingPeriod:DesignDay" ) && unitsStyle == unitsStyleInchPound ) {
-										if ( SameString( columnHead( colCurrent ), "Humidity Value" ) ) {
+									if ( InputProcessor::SameString( subTable( jSubTable ).name, "SizingPeriod:DesignDay" ) && unitsStyle == unitsStyleInchPound ) {
+										if ( InputProcessor::SameString( columnHead( colCurrent ), "Humidity Value" ) ) {
 											LookupSItoIP( tableEntry( lTableEntry + 1 ).charEntry, columnUnitConv, repTableTag );
 											tableEntry( lTableEntry + 1 ).charEntry = repTableTag;
 										}
@@ -10497,7 +10496,7 @@ namespace OutputReportTabular {
 				//entries for the particular subtable.
 				for ( iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry ) {
 					if ( ! CompSizeTableEntry( iTableEntry ).written ) {
-						if ( SameString( CompSizeTableEntry( iTableEntry ).typeField, CompSizeTableEntry( foundEntry ).typeField ) ) {
+						if ( InputProcessor::SameString( CompSizeTableEntry( iTableEntry ).typeField, CompSizeTableEntry( foundEntry ).typeField ) ) {
 							CompSizeTableEntry( iTableEntry ).active = true;
 						}
 					}
@@ -10514,7 +10513,7 @@ namespace OutputReportTabular {
 						curDesc = CompSizeTableEntry( iTableEntry ).description;
 						//look through the list of unique items to see if it matches
 						for ( jUnique = 1; jUnique <= numUniqueDesc; ++jUnique ) {
-							if ( SameString( curDesc, uniqueDesc( jUnique ) ) ) {
+							if ( InputProcessor::SameString( curDesc, uniqueDesc( jUnique ) ) ) {
 								foundDesc = jUnique;
 								break;
 							}
@@ -10528,7 +10527,7 @@ namespace OutputReportTabular {
 						foundObj = 0;
 						curObj = CompSizeTableEntry( iTableEntry ).nameField;
 						for ( jUnique = 1; jUnique <= numUniqueObj; ++jUnique ) {
-							if ( SameString( curObj, uniqueObj( jUnique ) ) ) {
+							if ( InputProcessor::SameString( curObj, uniqueObj( jUnique ) ) ) {
 								foundObj = jUnique;
 								break;
 							}
@@ -10575,7 +10574,7 @@ namespace OutputReportTabular {
 						curDesc = CompSizeTableEntry( iTableEntry ).description;
 						foundDesc = 0;
 						for ( jUnique = 1; jUnique <= numUniqueDesc; ++jUnique ) {
-							if ( SameString( uniqueDesc( jUnique ), curDesc ) ) {
+							if ( InputProcessor::SameString( uniqueDesc( jUnique ), curDesc ) ) {
 								foundDesc = jUnique;
 								break;
 							}
@@ -10583,7 +10582,7 @@ namespace OutputReportTabular {
 						curObj = CompSizeTableEntry( iTableEntry ).nameField;
 						foundObj = 0;
 						for ( jUnique = 1; jUnique <= numUniqueObj; ++jUnique ) {
-							if ( SameString( rowHead( jUnique ), curObj ) ) {
+							if ( InputProcessor::SameString( rowHead( jUnique ), curObj ) ) {
 								foundObj = jUnique;
 								break;
 							}
@@ -13039,7 +13038,7 @@ namespace OutputReportTabular {
 					//if report name and subtable name the same add "record" to the end
 					activeSubTableName = ConvertToElementTag( activeSubTableName );
 					activeReportNameNoSpace = ConvertToElementTag( activeReportName );
-					if ( SameString( activeSubTableName, activeReportNameNoSpace ) ) {
+					if ( InputProcessor::SameString( activeSubTableName, activeReportNameNoSpace ) ) {
 						activeSubTableName += "Record";
 					}
 					//if no subtable name use the report name and add "record" to the end
@@ -13057,7 +13056,7 @@ namespace OutputReportTabular {
 							rowLabelTags( jRow ) = "none";
 						}
 						rowUnitStrings( jRow ) = GetUnitSubString( rowLabels( jRow ) );
-						if ( SameString( rowUnitStrings( jRow ), "Invalid/Undefined" ) ) {
+						if ( InputProcessor::SameString( rowUnitStrings( jRow ), "Invalid/Undefined" ) ) {
 							rowUnitStrings( jRow ) = "";
 						}
 					}
@@ -13067,7 +13066,7 @@ namespace OutputReportTabular {
 							columnLabelTags( iCol ) = "none";
 						}
 						columnUnitStrings( iCol ) = GetUnitSubString( columnLabels( iCol ) );
-						if ( SameString( columnUnitStrings( iCol ), "Invalid/Undefined" ) ) {
+						if ( InputProcessor::SameString( columnUnitStrings( iCol ), "Invalid/Undefined" ) ) {
 							columnUnitStrings( iCol ) = "";
 						}
 					}
@@ -13482,12 +13481,12 @@ namespace OutputReportTabular {
 			//check if this zone is also a return plenum or a supply plenum
 			//found = 0
 			//if (NumZoneReturnPlenums > 0) THEN
-			//  found = FindItemInList(Zone(iZone)%Name, ZoneRetPlenCond%ZoneName, NumZoneReturnPlenums)
+			//  found = InputProcessor::FindItemInList(Zone(iZone)%Name, ZoneRetPlenCond%ZoneName, NumZoneReturnPlenums)
 			//endif
 			//IF (found /= 0)  curZoneArea = 0.0d0
 			//found = 0
 			//if (NumZoneSupplyPlenums > 0) THEN
-			//  found = FindItemInList(Zone(iZone)%Name, ZoneSupPlenCond%ZoneName, NumZoneSupplyPlenums)
+			//  found = InputProcessor::FindItemInList(Zone(iZone)%Name, ZoneSupPlenCond%ZoneName, NumZoneSupplyPlenums)
 			//endif
 			//IF (found /= 0)  curZoneArea = 0.0d0
 
@@ -14246,7 +14245,7 @@ Label900: ;
 		UnitConvSize = 95;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
-		UnitConv( 2 ).siName = "°C";
+		UnitConv( 2 ).siName = "Â°C";
 		UnitConv( 3 ).siName = "0=OFF 1=ON";
 		UnitConv( 4 ).siName = "0-NO  1-YES";
 		UnitConv( 5 ).siName = "1-YES 0-NO";
@@ -14675,7 +14674,7 @@ Label900: ;
 		int const misBrac( 1 );
 		int const misParen( 2 );
 		int const misNoHint( 3 );
-		std::string const stringInUpper( MakeUPPERCase( stringInWithSI ) );
+		std::string const stringInUpper( InputProcessor::MakeUPPERCase( stringInWithSI ) );
 
 		stringOutWithIP = "";
 		//check if string has brackets or parentheses
@@ -14698,7 +14697,7 @@ Label900: ;
 		int foundConv = 0;
 		int firstOfSeveral = 0;
 		for ( int iUnit = 1; iUnit <= UnitConvSize; ++iUnit ) {
-			if ( SameString( UnitConv( iUnit ).siName, unitSIOnly ) ) {
+			if ( InputProcessor::SameString( UnitConv( iUnit ).siName, unitSIOnly ) ) {
 				if ( UnitConv( iUnit ).several ) {
 					if ( firstOfSeveral == 0 ) firstOfSeveral = iUnit;
 					if ( UnitConv( iUnit ).is_default ) defaultConv = iUnit;
@@ -14989,8 +14988,8 @@ Label900: ;
 		static int iUnit( 0 );
 
 		for ( iUnit = 1; iUnit <= UnitConvSize; ++iUnit ) {
-			if ( SameString( UnitConv( iUnit ).siName, SIunit ) ) {
-				if ( SameString( UnitConv( iUnit ).ipName, IPunit ) ) {
+			if ( InputProcessor::SameString( UnitConv( iUnit ).siName, SIunit ) ) {
+				if ( InputProcessor::SameString( UnitConv( iUnit ).ipName, IPunit ) ) {
 					found = iUnit;
 					break;
 				}
@@ -15108,8 +15107,8 @@ Label900: ;
 		static int iUnit( 0 );
 
 		for ( iUnit = 1; iUnit <= UnitConvSize; ++iUnit ) {
-			if ( SameString( UnitConv( iUnit ).siName, SIunit ) ) {
-				if ( SameString( UnitConv( iUnit ).ipName, IPunit ) ) {
+			if ( InputProcessor::SameString( UnitConv( iUnit ).siName, SIunit ) ) {
+				if ( InputProcessor::SameString( UnitConv( iUnit ).ipName, IPunit ) ) {
 					found = iUnit;
 					break;
 				}

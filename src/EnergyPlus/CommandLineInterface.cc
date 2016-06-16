@@ -70,7 +70,7 @@
 #include <DisplayRoutines.hh>
 #include <EnergyPlus.hh>
 #include <FileSystem.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReports.hh>
@@ -86,7 +86,6 @@ using namespace DataGlobals;
 using namespace DataStringGlobals;
 using namespace DataSystemVariables;
 using namespace FileSystem;
-using namespace InputProcessor;
 using namespace SimulationManager;
 using namespace OutputReportTabular;
 using namespace OutputProcessor;

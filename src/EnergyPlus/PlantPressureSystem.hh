@@ -368,7 +368,7 @@ namespace PlantPressureSystem {
 	//          ! na
 
 	//          ! USE STATEMENTS:
-	//  USE InputProcessor, ONLY : FindItemInList
+	//  USE InputProcessor, ONLY : InputProcessor::FindItemInList(
 	//  USE CurveManager,   ONLY : GetCurveIndex, GetCurveType
 	//  USE GlobalDataConstants,  ONLY : PressureCurve_None, PressureCurve_Pressure, PressureCurve_Generic, PressureCurve_Error
 
@@ -425,7 +425,7 @@ namespace PlantPressureSystem {
 	//  !Then try to retrieve a pressure curve object
 	//  IF (ALLOCATED(PressureCurve)) THEN
 	//    IF (SIZE(PressureCurve) > 0) THEN
-	//      TempCurveIndex = FindItemInList(PressureCurveName,PressureCurve(1:SIZE(PressureCurve))%Name,SIZE(PressureCurve))
+	//      TempCurveIndex = InputProcessor::FindItemInList(PressureCurveName,PressureCurve(1:SIZE(PressureCurve))%Name,SIZE(PressureCurve))
 	//    ELSE
 	//      TempCurveIndex = 0
 	//    END IF

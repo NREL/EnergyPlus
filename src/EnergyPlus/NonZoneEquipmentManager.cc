@@ -59,7 +59,7 @@
 // EnergyPlus Headers
 #include <NonZoneEquipmentManager.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <WaterThermalTanks.hh>
 #include <WaterUse.hh>
 
@@ -121,7 +121,7 @@ namespace NonZoneEquipmentManager {
 
 		// Using/Aliasing
 		using DataGlobals::ZoneSizingCalc;
-		using InputProcessor::GetNumObjectsFound;
+
 		using WaterThermalTanks::SimulateWaterHeaterStandAlone;
 		using WaterUse::SimulateWaterUse;
 
@@ -135,7 +135,7 @@ namespace NonZoneEquipmentManager {
 
 		// FLOW:
 		if ( CountNonZoneEquip ) {
-			NumOfWaterHeater = GetNumObjectsFound( "WaterHeater:Mixed" ) + GetNumObjectsFound( "WaterHeater:Stratified" );
+			NumOfWaterHeater = InputProcessor::GetNumObjectsFound( "WaterHeater:Mixed" ) + InputProcessor::GetNumObjectsFound( "WaterHeater:Stratified" );
 			CountNonZoneEquip = false;
 		}
 

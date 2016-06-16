@@ -59,7 +59,7 @@
 // EnergyPlus Headers
 #include <FaultsManager.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <ScheduleManager.hh>
 #include <CurveManager.hh>
 #include <Fans.hh>
@@ -88,8 +88,7 @@ namespace FaultsManager {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::ScheduleAlwaysOn;
-	using namespace InputProcessor;
-
+	
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
@@ -234,18 +233,18 @@ namespace FaultsManager {
 		// check number of faults
 		NumFaults = 0;
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
-			iFaults = GetNumObjectsFound( cFaults( i ) );
+			iFaults = InputProcessor::GetNumObjectsFound( cFaults( i ) );
 			NumFaults += iFaults;
 		}
 
 		// Coil fouling is the 6th fault
-		NumFouledCoil = GetNumObjectsFound( cFaults( 6 ) );
+		NumFouledCoil = InputProcessor::GetNumObjectsFound( cFaults( 6 ) );
 		// Faulty thermostat is the 7th fault
-		NumFaultyThermostat = GetNumObjectsFound( cFaults( 7 ) );
+		NumFaultyThermostat = InputProcessor::GetNumObjectsFound( cFaults( 7 ) );
 		// Faulty humidistat is the 8th fault
-		NumFaultyHumidistat = GetNumObjectsFound( cFaults( 8 ) );
+		NumFaultyHumidistat = InputProcessor::GetNumObjectsFound( cFaults( 8 ) );
 		// Fouled air filter is the 9th fault
-		NumFaultyAirFilter = GetNumObjectsFound( cFaults( 9 ) );
+		NumFaultyAirFilter = InputProcessor::GetNumObjectsFound( cFaults( 9 ) );
 
 		if ( NumFaults > 0 ) {
 			AnyFaultsInModel = true;
@@ -273,12 +272,12 @@ namespace FaultsManager {
 
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
 			cFault1 = cFaults( i ); // fault object string
-			iFaults = GetNumObjectsFound( cFault1 );
+			iFaults = InputProcessor::GetNumObjectsFound( cFault1 );
 
 			for ( jj = 1; jj <= iFaults; ++jj ) {
-				GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( SameString( cFault1, "FaultModel:Fouling:AirFilter" ) ) { // For Fault_type 109: Fouled Air Filters
+				if ( InputProcessor::SameString( cFault1, "FaultModel:Fouling:AirFilter" ) ) { // For Fault_type 109: Fouled Air Filters
 					++jFaultyAirFilter;
 
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultType = cFault1;
@@ -290,14 +289,14 @@ namespace FaultsManager {
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
 					// Check whether the specified fan exsits in the fan list
-					if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
+					if ( InputProcessor::FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
 						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 
 					// Assign fault index to the fan object
 					for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
-						if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
+						if ( InputProcessor::SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
 							Fans::Fan( FanNum ).FaultyFilterFlag = true;
 							Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
 							break;
@@ -347,7 +346,7 @@ namespace FaultsManager {
 
 					//In the fan object, calculate by each time-step: 1) pressure inc value; 2) air flow rate decrease value ......
 
-				} else if ( SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
+				} else if ( InputProcessor::SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
 					++jFaultyHumidistat;
 
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultType = cFault1;
@@ -356,7 +355,7 @@ namespace FaultsManager {
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
-					if ( SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+					if ( InputProcessor::SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
 					// For Humidistat Offset Type: ThermostatOffsetDependent
 
 						// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
@@ -405,7 +404,7 @@ namespace FaultsManager {
 					}
 
 
-				} else if ( SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
+				} else if ( InputProcessor::SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
 					++jFaultyThermostat;
 
 					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
@@ -445,7 +444,7 @@ namespace FaultsManager {
 						FaultsThermostatOffset( jFaultyThermostat ).Offset = rNumericArgs( 1 );
 					}
 
-				} else if ( SameString( cFault1, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
+				} else if ( InputProcessor::SameString( cFault1, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
 					++jFoulingCoil;
 
 					FouledCoils( jFoulingCoil ).FaultType = cFault1;
@@ -477,7 +476,7 @@ namespace FaultsManager {
 						}
 					}
 
-					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
+					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 5 ) ) );
 					if ( SELECT_CASE_var == "FOULEDUARATED" ) {
 						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 
@@ -530,7 +529,7 @@ namespace FaultsManager {
 						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
 						ErrorsFound = true;
 					} else {
-						{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
+						{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 4 ) ) );
 						if ( SELECT_CASE_var == "CONTROLLER:OUTDOORAIR" ) {
 							Faults( j ).ControllerTypeEnum = iController_AirEconomizer;
 
@@ -612,7 +611,7 @@ namespace FaultsManager {
 		FanFound = false;
 
 		for ( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
-			if ( SameString( Fan( FanNum ).FanName, FanName ) ) {
+			if ( InputProcessor::SameString( Fan( FanNum ).FanName, FanName ) ) {
 				FanMaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
 				FanDeltaPress = Fan( FanNum ).DeltaPress;
 				FanFound = true;

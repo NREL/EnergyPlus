@@ -76,7 +76,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -249,10 +249,10 @@ namespace loc {
 
 		// Using/Aliasing
 		using DataHeatBalance::Construct;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -288,7 +288,7 @@ namespace loc {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Surface";
-		int NumOfSurfaceGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		int NumOfSurfaceGHEs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( SurfaceGHE ) ) SurfaceGHE.deallocate();
 
@@ -301,12 +301,12 @@ namespace loc {
 		for ( Item = 1; Item <= NumOfSurfaceGHEs; ++Item ) {
 
 			// get the input data
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			// General user input data
 			SurfaceGHE( Item ).Name = cAlphaArgs( 1 );
 			SurfaceGHE( Item ).ConstructionName = cAlphaArgs( 2 );
-			SurfaceGHE( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			SurfaceGHE( Item ).ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( SurfaceGHE( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -377,9 +377,9 @@ namespace loc {
 			}
 
 			// get lower b.c. type
-			if ( SameString( cAlphaArgs( 5 ), "GROUND" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "GROUND" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Ground;
-			} else if ( SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Exposed;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
@@ -453,7 +453,7 @@ namespace loc {
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
-		using InputProcessor::SameString;
+
 		using DataPlant::TypeOf_GrndHtExchgSurface;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -506,7 +506,7 @@ namespace loc {
 		// get QTF data - only once
 		if ( this->InitQTF ) {
 			for ( Cons = 1; Cons <= TotConstructs; ++Cons ) {
-				if ( SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
+				if ( InputProcessor::SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
 					// some error checking ??
 					// CTF stuff
 					LayerNum = Construct( Cons ).TotLayers;

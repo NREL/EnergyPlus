@@ -76,7 +76,7 @@
 #include <DataSurfaces.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -271,8 +271,7 @@ namespace HeatBalanceHAMTManager {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -365,25 +364,25 @@ namespace HeatBalanceHAMTManager {
 
 		MaxAlphas = 0;
 		MaxNums = 0;
-		GetObjectDefMaxArgs( cHAMTObject1, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject1, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( cHAMTObject2, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject2, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( cHAMTObject3, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject3, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( cHAMTObject4, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject4, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( cHAMTObject5, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject5, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( cHAMTObject6, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject6, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( cHAMTObject7, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cHAMTObject7, NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 
@@ -396,11 +395,11 @@ namespace HeatBalanceHAMTManager {
 		lAlphaBlanks.dimension( MaxAlphas, false );
 		lNumericBlanks.dimension( MaxNums, false );
 
-		HAMTitems = GetNumObjectsFound( cHAMTObject1 ); // MaterialProperty:HeatAndMoistureTransfer:Settings
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject1 ); // MaterialProperty:HeatAndMoistureTransfer:Settings
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject1, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject1, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material );
+			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject1 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -418,11 +417,11 @@ namespace HeatBalanceHAMTManager {
 
 		}
 
-		HAMTitems = GetNumObjectsFound( cHAMTObject2 ); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject2 ); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject2, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject2, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material );
+			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject2 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -497,11 +496,11 @@ namespace HeatBalanceHAMTManager {
 			}
 		}
 
-		HAMTitems = GetNumObjectsFound( cHAMTObject3 ); // MaterialProperty:HeatAndMoistureTransfer:Suction
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject3 ); // MaterialProperty:HeatAndMoistureTransfer:Suction
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject3, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject3, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material );
+			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject3 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -530,11 +529,11 @@ namespace HeatBalanceHAMTManager {
 
 		}
 
-		HAMTitems = GetNumObjectsFound( cHAMTObject4 ); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject4 ); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject4, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject4, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material );
+			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject4 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -561,11 +560,11 @@ namespace HeatBalanceHAMTManager {
 
 		}
 
-		HAMTitems = GetNumObjectsFound( cHAMTObject5 ); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject5 ); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject5, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject5, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material );
+			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject5 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -595,11 +594,11 @@ namespace HeatBalanceHAMTManager {
 			}
 		}
 
-		HAMTitems = GetNumObjectsFound( cHAMTObject6 ); // MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject6 ); // MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject6, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject6, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material );
+			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject6 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -629,11 +628,11 @@ namespace HeatBalanceHAMTManager {
 		}
 
 		// Vapor Transfer coefficients
-		HAMTitems = GetNumObjectsFound( cHAMTObject7 ); // SurfaceProperties:VaporCoefficients
+		HAMTitems = InputProcessor::GetNumObjectsFound( cHAMTObject7 ); // SurfaceProperties:VaporCoefficients
 		for ( item = 1; item <= HAMTitems; ++item ) {
-			GetObjectItem( cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			vtcsid = FindItemInList( AlphaArray( 1 ), Surface );
+			vtcsid = InputProcessor::FindItemInList( AlphaArray( 1 ), Surface );
 			if ( vtcsid == 0 ) {
 				ShowSevereError( cHAMTObject7 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );

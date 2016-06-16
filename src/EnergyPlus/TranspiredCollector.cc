@@ -80,7 +80,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -176,7 +176,7 @@ namespace TranspiredCollector {
 		//  none
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -205,7 +205,7 @@ namespace TranspiredCollector {
 
 		// Find the correct transpired collector with the Component name and/or index
 		if ( CompIndex == 0 ) {
-			UTSCNum = FindItemInList( CompName, UTSC );
+			UTSCNum = InputProcessor::FindItemInList( CompName, UTSC );
 			if ( UTSCNum == 0 ) {
 				ShowFatalError( "Transpired Collector not found=" + CompName );
 			}
@@ -274,11 +274,11 @@ namespace TranspiredCollector {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
+
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using DataGlobals::Pi;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -355,7 +355,7 @@ namespace TranspiredCollector {
 		std::string CurrentModuleMultiObject; // for ease in renaming.
 
 		CurrentModuleObject = "SolarCollector:UnglazedTranspired";
-		GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 11 ) {
 			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
@@ -365,23 +365,23 @@ namespace TranspiredCollector {
 		Numbers = 0.0;
 		Alphas = "";
 
-		NumUTSC = GetNumObjectsFound( CurrentModuleObject );
+		NumUTSC = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
-		NumUTSCSplitter = GetNumObjectsFound( CurrentModuleMultiObject );
+		NumUTSCSplitter = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleMultiObject );
 
 		UTSC.allocate( NumUTSC );
 		CheckEquipName.dimension( NumUTSC, true );
 		SplitterNameOK.dimension( NumUTSCSplitter, false );
 
 		for ( Item = 1; Item <= NumUTSC; ++Item ) {
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// first handle alphas
 			UTSC( Item ).Name = Alphas( 1 );
 
 			// now check for multisystem
 			if ( NumUTSCSplitter > 0 ) {
-				GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
+				InputProcessor::GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
 
 				if ( MaxNumNumbersSplit != 0 ) {
 					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
@@ -391,8 +391,8 @@ namespace TranspiredCollector {
 				NumbersSplit = 0.0;
 				AlphasSplit = "";
 				for ( ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit ) {
-					GetObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
-					if ( ! ( SameString( AlphasSplit( 1 ), Alphas( 1 ) ) ) ) continue;
+					InputProcessor::GetObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
+					if ( ! ( InputProcessor::SameString( AlphasSplit( 1 ), Alphas( 1 ) ) ) ) continue;
 					SplitterNameOK( ItemSplit ) = true;
 					UTSC( Item ).NumOASysAttached = std::floor( NumAlphasSplit / 4.0 );
 					if ( mod( ( NumAlphasSplit ), 4 ) != 1 ) {
@@ -423,7 +423,7 @@ namespace TranspiredCollector {
 			} // any UTSC Multisystem present
 
 			UTSC( Item ).OSCMName = Alphas( 2 );
-			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM );
+			Found = InputProcessor::FindItemInList( UTSC( Item ).OSCMName, OSCM );
 			if ( Found == 0 ) {
 				ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + UTSC( Item ).OSCMName + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
@@ -467,9 +467,9 @@ namespace TranspiredCollector {
 				continue;
 			}
 
-			if ( SameString( Alphas( 9 ), "Triangle" ) ) {
+			if ( InputProcessor::SameString( Alphas( 9 ), "Triangle" ) ) {
 				UTSC( Item ).Layout = Layout_Triangle;
-			} else if ( SameString( Alphas( 9 ), "Square" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 9 ), "Square" ) ) {
 				UTSC( Item ).Layout = Layout_Square;
 			} else {
 				ShowSevereError( cAlphaFieldNames( 9 ) + " has incorrect entry of " + Alphas( 9 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
@@ -477,9 +477,9 @@ namespace TranspiredCollector {
 				continue;
 			}
 
-			if ( SameString( Alphas( 10 ), "Kutscher1994" ) ) {
+			if ( InputProcessor::SameString( Alphas( 10 ), "Kutscher1994" ) ) {
 				UTSC( Item ).Correlation = Correlation_Kutscher1994;
-			} else if ( SameString( Alphas( 10 ), "VanDeckerHollandsBrunger2001" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 10 ), "VanDeckerHollandsBrunger2001" ) ) {
 				UTSC( Item ).Correlation = Correlation_VanDeckerHollandsBrunger2001;
 			} else {
 				ShowSevereError( cAlphaFieldNames( 10 ) + " has incorrect entry of " + Alphas( 9 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
@@ -489,12 +489,12 @@ namespace TranspiredCollector {
 
 			Roughness = Alphas( 11 );
 			//Select the correct Number for the associated ascii name for the roughness type
-			if ( SameString( Roughness, "VeryRough" ) ) UTSC( Item ).CollRoughness = VeryRough;
-			if ( SameString( Roughness, "Rough" ) ) UTSC( Item ).CollRoughness = Rough;
-			if ( SameString( Roughness, "MediumRough" ) ) UTSC( Item ).CollRoughness = MediumRough;
-			if ( SameString( Roughness, "MediumSmooth" ) ) UTSC( Item ).CollRoughness = MediumSmooth;
-			if ( SameString( Roughness, "Smooth" ) ) UTSC( Item ).CollRoughness = Smooth;
-			if ( SameString( Roughness, "VerySmooth" ) ) UTSC( Item ).CollRoughness = VerySmooth;
+			if ( InputProcessor::SameString( Roughness, "VeryRough" ) ) UTSC( Item ).CollRoughness = VeryRough;
+			if ( InputProcessor::SameString( Roughness, "Rough" ) ) UTSC( Item ).CollRoughness = Rough;
+			if ( InputProcessor::SameString( Roughness, "MediumRough" ) ) UTSC( Item ).CollRoughness = MediumRough;
+			if ( InputProcessor::SameString( Roughness, "MediumSmooth" ) ) UTSC( Item ).CollRoughness = MediumSmooth;
+			if ( InputProcessor::SameString( Roughness, "Smooth" ) ) UTSC( Item ).CollRoughness = Smooth;
+			if ( InputProcessor::SameString( Roughness, "VerySmooth" ) ) UTSC( Item ).CollRoughness = VerySmooth;
 
 			// Was it set?
 			if ( UTSC( Item ).CollRoughness == 0 ) {
@@ -512,7 +512,7 @@ namespace TranspiredCollector {
 			UTSC( Item ).SurfPtrs.allocate( UTSC( Item ).NumSurfs );
 			UTSC( Item ).SurfPtrs = 0;
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
-				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface );
+				Found = InputProcessor::FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface );
 				if ( Found == 0 ) {
 					ShowSevereError( "Surface Name not found=" + Alphas( ThisSurf + AlphaOffset ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
@@ -1364,7 +1364,7 @@ namespace TranspiredCollector {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using DataSurfaces::Surface;
 
 		// Locals

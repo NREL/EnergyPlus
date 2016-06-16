@@ -76,7 +76,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -191,7 +191,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -216,7 +216,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( EquipName, FluidHX );
+			CompNum = InputProcessor::FindItemInList( EquipName, FluidHX );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimFluidHeatExchanger: HeatExchanger:FluidToFluid not found" );
 			}
@@ -287,13 +287,13 @@ namespace PlantHeatExchangerFluidToFluid {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItem;
+
+
+
+
+
+
+
 		using General::RoundSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -341,10 +341,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
-		NumberOfPlantFluidHXs = GetNumObjectsFound( cCurrentModuleObject );
+		NumberOfPlantFluidHXs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		if ( NumberOfPlantFluidHXs == 0 ) return;
 
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 
@@ -359,10 +359,10 @@ namespace PlantHeatExchangerFluidToFluid {
 			FluidHX.allocate( NumberOfPlantFluidHXs );
 			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
-				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), FluidHX, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( cAlphaArgs( 1 ), FluidHX, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -397,19 +397,19 @@ namespace PlantHeatExchangerFluidToFluid {
 					FluidHX( CompLoop ).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
 				}
 
-				if ( SameString( cAlphaArgs( 7 ), "CrossFlowBothUnMixed" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 7 ), "CrossFlowBothUnMixed" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = CrossFlowBothUnMixed;
-				} else if ( SameString( cAlphaArgs( 7 ), "CrossFlowBothMixed" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "CrossFlowBothMixed" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = CrossFlowBothMixed;
-				} else if ( SameString( cAlphaArgs( 7 ), "CrossFlowSupplyMixedDemandUnMixed" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "CrossFlowSupplyMixedDemandUnMixed" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = CrossFlowSupplyLoopMixedDemandLoopUnMixed;
-				} else if ( SameString( cAlphaArgs( 7 ), "CrossFlowSupplyUnMixedDemandMixed" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "CrossFlowSupplyUnMixedDemandMixed" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = CrossFlowSupplyLoopUnMixedDemandLoopMixed;
-				} else if ( SameString( cAlphaArgs( 7 ), "CounterFlow" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "CounterFlow" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = CounterFlow;
-				} else if ( SameString( cAlphaArgs( 7 ), "ParallelFlow" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "ParallelFlow" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = ParallelFlow;
-				} else if ( SameString( cAlphaArgs( 7 ), "Ideal" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "Ideal" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = Ideal;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -430,29 +430,29 @@ namespace PlantHeatExchangerFluidToFluid {
 					}
 				}
 
-				if ( SameString( cAlphaArgs( 8 ), "UncontrolledOn" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 8 ), "UncontrolledOn" ) ) {
 					FluidHX( CompLoop ).ControlMode = UncontrolledOn;
-				} else if ( SameString( cAlphaArgs( 8 ), "OperationSchemeModulated" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "OperationSchemeModulated" ) ) {
 					FluidHX( CompLoop ).ControlMode = OperationSchemeModulated;
-				} else if ( SameString( cAlphaArgs( 8 ), "OperationSchemeOnOff" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "OperationSchemeOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = OperationSchemeOnOff;
-				} else if ( SameString( cAlphaArgs( 8 ), "HeatingSetpointModulated" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "HeatingSetpointModulated" ) ) {
 					FluidHX( CompLoop ).ControlMode = HeatingSetPointModulated;
-				} else if ( SameString( cAlphaArgs( 8 ), "HeatingSetpointOnOff" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "HeatingSetpointOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = HeatingSetPointOnOff;
-				} else if ( SameString( cAlphaArgs( 8 ), "CoolingSetpointModulated" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "CoolingSetpointModulated" ) ) {
 					FluidHX( CompLoop ).ControlMode = CoolingSetPointModulated;
-				} else if ( SameString( cAlphaArgs( 8 ), "CoolingSetpointOnOff" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "CoolingSetpointOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = CoolingSetPointOnOff;
-				} else if ( SameString( cAlphaArgs( 8 ), "DualDeadbandSetpointModulated" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "DualDeadbandSetpointModulated" ) ) {
 					FluidHX( CompLoop ).ControlMode = DualDeadBandSetPointModulated;
-				} else if ( SameString( cAlphaArgs( 8 ), "DualDeadbandSetpointOnOff" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "DualDeadbandSetpointOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = DualDeadBandSetPointOnOff;
-				} else if ( SameString( cAlphaArgs( 8 ), "CoolingDifferentialOnOff" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "CoolingDifferentialOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = CoolingDifferentialOnOff;
-				} else if ( SameString( cAlphaArgs( 8 ), "CoolingSetpointOnOffWithComponentOverride" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "CoolingSetpointOnOffWithComponentOverride" ) ) {
 					FluidHX( CompLoop ).ControlMode = CoolingSetPointOnOffWithComponentOverride;
-				} else if ( SameString( cAlphaArgs( 8 ), "TrackComponentOnOff" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "TrackComponentOnOff" ) ) {
 					FluidHX( CompLoop ).ControlMode = TrackComponentOnOff;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -542,11 +542,11 @@ namespace PlantHeatExchangerFluidToFluid {
 				}
 
 				if ( ! lAlphaFieldBlanks( 13 ) ) {
-					if ( SameString( cAlphaArgs( 13 ), "WetBulbTemperature" ) ) {
+					if ( InputProcessor::SameString( cAlphaArgs( 13 ), "WetBulbTemperature" ) ) {
 						FluidHX( CompLoop ).ControlSignalTemp = WetBulbTemperature;
-					} else if ( SameString( cAlphaArgs( 13 ), "DryBulbTemperature" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 13 ), "DryBulbTemperature" ) ) {
 						FluidHX( CompLoop ).ControlSignalTemp = DryBulbTemperature;
-					} else if ( SameString( cAlphaArgs( 13 ), "Loop" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 13 ), "Loop" ) ) {
 						FluidHX( CompLoop ).ControlSignalTemp = LoopTemperature;
 					}
 				} else {

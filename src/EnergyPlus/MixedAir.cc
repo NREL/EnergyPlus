@@ -97,7 +97,7 @@
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HVACUnitarySystem.hh>
 #include <Humidifiers.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -431,7 +431,6 @@ namespace MixedAir {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -452,7 +451,7 @@ namespace MixedAir {
 		}
 
 		if ( OASysNum == 0 ) {
-			OASysNum = FindItemInList( OASysName, OutsideAirSys );
+			OASysNum = InputProcessor::FindItemInList( OASysName, OutsideAirSys );
 			if ( OASysNum == 0 ) {
 				ShowFatalError( "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName );
 			}
@@ -486,8 +485,7 @@ namespace MixedAir {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -556,9 +554,9 @@ namespace MixedAir {
 			for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
 				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				if ( SameString( CompType, "OutdoorAir:Mixer" ) ) {
-					OAMixerNum = FindItemInList( CompName, OAMixer );
-					OAControllerNum = FindItemInList( CtrlName, OAController );
+				if ( InputProcessor::SameString( CompType, "OutdoorAir:Mixer" ) ) {
+					OAMixerNum = InputProcessor::FindItemInList( CompName, OAMixer );
+					OAControllerNum = InputProcessor::FindItemInList( CtrlName, OAController );
 					if ( OAController( OAControllerNum ).MixNode != OAMixer( OAMixerNum ).MixNode ) {
 						ShowSevereError( "The mixed air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
 						ShowContinueError( "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
@@ -831,7 +829,6 @@ namespace MixedAir {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -853,7 +850,7 @@ namespace MixedAir {
 		}
 
 		if ( CompIndex == 0 ) {
-			OAMixerNum = FindItemInList( CompName, OAMixer );
+			OAMixerNum = InputProcessor::FindItemInList( CompName, OAMixer );
 			CompIndex = OAMixerNum;
 			if ( OAMixerNum == 0 ) {
 				ShowFatalError( "SimOAMixer: OutdoorAir:Mixer not found=" + CompName );
@@ -895,7 +892,6 @@ namespace MixedAir {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -918,7 +914,7 @@ namespace MixedAir {
 
 		if ( CtrlIndex == 0 ) {
 			if ( NumOAControllers > 0 ) {
-				OAControllerNum = FindItemInList( CtrlName, OAController );
+				OAControllerNum = InputProcessor::FindItemInList( CtrlName, OAController );
 			} else {
 				OAControllerNum = 0;
 			}
@@ -963,8 +959,7 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using BranchNodeConnections::TestCompSet;
+				using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
 		using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 
@@ -1012,13 +1007,13 @@ namespace MixedAir {
 
 		if ( ! GetOASysInputFlag ) return;
 
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OASystem ), TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OASystem ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_AirLoopEqList ), TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_AirLoopEqList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_ControllerList ), TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_ControllerList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -1030,7 +1025,7 @@ namespace MixedAir {
 		lNumericBlanks.dimension( MaxNums, true );
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_ControllerList );
-		NumControllerLists = GetNumObjectsFound( CurrentModuleObject );
+		NumControllerLists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		ControllerLists.allocate( NumControllerLists );
 
@@ -1038,10 +1033,10 @@ namespace MixedAir {
 
 			// create a reference for convenience
 			auto & thisControllerList( ControllerLists( Item ) );
-			GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ControllerLists, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), ControllerLists, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1054,7 +1049,7 @@ namespace MixedAir {
 			thisControllerList.ControllerName.allocate( thisControllerList.NumControllers );
 			AlphaNum = 2;
 			for ( CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum ) {
-				if ( SameString( AlphArray( AlphaNum ), "Controller:WaterCoil" ) || SameString( AlphArray( AlphaNum ), "Controller:OutdoorAir" ) ) {
+				if ( InputProcessor::SameString( AlphArray( AlphaNum ), "Controller:WaterCoil" ) || InputProcessor::SameString( AlphArray( AlphaNum ), "Controller:OutdoorAir" ) ) {
 					thisControllerList.ControllerType( CompNum ) = AlphArray( AlphaNum );
 					thisControllerList.ControllerName( CompNum ) = AlphArray( AlphaNum + 1 );
 					// loop over all previous controller lists to check if this controllers is also present on previous controllers
@@ -1082,7 +1077,7 @@ namespace MixedAir {
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_OASystem );
 
-		NumOASystems = GetNumObjectsFound( CurrentModuleObject );
+		NumOASystems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		OutsideAirSys.allocate( NumOASystems );
 		OASysEqSizing.allocate( NumOASystems );
@@ -1091,10 +1086,10 @@ namespace MixedAir {
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
-			GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), OutsideAirSys, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), OutsideAirSys, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1102,7 +1097,7 @@ namespace MixedAir {
 			OutsideAirSys( OASysNum ).Name = AlphArray( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 2 ), OutsideAirSys, &OutsideAirSysProps::ControllerListName, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
+			InputProcessor::VerifyName( AlphArray( 2 ), OutsideAirSys, &OutsideAirSysProps::ControllerListName, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
 			if ( IsNotOK && AlphArray( 1 ) != "xxxxx" ) {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\"." );
 				ErrorsFound = true;
@@ -1117,9 +1112,9 @@ namespace MixedAir {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), "UNDEFINED", "UNDEFINED", "Air Nodes" );
 
 			if ( ! lAlphaBlanks( 3 ) ) {
-				ListNum = GetObjectItemNum( CurrentModuleObjects( CMO_AirLoopEqList ), ComponentListName );
+				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CMO_AirLoopEqList ), ComponentListName );
 				if ( ListNum > 0 ) {
-					GetObjectItem( CurrentModuleObjects( CMO_AirLoopEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					InputProcessor::GetObjectItem( CurrentModuleObjects( CMO_AirLoopEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2;
 					OutsideAirSys( OASysNum ).NumComponents = NumInList;
 					OutsideAirSys( OASysNum ).ComponentName.allocate( NumInList );
@@ -1145,9 +1140,9 @@ namespace MixedAir {
 			ListNum = 0;
 			NumSimpControllers = 0;
 			if ( ! lAlphaBlanks( 2 ) ) {
-				ListNum = GetObjectItemNum( CurrentModuleObjects( CMO_ControllerList ), ControllerListName );
+				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CMO_ControllerList ), ControllerListName );
 				if ( ListNum > 0 ) {
-					GetObjectItem( CurrentModuleObjects( CMO_ControllerList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					InputProcessor::GetObjectItem( CurrentModuleObjects( CMO_ControllerList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2;
 					OutsideAirSys( OASysNum ).NumControllers = NumInList;
 					OutsideAirSys( OASysNum ).ControllerName.allocate( NumInList );
@@ -1156,7 +1151,7 @@ namespace MixedAir {
 					for ( InListNum = 1; InListNum <= NumInList; ++InListNum ) {
 						OutsideAirSys( OASysNum ).ControllerName( InListNum ) = AlphArray( InListNum * 2 + 1 );
 						OutsideAirSys( OASysNum ).ControllerType( InListNum ) = AlphArray( InListNum * 2 );
-						if ( ! SameString( OutsideAirSys( OASysNum ).ControllerType( InListNum ), CurrentModuleObjects( CMO_OAController ) ) ) {
+						if ( ! InputProcessor::SameString( OutsideAirSys( OASysNum ).ControllerType( InListNum ), CurrentModuleObjects( CMO_OAController ) ) ) {
 							++NumSimpControllers;
 						}
 					}
@@ -1172,7 +1167,7 @@ namespace MixedAir {
 			OutsideAirSys( OASysNum ).NumSimpleControllers = NumSimpControllers;
 
 			if ( ! lAlphaBlanks( 4 ) ) {
-				ListNum = GetObjectItemNum( CurrentModuleObjects( CMO_SysAvailMgrList ), AvailManagerListName );
+				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CMO_SysAvailMgrList ), AvailManagerListName );
 				if ( ListNum <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\" not found." );
 					ErrorsFound = true;
@@ -1183,7 +1178,7 @@ namespace MixedAir {
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 			for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
 
-				{ auto const SELECT_CASE_var( MakeUPPERCase( OutsideAirSys( OASysNum ).ComponentType( CompNum ) ) );
+				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( OutsideAirSys( OASysNum ).ComponentType( CompNum ) ) );
 
 				if ( SELECT_CASE_var == "OUTDOORAIR:MIXER" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = OAMixer_Num;
@@ -1304,8 +1299,7 @@ namespace MixedAir {
 		// Use the Get routines from the InputProcessor module.
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using namespace DataDefineEquip;
+				using namespace DataDefineEquip;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1384,13 +1378,13 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 		MaxAlphas = NumAlphas;
 		MaxNums = NumNums;
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_ERVController ), NumArg, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_ERVController ), NumArg, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_MechVentilation ), NumArg, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_MechVentilation ), NumArg, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 
@@ -1412,10 +1406,10 @@ namespace MixedAir {
 			int currentOAControllerNum = 0;
 			for ( OutAirNum = NumERVControllers+1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
 				++currentOAControllerNum;
-				GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1427,7 +1421,7 @@ namespace MixedAir {
 				//  loop through each fault for each OA controller
 				for ( i = 1; i <= NumFaults; ++i ) {
 					if ( Faults( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
-					if ( SameString( OAController( OutAirNum ).Name, Faults( i ).ControllerName ) ) {
+					if ( InputProcessor::SameString( OAController( OutAirNum ).Name, Faults( i ).ControllerName ) ) {
 						Faults( i ).ControllerID = OutAirNum;
 					}
 				}
@@ -1492,11 +1486,11 @@ namespace MixedAir {
 
 		// Process Controller:MechanicalVentilation objects
 		CurrentModuleObject = CurrentModuleObjects( CMO_MechVentilation );
-		NumVentMechControllers = GetNumObjectsFound( CurrentModuleObject );
+		NumVentMechControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( NumVentMechControllers > 0 ) {
 			VentilationMechanical.allocate( NumVentMechControllers );
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
-				GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				MechVentZoneCount = 0;
 
@@ -1507,7 +1501,7 @@ namespace MixedAir {
 				// Check Controller:MechanicalVentilation object name
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), VentilationMechanical, VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( AlphArray( 1 ), VentilationMechanical, VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1525,9 +1519,9 @@ namespace MixedAir {
 				}
 
 				// Adding new flag for DCV
-				if ( SameString( AlphArray( 3 ), "Yes" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 3 ), "Yes" ) ) {
 					VentilationMechanical( VentMechNum ).DCVFlag = true;
-				} else if ( SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
 					VentilationMechanical( VentMechNum ).DCVFlag = false;
 				} else {
 					ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid value " + cAlphaFields( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
@@ -1536,18 +1530,18 @@ namespace MixedAir {
 				}
 
 				// System outdoor air method
-				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 4 ) ) );
+				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( AlphArray( 4 ) ) );
 				if ( SELECT_CASE_var == "ZONESUM" ) { // Simplifily sum the zone OA flow rates
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ZoneSum;
 				} else if ( ( SELECT_CASE_var == "VRP" ) || ( SELECT_CASE_var == "VENTILATIONRATEPROCEDURE" ) ) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
-					if ( SameString( AlphArray( 4 ), "VRP" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 4 ), "VRP" ) ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using VentilationRateProcedure." );
 					}
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_VRP;
 				} else if ( ( SELECT_CASE_var == "IAQP" ) || ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQP;
-					if ( SameString( AlphArray( 4 ), "IAQP" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 4 ), "IAQP" ) ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using IndoorAirQualityProcedure." );
 					}
@@ -1623,7 +1617,7 @@ namespace MixedAir {
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
 						DesignSpecOAObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 6 );
-						ObjIndex = FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements );
+						ObjIndex = InputProcessor::FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements );
 						DesignSpecOAObjIndex( groupNum ) = ObjIndex;
 
 						if ( ObjIndex > 0 ) {
@@ -1641,7 +1635,7 @@ namespace MixedAir {
 					// Get zone air distribution details from design specification Zone Air Distribution object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 7 ) ) {
 						DesignSpecZoneADObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 7 );
-						ObjIndex = FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution );
+						ObjIndex = InputProcessor::FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution );
 						DesignSpecZoneADObjIndex( groupNum ) = ObjIndex;
 
 						if ( ObjIndex > 0 ) {
@@ -1659,11 +1653,11 @@ namespace MixedAir {
 						}
 					}
 
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
+					ZoneNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						++MechVentZoneCount;
 					} else {
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
+						ZoneListNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							MechVentZoneCount += ZoneList( ZoneListNum ).NumOfZones;
 						} else {
@@ -1702,7 +1696,7 @@ namespace MixedAir {
 
 				//   Loop through zone names and list of zone names and store data
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
+					ZoneNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						if ( any_eq( VentilationMechanical( VentMechNum ).Zone, ZoneNum ) ) {
 							//          Disregard duplicate zone names, show warning and do not store data for this zone
@@ -1723,7 +1717,7 @@ namespace MixedAir {
 								VentilationMechanical( VentMechNum ).ZoneOAACH = VentMechZoneOAACH( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+									ObjIndex = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1759,7 +1753,7 @@ namespace MixedAir {
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+									ObjIndex = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1774,7 +1768,7 @@ namespace MixedAir {
 						}
 					} else {
 						//       Not a zone name, must be a zone list
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
+						ZoneListNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							for ( ScanZoneListNum = 1; ScanZoneListNum <= ZoneList( ZoneListNum ).NumOfZones; ++ScanZoneListNum ) {
 								// check to make sure zone name is unique (not listed more than once)...
@@ -1795,7 +1789,7 @@ namespace MixedAir {
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+											ObjIndex = InputProcessor::FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1828,7 +1822,7 @@ namespace MixedAir {
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+											ObjIndex = InputProcessor::FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1902,9 +1896,9 @@ namespace MixedAir {
 								for ( EquipListNum = 1; EquipListNum <= NumOfZoneEquipLists; ++EquipListNum ) {
 									if ( EquipListNum == EquipListIndex ) {
 										for ( EquipNum = 1; EquipNum <= ZoneEquipList( EquipListNum ).NumOfEquipTypes; ++EquipNum ) {
-											if ( SameString( ZoneEquipList( EquipListNum ).EquipType( EquipNum ), "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) ) {
+											if ( InputProcessor::SameString( ZoneEquipList( EquipListNum ).EquipType( EquipNum ), "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) ) {
 												for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-													if ( SameString( ZoneEquipList( EquipListNum ).EquipName( EquipNum ), AirDistUnit( ADUNum ).Name ) ) {
+													if ( InputProcessor::SameString( ZoneEquipList( EquipListNum ).EquipName( EquipNum ), AirDistUnit( ADUNum ).Name ) ) {
 														if ( ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheatVSFan ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolCooledBeam ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolFourPipeBeam )  || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == DualDuctVAVOutdoorAir ) ) {
 															ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate use of Zone secondary recirculation" );
 															ShowContinueError( "A zone secondary recirculation fraction is specified for zone served by " );
@@ -1953,7 +1947,7 @@ namespace MixedAir {
 
 			// Link OA controller object with mechanical ventilation object
 			for ( OAControllerNum = 1; OAControllerNum <= NumOAControllers; ++OAControllerNum ) {
-				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical );
+				OAController( OAControllerNum ).VentMechObjectNum = InputProcessor::FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical );
 				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && ! OAController( OAControllerNum ).VentilationMechanicalName.empty() ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", non-match to Controller:OutdoorAir" );
 					ShowContinueError( "Invalid specified in Controller:OutdoorAir object = " + OAController( OAControllerNum ).Name );
@@ -2021,11 +2015,10 @@ namespace MixedAir {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
 
-		using namespace InputProcessor;
-
+		
 		if ( AllocateOAControllersFlag ) {
-			NumOAControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
-			NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
+			NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
+			NumERVControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
 			NumOAControllers += NumERVControllers;
 			OAController.allocate( NumOAControllers );
 			OAControllerInfo.allocate( NumOAControllers );
@@ -2054,8 +2047,7 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using NodeInputManager::GetOnlySingleNode;
+				using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 
 		// Locals
@@ -2088,7 +2080,7 @@ namespace MixedAir {
 
 		if ( ! GetOAMixerInputFlag ) return;
 
-		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAMixer ), NumArg, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAMixer ), NumArg, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
@@ -2099,17 +2091,17 @@ namespace MixedAir {
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_OAMixer );
 
-		NumOAMixers = GetNumObjectsFound( CurrentModuleObject );
+		NumOAMixers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumOAMixers > 0 ) {
 
 			OAMixer.allocate( NumOAMixers );
 
 			for ( OutAirNum = 1; OutAirNum <= NumOAMixers; ++OutAirNum ) {
-				GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), OAMixer, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				InputProcessor::VerifyName( AlphArray( 1 ), OAMixer, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -2194,8 +2186,7 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using namespace InputProcessor;
-		using namespace DataDefineEquip;
+				using namespace DataDefineEquip;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
@@ -2255,30 +2246,30 @@ namespace MixedAir {
 			ShowWarningError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\": " + cAlphaFields( 5 ) + "=\"" + AlphArray( 5 ) + "\" is not an OutdoorAir:Node." );
 			ShowContinueError( "Confirm that this is the intended source for the outdoor air stream." );
 		}
-		if ( SameString( AlphArray( 6 ), "NoEconomizer" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 6 ), "NoEconomizer" ) ) {
 			OAController( OutAirNum ).Econo = NoEconomizer;
-		} else if ( SameString( AlphArray( 6 ), "FixedDryBulb" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "FixedDryBulb" ) ) {
 			OAController( OutAirNum ).Econo = FixedDryBulb;
-		} else if ( SameString( AlphArray( 6 ), "FixedEnthalpy" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "FixedEnthalpy" ) ) {
 			OAController( OutAirNum ).Econo = FixedEnthalpy;
-		} else if ( SameString( AlphArray( 6 ), "FixedDewPointAndDryBulb" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "FixedDewPointAndDryBulb" ) ) {
 			OAController( OutAirNum ).Econo = FixedDewPointAndDryBulb;
-		} else if ( SameString( AlphArray( 6 ), "DifferentialDryBulb" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "DifferentialDryBulb" ) ) {
 			OAController( OutAirNum ).Econo = DifferentialDryBulb;
-		} else if ( SameString( AlphArray( 6 ), "DifferentialEnthalpy" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "DifferentialEnthalpy" ) ) {
 			OAController( OutAirNum ).Econo = DifferentialEnthalpy;
-		} else if ( SameString( AlphArray( 6 ), "DifferentialDryBulbAndEnthalpy" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "DifferentialDryBulbAndEnthalpy" ) ) {
 			OAController( OutAirNum ).Econo = DifferentialDryBulbAndEnthalpy;
-		} else if ( SameString( AlphArray( 6 ), "ElectronicEnthalpy" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 6 ), "ElectronicEnthalpy" ) ) {
 			OAController( OutAirNum ).Econo = ElectronicEnthalpy;
 		} else {
 			ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\" value." );
 			ErrorsFound = true;
 		}
 		//Bypass choice - Added by Amit for new feature implementation
-		if ( SameString( AlphArray( 7 ), "ModulateFlow" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 7 ), "ModulateFlow" ) ) {
 			OAController( OutAirNum ).EconBypass = false;
-		} else if ( SameString( AlphArray( 7 ), "MinimumFlowWithBypass" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 7 ), "MinimumFlowWithBypass" ) ) {
 			OAController( OutAirNum ).EconBypass = true;
 		} else {
 			ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + AlphArray( 7 ) + "\" value." );
@@ -2291,17 +2282,17 @@ namespace MixedAir {
 		//      CALL ShowContinueError(TRIM(cAlphaFields(7))//'="'//TRIM(AlphArray(7))//'" incompatible specifications.')
 		//      ErrorsFound = .TRUE.
 		//    END IF
-		if ( SameString( AlphArray( 9 ), "NoLockout" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 9 ), "NoLockout" ) ) {
 			OAController( OutAirNum ).Lockout = NoLockoutPossible;
-		} else if ( SameString( AlphArray( 9 ), "LockoutWithHeating" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 9 ), "LockoutWithHeating" ) ) {
 			OAController( OutAirNum ).Lockout = LockoutWithHeatingPossible;
-		} else if ( SameString( AlphArray( 9 ), "LockoutWithCompressor" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 9 ), "LockoutWithCompressor" ) ) {
 			OAController( OutAirNum ).Lockout = LockoutWithCompressorPossible;
 		} else {
 			ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + AlphArray( 9 ) + "\" value." );
 			ErrorsFound = true;
 		}
-		if ( SameString( AlphArray( 10 ), "FixedMinimum" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 10 ), "FixedMinimum" ) ) {
 			OAController( OutAirNum ).FixedMin = true;
 		} else {
 			OAController( OutAirNum ).FixedMin = false;
@@ -2379,9 +2370,9 @@ namespace MixedAir {
 		OAController( OutAirNum ).EconomizerOASchedPtr = GetScheduleIndex( AlphArray( 15 ) );
 
 		//   High humidity control option can be used with any economizer flag
-		if ( SameString( AlphArray( 16 ), "Yes" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 16 ), "Yes" ) ) {
 
-			OAController( OutAirNum ).HumidistatZoneNum = FindItemInList( AlphArray( 17 ), Zone );
+			OAController( OutAirNum ).HumidistatZoneNum = InputProcessor::FindItemInList( AlphArray( 17 ), Zone );
 
 			// Get the node number for the zone with the humidistat
 			if ( OAController( OutAirNum ).HumidistatZoneNum > 0 ) {
@@ -2396,7 +2387,7 @@ namespace MixedAir {
 					OASysIndex = 0;
 					for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 						for ( OAControllerNum = 1; OAControllerNum <= OutsideAirSys( OASysNum ).NumControllers; ++OAControllerNum ) {
-							if ( ! SameString( OutsideAirSys( OASysNum ).ControllerType( OAControllerNum ), CurrentModuleObject ) || ! SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerNum ), OAController( OutAirNum ).Name ) ) continue;
+							if ( ! InputProcessor::SameString( OutsideAirSys( OASysNum ).ControllerType( OAControllerNum ), CurrentModuleObject ) || ! InputProcessor::SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerNum ), OAController( OutAirNum ).Name ) ) continue;
 							OASysIndex = OASysNum;
 							OASysFound = true;
 							break;
@@ -2408,7 +2399,7 @@ namespace MixedAir {
 					if ( AirLoopNumber > 0 && OASysIndex > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( OASysIndex ).Name ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirLoopHVAC:OutdoorAirSystem" ) ) continue;
+								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( OASysIndex ).Name ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirLoopHVAC:OutdoorAirSystem" ) ) continue;
 								AirLoopFound = true;
 								break;
 							}
@@ -2458,7 +2449,7 @@ namespace MixedAir {
 				OAController( OutAirNum ).HighRHOAFlowRatio = 1.0;
 			}
 
-			if ( SameString( AlphArray( 16 ), "Yes" ) && OAController( OutAirNum ).FixedMin ) {
+			if ( InputProcessor::SameString( AlphArray( 16 ), "Yes" ) && OAController( OutAirNum ).FixedMin ) {
 				if ( OAController( OutAirNum ).MaxOA > 0.0 && OAController( OutAirNum ).MinOA != AutoSize ) {
 					OAFlowRatio = OAController( OutAirNum ).MinOA / OAController( OutAirNum ).MaxOA;
 					if ( OAController( OutAirNum ).HighRHOAFlowRatio < OAFlowRatio ) {
@@ -2474,9 +2465,9 @@ namespace MixedAir {
 			}
 
 			if ( NumAlphas >= 18 ) {
-				if ( SameString( AlphArray( 18 ), "Yes" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 18 ), "Yes" ) ) {
 					OAController( OutAirNum ).ModifyDuringHighOAMoisture = false;
-				} else if ( SameString( AlphArray( 18 ), "No" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 18 ), "No" ) ) {
 					OAController( OutAirNum ).ModifyDuringHighOAMoisture = true;
 				} else {
 					ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
@@ -2493,9 +2484,9 @@ namespace MixedAir {
 				}
 			}
 
-		} else if ( SameString( AlphArray( 16 ), "No" ) || lAlphaBlanks( 16 ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 16 ), "No" ) || lAlphaBlanks( 16 ) ) {
 			if ( NumAlphas >= 18 ) {
-				if ( ! SameString( AlphArray( 18 ), "Yes" ) && ! SameString( AlphArray( 18 ), "No" ) ) {
+				if ( ! InputProcessor::SameString( AlphArray( 18 ), "Yes" ) && ! InputProcessor::SameString( AlphArray( 18 ), "No" ) ) {
 					ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
 					ShowContinueError( "..." + cAlphaFields( 18 ) + "=\"" + AlphArray( 18 ) + "\" - valid values are \"Yes\" or \"No\"." );
 					ErrorsFound = true;
@@ -2506,7 +2497,7 @@ namespace MixedAir {
 			ShowContinueError( "..." + cAlphaFields( 16 ) + "=\"" + AlphArray( 16 ) + "\" - valid values are \"Yes\" or \"No\"." );
 			ErrorsFound = true;
 			if ( NumAlphas >= 18 ) {
-				if ( ! SameString( AlphArray( 18 ), "Yes" ) && ! SameString( AlphArray( 18 ), "No" ) ) {
+				if ( ! InputProcessor::SameString( AlphArray( 18 ), "Yes" ) && ! InputProcessor::SameString( AlphArray( 18 ), "No" ) ) {
 					ShowSevereError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\", invalid field value" );
 					ShowContinueError( "..." + cAlphaFields( 18 ) + "=\"" + AlphArray( 18 ) + "\" - valid values are \"Yes\" or \"No\"." );
 					ErrorsFound = true;
@@ -2516,9 +2507,9 @@ namespace MixedAir {
 
 		if ( NumAlphas > 18 ) {
 			if ( ! lAlphaBlanks( 19 ) ) {
-				if ( SameString( AlphArray( 19 ), "BypassWhenWithinEconomizerLimits" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 19 ), "BypassWhenWithinEconomizerLimits" ) ) {
 					OAController( OutAirNum ).HeatRecoveryBypassControlType = BypassWhenWithinEconomizerLimits;
-				} else if ( SameString( AlphArray( 19 ), "BypassWhenOAFlowGreaterThanMinimum" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 19 ), "BypassWhenOAFlowGreaterThanMinimum" ) ) {
 					OAController( OutAirNum ).HeatRecoveryBypassControlType = BypassWhenOAFlowGreaterThanMinimum;
 				} else {
 					ShowWarningError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 19 ) + "=\"" + AlphArray( 19 ) + "\"." );
@@ -2528,7 +2519,7 @@ namespace MixedAir {
 			}
 		}
 
-		if ( SameString( AlphArray( 16 ), "Yes" ) && OAController( OutAirNum ).Econo == NoEconomizer ) {
+		if ( InputProcessor::SameString( AlphArray( 16 ), "Yes" ) && OAController( OutAirNum ).Econo == NoEconomizer ) {
 			ShowWarningError( OAController( OutAirNum ).ControllerType + " \"" + OAController( OutAirNum ).Name + "\"" );
 			ShowContinueError( "...Economizer operation must be enabled when " + cAlphaFields( 16 ) + " is set to YES." );
 			ShowContinueError( "...The high humidity control option will be disabled and the simulation continues." );
@@ -2625,9 +2616,9 @@ namespace MixedAir {
 		using DataHeatBalance::TotPeople;
 		using DataHeatBalance::People;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
+
+
 		using General::RoundSigDigits;
 		using namespace OutputReportPredefined;
 		using EMSManager::iTemperatureSetPoint;
@@ -2712,7 +2703,7 @@ namespace MixedAir {
 				thisOASys = 0;
 				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 					// find which OAsys has this controller
-					found = FindItemInList( OAController( OAControllerNum ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
+					found = InputProcessor::FindItemInList( OAController( OAControllerNum ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
 					if ( found != 0 ) {
 						thisOASys = OASysNum;
 						break; // we found it
@@ -2723,10 +2714,10 @@ namespace MixedAir {
 					ShowContinueError( "in list of valid OA Controllers." );
 					ErrorsFound = true;
 				}
-				thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
+				thisNumForMixer = InputProcessor::FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
 				if ( thisNumForMixer != 0 ) {
 					equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
-					thisMixerIndex = FindItemInList( equipName, OAMixer );
+					thisMixerIndex = InputProcessor::FindItemInList( equipName, OAMixer );
 					if ( thisMixerIndex != 0 ) {
 						OAController( OAControllerNum ).InletNode = OAMixer( thisMixerIndex ).InletNode;
 					} else {
@@ -3060,7 +3051,7 @@ namespace MixedAir {
 					thisOASys = 0;
 					for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 						for ( OAControllerLoop2 = 1; OAControllerLoop2 <= OutsideAirSys( OASysNum ).NumControllers; ++OAControllerLoop2 ) {
-							if ( SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerLoop2 ), OAController( OAControllerLoop ).Name ) ) {
+							if ( InputProcessor::SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerLoop2 ), OAController( OAControllerLoop ).Name ) ) {
 								thisOASys = OASysNum;
 								OASysFound = true;
 								break;
@@ -3079,7 +3070,7 @@ namespace MixedAir {
 						for ( thisAirLoop = 1; thisAirLoop <= NumPrimaryAirSys; ++thisAirLoop ) {
 							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( thisAirLoop ).NumBranches; ++BranchNum ) {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( thisAirLoop ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-									if ( ! SameString( PrimaryAirSystem( thisAirLoop ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( thisOASys ).Name ) || ! SameString( PrimaryAirSystem( thisAirLoop ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirLoopHVAC:OutdoorAirSystem" ) ) continue;
+									if ( ! InputProcessor::SameString( PrimaryAirSystem( thisAirLoop ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( thisOASys ).Name ) || ! InputProcessor::SameString( PrimaryAirSystem( thisAirLoop ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirLoopHVAC:OutdoorAirSystem" ) ) continue;
 									AirLoopFound = true;
 									break;
 								}
@@ -3417,8 +3408,8 @@ namespace MixedAir {
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using CurveManager::CurveValue;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetNumObjectsFound;
+
+
 		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::People;
@@ -4515,7 +4506,7 @@ namespace MixedAir {
 		// Using/Aliasing
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
-		using InputProcessor::SameString;
+
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
 		using HVACHXAssistedCoolingCoil::GetHXCoilType;
 		using WaterCoils::SetCoilDesFlow;
@@ -4633,8 +4624,8 @@ namespace MixedAir {
 			for ( CompNum = 1; CompNum <= OutsideAirSys( CurOASysNum ).NumComponents; ++CompNum ) {
 				CompType = OutsideAirSys( CurOASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( CurOASysNum ).ComponentName( CompNum );
-				if ( SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || SameString( CompType, "COIL:HEATING:WATER" ) || SameString( CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) ) {
-					if ( SameString( CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) ) {
+				if ( InputProcessor::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || InputProcessor::SameString( CompType, "COIL:HEATING:WATER" ) || InputProcessor::SameString( CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) ) {
+					if ( InputProcessor::SameString( CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) ) {
 						CoilName = GetHXDXCoilName( CompType, CompName, ErrorsFound );
 						CoilType = GetHXCoilType( CompType, CompName, ErrorsFound );
 					} else {
@@ -4933,7 +4924,6 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		Array1D_int OANodeNumbers( 4 ); // return OA mixer nodes
@@ -4959,7 +4949,7 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		WhichOAMixer = FindItemInList( OAMixerName, OAMixer );
+		WhichOAMixer = InputProcessor::FindItemInList( OAMixerName, OAMixer );
 		if ( WhichOAMixer != 0 ) {
 			OANodeNumbers( 1 ) = OAMixer( WhichOAMixer ).InletNode;
 			OANodeNumbers( 2 ) = OAMixer( WhichOAMixer ).RelNode;
@@ -5452,7 +5442,6 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int OASysNumber; // OA Sys Number
@@ -5477,7 +5466,7 @@ namespace MixedAir {
 			GetOASysInputFlag = false;
 		}
 
-		OASysNumber = FindItemInList( OASysName, OutsideAirSys );
+		OASysNumber = InputProcessor::FindItemInList( OASysName, OutsideAirSys );
 
 		return OASysNumber;
 
@@ -5504,8 +5493,7 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		int OAMixerNumber; // Mixer Number
@@ -5533,8 +5521,8 @@ namespace MixedAir {
 		OAMixerNumber = 0;
 		if ( OASysNumber > 0 && OASysNumber <= NumOASystems ) {
 			for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++OACompNum ) {
-				if ( SameString( OutsideAirSys( OASysNumber ).ComponentType( OACompNum ), "OUTDOORAIR:MIXER" ) ) {
-					OAMixerNumber = FindItemInList( OutsideAirSys( OASysNumber ).ComponentName( OACompNum ), OAMixer );
+				if ( InputProcessor::SameString( OutsideAirSys( OASysNumber ).ComponentType( OACompNum ), "OUTDOORAIR:MIXER" ) ) {
+					OAMixerNumber = InputProcessor::FindItemInList( OutsideAirSys( OASysNumber ).ComponentName( OACompNum ), OAMixer );
 					break;
 				}
 			}
@@ -5565,7 +5553,6 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
 
 		// Return value
 		int OAMixerIndex; // Mixer Index
@@ -5590,7 +5577,7 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		OAMixerIndex = FindItem( OAMixerName, OAMixer );
+		OAMixerIndex = InputProcessor::FindItem( OAMixerName, OAMixer );
 
 		if ( OAMixerIndex == 0 ) {
 			ShowSevereError( "GetOAMixerIndex: Could not find OutdoorAir:Mixer, Name=\"" + OAMixerName + "\"" );
@@ -5789,7 +5776,6 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 
 		// Return value
 		bool OnControllerList; // true if found on controller list
@@ -5820,8 +5806,8 @@ namespace MixedAir {
 		for ( Num = 1; Num <= NumControllerLists; ++Num ) {
 			for ( CompNum = 1; CompNum <= ControllerLists( Num ).NumControllers; ++CompNum ) {
 
-				if ( ! SameString( ControllerLists( Num ).ControllerType( CompNum ), ControllerType ) ) continue;
-				if ( ! SameString( ControllerLists( Num ).ControllerName( CompNum ), ControllerName ) ) continue;
+				if ( ! InputProcessor::SameString( ControllerLists( Num ).ControllerType( CompNum ), ControllerType ) ) continue;
+				if ( ! InputProcessor::SameString( ControllerLists( Num ).ControllerName( CompNum ), ControllerName ) ) continue;
 				OnControllerList = true;
 				break;
 			}
@@ -5853,9 +5839,8 @@ namespace MixedAir {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
+
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5889,20 +5874,20 @@ namespace MixedAir {
 			GetOASysInputFlag = false;
 		}
 
-		NumControllers = GetNumObjectsFound( CurrentModuleObject );
-		NumAirLoop = GetNumObjectsFound( AirLoopObject );
+		NumControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumAirLoop = InputProcessor::GetNumObjectsFound( AirLoopObject );
 		AirLoopName = "";
 
 		for ( Item = 1; Item <= NumControllers; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
 			ControllerListName = cAlphaArgs( 1 );
 			Count = 0;
 
 			// Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
 			for ( Loop = 1; Loop <= NumAirLoop; ++Loop ) {
-				GetObjectItem( AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
+				InputProcessor::GetObjectItem( AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
 				if ( cAlphaArgs( 2 ) != ControllerListName ) continue;
 				++Count;
 				if ( Count == 1 ) AirLoopName = cAlphaArgs( 1 );
@@ -5911,7 +5896,7 @@ namespace MixedAir {
 			//  Now check AirLoopHVAC and AirLoopHVAC:OutdoorAirSystem
 			Found = 0;
 			if ( NumOASystems > 0 ) {
-				Found = FindItemInList( ControllerListName, OutsideAirSys, &OutsideAirSysProps::ControllerListName );
+				Found = InputProcessor::FindItemInList( ControllerListName, OutsideAirSys, &OutsideAirSysProps::ControllerListName );
 				if ( Found > 0 ) ++Count;
 			}
 
@@ -5981,8 +5966,7 @@ namespace MixedAir {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6024,11 +6008,11 @@ namespace MixedAir {
 		}
 
 		if ( present( LockoutType ) ) {
-			if ( SameString( LockoutType, "NOLOCKOUT" ) ) {
+			if ( InputProcessor::SameString( LockoutType, "NOLOCKOUT" ) ) {
 				OAController( OACtrlNum ).Lockout = NoLockoutPossible;
-			} else if ( SameString( LockoutType, "LOCKOUTWITHHEATING" ) ) {
+			} else if ( InputProcessor::SameString( LockoutType, "LOCKOUTWITHHEATING" ) ) {
 				OAController( OACtrlNum ).Lockout = LockoutWithHeatingPossible;
-			} else if ( SameString( LockoutType, "LOCKOUTWITHCOMPRESSOR" ) ) {
+			} else if ( InputProcessor::SameString( LockoutType, "LOCKOUTWITHCOMPRESSOR" ) ) {
 				OAController( OACtrlNum ).Lockout = LockoutWithCompressorPossible;
 			} else {
 				ShowSevereError( "SetOAControllerData: Illegal Lockout type specified=" + LockoutType );
@@ -6069,15 +6053,15 @@ namespace MixedAir {
 		}
 
 		if ( present( EconoType ) ) {
-			if ( SameString( EconoType, "NoEconomizer" ) ) {
+			if ( InputProcessor::SameString( EconoType, "NoEconomizer" ) ) {
 				OAController( OACtrlNum ).Econo = NoEconomizer;
-			} else if ( SameString( EconoType, "DifferentialDryBulbandenthalpy" ) ) {
+			} else if ( InputProcessor::SameString( EconoType, "DifferentialDryBulbandenthalpy" ) ) {
 				OAController( OACtrlNum ).Econo = DifferentialDryBulbAndEnthalpy;
-			} else if ( SameString( EconoType, "DifferentialDryBulb" ) ) {
+			} else if ( InputProcessor::SameString( EconoType, "DifferentialDryBulb" ) ) {
 				OAController( OACtrlNum ).Econo = DifferentialDryBulb;
-			} else if ( SameString( EconoType, "DifferentialEnthalpy" ) ) {
+			} else if ( InputProcessor::SameString( EconoType, "DifferentialEnthalpy" ) ) {
 				OAController( OACtrlNum ).Econo = DifferentialEnthalpy;
-			} else if ( SameString( EconoType, "Economizer Strategy Present" ) ) { // from routines, not from input
+			} else if ( InputProcessor::SameString( EconoType, "Economizer Strategy Present" ) ) { // from routines, not from input
 				OAController( OACtrlNum ).Econo = FixedDryBulb;
 			} else {
 				ShowSevereError( "SetOAControllerData: Illegal Economizer type specified=" + EconoType );
@@ -6086,9 +6070,9 @@ namespace MixedAir {
 		}
 
 		if ( present( BypassType ) ) {
-			if ( SameString( BypassType, "MINIMUMFLOWWITHBYPASS" ) ) {
+			if ( InputProcessor::SameString( BypassType, "MINIMUMFLOWWITHBYPASS" ) ) {
 				OAController( OACtrlNum ).EconBypass = true;
-			} else if ( SameString( BypassType, "MODULATEFLOW" ) ) {
+			} else if ( InputProcessor::SameString( BypassType, "MODULATEFLOW" ) ) {
 				OAController( OACtrlNum ).EconBypass = false;
 			} else {
 				ShowSevereError( "SetOAControllerData:Illegal Economizer Bypass type specified =" + BypassType );
@@ -6166,7 +6150,6 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::VerifyName;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6188,7 +6171,7 @@ namespace MixedAir {
 			AllocateOAControllers();
 		}
 
-		VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
+		InputProcessor::VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
 
 	}
 
@@ -6334,7 +6317,6 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NumOACompList; // OA Comp Number

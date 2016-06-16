@@ -74,7 +74,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -193,7 +193,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// Using/Aliasing
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using DataPlant::TypeOf_HPWaterEFCooling;
-		using InputProcessor::FindItemInList;
+
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
 
@@ -222,7 +222,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP );
+			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + GSHPName );
 			}
@@ -283,9 +283,9 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPECooling;
 		using DataPlant::ScanPlantLoopsForObject;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
@@ -317,7 +317,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumGSHPs = GetNumObjectsFound( ModuleCompNameUC );
+		NumGSHPs = InputProcessor::GetNumObjectsFound( ModuleCompNameUC );
 
 		if ( NumGSHPs <= 0 ) {
 			ShowSevereError( "No Equipment found in SimGshp" );
@@ -330,10 +330,10 @@ namespace HeatPumpWaterToWaterCOOLING {
 		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;

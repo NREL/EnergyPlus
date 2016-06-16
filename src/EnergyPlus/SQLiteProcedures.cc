@@ -107,13 +107,13 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
 			int numNumbers;
 			int status;
 
-			InputProcessor::GetObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
+			InputProcessor::InputProcessor::GetObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
 			if ( numAlphas > 0 ) {
 				std::string option = alphas(1);
-				if ( InputProcessor::SameString(option,"SimpleAndTabular") ) {
+				if ( InputProcessor::InputProcessor::SameString(option,"SimpleAndTabular") ) {
 					writeTabularDataToSQLite = true;
 					writeOutputToSQLite = true;
-				} else if ( InputProcessor::SameString(option,"Simple") ) {
+				} else if ( InputProcessor::InputProcessor::SameString(option,"Simple") ) {
 					writeOutputToSQLite = true;
 				}
 			}

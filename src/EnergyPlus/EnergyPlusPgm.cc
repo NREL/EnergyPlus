@@ -215,7 +215,7 @@
 #include <DisplayRoutines.hh>
 #include <FileSystem.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -264,8 +264,7 @@ EnergyPlusPgm( std::string const & filepath )
 	using DataEnvironment::IgnoreDiffuseRadiation;
 	// routine modules
 	using namespace FileSystem;
-	using namespace InputProcessor;
-	using namespace OutputProcessor;
+		using namespace OutputProcessor;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;

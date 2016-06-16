@@ -65,7 +65,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -105,11 +105,11 @@ namespace EnergyPlus {
 		std::shared_ptr< KusudaGroundTempsModel > thisModel( new KusudaGroundTempsModel() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
-		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrModels = InputProcessor::InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			InputProcessor::InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( objectName == cAlphaArgs( 1 ) ) {
 

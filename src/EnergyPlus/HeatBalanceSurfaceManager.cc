@@ -111,7 +111,7 @@
 #include <HeatBalFiniteDiffManager.hh>
 #include <HighTempRadiantSystem.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <MoistureBalanceEMPDManager.hh>
@@ -178,8 +178,7 @@ namespace HeatBalanceSurfaceManager {
 	//unused0909USE DataMoistureBalanceEMPD, ONLY: MoistEMPDNew, MoistEMPDFlux
 
 	// Use statements for access to subroutines in other modules
-	using namespace InputProcessor;
-	using namespace ScheduleManager;
+		using namespace ScheduleManager;
 	using namespace SolarShading;
 	using namespace DaylightingManager;
 
@@ -1141,10 +1140,10 @@ namespace HeatBalanceSurfaceManager {
 			}
 		}
 		// for fins and overhangs just add them explicitly since not otherwise classified
-		int totOverhangs = GetNumObjectsFound( "Shading:Overhang" ) + GetNumObjectsFound( "Shading:Overhang:Projection" );
+		int totOverhangs = InputProcessor::GetNumObjectsFound( "Shading:Overhang" ) + InputProcessor::GetNumObjectsFound( "Shading:Overhang:Projection" );
 		numSurfaces( SurfaceClass_Overhang ) = totOverhangs;
 		numExtSurfaces( SurfaceClass_Overhang ) = totOverhangs;
-		int totFins = GetNumObjectsFound( "Shading:Fin" ) + GetNumObjectsFound( "Shading:Fin:Projection" );
+		int totFins = InputProcessor::GetNumObjectsFound( "Shading:Fin" ) + InputProcessor::GetNumObjectsFound( "Shading:Fin:Projection" );
 		numSurfaces( SurfaceClass_Fin ) = totFins;
 		numExtSurfaces( SurfaceClass_Fin ) = totFins;
 		// go through all the surfaces again and this time insert the net area results

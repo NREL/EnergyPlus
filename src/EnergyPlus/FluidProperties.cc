@@ -70,7 +70,7 @@
 #include <FluidProperties.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -280,8 +280,7 @@ namespace FluidProperties {
 
 		// Using/Aliasing
 		using namespace std::placeholders; // For use with 'std::bind' in Array initializers
-		using namespace InputProcessor;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -458,37 +457,37 @@ namespace FluidProperties {
 		// FLOW:
 		MaxAlphas = 0;
 		MaxNumbers = 0;
-		if ( GetNumObjectsFound( "FluidProperties:Name" ) > 0 ) {
-			GetObjectDefMaxArgs( "FluidProperties:Name", Status, NumAlphas, NumNumbers );
+		if ( InputProcessor::GetNumObjectsFound( "FluidProperties:Name" ) > 0 ) {
+			InputProcessor::GetObjectDefMaxArgs( "FluidProperties:Name", Status, NumAlphas, NumNumbers );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNumbers );
 		}
-		if ( GetNumObjectsFound( "FluidProperties:GlycolConcentration" ) > 0 ) {
-			GetObjectDefMaxArgs( "FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers );
+		if ( InputProcessor::GetNumObjectsFound( "FluidProperties:GlycolConcentration" ) > 0 ) {
+			InputProcessor::GetObjectDefMaxArgs( "FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNumbers );
 		}
-		NumOfFluidTempArrays = GetNumObjectsFound( "FluidProperties:Temperatures" );
+		NumOfFluidTempArrays = InputProcessor::GetNumObjectsFound( "FluidProperties:Temperatures" );
 		if ( NumOfFluidTempArrays > 0 ) {
-			GetObjectDefMaxArgs( "FluidProperties:Temperatures", Status, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "FluidProperties:Temperatures", Status, NumAlphas, NumNumbers );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNumbers );
 		}
-		NumOfSatFluidPropArrays = GetNumObjectsFound( "FluidProperties:Saturated" );
+		NumOfSatFluidPropArrays = InputProcessor::GetNumObjectsFound( "FluidProperties:Saturated" );
 		if ( NumOfSatFluidPropArrays > 0 ) {
-			GetObjectDefMaxArgs( "FluidProperties:Saturated", Status, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "FluidProperties:Saturated", Status, NumAlphas, NumNumbers );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNumbers );
 		}
-		NumOfSHFluidPropArrays = GetNumObjectsFound( "FluidProperties:Superheated" );
+		NumOfSHFluidPropArrays = InputProcessor::GetNumObjectsFound( "FluidProperties:Superheated" );
 		if ( NumOfSHFluidPropArrays > 0 ) {
-			GetObjectDefMaxArgs( "FluidProperties:Superheated", Status, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "FluidProperties:Superheated", Status, NumAlphas, NumNumbers );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNumbers );
 		}
-		NumOfGlyFluidPropArrays = GetNumObjectsFound( "FluidProperties:Concentration" );
+		NumOfGlyFluidPropArrays = InputProcessor::GetNumObjectsFound( "FluidProperties:Concentration" );
 		if ( NumOfGlyFluidPropArrays > 0 ) {
-			GetObjectDefMaxArgs( "FluidProperties:Concentration", Status, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "FluidProperties:Concentration", Status, NumAlphas, NumNumbers );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNumbers );
 		}
@@ -513,7 +512,7 @@ namespace FluidProperties {
 		// long as the user only desires to simulate loops with water.  More than
 		// one FluidName input is not allowed.
 		CurrentModuleObject = "FluidProperties:Name";
-		NumOfOptionalInput = GetNumObjectsFound( CurrentModuleObject );
+		NumOfOptionalInput = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		FluidNames.allocate( NumOfOptionalInput );
 
@@ -521,11 +520,11 @@ namespace FluidProperties {
 		// so that the main derived types can be allocated
 		FluidNum = 0;
 		for ( Loop = 1; Loop <= NumOfOptionalInput; ++Loop ) {
-			GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), FluidNames, FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), FluidNames, FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -533,10 +532,10 @@ namespace FluidProperties {
 			}
 			++FluidNum;
 			FluidNames( FluidNum ).Name = Alphas( 1 );
-			if ( SameString( Alphas( 2 ), Refrig ) ) {
+			if ( InputProcessor::SameString( Alphas( 2 ), Refrig ) ) {
 				++NumOfRefrigerants;
 				FluidNames( FluidNum ).IsGlycol = false;
-			} else if ( SameString( Alphas( 2 ), Glycol ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 2 ), Glycol ) ) {
 				++NumOfGlycols;
 				FluidNames( FluidNum ).IsGlycol = true;
 			} else {
@@ -625,7 +624,7 @@ namespace FluidProperties {
 
 		for ( Loop = 1; Loop <= NumOfFluidTempArrays; ++Loop ) {
 
-			GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FluidTemps( Loop ).Name = Alphas( 1 );
 			FluidTemps( Loop ).NumOfTemps = NumNumbers;
@@ -660,13 +659,13 @@ namespace FluidProperties {
 			TempsName = "";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Pressure ) ) && ( SameString( Alphas( 3 ), GasFluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Pressure ) ) && ( InputProcessor::SameString( Alphas( 3 ), GasFluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
 							TempsName = FluidTemps( TempLoop ).Name;
 							// At this point, we have found the correct input line and found a match
 							// for the temperature array.  It's time to load up the local derived type.
@@ -720,13 +719,13 @@ namespace FluidProperties {
 			TempsName = "";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Enthalpy ) ) && ( SameString( Alphas( 3 ), Fluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Enthalpy ) ) && ( InputProcessor::SameString( Alphas( 3 ), Fluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
 							TempsName = FluidTemps( TempLoop ).Name;
 							// At this point, we have found the correct input line and found a match
 							// for the temperature array.  It's time to load up the local derived type.
@@ -778,14 +777,14 @@ namespace FluidProperties {
 			CurrentModuleObject = "FluidProperties:Saturated";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Enthalpy ) ) && ( SameString( Alphas( 3 ), GasFluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Enthalpy ) ) && ( InputProcessor::SameString( Alphas( 3 ), GasFluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
-							if ( ! SameString( FluidTemps( TempLoop ).Name, TempsName ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+							if ( ! InputProcessor::SameString( FluidTemps( TempLoop ).Name, TempsName ) ) {
 								ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 								ShowContinueError( "Temperatures for enthalpy fluid and gas/fluid points are not the same" );
 								ShowContinueError( "Name=" + Alphas( 4 ) + " => " + FluidTemps( TempLoop ).Name + " /= " + TempsName );
@@ -840,13 +839,13 @@ namespace FluidProperties {
 			TempsName = "";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), SpecificHeat ) ) && ( SameString( Alphas( 3 ), Fluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), SpecificHeat ) ) && ( InputProcessor::SameString( Alphas( 3 ), Fluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
 							TempsName = FluidTemps( TempLoop ).Name;
 							// At this point, we have found the correct input line and found a match
 							// for the temperature array.  It's time to load up the local derived type.
@@ -898,14 +897,14 @@ namespace FluidProperties {
 			CurrentModuleObject = "FluidProperties:Saturated";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), SpecificHeat ) ) && ( SameString( Alphas( 3 ), GasFluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), SpecificHeat ) ) && ( InputProcessor::SameString( Alphas( 3 ), GasFluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
-							if ( ! SameString( FluidTemps( TempLoop ).Name, TempsName ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+							if ( ! InputProcessor::SameString( FluidTemps( TempLoop ).Name, TempsName ) ) {
 								ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 								ShowContinueError( "Temperatures for specific heat fluid and gas/fluid points are not the same" );
 								ShowContinueError( "Name=" + Alphas( 4 ) + " => " + FluidTemps( TempLoop ).Name + " /= " + TempsName );
@@ -960,13 +959,13 @@ namespace FluidProperties {
 			TempsName = "";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Density ) ) && ( SameString( Alphas( 3 ), Fluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Density ) ) && ( InputProcessor::SameString( Alphas( 3 ), Fluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
 							TempsName = FluidTemps( TempLoop ).Name;
 							// At this point, we have found the correct input line and found a match
 							// for the temperature array.  It's time to load up the local derived type.
@@ -1018,14 +1017,14 @@ namespace FluidProperties {
 			CurrentModuleObject = "FluidProperties:Saturated";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Density ) ) && ( SameString( Alphas( 3 ), GasFluid ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Density ) ) && ( InputProcessor::SameString( Alphas( 3 ), GasFluid ) ) ) {
 
 					for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
 
-						if ( SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
-							if ( ! SameString( FluidTemps( TempLoop ).Name, TempsName ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), FluidTemps( TempLoop ).Name ) ) {
+							if ( ! InputProcessor::SameString( FluidTemps( TempLoop ).Name, TempsName ) ) {
 								ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 								ShowContinueError( "Temperatures for density fluid and gas/fluid points are not the same" );
 								ShowContinueError( "Name=" + Alphas( 4 ) + " => " + FluidTemps( TempLoop ).Name + " /= " + TempsName );
@@ -1104,9 +1103,9 @@ namespace FluidProperties {
 			CurrentModuleObject = "FluidProperties:Saturated";
 			for ( InData = 1; InData <= NumOfSatFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( SameString( Alphas( 3 ), Fluid ) ) {
-					if ( ! SameString( Alphas( 2 ), Enthalpy ) && ! SameString( Alphas( 2 ), SpecificHeat ) && ! SameString( Alphas( 2 ), Density ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( InputProcessor::SameString( Alphas( 3 ), Fluid ) ) {
+					if ( ! InputProcessor::SameString( Alphas( 2 ), Enthalpy ) && ! InputProcessor::SameString( Alphas( 2 ), SpecificHeat ) && ! InputProcessor::SameString( Alphas( 2 ), Density ) ) {
 						if ( iTemp == 0 ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 							ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + Fluid + "\", but " + cAlphaFieldNames( 2 ) + "=\"" + Alphas( 2 ) + "\" is not valid." );
@@ -1115,8 +1114,8 @@ namespace FluidProperties {
 						}
 						++iTemp;
 					}
-				} else if ( SameString( Alphas( 3 ), GasFluid ) ) {
-					if ( ! SameString( Alphas( 2 ), Pressure ) && ! SameString( Alphas( 2 ), Enthalpy ) && ! SameString( Alphas( 2 ), SpecificHeat ) && ! SameString( Alphas( 2 ), Density ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 3 ), GasFluid ) ) {
+					if ( ! InputProcessor::SameString( Alphas( 2 ), Pressure ) && ! InputProcessor::SameString( Alphas( 2 ), Enthalpy ) && ! InputProcessor::SameString( Alphas( 2 ), SpecificHeat ) && ! InputProcessor::SameString( Alphas( 2 ), Density ) ) {
 						if ( iTemp == 0 ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 							ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + Fluid + "\", but " + cAlphaFieldNames( 2 ) + "=\"" + Alphas( 2 ) + "\" is not valid." );
@@ -1149,15 +1148,15 @@ namespace FluidProperties {
 			FirstSHMatch = true;
 			NumOfPressPts = 0;
 			for ( InData = 1; InData <= NumOfSHFluidPropArrays; ++InData ) {
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Enthalpy ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Enthalpy ) ) ) {
 					++NumOfPressPts;
 					if ( FirstSHMatch ) {
 						TempsName = Alphas( 3 );
 						FirstSHMatch = false;
 					} else {
-						if ( ! SameString( TempsName, Alphas( 3 ) ) ) {
+						if ( ! InputProcessor::SameString( TempsName, Alphas( 3 ) ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 							ShowContinueError( "All superheated data for the same property must use the same temperature list" );
 							ShowContinueError( "Expected name=" + TempsName + ", Entered name=" + Alphas( 3 ) );
@@ -1175,7 +1174,7 @@ namespace FluidProperties {
 			// Now allocate the arrays and read the data into the proper place
 			// First, allocate the temperature array and transfer the data from the FluidTemp array
 			for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
-				if ( SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
+				if ( InputProcessor::SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
 					RefrigData( Loop ).NumSuperTempPts = FluidTemps( TempLoop ).NumOfTemps;
 					RefrigData( Loop ).SHTemps.allocate( RefrigData( Loop ).NumSuperTempPts );
 					RefrigData( Loop ).SHTemps = FluidTemps( TempLoop ).Temps;
@@ -1199,9 +1198,9 @@ namespace FluidProperties {
 			NumOfPressPts = 0;
 			PressurePtr.allocate( NumOfSHFluidPropArrays );
 			for ( InData = 1; InData <= NumOfSHFluidPropArrays; ++InData ) {
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Enthalpy ) ) ) {
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Enthalpy ) ) ) {
 					++NumOfPressPts;
 					if ( Numbers( 1 ) <= 0.0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
@@ -1230,7 +1229,7 @@ namespace FluidProperties {
 			}
 
 			for ( InData = 1; InData <= NumOfPressPts; ++InData ) {
-				GetObjectItem( CurrentModuleObject, PressurePtr( InData ).InPtr, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, PressurePtr( InData ).InPtr, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				RefrigData( Loop ).SHPress( InData ) = Numbers( 1 );
 				// a little error trapping
 				if ( InData > 1 ) {
@@ -1262,8 +1261,8 @@ namespace FluidProperties {
 			NumOfPressPts = 0;
 			PressurePtr.allocate( NumOfSHFluidPropArrays );
 			for ( InData = 1; InData <= NumOfSHFluidPropArrays; ++InData ) {
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( ( SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Density ) ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( ( InputProcessor::SameString( Alphas( 1 ), RefrigData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Density ) ) ) {
 					++NumOfPressPts;
 					if ( Numbers( 1 ) <= 0.0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
@@ -1292,13 +1291,13 @@ namespace FluidProperties {
 			}
 
 			for ( InData = 1; InData <= NumOfPressPts; ++InData ) {
-				GetObjectItem( CurrentModuleObject, PressurePtr( InData ).InPtr, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, PressurePtr( InData ).InPtr, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( std::abs( Numbers( 1 ) - RefrigData( Loop ).SHPress( InData ) ) > PressToler ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 					ShowContinueError( "All superheated data for the same refrigerant must use the same pressure data" );
 					ErrorsFound = true;
 				}
-				if ( ! SameString( TempsName, Alphas( 3 ) ) ) {
+				if ( ! InputProcessor::SameString( TempsName, Alphas( 3 ) ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 					ShowContinueError( "All superheated data for the same property must use the same temperature list" );
 					ErrorsFound = true;
@@ -1319,8 +1318,8 @@ namespace FluidProperties {
 			CurrentModuleObject = "FluidProperties:Superheated";
 			for ( InData = 1; InData <= NumOfSHFluidPropArrays; ++InData ) {
 
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( ! SameString( Alphas( 2 ), Enthalpy ) && ! SameString( Alphas( 2 ), Density ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( ! InputProcessor::SameString( Alphas( 2 ), Enthalpy ) && ! InputProcessor::SameString( Alphas( 2 ), Density ) ) {
 					if ( iTemp == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + " Name=" + RefrigData( Loop ).Name );
 						ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + Alphas( 2 ) + "\" is not valid." );
@@ -1364,14 +1363,14 @@ namespace FluidProperties {
 			NumOfConcPts = 0;
 			GlyRawData( Loop ).CpDataPresent = false;
 			for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) { // check temperatures given for specific heat are consistant
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), SpecificHeat ) ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), SpecificHeat ) ) ) {
 					++NumOfConcPts;
 					if ( FirstSHMatch ) {
 						TempsName = Alphas( 3 );
 						FirstSHMatch = false;
 					} else {
-						if ( ! SameString( TempsName, Alphas( 3 ) ) ) {
+						if ( ! InputProcessor::SameString( TempsName, Alphas( 3 ) ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + GlyRawData( Loop ).Name );
 							ShowContinueError( "All glycol specific heat data for the same glycol must use the same temperature list" );
 							ShowContinueError( "Expected name=" + TempsName + ", Entered name=" + Alphas( 3 ) );
@@ -1385,7 +1384,7 @@ namespace FluidProperties {
 				// First, allocate the temperature array and transfer the data from the FluidTemp array
 				GlyRawData( Loop ).CpDataPresent = true;
 				for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
-					if ( SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
+					if ( InputProcessor::SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
 						GlyRawData( Loop ).NumCpTempPts = FluidTemps( TempLoop ).NumOfTemps;
 						GlyRawData( Loop ).CpTemps.allocate( GlyRawData( Loop ).NumCpTempPts );
 						GlyRawData( Loop ).CpTemps = FluidTemps( TempLoop ).Temps;
@@ -1407,8 +1406,8 @@ namespace FluidProperties {
 				CurrentModuleObject = "FluidProperties:Concentration";
 				NumOfConcPts = 0;
 				for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) {
-					GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), SpecificHeat ) ) ) {
+					InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), SpecificHeat ) ) ) {
 						++NumOfConcPts;
 						GlyRawData( Loop ).CpConcs( NumOfConcPts ) = Numbers( 1 );
 						// a little error trapping
@@ -1444,14 +1443,14 @@ namespace FluidProperties {
 			GlyRawData( Loop ).RhoDataPresent = false;
 			CurrentModuleObject = "FluidProperties:Concentration";
 			for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) { // check temperatures given for density are consistant
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Density ) ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Density ) ) ) {
 					++NumOfConcPts;
 					if ( FirstSHMatch ) {
 						TempsName = Alphas( 3 );
 						FirstSHMatch = false;
 					} else {
-						if ( ! SameString( TempsName, Alphas( 3 ) ) ) {
+						if ( ! InputProcessor::SameString( TempsName, Alphas( 3 ) ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + GlyRawData( Loop ).Name );
 							ShowContinueError( "All glycol density data for the same glycol must use the same temperature list" );
 							ShowContinueError( "Expected name=" + TempsName + ", Entered name=" + Alphas( 3 ) );
@@ -1465,7 +1464,7 @@ namespace FluidProperties {
 				// First, allocate the temperature array and transfer the data from the FluidTemp array
 				GlyRawData( Loop ).RhoDataPresent = true;
 				for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
-					if ( SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
+					if ( InputProcessor::SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
 						GlyRawData( Loop ).NumRhoTempPts = FluidTemps( TempLoop ).NumOfTemps;
 						GlyRawData( Loop ).RhoTemps.allocate( GlyRawData( Loop ).NumRhoTempPts );
 						GlyRawData( Loop ).RhoTemps = FluidTemps( TempLoop ).Temps;
@@ -1487,8 +1486,8 @@ namespace FluidProperties {
 				NumOfConcPts = 0;
 				CurrentModuleObject = "FluidProperties:Concentration";
 				for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) {
-					GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Density ) ) ) {
+					InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Density ) ) ) {
 						++NumOfConcPts;
 						GlyRawData( Loop ).RhoConcs( NumOfConcPts ) = Numbers( 1 );
 						// a little error trapping
@@ -1524,14 +1523,14 @@ namespace FluidProperties {
 			GlyRawData( Loop ).CondDataPresent = false;
 			CurrentModuleObject = "FluidProperties:Concentration";
 			for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) { // check temperatures given for conductivity are consistant
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Conductivity ) ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Conductivity ) ) ) {
 					++NumOfConcPts;
 					if ( FirstSHMatch ) {
 						TempsName = Alphas( 3 );
 						FirstSHMatch = false;
 					} else {
-						if ( ! SameString( TempsName, Alphas( 3 ) ) ) {
+						if ( ! InputProcessor::SameString( TempsName, Alphas( 3 ) ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + GlyRawData( Loop ).Name );
 							ShowContinueError( "All glycol conductivity data for the same glycol must use the same temperature list" );
 							ShowContinueError( "Expected name=" + TempsName + ", Entered name=" + Alphas( 3 ) );
@@ -1545,7 +1544,7 @@ namespace FluidProperties {
 				// First, allocate the temperature array and transfer the data from the FluidTemp array
 				GlyRawData( Loop ).CondDataPresent = true;
 				for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
-					if ( SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
+					if ( InputProcessor::SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
 						GlyRawData( Loop ).NumCondTempPts = FluidTemps( TempLoop ).NumOfTemps;
 						GlyRawData( Loop ).CondTemps.allocate( GlyRawData( Loop ).NumCondTempPts );
 						GlyRawData( Loop ).CondTemps = FluidTemps( TempLoop ).Temps;
@@ -1567,8 +1566,8 @@ namespace FluidProperties {
 				NumOfConcPts = 0;
 				CurrentModuleObject = "FluidProperties:Concentration";
 				for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) {
-					GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Conductivity ) ) ) {
+					InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Conductivity ) ) ) {
 						++NumOfConcPts;
 						GlyRawData( Loop ).CondConcs( NumOfConcPts ) = Numbers( 1 );
 						// a little error trapping
@@ -1604,14 +1603,14 @@ namespace FluidProperties {
 			GlyRawData( Loop ).ViscDataPresent = false;
 			CurrentModuleObject = "FluidProperties:Concentration";
 			for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) { // check temperatures given for viscosity are consistant
-				GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Viscosity ) ) ) {
+				InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Viscosity ) ) ) {
 					++NumOfConcPts;
 					if ( FirstSHMatch ) {
 						TempsName = Alphas( 3 );
 						FirstSHMatch = false;
 					} else {
-						if ( ! SameString( TempsName, Alphas( 3 ) ) ) {
+						if ( ! InputProcessor::SameString( TempsName, Alphas( 3 ) ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Name=" + GlyRawData( Loop ).Name );
 							ShowContinueError( "All glycol viscosity data for the same glycol must use the same temperature list" );
 							ShowContinueError( "Expected name=" + TempsName + ", Entered name=" + Alphas( 3 ) );
@@ -1625,7 +1624,7 @@ namespace FluidProperties {
 				// Now allocate the arrays and read the data into the proper place
 				// First, allocate the temperature array and transfer the data from the FluidTemp array
 				for ( TempLoop = 1; TempLoop <= NumOfFluidTempArrays; ++TempLoop ) {
-					if ( SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
+					if ( InputProcessor::SameString( TempsName, FluidTemps( TempLoop ).Name ) ) {
 						GlyRawData( Loop ).NumViscTempPts = FluidTemps( TempLoop ).NumOfTemps;
 						GlyRawData( Loop ).ViscTemps.allocate( GlyRawData( Loop ).NumViscTempPts );
 						GlyRawData( Loop ).ViscTemps = FluidTemps( TempLoop ).Temps;
@@ -1647,8 +1646,8 @@ namespace FluidProperties {
 				NumOfConcPts = 0;
 				CurrentModuleObject = "FluidProperties:Concentration";
 				for ( InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData ) {
-					GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					if ( ( SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( SameString( Alphas( 2 ), Viscosity ) ) ) {
+					InputProcessor::GetObjectItem( CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					if ( ( InputProcessor::SameString( Alphas( 1 ), GlyRawData( Loop ).Name ) ) && ( InputProcessor::SameString( Alphas( 2 ), Viscosity ) ) ) {
 						++NumOfConcPts;
 						GlyRawData( Loop ).ViscConcs( NumOfConcPts ) = Numbers( 1 );
 						// a little error trapping
@@ -1706,7 +1705,7 @@ namespace FluidProperties {
 		// More than one GlycolConcentrations input is not allowed.
 
 		CurrentModuleObject = "FluidProperties:GlycolConcentration";
-		NumOfOptionalInput = GetNumObjectsFound( CurrentModuleObject );
+		NumOfOptionalInput = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		NumOfGlyConcs = NumOfOptionalInput + 1;
 		GlycolData.allocate( NumOfGlyConcs );
@@ -1746,30 +1745,30 @@ namespace FluidProperties {
 		NumOfGlyConcs = 1; // Water is always available, everything else must be specified
 
 		for ( Loop = 1; Loop <= NumOfOptionalInput; ++Loop ) {
-			GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), GlycolData, NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), GlycolData, NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
 				ErrorsFound = true;
 				continue;
 			}
 			GlycolFound = false;
-			if ( SameString( Alphas( 2 ), EthyleneGlycol ) ) {
+			if ( InputProcessor::SameString( Alphas( 2 ), EthyleneGlycol ) ) {
 				GlycolFound = true;
 				++NumOfGlyConcs;
 				GlycolData( NumOfGlyConcs ).Name = Alphas( 1 );
 				GlycolData( NumOfGlyConcs ).GlycolName = Alphas( 2 );
-			} else if ( SameString( Alphas( 2 ), PropyleneGlycol ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 2 ), PropyleneGlycol ) ) {
 				GlycolFound = true;
 				++NumOfGlyConcs;
 				GlycolData( NumOfGlyConcs ).Name = Alphas( 1 );
 				GlycolData( NumOfGlyConcs ).GlycolName = Alphas( 2 );
-			} else if ( SameString( Alphas( 2 ), "UserDefinedGlycolType" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 2 ), "UserDefinedGlycolType" ) ) {
 				for ( InData = 1; InData <= NumOfGlycols; ++InData ) {
-					if ( SameString( Alphas( 3 ), GlyRawData( InData ).Name ) ) {
+					if ( InputProcessor::SameString( Alphas( 3 ), GlyRawData( InData ).Name ) ) {
 						GlycolFound = true;
 						break; // DO LOOP through user defined glycols
 					}
@@ -1796,13 +1795,13 @@ namespace FluidProperties {
 		// Now initialize the rest of the data for the glycols
 		for ( Loop = 2; Loop <= NumOfGlyConcs; ++Loop ) {
 			// Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
-			if ( SameString( GlycolData( Loop ).GlycolName, EthyleneGlycol ) ) {
+			if ( InputProcessor::SameString( GlycolData( Loop ).GlycolName, EthyleneGlycol ) ) {
 				GlycolData( Loop ).GlycolIndex = EthyleneGlycolIndex;
-			} else if ( SameString( GlycolData( Loop ).GlycolName, PropyleneGlycol ) ) {
+			} else if ( InputProcessor::SameString( GlycolData( Loop ).GlycolName, PropyleneGlycol ) ) {
 				GlycolData( Loop ).GlycolIndex = PropyleneGlycolIndex;
 			} else {
 				for ( InData = 1; InData <= NumOfGlycols; ++InData ) {
-					if ( SameString( GlycolData( Loop ).GlycolName, GlyRawData( InData ).Name ) ) {
+					if ( InputProcessor::SameString( GlycolData( Loop ).GlycolName, GlyRawData( InData ).Name ) ) {
 						GlycolData( Loop ).GlycolIndex = InData;
 						break; // DO LOOP through user defined glycols
 					}
@@ -1938,10 +1937,10 @@ namespace FluidProperties {
 			ShowFatalError( RoutineName + "Previous errors in input cause program termination." );
 		}
 
-		if ( GetNumSectionsFound( "REPORTGLYCOLS" ) > 0 ) DebugReportGlycols = true;
-		if ( GetNumSectionsFound( "REPORTREFRIGERANTS" ) > 0 ) DebugReportRefrigerants = true;
-		if ( GetNumSectionsFound( "INCREASEGLYCOLERRORLIMIT" ) > 0 ) GlycolErrorLimitTest += 10;
-		if ( GetNumSectionsFound( "INCREASEREFRIGERANTERRORLIMIT" ) > 0 ) RefrigerantErrorLimitTest += 10;
+		if ( InputProcessor::GetNumSectionsFound( "REPORTGLYCOLS" ) > 0 ) DebugReportGlycols = true;
+		if ( InputProcessor::GetNumSectionsFound( "REPORTREFRIGERANTS" ) > 0 ) DebugReportRefrigerants = true;
+		if ( InputProcessor::GetNumSectionsFound( "INCREASEGLYCOLERRORLIMIT" ) > 0 ) GlycolErrorLimitTest += 10;
+		if ( InputProcessor::GetNumSectionsFound( "INCREASEREFRIGERANTERRORLIMIT" ) > 0 ) RefrigerantErrorLimitTest += 10;
 
 		if ( DebugReportGlycols ) ReportAndTestGlycols();
 		if ( DebugReportRefrigerants ) ReportAndTestRefrigerants();
@@ -5420,8 +5419,7 @@ namespace FluidProperties {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
+
 
 		// Return value
 		int FindRefrigerant;
@@ -5449,7 +5447,7 @@ namespace FluidProperties {
 		}
 
 		// Check to see if this glycol shows up in the glycol data
-		Found = FindItemInList( MakeUPPERCase( Refrigerant ), RefrigData );
+		Found = InputProcessor::FindItemInList( InputProcessor::MakeUPPERCase( Refrigerant ), RefrigData );
 
 		if ( Found > 0 ) {
 			FindRefrigerant = Found;
@@ -5488,8 +5486,7 @@ namespace FluidProperties {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
+
 
 		// Return value
 		int FindGlycol;
@@ -5517,7 +5514,7 @@ namespace FluidProperties {
 		}
 
 		// Check to see if this glycol shows up in the glycol data
-		Found = FindItemInList( MakeUPPERCase( Glycol ), GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
+		Found = InputProcessor::FindItemInList( InputProcessor::MakeUPPERCase( Glycol ), GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
 
 		if ( Found > 0 ) {
 			FindGlycol = Found;
@@ -5824,7 +5821,6 @@ namespace FluidProperties {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int CheckFluidPropertyName;
@@ -5852,11 +5848,11 @@ namespace FluidProperties {
 		// Item must be either in Refrigerant or Glycol list
 		Found = 0;
 		if ( NumOfRefrigerants > 0 ) {
-			Found = FindItemInList( NameToCheck, RefrigData );
+			Found = InputProcessor::FindItemInList( NameToCheck, RefrigData );
 		}
 		if ( Found == 0 ) {
 			if ( NumOfGlycols > 0 ) {
-				Found = FindItemInList( NameToCheck, GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
+				Found = InputProcessor::FindItemInList( NameToCheck, GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
 			}
 		}
 
@@ -5887,7 +5883,6 @@ namespace FluidProperties {
 
 		// Using/Aliasing
 		using DataGlobals::DisplayUnusedObjects;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5913,7 +5908,7 @@ namespace FluidProperties {
 
 		for ( Item = 1; Item <= NumOfRefrigerants; ++Item ) {
 			if ( RefrigUsed( Item ) ) continue;
-			if ( SameString( RefrigData( Item ).Name, Steam ) ) continue;
+			if ( InputProcessor::SameString( RefrigData( Item ).Name, Steam ) ) continue;
 			if ( NeedOrphanMessage && DisplayUnusedObjects ) {
 				ShowWarningError( "The following fluid names are \"Unused Fluids\".  These fluids are in the idf" );
 				ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
@@ -5930,9 +5925,9 @@ namespace FluidProperties {
 
 		for ( Item = 1; Item <= NumOfGlycols; ++Item ) {
 			if ( GlycolUsed( Item ) ) continue;
-			if ( SameString( GlycolData( Item ).Name, Water ) ) continue;
-			if ( SameString( GlycolData( Item ).Name, EthyleneGlycol ) ) continue;
-			if ( SameString( GlycolData( Item ).Name, PropyleneGlycol ) ) continue;
+			if ( InputProcessor::SameString( GlycolData( Item ).Name, Water ) ) continue;
+			if ( InputProcessor::SameString( GlycolData( Item ).Name, EthyleneGlycol ) ) continue;
+			if ( InputProcessor::SameString( GlycolData( Item ).Name, PropyleneGlycol ) ) continue;
 			if ( NeedOrphanMessage && DisplayUnusedObjects ) {
 				ShowWarningError( "The following fluid names are \"Unused Fluids\".  These fluids are in the idf" );
 				ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );

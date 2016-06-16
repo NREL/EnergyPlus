@@ -84,7 +84,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -280,7 +280,7 @@ namespace WaterCoils {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -310,7 +310,7 @@ namespace WaterCoils {
 
 		// Find the correct WaterCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, WaterCoil );
+			CoilNum = InputProcessor::FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + CompName );
 			}
@@ -389,8 +389,7 @@ namespace WaterCoils {
 
 		// Using/Aliasing
 		using DataSizing::AutoSize;
-		using namespace InputProcessor;
-		using NodeInputManager::GetOnlySingleNode;
+				using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankSupplyComponent;
 		using namespace DataIPShortCuts;
@@ -440,9 +439,9 @@ namespace WaterCoils {
 		static int j1( 0 );
 
 		// Flow
-		NumSimpHeat = GetNumObjectsFound( "Coil:Heating:Water" );
-		NumFlatFin = GetNumObjectsFound( "Coil:Cooling:Water:DetailedGeometry" );
-		NumCooling = GetNumObjectsFound( "Coil:Cooling:Water" );
+		NumSimpHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water" );
+		NumFlatFin = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry" );
+		NumCooling = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water" );
 		NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
 		if ( NumWaterCoils > 0 ) {
@@ -453,13 +452,13 @@ namespace WaterCoils {
 			CheckEquipName.dimension( NumWaterCoils, true );
 		}
 
-		GetObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -476,7 +475,7 @@ namespace WaterCoils {
 
 			CoilNum = SimpHeatNum;
 
-			GetObjectItem( CurrentModuleObject, SimpHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, SimpHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
@@ -484,7 +483,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -577,7 +576,7 @@ namespace WaterCoils {
 
 			CoilNum = NumSimpHeat + FlatFinNum;
 
-			GetObjectItem( CurrentModuleObject, FlatFinNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, FlatFinNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
@@ -585,7 +584,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -687,7 +686,7 @@ namespace WaterCoils {
 
 			CoilNum = NumSimpHeat + NumFlatFin + CoolingNum;
 
-			GetObjectItem( CurrentModuleObject, CoolingNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CoolingNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
@@ -695,7 +694,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -799,7 +798,7 @@ namespace WaterCoils {
 		for ( CoilNum = 1; CoilNum <= NumWaterCoils; ++CoilNum ) {
 			if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_Cooling || WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) {
 				for ( j1 = 1; j1 <= NumFouledCoil; ++j1 ) {
-					if ( SameString( WaterCoil( CoilNum ).Name, FouledCoils( j1 ).FouledCoilName ) ) {
+					if ( InputProcessor::SameString( WaterCoil( CoilNum ).Name, FouledCoils( j1 ).FouledCoilName ) ) {
 						FouledCoils( j1 ).FouledCoilID = CoilNum;
 						break;
 					}
@@ -4897,7 +4896,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 
 		// Locals
@@ -4923,7 +4922,7 @@ Label10: ;
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, WaterCoil );
+			CoilNum = InputProcessor::FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + CompName );
 			}
@@ -4968,8 +4967,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
@@ -4996,8 +4994,8 @@ Label10: ;
 		}
 
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = WaterCoil( WhichCoil ).MaxWaterVolFlowRate;
@@ -5043,8 +5041,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
@@ -5072,8 +5069,8 @@ Label10: ;
 
 		NodeNumber = 0;
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -5117,8 +5114,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
@@ -5146,8 +5142,8 @@ Label10: ;
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -5191,8 +5187,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
@@ -5220,8 +5215,8 @@ Label10: ;
 
 		NodeNumber = 0;
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).WaterInletNodeNum;
 			}
@@ -5265,8 +5260,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
@@ -5294,8 +5288,8 @@ Label10: ;
 
 		NodeNumber = 0;
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).WaterOutletNodeNum;
 			}
@@ -5340,8 +5334,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5363,10 +5356,10 @@ Label10: ;
 			GetWaterCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
-				if ( SameString( CoilType, "Coil:Cooling:Water" ) && WaterCoil( WhichCoil ).DesAirVolFlowRate < 0.0 ) {
+				if ( InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) && WaterCoil( WhichCoil ).DesAirVolFlowRate < 0.0 ) {
 					WaterCoil( WhichCoil ).DesAirVolFlowRate = CoilDesFlow;
 				} else {
 					WaterCoil( WhichCoil ).DesAirVolFlowRate = CoilDesFlow;
@@ -5405,8 +5398,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5431,8 +5423,8 @@ Label10: ;
 			GetWaterCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				CoilDesAirFlow = WaterCoil( WhichCoil ).DesAirVolFlowRate;
 			} else {
@@ -5862,7 +5854,6 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int IndexNum; // returned coil index if matched coil
@@ -5890,11 +5881,11 @@ Label10: ;
 
 		IndexNum = 0;
 		if ( CoilType == "COIL:HEATING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 		} else if ( CoilType == "COIL:COOLING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 		} else if ( CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -5934,7 +5925,6 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 Capacity; // returned coil capacity if matched coil
@@ -5963,13 +5953,13 @@ Label10: ;
 		Capacity = -1.0;
 
 		if ( CoilType == "COIL:HEATING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterHeatingCoilRate;
 		} else if ( CoilType == "COIL:COOLING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterCoolingCoilRate;
 		} else if ( CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterCoolingCoilRate;
 		} else {
 			IndexNum = 0;
@@ -6016,7 +6006,7 @@ Label10: ;
 		using DataLoopNode::Node;
 		using DataPlant::ccSimPlantEquipTypes;
 		using DataPlant::PlantLoop;
-		using InputProcessor::FindItemInList;
+
 		using General::TrimSigDigits;
 		using DataHVACGlobals::SimAirLoopsFlag;
 		using DataHVACGlobals::SimZoneEquipmentFlag;
@@ -6042,7 +6032,7 @@ Label10: ;
 
 		// Find the correct water coil
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CoilName, WaterCoil );
+			CoilNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName );
 			}
@@ -6121,8 +6111,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+
 
 		// Return value
 		int AvailSchIndex; // returned availability schedule of matched coil
@@ -6152,8 +6141,8 @@ Label10: ;
 		WhichCoil = 0;
 		AvailSchIndex = 0;
 
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = WaterCoil( WhichCoil ).SchedPtr;
 			}

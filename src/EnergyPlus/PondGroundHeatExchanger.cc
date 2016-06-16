@@ -76,7 +76,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
@@ -227,9 +227,9 @@ namespace PondGroundHeatExchanger {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
+
+
+
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -263,7 +263,7 @@ namespace PondGroundHeatExchanger {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Pond";
-		NumOfPondGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPondGHEs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( PondGHE ) ) PondGHE.deallocate();
 
@@ -273,7 +273,7 @@ namespace PondGroundHeatExchanger {
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
 
 			// get the input data
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			PondGHE( Item ).WaterIndex = FindGlycol( fluidNameWater );
 

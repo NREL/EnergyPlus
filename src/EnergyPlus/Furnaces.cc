@@ -92,7 +92,7 @@
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessor_json.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -334,7 +334,7 @@ namespace Furnaces {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using DataAirLoop::AirLoopControlInfo;
@@ -392,7 +392,7 @@ namespace Furnaces {
 
 		// Find the correct Furnace
 		if ( CompIndex == 0 ) {
-			FurnaceNum = FindItemInList( FurnaceName, Furnace );
+			FurnaceNum = InputProcessor::FindItemInList( FurnaceName, Furnace );
 			if ( FurnaceNum == 0 ) {
 				ShowFatalError( "SimFurnace: Unit not found=" + FurnaceName );
 			}
@@ -697,12 +697,12 @@ namespace Furnaces {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
+
+
+
+
+
+
 		using NodeInputManager::GetOnlySingleNode;
 		using DataLoopNode::NodeID;
 		using DataHeatBalance::Zone;
@@ -872,38 +872,38 @@ namespace Furnaces {
 		MaxAlphas = 0;
 
 		CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
-		NumHeatOnly = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumHeatOnly = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatCool";
-		NumHeatCool = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumHeatCool = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "AirLoopHVAC:UnitaryHeatOnly";
-		NumUnitaryHeatOnly = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumUnitaryHeatOnly = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool";
-		NumUnitaryHeatCool = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumUnitaryHeatCool = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir";
-		NumHeatPump = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumHeatPump = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:WaterToAir";
-		NumWaterToAirHeatPump = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumWaterToAirHeatPump = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -946,11 +946,11 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).FurnaceType_Num = FurnaceType_Num;
 			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
-			GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -983,7 +983,7 @@ namespace Furnaces {
 			}
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 6 ), Zone );
+			Furnace( FurnaceNum ).ControlZoneNum = InputProcessor::FindItemInList( Alphas( 6 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
@@ -1005,7 +1005,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 								AirLoopFound = true;
 								break;
 							}
@@ -1133,8 +1133,8 @@ namespace Furnaces {
 				ErrorsFound = true;
 			} // IF (Furnace(FurnaceNum)%FanType_Num == FanType_SimpleOnOff .OR. &
 
-			if ( SameString( Alphas( 9 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 9 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 9 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 9 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
 			if ( Furnace( FurnaceNum ).FanPlace == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 9 ) + " = " + Alphas( 9 ) );
@@ -1146,7 +1146,7 @@ namespace Furnaces {
 			HeatingCoilName = Alphas( 11 );
 			Furnace( FurnaceNum ).HeatingCoilType = HeatingCoilType;
 			Furnace( FurnaceNum ).HeatingCoilName = HeatingCoilName;
-			if ( SameString( HeatingCoilType, "Coil:Heating:Gas" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
+			if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
 				errFlag = false;
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
@@ -1197,7 +1197,7 @@ namespace Furnaces {
 
 				}
 
-			} else if ( SameString( HeatingCoilType, "Coil:Heating:Water" ) ) {
+			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Water" ) ) {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingWater;
 				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -1251,7 +1251,7 @@ namespace Furnaces {
 
 				}
 
-			} else if ( SameString( HeatingCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Steam" ) ) {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingSteam;
 				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -1464,11 +1464,11 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).FurnaceType_Num = FurnaceType_Num;
 			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
-			GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1501,7 +1501,7 @@ namespace Furnaces {
 			}
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 6 ), Zone );
+			Furnace( FurnaceNum ).ControlZoneNum = InputProcessor::FindItemInList( Alphas( 6 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
@@ -1523,7 +1523,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 								AirLoopFound = true;
 								break;
 							}
@@ -1651,8 +1651,8 @@ namespace Furnaces {
 				ErrorsFound = true;
 			} //  IF (TFurnace(FurnaceNum)%FanType_Num == FanType_SimpleOnOff .OR. &, etc.
 
-			if ( SameString( Alphas( 9 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 9 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 9 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 9 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
 			if ( Furnace( FurnaceNum ).FanPlace == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 9 ) + " = " + Alphas( 9 ) );
@@ -1665,7 +1665,7 @@ namespace Furnaces {
 			HeatingCoilPLFCurveIndex = 0;
 			Furnace( FurnaceNum ).HeatingCoilType = HeatingCoilType;
 			Furnace( FurnaceNum ).HeatingCoilName = HeatingCoilName;
-			if ( SameString( HeatingCoilType, "Coil:Heating:Gas" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
+			if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
 				errFlag = false;
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
@@ -1724,7 +1724,7 @@ namespace Furnaces {
 
 				}
 
-			} else if ( SameString( HeatingCoilType, "Coil:Heating:Water" ) ) {
+			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Water" ) ) {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingWater;
 				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -1777,7 +1777,7 @@ namespace Furnaces {
 					}
 				}
 
-			} else if ( SameString( HeatingCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Steam" ) ) {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingSteam;
 				ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -1842,7 +1842,7 @@ namespace Furnaces {
 			errFlag = false;
 			PrintMessage = false;
 
-			if ( SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			if ( InputProcessor::SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 				Furnace( FurnaceNum ).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 			} else {
 				Furnace( FurnaceNum ).CoolingCoilType_Num = GetCoilTypeNum( CoolingCoilType, CoolingCoilName, errFlag, PrintMessage );
@@ -1989,9 +1989,9 @@ namespace Furnaces {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( Alphas( 14 ), "None" ) || SameString( Alphas( 14 ), "Multimode" ) || SameString( Alphas( 14 ), "CoolReheat" ) ) {
+			if ( InputProcessor::SameString( Alphas( 14 ), "None" ) || InputProcessor::SameString( Alphas( 14 ), "Multimode" ) || InputProcessor::SameString( Alphas( 14 ), "CoolReheat" ) ) {
 				AirNodeFound = false;
-				if ( SameString( Alphas( 14 ), "Multimode" ) ) {
+				if ( InputProcessor::SameString( Alphas( 14 ), "Multimode" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_Multimode;
 					Furnace( FurnaceNum ).Humidistat = true;
 					if ( Furnace( FurnaceNum ).CoolingCoilType_Num != CoilDX_CoolingHXAssisted ) {
@@ -2008,7 +2008,7 @@ namespace Furnaces {
 						}
 					}
 				}
-				if ( SameString( Alphas( 14 ), "CoolReheat" ) ) {
+				if ( InputProcessor::SameString( Alphas( 14 ), "CoolReheat" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
 					Furnace( FurnaceNum ).Humidistat = true;
 					if ( lAlphaBlanks( 15 ) ) {
@@ -2018,7 +2018,7 @@ namespace Furnaces {
 						Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_None;
 					}
 				}
-				if ( SameString( Alphas( 14 ), "None" ) ) {
+				if ( InputProcessor::SameString( Alphas( 14 ), "None" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_None;
 					Furnace( FurnaceNum ).Humidistat = false;
 				}
@@ -2059,7 +2059,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilName = ReheatingCoilName;
 			errFlag = false;
 			if ( ! lAlphaBlanks( 15 ) ) {
-				if ( SameString( ReheatingCoilType, "Coil:Heating:Gas" ) || SameString( ReheatingCoilType, "Coil:Heating:Electric" ) || SameString( ReheatingCoilType, "Coil:Heating:Desuperheater" ) ) {
+				if ( InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Electric" ) || InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Desuperheater" ) ) {
 
 					Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( ReheatingCoilType, ReheatingCoilName, errFlag );
 					if ( errFlag ) {
@@ -2108,7 +2108,7 @@ namespace Furnaces {
 						} // IF (IsNotOK) THEN
 					}
 
-				} else if ( SameString( ReheatingCoilType, "Coil:Heating:Water" ) ) {
+				} else if ( InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Water" ) ) {
 					Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 					ValidateComponent( ReheatingCoilType, ReheatingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -2162,7 +2162,7 @@ namespace Furnaces {
 
 					}
 
-				} else if ( SameString( ReheatingCoilType, "Coil:Heating:Steam" ) ) {
+				} else if ( InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Steam" ) ) {
 					Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 					ValidateComponent( ReheatingCoilType, ReheatingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -2549,11 +2549,11 @@ namespace Furnaces {
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
 			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
-			GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2578,7 +2578,7 @@ namespace Furnaces {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone );
+			Furnace( FurnaceNum ).ControlZoneNum = InputProcessor::FindItemInList( Alphas( 5 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
@@ -2600,7 +2600,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 								AirLoopFound = true;
 								break;
 							}
@@ -2717,7 +2717,7 @@ namespace Furnaces {
 
 			errFlag = false;
 
-			if ( SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
+			if ( InputProcessor::SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
 			} else {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
@@ -2780,7 +2780,7 @@ namespace Furnaces {
 			CoolingCoilType = Alphas( 10 );
 			CoolingCoilName = Alphas( 11 );
 
-			if ( SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			if ( InputProcessor::SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 				Furnace( FurnaceNum ).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 			}
 
@@ -2893,7 +2893,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilType = SuppHeatCoilType;
 			Furnace( FurnaceNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
-			if ( SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
+			if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
 
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -2941,7 +2941,7 @@ namespace Furnaces {
 
 					} // IF (IsNotOK) THEN
 				}
-			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
+			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 				ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -2993,7 +2993,7 @@ namespace Furnaces {
 
 				}
 
-			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 				ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -3051,8 +3051,8 @@ namespace Furnaces {
 				ErrorsFound = true;
 			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGas .OR. &, etc.
 
-			if ( SameString( Alphas( 14 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 14 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 14 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 14 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
 			if ( Furnace( FurnaceNum ).FanPlace == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 14 ) + " = " + Alphas( 14 ) );
@@ -3088,9 +3088,9 @@ namespace Furnaces {
 			}
 
 			// Dehumidification Control Type
-			if ( SameString( Alphas( 16 ), "None" ) || SameString( Alphas( 16 ), "Multimode" ) || SameString( Alphas( 16 ), "CoolReheat" ) ) {
+			if ( InputProcessor::SameString( Alphas( 16 ), "None" ) || InputProcessor::SameString( Alphas( 16 ), "Multimode" ) || InputProcessor::SameString( Alphas( 16 ), "CoolReheat" ) ) {
 				AirNodeFound = false;
-				if ( SameString( Alphas( 16 ), "Multimode" ) ) {
+				if ( InputProcessor::SameString( Alphas( 16 ), "Multimode" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_Multimode;
 					Furnace( FurnaceNum ).Humidistat = true;
 					if ( Furnace( FurnaceNum ).CoolingCoilType_Num != CoilDX_CoolingHXAssisted ) {
@@ -3100,11 +3100,11 @@ namespace Furnaces {
 						ErrorsFound = true;
 					}
 				}
-				if ( SameString( Alphas( 16 ), "CoolReheat" ) ) {
+				if ( InputProcessor::SameString( Alphas( 16 ), "CoolReheat" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
 					Furnace( FurnaceNum ).Humidistat = true;
 				}
-				if ( SameString( Alphas( 16 ), "None" ) ) {
+				if ( InputProcessor::SameString( Alphas( 16 ), "None" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_None;
 					Furnace( FurnaceNum ).Humidistat = false;
 				}
@@ -3375,11 +3375,11 @@ namespace Furnaces {
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
 			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
 
-			GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3404,7 +3404,7 @@ namespace Furnaces {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone );
+			Furnace( FurnaceNum ).ControlZoneNum = InputProcessor::FindItemInList( Alphas( 5 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
@@ -3426,7 +3426,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 								AirLoopFound = true;
 								break;
 							}
@@ -3610,9 +3610,9 @@ namespace Furnaces {
 
 			if ( NumAlphas >= 18 ) {
 				// get water flow mode info before CALL SetSimpleWSHPData
-				if ( SameString( Alphas( 18 ), "Constant" ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterConstant;
-				if ( SameString( Alphas( 18 ), "Cycling" ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterCycling;
-				if ( SameString( Alphas( 18 ), "ConstantOnDemand" ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterConstantOnDemand;
+				if ( InputProcessor::SameString( Alphas( 18 ), "Constant" ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterConstant;
+				if ( InputProcessor::SameString( Alphas( 18 ), "Cycling" ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterCycling;
+				if ( InputProcessor::SameString( Alphas( 18 ), "ConstantOnDemand" ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterConstantOnDemand;
 				//default to draw through if not specified in input
 				if ( lAlphaBlanks( 18 ) ) Furnace( FurnaceNum ).WaterCyclingMode = WaterCycling;
 			} else {
@@ -3646,7 +3646,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilType = SuppHeatCoilType;
 			Furnace( FurnaceNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
-			if ( SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
+			if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
 
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -3693,7 +3693,7 @@ namespace Furnaces {
 
 					} // IF (IsNotOK) THEN
 				}
-			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
+			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 				ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -3746,7 +3746,7 @@ namespace Furnaces {
 
 				}
 
-			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 				ValidateComponent( SuppHeatCoilType, SuppHeatCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -3817,8 +3817,8 @@ namespace Furnaces {
 				}
 			}
 
-			if ( SameString( Alphas( 15 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 15 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 15 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 15 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
 			if ( Furnace( FurnaceNum ).FanPlace == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 15 ) + " = " + Alphas( 15 ) );
@@ -3841,9 +3841,9 @@ namespace Furnaces {
 			}
 
 			// add the Dehumidification Type
-			if ( SameString( Alphas( 17 ), "None" ) || SameString( Alphas( 17 ), "CoolReheat" ) ) {
+			if ( InputProcessor::SameString( Alphas( 17 ), "None" ) || InputProcessor::SameString( Alphas( 17 ), "CoolReheat" ) ) {
 				AirNodeFound = false;
-				if ( SameString( Alphas( 17 ), "CoolReheat" ) ) {
+				if ( InputProcessor::SameString( Alphas( 17 ), "CoolReheat" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
 					Furnace( FurnaceNum ).Humidistat = true;
 					if ( lAlphaBlanks( 17 ) ) {
@@ -3853,7 +3853,7 @@ namespace Furnaces {
 						Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_None;
 					}
 				}
-				if ( SameString( Alphas( 17 ), "None" ) ) {
+				if ( InputProcessor::SameString( Alphas( 17 ), "None" ) ) {
 					Furnace( FurnaceNum ).DehumidControlType_Num = DehumidControl_None;
 					Furnace( FurnaceNum ).Humidistat = false;
 				}
@@ -6829,7 +6829,7 @@ namespace Furnaces {
 
 		// Using/Aliasing
 		using HeatingCoils::SimulateHeatingCoilComponents;
-		using InputProcessor::FindItemInList;
+
 		using DataHeatBalFanSys::MAT;
 		using DataAirLoop::AirToOANodeInfo;
 		using General::SolveRegulaFalsi;

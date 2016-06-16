@@ -2231,7 +2231,7 @@ namespace EnergyPlus {
 
 			GetReportVariableInput();
 
-			NumOfReqVariables = InputProcessor::GetNumObjectsFound( "Output:Variable" );
+			NumOfReqVariables = InputProcessor::InputProcessor::GetNumObjectsFound( "Output:Variable" );
 
 			EXPECT_EQ( 5, NumOfReqVariables );
 
