@@ -1944,9 +1944,19 @@ namespace CurveManager {
 				ShowContinueError( "The number of data entries must be evenly divisable by 2. Number of data entries = " + RoundSigDigits( NumNumbers - 5 ) );
 				ErrorsFound = true;
 			} else {
+				Real64 localMin = std::numeric_limits<Real64>::infinity();
+				Real64 localMax = -std::numeric_limits<Real64>::infinity();
 				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
 					TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 2 + 5 + 1 );
 					TableData( TableNum ).Y( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 2 + 5 + 2 ) / TableData( TableNum ).NormalPoint;
+					localMin = std::min(localMin, TableData(TableNum).X1(TableDataIndex));
+					localMax = std::max(localMax, TableData(TableNum).X1(TableDataIndex));
+				}
+				if (!PerfCurve(CurveNum).Var1MinPresent) {
+					PerfCurve(CurveNum).Var1Min = localMin;
+				}
+				if (!PerfCurve(CurveNum).Var1MaxPresent) {
+					PerfCurve(CurveNum).Var1Max = localMax;
 				}
 			}
 

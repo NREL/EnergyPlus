@@ -830,10 +830,10 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear_BadMinMax) {
 	int index = CurveManager::GetCurveCheck("TESTTABLEMINMAX", error, "TEST");
 	EXPECT_FALSE(error);
 	EXPECT_EQ(1, index);
-	//Real64 min, max;
-	//CurveManager::GetCurveMinMaxValues(1, min, max);
-	//EXPECT_EQ(0, min);
-	//EXPECT_EQ(5, max);
+	Real64 min, max;
+	CurveManager::GetCurveMinMaxValues(1, min, max);
+	EXPECT_EQ(0, min);
+	EXPECT_EQ(5, max);
 	EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
 
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0)); // In-range value
@@ -843,7 +843,16 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear_BadMinMax) {
 	EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
 	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5000)); // Maximum x
 
-	EXPECT_FALSE(has_err_output());
+	std::string const error_string = delimited_string({
+		"   ** Warning ** GetCurveInput: For Table : OneIndependentVariable : TESTTABLEMINMAX",
+		"   **   ~~~   ** Minimum Value of X exceeds the data range and will not be used.",
+		"   **   ~~~   **  Entered value = -1.000000, Minimum data range = 0.000000",
+		"   ** Warning ** GetCurveInput: For Table : OneIndependentVariable : TESTTABLEMINMAX",
+		"   **   ~~~   ** Maximum Value of X exceeds the data range and will not be used.",
+		"   **   ~~~   **  Entered value = 6.000000, Maximum data range = 1.000000"
+	});
+
+	EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits) {
@@ -1792,7 +1801,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits) {
 		"Table:TwoIndependentVariables,",
 		"TestTableMinMax,         !- Name",
 		"QuadraticLinear,         !- Curve Type",
-		"EvaluateToLimits,        !- Interpolation Method",
+		"EvaluateCurveToLimits,   !- Interpolation Method",
 		"0,                       !- Minimum Value of X",
 		"5,                       !- Maximum Value of X",
 		"1,                       !- Minimum Value of Y",
@@ -1903,7 +1912,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits2) {
 		"BiQuadratic,             !- Curve Type",
 		"EvaluateCurveToLimits,   !- Interpolation Method",
 		"0,                       !- Minimum Value of X",
-		"5,                       !- Maximum Value of X",
+		"6,                       !- Maximum Value of X",
 		"0,                       !- Minimum Value of Y",
 		"4,                       !- Maximum Value of Y",
 		",                        !- Minimum Table Output",
@@ -1946,17 +1955,17 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits2) {
 	EXPECT_EQ(4, max2);
 	EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
 
-	EXPECT_DOUBLE_EQ(-0.40430482838859316, CurveManager::CurveValue(1, 0, 0)); // In-range value
-	EXPECT_NEAR(2.7755053810354879, CurveManager::CurveValue(1, 0.5, 1.5),1.0e-13); // In-range value
-	EXPECT_DOUBLE_EQ(-0.40430482838859316, CurveManager::CurveValue(1, -10, 0.0)); // Minimum x
-	EXPECT_DOUBLE_EQ(1.9569517161140251, CurveManager::CurveValue(1, 10, 0.0)); // Maximum x
-	EXPECT_DOUBLE_EQ(-0.40430482838859316, CurveManager::CurveValue(1, 0, -5000)); // Minimum y
-	EXPECT_DOUBLE_EQ(15.046829552065159, CurveManager::CurveValue(1, 0, 5000)); // Maximum y
+	EXPECT_NEAR(-0.40430482838859316, CurveManager::CurveValue(1, 0, 0), 1.0e-14); // In-range value
+	EXPECT_NEAR(2.7755053810354879, CurveManager::CurveValue(1, 0.5, 1.5), 1.0e-13); // In-range value
+	EXPECT_NEAR(-0.40430482838859316, CurveManager::CurveValue(1, -10, 0.0), 1.0e-14); // Minimum x
+	EXPECT_NEAR(1.9569517161140251, CurveManager::CurveValue(1, 10, 0.0), 1.0e-13); // Maximum x
+	EXPECT_NEAR(-0.40430482838859316, CurveManager::CurveValue(1, 0, -5000), 1.0e-14); // Minimum y
+	EXPECT_NEAR(15.046829552065159, CurveManager::CurveValue(1, 0, 5000), 1.0e-12); // Maximum y
 
 	CurveManager::SetCurveOutputMinMaxValues(1, error, 0.5, 1.0);
 	EXPECT_FALSE(error);
-	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0, 1.5)); // Value too small
-	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 5, 1.5)); // Value too large
+	EXPECT_DOUBLE_EQ(0.5, CurveManager::CurveValue(1, 0, 0)); // Value too small
+	EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5, 1.5)); // Value too large
 
 	EXPECT_FALSE(has_err_output());
 }
