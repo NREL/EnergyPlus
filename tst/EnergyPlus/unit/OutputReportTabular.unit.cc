@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -80,6 +81,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -5735,5 +5737,116 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 }
 
 
+TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
+	sqlite_test->sqliteBegin();
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	displayTabularVeriSum = true;
+	Latitude = 12.3;
+	Longitude = 45.6;
+
+	TotSurfaces = 4;
+	Surface.allocate( TotSurfaces );
+
+	// walls
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).HeatTransSurf = true;
+	Surface( 1 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 1 ).Azimuth = 0.;
+	Surface( 1 ).GrossArea = 200.; // 20 x 10
+	Surface( 1 ).FrameDivider = 0;
+	Surface( 1 ).Tilt = 90.;
+	Surface( 1 ).Zone = 1;
+
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).HeatTransSurf = true;
+	Surface( 2 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 2 ).Azimuth = 90.;
+	Surface( 2 ).GrossArea = 300.; // 30 x 10
+	Surface( 2 ).FrameDivider = 0;
+	Surface( 2 ).Tilt = 90.;
+	Surface( 2 ).Zone = 1;
+
+	// windows
+	Surface( 3 ).Class = SurfaceClass_Window;
+	Surface( 3 ).HeatTransSurf = true;
+	Surface( 3 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 3 ).Azimuth = 0.;
+	Surface( 3 ).GrossArea = 40.;
+	Surface( 3 ).Height = 5;
+	Surface( 3 ).Width = 8;
+	Surface( 3 ).FrameDivider = 1;
+	Surface( 3 ).Tilt = 90.;
+	Surface( 3 ).Zone = 1;
+
+	Surface( 4 ).Class = SurfaceClass_Window;
+	Surface( 4 ).HeatTransSurf = true;
+	Surface( 4 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 4 ).Azimuth = 90.;
+	Surface( 4 ).GrossArea = 60.;
+	Surface( 4 ).Height = 6;
+	Surface( 4 ).Width = 10;
+	Surface( 4 ).FrameDivider = 2;
+	Surface( 4 ).Tilt = 90.;
+	Surface( 4 ).Zone = 1;
+
+	// frames
+	TotFrameDivider = 2;
+	FrameDivider.allocate( TotFrameDivider );
+	FrameDivider( 1 ).FrameWidth = 0.3;
+	FrameDivider( 2 ).FrameWidth = 0.2;
+
+	// zone
+	NumOfZones = 1;
+	Zone.allocate( NumOfZones );
+	Zone( 1 ).SystemZoneNodeNumber = 1;
+	Zone( 1 ).Multiplier = 1.;
+	Zone( 1 ).ListMultiplier = 1.;
+	Zone( 1 ).FloorArea = 600.; // 20 x 30
+	Zone( 1 ).Volume = 6000.; // 20 x 30 x 10
+	Zone( 1 ).isPartOfTotalArea = true;
+	Zone( 1 ).ExtGrossWallArea = 500.;
+	Zone( 1 ).ExteriorTotalGroundSurfArea = 0;
+	Zone( 1 ).ExtWindowArea = Surface( 3 ).GrossArea + Surface( 4 ).GrossArea;
+
+	WriteVeriSumTable();
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
+	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
+	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
+	sqlite_test->sqliteCommit();
+
+	EXPECT_EQ( 123ul, tabularData.size() );
+	// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value
+	EXPECT_EQ( "       12.30", tabularData[3][10] );
+	EXPECT_EQ( "       45.60", tabularData[4][10] );
+	// envelope - window-wall ratio subtable
+	// north
+	EXPECT_EQ( "      200.00", tabularData[15][10] );
+	EXPECT_EQ( "      200.00", tabularData[16][10] );
+	EXPECT_EQ( "       48.16", tabularData[17][10] );
+	EXPECT_EQ( "       24.08", tabularData[18][10] );
+	EXPECT_EQ( "       24.08", tabularData[19][10] );
+	// east
+	EXPECT_EQ( "      300.00", tabularData[20][10] );
+	EXPECT_EQ( "      300.00", tabularData[21][10] );
+	EXPECT_EQ( "       66.56", tabularData[22][10] );
+	EXPECT_EQ( "       22.19", tabularData[23][10] );
+	EXPECT_EQ( "       22.19", tabularData[24][10] );
+    // Performance - zone summary table
+	EXPECT_EQ( "      600.00", tabularData[63][10] ); //area
+	EXPECT_EQ( "Yes", tabularData[68][10] ); // conditioned
+	EXPECT_EQ( "Yes", tabularData[73][10] ); // part of total floor area
+	EXPECT_EQ( "     6000.00", tabularData[78][10] ); // volume
+	EXPECT_EQ( "        1.00", tabularData[83][10] ); // multiplier
+	EXPECT_EQ( "      500.00", tabularData[88][10] ); // above ground gross floor area
+	EXPECT_EQ( "      100.00", tabularData[98][10] ); // window glass area
+	EXPECT_EQ( "      114.72", tabularData[103][10] ); // window opening area
+
+}
 
 
