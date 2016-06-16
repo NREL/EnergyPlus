@@ -14263,7 +14263,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 104;
+		UnitConvSize = 113;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14369,6 +14369,15 @@ Label900: ;
 		UnitConv( 102 ).siName = "$/UNIT ENERGY";
 		UnitConv( 103 ).siName = "KW";
 		UnitConv( 104 ).siName = "KGWATER/KGDRYAIR";
+		UnitConv( 105 ).siName = " ";
+		UnitConv( 106 ).siName = "AH";
+		UnitConv( 107 ).siName = "CLO";
+		UnitConv( 108 ).siName = "J/KG-K";
+		UnitConv( 109 ).siName = "J/KGWATER";
+		UnitConv( 110 ).siName = "KGWATER/S";
+		UnitConv( 111 ).siName = "PPM";
+		UnitConv( 112 ).siName = "RAD";
+		UnitConv( 113 ).siName = "REV/MIN";
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14467,13 +14476,22 @@ Label900: ;
 		UnitConv( 95 ).ipName = "Invalid/Undefined";
 		UnitConv( 96 ).ipName = "";
 		UnitConv( 97 ).ipName = "Btu/h-F";
-		UnitConv( 98 ).ipName = "DAY";
-		UnitConv( 99 ).ipName = "MIN";
-		UnitConv( 100 ).ipName = "HR/WK";
+		UnitConv( 98 ).ipName = "day";
+		UnitConv( 99 ).ipName = "min";
+		UnitConv( 100 ).ipName = "hr/wk";
 		UnitConv( 101 ).ipName = "$";
 		UnitConv( 102 ).ipName = "$/unit energy";
 		UnitConv( 103 ).ipName = "kW";
 		UnitConv( 104 ).ipName = "lbWater/lbDryAir";
+		UnitConv( 105 ).ipName = " ";
+		UnitConv( 106 ).ipName = "Ah";
+		UnitConv( 107 ).ipName = "clo";
+		UnitConv( 108 ).ipName = "Btu/lbm-R";
+		UnitConv( 109 ).ipName = "Btu/lbWater";
+		UnitConv( 110 ).ipName = "lbWater/s";
+		UnitConv( 111 ).ipName = "ppm";
+		UnitConv( 112 ).ipName = "rad";
+		UnitConv( 113 ).ipName = "rev/min";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14579,6 +14597,15 @@ Label900: ;
 		UnitConv( 102 ).mult = 1.0;
 		UnitConv( 103 ).mult = 1.0;
 		UnitConv( 104 ).mult = 1.0;
+		UnitConv( 105 ).mult = 1.0;
+		UnitConv( 106 ).mult = 1.0;
+		UnitConv( 107 ).mult = 1.0;
+		UnitConv( 108 ).mult = 0.000238845896627;
+		UnitConv( 109 ).mult = 0.0000004302105;
+		UnitConv( 110 ).mult = 2.2046;
+		UnitConv( 111 ).mult = 1.0;
+		UnitConv( 112 ).mult = 1.0;
+		UnitConv( 113 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14805,9 +14832,7 @@ Label900: ;
 		if (unitConvIndex == 0 && ! noBrackets && unitSIOnly != "BTU/W-H") {
 			ShowWarningError("Unable to find a unit conversion from " + stringInWithSI + " into IP units");
 			ShowContinueError("Applying default conversion factor of 1.0");
-			ShowContinueError("Please report to https://github.com/NREL/EnergyPlus/issues");
 		}
-
 	}
 
 

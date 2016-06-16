@@ -252,6 +252,61 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	EXPECT_EQ( "", curUnits );
 	EXPECT_EQ( 1.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
+
+	std::vector<std::string> units = {
+		"[ ]",
+		"[%]",
+		"[]",
+		"[A]",
+		"[ach]",
+		"[Ah]",
+		"[C]",
+		"[cd/m2]",
+		"[clo]",
+		"[deg]",
+		"[deltaC]",
+		"[hr]",
+		"[J/kg]",
+		"[J/kg-K]",
+		"[J/kgWater]",
+		"[J/m2]",
+		"[J]",
+		"[K/m]",
+		"[kg/kg]",
+		"[kg/m3]",
+		"[kg/s]",
+		"[kg]",
+		"[kgWater/kgDryAir]",
+		"[kgWater/s]",
+		"[kmol/s]",
+		"[L]",
+		"[lum/W]",
+		"[lux]",
+		"[m/s]",
+		"[m]",
+		"[m2]",
+		"[m3/s]",
+		"[m3]",
+		"[min]",
+		"[Pa]",
+		"[ppm]",
+		"[rad]",
+		"[rev/min]",
+		"[s]",
+		"[V]",
+		"[W/K]",
+		"[W/m2]",
+		"[W/m2-C]",
+		"[W/m2-K]",
+		"[W/W]",
+		"[W]"
+	};
+
+	for ( auto u : units ) {
+		LookupSItoIP( u, indexUnitConv, curUnits );
+		EXPECT_NE( indexUnitConv, 0 );
+	}
+
 }
 
 
@@ -5855,5 +5910,3 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	EXPECT_EQ( "      114.72", tabularData[103][10] ); // window opening area
 
 }
-
-
