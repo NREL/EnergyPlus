@@ -3678,11 +3678,6 @@ namespace MixedAir {
 				this->OAFractionRpt = 0.0;
 			}
 		}
-
-		// IF (ErrorsFound) THEN
-		//   CALL ShowFatalError('Errors found in getting Controller:OutdoorAir inputs')
-		// ENDIF
-
 	}
 
 	void
@@ -3797,24 +3792,21 @@ namespace MixedAir {
 				SysOA = 0.0;
 				for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
 					ZoneNum = this->VentMechZone( ZoneIndex );
+					auto & curZone( Zone( ZoneNum ) );
 
 					// Calc the zone OA flow rate based on the people component
 					// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 					//  Checking DCV flag before calculating zone OA per person
 					if ( this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
-						ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
+						ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
 					} else {
-						ZoneOAPeople = 0.0;
-						for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
-							if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
-							ZoneOAPeople += People( PeopleNum ).NumberOfPeople * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
-						}
+						ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
 					}
 
 					// Calc the zone OA flow rate based on the floor area component
-					ZoneOAArea = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * this->ZoneOAAreaRate( ZoneIndex );
-					ZoneOAFlow = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * this->ZoneOAFlowRate( ZoneIndex );
-					ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
+					ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate( ZoneIndex );
+					ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate( ZoneIndex );
+					ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
 
 					// Calc the breathing-zone OA flow rate
 					OAIndex = this->ZoneDesignSpecOAObjIndex( ZoneIndex );
@@ -3881,12 +3873,11 @@ namespace MixedAir {
 						if ( this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
 							ZoneOAPeople = curZoneIntGain.NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
 						} else {
-							ZoneOAPeople = 0.0;
+							ZoneOAPeople = Zone( ZoneNum ).TotOccupants * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
 							CO2PeopleGeneration = 0.0;
-							for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
-								if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
-								ZoneOAPeople += People( PeopleNum ).NumberOfPeople * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
-								if ( this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+							if ( this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+								for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
+									if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
 									CO2PeopleGeneration += People( PeopleNum ).NumberOfPeople * People( PeopleNum ).CO2RateFactor * GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr );
 								}
 							}
