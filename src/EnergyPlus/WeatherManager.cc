@@ -3235,18 +3235,20 @@ namespace WeatherManager {
 		Real64 const curHrWeight
 	)
 	{
+		// adapted from http://stackoverflow.com/questions/2708476/rotation-interpolation
 		assert( (prevHrWeight + curHrWeight) ==  1.0);
-		Real64 changeAngle = curHrWindDir - prevHrWindDir;
-		Real64 changeAngleAdj = ( changeAngle < 0. ) ? changeAngle + 360. : changeAngle;
-		Real64 interpolatedWindDirAdj = 0.;
-		if ( changeAngleAdj <= 180. ){
-			interpolatedWindDirAdj = curHrWeight * changeAngleAdj;
-		} else {
-			interpolatedWindDirAdj = curHrWeight * changeAngleAdj + 180.;
+		Real64 curAng = curHrWindDir;
+		Real64 prevAng = prevHrWindDir;
+		Real64 diff = abs( curAng - prevAng );
+		if ( diff > 180. ){
+			if ( curAng > prevAng ){
+				prevAng += 360.;
+			} else {
+				curAng += 360.;
+			}
 		}
-		Real64 interpolatedWindDir = prevHrWindDir + interpolatedWindDirAdj;
-		Real64 interpolatedWindDirIn360 = ( interpolatedWindDir >= 360. ) ? interpolatedWindDir - 360 : interpolatedWindDir;
-		return interpolatedWindDirIn360;
+		Real64 interpAng = prevAng + ( curAng - prevAng ) * curHrWeight;
+		return ( fmod(interpAng, 360.) ); // fmod is float modulus function
 	}
 
 	void

@@ -269,6 +269,29 @@ TEST_F( EnergyPlusFixture, interpolateWindDirectionTest )
 	EXPECT_EQ( interpolateWindDirection( 350, 0.3, 160, 0.7 ), 109. );
 	EXPECT_EQ( interpolateWindDirection( 350, 0.7, 160, 0.3 ), 41. );
 
+	// tests for new failures
+	EXPECT_EQ( interpolateWindDirection( 70, 0.75, 30, 0.25 ), 60. );
+
+	// tests across 180 degree angle (reversed)
+	EXPECT_EQ( interpolateWindDirection( 190, 0.7, 170, 0.3 ), 184. );
+	EXPECT_EQ( interpolateWindDirection( 190, 0.3, 170, 0.7 ), 176. );
+	EXPECT_EQ( interpolateWindDirection( 260, 0.7, 100, 0.3 ), 212. );
+	EXPECT_EQ( interpolateWindDirection( 260, 0.3, 100, 0.7 ), 148. );
+
+	// tests across 0 degree angle (reversed)
+	EXPECT_EQ( interpolateWindDirection( 10, 0.7, 350, 0.3 ), 4. );
+	EXPECT_EQ( interpolateWindDirection( 10, 0.3, 350, 0.7 ), 356. );
+	EXPECT_EQ( interpolateWindDirection( 80, 0.7, 300, 0.3 ), 38. );
+	EXPECT_EQ( interpolateWindDirection( 80, 0.3, 300, 0.7 ), 342. );
+
+	EXPECT_EQ( interpolateWindDirection( 10, 0.5, 350, 0.5 ), 0. );
+	EXPECT_EQ( interpolateWindDirection( 10, 0.5, 340, 0.5 ), 355. );
+	EXPECT_EQ( interpolateWindDirection( 10, 0.5, 280, 0.5 ), 325. );
+	EXPECT_EQ( interpolateWindDirection( 10, 0.5, 260, 0.5 ), 315. );
+	EXPECT_EQ( interpolateWindDirection( 10, 0.7, 200, 0.3 ), 319. );
+	EXPECT_EQ( interpolateWindDirection( 10, 0.3, 200, 0.7 ), 251. );
+	EXPECT_EQ( interpolateWindDirection( 160, 0.7, 350, 0.3 ), 109. );
+	EXPECT_EQ( interpolateWindDirection( 160, 0.3, 350, 0.7 ), 41. );
 
 
 }
