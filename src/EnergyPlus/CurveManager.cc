@@ -5007,10 +5007,10 @@ Label999: ;
 		PerfCurve( CurveNum ).Var1Max = MaxX;
 		PerfCurve( CurveNum ).Var2Min = MinX2;
 		PerfCurve( CurveNum ).Var2Max = MaxX2;
-//		PerfCurve( CurveNum ).CurveMin = MinY;
-//		PerfCurve( CurveNum ).CurveMax = MaxY;
-//		PerfCurve( CurveNum ).CurveMinPresent = true;
-//		PerfCurve( CurveNum ).CurveMaxPresent = true;
+		PerfCurve( CurveNum ).CurveMin = MinY;
+		PerfCurve( CurveNum ).CurveMax = MaxY;
+		PerfCurve( CurveNum ).CurveMinPresent = true;
+		PerfCurve( CurveNum ).CurveMaxPresent = true;
 
 		A.deallocate();
 		Results.deallocate();
