@@ -204,9 +204,9 @@ namespace FaultsManager {
 
 	// Object Data
 	Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
-	Array1D< FaultProperties > FouledCoils;
-	Array1D< FaultProperties > FaultsThermostatOffset;
-	Array1D< FaultProperties > FaultsHumidistatOffset;
+	Array1D< FaultPropertiesFoulingCoil > FouledCoils;
+	Array1D< FaultPropertiesThermostat > FaultsThermostatOffset;
+	Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	Array1D< FaultProperties > FaultsChillerSWTSensor;
 	Array1D< FaultProperties > FaultsCondenserSWTSensor;

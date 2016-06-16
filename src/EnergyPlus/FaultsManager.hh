@@ -141,12 +141,11 @@ namespace FaultsManager {
 	extern Array1D_int const iFaultTypeEnums;
 
 	extern bool AnyFaultsInModel; // True if there are operational faults in the model
-	extern int NumFaults; // Number of faults (include multiple faults of same type) in the model
+	extern int NumFaults; // Total number of all faults
 	extern int NumFaultyEconomizer; // Total number of faults related with the economizer
 	extern int NumFouledCoil; // Total number of fouled coils
 	extern int NumFaultyThermostat; // Total number of faulty thermostat with offset
 	extern int NumFaultyHumidistat; // Total number of faulty humidistat with offset
-	extern int NumFaultyAirFilter;  // Total number of fouled air filters
 	extern int NumFaultyAirFilter;  // Total number of fouled air filters
 	extern int NumFaultyChillerSWTSensor;  // Total number of faulty Chillers Supply Water Temperature Sensor
 	extern int NumFaultyCondenserSWTSensor;  // Total number of faulty Condenser Supply Water Temperature Sensor
@@ -164,25 +163,11 @@ namespace FaultsManager {
 		std::string FaultType; // Fault type
 		std::string AvaiSchedule; // Availability schedule
 		std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
-		
-		Real64 Offset; // offset, + means sensor reading is higher than actual value
-		bool Status; // for future use
+		int FaultTypeEnum;
 		int AvaiSchedPtr;
 		int SeveritySchedPtr;
-		int FaultTypeEnum;
-
-		std::string FouledCoilName; // The fouled coil name
-		int FouledCoilID; // Point to a fouling coil
-		int FoulingInputMethod; // Coil fouling input method
-		Real64 UAFouled; // Fouling coil UA under rating conditions
-		Real64 Rfw; // Water side fouling factor
-		Real64 Rfa; // Air side fouling factor
-		Real64 Aout; // Coil outside surface area
-		Real64 Aratio; // Inside to outside surface area ratio
-
-		std::string FaultyThermostatName; // The faulty thermostat name
-		std::string FaultyHumidistatName; // The faulty humidistat name
-		std::string FaultyHumidistatType; // The faulty humidistat type
+		Real64 Offset; // offset, + means sensor reading is higher than actual value
+		bool Status; // for future use
 
 		// Default Constructor
 		FaultProperties():
@@ -190,27 +175,16 @@ namespace FaultsManager {
 			FaultType( "" ),
 			AvaiSchedule( "" ),
 			SeveritySchedule( "" ),
-			Offset( 0.0 ),
-			Status( false ),
+			FaultTypeEnum( 0 ),
 			AvaiSchedPtr( 0 ),
 			SeveritySchedPtr( 0 ),
-			FaultTypeEnum( 0 ),
-			FouledCoilName( "" ),
-			FouledCoilID( 0 ),
-			FoulingInputMethod( 0 ),
-			UAFouled( 0.0 ),
-			Rfw( 0.0 ),
-			Rfa( 0.0 ),
-			Aout( 0.0 ),
-			Aratio( 0.0 ),
-			FaultyThermostatName( "" ),
-			FaultyHumidistatName( "" ),
-			FaultyHumidistatType( "" )
+			Offset( 0.0 ),
+			Status( false )
 		{}
 
 	};
 	
-	struct FaultPropertiesEconomizer : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
+	struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
 	{
 		// Members
 		int ControllerTypeEnum;
@@ -224,6 +198,57 @@ namespace FaultsManager {
 			ControllerID( 0 ),
 			ControllerType( "" ),
 			ControllerName( "" )
+		{}
+	};
+	
+	struct FaultPropertiesThermostat : public FaultProperties // Class for FaultModel:ThermostatOffset
+	{
+		// Members
+		std::string FaultyThermostatName; // The faulty thermostat name
+	
+		// Default Constructor
+		FaultPropertiesThermostat():
+			FaultyThermostatName( "" )
+		{}
+	};
+	
+	struct FaultPropertiesHumidistat : public FaultProperties // Class for FaultModel:HumidistatOffset
+	{
+		// Members
+		std::string FaultyThermostatName; // The faulty thermostat name
+		std::string FaultyHumidistatName; // The faulty humidistat name
+		std::string FaultyHumidistatType; // The faulty humidistat type
+	
+		// Default Constructor
+		FaultPropertiesHumidistat():
+			FaultyThermostatName( "" ),
+			FaultyHumidistatName( "" ),
+			FaultyHumidistatType( "" )
+		{}
+	};
+	
+	struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
+	{
+		// Members
+		std::string FouledCoilName; // The fouled coil name
+		int FouledCoilID; // Point to a fouling coil
+		int FoulingInputMethod; // Coil fouling input method
+		Real64 UAFouled; // Fouling coil UA under rating conditions
+		Real64 Rfw; // Water side fouling factor
+		Real64 Rfa; // Air side fouling factor
+		Real64 Aout; // Coil outside surface area
+		Real64 Aratio; // Inside to outside surface area ratio
+	
+		// Default Constructor
+		FaultPropertiesFoulingCoil():
+			FouledCoilName( "" ),
+			FouledCoilID( 0 ),
+			FoulingInputMethod( 0 ),
+			UAFouled( 0.0 ),
+			Rfw( 0.0 ),
+			Rfa( 0.0 ),
+			Aout( 0.0 ),
+			Aratio( 0.0 )
 		{}
 	};
 	
@@ -257,9 +282,9 @@ namespace FaultsManager {
 	
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
-	extern Array1D< FaultProperties > FouledCoils;
-	extern Array1D< FaultProperties > FaultsThermostatOffset;
-	extern Array1D< FaultProperties > FaultsHumidistatOffset;
+	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
+	extern Array1D< FaultPropertiesThermostat > FaultsThermostatOffset;
+	extern Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	extern Array1D< FaultProperties > FaultsChillerSWTSensor;
 	extern Array1D< FaultProperties > FaultsCondenserSWTSensor;
