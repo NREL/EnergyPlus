@@ -2109,12 +2109,18 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		"  12.77778,       !- X Value #1",
 		"  36,             !- Y Value #1",
 		"  19524.15032,    !- Output Value #1",
+		"  12.77778,       !- X Value #2",
+		"  42,             !- Y Value #2",
+		"  18167.25518,    !- Output Value #2",
 		"  12.77778,       !- X Value #3",
 		"  46.11111,       !- Y Value #3",
 		"  16810.36004,    !- Output Value #3",
 		"  19.44448943,    !- <none>",
 		"  41,             !- <none>",
 		"  23375.08713,    !- <none>",
+		"  19.44448943,    !- <none>",
+		"  41,             !- <none>",
+		"  22686.72090,    !- <none>",
 		"  19.44448943,    !- <none>",
 		"  46.11111,       !- <none>",
 		"  21998.35468;    !- <none>",
@@ -2136,12 +2142,18 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		"  12.77778,       !- X Value #1",
 		"  36,             !- Y Value #1",
 		"  19524.15032,    !- Output Value #1",
+		"  12.77778,       !- X Value #2",
+		"  42,             !- Y Value #2",
+		"  18167.25518,    !- Output Value #2",
 		"  12.77778,       !- X Value #3",
 		"  46.11111,       !- Y Value #3",
 		"  16810.36004,    !- Output Value #3",
 		"  19.44448943,    !- <none>",
 		"  41,             !- <none>",
 		"  23375.08713,    !- <none>",
+		"  19.44448943,    !- <none>",
+		"  41,             !- <none>",
+		"  22686.72090,    !- <none>",
 		"  19.44448943,    !- <none>",
 		"  46.11111,       !- <none>",
 		"  21998.35468;    !- <none>" 	} );
@@ -2153,7 +2165,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		CurveManager::GetCurvesInputFlag = false;
 		ASSERT_EQ( 2, CurveManager::NumCurves );
 
-		// Linear curve type, specified min/max
+		// BiQuadratic curve type, specified min/max
 		EXPECT_EQ( "BIQUADRATIC", CurveManager::GetCurveType( 1 ) );
 		EXPECT_EQ( "TWOVARS", CurveManager::GetCurveName( 1 ) );
 		EXPECT_EQ( 1, CurveManager::GetCurveIndex( "TWOVARS" ) );
@@ -2164,28 +2176,45 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		Real64 min1, max1, min2, max2;
 		CurveManager::GetCurveMinMaxValues( 1, min1, max1, min2, max2 );
 		EXPECT_EQ( 12.77778, min1 ); // Minimum Value of X
-		EXPECT_EQ( 19.44448943, max1 );  // Maximum Value of X
-		EXPECT_EQ( 36.0, min2 ); // Minimum Value of Y
+		EXPECT_EQ( 23.88889, max1 );  // Maximum Value of X
+		EXPECT_EQ( 18.0, min2 ); // Minimum Value of Y
 		EXPECT_EQ( 46.11111, max2 );  // Maximum Value of Y
 		EXPECT_EQ( ( 15000.0 / 25000.0 ), CurveManager::PerfCurve( 1 ).CurveMin );
 		EXPECT_EQ( ( 40000.0 / 25000.0 ), CurveManager::PerfCurve( 1 ).CurveMax );
 		EXPECT_EQ( CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum( 1 ) );
 
 		EXPECT_GT( CurveManager::CurveValue( 1, 10.0, 15.0 ), ( 15000.0 / 25000.0 ) ); // both values too small, Minimum Value of X (12.8) and Y (18) are used, Min Table Output is not used
-		EXPECT_EQ( 0.7809660128, CurveManager::CurveValue( 1, 10.0, 15.0 ) );  // result of using minimum X and Y limits
-		EXPECT_EQ( 0.7809660128, CurveManager::CurveValue( 1, 12.0, 16.0 ) );  // result shouldn't change as long as inputs are below minimum X and Y limits
-		EXPECT_LT( CurveManager::CurveValue( 1, 40.0, 50.0 ), ( 40000.0 / 25000.0 ) ); // both values too large, Maximum Value of X (23.8) and Y (46.1) are used, Max Table Output is not used
-		EXPECT_NEAR( 0.935003, CurveManager::CurveValue( 1, 40.0, 50.0 ), 0.000001 );  // result of using maximum X and Y limits
-		EXPECT_NEAR( 0.935003, CurveManager::CurveValue( 1, 25.0, 47.0 ), 0.000001 );  // result shouldn't change as long as inputs are above maximum X and Y limits
+		Real64 Coeff1 = CurveManager::PerfCurve( 1 ).Coeff1;
+		Real64 Coeff2 = CurveManager::PerfCurve( 1 ).Coeff2;
+		Real64 Coeff3 = CurveManager::PerfCurve( 1 ).Coeff3;
+		Real64 Coeff4 = CurveManager::PerfCurve( 1 ).Coeff4;
+		Real64 Coeff5 = CurveManager::PerfCurve( 1 ).Coeff5;
+		Real64 Coeff6 = CurveManager::PerfCurve( 1 ).Coeff6;
+
+		// calculate output as if entered data was valid
+		Real64 curveOut = Coeff1 + ( Coeff2 * 10.0 ) + ( Coeff3 * 10.0 * 10.0 ) + ( Coeff4 * 15.0 ) + ( Coeff5 * 15.0 * 15.0 ) + ( Coeff6 * 10.0 * 15.0 );
+		// entered data was not valid since 10 < min X1 and 15 < min X2 so expect result to be greater than curveOut
+		EXPECT_LT( curveOut, CurveManager::CurveValue( 1, 10.0, 15.0 ) );  // result of using less than minimum X1 and X2 limits
+
+		// calculate new value using min X1 and min X2, this value should match curve output
+		Real64 curveOutActual = Coeff1 + ( Coeff2 * 12.77778 ) + ( Coeff3 * 12.77778 * 12.77778 ) + ( Coeff4 * 18.0 ) + ( Coeff5 * 18.0 * 18.0 ) + ( Coeff6 * 12.77778 * 18.0 );
+		EXPECT_NEAR( 0.7662161, curveOutActual, 0.0000001 );  // result of using less than minimum X1 and X2 limits
+		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 10.0, 15.0 ), 0.000001 );  // result of using less than minimum X1 and X2 limits
+		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 12.0, 16.0 ), 0.000001 );  // result shouldn't change as long as inputs are below minimum X1 and X2 limits
+		curveOutActual = Coeff1 + ( Coeff2 * 23.88889 ) + ( Coeff3 * 23.88889 * 23.88889 ) + ( Coeff4 * 46.11111 ) + ( Coeff5 * 46.11111 * 46.11111 ) + ( Coeff6 * 23.88889 * 46.11111 );
+		EXPECT_LT( CurveManager::CurveValue( 1, 40.0, 50.0 ), ( 40000.0 / 25000.0 ) ); // both values too large, Maximum Value of X1 (23.8) and X2 (46.1) are used, Max Table Output is too high
+		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 40.0, 50.0 ), 0.000001 );  // result of using maximum X1 and X2 limits
+		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 25.0, 47.0 ), 0.000001 );  // result shouldn't change as long as inputs are above maximum X and Y limits
+		EXPECT_NEAR( 0.91625045, curveOutActual, 0.00000001 );  // result is actually less than max ouput since a regression was performed
 
 		// artificially change CurveMin And CurveMax and repeat limit test
 		CurveManager::PerfCurve( 1 ).CurveMin = 0.8; // 0.8 is same as entering 20000 for Minimum Table Output
 		CurveManager::PerfCurve( 1 ).CurveMax = 0.9; // 0.9 is same as entering 22500 for Maximum Table Output
-		EXPECT_EQ( 0.8, CurveManager::CurveValue( 1, 10.0, 15.0 ) );  // result of using minimum X and Y limits when minimum output > result
-		EXPECT_EQ( 0.9, CurveManager::CurveValue( 1, 40.0, 50.0 ) );  // result of using maximum X and Y limits when maximum output < result
+		EXPECT_EQ( 0.8, CurveManager::CurveValue( 1, 10.0, 15.0 ) );  // result of using minimum X1 and X2 limits when minimum output > result
+		EXPECT_EQ( 0.9, CurveManager::CurveValue( 1, 40.0, 50.0 ) );  // result of using maximum X1 and X2 limits when maximum output < result
 
 		// Evaluate 2nd performance curve
-		// Linear curve type, no specified min/max
+		// BiQuadratic curve type, no specified min/max
 		EXPECT_EQ( "BIQUADRATIC", CurveManager::GetCurveType( 2 ) );
 		EXPECT_EQ( "TWOVARS2", CurveManager::GetCurveName( 2 ) );
 		EXPECT_EQ( 2, CurveManager::GetCurveIndex( "TWOVARS2" ) );
@@ -2195,32 +2224,79 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		EXPECT_EQ( 2, index );
 
 		CurveManager::GetCurveMinMaxValues( 2, min1, max1, min2, max2 );
-		EXPECT_EQ( 12.77778, min1 ); // Minimum Value of X defaults to lower limit
-		EXPECT_EQ( 19.44448943, max1 );  // Maximum Value of X defaults to upper limit
-		EXPECT_EQ( 36.0, min2 ); // Minimum Value of Y defaults to lower limit
-		EXPECT_EQ( 46.11111, max2 );  // Maximum Value of Y defaults to upper limit
-		EXPECT_EQ( 0.0, CurveManager::PerfCurve( 2 ).CurveMin );
-		EXPECT_EQ( 0.0, CurveManager::PerfCurve( 2 ).CurveMax );
+		EXPECT_EQ( 12.77778, min1 ); // Minimum Value of X defaults to lower limit specified in table data
+		EXPECT_EQ( 19.44448943, max1 );  // Maximum Value of X defaults to upper limit specified in table data
+		EXPECT_EQ( 36.0, min2 ); // Minimum Value of Y defaults to lower limit specified in table data
+		EXPECT_EQ( 46.11111, max2 );  // Maximum Value of Y defaults to upper limit specified in table data
+
+		// curve min/max output were not entered by user. Expect min/max equal to 0 since they were not initilized 
+		EXPECT_NEAR( 0.0, CurveManager::PerfCurve( 2 ).CurveMin, 0.0000000001 );
+		EXPECT_FALSE( CurveManager::PerfCurve( 2 ).CurveMinPresent ); // min won't be used since value is NOT present
+		EXPECT_NEAR( 0.0, CurveManager::PerfCurve( 2 ).CurveMax, 0.0000000001 );
+		EXPECT_FALSE( CurveManager::PerfCurve( 2 ).CurveMaxPresent ); // max won't be used since value is NOT present
 		EXPECT_EQ( CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum( 2 ) );
 
-		EXPECT_GT( CurveManager::CurveValue( 2, 10.0, 15.0 ), ( 15000.0 / 25000.0 ) ); // both values too small, Minimum Value of X (12.8) and Y (18) are used, Min Table Output is not used
-		EXPECT_EQ( 0.7809660128, CurveManager::CurveValue( 2, 10.0, 15.0 ) );  // result of using minimum X and Y limits
-		EXPECT_EQ( 0.7809660128, CurveManager::CurveValue( 2, 12.0, 16.0 ) );  // result shouldn't change as long as inputs are below minimum X and Y limits
-		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), ( 40000.0 / 25000.0 ) ); // both values too large, Maximum Value of X (23.8) and Y (46.1) are used, Max Table Output is not used
-		EXPECT_NEAR( 0.935003, CurveManager::CurveValue( 2, 40.0, 50.0 ), 0.000001 );  // result of using maximum X and Y limits
-		EXPECT_NEAR( 0.935003, CurveManager::CurveValue( 2, 25.0, 47.0 ), 0.000001 );  // result shouldn't change as long as inputs are above maximum X and Y limits
+		EXPECT_GT( CurveManager::CurveValue( 2, 10.0, 15.0 ), ( 15000.0 / 25000.0 ) ); // both values too small, Minimum Value of X1 (12.8) and X2 (18) are used, Min Table Output is not present
+		EXPECT_NEAR( 0.780966, CurveManager::CurveValue( 2, 10.0, 15.0 ), 0.0000001 );  // result of using minimum X1 and X2 limits
+		EXPECT_NEAR( 0.780966, CurveManager::CurveValue( 2, 12.0, 16.0 ), 0.0000001 );  // result shouldn't change as long as inputs are below minimum X1 and X2 limits
+		curveOutActual = Coeff1 + ( Coeff2 * 19.44448943 ) + ( Coeff3 * 19.44448943 * 19.44448943 ) + ( Coeff4 * 46.11111 ) + ( Coeff5 * 46.11111 * 46.11111 ) + ( Coeff6 * 19.44448943 * 46.11111 );
+		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), ( 23375.08713 / 25000.0 ) ); // both values too large, Maximum Value of X1 (23.8) and X2 (46.1) are used, Max Table Output is not present
+		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 2, 40.0, 50.0 ), 0.000001 );  // result of using maximum X1 and X2 limits
+		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 2, 25.0, 47.0 ), 0.000001 );  // result shouldn't change as long as inputs are above maximum X1 and X2 limits
 
 		// test capacity entered by user is same as calculated
 		EXPECT_NEAR( 19524.15032, ( CurveManager::CurveValue( 2, 12.77778, 36.0 ) * 25000.0 ), 0.1 ); // uses data from first entry in table
 
-		// artificially change CurveMin And CurveMax and repeat limit test
+		// artificially change CurveMin And CurveMax to be above min and below max table data and repeat limit test
 		CurveManager::PerfCurve( 2 ).CurveMin = 0.8; // 0.8 is same as entering 20000 for Minimum Table Output
-		CurveManager::PerfCurve( 2 ).CurveMinPresent = true;
-		CurveManager::PerfCurve( 2 ).CurveMax = 0.9; // 0.9 is same as entering 22500 for Maximum Table Output
-		CurveManager::PerfCurve( 2 ).CurveMaxPresent = true;
+		CurveManager::PerfCurve( 2 ).CurveMinPresent = true; // as if user did enter input data
+		CurveManager::PerfCurve( 2 ).CurveMax = 0.87; // 0.87 is same as entering 21750 for Maximum Table Output
+		CurveManager::PerfCurve( 2 ).CurveMaxPresent = true; // as if user did enter input data
 
-		EXPECT_EQ( 0.8, CurveManager::CurveValue( 2, 10.0, 15.0 ) );  // result of using minimum X and Y limits when minimum output > result
-		EXPECT_EQ( 0.9, CurveManager::CurveValue( 2, 40.0, 50.0 ) );  // result of using maximum X and Y limits when maximum output < result
+		EXPECT_EQ( 0.8, CurveManager::CurveValue( 2, 10.0, 15.0 ) );  // result of using minimum X1 and X2 table data limits, Curve Minimum Output > result
+		EXPECT_EQ( 0.87, CurveManager::CurveValue( 2, 40.0, 50.0 ) );  // result of using maximum X1 and X2 table data limits, Curve Maximum Output < result
+
+		// artificially change CurveMin And CurveMax to be below min and above max table data and repeat limit test
+		CurveManager::PerfCurve( 2 ).CurveMin = 0.5; // 0.5 is same as entering 12500 for Minimum Table Output
+		CurveManager::PerfCurve( 2 ).CurveMax = 1.2; // 1.2 is same as entering 30000 for Maximum Table Output
+		// result is lower than before when using 0.8 as Minimum Table Output
+		EXPECT_LT( 0.5, CurveManager::CurveValue( 2, 10.0, 15.0 ) );  // new result is lower than 0.8 but not lower than 0.5 since output is limited by X1 X2 min/max
+		EXPECT_GT( 0.8, CurveManager::CurveValue( 2, 10.0, 15.0 ) );
+		EXPECT_NEAR( 0.780966, CurveManager::CurveValue( 2, 10.0, 15.0 ), 0.000001 );
+		// result is higher than before when using 0.87 as Maximum Table Output
+		EXPECT_LT( 0.87, CurveManager::CurveValue( 2, 40.0, 50.0 ) );  // new result is higher than 0.87 but not higher than 1.2 since output is limited by X1 X2 min/max
+		EXPECT_GT( 1.2, CurveManager::CurveValue( 2, 40.0, 50.0 ) );
+		EXPECT_NEAR( 0.8799342, CurveManager::CurveValue( 2, 40.0, 50.0 ), 0.0000001 );
+
+		// if CurveMin And CurveMax are blank, result should be same as above
+		CurveManager::PerfCurve( 2 ).CurveMinPresent = false; // as if user did not enter input data
+		CurveManager::PerfCurve( 2 ).CurveMaxPresent = false; // as if user did not enter input data
+		EXPECT_LT( 0.5, CurveManager::CurveValue( 2, 10.0, 15.0 ) );  // curve extrapolates up to 
+		EXPECT_GT( 1.2, CurveManager::CurveValue( 2, 40.0, 50.0 ) );  // result of using maximum X and Y limits when maximum output < result
+
+		// if user actually enters min/max values to extrapolate curve, then allow extrapolation
+		CurveManager::PerfCurve( 2 ).Var1Min = 10.0;
+		CurveManager::PerfCurve( 2 ).Var1Max = 40.0;
+		CurveManager::PerfCurve( 2 ).Var2Min = 15.0;
+		CurveManager::PerfCurve( 2 ).Var2Max = 50.0;
+		Real64 extrapolatedCapacity = CurveManager::CurveValue( 2, 10.0, 15.0 ) * 25000.0;
+		EXPECT_LT( extrapolatedCapacity, 16810.36004 );  // curve extrapolates lower than minimum Y based on table data
+
+		extrapolatedCapacity = CurveManager::CurveValue( 2, 40.0, 50.0 ) * 25000.0;
+		Real64 minY = 16810.36004 / 25000.0;
+		Real64 maxY = 23375.08713 / 25000.0;
+
+		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), maxY );  // results show dangers of extrapolation, large X1 and X2 gives output lower than max Y table data
+		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), minY );  // results show dangers of extrapolation, large X1 and X2 gives output lower than min Y table data
+		Coeff1 = CurveManager::PerfCurve( 2 ).Coeff1;
+		Coeff2 = CurveManager::PerfCurve( 2 ).Coeff2;
+		Coeff3 = CurveManager::PerfCurve( 2 ).Coeff3;
+		Coeff4 = CurveManager::PerfCurve( 2 ).Coeff4;
+		Coeff5 = CurveManager::PerfCurve( 2 ).Coeff5;
+		Coeff6 = CurveManager::PerfCurve( 2 ).Coeff6;
+		curveOutActual = Coeff1 + ( Coeff2 * 40.0 ) + ( Coeff3 * 40.0 * 40.0 ) + ( Coeff4 * 50.0 ) + ( Coeff5 * 50.0 * 50.0 ) + ( Coeff6 * 40.0 * 50.0 );
+		EXPECT_NEAR( ( curveOutActual * 25000.0 ), extrapolatedCapacity, 0.001 );  // result of extrapolation is value less than minimum table data
+		EXPECT_NEAR( 9358.378, ( curveOutActual * 25000.0 ), 0.001 );  // result of extrapolation is value less than minimum table data
 
 }
 
