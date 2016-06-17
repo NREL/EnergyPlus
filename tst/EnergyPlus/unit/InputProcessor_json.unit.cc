@@ -24,7 +24,7 @@ const json initialize() {
 
 namespace EnergyPlus {
 
-    TEST_F( InputProcessorFixture, getObjectItem1 )
+    TEST_F( InputProcessorFixture, getObjectItem_json1 )
     {
       std::string const idf_objects = delimited_string({
         "Version,8.3;",

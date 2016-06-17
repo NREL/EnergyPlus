@@ -31,7 +31,7 @@ using json = nlohmann::json;
 
 class IdfParser {
 public:
-	IdfParser(json const &schema) {
+	void initialize(json const &schema) {
 		if (schema.is_null()) return;
 		const json &loc = schema["properties"];
 		for (auto it = loc.begin(); it != loc.end(); ++it) {
@@ -121,7 +121,7 @@ class State {
 	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
 
 public:
-	State(json parsed_schema);
+	void initialize(json &parsed_schema);
 	void traverse (json::parse_event_t &event, json &parsed, unsigned line_num, unsigned line_index);
 	void validate(json &parsed, unsigned line_num, unsigned line_index);
 	std::vector <std::string> errors, warnings;
@@ -163,7 +163,11 @@ namespace EnergyPlus {
 
 class InputProcessor {
 public:
-	json jdf;
+	static IdfParser idf_parser;
+	static State state;
+	static const json schema;
+	static json jdf;
+
 
 
 	/*
@@ -287,6 +291,7 @@ public:
 
 	};
 
+// schema
 	struct ObjectsDefinition
 	{
 		// Members

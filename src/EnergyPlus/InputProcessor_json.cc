@@ -465,7 +465,7 @@ IdfParser::Token IdfParser::next_token( std::string const & idf, size_t & index)
 	return Token::NONE;
 }
 
-State::State(json parsed_schema) {
+void State::initialize(json &parsed_schema) {
 	schema = parsed_schema;
 	stack.push_back(schema);
 	json &loc = stack.back()["required"];
@@ -2815,7 +2815,6 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 }
 */
 
-static
 void
 EnergyPlus::InputProcessor::GetObjectItem(
 	std::string const & Object,
@@ -2860,6 +2859,16 @@ EnergyPlus::InputProcessor::GetObjectItem(
 	std::string cfld2;
 	bool GoodItem;
 
+	if (jdf.find(Object) == jdf.end() || schema["properties"].find(Object) == schema["properties"].end()) {
+		std::cout << "error: object " << Object << " not found in either the schema or jdf, uppercase?" << std::endl;
+		return;
+	}
+	json object_in_jdf = jdf[Object];
+	json object_in_schema = schema["properties"][Object];
+
+
+
+
 	//Autodesk:Uninit Initialize variables used uninitialized
 	NumAlphas = 0; //Autodesk:Uninit Force default initialization
 	NumNumbers = 0; //Autodesk:Uninit Force default initialization
@@ -2893,21 +2902,14 @@ EnergyPlus::InputProcessor::GetObjectItem(
 		ShowFatalError( "IP: GetObjectItem: Requested object=" + UCObject + ", not found in Object Definitions -- incorrect IDD attached." );
 	}
 
-	if ( ObjectDef( Found ).NumAlpha > 0 ) {
-		if ( ObjectDef( Found ).NumAlpha > MaxAlphas ) {
-			cfld1 = IPTrimSigDigits( ObjectDef( Found ).NumAlpha );
-			cfld2 = IPTrimSigDigits( MaxAlphas );
-			ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );
-		}
-		Alphas( {1,ObjectDef( Found ).NumAlpha} ) = BlankString;
+	if (object_in_schema["alphas"].size() > MaxAlphas) {
+		ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of Object Alpha Args [" + std::to_string(MaxAlphas)
+		 					+ "] > Size of alphas array [" + std::to_string(object_in_schema["alphas"].size()) + "]." );
 	}
-	if ( ObjectDef( Found ).NumNumeric > 0 ) {
-		if ( ObjectDef( Found ).NumNumeric > MaxNumbers ) {
-			cfld1 = IPTrimSigDigits( ObjectDef( Found ).NumNumeric );
-			cfld2 = IPTrimSigDigits( MaxNumbers );
-			ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Numeric Args [" + cfld1 + "] > Size of NumericArg array [" + cfld2 + "]." );
-		}
-		Numbers( {1,ObjectDef( Found ).NumNumeric} ) = 0.0;
+
+	if (object_in_schema["numerics"].size() > MaxNumbers) {
+		ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of Numeric Args [" + std::to_string(MaxNumbers)
+							 + "] > Size of numerics array [" + std::to_string(object_in_schema["numerics"].size()) + "]." );
 	}
 
 	StartRecord = ObjectStartRecord( Found );
@@ -2936,16 +2938,16 @@ EnergyPlus::InputProcessor::GetObjectItem(
 				NumNumbers = min( MaxNumbers, NumNumbers );
 				GoodItem = true;
 				if ( NumAlphas > 0 ) {
-					Alphas( {1,NumAlphas} ) = AlphaArgs( {1,NumAlphas} );
-					// for (int i = 1; i < NumAlphas; i++) {
-						// Alphas[i - 1] = AlphaArgs[i - 1];
-					// }
+					// Alphas( {1,NumAlphas} ) = AlphaArgs( {1,NumAlphas} );
+					for (int i = 1; i < NumAlphas; i++) {
+						Alphas[i - 1] = AlphaArgs[i - 1];
+					}
 				}
 				if ( NumNumbers > 0 ) {
-					Numbers( {1,NumNumbers} ) = NumberArgs( {1,NumNumbers} );
-					// for (int i = 1; i < NumAlphas; i++) {
-						// Alphas[i - 1] = AlphaArgs[i - 1];
-					// }
+					// Numbers( {1,NumNumbers} ) = NumberArgs( {1,NumNumbers} );
+					for (int i = 1; i < NumAlphas; i++) {
+						Alphas[i - 1] = AlphaArgs[i - 1];
+					}
 				}
 				if ( present( NumBlank ) ) {
 					NumBlank = true;
