@@ -785,6 +785,91 @@ namespace FaultsManager {
 		return OffsetAct;
 	}
 
+	void
+	FaultPropertiesChillerSWT::CalFaultChillerSWT(
+		bool FlagVariableFlowChiller, // True if chiller is variable flow and false if it is constant flow
+		Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
+		Real64 Cp, // Local fluid specific heat
+		Real64 EvapInletTemp, // Chiller evaporator inlet water temperature 
+		Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature 
+		Real64 & EvapMassFlowRate, // Chiller mass flow rate
+		Real64 & QEvaporator // Chiller evaporator heat transfer rate
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Jun. 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To calculate the mass flow rate and supply water temperature of a chiller with faulty SWT sensor.
+
+		// METHODOLOGY EMPLOYED:
+		// NA
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		// na
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Variables for fault free cases
+		Real64 EvapOutletTemp_ff = EvapOutletTemp;   // Chiller supply water temperature, fault free [C]
+		Real64 EvapMassFlowRate_ff = EvapMassFlowRate; // Chiller mass flow rate, fault free [kg/s]
+		Real64 QEvaporator_ff = QEvaporator; // Chiller evaporator heat transfer rate, fault free [W]
+		
+		// Variables for faulty cases
+		Real64 EvapOutletTemp_f = EvapOutletTemp_ff;    // Chiller supply water temperature, faulty case [C]
+		Real64 EvapMassFlowRate_f = EvapMassFlowRate_ff;  // Chiller mass flow rate, faulty case [kg/s]
+		Real64 QEvaporator_f = QEvaporator_ff;  // Chiller evaporator heat transfer rate, faulty case [W]
+		
+		// FLOW
+		
+		if( !FlagVariableFlowChiller ){
+		// Chillers with ConstantFlow mode
+		
+			EvapOutletTemp_f = EvapOutletTemp_ff - FaultyChillerSWTOffset;
+			
+			if( EvapInletTemp > EvapOutletTemp_f ){
+				QEvaporator_f = EvapMassFlowRate_ff * Cp * ( EvapInletTemp - EvapOutletTemp_f );
+			} else {
+				EvapMassFlowRate_f = 0.0;
+				QEvaporator_f = 0.0;
+			}
+		
+		} else {
+		// Chillers with LeavingSetpointModulated mode
+		
+			EvapOutletTemp_f = EvapOutletTemp_ff - FaultyChillerSWTOffset;
+			
+			if( ( EvapInletTemp > EvapOutletTemp_f ) && ( Cp > 0 ) ){
+				EvapMassFlowRate_f = QEvaporator_ff / Cp / ( EvapInletTemp - EvapOutletTemp_ff );
+				QEvaporator_f =  EvapMassFlowRate_f * Cp * ( EvapInletTemp - EvapOutletTemp_f );
+			} else {
+				EvapMassFlowRate_f = 0.0;
+				QEvaporator_f = 0.0;
+			}
+		}
+		
+		// Return variables
+		EvapOutletTemp = EvapOutletTemp_f;
+		EvapMassFlowRate = EvapMassFlowRate_f;
+		QEvaporator = QEvaporator_f;
+	}
 
 	bool
 	FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()

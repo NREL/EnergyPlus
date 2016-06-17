@@ -294,6 +294,18 @@ namespace FaultsManager {
 			ChillerType( "" ),
 			ChillerName( "" )
 		{}
+		
+		public:
+			void CalFaultChillerSWT(
+				bool FlagConstantFlowChiller, // True if chiller is constant flow and false if it is variable flow
+				Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
+				Real64 Cp, // Local fluid specific heat
+				Real64 EvapInletTemp, // Chiller evaporator inlet water temperature 
+				Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature 
+				Real64 & EvapMassFlowRate, // Chiller mass flow rate
+				Real64 & QEvaporator // Chiller evaporator heat transfer rate
+			);
+			
 	};
 	
 	// Object Data
