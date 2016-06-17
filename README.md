@@ -17,7 +17,7 @@ EnergyPlus is typically released twice annually, usually in March and September.
 
 # License & Contributing Development [![](https://img.shields.io/badge/license-BSD--3--like-orange.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
 
-EnergyPlus is available under a BSD-3-like license.  For more information, check out the [license file](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt).  The EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  We are currently refining our contribution policy, so if you are interested in contributing, please start with a ticket on the [Helpdesk](http://energyplus.helpserve.com) to begin the conversation.
+EnergyPlus is available under a BSD-3-like license.  For more information, check out the [license file](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt).  The EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  The current EnergyPlus contribution policy is now available on the EnergyPlus [contribution policy page](https://www.energyplus.net/contributing). If you are interested in contributing, please start there, but feel free to reach out to the team.
 
 # Building EnergyPlus [![](https://img.shields.io/badge/dashboard-online-green.svg)](http://nrel.github.io/EnergyPlusBuildResults/)
 
