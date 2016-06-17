@@ -187,7 +187,8 @@ CalcOutsideSurfTemp(
 	int const ZoneNum, // Zone number the current surface is attached to
 	int const ConstrNum, // Construction index for the current surface
 	Real64 const HMovInsul, // "Convection" coefficient of movable insulation
-	Real64 const TempExt // Exterior temperature boundary condition
+	Real64 const TempExt, // Exterior temperature boundary condition
+	bool & ErrorFlag // Error flag for movable insulation problem
 );
 
 void
