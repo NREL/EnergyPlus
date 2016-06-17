@@ -28,7 +28,7 @@ Zone type is currently unused.
 
 \paragraph{Field: Multiplier}\label{field-multiplier}
 
-Zone Multiplier is designed as a ``multiplier'' for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.
+Zone Multiplier is designed as a ``multiplier'' for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be multiplied. The default is 1.
 
 \paragraph{Field: Ceiling Height}\label{field-ceiling-height}
 
@@ -46,7 +46,7 @@ Zone floor area is used in many places within EnergyPlus. EnergyPlus automatical
 
 \paragraph{Field: Zone Inside Convection Algorithm}\label{field-zone-inside-convection-algorithm}
 
-The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaes associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{Detailed} (variable natural convection based on temperature difference - ASHRAE), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
+The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{Detailed} (variable natural convection based on temperature difference - ASHRAE), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
 
 If omitted or blank, the algorithm specified in the SurfaceConvectionAlgorithm:Inside object is the default.
 
@@ -217,7 +217,7 @@ The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of hea
 
 \subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVac:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
 
 \subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
@@ -349,7 +349,7 @@ NOTE: Although ZoneLists are not exclusive by themselves, ZoneLists used to form
 \item
   For floors that are multiplied, connect exterior boundary conditions of the floor to the ceiling and vice versa.
 \item
-  Since exterior convection coefficients vary with elevation, locate the typical middle floor zones midheight between the lowest and highest middle floors to be modeled.
+  Since exterior convection coefficients vary with elevation, locate the typical middle floor zones mid-height between the lowest and highest middle floors to be modeled.
 \item
   Shading must be identical for all multiplied floors or less accurate results may be obtained by using the zone list multiplier.
 \end{itemize}
@@ -366,7 +366,7 @@ Reference to a ZoneList object. The zones in the list constitute the zones in th
 
 \paragraph{Field: Zone List Multiplier}\label{field-zone-list-multiplier}
 
-An integer multiplier. Zone List Multiplier is designed as a ``multiplier'' for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.
+An integer multiplier. Zone List Multiplier is designed as a ``multiplier'' for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be multiplied. The default is 1.
 
 \begin{lstlisting}
 
@@ -458,11 +458,11 @@ During specification of surfaces, several ``outside'' environments may be chosen
 \begin{itemize}
 \tightlist
 \item
-  The zone that contains the other surface that is adjactent to this surface but is not entered in input.
+  The zone that contains the other surface that is adjacent to this surface but is not entered in input.
 \end{itemize}
 
 \begin{callout}
-Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description -- these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
+Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coefficients neither inside nor outside are used in the description -- these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
 \end{callout}
 
 \textbf{Shading} surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g.~trees, bushes, mountains, nearby buildings which aren't being simulated as part of this facility, etc.)
@@ -997,7 +997,7 @@ This field is the width of the floor in meters.
 
 \subsection{Floor:Adiabatic}\label{flooradiabatic}
 
-The Floor:Adiabatict object is used to describe interior floors or floors that you wish to model with no heat transfer from the exterior to the floor.
+The Floor:Adiabatic object is used to describe interior floors or floors that you wish to model with no heat transfer from the exterior to the floor.
 
 \subsubsection{Inputs}\label{inputs-12-019}
 
@@ -1115,7 +1115,7 @@ This is a unique name associated with the window.
 
 \paragraph{Field: Construction Name}\label{field-construction-name-10}
 
-This is the name of the subsurface's construction (ref: objects: Construction, Construction:WindowDataFile, Construction:CompexFenestrationState).
+This is the name of the subsurface's construction (ref: objects: Construction, Construction:WindowDataFile, Construction:ComplexFenestrationState).
 
 For windows, if Construction Name is not found among the constructions on the input (.idf) file, the Window Data File (ref. Construction:WindowDataFile object) will be searched for that Construction Name (see ``Importing Windows from WINDOW''). If that file is not present or if the Construction Name does not match the name of an entry on the file, an error will result. If there is a match, a window construction and its corresponding glass and gas materials will be created from the information read from the file.
 
@@ -1147,7 +1147,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-10}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-10}
 
@@ -1197,7 +1197,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-11}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-11}
 
@@ -1227,7 +1227,7 @@ This is a unique name associated with the glass door.
 
 \paragraph{Field: Construction Name}\label{field-construction-name-12}
 
-This is the name of the subsurface's construction (ref: objects: Construction, Construction:WindowDataFile, Construction:CompexFenestrationState).
+This is the name of the subsurface's construction (ref: objects: Construction, Construction:WindowDataFile, Construction:ComplexFenestrationState).
 
 For windows, if Construction Name is not found among the constructions on the input (.idf) file, the Window Data File (ref. Construction:WindowDataFile object) will be searched for that Construction Name (see ``Importing Windows from WINDOW''). If that file is not present or if the Construction Name does not match the name of an entry on the file, an error will result. If there is a match, a window construction and its corresponding glass and gas materials will be created from the information read from the file.
 
@@ -1259,7 +1259,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-12}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-12}
 
@@ -1289,7 +1289,7 @@ This is a unique name associated with the window.
 
 \paragraph{Field: Construction Name}\label{field-construction-name-13}
 
-This is the name of the subsurface's construction (ref: objects: Construction, Construction:WindowDataFile, Construction:CompexFenestrationState).
+This is the name of the subsurface's construction (ref: objects: Construction, Construction:WindowDataFile, Construction:ComplexFenestrationState).
 
 For windows, if Construction Name is not found among the constructions on the input (.idf) file, the Window Data File (ref. Construction:WindowDataFile object) will be searched for that Construction Name (see ``Importing Windows from WINDOW''). If that file is not present or if the Construction Name does not match the name of an entry on the file, an error will result. If there is a match, a window construction and its corresponding glass and gas materials will be created from the information read from the file.
 
@@ -1315,7 +1315,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-13}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-13}
 
@@ -1369,7 +1369,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-14}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-14}
 
@@ -1425,7 +1425,7 @@ If Multiplier \textgreater{} 1, you will get
 
 \paragraph{Starting Corner for the surface}\label{starting-corner-for-the-surface-15}
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate. This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 \paragraph{Field: Starting X Coordinate}\label{field-starting-x-coordinate-15}
 
@@ -1545,7 +1545,7 @@ Each of the following surfaces:
 \item
   Floor:Detailed
 \item
-  FenstrationSurface:Detailed
+  FenestrationSurface:Detailed
 \item
   Shading:Site:Detailed
 \item
@@ -1623,7 +1623,7 @@ This value can be one of several things depending on the actual kind of surface.
   \item
     \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
   \item
-    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModelspecification.
+    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
   \item
     \textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
   \item
@@ -1732,7 +1732,7 @@ This value can be one of several things depending on the actual kind of surface.
   \item
     \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
   \item
-    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModelspecification.
+    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
   \item
     \textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
   \item
@@ -1841,7 +1841,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 7)~~~\textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
 
-8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModelspecification.
+8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
 
 9)~~~\textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
 
@@ -2005,7 +2005,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 7)~~~\textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
 
-8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModelspecification.
+8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
 
 9)~~~\textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
 
@@ -2278,7 +2278,7 @@ Determine when \textbf{condensation} occurs & Print the variables ``Surface Wind
 
 \subsection{InternalMass}\label{internalmass}
 
-Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condtion, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the ``FullInteriorAndExterior'' or ``FullInteriorAndExteriorWithReflections'' Solar Distribution model (see Building parameters) is chosen.
+Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condition, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the ``FullInteriorAndExterior'' or ``FullInteriorAndExteriorWithReflections'' Solar Distribution model (see Building parameters) is chosen.
 
 \subsubsection{Inputs}\label{inputs-25-004}
 
@@ -3362,7 +3362,7 @@ The net exchange of infrared radiation heat transfer from the shade or blind to 
 
 The other (extra) convection heat transfer rate from the inside face of a an equivalent layer window. This output is computed from the difference in convection flux when using equivalent inside surface temperature of a window instead of the inside surface temperature from the standard surface heat balance calculation.
 
-\subsection{Thermochomic Window Outputs}\label{thermochomic-window-outputs}
+\subsection{Thermochromic Window Outputs}\label{thermochomic-window-outputs}
 
 \subsubsection{Window Thermochromic Layer Temperature {[}C{]}}\label{window-thermochromic-layer-temperature-c}
 
@@ -3447,7 +3447,7 @@ It is important to note that EnergyPlus will automatically account for ``self-sh
 
 Shading surfaces can also \textbf{reflect} solar radiation onto the building. This feature is simulated if you choose FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building object (ref: Building - Field: Solar Distribution). In this case, you may specify the reflectance properties of a shading surface with the ShadingProperty:Reflectance object. Note: If no ShadingProperty:Reflectance object is defined, then the shading surface reflectance values are assumed to be 0.2 and the fraction of shading surface that is glazed is assumed to be 0.0.
 
-Shading surfaces also automatically shade diffuse solar radiation (and long-wave radiation) from the sky. And they will automically shade diffuse solar radiation from the ground if Solar Distribution Field = FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building object. (If the reflections option for Solar Distribution is used, the program also takes into account the reduction of solar radiation reflected from the ground due to shading of the ground by shading surfaces and by the building itself.) Otherwise, shading surfaces will not shade diffuse radiation from the ground unless you enter a reduced value for View Factor to Ground for those building surfaces that are shaded (ref: BuildingSurface:Detailed - Field: View Factor to Ground and FenestrationSurface:Detailed - Field: View Factor to Ground).
+Shading surfaces also automatically shade diffuse solar radiation (and long-wave radiation) from the sky. And they will automatically shade diffuse solar radiation from the ground if Solar Distribution Field = FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building object. (If the reflections option for Solar Distribution is used, the program also takes into account the reduction of solar radiation reflected from the ground due to shading of the ground by shading surfaces and by the building itself.) Otherwise, shading surfaces will not shade diffuse radiation from the ground unless you enter a reduced value for View Factor to Ground for those building surfaces that are shaded (ref: BuildingSurface:Detailed - Field: View Factor to Ground and FenestrationSurface:Detailed - Field: View Factor to Ground).
 
 \subsection{Detached Shading Surfaces}\label{detached-shading-surfaces}
 
@@ -4050,7 +4050,7 @@ The type of shading device. The choices are:
 
 \emph{BetweenGlassShade}: A diffusing shade is between two glass layers. (In the shaded Construction the shading layer must be a WindowMaterial:Shade.) This shading type is allowed only for double- and triple-glazing. For triple-glazing the shade must be between the two inner glass layers.
 
-\emph{ExteriorScreen}: An insect screen is on the outside of the window. (In the shaded Construction the shadling layer must be a WindowMaterial:Screen.)
+\emph{ExteriorScreen}: An insect screen is on the outside of the window. (In the shaded Construction the shading layer must be a WindowMaterial:Screen.)
 
 \emph{InteriorBlind}: A slat-type shading device, such as a Venetian blind, is on the inside of the window. (In the shaded Construction the shading layer must be a WindowMaterial:Blind.)
 
@@ -4183,9 +4183,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow,
-
-and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
 
 An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m\(^{2}\).
 
