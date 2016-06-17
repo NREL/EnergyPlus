@@ -2586,8 +2586,6 @@ namespace WeatherManager {
 		Real64 WgtHourNow;
 		Real64 WgtPrevHour;
 		Real64 WgtNextHour;
-		Real64 curHrWindDir;
-		Real64 tomorrowWindDirTS;
 		static Real64 LastHrOutDryBulbTemp;
 		static Real64 LastHrOutDewPointTemp;
 		static Real64 LastHrOutBaroPress;
