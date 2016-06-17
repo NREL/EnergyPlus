@@ -3914,10 +3914,14 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 	ExchCond( ExchNum ).PerfDataIndex = BalDesDehumPerfDataIndex;
 
 	BalDesDehumPerfData.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
 	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).Name = "DehumPerformanceData";
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
 
 	// autosize nominal vol flow and face velocity
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 1 ) = "Nominal Air Flow Rate";
 	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow = AutoSize;
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 2 ) = "Nominal Air Face Velocity";
 	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel = AutoSize;
 
 	// initialize sizing variables

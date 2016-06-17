@@ -1374,6 +1374,12 @@ namespace HVACStandAloneERV {
 		ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
 
+		ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+		ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+		ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
+		ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
+
+
 		// Check supply fan flow rate or set flow rate if autosized in fan object
 		IsAutoSize = false;
 		if ( StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate == AutoSize ) {
