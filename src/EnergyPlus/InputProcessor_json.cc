@@ -2889,7 +2889,6 @@ EnergyPlus::InputProcessor::GetObjectItem(
 		AlphaArgsBlank.allocate( MaxAlphaArgsFound );
 	}
 
-	Count = 0;
 	Status = -1;
 	UCObject = MakeUPPERCase( Object );
 	if ( SortedIDD ) {
@@ -2924,106 +2923,37 @@ EnergyPlus::InputProcessor::GetObjectItem(
 	}
 	++ObjectGotCount( Found );
 
-	for ( LoopIndex = StartRecord; LoopIndex <= NumIDFRecords; ++LoopIndex ) {
-		if ( IDFRecords( LoopIndex ).Name == UCObject ) {
-			++Count;
-			if ( Count == Number ) {
-				IDFRecordsGotten( LoopIndex ) = true; // only object level "gets" recorded
-				// Read this one
-				GetObjectItemfromFile( LoopIndex, ObjectWord, NumAlphas, NumNumbers, AlphaArgs, NumberArgs, AlphaArgsBlank, NumberArgsBlank );
-				if ( NumAlphas > MaxAlphas || NumNumbers > MaxNumbers ) {
-					ShowFatalError( "IP: GetObjectItem: Too many actual arguments for those expected on Object: " + ObjectWord, EchoInputFile );
-				}
-				NumAlphas = min( MaxAlphas, NumAlphas );
-				NumNumbers = min( MaxNumbers, NumNumbers );
-				GoodItem = true;
-				if ( NumAlphas > 0 ) {
-					// Alphas( {1,NumAlphas} ) = AlphaArgs( {1,NumAlphas} );
-					for (int i = 1; i < NumAlphas; i++) {
-						Alphas[i - 1] = AlphaArgs[i - 1];
-					}
-				}
-				if ( NumNumbers > 0 ) {
-					// Numbers( {1,NumNumbers} ) = NumberArgs( {1,NumNumbers} );
-					for (int i = 1; i < NumAlphas; i++) {
-						Alphas[i - 1] = AlphaArgs[i - 1];
-					}
-				}
-				if ( present( NumBlank ) ) {
-					NumBlank = true;
-					if ( NumNumbers > 0 ) NumBlank()( {1,NumNumbers} ) = NumberArgsBlank( {1,NumNumbers} );
-				}
-				if ( present( AlphaBlank ) ) {
-					AlphaBlank = true;
-					if ( NumAlphas > 0 ) AlphaBlank()( {1,NumAlphas} ) = AlphaArgsBlank( {1,NumAlphas} );
-				}
-				if ( present( AlphaFieldNames ) ) {
-					AlphaFieldNames()( {1,ObjectDef( Found ).NumAlpha} ) = ObjectDef( Found ).AlphFieldChks( {1,ObjectDef( Found ).NumAlpha} );
-				}
-				if ( present( NumericFieldNames ) ) {
-					for ( int i = 1, e = ObjectDef( Found ).NumNumeric; i <= e; ++i ) NumericFieldNames()( i ) = ObjectDef( Found ).NumRangeChks( i ).FieldName;
-				}
-				Status = 1;
-				break;
-			}
+	auto obj = object_in_jdf.begin() + Number - 1;
+	auto const &alphas = object_in_schema["legacy_idd"]["alphas"];
+	for (int i = 0; i < alphas.size(); ++i) {
+		auto it = obj.value().find(alphas[i]);
+		if ( it != it.value().end() ) {
+			Alphas[i + 1] = it.value()[alphas[i].get<std::string>()].get<std::string>();
+			AlphaBlank[i + 1] = false;
+		} else {
+			Alphas[i + 1] = "";
+			AlphaBlank[i + 1] = true;
 		}
+		if ( present( AlphaFieldNames ) ) AlphaFieldNames[i + 1] = obj.key();
+		// TODO else also set obj.key() as alphafieldnames?
 	}
 
-/*
-	#ifdef IDDTEST
-		// This checks various principles of the IDD (e.g. required fields, defaults) to see what happens in the GetInput
-			// This can only work for "good" objects. (Found=object def)
-			// exempt certain objects
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "Schedule:Compact" ) ) return;
-	if ( has_prefixi( ObjectDef( Found ).Name, "Schedule" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "Construction" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "Construction:InternalSource" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "BuildingSurface:Detailed" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "Wall:Detailed" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "RoofCeiling:Detailed" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "Floor:Detailed" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "FenestrationSurface:Detailed" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "SizingPeriod:DesignDay" ) ) return;
-	if ( InputProcessor::SameString( ObjectDef( Found ).Name, "Branch" ) ) return;
-
-	if ( GoodItem ) {
-		NAfld = 0;
-		NNfld = 0;
-		for ( LoopIndex = 1; LoopIndex <= NumAlphas + NumNumbers; ++LoopIndex ) {
-			if ( LoopIndex > ObjectDef( Found ).MinNumFields ) break;
-			if ( ObjectDef( Found ).AlphaOrNumeric( LoopIndex ) ) {
-				++NAfld;
-				if ( ! ObjectDef( Found ).ReqField( LoopIndex ) ) {
-					if ( AlphaArgsBlank( NAfld ) ) Alphas( NAfld ) = ObjectDef( Found ).AlphFieldDefs( NAfld );
-					if ( present( AlphaBlank ) ) {
-						if ( is_blank( Alphas( NAfld ) ) ) {
-							AlphaBlank()( NAfld ) = true;
-						} else {
-							AlphaBlank()( NAfld ) = false;
-						}
-					}
-				}
-			} else {
-				++NNfld;
-				if ( ! ObjectDef( Found ).ReqField( LoopIndex ) ) {
-					Numbers( NNfld ) = ObjectDef( Found ).NumRangeChks( NNfld ).Default;
-					if ( ObjectDef( Found ).NumRangeChks( NNfld ).DefAutoSize ) Numbers( NNfld ) = ObjectDef( Found ).NumRangeChks( NNfld ).AutoSizeValue;
-					if ( ObjectDef( Found ).NumRangeChks( NNfld ).AutoCalculatable ) Numbers( NNfld ) = ObjectDef( Found ).NumRangeChks( NNfld ).AutoCalculateValue;
-
-					if ( present( NumBlank ) ) {
-						if ( Numbers( NNfld ) == ObjectDef( Found ).NumRangeChks( NNfld ).Default ) {
-							NumBlank()( NNfld ) = true;
-						} else {
-							NumBlank()( NNfld ) = false;
-						}
-					}
-				}
-			}
+	auto const &numerics = object_in_schema["legacy_idd"]["numerics"];
+	for (int i = 0; i < numerics.size(); ++i) {
+		auto it = obj.value().find(numerics[i]);
+		if ( it != it.value().end() ) {
+			if (it.value().is_string()) Numbers[i + 1] = it.value()[numerics[i]].get<double>();
+			else Numbers[i + 1] = -99999;  // autosize and autocalculate
+			NumBlank[i + 1] = false;
+		} else {
+			// TODO What to do if a numeric field is left blank?
+			Numbers[i + 1] = -123456789;
+			NumBlank[i + 1] = true;
 		}
+		if ( present( NumberFieldNames ) ) NumberFieldNames[i+1] = obj.key();
 	}
-	#endif
-	*/
 
+	Status = 1;
 }
 
 int
