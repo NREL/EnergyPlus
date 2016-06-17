@@ -728,6 +728,64 @@ namespace FaultsManager {
 
 	}
 
+	Real64
+	FaultProperties::CalFaultOffsetAct()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Jun. 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To calculate the dynamic fault offset based on the fault availability schedule and severity schedule.
+
+		// METHODOLOGY EMPLOYED:
+		// NA
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using ScheduleManager::GetCurrentScheduleValue;
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FaultFac( 0.0 ); // fault modification factor
+		Real64 OffsetAct( 0.0 ); // actual offset after applying the modification factor
+
+		// FLOW
+		
+		// Check fault availability schedules
+		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
+		
+			// Check fault severity schedules 
+			if ( this->SeveritySchedPtr >= 0 ) {
+				FaultFac = GetCurrentScheduleValue( this->SeveritySchedPtr );
+			} else {
+				FaultFac = 1.0;
+			}
+		}
+		
+		OffsetAct = FaultFac * this->Offset;
+
+		return OffsetAct;
+	}
+
+
 	bool
 	FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()
 	{

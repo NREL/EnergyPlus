@@ -181,6 +181,9 @@ namespace FaultsManager {
 			Offset( 0.0 ),
 			Status( false )
 		{}
+		
+		public:
+			Real64 CalFaultOffsetAct();
 
 	};
 	
