@@ -237,22 +237,33 @@ namespace EnergyPlus {
 			// figure out which index this substep needs to go into
 			// the zone step level data are not yet available for minute, but we can get the previous zone step data...
 		lastZnStepIndex = (ztIndex - 1);
+
 		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
 		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr) {
 			if ( itr->second == ztIndex ) { // don't drop back into the previous environment
-					lastZnStepIndex = ztIndex;
+				lastZnStepIndex = ztIndex;
+				ZoneStepStartMinutes = ztStepObj[lastZnStepIndex].stepStartMinute;
 			}
 		}
 
-		ZoneStepStartMinutes = ztStepObj[lastZnStepIndex].stepEndMinute;
+		if ( lastZnStepIndex < ztIndex ) {
+			ZoneStepStartMinutes = ztStepObj[lastZnStepIndex].stepEndMinute;
+		}
+		
 		if (ZoneStepStartMinutes < 0.0 ) ZoneStepStartMinutes = 0.0;
 
 		tmpSysStepStamp.stStepsIntoZoneStep = round(
 			(( ( tmpSysStepStamp.CurMinuteStart - ZoneStepStartMinutes ) / MinutesPerHour)
 			/ tmpSysStepStamp.TimeStepDuration) );
 
-		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ] = tmpSysStepStamp;
-		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ].LogDataValue = p_rVariable;
+		if ( ( tmpSysStepStamp.stStepsIntoZoneStep >= 0 ) && ( tmpSysStepStamp.stStepsIntoZoneStep < ztStepObj[ ztIndex ].numSubSteps ) ) {
+			ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ] = tmpSysStepStamp;
+			ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ].LogDataValue = p_rVariable;
+		} else {
+			ztStepObj[ ztIndex ].subSteps[ 0 ] = tmpSysStepStamp;
+			ztStepObj[ ztIndex ].subSteps[ 0 ].LogDataValue = p_rVariable;
+		}
+
 
 	}
 
@@ -305,7 +316,7 @@ namespace EnergyPlus {
 		MaxVal = 0.0;
 
 		if ( ! ztStepObj.empty() ) {
-			tmpztStepStamp = ztStepObj[ 1 ];
+			tmpztStepStamp = ztStepObj[ 0 ];
 		}
 
 		for ( auto &Zt : ztStepObj ) {
@@ -539,7 +550,7 @@ namespace EnergyPlus {
 
 		// first make sure we have valid time stamps to work with
 		if ( CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )
-				|| CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {
+				&& CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) { //Trane: bug fix issue #5665
 			// problem, don't have valid stamp, don't have any info to report either
 			nullStampProblem =  true;
 		} else {
@@ -548,17 +559,17 @@ namespace EnergyPlus {
 
 		previousVolDesignFlowRate = PlantSizData( plantSizingIndex ).DesVolFlowRate;
 
-		if (newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) {
+		if ( ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp ) && ( newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) ) {   //Trane: bug fix #5665
 			newFoundMassFlowRate = newFoundMassFlowRateTimeStamp.runningAvgDataValue;
 		} else {
 			newFoundMassFlowRate = 0.0;
 		}
 
 		//step 3 calculate mdot from max load and delta T
-		if ( (NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0) &&
-			((specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT) > 0.0))  {
+		if ( ( ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) && ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) ) &&   //Trane: bug fix #5665
+			( ( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT ) > 0.0 ) )  {
 				peakLoadCalculatedMassFlow = NewFoundMaxDemandTimeStamp.runningAvgDataValue /
-											(specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT);
+											( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT );
 		} else {
 			peakLoadCalculatedMassFlow = 0.0;
 		}
@@ -663,7 +674,7 @@ namespace EnergyPlus {
 		}
 
 		if ( ! nullStampProblem ) {
-			if ( ! changedByDemand ) {
+			if ( ! changedByDemand && ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )) { //Trane: bug fix #5665
 				if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
 				}
@@ -673,7 +684,7 @@ namespace EnergyPlus {
 					newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
 				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
-			} else {
+			} else if ( changedByDemand && ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {    //Trane: bug fix #5665
 				if ( NewFoundMaxDemandTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title );
 				}
