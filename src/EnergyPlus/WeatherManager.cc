@@ -3164,7 +3164,7 @@ namespace WeatherManager {
 					TomorrowOutDewPointTemp( TS, Hour ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
 					TomorrowOutRelHum( TS, Hour ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
 					TomorrowWindSpeed( TS, Hour ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
-					TomorrowWindDir( TS, Hour ) = interpolateWindDirection( LastHrWindDir, WtPrevHour, Wthr.WindDir( Hour ), WtNow );
+					TomorrowWindDir( TS, Hour ) = interpolateWindDirection( LastHrWindDir, Wthr.WindDir( Hour ), WtNow );
 					TomorrowHorizIRSky( TS, Hour ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
 					if ( Environment( Environ ).WP_Type1 == 0 ) {
 						TomorrowSkyTemp( TS, Hour ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
@@ -3228,13 +3228,11 @@ namespace WeatherManager {
 	Real64
 	interpolateWindDirection(
 		Real64 const prevHrWindDir,
-		Real64 const prevHrWeight,
 		Real64 const curHrWindDir,
 		Real64 const curHrWeight
 	)
 	{
 		// adapted from http://stackoverflow.com/questions/2708476/rotation-interpolation
-		assert( (prevHrWeight + curHrWeight) ==  1.0);
 		Real64 curAng = curHrWindDir;
 		Real64 prevAng = prevHrWindDir;
 		Real64 diff = abs( curAng - prevAng );

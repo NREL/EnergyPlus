@@ -868,7 +868,6 @@ namespace WeatherManager {
 	Real64
 	interpolateWindDirection(
 		Real64 const prevHrWindDir,
-		Real64 const prevHrWeight,
 		Real64 const curHrWindDir,
 		Real64 const curHrWeight
 	);
