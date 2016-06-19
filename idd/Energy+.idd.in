@@ -42533,8 +42533,10 @@ Coil:Cooling:DX:VariableSpeed,
         \type alpha
         \reference CoolingCoilsDXVariableSpeed
    A2,  \field Indoor Air Inlet Node Name
+        \required-field
         \type node
    A3,  \field Indoor Air Outlet Node Name
+        \required-field
         \type node
    N1,  \field Number of Speeds
         \units dimensionless
@@ -45098,8 +45100,10 @@ Coil:Heating:DX:VariableSpeed,
         \type alpha
         \reference HeatingCoilsDXVariableSpeed
    A2,  \field Indoor Air Inlet Node Name
+        \required-field
         \type node
    A3,  \field Indoor Air Outlet Node Name
+        \required-field
         \type node
    N1,  \field Number of Speeds
         \units dimensionless
@@ -45623,60 +45627,39 @@ CoilSystem:IntegratedHeatPump:AirSource,
        \type alpha
        \reference IntegratedHeatPumps
        \note Unique name for this instance of an air-source integrated heat pump.
-  A2, \field Air Cooling Coil Inlet Node Name
+  A2, \field Supply Hot Water Flow Sensor Node Name 
        \required-field
        \type node
-  A3, \field Air Heating Coil Inlet Node Name
-       \required-field
-       \type node
-  A4, \field Air Outlet Node Name
-       \required-field
-       \type node
-  A5, \field Water Inlet Node Name
-       \required-field
-       \type node
-  A6, \field Water Outlet Node Name
-       \required-field
-       \type node
-  A7, \field Supply Hot Water Flow Sensor Node Name 
-       \required-field
-       \type node
-  A8, \field Outdoor Air Inlet Node Name
-       \required-field
-       \type node
-  A9, \field Outdoor Air Outlet Node Name
-       \required-field
-       \type node
-  A10, \field Space Cooling Coil  Name
+  A3, \field Space Cooling Coil  Name
        \required-field
        \type object-list
        \object-list CoolingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
-  A11, \field Space Heating Coil Name
+  A4, \field Space Heating Coil Name
        \type object-list
        \object-list HeatingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.
-  A12, \field Dedicated Water Heating Coil Name
+  A5, \field Dedicated Water Heating Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
-  A13, \field SCWH Coil Name
+  A6, \field SCWH Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
-  A14, \field SCDWH Cooling Coil Name
+  A7, \field SCDWH Cooling Coil Name
        \type object-list
        \object-list CoolingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
-  A15, \field SCDWH Water Heating Coil Name
+  A8, \field SCDWH Water Heating Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   
-  A16, \field SHDWH Heating Coil Name
+  A9, \field SHDWH Heating Coil Name
        \type object-list
        \object-list HeatingCoilsDXVariableSpeed
        \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.   
-  A17, \field SHDWH Water Heating Coil Name
+  A10, \field SHDWH Water Heating Coil Name
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   	   
@@ -48495,17 +48478,21 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Fraction of pump heat transferred to the condenser water. The pump is assumed
        \note to be located downstream of the condenser.
   A5 , \field Evaporator Air Inlet Node Name
+       \required-field
        \type node
        \note The node from which the DX coil draws its inlet air.
   A6 , \field Evaporator Air Outlet Node Name
+       \required-field
        \type node
        \note The node to which the DX coil sends its outlet air.
   A7 , \field Condenser Water Inlet Node Name
+       \required-field
        \type node
        \note The node from which the DX coil condenser draws its inlet water.
        \note This name should match the source side outlet node name in the associated
        \note water heater tank object.
   A8 , \field Condenser Water Outlet Node Name
+       \required-field
        \type node
        \note The node to which the DX coil condenser sends its outlet water.
        \note This name should match the source side inlet node name in the associated

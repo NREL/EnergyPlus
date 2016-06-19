@@ -229,6 +229,10 @@ namespace VariableSpeedCoils {
 		int AirOutletNodeNum; // Node Number of the Air Outlet
 		int WaterInletNodeNum; // Node Number of the Water Onlet
 		int WaterOutletNodeNum; // Node Number of the Water Outlet
+		std::string  AirInletNodeName; // Node Name of the Air Inlet
+		std::string  AirOutletNodeName; // Node Name of the Air Outlet
+		std::string  WaterInletNodeName; // Node Name of the Water Onlet
+		std::string  WaterOutletNodeName; // Node Name of the Water Outlet
 		int LoopNum; // plant loop index for water side
 		int LoopSide; // plant loop side index
 		int BranchNum; // plant branch index

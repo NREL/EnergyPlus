@@ -674,6 +674,12 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
+			VarSpeedCoil(DXCoilNum).WaterInletNodeName = AlphArray(2);
+			VarSpeedCoil(DXCoilNum).WaterOutletNodeName = AlphArray(3);
+			VarSpeedCoil(DXCoilNum).AirInletNodeName = AlphArray(4);
+			VarSpeedCoil(DXCoilNum).AirOutletNodeName = AlphArray(5);
+
+
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
 
@@ -1042,11 +1048,16 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).Twet_Rated = NumArray( 5 );
 			VarSpeedCoil( DXCoilNum ).Gamma_Rated = NumArray( 6 );
 
-			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VarSpeedCoil(DXCoilNum).AirInletNodeName = AlphArray(2);
+			VarSpeedCoil(DXCoilNum).AirOutletNodeName = AlphArray(3);
 
 			if (!IsCallbyIHP) // IHP allows no node inputs for coil
-			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
+			{
+				VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+				VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+				TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Air Nodes");
+			}
+
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1398,6 +1409,11 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
+			VarSpeedCoil(DXCoilNum).WaterInletNodeName = AlphArray(2);
+			VarSpeedCoil(DXCoilNum).WaterOutletNodeName = AlphArray(3);
+			VarSpeedCoil(DXCoilNum).AirInletNodeName = AlphArray(4);
+			VarSpeedCoil(DXCoilNum).AirOutletNodeName = AlphArray(5);
+
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
 
@@ -1747,11 +1763,16 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).RatedCapHeat = NumArray( 3 );
 			VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate = NumArray( 4 );
 
-			VarSpeedCoil( DXCoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			VarSpeedCoil( DXCoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			VarSpeedCoil(DXCoilNum).AirInletNodeName = AlphArray(2);
+			VarSpeedCoil(DXCoilNum).AirOutletNodeName = AlphArray(3);
 
 			if (!IsCallbyIHP) // IHP allows no node inputs for coil
-			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Air Nodes" );
+			{
+				VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+				VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+				TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Air Nodes");
+			}
+
 
 			if ( VarSpeedCoil( DXCoilNum ).NumOfSpeeds < 1 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2168,23 +2189,31 @@ namespace VariableSpeedCoils {
 			}
 
 			//Air nodes
-			VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-
-			VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+			VarSpeedCoil(DXCoilNum).AirInletNodeName = AlphArray(5);
+			VarSpeedCoil(DXCoilNum).AirOutletNodeName = AlphArray(6);
 
 			if (!IsCallbyIHP) // IHP allows no node inputs for coil
-			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
+			{
+				VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+				VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+				TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
+			}
+
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
 			VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum );
 
 			//Water nodes
-			VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-
-			VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+			VarSpeedCoil(DXCoilNum).WaterInletNodeName = AlphArray(7);
+			VarSpeedCoil(DXCoilNum).WaterOutletNodeName = AlphArray(8);
 
 			if (!IsCallbyIHP) // IHP allows no node inputs for coil
-			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(7), AlphArray(8), "Water Nodes");
+			{
+				VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+				VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+				TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(7), AlphArray(8), "Water Nodes");
+			}
+
 
 			VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(10);
 			if (VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
