@@ -479,6 +479,7 @@ namespace MoistureBalanceEMPDManager {
 		Real64 EMPDdiffusivity;
 		Real64 Rcoating;
 		Real64 RH_surf_layer;
+		Real64 RH_surf_layer_tmp;
 		Real64 RH_deep_layer;
 
 		if ( BeginEnvrnFlag && OneTimeFlag ) {
@@ -495,6 +496,11 @@ namespace MoistureBalanceEMPDManager {
 		auto const & rv_surface_old( RVSurfaceOld( SurfNum ) ); // input
 		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) ); // input
 		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) ); // input
+		Real64 RHZone;
+		Real64 mass_flux_surf_deep;
+		Real64 mass_flux_surf_deep_max;
+		Real64 mass_flux_zone_surf;
+		Real64 mass_flux_zone_surf_max;
 		Real64 mass_flux_surf_layer;
 		Real64 mass_flux_deep_layer;
 		Real64 mass_flux_zone;
@@ -539,6 +545,14 @@ namespace MoistureBalanceEMPDManager {
 		// Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
 		dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
 
+		//Convert vapor density and temperature of zone air to RH
+		RHZone = rho_vapor_air_in * 461.52 * (TempZone + KelvinConv) * std::exp(-23.7093 + 4111.0 / ((TempZone + KelvinConv) - 35.45));
+
+		// Convert stored vapor density from previous timestep to RH.
+		RH_deep_layer_old = PsyRhFnTdbRhov(Taver, rv_deep_old);
+		RH_surf_layer_old = PsyRhFnTdbRhov(Taver, rv_surf_layer_old);
+
+
 		// If coating vapor resistance factor equals 0, coating resistance is zero (avoid divide by zero).
 		// Otherwise, calculate coating resistance with coating vapor resistance factor and thickness. [s/m]
 		if (material.EMPDmuCoating <= 0.0) {
@@ -561,16 +575,90 @@ namespace MoistureBalanceEMPDManager {
 		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd - Rcoating;
 
 		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
+		mass_flux_surf_deep_max = material.EMPDDeepDepth*material.Density*dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (TimeStepZone * 3600.0);
+		mass_flux_surf_deep = hm_deep_layer * (rv_surf_layer_old - rv_deep_old);
+		if (std::abs(mass_flux_surf_deep_max) > std::abs(mass_flux_surf_deep)) {
+			mass_flux_surf_deep = mass_flux_surf_deep;
+		}
+		else {
+			mass_flux_surf_deep = mass_flux_surf_deep_max;
+		}
+
+		mass_flux_zone_surf_max = material.EMPDSurfaceDepth*material.Density*dU_dRH * (RHZone - RH_surf_layer_old) / (TimeStepZone * 3600.0);
+		mass_flux_zone_surf = hm_surf_layer * (rho_vapor_air_in - rv_surf_layer_old);
+		if (std::abs(mass_flux_zone_surf_max) > std::abs(mass_flux_zone_surf)) {
+			mass_flux_zone_surf = mass_flux_zone_surf;
+		}
+		else {
+			mass_flux_zone_surf = mass_flux_zone_surf_max;
+		}
+
+		//mass_flux_surf_layer = -mass_flux_zone_surf + mass_flux_surf_deep;
+		//mass_flux_deep_layer = mass_flux_surf_deep;
+		//mass_flux_zone = -mass_flux_zone_surf;
+
 		mass_flux_surf_layer = hm_surf_layer * ( rv_surf_layer_old - rho_vapor_air_in ) + hm_deep_layer * ( rv_surf_layer_old - rv_deep_old );
 		mass_flux_deep_layer = hm_deep_layer * ( rv_surf_layer_old - rv_deep_old );
 		mass_flux_zone = hm_surf_layer * ( rv_surf_layer_old - rho_vapor_air_in );
 
-		// Convert stored vapor density from previous timestep to RH.
-		RH_deep_layer_old = PsyRhFnTdbRhov( Taver, rv_deep_old );
-		RH_surf_layer_old = PsyRhFnTdbRhov( Taver, rv_surf_layer_old );
-
 		// Calculate new surface layer RH using mass balance on surface layer
-		RH_surf_layer = RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
+		RH_surf_layer_tmp = RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
+
+	//	RH_surf_layer = RH_surf_layer_tmp;
+
+		if (RH_surf_layer_old < RH_deep_layer_old && RH_surf_layer_old < RHZone) {
+			if (RHZone > RH_deep_layer_old) {
+				if (RH_surf_layer_tmp > RHZone) {
+					RH_surf_layer = RHZone;
+				}
+				else {
+					RH_surf_layer = RH_surf_layer_tmp;
+				}
+			}
+			else if (RH_surf_layer_tmp > RH_deep_layer_old) {
+					RH_surf_layer = RH_deep_layer_old;
+			}
+			else {
+					RH_surf_layer = RH_surf_layer_tmp;
+			}
+		
+		}
+		else if (RH_surf_layer_old < RH_deep_layer_old && RH_surf_layer_old > RHZone) {
+			if (RH_surf_layer_tmp > RH_deep_layer_old) {
+				RH_surf_layer = RH_deep_layer_old;
+			}
+			else if (RH_surf_layer_tmp < RHZone) {
+				RH_surf_layer = RHZone;
+			}
+			else {
+				RH_surf_layer = RH_surf_layer_tmp;
+			}
+		}
+		else if (RH_surf_layer_old > RH_deep_layer_old && RH_surf_layer_old < RHZone) {
+			if (RH_surf_layer_tmp > RHZone) {
+				RH_surf_layer = RHZone;
+			}
+			else if (RH_surf_layer_tmp < RH_deep_layer_old) {
+				RH_surf_layer = RH_deep_layer_old;
+			}
+			else
+				RH_surf_layer = RH_surf_layer_tmp;
+		}
+		else if (RHZone < RH_deep_layer_old) {
+			if (RH_surf_layer_tmp < RHZone) {
+				RH_surf_layer = RHZone;
+			}
+			else {
+				RH_surf_layer = RH_surf_layer_tmp;
+			}
+		}
+		else if (RH_surf_layer_tmp < RH_deep_layer_old) {
+			RH_surf_layer = RH_deep_layer_old;
+		}
+		else {
+			RH_surf_layer = RH_surf_layer_tmp;
+		}
+
 
 		// Calculate new deep layer RH using mass balance on deep layer (unless depth <= 0).
 		if (material.EMPDDeepDepth <= 0.0) {
@@ -639,7 +727,7 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if (SurfNum==194) std::cout << "---" << std::endl;
+		//if (SurfNum==194) std::cout << "---" << std::endl;
 		RVSurfaceOld( SurfNum ) = RVSurface( SurfNum );
 		RVdeepOld( SurfNum ) = RVDeepLayer( SurfNum );
 		RVSurfLayerOld( SurfNum ) = RVSurfLayer( SurfNum );
