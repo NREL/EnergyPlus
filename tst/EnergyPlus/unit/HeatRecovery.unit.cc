@@ -118,6 +118,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Real64 Tnode = 0.0;
 	Real64 SetPointTemp = 19.0;
 	Real64 PartLoadRatio = 0.25;
+	int BalDesDehumPerfDataIndex = 1;
 
 	CurZoneEqNum = 0;
 	CurSysNum = 0;
@@ -156,6 +157,11 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Node( ExchCond( ExchNum ).SecInletNode ).Enthalpy = ExchCond( ExchNum ).SecInEnth;
 	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow;
 	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow;
+
+	HeatExchCondNumericFields.allocate( ExchNum );
+	HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( 5 );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
 
 	// HXUnitOn is false so expect outlet = inlet
 	InitHeatRecovery( ExchNum, CompanionCoilNum );

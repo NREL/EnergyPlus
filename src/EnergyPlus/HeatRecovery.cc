@@ -1491,6 +1491,7 @@ namespace HeatRecovery {
 		std::string	CompType; // component type
 		std::string SizingString; // input field sizing description
 
+		HRFlowSizingFlag = true;
 		PrintFlag = true;
 		if ( ExchCond( ExchNum ).ExchTypeNum == HX_DESICCANT_BALANCED ) {			
 			FieldNum = 0;
@@ -1508,21 +1509,51 @@ namespace HeatRecovery {
 			SizingString = "Nominal Supply Air Flow Rate [m3/s]";
 		}
 		SizingMethod = SystemAirflowSizing;
+		if ( CurZoneEqNum > 0 ) {
+			if ( ExchCond( ExchNum ).NomSupAirVolFlow == AutoSize ) {
+				// Heat recovery heat exchanger in zoneHVAC equipment shall be sized to OA flow in the parent equipment
+				SizingMethod = AutoCalculateSizing;
+				DataConstantUsedForSizing = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				DataFractionUsedForSizing = 1.0;
+			} else {
+				if ( ZoneSizingRunDone ) {
+					// Heat recovery heat exchanger in zoneHVAC equipment shall be sized to OA flow in the parent equipment
+					SizingMethod = AutoCalculateSizing;
+					DataConstantUsedForSizing = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+					DataFractionUsedForSizing = 1.0;
+				} 
+			}
+		} 
 		TempSize = ExchCond( ExchNum ).NomSupAirVolFlow;
 		RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 		ExchCond( ExchNum ).NomSupAirVolFlow = TempSize;
-
+		DataConstantUsedForSizing = 0.0;
+		DataFractionUsedForSizing = 0.0;
 		if ( ExchCond( ExchNum ).ExchTypeNum == HX_AIRTOAIR_FLATPLATE ) {
 			PrintFlag = true;
 			FieldNum = 5;
 			CompName = ExchCond( ExchNum ).Name;
 			CompType = cHXTypes( ExchCond( ExchNum ).ExchTypeNum );
 			SizingString = HeatExchCondNumericFields( ExchNum ).NumericFieldNames( FieldNum ) + " [m3/s]";
-			SizingMethod = SystemAirflowSizing;
+			SizingMethod = SystemAirflowSizing;						
+			if ( ExchCond( ExchNum ).NomSecAirVolFlow == AutoSize ) {
+					SizingMethod = AutoCalculateSizing;
+					DataConstantUsedForSizing = ExchCond( ExchNum ).NomSupAirVolFlow;
+					DataFractionUsedForSizing = 1.0;
+			} else {
+				if ( ZoneSizingRunDone || SysSizingRunDone ) {
+					SizingMethod = AutoCalculateSizing;
+					DataConstantUsedForSizing = ExchCond( ExchNum ).NomSupAirVolFlow;
+					DataFractionUsedForSizing = 1.0;
+				} 
+			}				
 			TempSize = ExchCond( ExchNum ).NomSecAirVolFlow;
 			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 			ExchCond( ExchNum ).NomSecAirVolFlow = TempSize;
+			DataConstantUsedForSizing = 0.0;
+			DataFractionUsedForSizing = 0.0;
 		}
+		HRFlowSizingFlag = false;
 
 		if ( ExchCond( ExchNum ).ExchTypeNum == HX_DESICCANT_BALANCED && ExchCond( ExchNum ).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1 ) {
 

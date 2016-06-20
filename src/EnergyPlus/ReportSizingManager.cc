@@ -1360,11 +1360,27 @@ namespace ReportSizingManager {
 						}
 					}
 				} else if ( SizingType == SystemAirflowSizing ) {
-					if ( CurOASysNum > 0 ) {
-						if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
-							AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+					if ( HRFlowSizingFlag ) {						
+						if ( CurOASysNum ) {
+							if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+							} else {
+								// ELSE size to supply air duct flow rate
+								{ auto const SELECT_CASE_var( CurDuctType );
+								if ( SELECT_CASE_var == Main ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								} else if ( SELECT_CASE_var == Cooling ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+								} else if ( SELECT_CASE_var == Heating ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+								} else if ( SELECT_CASE_var == Other ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								} else {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								}}
+							}
+
 						} else {
-							// ELSE size to supply air duct flow rate
 							{ auto const SELECT_CASE_var( CurDuctType );
 							if ( SELECT_CASE_var == Main ) {
 								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
@@ -1378,6 +1394,7 @@ namespace ReportSizingManager {
 								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 							}}
 						}
+
 					} else {
 						if ( AirLoopSysFlag ) {
 							if ( UnitarySysEqSizing( CurSysNum ).CoolingAirFlow && UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {

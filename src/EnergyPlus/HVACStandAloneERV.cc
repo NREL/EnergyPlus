@@ -1256,6 +1256,7 @@ namespace HVACStandAloneERV {
 		using MixedAir::SetOAControllerData;
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
+		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1374,12 +1375,6 @@ namespace HVACStandAloneERV {
 		ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
 
-		ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
-		ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
-		ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
-		ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
-
-
 		// Check supply fan flow rate or set flow rate if autosized in fan object
 		IsAutoSize = false;
 		if ( StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate == AutoSize ) {
@@ -1402,6 +1397,10 @@ namespace HVACStandAloneERV {
 				}
 			}
 		}
+
+		SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
+		SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );		
+		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
 
 		// Check heat exchanger flow rate or set flow rate if autosized in heat exchanger object
 		IsAutoSize = false;
