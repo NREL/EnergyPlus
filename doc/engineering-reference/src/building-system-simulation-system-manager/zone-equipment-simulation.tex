@@ -3,38 +3,26 @@
 When the EnergyPlus HVAC simulation manager needs to simulate the zone equipment side of the air loop it calls \emph{ManageZoneEquipment}, the zone equipment simulation manager subroutine. Like the other managers, \emph{ManageZoneEquipment} has a very simple structure:
 
 \begin{lstlisting}
-        IF (GetInputFlag) THEN
-          CALL GetZoneEquipment
-          GetInputFlag = .FALSE.
-        END IF
-\end{lstlisting}
+IF (GetInputFlag) THEN
+  CALL GetZoneEquipment
+  GetInputFlag = .FALSE.
+END IF
 
-\begin{lstlisting}
-        CALL InitZoneEquipment(FirstHVACIteration)
-\end{lstlisting}
+CALL InitZoneEquipment(FirstHVACIteration)
 
-\begin{lstlisting}
-        IF (ZoneSizingCalc) THEN
-          CALL SizeZoneEquipment
-        ELSE
-          CALL SimZoneEquipment(FirstHVACIteration, SimAir)
-        END IF
-\end{lstlisting}
+IF (ZoneSizingCalc) THEN
+  CALL SizeZoneEquipment
+ELSE
+  CALL SimZoneEquipment(FirstHVACIteration, SimAir)
+END IF
 
-\begin{lstlisting}
-        CALL RecordZoneEquipment(SimAir)
-\end{lstlisting}
+CALL RecordZoneEquipment(SimAir)
+ 
+CALL ReportZoneEquipment
 
-\begin{lstlisting}
-        CALL ReportZoneEquipment
-\end{lstlisting}
+SimZone = .False.
 
-\begin{lstlisting}
-        SimZone = .False.
-\end{lstlisting}
-
-\begin{lstlisting}
-        RETURN
+RETURN
 \end{lstlisting}
 
 \begin{enumerate}
@@ -56,43 +44,23 @@ When the EnergyPlus HVAC simulation manager needs to simulate the zone equipment
 The input specifying a set of zone equipment consists of:
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  the ZoneHVAC:EquipmentConnections object data;
+  \item
+    the ZoneHVAC:EquipmentConnections object data;
+    \begin{enumerate}
+      \item the zone connection to the air loop – air inlet nodes, exhaust nodes, outlet node, zone node;
+      \item the components serving each zone – air terminal units, fan coils etc.;
+    \end{enumerate}
+  \item
+    zone supply air path data;
+    \begin{enumerate}
+      \item zone splitters and supply plenums;
+    \end{enumerate}
+  \item
+    zone return air path data;
+    \begin{enumerate}
+      \item zone mixer and return plenums;
+    \end{enumerate}
 \end{enumerate}
-
-\begin{lstlisting}
-a.  the zone connection to the air loop – air inlet nodes, exhaust nodes, outlet node, zone node;
-\end{lstlisting}
-
-\begin{lstlisting}
-b.  the components serving each zone – air terminal units, fan coils etc.;
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  zone supply air path data;
-\end{enumerate}
-
-\begin{lstlisting}
-a.  zone splitters and supply plenums;
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
-\item
-  zone return air path data;
-\end{enumerate}
-
-\begin{lstlisting}
-a.  zone mixer and return plenums;
-\end{lstlisting}
 
 \subsection{Initialization Calculations}\label{initialization-calculations-000}
 
