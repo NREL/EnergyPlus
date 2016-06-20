@@ -1748,7 +1748,7 @@ This is the amount of evaporative heat loss (latent) to the zone from the pool i
 
 \subsection{OtherEquipment}\label{otherequipment}
 
-Other Equipment object is provided as an additional source for heat gains or losses directly to the zone.~ That is to say, a loss can be entered by putting a negative value into the Design Level field(s). Note, too, that this object does not have an end-use component -- gains or losses do not show up in the bottom energy lines (except as influencing overall zone gains or losses).
+Other Equipment object is provided as an additional source for heat gains or losses directly to the zone with a fuel type that is configurable. If a fuel type is specified, the energy is attributed to the appropriate end use. Otherwise, a loss can be entered by putting a negative value into the Design Level field and this object will not have an end-use component -- gains or losses do not show up in the bottom energy lines (except as influencing overall zone gains or losses).
 
 \subsubsection{Inputs}\label{inputs-8-010}
 
@@ -1756,9 +1756,9 @@ Other Equipment object is provided as an additional source for heat gains or los
 
 The name of the OtherEquipment object.
 
-\paragraph{Field: Fuel Use Type}\label{field-fuel-use-type}
+\paragraph{Field: Fuel Type}\label{field-fuel-use-type}
 
-This field designates the appropriate meter for the equipment. Valid fuel types are: Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
+This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains. 
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-6}
 
@@ -1798,15 +1798,15 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 \paragraph{Field: Design Level}\label{field-design-level-4}
 
-This field (in Watts) is typically used to represent the maximum energy input to other equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the other equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. This value can be negative to denote a loss. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
+This field (in Watts) is typically used to represent the maximum energy input to other equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the other equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
 \paragraph{Field: Power per Zone Floor Area}\label{field-power-per-zone-floor-area-3}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
 
 \paragraph{Field: Power per Person}\label{field-power-per-person-3}
 
-This factor (watts/person) is used, along with the number of occupants (people) to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss. The choice from the method field should be ``\textbf{Watts/Person}'' or ``\textbf{Power/Person}''.
+This factor (watts/person) is used, along with the number of occupants (people) to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. The choice from the method field should be ``\textbf{Watts/Person}'' or ``\textbf{Power/Person}''.
 
 \paragraph{Heat Gains/Losses from Other Equipment:}\label{heat-gainslosses-from-other-equipment}
 
