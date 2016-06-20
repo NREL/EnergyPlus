@@ -1430,12 +1430,12 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).HeatingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).CoolingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).NoHeatCoolSpeedRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
-					if ( UnitarySystem( UnitarySysNum ).FanExists ) {
+					if ( UnitarySystem( UnitarySysNum ).FanExists && ! MultiOrVarSpeedHeatCoil( UnitarySysNum ) && ! MultiOrVarSpeedCoolCoil( UnitarySysNum )) {
 						if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) {
 							if ( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow ) {
 								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 								ShowContinueError( "...For fan type and name = " + FanType + " \"" + FanName + "\"" );
-								ShowContinueError( "...Fan power ratio function of speed ratio curve has no impact IF fan volumetric flow rate is the same as the unitary system volumetric flow rate." );
+								ShowContinueError( "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the same as the unitary system volumetric flow rate." );
 								ShowContinueError( "...Fan volumetric flow rate            = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 5 ) + " m3/s." );
 								ShowContinueError( "...Unitary system volumetric flow rate = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, 5 ) + " m3/s." );
 							}
@@ -2343,16 +2343,17 @@ namespace HVACUnitarySystem {
 			if ( MSHPIndex > 0 ) {
 				for ( Iter = DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating; Iter >= 1; --Iter ) { // use reverse order since we divide by HeatVolumeFlowRate(max)
 					if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) == AutoSize ) {
-						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
+						if ( UnitarySystem( UnitarySysNum ).ControlType == SetPointBased && ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) ) {
 							DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = 1.0;
 						} else {
 							DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = double( Iter ) / double( DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating );
 						}
 					} else {
 						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
-							if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) < 1.0 ) {
+							if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) < 1.0 && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 								ShowWarningError( RoutineName + ": " + CompType + " = " + CompName );
 								ShowContinueError( "Design specification object = " + DesignSpecMSHP( MSHPIndex ).Name );
+								ShowContinueError( "When control type = SetPointBased the outlet air temperature must change with coil capacity, if air flow also changes outlet air temperature will be relatively constant." );
 								ShowContinueError( "Speed " + TrimSigDigits( Iter ) + " Supply Air Flow Ratio During Heating Operation will be set = 1.0 and the simulation continues");
 								DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = 1.0;
 							}
@@ -7200,7 +7201,11 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).HeatingSpeedNum <= 1 ) {
 					UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).HeatingCycRatio = PartLoadRatio;
-					MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+						MSHPMassFlowRateLow = CompOnMassFlow; // Trane #5737
+					} else {
+						MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					}
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
 						UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = PartLoadRatio;
@@ -7228,7 +7233,11 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum <= 1 ) {
 					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).CoolingCycRatio = PartLoadRatio;
-					MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+						MSHPMassFlowRateLow = CompOnMassFlow; // Trane #5737
+					} else {
+						MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					}
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
 						UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = PartLoadRatio;
@@ -7462,6 +7471,8 @@ namespace HVACUnitarySystem {
 			// for multispeed coils, comp is on IF speed > 1
 		} else if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
 			CoolingCompOn = 1;
+			// let logical override compressor status if present (tests if economizer can meet load without compressor)
+			if ( present( CompOn ) ) CoolingCompOn = CompOn;
 		}
 
 		HeatingCompOn = 0;
@@ -10722,9 +10733,17 @@ namespace HVACUnitarySystem {
 		} // No Heating/Cooling Load
 
 		if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil && ( HeatingLoad && HeatSpeedNum == 1 ) ) {
-			MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				MSHPMassFlowRateLow = CompOnMassFlow; // Trane #7
+			} else {
+				MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			}
 		} else if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil && ( CoolingLoad && CoolSpeedNum == 1 ) ) {
-			MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				MSHPMassFlowRateLow = CompOnMassFlow; // Trane #7
+			} else {
+				MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			}
 		} else {
 			MSHPMassFlowRateLow = CompOffMassFlow; // these need to be set for multi-speed coils
 		}
