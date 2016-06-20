@@ -2244,15 +2244,15 @@ This numeric field contains the higher heating value of the fuel used in kJ/kg.
 
 \paragraph{Field: Design Heat Recovery Water Flow Rate}\label{field-design-heat-recovery-water-flow-rate-3}
 
-This numeric field specifies the heat recovery volumetric flow rate through the engine in m\(^{3}\)/sec.~The heat recovery loop manager and hot water tan must also be specified if heat energy is to be recovered from the engine driven chiller.
+This optional numeric field is the design heat recovery plant fluid flow rate, if the heat recovery option is being simulated. If this value is greater than 0.0, or autosize, then a heat recovery loop must be specified and attached to the chiller using the next two node input fields. The units are in cubic meters per second.  This field is autosizable. When autosizing, the flow rate is simply the product of the design condenser flow rate and the Condenser Heat Recovery Relative Capacity Fraction set in the field below.
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{field-heat-recovery-inlet-node-name-3}
 
-This alpha field contains the identifying name for the heat recovery side inlet. If a loop is connected, then the jacket and lubricant heat will be recovered. There is no need for an effectiveness term, since the jacket and lubricant recovered heat energies are the actual recovered energies.
+This alpha field contains the identifying name for the heat recovery side inlet node. If a loop is connected, then the jacket and lubricant heat will be recovered. There is no need for an effectiveness term, since the jacket and lubricant recovered heat energies are the actual recovered energies.
 
 \paragraph{Field: Heat Recovery Outlet Node Name}\label{field-heat-recovery-outlet-node-name-3}
 
-This alpha field contains the identifying name for the heat recovery side outlet.
+This alpha field contains the identifying name for the heat recovery side outlet node.
 
 \paragraph{Field: Chiller Flow Mode}\label{field-chiller-flow-mode-5}
 
@@ -2279,6 +2279,10 @@ This numeric field contains the set point temperature (˚C) for the basin heater
 \paragraph{Field: Basin Heater Operating Schedule Name}\label{field-basin-heater-operating-schedule-name-3-001}
 
 This alpha field contains the name of the basin heater operating schedule. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater operating schedule is assumed to be an on/off schedule and the heater is available to operate any time the schedule value is greater than 0. The basin heater operates when scheduled on and the outdoor air dry-bulb temperature is below the set point temperature described in the previous field. If this field is left blank, the basin heater is available to operate throughout the simulation. Regardless of this schedule, the basin heater may only operate when the chiller is off.
+
+\paragraph{Field: Condenser Heat Recovery Relative Capacity Fraction}\label{field-engine-heat-recovery-fraction}
+
+This field is optional. It can be used to describe the physical size of the heat recovery portion of a split bundle condenser section. This fraction describes the relative capacity of the heat recovery bundle of a split condenser compared to the nominal, full load heat rejection rate of the chiller. This fraction will be applied to the full heat rejection when operating at nominal capacity and nominal COP to model a capacity limit for the heat rejection. If this field is not entered then the capacity fraction is set to 1.0.
 
 An example of this statement in an IDF is:
 
@@ -2783,7 +2787,7 @@ This numeric field contains the higher heating value of the fuel used in kJ/kg.
 
 \paragraph{Field: Design Heat Recovery Water Flow Rate}\label{field-design-heat-recovery-water-flow-rate-4}
 
-This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0, a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.
+This optional numeric field is the design heat recovery plant fluid flow rate, if the heat recovery option is being simulated. If this value is greater than 0.0, or autosize, then a heat recovery loop must be specified and attached to the chiller using the next two node input fields. The units are in cubic meters per second.  This field is autosizable. When autosizing, the flow rate is simply the product of the design condenser flow rate and the Condenser Heat Recovery Relative Capacity Fraction set in the field below.
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{field-heat-recovery-inlet-node-name-4}
 
@@ -2824,6 +2828,10 @@ This numeric field contains the set point temperature (˚C) for the basin heater
 \paragraph{Field: Basin Heater Operating Schedule Name}\label{field-basin-heater-operating-schedule-name-4-000}
 
 This alpha field contains the name of the basin heater operating schedule. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater operating schedule is assumed to be an on/off schedule and the heater is available to operate any time the schedule value is greater than 0. The basin heater operates when scheduled on and the outdoor air dry-bulb temperature is below the set point temperature described in the previous field. If this field is left blank, the basin heater is available to operate throughout the simulation. Regardless of this schedule, the basin heater may only operate when the chiller is off.
+
+\paragraph{Field: Condenser Heat Recovery Relative Capacity Fraction}\label{field-heat-recovery-fraction}
+
+This field is optional. It can be used to describe the physical size of the heat recovery portion of a split bundle condenser section. This fraction describes the relative capacity of the heat recovery bundle of a split condenser compared to the nominal, full load heat rejection rate of the chiller. This fraction will be applied to the full heat rejection when operating at nominal capacity and nominal COP to model a capacity limit for the heat rejection. If this field is not entered then the capacity fraction is set to 1.0.
 
 An example of this statement in an IDF is:
 
@@ -4421,21 +4429,21 @@ This alpha field contains the heat pump's load side inlet node name.
 
 This alpha field contains the heat pump's load side outlet node name.
 
-\paragraph{Field: Rated Load Side Flow Rate}\label{field-rated-load-side-flow-rate}
+\paragraph{Field: Design Load Side Flow Rate}\label{field-rated-load-side-flow-rate}
 
-This numeric field contains the rated volumetric flow rate on the load side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data.
+This numeric field contains the design volume flow rate on the load side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Rated Source Side Flow Rate}\label{field-rated-source-side-flow-rate}
+\paragraph{Field: Design Source Side Flow Rate}\label{field-rated-source-side-flow-rate}
 
-This numeric field contains the rated volumetric flow rate on the source side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data.
+This numeric field contains the design volume flow rate on the source side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Rated Cooling Capacity}\label{field-rated-cooling-capacity}
+\paragraph{Field: Design Cooling Capacity}\label{field-rated-cooling-capacity}
 
-This numeric field contains the rated cooling capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data.
+This numeric field contains the design cooling capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Rated Cooling Power Consumption}\label{field-rated-cooling-power-consumption}
+\paragraph{Field: Design Cooling Power Consumption}\label{field-rated-cooling-power-consumption}
 
-Rated cooling power consumption, in W.
+This numeric field is the design electric power consumption for cooling, in W.  This corresponds to the electic power use at the Design Cooling Capacity. This field is autosizable.  When autosized, the field called Nominal Coefficient of Performance must be used.
 
 \paragraph{Fields: Cooling Capacity Coefficients 1-5}\label{fields-cooling-capacity-coefficients-1-5}
 
@@ -4444,6 +4452,18 @@ Five fields are used to describe the coefficients for the Cooling Capacity curve
 \paragraph{Field: Cooling Compressor Power Coefficients 1-5}\label{field-cooling-compressor-power-coefficients-1-5}
 
 Five fields are used to decribe the coefficients for the Cooling Compressor Power curve.
+
+\paragraph{Field: Nominal Coefficient of Performance}\label{field-cooling-nom-COP}
+
+This field is required if the Design Cooling Power Consumption is set to autosize.  The nominal COP is defined by the Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and is non-dimensional.  This field is only used for sizing; if the Design Cooling Power Consumption is set to a fixed value then COP of the component during simulation will be determined by the ratio of Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and not by the value in this field.
+
+\paragraph{Field: Sizing Factor}\label{field-cooling-siz-fac}
+
+This optional numeric field allows the user to specify a sizing factor for this component. The
+sizing factor is used when the component design inputs are autosized: the autosizing calculations
+are performed as usual and the results are multiplied by the sizing factor. For this component
+the inputs that would be altered by the sizing factor are: Design Load Side Flow Rate, Design Source Side Flow Rate, Design Cooling Capacity, and Design Cooling Power Consumption. The Sizing Factor allows the user to size
+a component to meet part of the plant loop's design load while continuing to use the autosizing feature.  For example if there are two heat pumps on the supply side, each one could be sized to be half of the design load.
 
 An idf example:
 
@@ -4468,7 +4488,9 @@ HeatPump:WaterToWater:EquationFit:Cooling,
   0.96265085,              !- Cooling Compressor Power Coefficient 2
   8.69489229,              !- Cooling Compressor Power Coefficient 3
   0.02501669,              !- Cooling Compressor Power Coefficient 4
-  -0.20132665;             !- Cooling Compressor Power Coefficient 5
+  -0.20132665,             !- Cooling Compressor Power Coefficient 5
+  8.32,                    !- Nominal Coefficient of Performance
+  1.0;                     !- Sizing Factor
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-004}
@@ -4574,21 +4596,21 @@ This alpha field contains the heat pump's load side inlet node name.
 
 This alpha field contains the heat pump's load side outlet node name.
 
-\paragraph{Field: Rated Load Side Flow Rate}\label{field-rated-load-side-flow-rate-1}
+\paragraph{Field: Design Load Side Flow Rate}\label{field-rated-load-side-flow-rate-1}
 
-This numeric field contains the rated volumetric flow rate on the load side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data.
+This numeric field contains the design volume flow rate on the load side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Rated Source Side Flow Rate}\label{field-rated-source-side-flow-rate-1}
+\paragraph{Field: Design Source Side Flow Rate}\label{field-rated-source-side-flow-rate-1}
 
-This numeric field contains the rated volumetric flow rate on the source side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data.
+This numeric field contains the design volume flow rate on the source side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Rated Heating Capacity}\label{field-rated-heating-capacity-000}
+\paragraph{Field: Design Heating Capacity}\label{field-rated-heating-capacity-000}
 
-This numeric field contains the rated heating capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data.
+This numeric field contains the design heating capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Rated Heating Power Consumption}\label{field-rated-heating-power-consumption}
+\paragraph{Field: Design Heating Power Consumption}\label{field-rated-heating-power-consumption}
 
-Rated heating power consumption, in W.
+This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Design Heating Capacity. This field is autosizable.  When autosized, the field called Nominal Coefficient of Performance must be used.
 
 \paragraph{Fields: Heating Capacity Coefficients 1-5}\label{fields-heating-capacity-coefficients-1-5}
 
@@ -4597,6 +4619,19 @@ Five fields are used to describe the coefficients for the Heating Capacity curve
 \paragraph{Field: Heating Compressor Power Coefficients 1-5}\label{field-heating-compressor-power-coefficients-1-5}
 
 Five fields are used to describe the coefficients for the Heating Compressor Power curve.
+
+\paragraph{Field: Nominal Coefficient of Performance}\label{field-heating-nom-COP}
+
+This field is required if the Design Heating Power Consumption is set to autosize.  The nominal COP is defined by the Design Heating Capacity divided by the corresponding Design Heating Power Consumption and is non-dimensional.  This field is only used for sizing; if the Design Heating Power Consumption is set to a fixed value then COP of the component during simulation will be determined by the ratio of Design Heating Capacity divided by the corresponding Design Heating Power Consumption and not by the value in this field.
+
+\paragraph{Field: Sizing Factor}\label{field-heating-siz-fac}
+
+This optional numeric field allows the user to specify a sizing factor for this component. The
+sizing factor is used when the component design inputs are autosized: the autosizing calculations
+are performed as usual and the results are multiplied by the sizing factor. For this component
+the inputs that would be altered by the sizing factor are: Design Load Side Flow Rate, Design Source Side Flow Rate, Design Heating Capacity, and Design Heating Power Consumption. The Sizing Factor allows the user to size
+a component to meet part of the plant loop's design load while continuing to use the autosizing feature.  For example if there are two heat pumps on the supply side, each one could be sized to be half of the design load.
+
 
 An idf example:
 
@@ -4621,7 +4656,9 @@ HeatPump:WaterToWater:EquationFit:Heating,
   8.57035762,              !- Heating Compressor Power Coefficient 2
   1.29660976,              !- Heating Compressor Power Coefficient 3
   -0.21629222,             !- Heating Compressor Power Coefficient 4
-  0.033862378;             !- Heating Compressor Power Coefficient 5
+  0.033862378,             !- Heating Compressor Power Coefficient 5
+  7.61,                    !- Nominal Coefficient of Performance
+  1.0;                     !- Sizing Factor
 \end{lstlisting}
 
 Next, the parameter estimation model objects are described. This model has two sets of parameters, one for the heating mode and other for the cooling mode.

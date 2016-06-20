@@ -61565,6 +61565,7 @@ Chiller:EngineDriven,
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
        \ip-units gal/min
+       \autosizable
   A13, \field Heat Recovery Inlet Node Name
        \type node
   A14, \field Heat Recovery Outlet Node Name
@@ -61607,7 +61608,7 @@ Chiller:EngineDriven,
        \default 2.0
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Enter the outdoor dry-bulb temperature when the basin heater turns on.
-  A16; \field Basin Heater Operating Schedule Name
+  A16, \field Basin Heater Operating Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note This field is only used for Condenser Type = EvaporativelyCooled.
@@ -61615,6 +61616,12 @@ Chiller:EngineDriven,
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
+  N31; \field Condenser Heat Recovery Relative Capacity Fraction
+       \note This optional field is the fraction of total rejected heat that can be recovered at full load.
+       \note Also used to autosize Design Heat Recovery Water Flow Rate as a fraction of Design Condenser Water Flow Rate.
+       \type real
+       \minimum 0.0
+       \maximum 1.0
 
 Chiller:CombustionTurbine,
    \min-fields 56
@@ -61725,6 +61732,7 @@ Chiller:CombustionTurbine,
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
        \ip-units gal/min
+       \autosizable
   A7 , \field Heat Recovery Inlet Node Name
        \type node
   A8 , \field Heat Recovery Outlet Node Name
@@ -61779,7 +61787,7 @@ Chiller:CombustionTurbine,
        \default 2.0
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Enter the outdoor dry-bulb temperature when the basin heater turns on.
-  A11; \field Basin Heater Operating Schedule Name
+  A11, \field Basin Heater Operating Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note This field is only used for Condenser Type = EvaporativelyCooled.
@@ -61787,6 +61795,12 @@ Chiller:CombustionTurbine,
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
+  N50; \field Condenser Heat Recovery Relative Capacity Fraction
+       \note This optional field is the fraction of total rejected heat that can be recovered at full load.
+       \note Also used to autosize Design Heat Recovery Water Flow Rate as a fraction of Design Condenser Water Flow Rate.
+       \type real
+       \minimum 0.0
+       \maximum 1.0  
 
 ChillerHeater:Absorption:DirectFired,
   \min-fields 35
@@ -62223,22 +62237,26 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
+        \autosizable
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
+        \autosizable
    N3,  \field Rated Heating Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
+        \autosizable
    N4,  \field Rated Heating Power Consumption
         \required-field
         \type real
         \minimum> 0.0
         \units W
+        \autosizable
    N5,  \field Heating Capacity Coefficient 1
         \required-field
         \type real
@@ -62266,9 +62284,19 @@ HeatPump:WaterToWater:EquationFit:Heating,
    N13, \field Heating Compressor Power Coefficient 4
         \required-field
         \type real
-   N14; \field Heating Compressor Power Coefficient 5
+   N14, \field Heating Compressor Power Coefficient 5
         \required-field
         \type real
+   N15, \field Nominal Coefficient of Performance
+        \note This optional field is used to autosize Rated Heating Power Consumption
+        \note COP = Rated Heating Capacity / Rated Heating Power Consumption
+        \type real
+        \minimum> 0.0
+   N16; \field  Sizing Factor
+        \note Multiplies the autosized capacity and flow rates
+        \type real
+        \minimum> 0.0
+        \default 1.0
 
 HeatPump:WaterToWater:EquationFit:Cooling,
         \memo simple water-water heat pump curve-fit model
@@ -62293,22 +62321,26 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
+        \autosizable
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
+        \autosizable
    N3,  \field Rated Cooling Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
+        \autosizable
    N4,  \field Rated Cooling Power Consumption
         \required-field
         \type real
         \minimum> 0.0
         \units W
+        \autosizable
    N5,  \field Cooling Capacity Coefficient 1
         \required-field
         \type real
@@ -62336,9 +62368,19 @@ HeatPump:WaterToWater:EquationFit:Cooling,
    N13, \field Cooling Compressor Power Coefficient 4
         \required-field
         \type real
-   N14; \field Cooling Compressor Power Coefficient 5
+   N14, \field Cooling Compressor Power Coefficient 5
         \required-field
         \type real
+   N15, \field Nominal Coefficient of Performance
+        \note This optional field is used to autosize Rated Cooling Power Consumption
+        \note COP = Rated Cooling Capacity / Rated Cooling Power Consumption
+        \type real
+        \minimum> 0.0
+   N16; \field  Sizing Factor
+        \note Multiplies the autosized capacity and flow rates
+        \type real
+        \minimum> 0.0
+        \default 1.0
 
 HeatPump:WaterToWater:ParameterEstimation:Cooling,
   \memo OSU parameter estimation model
