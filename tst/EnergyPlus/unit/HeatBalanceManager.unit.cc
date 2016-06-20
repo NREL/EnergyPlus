@@ -75,6 +75,7 @@
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataHVACGlobals.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -439,6 +440,77 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ZoneAirMassFlow.BalanceMixing );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationZoneType, 0 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest )
+	{
+		// Test get output variables for ZoneAirMassFlowConservation object #5637
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.5;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"Yes, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"AdjustInfiltrationFlow, !- Infiltration Balancing Method",
+			"AllZones;                !- Infiltration Balancing Zones",
+
+			"  Zone,",
+			"    WEST ZONE,               !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    autocalculate,           !- Ceiling Height {m}",
+			"    autocalculate;           !- Volume {m3}",
+
+			"  Zone,",
+			"    EAST ZONE,               !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    autocalculate,           !- Ceiling Height {m}",
+			"    autocalculate;           !- Volume {m3}",
+			" Output:Variable,",
+			"   *, !- Key Value",
+			"   Zone Air Mass Balance Exhaust Mass Flow Rate, !- Variable Name",
+			"   hourly;                  !- Reporting Frequency",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+
+		// call to process input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+		EXPECT_FALSE( ErrorsFound );
+		NumOfZones = 2;
+		ZoneReOrder.allocate( NumOfZones );
+		ErrorsFound = false;
+		GetZoneData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		ErrorsFound = false;
+		GetSimpleAirModelInputs( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		EXPECT_EQ( "WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 1 ).VarName );
+		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
+		EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
+		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
 
 	}
 }
