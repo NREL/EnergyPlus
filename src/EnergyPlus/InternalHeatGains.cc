@@ -2150,10 +2150,11 @@ namespace InternalHeatGains {
 					std::string FuelTypeString( "" );
 					if ( AlphaName( 2 ) == "NONE" ) {
 						ZoneOtherEq( Loop ).OtherEquipFuelType = 0;
+						FuelTypeString = AlphaName( 2 );
 					} else {
-						ExteriorEnergyUse::ValidateFuelType( ZoneOtherEq( Loop ).OtherEquipFuelType, AlphaName( 2 ), FuelTypeString, cCurrentModuleObject, cAlphaFieldNames( 2 ), AlphaName( 2 ) );
+						ExteriorEnergyUse::ValidateFuelType( ZoneOtherEq( Loop ).OtherEquipFuelType, AlphaName( 2 ), FuelTypeString, CurrentModuleObject, cAlphaFieldNames( 2 ), AlphaName( 2 ) );
 						if ( ZoneOtherEq( Loop ).OtherEquipFuelType == 0 || ZoneOtherEq( Loop ).OtherEquipFuelType == ExteriorEnergyUse::WaterUse ) {
-							ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + AlphaName( 1 ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + AlphaName( 1 ) );
 							ErrorsFound = true;
 						}
 					}
@@ -2174,33 +2175,37 @@ namespace InternalHeatGains {
 					}
 
 					// equipment design level calculation method.
+					unsigned int DesignLevelFieldNumber;
 					{ auto const equipmentLevel( AlphaName( 5 ) );
 					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
-						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 1 );
-						if ( lNumericFieldBlanks( 1 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Other Equipment will result." );
+						DesignLevelFieldNumber = 1;
+						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( DesignLevelFieldNumber );
+						if ( lNumericFieldBlanks( DesignLevelFieldNumber ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but that field is blank.  0 Other Equipment will result." );
 						}
 
 					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
+						DesignLevelFieldNumber = 2;
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
-							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
+							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( DesignLevelFieldNumber ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea <= 0.0 ) {
-								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but Zone Floor Area = 0.  0 Other Equipment will result." );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but Zone Floor Area = 0.  0 Other Equipment will result." );
 							}
 						}
-						if ( lNumericFieldBlanks( 2 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Other Equipment will result." );
+						if ( lNumericFieldBlanks( DesignLevelFieldNumber ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but that field is blank.  0 Other Equipment will result." );
 						}
 
 					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
+						DesignLevelFieldNumber = 3;
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants <= 0.0 ) {
-								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but Total Occupants = 0.  0 Other Equipment will result." );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but Total Occupants = 0.  0 Other Equipment will result." );
 							}
 						}
-						if ( lNumericFieldBlanks( 3 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 3 ) + ", but that field is blank.  0 Other Equipment will result." );
+						if ( lNumericFieldBlanks( DesignLevelFieldNumber ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but that field is blank.  0 Other Equipment will result." );
 						}
 
 					} else {
@@ -2210,6 +2215,13 @@ namespace InternalHeatGains {
 							ErrorsFound = true;
 						}
 					}}
+
+					// Throw an error if the design level is negative and we have a fuel type
+					if ( ZoneOtherEq( Loop ).DesignLevel < 0.0 && ZoneOtherEq( Loop ).OtherEquipFuelType != 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cNumericFieldNames( DesignLevelFieldNumber ) + " is not allowed to be negative" );
+						ShowContinueError( "... when a fuel type of " + FuelTypeString + " is specified." );
+						ErrorsFound = true;
+					}
 
 					// Calculate nominal min/max equipment level
 					ZoneOtherEq( Loop ).NomMinDesignLevel = ZoneOtherEq( Loop ).DesignLevel * SchMin;
