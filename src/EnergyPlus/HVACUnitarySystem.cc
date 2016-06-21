@@ -497,7 +497,7 @@ namespace HVACUnitarySystem {
 		}
 
 		// Coils should have been sized by now. Set this flag to false in case other equipment is downstream of Unitary System.
-		// can't do this since there are other checks that need this flag (e.g., HVACManager, line 3577)
+		// can't do this since there are other checks that need this flag (e.g., HVACManager, SetHeatToReturnAirFlag())
 		//  AirLoopControlInfo(AirLoopNum)%UnitarySys = .FALSE.
 
 		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
@@ -1723,10 +1723,10 @@ namespace HVACUnitarySystem {
 				ZoneLoad = 0.0;
 				CoolingLoad = false;
 				HeatingLoad = false;
-			} else if ( UnitarySystem( UnitarySysNum ).iterationCounter > 4 )  { // attempt to lock output (air flow) if oscillations are detected
-				OperatingMode = UnitarySystem( UnitarySysNum ).iterationMode( 5 );
-				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 4 );
-				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 3 );
+			} else if ( UnitarySystem( UnitarySysNum ).iterationCounter > 6 )  { // attempt to lock output (air flow) if oscillations are detected
+				OperatingMode = UnitarySystem( UnitarySysNum ).iterationMode( 7 ); // VS systems can take a few more iterations than single-speed systems
+				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 6 ); // previously tested 5th iteration, now tests 7th
+				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 5 );
 				Oscillate = true;
 				if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
 				if ( Oscillate ) {
@@ -7202,7 +7202,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).HeatingCycRatio = PartLoadRatio;
 					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
-						MSHPMassFlowRateLow = CompOnMassFlow; // Trane #5737
+						MSHPMassFlowRateLow = CompOnMassFlow; // #5737
 					} else {
 						MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
 					}
@@ -7234,7 +7234,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).CoolingCycRatio = PartLoadRatio;
 					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
-						MSHPMassFlowRateLow = CompOnMassFlow; // Trane #5737
+						MSHPMassFlowRateLow = CompOnMassFlow; // #5737
 					} else {
 						MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
 					}
@@ -10734,13 +10734,13 @@ namespace HVACUnitarySystem {
 
 		if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil && ( HeatingLoad && HeatSpeedNum == 1 ) ) {
 			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
-				MSHPMassFlowRateLow = CompOnMassFlow; // Trane #7
+				MSHPMassFlowRateLow = CompOnMassFlow; // #5737
 			} else {
 				MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
 			}
 		} else if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil && ( CoolingLoad && CoolSpeedNum == 1 ) ) {
 			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
-				MSHPMassFlowRateLow = CompOnMassFlow; // Trane #7
+				MSHPMassFlowRateLow = CompOnMassFlow; // #5737
 			} else {
 				MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
 			}
