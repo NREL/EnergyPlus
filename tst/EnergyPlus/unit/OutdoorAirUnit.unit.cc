@@ -68,9 +68,11 @@
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalance.hh>
+#include <DataLoopNode.hh>
 #include <DataSizing.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <Fans.hh>
 #include <HeatBalanceManager.hh>
 #include "OutdoorAirUnit.hh"
 #include <OutputReportPredefined.hh>
@@ -329,6 +331,8 @@ namespace EnergyPlus {
 		Schedule( 1 ).CurrentValue = 1.0; // enable the VRF condenser
 		Schedule( 2 ).CurrentValue = 1.0; // enable the terminal unit
 		Schedule( 3 ).CurrentValue = 1.0; // turn on fan
+		DataLoopNode::Node( 5 ).MassFlowRate = 0.60215437; // zone exhaust flow rate
+		DataLoopNode::Node( 5 ).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
 		SetPredefinedTables();
 		SimOutdoorAirUnit( "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
@@ -338,12 +342,12 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).MinOA, OutAirUnit( OAUnitNum ).ExtAirVolFlow );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).MinOA * StdRhoAir, OutAirUnit( OAUnitNum ).ExtAirMassFlow );
 
-		// clean up
-		StdRhoAir = 0.0;
-		ZoneEqSizing.deallocate();
-		FinalZoneSizing.deallocate();
-		ZoneSysEnergyDemand.deallocate();
-		DesDayWeath.deallocate();
+		// test that both fans are included in OA unit fan power report
+		Real64 SAFanPower = Fans::Fan( 1 ).FanPower;
+		Real64 EAFanPower = Fans::Fan( 2 ).FanPower;
+		EXPECT_DOUBLE_EQ( SAFanPower, 75.0 );
+		EXPECT_DOUBLE_EQ( EAFanPower, 75.0 );
+		EXPECT_DOUBLE_EQ( SAFanPower + EAFanPower, OutAirUnit( OAUnitNum ).ElecFanRate );
 
 	}
 }

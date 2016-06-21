@@ -1049,8 +1049,9 @@ public: // Predicate
 			return false;
 		} else { // Equal index ranges
 			for ( int i = l1(), ie = u1(); i <= ie; ++i ) {
-				for ( int j = l2(), je = i - 1; j <= je; ++j ) {
-					if ( A( i, j ) != A( j, i ) ) return false;
+				size_type l( A.index( i, l2() ) );
+				for ( int j = l2(); j < i; ++j, ++l ) {
+					if ( A[ l ] != A( j, i ) ) return false;
 				}
 			}
 			return true;
