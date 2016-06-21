@@ -415,7 +415,7 @@
     13.0,                    !- Minimum Value of X
     23.89,                   !- Maximum Value of X
     -10.0,                   !- Minimum Value of Y
-    46.11,                   !- Maximum Value of Y
+    46.0,                    !- Maximum Value of Y
     ,                        !- Minimum Table Output
     ,                        !- Maximum Table Output
     Temperature,             !- Input Unit Type for X
