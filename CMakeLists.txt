@@ -156,9 +156,6 @@ IF(NOT APPLE )
 ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
 
-# Windows-CalcEngine exterior library
-include(cmake3rdParty/CMakeLists-Windows-CalcEngine.txt)
-
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
