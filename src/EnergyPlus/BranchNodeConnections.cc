@@ -80,21 +80,10 @@ namespace BranchNodeConnections {
 	// MODULE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   May 2005
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// This module encapsulates the connection data necessary for some of the checks
 	// needed in the branch-node data
-
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
 
 	// Using/Aliasing
 	using DataGlobals::OutputFileDebug;
@@ -104,14 +93,6 @@ namespace BranchNodeConnections {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
-	// na
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Functions
 
@@ -244,6 +225,62 @@ namespace BranchNodeConnections {
 			errFlag = true;
 		}
 
+	}
+
+	void
+	OverrideNodeConnectionType(
+		int const NodeNumber, // Number for this Node
+		std::string const & NodeName, // Name of this Node
+		std::string const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		std::string const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		std::string const & ConnectionType, // Connection Type for this Node (must be valid)
+		int const FluidStream, // Count on Fluid Streams
+		bool const IsParent, // True when node is a parent node
+		bool & errFlag // Will be True if errors already detected or if errors found here
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M. J. Witte
+		//       DATE WRITTEN   June 2016
+
+		// PURPOSE:
+		// This subroutine modifies an existing node connection in the Node Connection data structure.  This
+		// structure is intended to help with HVAC diagramming as well as validation of nodes. This function
+		// is a based on RegisterNodeConnection.
+
+		// Using/Aliasing
+		using InputProcessor::SameString;
+		using InputProcessor::MakeUPPERCase;
+		using InputProcessor::FindItemInList;
+
+		static std::string const RoutineName( "ModifyNodeConnectionType: " );
+		int Found;
+
+		if ( ! IsValidConnectionType( ConnectionType ) ) {
+			ShowSevereError( RoutineName + "Invalid ConnectionType=" + ConnectionType );
+			ShowContinueError( "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName );
+			errFlag = true;
+		}
+
+		Found = 0;
+		for ( int Count = 1; Count <= NumOfNodeConnections; ++Count ) {
+			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
+			if ( ! SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
+			if ( ( NodeConnections( Count ).ObjectIsParent != IsParent )) continue;
+			Found = Count;
+			break;
+		}
+
+		if ( Found > 0 ) {
+			NodeConnections( Found ).ConnectionType = ConnectionType;
+		} else {
+			ShowSevereError( RoutineName + "Existing node connection not found." );
+			ShowContinueError( "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName );
+			errFlag = true;
+		}
 	}
 
 	bool
@@ -665,7 +702,6 @@ namespace BranchNodeConnections {
 					}
 				}
 				if ( ! IsValid ) {
-					if (NodeConnections(Loop1).ObjectType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") continue;
 					ShowSevereError( "(Developer) Node Connection Error, Object=" + NodeConnections( Loop1 ).ObjectType + ':' + NodeConnections( Loop1 ).ObjectName );
 					ShowContinueError( "Object has multiple connections on both inlet and outlet fluid streams." );
 					for ( Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2 ) {
@@ -1860,7 +1896,6 @@ namespace BranchNodeConnections {
 			for ( Other = 1; Other <= NumCompSets; ++Other ) {
 				if ( Count == Other ) continue;
 				if ( CompSets( Count ).CType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) continue;
-				if (CompSets(Count).CType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") continue; // ingore the connnection error for IHP coil; Bo Shen, ORNL
 				if ( CompSets( Count ).CType != CompSets( Other ).CType || CompSets( Count ).CName != CompSets( Other ).CName ) continue;
 				if ( CompSets( Count ).Description != CompSets( Other ).Description ) {
 					if ( CompSets( Count ).Description != "UNDEFINED" && CompSets( Other ).Description != "UNDEFINED" ) continue;
@@ -1870,11 +1905,6 @@ namespace BranchNodeConnections {
 				if ( AlreadyNoted( Count ) ) continue;
 				//  All other values must match
 				AlreadyNoted( Other ) = true;
-
-				if (CompSets( Count ).CType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" )	{
-					continue; //ignore the error for IHP objects, BOS, 03/2016
-				}
-
 				ShowSevereError( "Same component name and type has differing Node Names." );
 				ShowContinueError( "   Component:    " + CompSets( Count ).CType + ", name=" + CompSets( Count ).CName );
 				ShowContinueError( "   Nodes, inlet: " + CompSets( Count ).InletNodeName + ", outlet: " + CompSets( Count ).OutletNodeName );

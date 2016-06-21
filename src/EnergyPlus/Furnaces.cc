@@ -2486,10 +2486,19 @@ namespace Furnaces {
 			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 7 ), Alphas( 8 ), NodeID( FanInletNode ), NodeID( FanOutletNode ) );
 
 			// Add DX cooling coil to component sets array
-			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ), NodeID( CoolingCoilInletNode ), NodeID( CoolingCoilOutletNode ) );
+			if (Furnace(FurnaceNum).bIsIHP) {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ) + "Cooling Coil", NodeID( CoolingCoilInletNode ), NodeID( CoolingCoilOutletNode ) );
+			} else {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ), NodeID( CoolingCoilInletNode ), NodeID( CoolingCoilOutletNode ) );
+			}
+
 
 			// Add heating coil to component sets array
-			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ), NodeID( HeatingCoilInletNode ), NodeID( HeatingCoilOutletNode ) );
+			if (Furnace(FurnaceNum).bIsIHP) {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ) + "Heating Coil", NodeID( HeatingCoilInletNode ), NodeID( HeatingCoilOutletNode ) );
+			} else {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ), NodeID( HeatingCoilInletNode ), NodeID( HeatingCoilOutletNode ) );
+			}
 
 			if ( ReheatCoilInletNode > 0 ) {
 
@@ -3332,10 +3341,17 @@ namespace Furnaces {
 			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), CompSetFanInlet, "UNDEFINED" );
 
 			// Add DX cooling coil to component sets array
-			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ), CompSetCoolInlet, "UNDEFINED" );
-
+			if (Furnace(FurnaceNum).bIsIHP) {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ) + "Cooling Coil", CompSetCoolInlet, "UNDEFINED" );
+			} else {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ), CompSetCoolInlet, "UNDEFINED" );
+			}
 			// Add DX heating coil to component sets array
-			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 8 ), Alphas( 9 ), "UNDEFINED", "UNDEFINED" );
+			if (Furnace(FurnaceNum).bIsIHP) {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 8 ), Alphas( 9 ) + "Heating Coil", "UNDEFINED", "UNDEFINED" );
+			} else {
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 8 ), Alphas( 9 ), "UNDEFINED", "UNDEFINED" );
+			}
 
 			// Add supplemental heating coil to component sets array
 			SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ), "UNDEFINED", Alphas( 4 ) );

@@ -2198,7 +2198,11 @@ namespace WaterThermalTanks {
 					}
 
 					// set up comp set for air side nodes (can be blow thru or draw thru, may or may not have damper nodes)
-					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, CoilInletNode, CoilOutletNode );
+					if (HPWH.bIsIHP) {
+						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName + " Outdoor Coil", CoilInletNode, CoilOutletNode );
+					} else {
+						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, CoilInletNode, CoilOutletNode );
+					}
 
 					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
@@ -3840,7 +3844,11 @@ namespace WaterThermalTanks {
 
 						// Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
 						WaterHeaterSaveNodes const &HPWHSaveNode = HPWHSaveNodeNames( HPWaterHeaterNum );
-						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1, "HPWH To Coil" );
+						if (HPWH.bIsIHP) {
+							SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName + " Water Coil", HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1, "HPWH To Coil" );
+						} else {
+							SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1, "HPWH To Coil" );
+						}
 						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1, "HPWH To Tank" );
 
 						// do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)

@@ -558,26 +558,16 @@ namespace EnergyPlus {
 			using namespace NodeInputManager;
 			using BranchNodeConnections::TestCompSet;
 			using BranchNodeConnections::SetUpCompSets;
+			using BranchNodeConnections::RegisterNodeConnection;
+			using BranchNodeConnections::OverrideNodeConnectionType;
 			using GlobalNames::VerifyUniqueCoilName;
 			using namespace OutputReportPredefined;
 			using General::TrimSigDigits;
 			using VariableSpeedCoils::VarSpeedCoil;
 			using VariableSpeedCoils::GetCoilIndexVariableSpeed;
-			using VariableSpeedCoils::SetAirNodes;
-			using VariableSpeedCoils::SetWaterNodes;
-
-			// Locals
-			// SUBROUTINE ARGUMENT DEFINITIONS:
-			// na
 
 			// SUBROUTINE PARAMETER DEFINITIONS:
 			static std::string const RoutineName( "GetIHPInput: " ); // include trailing blank space
-
-			// INTERFACE BLOCK SPECIFICATIONS
-			// na
-
-			// DERIVED TYPE DEFINITIONS
-			// na
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int DXCoilNum; //No of IHP DX system
@@ -590,6 +580,8 @@ namespace EnergyPlus {
 			int MaxAlphas( 0 ); // Maximum number of alpha input fields
 			std::string CoilName; // Name of the  Coil
 			std::string Coiltype; // type of coil
+			std::string InNodeName; // Name of coil inlet node
+			std::string OutNodeName; // Name of coil outlet node
 
 			std::string CurrentModuleObject; // for ease in getting objects
 			std::string sIHPType; //specify IHP type
@@ -662,7 +654,6 @@ namespace EnergyPlus {
 					ErrorsFound = true;
 				}
 
-				IntegratedHeatPumps( DXCoilNum ).NodeConnected = false;
 				IntegratedHeatPumps( DXCoilNum ).Name = AlphArray( 1 );
 				IntegratedHeatPumps( DXCoilNum ).IHPtype = "AIRSOURCE_IHP";
 
@@ -680,8 +671,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SCCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                          errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SCCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -701,8 +691,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                          errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -721,8 +710,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                           errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -741,8 +729,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                            errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -762,8 +749,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                                 errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -783,8 +769,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                               errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -806,8 +791,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                                 errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -826,8 +810,7 @@ namespace EnergyPlus {
 				}
 				else {
 					errFlag = false;
-					IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName,
-					                                                                               errFlag, true );
+					IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed( Coiltype, CoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ErrorsFound = true;
@@ -848,184 +831,200 @@ namespace EnergyPlus {
 				IntegratedHeatPumps( DXCoilNum ).TimeLimitSHDWH = NumArray( 9 );
 				IntegratedHeatPumps( DXCoilNum ).MinSpedSHDWH = int( NumArray( 10 ) );
 
-				if ( false == IntegratedHeatPumps( DXCoilNum ).NodeConnected ) {
-					//cooling coil air node connections
-					ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
-					VarSpeedCoil(ChildCoilIndex).AirInletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).AirInletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SCCoilName, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-					VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).AirOutletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SCCoilName, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-					TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SCCoilName, 
-						VarSpeedCoil(ChildCoilIndex).AirInletNodeName, VarSpeedCoil(ChildCoilIndex).AirOutletNodeName, "Air Nodes");
+				// Due to the overlapping coil objects, compsets and node registrations are handled as follows:
+				//  1. The ASIHP coil object is registered as four different coils, Name+" Cooling Coil", Name+" Heating Coil",
+				//     Name+" Outdoor Coil", and Name+" Water Coil"
+				//  2. For each of these four coils, TestCompSet is called once to register it as a child object
+				//  3. For each of these four coils, RegisterNodeConnection is called twice to register the inlet and outlet nodes
+				//     RegisterNodeConnection is used instead of GetOnlySingleNode because the node names are not inputs here
+				//  4. The parent objects that reference the ASIHP coil must use the appropriate name suffixes when calling SetUpCompSets
+				//  5. The ASIHP calls SetUpCompSets to register the various child coils.  This is important so that the system energy
+				//     use is collected in SystemReports::CalcSystemEnergyUse
+				//  6. The child coil inlet/outlet node connections are reset to connection type "Internal" to avoid duplicate node problems
+				//     using OverrideNodeConnectionType
 
-					InNode = VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
-					OutNode = VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
-					IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = InNode; 
-					IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = OutNode; 
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirInletNodeNum = InNode; 
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirInletNodeName != VarSpeedCoil(ChildCoilIndex).AirInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirOutletNodeName != VarSpeedCoil(ChildCoilIndex).AirOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCWHCoilName
-						 + "-wrong coil node names.");
-						ErrorsFound = true;
+				//cooling coil air node connections
+				ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
+				InNode = VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
+				OutNode = VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
+				InNodeName = NodeID( InNode );
+				OutNodeName = NodeID( OutNode );
 
-					}
+				IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = InNode; 
+				IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = OutNode; 
 
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirInletNodeNum = InNode; 
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirInletNodeName != VarSpeedCoil(ChildCoilIndex).AirInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirOutletNodeName != VarSpeedCoil(ChildCoilIndex).AirOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
+				TestCompSet( CurrentModuleObject, IntegratedHeatPumps( DXCoilNum ).Name + " Cooling Coil", InNodeName, OutNodeName, "Cooling Air Nodes" );
+				RegisterNodeConnection( InNode, NodeID( InNode ), CurrentModuleObject, IntegratedHeatPumps( DXCoilNum ).Name + " Cooling Coil", "Inlet", 1, ObjectIsNotParent, ErrorsFound );
+				RegisterNodeConnection( OutNode, NodeID( OutNode ), CurrentModuleObject, IntegratedHeatPumps( DXCoilNum ).Name + " Cooling Coil", "Outlet", 1, ObjectIsNotParent, ErrorsFound );
 
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil", IntegratedHeatPumps(DXCoilNum).SCCoilType, IntegratedHeatPumps(DXCoilNum).SCCoilName, InNodeName, OutNodeName );
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SCCoilType, IntegratedHeatPumps( DXCoilNum ).SCCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SCCoilType, IntegratedHeatPumps( DXCoilNum ).SCCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
 
+					
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirInletNodeNum != InNode ) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirOutletNodeNum != OutNode )
+					)
+				{
+					ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCWHCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
 
-					//heating coil air node connections
-					ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
-					VarSpeedCoil(ChildCoilIndex).AirInletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).AirInletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SHCoilName,
-						NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-					VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).AirOutletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SHCoilName,
-						NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-					TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SHCoilName,
-						VarSpeedCoil(ChildCoilIndex).AirInletNodeName,VarSpeedCoil(ChildCoilIndex).AirOutletNodeName, "Air Nodes");
+				}
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil", IntegratedHeatPumps(DXCoilNum).SCWHCoilType, IntegratedHeatPumps(DXCoilNum).SCWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SCWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SCWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
 
-					if (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).AirInletNodeNum !=
-						VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).AirOutletNodeNum)
-					{
-						ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + 
-							"- cooling coil outlet mismatches heating coil inlet"+ ".");
-						ErrorsFound = true;
-					}
-
-					InNode = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).AirInletNodeNum;
-					OutNode = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).AirOutletNodeNum;
-					IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = InNode;
-					IntegratedHeatPumps(DXCoilNum).AirOutletNodeNum = OutNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirInletNodeNum = InNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirInletNodeName != VarSpeedCoil(ChildCoilIndex).AirInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirOutletNodeName != VarSpeedCoil(ChildCoilIndex).AirOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
-
-					//water node connections
-					ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
-					VarSpeedCoil(ChildCoilIndex).WaterInletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).WaterInletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SCWHCoilName, 
-						NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-					VarSpeedCoil(ChildCoilIndex).WaterOutletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).WaterOutletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SCWHCoilName, 
-						NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-					TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
-						VarSpeedCoil(ChildCoilIndex).WaterInletNodeName, VarSpeedCoil(ChildCoilIndex).WaterOutletNodeName, "Water Nodes");
-
-					InNode = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).WaterInletNodeNum;
-					OutNode = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).WaterOutletNodeNum;
-					IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum = InNode;
-					IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum = OutNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterInletNodeNum = InNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterInletNodeName != VarSpeedCoil(ChildCoilIndex).WaterInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterOutletNodeName != VarSpeedCoil(ChildCoilIndex).WaterOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
-
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterInletNodeNum = InNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterInletNodeName != VarSpeedCoil(ChildCoilIndex).WaterInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterOutletNodeName != VarSpeedCoil(ChildCoilIndex).WaterOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
-
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterInletNodeNum = InNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterInletNodeName != VarSpeedCoil(ChildCoilIndex).WaterInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterOutletNodeName != VarSpeedCoil(ChildCoilIndex).WaterOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).DWHCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
-
-					if (VarSpeedCoil(ChildCoilIndex).WaterInletNodeName == AlphArray(2))
-					{
-						IntegratedHeatPumps(DXCoilNum).WaterTankoutNod = InNode;
-					}
-					else if (VarSpeedCoil(ChildCoilIndex).WaterOutletNodeName == AlphArray(2))
-					{
-						IntegratedHeatPumps(DXCoilNum).WaterTankoutNod = OutNode;
-					}
-					else
-					{
-						IntegratedHeatPumps(DXCoilNum).WaterTankoutNod =
-							GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water,
-							NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-					}
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirInletNodeNum != InNode ) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirOutletNodeNum != OutNode )
+					)
+				{
+					ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil", IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilType, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilType, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
 
 
-					//outdoor air node connections for water heating coils
-					//DWH, SCDWH, SHDWH coils have the same outdoor air nodes
-					ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).DWHCoilIndex; 
-					VarSpeedCoil(ChildCoilIndex).AirInletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).AirInletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-						NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-					VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum = GetOnlySingleNode(VarSpeedCoil(ChildCoilIndex).AirOutletNodeName,
-						ErrorsFound, CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-						NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-					TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-						VarSpeedCoil(ChildCoilIndex).AirInletNodeName, VarSpeedCoil(ChildCoilIndex).AirOutletNodeName, "Air Nodes");
 
-					InNode = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).AirInletNodeNum;
-					OutNode = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).AirOutletNodeNum;
-					IntegratedHeatPumps(DXCoilNum).ODAirInletNodeNum = InNode;
-					IntegratedHeatPumps(DXCoilNum).ODAirOutletNodeNum = OutNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirInletNodeNum = InNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirInletNodeName != VarSpeedCoil(ChildCoilIndex).AirInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirOutletNodeName != VarSpeedCoil(ChildCoilIndex).AirOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
+				//heating coil air node connections
+				ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
 
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirInletNodeNum = InNode;
-					VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirOutletNodeNum = OutNode;
-					if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirInletNodeName != VarSpeedCoil(ChildCoilIndex).AirInletNodeName) ||
-						(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirOutletNodeName != VarSpeedCoil(ChildCoilIndex).AirOutletNodeName)
-						)
-					{
-						ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName
-							+ "-wrong coil node names.");
-						ErrorsFound = true;
-					}
+				InNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
+				OutNode = VarSpeedCoil( ChildCoilIndex ).AirOutletNodeNum;
+				IntegratedHeatPumps(DXCoilNum).AirOutletNodeNum = OutNode;
+				InNodeName = NodeID( InNode );
+				OutNodeName = NodeID( OutNode );
+				if (VarSpeedCoil( ChildCoilIndex ).AirInletNodeNum != InNode )
+				{
+					ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + 
+						"- cooling coil outlet mismatches heating coil inlet"+ ".");
+					ErrorsFound = true;
+				}
+				TestCompSet( CurrentModuleObject, IntegratedHeatPumps( DXCoilNum ).Name + " Heating Coil", InNodeName, OutNodeName, "Heating Air Nodes" );
+				RegisterNodeConnection( InNode, NodeID( InNode), CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil", "Inlet", 1, ObjectIsNotParent, ErrorsFound);
+				RegisterNodeConnection( OutNode, NodeID( OutNode), CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil", "Outlet", 1, ObjectIsNotParent, ErrorsFound);
 
-					IntegratedHeatPumps( DXCoilNum ).NodeConnected = true;
-				};
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil", IntegratedHeatPumps(DXCoilNum).SHCoilType, IntegratedHeatPumps(DXCoilNum).SHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SHCoilType, IntegratedHeatPumps( DXCoilNum ).SHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SHCoilType, IntegratedHeatPumps( DXCoilNum ).SHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
 
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirInletNodeNum != InNode ) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirOutletNodeNum != OutNode)
+					)
+				{
+					ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil", IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilType, IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilType, IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+
+				//water node connections
+				ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
+
+				InNode = VarSpeedCoil( ChildCoilIndex ).WaterInletNodeNum;
+				OutNode = VarSpeedCoil( ChildCoilIndex ).WaterOutletNodeNum;
+				InNodeName = NodeID( InNode );
+				OutNodeName = NodeID( OutNode );
+				IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum = InNode;
+				IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum = OutNode;
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterInletNodeNum != InNode ) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterOutletNodeNum != OutNode )
+					)
+				{
+					ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+
+				TestCompSet( CurrentModuleObject, IntegratedHeatPumps( DXCoilNum ).Name + " Water Coil", InNodeName, OutNodeName, "Water Nodes" );
+				RegisterNodeConnection( InNode, NodeID( InNode), CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", "Inlet", 1, ObjectIsNotParent, ErrorsFound);
+				RegisterNodeConnection( OutNode, NodeID( InNode), CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", "Outlet", 1, ObjectIsNotParent, ErrorsFound);
+
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", IntegratedHeatPumps(DXCoilNum).SCWHCoilType, IntegratedHeatPumps(DXCoilNum).SCWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SCWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SCWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType, IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterInletNodeNum != InNode ) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterOutletNodeNum != OutNode )
+					)
+				{
+					ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterInletNodeNum != InNode ) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterOutletNodeNum != OutNode )
+					)
+				{
+					ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).DWHCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", IntegratedHeatPumps(DXCoilNum).DWHCoilType, IntegratedHeatPumps(DXCoilNum).DWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).DWHCoilType, IntegratedHeatPumps( DXCoilNum ).DWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).DWHCoilType, IntegratedHeatPumps( DXCoilNum ).DWHCoilName, "Internal", 2, ObjectIsNotParent, ErrorsFound);
+
+				IntegratedHeatPumps(DXCoilNum).WaterTankoutNod =
+					GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water,
+					NodeConnectionType_Sensor, 2, ObjectIsNotParent);
+
+				//outdoor air node connections for water heating coils
+				//DWH, SCDWH, SHDWH coils have the same outdoor air nodes
+				ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).DWHCoilIndex; 
+				InNode = VarSpeedCoil( ChildCoilIndex ).AirInletNodeNum;
+				OutNode = VarSpeedCoil( ChildCoilIndex ).AirOutletNodeNum;
+				InNodeName = NodeID( InNode );
+				OutNodeName = NodeID( OutNode );
+				IntegratedHeatPumps(DXCoilNum).ODAirInletNodeNum = InNode;
+				IntegratedHeatPumps(DXCoilNum).ODAirOutletNodeNum = OutNode;
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirInletNodeNum != InNode) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirOutletNodeNum != OutNode)
+					)
+				{
+					ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+
+				TestCompSet( CurrentModuleObject, IntegratedHeatPumps( DXCoilNum ).Name + " Outdoor Coil", InNodeName, OutNodeName, "Outdoor Air Nodes" );
+				RegisterNodeConnection( InNode, NodeID( InNode), CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil", "Inlet", 1, ObjectIsNotParent, ErrorsFound);
+				RegisterNodeConnection( OutNode, NodeID( InNode), CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil", "Outlet", 1, ObjectIsNotParent, ErrorsFound);
+
+
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil", IntegratedHeatPumps(DXCoilNum).DWHCoilType, IntegratedHeatPumps(DXCoilNum).DWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).DWHCoilType, IntegratedHeatPumps( DXCoilNum ).DWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).DWHCoilType, IntegratedHeatPumps( DXCoilNum ).DWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil", IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType, IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+
+				VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirInletNodeNum = InNode;
+				VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirOutletNodeNum = OutNode;
+				if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirInletNodeNum != InNode) ||
+					(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirOutletNodeNum != OutNode)
+					)
+				{
+					ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName
+						+ "-wrong coil node names.");
+					ErrorsFound = true;
+				}
+				SetUpCompSets(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil", IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName, InNodeName, OutNodeName);
+				OverrideNodeConnectionType( InNode, InNodeName, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
+				OverrideNodeConnectionType( OutNode, OutNodeName, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilType, IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, "Internal", 1, ObjectIsNotParent, ErrorsFound);
 
 				IntegratedHeatPumps( DXCoilNum ).IHPCoilsSized = false;
 				IntegratedHeatPumps(
@@ -2347,138 +2346,6 @@ namespace EnergyPlus {
 			Node( IntegratedHeatPumps( DXCoilNum ).AirOutletNodeNum ).MassFlowRateMax = AirMassFlowRate;
 
 			return ( AirMassFlowRate );
-		}
-
-		void
-		ConnectIHP(
-			int const WhichCoil // must match coil names for the coil type
-		) {
-			using VariableSpeedCoils::SetAirNodes;
-			using VariableSpeedCoils::SetWaterNodes;
-			using General::TrimSigDigits;
-
-			int DXCoilNum( 0 );
-			int InNode( 0 );
-			int OutNode( 0 );
-			bool ErrorsFound( false );
-
-			// Obtains and Allocates WatertoAirHP related parameters from input file
-			if ( GetCoilsInputFlag ) { //First time subroutine has been entered
-				GetIHPInput();
-				GetCoilsInputFlag = false;
-			}
-
-			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "ConnectIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
-				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
-				                ", IHP name=" + "AS-IHP" );
-			}
-
-			if ( WhichCoil != 0 ) {
-				//air node connections
-				InNode = IntegratedHeatPumps( DXCoilNum ).AirCoolInletNodeNum;
-				OutNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
-				//all the SC air coils have indoor air nodes for cooling
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCCoilName, ErrorsFound, InNode, OutNode );
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilName, ErrorsFound, InNode, OutNode );
-
-				InNode = IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum;
-				OutNode = IntegratedHeatPumps( DXCoilNum ).AirOutletNodeNum;
-				//all the SH air coils have indoor air nodes for heating
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHCoilName, ErrorsFound, InNode, OutNode );
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilName, ErrorsFound, InNode, OutNode );
-
-				//water node connections
-				InNode = IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum;
-				OutNode = IntegratedHeatPumps( DXCoilNum ).WaterOutletNodeNum;
-				//all the water coils have the same water side node connnections
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode, OutNode );
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode, OutNode );
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode, OutNode );
-
-				//outdoor air node connections
-				//DWH, SCDWH, SHDWH coils have the same outdoor air nodes
-				InNode = IntegratedHeatPumps( DXCoilNum ).ODAirInletNodeNum;
-				OutNode = IntegratedHeatPumps( DXCoilNum ).ODAirOutletNodeNum;
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode,
-				             OutNode );//SCDWHCoil has outdoor air nodes
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode,
-				             OutNode );//SCDWHCoil has outdoor air nodes
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode,
-				             OutNode );//SHDWHWHCoil has outdoor air nodes
-
-				IntegratedHeatPumps( DXCoilNum ).NodeConnected = true;
-			}
-
-		}
-
-		void
-		DisconnectIHP(
-			int const WhichCoil // must match coil names for the coil type
-		) {
-			using VariableSpeedCoils::SetAirNodes;
-			using VariableSpeedCoils::SetWaterNodes;
-			using General::TrimSigDigits;
-
-			int DXCoilNum( 0 );
-			int InNode( 0 );
-			int OutNode( 0 );
-			bool ErrorsFound( false );
-
-			// Obtains and Allocates WatertoAirHP related parameters from input file
-			if ( GetCoilsInputFlag ) { //First time subroutine has been entered
-				GetIHPInput();
-				GetCoilsInputFlag = false;
-			}
-
-			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "DisconnectIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
-				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
-				                ", IHP name=" + "AS-IHP" );
-			}
-
-			if ( WhichCoil != 0 ) {
-
-				//air node connections
-				InNode = 0;
-				OutNode = 0;
-				//all the SC air coils have indoor air nodes for cooling
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCCoilName, ErrorsFound, InNode, OutNode );
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilName, ErrorsFound, InNode, OutNode );
-
-				InNode = 0;
-				OutNode = 0;
-				//all the SH air coils have indoor air nodes for heating
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHCoilName, ErrorsFound, InNode, OutNode );
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilName, ErrorsFound, InNode, OutNode );
-
-				//water node connections
-				InNode = 0;
-				OutNode = 0;
-				//all the water coils have the same water side node connnections
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCWHCoilName, ErrorsFound, InNode, OutNode );
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode, OutNode );
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode, OutNode );
-				SetWaterNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode, OutNode );
-
-				//outdoor air node connections
-				//DWH, SCDWH, SHDWH coils have the same outdoor air nodes
-				InNode = 0;
-				OutNode = 0;
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).DWHCoilName, ErrorsFound, InNode,
-				             OutNode );//SCDWHCoil has outdoor air nodes
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilName, ErrorsFound, InNode,
-				             OutNode );//SCDWHCoil has outdoor air nodes
-				SetAirNodes( IntegratedHeatPumps( DXCoilNum ).SHDWHWHCoilName, ErrorsFound, InNode,
-				             OutNode );//SHDWHWHCoil has outdoor air nodes
-
-				IntegratedHeatPumps( DXCoilNum ).NodeConnected = false;
-			}
-
-
 		}
 
 	} // IntegratedHeatPump

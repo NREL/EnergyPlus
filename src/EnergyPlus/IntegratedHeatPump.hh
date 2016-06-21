@@ -180,7 +180,6 @@ namespace EnergyPlus {
 			Real64 WaterFlowAccumVol;
 			// water flow accumulated volume
 			Real64 SHDWHRunTime;
-			bool NodeConnected;
 			Real64 CoolVolFlowScale;
 			// max fan cooling volumetric flow rate
 			Real64 HeatVolFlowScale;
@@ -270,7 +269,6 @@ namespace EnergyPlus {
 				ControlledZoneTemp( 0 ),
 				WaterFlowAccumVol( 0 ),
 				SHDWHRunTime( 0 ),
-				NodeConnected( false ),
 				CoolVolFlowScale( 0 ),
 				HeatVolFlowScale( 0 ),
 				MaxHeatAirMassFlow( 0 ),
@@ -406,16 +404,6 @@ namespace EnergyPlus {
 
 		void ClearCoils(
 			int const DXCoilNum // coil ID
-		);
-
-		void
-		ConnectIHP(
-			int const WhichCoil // must match coil names for the coil type
-		);
-
-		void
-		DisconnectIHP(
-			int const WhichCoil // must match coil names for the coil type
 		);
 
 	} // IntegratedHeatPump
