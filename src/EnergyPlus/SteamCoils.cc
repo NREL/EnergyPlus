@@ -333,7 +333,7 @@ namespace SteamCoils {
 		bool errFlag;
 
 		CurrentModuleObject = "Coil:Heating:Steam";
-		NumStmHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumStmHeat = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );

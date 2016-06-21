@@ -230,8 +230,8 @@ namespace Pipes {
 		bool IsBlank; // Flag for blank name
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		NumWaterPipes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Pipe:Adiabatic" );
-		NumSteamPipes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Pipe:Adiabatic:Steam" );
+		NumWaterPipes = InputProcessor::GetObjectDefMaxArgs( "Pipe:Adiabatic" );
+		NumSteamPipes = InputProcessor::GetObjectDefMaxArgs( "Pipe:Adiabatic:Steam" );
 		NumLocalPipes = NumWaterPipes + NumSteamPipes;
 		LocalPipe.allocate( NumLocalPipes );
 

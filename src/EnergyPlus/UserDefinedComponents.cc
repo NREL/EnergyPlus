@@ -718,7 +718,7 @@ namespace UserDefinedComponents {
 		//need to make sure GetEMSInput has run...
 
 		cCurrentModuleObject = "PlantComponent:UserDefined";
-		NumUserPlantComps = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumUserPlantComps = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		if ( NumUserPlantComps > 0 ) {
 			UserPlantComp.allocate( NumUserPlantComps );
 			CheckUserPlantCompName.dimension( NumUserPlantComps, true );
@@ -904,7 +904,7 @@ namespace UserDefinedComponents {
 		}
 
 		cCurrentModuleObject = "Coil:UserDefined";
-		NumUserCoils = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumUserCoils = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		if ( NumUserCoils > 0 ) {
 			UserCoil.allocate( NumUserCoils );
 			CheckUserCoilName.dimension( NumUserCoils, true );
@@ -1057,7 +1057,7 @@ namespace UserDefinedComponents {
 		}
 
 		cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
-		NumUserZoneAir = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumUserZoneAir = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		if ( NumUserZoneAir > 0 ) {
 			UserZoneAirHVAC.allocate( NumUserZoneAir );
 			CheckUserZoneAirName.dimension( NumUserZoneAir, true );
@@ -1209,7 +1209,7 @@ namespace UserDefinedComponents {
 		}
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
-		NumUserAirTerminals = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumUserAirTerminals = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		if ( NumUserAirTerminals > 0 ) {
 			UserAirTerminal.allocate( NumUserAirTerminals );
 			CheckUserAirTerminal.dimension( NumUserAirTerminals, true );

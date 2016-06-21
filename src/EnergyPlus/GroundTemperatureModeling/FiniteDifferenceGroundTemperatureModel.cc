@@ -121,11 +121,11 @@ namespace EnergyPlus {
 
 		// Search through finite diff models here
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_FiniteDiffGroundTemp );
-		int numCurrModels = InputProcessor::InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-			InputProcessor::InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( objectName == cAlphaArgs( 1 ) ) {
 				// Read input into object here

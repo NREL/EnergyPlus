@@ -213,7 +213,7 @@ namespace EnergyPlus {
 	{
 		std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
-		numLoadCenters_ = InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Distribution" );
+		numLoadCenters_ = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Distribution" );
 
 		if ( numLoadCenters_ > 0 ){
 			for ( auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum ){
@@ -222,27 +222,27 @@ namespace EnergyPlus {
 			}
 		} else {
 			// issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
-			int numGenLists   = InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Generators" );
+			int numGenLists   = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Generators" );
 			if ( numGenLists > 0 ) {
 				ShowWarningError( "ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object." );
 			}
-			int numInverters  = InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:Simple" );
-				numInverters += InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:FunctionOfPower" );
-				numInverters += InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:LookUpTable" );
+			int numInverters  = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:Simple" );
+				numInverters += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:FunctionOfPower" );
+				numInverters += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:LookUpTable" );
 			if ( numInverters > 0 ) {
 				ShowWarningError( "ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object." );
 			}
-			int numStorage    = InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Simple" );
-				numStorage   += InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Battery" );
+			int numStorage    = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Simple" );
+				numStorage   += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Battery" );
 			if ( numStorage > 0 ) {
 				ShowWarningError( "ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object." );
 			}
-			int numGenerators  = InputProcessor::InputProcessor::GetNumObjectsFound( "Generator:InternalCombustionEngine" );
-				numGenerators += InputProcessor::InputProcessor::GetNumObjectsFound( "Generator:CombustionTurbine" );
-				numGenerators += InputProcessor::InputProcessor::GetNumObjectsFound( "Generator:MicroCHP" );
-				numGenerators += InputProcessor::InputProcessor::GetNumObjectsFound( "Generator:FuelCell" );
-				numGenerators += InputProcessor::InputProcessor::GetNumObjectsFound( "Generator:Photovoltaic" );
-				numGenerators += InputProcessor::InputProcessor::GetNumObjectsFound( "Generator:WindTurbine" );
+			int numGenerators  = InputProcessor::GetNumObjectsFound( "Generator:InternalCombustionEngine" );
+				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:CombustionTurbine" );
+				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:MicroCHP" );
+				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:FuelCell" );
+				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:Photovoltaic" );
+				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:WindTurbine" );
 			if ( numGenerators > 0 ) {
 				ShowWarningError( "Electric generator input objects require and ElectricLoadCenter:Distribution input object." );
 			}
@@ -256,7 +256,7 @@ namespace EnergyPlus {
 		}
 
 		// see if there are any transformers of the type powerInFromGrid
-		numTransformers_ = InputProcessor::InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Transformer" );
+		numTransformers_ = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Transformer" );
 
 		if ( numTransformers_ > 0 ) {
 			int numAlphas; // Number of elements in the alpha array
@@ -267,9 +267,9 @@ namespace EnergyPlus {
 
 			DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
 			for ( auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
-				InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, loopTransformer, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, loopTransformer, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
-				if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
+				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
 					if ( ! foundInFromGridTransformer ) {
 						foundInFromGridTransformer = true;
 						facilityPowerInTransformerIDFObjNum = loopTransformer;
@@ -281,7 +281,7 @@ namespace EnergyPlus {
 						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " = " + DataIPShortCuts::cAlphaArgs( 3 ) );
 						ShowContinueError("Only one transformer with Usage PowerInFromGrid can be used, first one in input file will be used and the simulation continues...");
 					}
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
 					if ( powerOutTransformerObj_ == nullptr ) {
 						++numPowerOutTransformers_;
 						powerOutTransformerName_ = DataIPShortCuts::cAlphaArgs( 1 );
@@ -627,7 +627,7 @@ namespace EnergyPlus {
 		DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Distribution";
 		errorsFound = false;
 		if ( objectNum > 0 ) {
-			InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, objectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, objectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
@@ -636,7 +636,7 @@ namespace EnergyPlus {
 				generatorListName_ = DataIPShortCuts::cAlphaArgs( 2 );
 				// check that 
 
-				int testIndex = InputProcessor::InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Generators", generatorListName_ );
+				int testIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Generators", generatorListName_ );
 				if ( testIndex == 0 ) {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 2 ) + " = " + DataIPShortCuts::cAlphaArgs( 2 ) );
@@ -646,19 +646,19 @@ namespace EnergyPlus {
 
 			if ( ! DataIPShortCuts::lAlphaFieldBlanks( 3 ) )  {
 				//Load the Generator Control Operation Scheme
-				if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "Baseload" ) ) {
+				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "Baseload" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::baseLoad;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "DemandLimit" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "DemandLimit" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::demandLimit;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackElectrical" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackElectrical" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::trackElectrical;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackSchedule" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackSchedule" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::trackSchedule;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackMeter" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackMeter" ) ) {
 					genOperationScheme_ =  GeneratorOpScheme::trackMeter;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermal" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermal" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::thermalFollow;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermalLimitElectrical" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermalLimitElectrical" ) ) {
 					genOperationScheme_ =  GeneratorOpScheme::thermalFollowLimitElectrical;
 				} else {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -682,26 +682,26 @@ namespace EnergyPlus {
 				errorsFound = true;
 			}
 
-			demandMeterName_ = InputProcessor::InputProcessor::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( 5 ) );
+			demandMeterName_ = InputProcessor::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( 5 ) );
 				// meters may not be "loaded" yet, defered check to later subroutine
 
-			if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrent" ) ) {
+			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrent" ) ) {
 				bussType = ElectricBussType::aCBuss;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "AlternatingCurrent";
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverter" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverter" ) ) {
 				bussType  = ElectricBussType::dCBussInverter;
 				inverterPresent = true;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "DirectCurrentWithInverter";
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrentWithStorage" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrentWithStorage" ) ) {
 				bussType  = ElectricBussType::aCBussStorage;
 				storagePresent_ = true;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "AlternatingCurrentWithStorage";
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterDCStorage" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterDCStorage" ) ) {
 				bussType  = ElectricBussType::dCBussInverterDCStorage;
 				inverterPresent = true;
 				storagePresent_ = true;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "DirectCurrentWithInverterDCStorage";
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterACStorage" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterACStorage" ) ) {
 				bussType  = ElectricBussType::dCBussInverterACStorage;
 				inverterPresent = true;
 				storagePresent_ = true;
@@ -745,13 +745,13 @@ namespace EnergyPlus {
 			// Begin new content for grid supply and more control over storage
 			// user selected storage operation scheme
 			if ( ! DataIPShortCuts::lAlphaFieldBlanks( 10 ) ) {
-				if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackFacilityElectricDemandStoreExcessOnSite" ) ) {
+				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackFacilityElectricDemandStoreExcessOnSite" ) ) {
 					storageScheme_ = StorageOpScheme::facilityDemandStoreExcessOnSite;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackMeterDemandStoreExcessOnSite" )  ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackMeterDemandStoreExcessOnSite" )  ) {
 					storageScheme_ = StorageOpScheme::meterDemandStoreExcessOnSite;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackChargeDischargeSchedules" )  ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackChargeDischargeSchedules" )  ) {
 					storageScheme_ = StorageOpScheme::chargeDischargeSchedules;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "FacilityDemandLeveling" )  ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "FacilityDemandLeveling" )  ) {
 					storageScheme_ = StorageOpScheme::facilityDemandLeveling;
 				} else {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -861,9 +861,9 @@ namespace EnergyPlus {
 
 		// now that we are done with processing get input for ElectricLoadCenter:Distribution we can call child input objects without IP shortcut problems
 		DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Generators";
-		int genListObjectNum = InputProcessor::InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, generatorListName_ );
+		int genListObjectNum = InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, generatorListName_ );
 		if ( genListObjectNum > 0 ){
-			InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, genListObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, genListObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			//Calculate the number of generators in list
 			numGenerators = numNums / 2; // note IDD needs Min Fields = 6  
@@ -902,11 +902,11 @@ namespace EnergyPlus {
 		if ( ! errorsFound && transformerPresent_ ) {
 
 			DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
-			int transformerItemNum = InputProcessor::InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, transformerName_ );
+			int transformerItemNum = InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, transformerName_ );
 			int iOStat;
 			if ( transformerItemNum > 0 ) {
-				InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
-				if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
+				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
 					transformerObj = std::unique_ptr< ElectricTransformer >( new ElectricTransformer (transformerName_ ) );
 				} else {
 					ShowWarningError( "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " set to LoadCenterPowerConditioning." );
@@ -1933,31 +1933,31 @@ namespace EnergyPlus {
 
 		name                   = objectName;
 		typeOfName             = objectType;
-		if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:InternalCombustionEngine" ) ) {
+		if ( InputProcessor::SameString( objectType, "Generator:InternalCombustionEngine" ) ) {
 			generatorType = GeneratorType::iCEngine;
 			compGenTypeOf_Num   = DataGlobalConstants::iGeneratorICEngine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
-		} else if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:CombustionTurbine" ) ) {
+		} else if ( InputProcessor::SameString( objectType, "Generator:CombustionTurbine" ) ) {
 			generatorType = GeneratorType::combTurbine;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
-		} else if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:MicroTurbine" ) ) {
+		} else if ( InputProcessor::SameString( objectType, "Generator:MicroTurbine" ) ) {
 			generatorType = GeneratorType::microturbine;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
-		} else if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:Photovoltaic" ) ) {
+		} else if ( InputProcessor::SameString( objectType, "Generator:Photovoltaic" ) ) {
 			generatorType = GeneratorType::pV;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
 			compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
-		} else if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
+		} else if ( InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
 			generatorType = GeneratorType::fuelCell;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCStackCooler;
-		} else if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:MicroCHP" ) ) {
+		} else if ( InputProcessor::SameString( objectType, "Generator:MicroCHP" ) ) {
 			generatorType = GeneratorType::microCHP;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
-		} else if ( InputProcessor::InputProcessor::SameString( objectType, "Generator:WindTurbine" ) ) {
+		} else if ( InputProcessor::SameString( objectType, "Generator:WindTurbine" ) ) {
 			generatorType = GeneratorType::windTurbine;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Other;
@@ -2128,21 +2128,21 @@ namespace EnergyPlus {
 		int testInvertIndex = 0;
 		int invertIDFObjectNum = 0;
 
-		testInvertIndex = InputProcessor::InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:LookUpTable",  objectName );
+		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:LookUpTable",  objectName );
 		if ( testInvertIndex > 0) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:LookUpTable";
 			modelType_ = InverterModelType::cECLookUpTableModel;
 		}
-		testInvertIndex = InputProcessor::InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:FunctionOfPower",  objectName );
+		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:FunctionOfPower",  objectName );
 		if ( testInvertIndex > 0) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:FunctionOfPower";
 			modelType_ = InverterModelType::curveFuncOfPower;
 		}
-		testInvertIndex = InputProcessor::InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:Simple",  objectName );
+		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:Simple",  objectName );
 		if ( testInvertIndex > 0) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
@@ -2152,7 +2152,7 @@ namespace EnergyPlus {
 
 		if ( foundInverter ){
 
-			InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, invertIDFObjectNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, invertIDFObjectNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
@@ -2168,7 +2168,7 @@ namespace EnergyPlus {
 				}
 			}
 
-			zoneNum_ = InputProcessor::InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
+			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
@@ -2459,12 +2459,12 @@ namespace EnergyPlus {
 		bool errorsFound = false;
 		// if/when add object class name to input object this can be simplified. for now search all possible types 
 
-		int testConvertIndex = InputProcessor::InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Storage:Converter",  objectName );
+		int testConvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Storage:Converter",  objectName );
 
 		if ( testConvertIndex > 0 ) {
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
-			InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, testConvertIndex, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, testConvertIndex, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// need a new general approach for verify names are unique across objects,  next gen GlobalNames
@@ -2480,9 +2480,9 @@ namespace EnergyPlus {
 				}
 			}
 
-			if ( InputProcessor::InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "SimpleFixed" ) ) {
+			if ( InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "SimpleFixed" ) ) {
 				modelType_ = ConverterModelType::simpleConstantEff;
-			} else if ( InputProcessor::InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "FunctionOfPower" ) ) {
+			} else if ( InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "FunctionOfPower" ) ) {
 				modelType_ = ConverterModelType::curveFuncOfPower;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -2515,7 +2515,7 @@ namespace EnergyPlus {
 
 			standbyPower_ = DataIPShortCuts::rNumericArgs( 3 );
 
-			zoneNum_ = InputProcessor::InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 5 ), DataHeatBalance::Zone );
+			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 5 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 5 ) ) {
@@ -2746,7 +2746,7 @@ namespace EnergyPlus {
 		int testStorageIndex = 0;
 		int storageIDFObjectNum = 0;
 
-		testStorageIndex = InputProcessor::InputProcessor::GetObjectItemNum("ElectricLoadCenter:Storage:Simple", objectName );
+		testStorageIndex = InputProcessor::GetObjectItemNum("ElectricLoadCenter:Storage:Simple", objectName );
 		if ( testStorageIndex > 0 ) {
 			foundStorage = true;
 			storageIDFObjectNum = testStorageIndex;
@@ -2754,7 +2754,7 @@ namespace EnergyPlus {
 			storageModelMode_ = StorageModelType::simpleBucketStorage;
 		}
 
-		testStorageIndex = InputProcessor::InputProcessor::GetObjectItemNum("ElectricLoadCenter:Storage:Battery", objectName );
+		testStorageIndex = InputProcessor::GetObjectItemNum("ElectricLoadCenter:Storage:Battery", objectName );
 		if ( testStorageIndex > 0 ) {
 			foundStorage = true;
 			storageIDFObjectNum = testStorageIndex;
@@ -2763,7 +2763,7 @@ namespace EnergyPlus {
 		}
 
 		if ( foundStorage ) {
-			InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, storageIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, storageIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
@@ -2779,7 +2779,7 @@ namespace EnergyPlus {
 				}
 			}
 
-			zoneNum_ = InputProcessor::InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
+			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
@@ -2818,7 +2818,7 @@ namespace EnergyPlus {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 4 ) + " cannot be blank. But no entry found." );
 					errorsFound = true;
-				} else if ( ! InputProcessor::InputProcessor::SameString( CurveManager::GetCurveType( chargeCurveNum_ ), "RectangularHyperbola2" ) ) {
+				} else if ( ! InputProcessor::SameString( CurveManager::GetCurveType( chargeCurveNum_ ), "RectangularHyperbola2" ) ) {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 4 ) + '=' + DataIPShortCuts::cAlphaArgs( 4 ) );
 					ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + CurveManager::GetCurveType( chargeCurveNum_ ) );
@@ -2833,16 +2833,16 @@ namespace EnergyPlus {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 5 ) + " cannot be blank. But no entry found." );
 					errorsFound = true;
-				} else if ( ! InputProcessor::InputProcessor::SameString( CurveManager::GetCurveType( dischargeCurveNum_ ), "RectangularHyperbola2" ) ) {
+				} else if ( ! InputProcessor::SameString( CurveManager::GetCurveType( dischargeCurveNum_ ), "RectangularHyperbola2" ) ) {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 5 ) + '=' + DataIPShortCuts::cAlphaArgs( 5 ) );
 					ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + CurveManager::GetCurveType( dischargeCurveNum_ ) );
 					errorsFound = true;
 				}
 
-				if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "Yes" ) ) {
+				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "Yes" ) ) {
 					lifeCalculation_ = BatteyDegredationModelType::lifeCalculationYes;
-				} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "No" ) ) {
+				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "No" ) ) {
 					lifeCalculation_ = BatteyDegredationModelType::lifeCalculationNo;
 				} else {
 					ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -2861,7 +2861,7 @@ namespace EnergyPlus {
 						ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 7 ) + " cannot be blank when " + DataIPShortCuts::cAlphaArgs( 6 ) + " = Yes. But no entry found." );
 						errorsFound = true;
-					} else if ( ! InputProcessor::InputProcessor::SameString( CurveManager::GetCurveType( lifeCurveNum_ ), "DoubleExponentialDecay" ) ) {
+					} else if ( ! InputProcessor::SameString( CurveManager::GetCurveType( lifeCurveNum_ ), "DoubleExponentialDecay" ) ) {
 						ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 7 ) + '=' + DataIPShortCuts::cAlphaArgs( 7 ) );
 						ShowContinueError( "Curve Type must be DoubleExponentialDecay but was " + CurveManager::GetCurveType( lifeCurveNum_ ) );
@@ -3704,9 +3704,9 @@ namespace EnergyPlus {
 		int transformerIDFObjectNum = 0;
 		DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
-		transformerIDFObjectNum = InputProcessor::InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Transformer",  objectName );
+		transformerIDFObjectNum = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Transformer",  objectName );
 		if ( transformerIDFObjectNum > 0 ) {
-			InputProcessor::InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 			name_  = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 2 ) ) {
@@ -3722,11 +3722,11 @@ namespace EnergyPlus {
 
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
 				usageMode_ = TransformerUse::powerInFromGrid; //default
-			} else if ( InputProcessor::InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
+			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
 				usageMode_ = TransformerUse::powerInFromGrid;
-			} else if ( InputProcessor::InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
+			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
 				usageMode_ = TransformerUse::powerOutFromBldgToGrid;
-			} else if ( InputProcessor::InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) {
+			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) {
 				usageMode_ = TransformerUse::powerBetweenLoadCenterAndBldg;
 
 			} else {
@@ -3735,7 +3735,7 @@ namespace EnergyPlus {
 					errorsFound = true;
 			}
 
-			zoneNum_ = InputProcessor::InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 4 ), DataHeatBalance::Zone );
+			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 4 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 4 ) ) {
@@ -3752,9 +3752,9 @@ namespace EnergyPlus {
 			ratedCapacity_ = DataIPShortCuts::rNumericArgs( 2 );
 			phase_         = DataIPShortCuts::rNumericArgs( 3 );
 
-			if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Copper" ) ) {
+			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Copper" ) ) {
 				factorTempCoeff_ = 234.5;
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Aluminum" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Aluminum" ) ) {
 				factorTempCoeff_ = 225.0;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -3764,9 +3764,9 @@ namespace EnergyPlus {
 			tempRise_ = DataIPShortCuts::rNumericArgs( 4 );
 			eddyFrac_ = DataIPShortCuts::rNumericArgs( 5 );
 
-			if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "RatedLosses" ) ) {
+			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "RatedLosses" ) ) {
 				performanceInputMode_ = TransformerPerformanceInput::lossesMethod;
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "NominalEfficiency" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "NominalEfficiency" ) ) {
 				performanceInputMode_ = TransformerPerformanceInput::efficiencyMethod;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" +  DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -3791,9 +3791,9 @@ namespace EnergyPlus {
 					errorsFound = true;
 				}
 			}
-			if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "Yes" ) ) {
+			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "Yes" ) ) {
 				considerLosses_ = true;
-			} else if ( InputProcessor::InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "No" ) ) {
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "No" ) ) {
 				considerLosses_ = false;
 			} else {
 				if ( usageMode_ == TransformerUse::powerInFromGrid ) {
@@ -3820,9 +3820,9 @@ namespace EnergyPlus {
 
 				//Meter check deferred because they may have not been "loaded" yet,
 				for ( auto loopCount = 0; loopCount < numWiredMeters; ++loopCount ) {
-					wiredMeterNames_[ loopCount ] = InputProcessor::InputProcessor::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( loopCount + numAlphaBeforeMeter + 1 ) );
+					wiredMeterNames_[ loopCount ] = InputProcessor::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( loopCount + numAlphaBeforeMeter + 1 ) );
 					//Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
-					if ( InputProcessor::InputProcessor::SameString( wiredMeterNames_[ loopCount ], "Electricity:Facility" ) || InputProcessor::InputProcessor::SameString( wiredMeterNames_[ loopCount ], "Electricity:HVAC" ) ) {
+					if ( InputProcessor::SameString( wiredMeterNames_[ loopCount ], "Electricity:Facility" ) || InputProcessor::SameString( wiredMeterNames_[ loopCount ], "Electricity:HVAC" ) ) {
 						specialMeter_[ loopCount ] = true;
 					} else {
 						specialMeter_[ loopCount ] = false;

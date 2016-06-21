@@ -398,7 +398,7 @@ namespace UnitVentilator {
 		// Figure out how many unit ventilators there are in the input file
 
 		CurrentModuleObject = cMO_UnitVentilator;
-		NumOfUnitVents = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOfUnitVents = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );

@@ -395,9 +395,9 @@ namespace PlantManager {
 
 		// FLOW:
 		CurrentModuleObject = "PlantLoop";
-		NumPlantLoops = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject ); // Get the number of primary plant loops
+		NumPlantLoops = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject ); // Get the number of primary plant loops
 		CurrentModuleObject = "CondenserLoop";
-		NumCondLoops = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject ); // Get the number of Condenser loops
+		NumCondLoops = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject ); // Get the number of Condenser loops
 		TotNumLoops = NumPlantLoops + NumCondLoops;
 		ErrFound = false;
 
@@ -4516,10 +4516,10 @@ namespace PlantManager {
 		int numCondenserLoopsCheck;
 
 		cCurrentModuleObject = "PlantLoop";
-		numPlantLoopsCheck = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		numPlantLoopsCheck = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		cCurrentModuleObject = "CondenserLoop";
-		numCondenserLoopsCheck = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		numCondenserLoopsCheck = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		if ( ( numPlantLoopsCheck + numCondenserLoopsCheck ) > 0 ) {
 			AnyPlantInModel = true;

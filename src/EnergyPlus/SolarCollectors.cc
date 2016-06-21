@@ -320,25 +320,25 @@ namespace SolarCollectors {
 		MaxAlphas = 0;
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
-		NumOfFlatPlateParam = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject );
+		NumOfFlatPlateParam = InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "SolarCollector:FlatPlate:Water";
-		NumFlatPlateUnits = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumFlatPlateUnits = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
-		NumOfICSParam = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject );
+		NumOfICSParam = InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-		NumOfICSUnits = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOfICSUnits = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );

@@ -299,7 +299,7 @@ namespace SplitterComponent {
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
-		NumSplitters = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumSplitters = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 		if ( NumSplitters > 0 ) SplitterCond.allocate( NumSplitters );
 		CheckEquipName.dimension( NumSplitters, true );

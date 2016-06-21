@@ -384,8 +384,8 @@ namespace WaterToAirHeatPumpSimple {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
-		NumCool = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:EquationFit" );
-		NumHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:EquationFit" );
+		NumCool = InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:EquationFit" );
+		NumHeat = InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:EquationFit" );
 		NumWatertoAirHPs = NumCool + NumHeat;
 		HPNum = 0;
 

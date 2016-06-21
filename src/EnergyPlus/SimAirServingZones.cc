@@ -546,7 +546,7 @@ namespace SimAirServingZones {
 		NodeNums.dimension( NumParams, 0 );
 
 		// Find number of primary air systems
-		NumPrimaryAirSys = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC" );
+		NumPrimaryAirSys = InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC" );
 		TestUniqueNodes.allocate( NumPrimaryAirSys * 4 ); // used to look at specific nodes that must be unique, fields A6-A9
 
 		PrimaryAirSystem.allocate( NumPrimaryAirSys ); // alloacate the primary air sys data array

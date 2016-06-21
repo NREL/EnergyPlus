@@ -438,7 +438,7 @@ namespace VentilatedSlab {
 		// make sure data is gotten for surface lists
 		BaseNum = GetNumberOfSurfListVentSlab();
 
-		NumOfVentSlabs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOfVentSlabs = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		// Allocate the local derived type and do one-time initializations for all parts of it
 
 		VentSlab.allocate( NumOfVentSlabs );

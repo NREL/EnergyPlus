@@ -12,18 +12,18 @@
 
 #include <tuple>
 #include <map>
-#include <nlohmann/json.hpp>
 #include <InputProcessor_json.hh>
 
-const json initialize() {
-       std::ifstream ifs("idd/FULL_SCHEMA_modified", std::ifstream::in);
-      ASSERT_TRUE(ifs.is_open());
-      const json schema = json::parse(ifs);
-      return schema;
-}
+// const json initialize() {
+//        std::ifstream ifs("idd/FULL_SCHEMA_modified", std::ifstream::in);
+//       ASSERT_TRUE(ifs.is_open());
+//       const json schema = json::parse(ifs);
+//       return schema;
+// }
 
 namespace EnergyPlus {
 
+/*
     TEST_F( InputProcessorFixture, getObjectItem_json1 )
     {
       std::string const idf_objects = delimited_string({
@@ -65,7 +65,58 @@ namespace EnergyPlus {
       EXPECT_EQ( 1, IOStatus );
 
     }
+*/
 
+    TEST_F( InputProcessorFixture, getObjectItem_json2 ) {
+        std::string const idf_objects = delimited_string({
+            "Version,8.3;",
+            "Humidifier:Steam:Gas,",
+            "  Main Gas Humidifier,     !- Name",
+            "  ,                        !- Availability Schedule Name",
+            "  autosize,                !- Rated Capacity {m3/s}",
+            "  autosize,                !- Rated Gas Use Rate {W}",
+            "  0.80,                    !- Thermal Efficiency {-} ",
+            "  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+            "  0,                       !- Rated Fan Power {W}",
+            "  0,                       !- Auxiliary Electric Power {W}",
+            "  Mixed Air Node 1,        !- Air Inlet Node Name",
+            "  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+            "  ;                        !- Water Storage Tank Name",
+        });
+
+        ASSERT_FALSE( process_idf( idf_objects ) );
+
+        std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+        int NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+        ASSERT_EQ( 1, NumGasSteamHums );
+
+        int TotalArgs = 0;
+        int NumAlphas = 0;
+        int NumNumbers = 0;
+
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+        int IOStatus = 0;
+        Array1D_string Alphas( NumAlphas );
+        Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+        Array1D_bool lNumericBlanks( NumAlphas, true );
+        Array1D_bool lAlphaBlanks( NumAlphas, true );
+        Array1D_string cAlphaFields( NumAlphas );
+        Array1D_string cNumericFields( NumNumbers );
+        InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
+        EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
+        EXPECT_EQ( 6, NumAlphas );
+        EXPECT_EQ( 5, NumNumbers );
+        EXPECT_EQ( 1, IOStatus );
+    }
+
+/*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
       const json schema = initialize();
@@ -125,4 +176,5 @@ namespace EnergyPlus {
       EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
    }
+   */
 }

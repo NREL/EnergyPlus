@@ -326,7 +326,7 @@ namespace ZoneDehumidifier {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max)
 		Real64 CurveVal; // Output from curve object (water removal or energy factor curves)
 
-		NumDehumidifiers = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumDehumidifiers = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 		ZoneDehumid.allocate( NumDehumidifiers );
 		CheckEquipName.dimension( NumDehumidifiers, true );

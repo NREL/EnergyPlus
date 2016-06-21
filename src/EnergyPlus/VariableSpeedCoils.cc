@@ -440,11 +440,11 @@ namespace VariableSpeedCoils {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
-		NumCool = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
-		NumHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
-		NumCoolAS = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "COIL:COOLING:DX:VARIABLESPEED" );
-		NumHeatAS = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "COIL:HEATING:DX:VARIABLESPEED" );
-		NumHPWHAirToWater = InputProcessor::InputProcessor::GetObjectDefMaxArgs("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
+		NumCool = InputProcessor::GetObjectDefMaxArgs( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
+		NumHeat = InputProcessor::GetObjectDefMaxArgs( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
+		NumCoolAS = InputProcessor::GetObjectDefMaxArgs( "COIL:COOLING:DX:VARIABLESPEED" );
+		NumHeatAS = InputProcessor::GetObjectDefMaxArgs( "COIL:HEATING:DX:VARIABLESPEED" );
+		NumHPWHAirToWater = InputProcessor::GetObjectDefMaxArgs("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
 		NumWatertoAirHPs = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
 		DXCoilNum = 0;
 

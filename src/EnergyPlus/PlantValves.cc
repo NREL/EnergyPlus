@@ -266,7 +266,7 @@ namespace PlantValves {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "TemperingValve";
-		NumTemperingValves = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumTemperingValves = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 		TemperValve.allocate( NumTemperingValves );
 		CheckEquipName.dimension( NumTemperingValves, true );

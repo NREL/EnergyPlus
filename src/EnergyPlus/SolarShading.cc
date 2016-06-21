@@ -590,7 +590,7 @@ namespace SolarShading {
 		cAlphaArgs( 1 ) = "";
 		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
-		NumItems = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumItems = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {

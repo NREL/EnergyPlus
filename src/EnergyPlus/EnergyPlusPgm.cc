@@ -189,6 +189,7 @@
 
 // C++ Headers
 #include <iostream>
+#include <fstream>
 #include <exception>
 #ifndef NDEBUG
 #ifdef __unix__
@@ -234,6 +235,7 @@ EnergyPlusPgm( std::string const & filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
+	using json = nlohmann::json;
 
 	// PROGRAM INFORMATION:
 	//       AUTHOR         Linda K. Lawrie, et al
@@ -444,7 +446,25 @@ EnergyPlusPgm( std::string const & filepath )
 
 	try {
 
-		ProcessInput();
+		// ProcessInput();
+		InputProcessor IP;
+		// std::ifstream ifs( "idd/FULL_SCHEMA_modified.json" , std::ifstream::in);
+		// if ( !ifs.open() ) {
+			// std::cout << " file path \"idd\FULL_SCHEMA_modified.json\" not found" << std::endl;
+			// return;
+		// }
+
+		// IP.schema = json::parse(ifs);
+		// IP.idf_parser.initialize(schema);
+		// IP.state.initialize(IP.schema);
+
+		// json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
+                                            // unsigned line_num, unsigned line_index) -> bool {
+        // state.traverse(event, parsed, line_num, line_index);
+        // return true;
+      	// };
+
+      	// json::parse(dump of jdf, cb);
 
 		ManageSimulation();
 
@@ -454,7 +474,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 		ShowPsychrometricSummary();
 
-		ReportOrphanRecordObjects();
+		// ReportOrphanRecordObjects();
 		ReportOrphanFluids();
 		ReportOrphanSchedules();
 

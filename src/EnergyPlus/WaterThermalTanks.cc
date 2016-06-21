@@ -983,13 +983,13 @@ namespace WaterThermalTanks {
 		CheckRefrigerationInput();
 
 		if ( GetWaterThermalTankInputFlag ) {
-			NumWaterHeaterMixed = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cMixedWHModuleObj );
-			NumWaterHeaterStratified = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cStratifiedWHModuleObj );
-			NumChilledWaterMixed = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cMixedCWTankModuleObj );
-			NumChilledWaterStratified = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cStratifiedCWTankModuleObj );
+			NumWaterHeaterMixed = InputProcessor::GetObjectDefMaxArgs( cMixedWHModuleObj );
+			NumWaterHeaterStratified = InputProcessor::GetObjectDefMaxArgs( cStratifiedWHModuleObj );
+			NumChilledWaterMixed = InputProcessor::GetObjectDefMaxArgs( cMixedCWTankModuleObj );
+			NumChilledWaterStratified = InputProcessor::GetObjectDefMaxArgs( cStratifiedCWTankModuleObj );
 			NumWaterThermalTank = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified;
-			NumHeatPumpWaterHeater = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cHPWHPumpedCondenser ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( cHPWHWrappedCondenser );
-			NumWaterHeaterDesuperheater = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:WaterHeating:Desuperheater" );
+			NumHeatPumpWaterHeater = InputProcessor::GetObjectDefMaxArgs( cHPWHPumpedCondenser ) + InputProcessor::GetObjectDefMaxArgs( cHPWHWrappedCondenser );
+			NumWaterHeaterDesuperheater = InputProcessor::GetObjectDefMaxArgs( "Coil:WaterHeating:Desuperheater" );
 
 			if ( NumWaterThermalTank > 0 ) {
 				// Write water heater header for EIO
@@ -1281,7 +1281,7 @@ namespace WaterThermalTanks {
 
 			//   get input for heat pump water heater object
 			if ( NumHeatPumpWaterHeater > 0 ) {
-				int const NumPumpedCondenser = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
+				int const NumPumpedCondenser = InputProcessor::GetObjectDefMaxArgs( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				int nAlphaOffset; // the difference of array location between alpha items between pumped and wrapped condensers
 				int nNumericOffset; // the difference of array location between numeric items between pumped and wrapped condensers
 				int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
@@ -3595,7 +3595,7 @@ namespace WaterThermalTanks {
 			// Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
 			if ( NumHeatPumpWaterHeater > 0 ) {
 
-				int const NumPumpedCondenser = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
+				int const NumPumpedCondenser = InputProcessor::GetObjectDefMaxArgs( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
 					// Create reference to current HPWH object in array.
@@ -3907,7 +3907,7 @@ namespace WaterThermalTanks {
 
 			// Get water heater sizing input.
 			cCurrentModuleObject = "WaterHeater:Sizing";
-			NumWaterHeaterSizing = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumWaterHeaterSizing = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 			if ( NumWaterHeaterSizing > 0 ) {
 

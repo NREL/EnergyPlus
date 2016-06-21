@@ -367,7 +367,7 @@ namespace WaterManager {
 
 			MyOneTimeFlag = false;
 			cCurrentModuleObject = "WaterUse:Storage";
-			NumWaterStorageTanks = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumWaterStorageTanks = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumWaterStorageTanks > 0 ) {
 				AnyWaterSystemsInModel = true;
 				if ( ! ( allocated( WaterStorage ) ) ) WaterStorage.allocate( NumWaterStorageTanks );
@@ -523,7 +523,7 @@ namespace WaterManager {
 			} // num water storage tanks > 0
 
 			cCurrentModuleObject = "WaterUse:RainCollector";
-			NumRainCollectors = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumRainCollectors = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumRainCollectors > 0 ) {
 				if ( ! ( allocated( RainCollector ) ) ) RainCollector.allocate( NumRainCollectors );
 				// allow exensible reference to surfaces.
@@ -627,7 +627,7 @@ namespace WaterManager {
 			} // (NumRainCollectors > 0)
 
 			cCurrentModuleObject = "WaterUse:Well";
-			NumGroundWaterWells = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumGroundWaterWells = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumGroundWaterWells > 0 ) {
 				AnyWaterSystemsInModel = true;
 				GroundwaterWell.allocate( NumGroundWaterWells );
@@ -722,7 +722,7 @@ namespace WaterManager {
 			}
 
 			cCurrentModuleObject = "Site:Precipitation";
-			NumSiteRainFall = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumSiteRainFall = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumSiteRainFall > 1 ) { // throw error
 				ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 				ErrorsFound = true;
@@ -756,7 +756,7 @@ namespace WaterManager {
 			}
 
 			cCurrentModuleObject = "RoofIrrigation";
-			NumIrrigation = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumIrrigation = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumIrrigation > 1 ) {
 				ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 				ErrorsFound = true;

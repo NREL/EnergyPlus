@@ -875,25 +875,25 @@ namespace RefrigeratedCase {
 		Array1D< Real64 > Numbers; // Numeric items for object
 		Array2D< Real64 > DayValues; // Array of schedule values
 
-		NumSimulationCascadeCondensers = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:Cascade" );
-		NumSimulationCases = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Case" );
-		NumSimulationCaseAndWalkInLists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList" );
-		NumRefrigeratedRacks = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CompressorRack" );
-		NumSimulationSecondarySystems = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:SecondarySystem" );
-		NumSimulationTransferLoadLists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:TransferLoadList" );
-		NumSimulationWalkIns = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:WalkIn" );
-		NumRefrigSystems = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:System" );
-		NumTransRefrigSystems = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:TranscriticalSystem" );
-		NumSimulationCondAir = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:AirCooled" );
-		NumSimulationCondEvap = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:EvaporativeCooled" );
-		NumSimulationCondWater = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:WaterCooled" );
-		NumSimulationGasCooler = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:GasCooler:AirCooled" );
+		NumSimulationCascadeCondensers = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:Cascade" );
+		NumSimulationCases = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Case" );
+		NumSimulationCaseAndWalkInLists = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList" );
+		NumRefrigeratedRacks = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CompressorRack" );
+		NumSimulationSecondarySystems = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:SecondarySystem" );
+		NumSimulationTransferLoadLists = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:TransferLoadList" );
+		NumSimulationWalkIns = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:WalkIn" );
+		NumRefrigSystems = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:System" );
+		NumTransRefrigSystems = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:TranscriticalSystem" );
+		NumSimulationCondAir = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:AirCooled" );
+		NumSimulationCondEvap = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:EvaporativeCooled" );
+		NumSimulationCondWater = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:WaterCooled" );
+		NumSimulationGasCooler = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:GasCooler:AirCooled" );
 		NumRefrigCondensers = NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater + NumSimulationCascadeCondensers;
-		NumSimulationCompressors = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Compressor" );
-		NumSimulationSubcoolers = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Subcooler" );
-		NumCompressorLists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CompressorList" );
-		NumRefrigChillerSets = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:RefrigerationChillerSet" );
-		NumSimulationRefrigAirChillers = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Refrigeration:AirChiller" );
+		NumSimulationCompressors = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Compressor" );
+		NumSimulationSubcoolers = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Subcooler" );
+		NumCompressorLists = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CompressorList" );
+		NumRefrigChillerSets = InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:RefrigerationChillerSet" );
+		NumSimulationRefrigAirChillers = InputProcessor::GetObjectDefMaxArgs( "Refrigeration:AirChiller" );
 
 		// Set flags used later to avoid unnecessary steps.
 		if ( NumRefrigeratedRacks == 0 ) HaveRefrigRacks = false;

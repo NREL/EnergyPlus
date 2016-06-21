@@ -429,7 +429,7 @@ namespace SizingManager {
 
 								//  After the first iteration of HeatBalance, all the "input" has been gotten
 								if ( BeginSimFlag ) {
-									if ( GetNumRangeCheckErrorsFound() > 0 ) {
+									if ( InputProcessor::GetNumRangeCheckErrorsFound() > 0 ) {
 										ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
 									}
 								}
@@ -518,7 +518,7 @@ namespace SizingManager {
 
 			ManageZoneEquipment( true, SimZoneEquip, SimAir );
 			ManageAirLoops( true, SimAir, SimZoneEquip );
-			if ( GetNumRangeCheckErrorsFound() > 0 ) {
+			if ( InputProcessor::GetNumRangeCheckErrorsFound() > 0 ) {
 				ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
 			}
 
@@ -818,7 +818,7 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:OutdoorAir";
-		NumOARequirements = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOARequirements = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
@@ -1061,7 +1061,7 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-		NumZoneAirDistribution = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumZoneAirDistribution = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
@@ -1195,7 +1195,7 @@ namespace SizingManager {
 		int Temp;
 
 		cCurrentModuleObject = "Sizing:Parameters";
-		NumSizParams = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSizParams = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		if ( NumSizParams == 1 ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1227,7 +1227,7 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "OutputControl:Sizing:Style";
-		Temp = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		Temp = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		if ( Temp == 0 ) {
 			cAlphaArgs( 1 ) = "Comma";
@@ -1339,7 +1339,7 @@ namespace SizingManager {
 		Array1D< GlobalMiscObject > SizingZoneObjects;
 
 		cCurrentModuleObject = "Sizing:Zone";
-		NumSizingZoneStatements = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSizingZoneStatements = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		SizingZoneObjects.allocate( NumSizingZoneStatements );
 
 		if ( NumSizingZoneStatements > 0 ) {
@@ -1391,7 +1391,7 @@ namespace SizingManager {
 		}
 
 		if ( NumZoneSizingInput > 0 ) {
-			NumDesDays = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "Zone Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -1897,7 +1897,7 @@ namespace SizingManager {
 
 		InErrFlag = ErrorsFound;
 		cCurrentModuleObject = "Zone";
-		NumZones = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		ZoneNames.allocate( NumZones );
 
 		for ( Item = 1; Item <= NumZones; ++Item ) {
@@ -1912,7 +1912,7 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "ZoneList";
-		NumZoneLists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumZoneLists = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		ZoneListNames.allocate( NumZoneLists );
 
 		for ( Item = 1; Item <= NumZoneLists; ++Item ) {
@@ -2027,12 +2027,12 @@ namespace SizingManager {
 		bool IsBlank; // Flag for blank name
 		int NumDesDays; // Number of design days in input
 
-		NumAirLoops = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC" );
+		NumAirLoops = InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC" );
 		cCurrentModuleObject = "Sizing:System";
-		NumSysSizInput = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSysSizInput = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		if ( NumSysSizInput > 0 ) {
-			NumDesDays = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "System Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -2483,10 +2483,10 @@ namespace SizingManager {
 		int NumDesDays; // Number of design days in input
 
 		cCurrentModuleObject = "Sizing:Plant";
-		NumPltSizInput = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumPltSizInput = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		if ( NumPltSizInput > 0 ) {
-			NumDesDays = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && DoPlantSizing ) {
 				ShowSevereError( "Plant Sizing calculations need SizingPeriod:* input" );
 				ErrorsFound = true;
@@ -2946,7 +2946,7 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-		NumZoneHVACSizing = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumZoneHVACSizing = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );

@@ -309,9 +309,9 @@ namespace OutsideEnergySources {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "DistrictHeating";
-		NumDistrictUnitsHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumDistrictUnitsHeat = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		cCurrentModuleObject = "DistrictCooling";
-		NumDistrictUnitsCool = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumDistrictUnitsCool = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
 		if ( allocated( EnergySource ) ) return;

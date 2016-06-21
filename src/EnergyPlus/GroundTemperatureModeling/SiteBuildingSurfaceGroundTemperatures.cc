@@ -113,7 +113,7 @@ namespace EnergyPlus {
 		std::shared_ptr< SiteBuildingSurfaceGroundTemps > thisModel( new SiteBuildingSurfaceGroundTemps() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp );
-		int numCurrObjects = InputProcessor::InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		thisModel->objectType = objectType;
 		thisModel->objectName = objectName;
@@ -121,7 +121,7 @@ namespace EnergyPlus {
 		if ( numCurrObjects == 1 ) {
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( NumNums < 12 ) {
 				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );

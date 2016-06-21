@@ -347,7 +347,7 @@ namespace SwimmingPool {
 		lNumericBlanks.allocate( MaxNumbers );
 		lNumericBlanks = true;
 
-		NumSwimmingPools = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor" );
+		NumSwimmingPools = InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor" );
 		CheckEquipName.allocate( NumSwimmingPools );
 		CheckEquipName = true;
 

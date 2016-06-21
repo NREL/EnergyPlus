@@ -385,11 +385,11 @@ namespace Pumps {
 		ErrorsFound = false;
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		NumVarSpeedPumps = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cPump_VarSpeed );
-		NumConstSpeedPumps = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cPump_ConSpeed );
-		NumCondensatePumps = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cPump_Cond );
-		NumPumpBankSimpleVar = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cPumpBank_VarSpeed );
-		NumPumpBankSimpleConst = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cPumpBank_ConSpeed );
+		NumVarSpeedPumps = InputProcessor::GetObjectDefMaxArgs( cPump_VarSpeed );
+		NumConstSpeedPumps = InputProcessor::GetObjectDefMaxArgs( cPump_ConSpeed );
+		NumCondensatePumps = InputProcessor::GetObjectDefMaxArgs( cPump_Cond );
+		NumPumpBankSimpleVar = InputProcessor::GetObjectDefMaxArgs( cPumpBank_VarSpeed );
+		NumPumpBankSimpleConst = InputProcessor::GetObjectDefMaxArgs( cPumpBank_ConSpeed );
 		NumPumps = NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar + NumPumpBankSimpleConst;
 
 		if ( NumPumps <= 0 ) {

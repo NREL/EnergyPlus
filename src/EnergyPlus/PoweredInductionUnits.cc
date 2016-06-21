@@ -362,8 +362,8 @@ namespace PoweredInductionUnits {
 		// FLOW
 		// find the number of each type of fan coil unit
 		SteamMessageNeeded = true;
-		NumSeriesPIUs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
-		NumParallelPIUs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
+		NumSeriesPIUs = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
+		NumParallelPIUs = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
 		NumPIUs = NumSeriesPIUs + NumParallelPIUs;
 		// allocate the data structures
 		PIU.allocate( NumPIUs );

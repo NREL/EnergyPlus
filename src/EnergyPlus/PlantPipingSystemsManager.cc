@@ -213,7 +213,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int numSlabsCheck;
 
-		numSlabsCheck = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Slab );
+		numSlabsCheck = InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Slab );
 
 		if ( numSlabsCheck > 0 ) {
 			AnySlabsInModel = true;
@@ -254,7 +254,7 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int const numBasementsCheck( InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Basement ) );
+		int const numBasementsCheck( InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Basement ) );
 
 		AnyBasementsInModel = ( numBasementsCheck > 0 );
 
@@ -554,20 +554,20 @@ namespace PlantPipingSystemsManager {
 		std::string ThisSegmentName;
 
 		// Read number of objects and allocate main data structures - first domains
-		NumGeneralizedDomains = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ug_GeneralDomain );
-		NumHorizontalTrenches = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_HorizTrench );
-		NumZoneCoupledDomains = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Slab );
-		NumBasements = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Basement );
+		NumGeneralizedDomains = InputProcessor::GetObjectDefMaxArgs( ObjName_ug_GeneralDomain );
+		NumHorizontalTrenches = InputProcessor::GetObjectDefMaxArgs( ObjName_HorizTrench );
+		NumZoneCoupledDomains = InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Slab );
+		NumBasements = InputProcessor::GetObjectDefMaxArgs( ObjName_ZoneCoupled_Basement );
 		TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
 		PipingSystemDomains.allocate( TotalNumDomains );
 
 		// then circuits
-		NumPipeCircuits = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_Circuit );
+		NumPipeCircuits = InputProcessor::GetObjectDefMaxArgs( ObjName_Circuit );
 		TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
 		PipingSystemCircuits.allocate( TotalNumCircuits );
 
 		// then segments
-		NumPipeSegmentsInInput = InputProcessor::InputProcessor::GetObjectDefMaxArgs( ObjName_Segment );
+		NumPipeSegmentsInInput = InputProcessor::GetObjectDefMaxArgs( ObjName_Segment );
 		NumSegmentsInHorizontalTrenches = GetNumSegmentsForHorizontalTrenches( NumHorizontalTrenches );
 		TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
 		PipingSystemSegments.allocate( TotalNumSegments );

@@ -271,7 +271,7 @@ namespace PollutionModule {
 
 		//First determine if the Pollution reporting has been triggered, and is not exit.
 		cCurrentModuleObject = "Output:EnvironmentalImpactFactors";
-		NumPolluteRpt = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumPolluteRpt = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		PollutionReportSetup = true;
 
 		for ( Loop = 1; Loop <= NumPolluteRpt; ++Loop ) {
@@ -340,7 +340,7 @@ namespace PollutionModule {
 		GetInputFlagPollution = false;
 
 		cCurrentModuleObject = "EnvironmentalImpactFactors";
-		NumEnvImpactFactors = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumEnvImpactFactors = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		if ( NumEnvImpactFactors > 0 ) {
 			// Now find and load all of the user inputs and factors.
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -379,7 +379,7 @@ namespace PollutionModule {
 
 		//Compare all of the Fuel Factors and compare to PollutionCalculationFactors List
 		cCurrentModuleObject = "FuelFactors";
-		NumFuelFactors = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumFuelFactors = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumFuelFactors; ++Loop ) {
 			// Now find and load all of the user inputs and factors.

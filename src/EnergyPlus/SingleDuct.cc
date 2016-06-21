@@ -443,12 +443,12 @@ namespace SingleDuct {
 		std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
 		// Flow
-		NumVAVSys = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat" );
-		NumNoRHVAVSys = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:NoReheat" );
-		NumConstVolSys = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ConstantVolume:Reheat" );
-		NumVAVVS = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" );
-		NumCBVAVSys = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" );
-		NumNoRHCBVAVSys = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" );
+		NumVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat" );
+		NumNoRHVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:NoReheat" );
+		NumConstVolSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ConstantVolume:Reheat" );
+		NumVAVVS = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" );
+		NumCBVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" );
+		NumNoRHCBVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" );
 		NumSys = NumVAVSys + NumConstVolSys + NumNoRHVAVSys + NumVAVVS + NumCBVAVSys + NumNoRHCBVAVSys;
 
 		Sys.allocate( NumSys );
@@ -1476,7 +1476,7 @@ namespace SingleDuct {
 		// Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
 		// specified in the Sizing:Zone object
 
-		NumZoneSiz = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Sizing:Zone" );
+		NumZoneSiz = InputProcessor::GetObjectDefMaxArgs( "Sizing:Zone" );
 		if ( NumZoneSiz > 0 ) {
 			for ( SysIndex = 1; SysIndex <= NumSys; ++SysIndex ) {
 				for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
@@ -4477,8 +4477,8 @@ namespace SingleDuct {
 		int SupAirIn; // Supply air inlet node index
 		bool errFlag; // error flag from component validation
 
-		NumInletATMixers = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:InletSideMixer" );
-		NumSupplyATMixers = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:SupplySideMixer" );
+		NumInletATMixers = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:InletSideMixer" );
+		NumSupplyATMixers = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:SupplySideMixer" );
 
 		NumATMixers = NumInletATMixers + NumSupplyATMixers;
 		SysATMixer.allocate( NumATMixers );

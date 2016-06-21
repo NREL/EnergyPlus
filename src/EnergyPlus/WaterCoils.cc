@@ -439,9 +439,9 @@ namespace WaterCoils {
 		static int j1( 0 );
 
 		// Flow
-		NumSimpHeat = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water" );
-		NumFlatFin = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry" );
-		NumCooling = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water" );
+		NumSimpHeat = InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water" );
+		NumFlatFin = InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry" );
+		NumCooling = InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water" );
 		NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
 		if ( NumWaterCoils > 0 ) {

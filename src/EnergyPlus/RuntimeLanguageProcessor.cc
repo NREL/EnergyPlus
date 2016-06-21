@@ -2823,7 +2823,7 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-			NumEMSCurveIndices = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumEMSCurveIndices = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumEMSCurveIndices > 0 ) {
 				CurveIndexVariableNums.dimension( NumEMSCurveIndices, 0 );
 				for ( loop = 1; loop <= NumEMSCurveIndices; ++loop ) {
@@ -2872,7 +2872,7 @@ namespace RuntimeLanguageProcessor {
 			} // NumEMSCurveIndices > 0
 
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-			NumEMSConstructionIndices = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumEMSConstructionIndices = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumEMSConstructionIndices > 0 ) {
 				ConstructionIndexVariableNums.dimension( NumEMSConstructionIndices, 0 );
 				for ( loop = 1; loop <= NumEMSConstructionIndices; ++loop ) {
@@ -2980,7 +2980,7 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-			NumErlTrendVariables = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumErlTrendVariables = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 			if ( NumErlTrendVariables > 0 ) {
 				TrendVariable.allocate( NumErlTrendVariables );
 				for ( TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum ) {

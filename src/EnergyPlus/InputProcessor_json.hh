@@ -165,7 +165,7 @@ class InputProcessor {
 public:
 	static IdfParser idf_parser;
 	static State state;
-	static const json schema;
+	static json schema;
 	static json jdf;
 
 
@@ -1153,6 +1153,7 @@ public:
 		}
 	}
 
+	static
 	void
 	RangeCheck(
 		bool & ErrorsFound, // Set to true if error detected
@@ -1183,6 +1184,7 @@ public:
 	void
 	TurnOffReportRangeCheckErrors();
 
+	static
 	int
 	GetNumRangeCheckErrorsFound();
 
@@ -1215,6 +1217,12 @@ public:
 		int & NumArgs, // How many arguments (max) this Object can have
 		int & NumAlpha, // How many Alpha arguments (max) this Object can have
 		int & NumNumeric // How many Numeric arguments (max) this Object can have
+	);
+
+	static
+	int
+	GetObjectDefMaxArgs(
+		std::string const & ObjectWord // Object for definition
 	);
 
 	void

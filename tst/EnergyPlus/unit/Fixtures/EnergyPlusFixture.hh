@@ -65,7 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessor_json.hh>
 
 #include <memory>
 #include <ostream>
@@ -332,6 +332,7 @@ namespace EnergyPlus {
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found
+		
 		static bool process_idd( std::string const & idd, bool & errors_found );
 
 		// This sets up the InputProcessor cache specificaly to store the processed full IDD for subsequent runs.

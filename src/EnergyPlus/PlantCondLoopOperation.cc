@@ -441,7 +441,7 @@ namespace PlantCondLoopOperation {
 
 		// get number of operation schemes
 		CurrentModuleObject = "PlantEquipmentOperationSchemes";
-		NumPlantOpSchemes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumPlantOpSchemes = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 		if ( NumPlantOpSchemes > 0 ) {
 			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
@@ -465,7 +465,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
-		NumCondOpSchemes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumCondOpSchemes = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 		if ( NumCondOpSchemes > 0 ) {
 			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
@@ -648,20 +648,20 @@ namespace PlantCondLoopOperation {
 		ErrorsFound = false; //DSU CS
 
 		//**********VERIFY THE 'PLANTEQUIPMENTOPERATION:...' KEYWORDS**********
-		CLRBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:CoolingLoad" );
-		HLRBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:HeatingLoad" );
-		DBRBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDryBulb" );
-		WBRBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorWetBulb" );
-		DPRBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDewpoint" );
-		RHRBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorRelativeHumidity" );
-		CSPBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:ComponentSetpoint" ); //* Temp Based Control
-		NumUserDefOpSchemes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:UserDefined" );
-		DBTDBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDryBulbDifference" );
-		WBTDBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorWetBulbDifference" );
-		DPTDBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDewpointDifference" );
-		TESSPBO = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:ThermalEnergyStorage" );
+		CLRBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:CoolingLoad" );
+		HLRBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:HeatingLoad" );
+		DBRBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDryBulb" );
+		WBRBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorWetBulb" );
+		DPRBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDewpoint" );
+		RHRBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorRelativeHumidity" );
+		CSPBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:ComponentSetpoint" ); //* Temp Based Control
+		NumUserDefOpSchemes = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:UserDefined" );
+		DBTDBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDryBulbDifference" );
+		WBTDBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorWetBulbDifference" );
+		DPTDBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:OutdoorDewpointDifference" );
+		TESSPBO = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:ThermalEnergyStorage" );
 		NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
-		NumUncontrolledSchemes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:Uncontrolled" );
+		NumUncontrolledSchemes = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentOperation:Uncontrolled" );
 		if ( ( NumSchemes + NumUncontrolledSchemes ) <= 0 ) {
 			ShowFatalError( "No PlantEquipmentOperation:* objects specified. Stop simulation." );
 		}
@@ -728,8 +728,8 @@ namespace PlantCondLoopOperation {
 		}
 
 		//**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
-		PELists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentList" );
-		CELists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "CondenserEquipmentList" );
+		PELists = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentList" );
+		CELists = InputProcessor::GetObjectDefMaxArgs( "CondenserEquipmentList" );
 		NumSchemeLists = PELists + CELists;
 		TempVerifyNames.allocate( NumSchemeLists );
 		Count = 0;
@@ -1212,8 +1212,8 @@ namespace PlantCondLoopOperation {
 
 		if ( LoadEquipListOneTimeFlag ) {
 			// assemble mapping between list names and indices one time
-			PELists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentList" );
-			CELists = InputProcessor::InputProcessor::GetObjectDefMaxArgs( "CondenserEquipmentList" );
+			PELists = InputProcessor::GetObjectDefMaxArgs( "PlantEquipmentList" );
+			CELists = InputProcessor::GetObjectDefMaxArgs( "CondenserEquipmentList" );
 			TotNumLists = PELists + CELists;
 			if ( TotNumLists > 0 ) {
 				EquipListsNameList.allocate( TotNumLists );

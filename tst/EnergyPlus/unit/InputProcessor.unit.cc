@@ -63,7 +63,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessor_json.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
 #include "Fixtures/InputProcessorFixture.hh"

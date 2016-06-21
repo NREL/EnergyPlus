@@ -153,9 +153,9 @@ namespace FourPipeBeam {
 		NumNumbers = 11;
 
 		// find beam index from name
-		beamIndex = InputProcessor::InputProcessor::GetObjectItemNum(cCurrentModuleObject, objectName );
+		beamIndex = InputProcessor::GetObjectItemNum(cCurrentModuleObject, objectName );
 		if ( beamIndex > 0 ) {
-			InputProcessor::InputProcessor::GetObjectItem( cCurrentModuleObject, beamIndex, cAlphaArgs, NumAlphas,
+			InputProcessor::GetObjectItem( cCurrentModuleObject, beamIndex, cAlphaArgs, NumAlphas,
 				 rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				found = true;
 		} else {

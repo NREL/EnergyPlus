@@ -65,8 +65,8 @@ set( test_src
   HWBaseboardRadiator.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
-  InputProcessor.unit.cc
-  InputProcessor_json.unit.cc
+  # InputProcessor.unit.cc
+        AAAInputProcessor_json.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MixedAir.unit.cc

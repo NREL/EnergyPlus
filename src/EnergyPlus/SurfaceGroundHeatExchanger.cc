@@ -288,7 +288,7 @@ namespace loc {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Surface";
-		int NumOfSurfaceGHEs = InputProcessor::InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		int NumOfSurfaceGHEs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( SurfaceGHE ) ) SurfaceGHE.deallocate();
 

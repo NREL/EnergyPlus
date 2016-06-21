@@ -393,7 +393,7 @@ namespace WindowAC {
 		// find the number of each type of window AC unit
 		CurrentModuleObject = "ZoneHVAC:WindowAirConditioner";
 
-		NumWindACCyc = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumWindACCyc = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		NumWindAC = NumWindACCyc;
 		// allocate the data structures
 		WindAC.allocate( NumWindAC );

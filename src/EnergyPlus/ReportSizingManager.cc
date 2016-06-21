@@ -1331,7 +1331,7 @@ namespace ReportSizingManager {
 							AutosizeDes = UnitarySysEqSizing(CurSysNum).HeatingAirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
+								if ( InputProcessor::SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && ! DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
 									} else {
@@ -1341,7 +1341,7 @@ namespace ReportSizingManager {
 									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
 							} else if ( CurDuctType == Cooling ) {
-								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
+								if ( InputProcessor::SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 									} else {

@@ -368,77 +368,77 @@ namespace ScheduleManager {
 		MaxAlps = 0;
 
 		CurrentModuleObject = "ScheduleTypeLimits";
-		NumScheduleTypes = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumScheduleTypes = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumScheduleTypes > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:Hourly";
-		NumHrDaySchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumHrDaySchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumHrDaySchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:Interval";
-		NumIntDaySchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumIntDaySchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumIntDaySchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:List";
-		NumLstDaySchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumLstDaySchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumLstDaySchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Week:Daily";
-		NumRegWeekSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumRegWeekSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumRegWeekSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Week:Compact";
-		NumCptWeekSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumCptWeekSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumCptWeekSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Year";
-		NumRegSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumRegSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumRegSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Compact";
-		NumCptSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumCptSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumCptSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		CurrentModuleObject = "Schedule:File";
-		NumCommaFileSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumCommaFileSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumCommaFileSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Constant";
-		NumConstantSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumConstantSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumConstantSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "ExternalInterface:Schedule";
-		NumExternalInterfaceSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumExternalInterfaceSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		// added for FMI
 		if ( NumExternalInterfaceSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
@@ -447,7 +447,7 @@ namespace ScheduleManager {
 		}
 		// added for FMU Import
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-		NumExternalInterfaceFunctionalMockupUnitImportSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumExternalInterfaceFunctionalMockupUnitImportSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
@@ -455,7 +455,7 @@ namespace ScheduleManager {
 		}
 		// added for FMU Export
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
-		NumExternalInterfaceFunctionalMockupUnitExportSchedules = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportSchedules = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 		if ( NumExternalInterfaceFunctionalMockupUnitExportSchedules > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
@@ -1886,7 +1886,7 @@ namespace ScheduleManager {
 
 		if ( NumScheduleTypes + NumDaySchedules + NumWeekSchedules + NumSchedules > 0 ) { // Report to EIO file
 			CurrentModuleObject = "Output:Schedules";
-			NumFields = InputProcessor::InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+			NumFields = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
 
 			//    RptSchedule=.FALSE.
 			RptLevel = 1;

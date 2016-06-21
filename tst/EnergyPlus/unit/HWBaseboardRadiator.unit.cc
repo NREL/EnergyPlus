@@ -77,7 +77,6 @@ using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
 using namespace Psychrometrics;
-using namespace InputProcessor;
 using namespace HWBaseboardRadiator;
 using namespace DataLoopNode;
 using namespace FluidProperties;

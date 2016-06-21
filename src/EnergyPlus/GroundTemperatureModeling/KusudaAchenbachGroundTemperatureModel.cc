@@ -105,11 +105,11 @@ namespace EnergyPlus {
 		std::shared_ptr< KusudaGroundTempsModel > thisModel( new KusudaGroundTempsModel() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
-		int numCurrModels = InputProcessor::InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-			InputProcessor::InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( objectName == cAlphaArgs( 1 ) ) {
 

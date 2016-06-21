@@ -79,7 +79,6 @@
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
-using namespace InputProcessor;
 using namespace DataLoopNode;
 using namespace DataSizing;
 using namespace DataZoneEquipment;
