@@ -577,9 +577,8 @@ namespace EnergyPlus {
 			return errors_found;
 		}
 
-		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 		InputProcessor IP;
-		InputProcessor::jdf = IP.idf_parser.decode(idf, InputProcessor::schema );
+		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, InputProcessor::schema );
 		// NumLines = 0;
 		// InitSecretObjects();
 		// ProcessInputDataFile( *idf_stream );

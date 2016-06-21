@@ -10,6 +10,7 @@ set( test_src
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
   Fixtures/SQLiteFixture.hh
+        InputProcessor_json.unit.cc
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
@@ -65,8 +66,6 @@ set( test_src
   HWBaseboardRadiator.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
-  # InputProcessor.unit.cc
-        AAAInputProcessor_json.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MixedAir.unit.cc

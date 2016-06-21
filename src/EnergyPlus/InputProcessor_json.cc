@@ -31,7 +31,7 @@
 
 using json = nlohmann::json;
 
-json EnergyPlus::InputProcessor::jdf = json();
+//json EnergyPlus::InputProcessor::jdf = json();
 json EnergyPlus::InputProcessor::schema = json();
 IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
 State EnergyPlus::InputProcessor::state = State();

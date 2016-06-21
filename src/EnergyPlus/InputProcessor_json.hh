@@ -160,16 +160,14 @@ public:
 };
 
 namespace EnergyPlus {
+	json jdf;
 
 class InputProcessor {
 public:
 	static IdfParser idf_parser;
 	static State state;
 	static json schema;
-	static json jdf;
-
-
-
+//	static json jdf;
 	/*
 	//MODULE PARAMETER DEFINITIONS
 	extern int const ObjectDefAllocInc; // Starting number of Objects allowed in IDD as well as the increment
