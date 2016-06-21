@@ -2487,7 +2487,7 @@ namespace Furnaces {
 
 			// Add DX cooling coil to component sets array
 			if (Furnace(FurnaceNum).bIsIHP) {
-				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ) + "Cooling Coil", NodeID( CoolingCoilInletNode ), NodeID( CoolingCoilOutletNode ) );
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ) + " Cooling Coil", NodeID( CoolingCoilInletNode ), NodeID( CoolingCoilOutletNode ) );
 			} else {
 				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 12 ), Alphas( 13 ), NodeID( CoolingCoilInletNode ), NodeID( CoolingCoilOutletNode ) );
 			}
@@ -2495,7 +2495,7 @@ namespace Furnaces {
 
 			// Add heating coil to component sets array
 			if (Furnace(FurnaceNum).bIsIHP) {
-				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ) + "Heating Coil", NodeID( HeatingCoilInletNode ), NodeID( HeatingCoilOutletNode ) );
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ) + " Heating Coil", NodeID( HeatingCoilInletNode ), NodeID( HeatingCoilOutletNode ) );
 			} else {
 				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ), NodeID( HeatingCoilInletNode ), NodeID( HeatingCoilOutletNode ) );
 			}
@@ -3342,13 +3342,13 @@ namespace Furnaces {
 
 			// Add DX cooling coil to component sets array
 			if (Furnace(FurnaceNum).bIsIHP) {
-				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ) + "Cooling Coil", CompSetCoolInlet, "UNDEFINED" );
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ) + " Cooling Coil", CompSetCoolInlet, "UNDEFINED" );
 			} else {
 				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 10 ), Alphas( 11 ), CompSetCoolInlet, "UNDEFINED" );
 			}
 			// Add DX heating coil to component sets array
 			if (Furnace(FurnaceNum).bIsIHP) {
-				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 8 ), Alphas( 9 ) + "Heating Coil", "UNDEFINED", "UNDEFINED" );
+				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 8 ), Alphas( 9 ) + " Heating Coil", "UNDEFINED", "UNDEFINED" );
 			} else {
 				SetUpCompSets( CurrentModuleObject, Alphas( 1 ), Alphas( 8 ), Alphas( 9 ), "UNDEFINED", "UNDEFINED" );
 			}

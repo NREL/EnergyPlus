@@ -1951,7 +1951,6 @@ namespace SimulationManager {
 					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have been retrieved." );
 					WarningOut = false;
 				}
-				if (CompSets(Count).CType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") continue;
 				ShowWarningError( "Node Connection Error for object " + CompSets( Count ).CType + ", name=" + CompSets( Count ).CName );
 				ShowContinueError( "  " + CompSets( Count ).Description + " not on any Branch or Parent Object" );
 				ShowContinueError( "  Inlet Node : " + CompSets( Count ).InletNodeName );
@@ -1966,7 +1965,6 @@ namespace SimulationManager {
 					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have been retrieved." );
 					WarningOut = false;
 				}
-				if (CompSets(Count).CType == "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") continue;
 				ShowWarningError( "Potential Node Connection Error for object " + CompSets( Count ).CType + ", name=" + CompSets( Count ).CName );
 				ShowContinueError( "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information" );
 				ShowContinueError( "  Inlet Node : " + CompSets( Count ).InletNodeName );
