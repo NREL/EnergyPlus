@@ -787,7 +787,7 @@ namespace FaultsManager {
 
 	void
 	FaultPropertiesChillerSWT::CalFaultChillerSWT(
-		bool FlagVariableFlowChiller, // True if chiller is variable flow and false if it is constant flow
+		bool FlagVariableFlow, // True if chiller is variable flow and false if it is constant flow
 		Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
 		Real64 Cp, // Local fluid specific heat
 		Real64 EvapInletTemp, // Chiller evaporator inlet water temperature 
@@ -839,12 +839,12 @@ namespace FaultsManager {
 		
 		// FLOW
 		
-		if( !FlagVariableFlowChiller ){
+		if( !FlagVariableFlow ){
 		// Chillers with ConstantFlow mode
 		
 			EvapOutletTemp_f = EvapOutletTemp_ff - FaultyChillerSWTOffset;
 			
-			if( EvapInletTemp > EvapOutletTemp_f ){
+			if( ( EvapInletTemp > EvapOutletTemp_f ) && ( EvapMassFlowRate_ff > 0 )){
 				QEvaporator_f = EvapMassFlowRate_ff * Cp * ( EvapInletTemp - EvapOutletTemp_f );
 			} else {
 				EvapMassFlowRate_f = 0.0;
@@ -856,7 +856,7 @@ namespace FaultsManager {
 		
 			EvapOutletTemp_f = EvapOutletTemp_ff - FaultyChillerSWTOffset;
 			
-			if( ( EvapInletTemp > EvapOutletTemp_f ) && ( Cp > 0 ) ){
+			if( ( EvapInletTemp > EvapOutletTemp_f ) && ( Cp > 0 ) && ( EvapMassFlowRate_ff > 0 ) ){
 				EvapMassFlowRate_f = QEvaporator_ff / Cp / ( EvapInletTemp - EvapOutletTemp_ff );
 				QEvaporator_f =  EvapMassFlowRate_f * Cp * ( EvapInletTemp - EvapOutletTemp_f );
 			} else {
