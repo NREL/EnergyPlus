@@ -1398,8 +1398,12 @@ namespace HVACStandAloneERV {
 			}
 		}
 
-		SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
-		SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );		
+		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
+			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
+		}		
+		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
+			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
+		}			
 		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
 
 		// Check heat exchanger flow rate or set flow rate if autosized in heat exchanger object

@@ -1511,13 +1511,13 @@ namespace HeatRecovery {
 		SizingMethod = SystemAirflowSizing;
 		if ( CurZoneEqNum > 0 ) {
 			if ( ExchCond( ExchNum ).NomSupAirVolFlow == AutoSize ) {
-				// Heat recovery heat exchanger in zoneHVAC equipment shall be sized to OA flow in the parent equipment
+				// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
 				SizingMethod = AutoCalculateSizing;
 				DataConstantUsedForSizing = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 				DataFractionUsedForSizing = 1.0;
 			} else {
 				if ( ZoneSizingRunDone ) {
-					// Heat recovery heat exchanger in zoneHVAC equipment shall be sized to OA flow in the parent equipment
+					// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
 					SizingMethod = AutoCalculateSizing;
 					DataConstantUsedForSizing = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 					DataFractionUsedForSizing = 1.0;
