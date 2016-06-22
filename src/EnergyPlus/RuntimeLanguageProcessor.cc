@@ -219,7 +219,7 @@ namespace RuntimeLanguageProcessor {
 		ActualDateAndTimeNum = 0;
 		ActualTimeNum = 0;
 		WarmUpFlagNum = 0;
-	
+
 	}
 
 	void
@@ -1364,7 +1364,7 @@ namespace RuntimeLanguageProcessor {
 						DivFound = false;
 					} else if ( OperatorProcessing && ( NextChar == '-' ) ) {
 						// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
-						// example: change "Var == -1" to "Var == 0-1" 
+						// example: change "Var == -1" to "Var == 0-1"
 						OperatorProcessing = false;
 						String.insert( Pos, "0" );
 						++LastPos;
@@ -2745,41 +2745,41 @@ namespace RuntimeLanguageProcessor {
 
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
-			if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+			if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 				+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 				+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables > 0) {
-				for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables 
-					+ NumExternalInterfaceGlobalVariables 
-					+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+				for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables
+					+ NumExternalInterfaceGlobalVariables
+					+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 					+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables; ++GlobalNum) {
 					// If we process the ExternalInterface actuators, all we need to do is to change the
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, 
+						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, 
+						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
 							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
-					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
-						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables, 
+						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 					}
-					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
-						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
-						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
-						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables 
-							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables, 
+						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
+							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
 
@@ -2823,7 +2823,7 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-			NumEMSCurveIndices = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumEMSCurveIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSCurveIndices > 0 ) {
 				CurveIndexVariableNums.dimension( NumEMSCurveIndices, 0 );
 				for ( loop = 1; loop <= NumEMSCurveIndices; ++loop ) {
@@ -2872,7 +2872,7 @@ namespace RuntimeLanguageProcessor {
 			} // NumEMSCurveIndices > 0
 
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-			NumEMSConstructionIndices = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumEMSConstructionIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSConstructionIndices > 0 ) {
 				ConstructionIndexVariableNums.dimension( NumEMSConstructionIndices, 0 );
 				for ( loop = 1; loop <= NumEMSConstructionIndices; ++loop ) {
@@ -2980,7 +2980,7 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-			NumErlTrendVariables = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumErlTrendVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumErlTrendVariables > 0 ) {
 				TrendVariable.allocate( NumErlTrendVariables );
 				for ( TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum ) {
@@ -3451,7 +3451,7 @@ namespace RuntimeLanguageProcessor {
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}}
-					
+
 					//Additional End Use Types Only Used for EnergyTransfer
 					if ( ( ResourceTypeString != "EnergyTransfer" ) && ( EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" || EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" || EndUseTypeString == "HeatRecoveryForHeating" ) ) {
 						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );

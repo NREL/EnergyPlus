@@ -435,7 +435,7 @@ namespace WaterUse {
 		// FLOW:
 
 		cCurrentModuleObject = "WaterUse:Equipment";
-		NumWaterEquipment = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumWaterEquipment = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWaterEquipment > 0 ) {
 			WaterEquipment.allocate( NumWaterEquipment );
@@ -537,7 +537,7 @@ namespace WaterUse {
 		}
 
 		cCurrentModuleObject = "WaterUse:Connections";
-		NumWaterConnections = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumWaterConnections = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWaterConnections > 0 ) {
 			WaterConnections.allocate( NumWaterConnections );

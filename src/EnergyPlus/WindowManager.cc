@@ -8907,7 +8907,7 @@ Label99999: ;
 
 		// Step 1 - check whether there is custom solar or visible spectrum
 		cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-		NumSiteSpectrum = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		// no custom spectrum data, done!
 		if ( NumSiteSpectrum == 0 ) {
@@ -8939,7 +8939,7 @@ Label99999: ;
 			cVisibleSpectrum = cAlphaArgs( 4 );
 
 			cCurrentModuleObject = "Site:SpectrumData";
-			NumSiteSpectrum = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+			NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
 				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;

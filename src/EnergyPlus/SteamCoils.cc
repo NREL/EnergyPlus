@@ -333,7 +333,7 @@ namespace SteamCoils {
 		bool errFlag;
 
 		CurrentModuleObject = "Coil:Heating:Steam";
-		NumStmHeat = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumStmHeat = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );
@@ -2438,7 +2438,7 @@ namespace SteamCoils {
 		int const CoilNum, // Number of hot water heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used
 		) {
 
 		// FUNCTION INFORMATION:

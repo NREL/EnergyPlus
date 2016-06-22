@@ -374,7 +374,7 @@ namespace SteamBaseboardRadiator {
 		bool SteamMessageNeeded;
 
 		SteamMessageNeeded = true;
-		NumSteamBaseboards = InputProcessor::GetObjectDefMaxArgs( cCMO_BBRadiator_Steam );
+		NumSteamBaseboards = InputProcessor::GetNumObjectsFound( cCMO_BBRadiator_Steam );
 
 		// Count total number of baseboard units
 

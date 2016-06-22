@@ -281,7 +281,7 @@ namespace PlantComponentTemperatureSources {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "PlantComponent:TemperatureSource";
-		NumSources = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSources = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSources <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );

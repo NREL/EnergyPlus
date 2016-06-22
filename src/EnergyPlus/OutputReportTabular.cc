@@ -791,7 +791,7 @@ namespace OutputReportTabular {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		MonthlyInputCount = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		MonthlyInputCount = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( MonthlyInputCount > 0 ) {
 			WriteTabularFiles = true;
 			// if not a run period using weather do not create reports
@@ -1473,7 +1473,7 @@ namespace OutputReportTabular {
 
 		timeInYear = 0.0; //intialize the time in year counter
 		// determine size of array that holds the IDF description
-		OutputTableBinnedCount = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		OutputTableBinnedCount = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		OutputTableBinned.allocate( OutputTableBinnedCount );
 		if ( OutputTableBinnedCount > 0 ) {
 			WriteTabularFiles = true;
@@ -1666,7 +1666,7 @@ namespace OutputReportTabular {
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 
-		NumTabularStyle = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumTabularStyle = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumTabularStyle == 0 ) {
 			AlphArray( 1 ) = "COMMA";
@@ -1853,7 +1853,7 @@ namespace OutputReportTabular {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumTabularPredefined = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumTabularPredefined = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( NumTabularPredefined == 1 ) {
 			// find out how many fields since the object is extensible
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
@@ -2261,7 +2261,7 @@ namespace OutputReportTabular {
 		bool isFound;
 
 		isFound = false;
-		NumTabularPredefined = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumTabularPredefined = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( NumTabularPredefined == 1 ) {
 			// find out how many fields since the object is extensible
 			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );

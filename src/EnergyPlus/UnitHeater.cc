@@ -382,7 +382,7 @@ namespace UnitHeater {
 
 		// Figure out how many unit heaters there are in the input file
 		CurrentModuleObject = cMO_UnitHeater;
-		NumOfUnitHeats = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOfUnitHeats = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );

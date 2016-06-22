@@ -659,19 +659,19 @@ namespace PackagedTerminalHeatPump {
 
 		// find the number of each type of packaged terminal unit
 		CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-		NumPTHP = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumPTHP = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-		NumPTAC = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumPTAC = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-		NumPTWSHP = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumPTWSHP = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );

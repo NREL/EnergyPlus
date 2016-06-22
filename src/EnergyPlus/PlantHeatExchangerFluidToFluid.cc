@@ -341,7 +341,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
-		NumberOfPlantFluidHXs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumberOfPlantFluidHXs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumberOfPlantFluidHXs == 0 ) return;
 
 		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );

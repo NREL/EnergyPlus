@@ -137,6 +137,9 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					obj.erase("name");
 				}
 			}
+			if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
+				name = obj_name + " " + std::to_string( root[ obj_name ].size() + 1 );
+			}
 			root[obj_name][name] = obj;
 		}
 	}
@@ -2835,8 +2838,8 @@ EnergyPlus::InputProcessor::GetObjectItem(
 
 
 	//Autodesk:Uninit Initialize variables used uninitialized
-//	NumAlphas = 0; //Autodesk:Uninit Force default initialization
-//	NumNumbers = 0; //Autodesk:Uninit Force default initialization
+	NumAlphas = 0; //Autodesk:Uninit Force default initialization
+	NumNumbers = 0; //Autodesk:Uninit Force default initialization
 
 	MaxAlphas = isize( Alphas, 1 );
 	MaxNumbers = isize( Numbers, 1 );
@@ -2902,6 +2905,7 @@ EnergyPlus::InputProcessor::GetObjectItem(
 		if ( it != obj.value().end() ) {
 			Alphas( i + 1 ) = MakeUPPERCase( it.value().get<std::string>() );
 			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = false;
+			NumAlphas++;
 		} else {
 			Alphas( i + 1 ) = "";
 			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = true;
@@ -2918,6 +2922,7 @@ EnergyPlus::InputProcessor::GetObjectItem(
 			if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
 			else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
 			if ( present( NumBlank ) ) NumBlank()( i + 1 ) = false;
+			NumNumbers++;
 		} else {
 			// TODO What to do if a numeric field is left blank?
 			Numbers( i + 1 ) = -99999;
@@ -4732,18 +4737,18 @@ EnergyPlus::InputProcessor::GetObjectDefMaxArgs(
 	NumArgs = NumAlpha + NumNumeric;
 }
 
-int
-EnergyPlus::InputProcessor::GetObjectDefMaxArgs(
-		std::string const & ObjectWord // Object for definition
-)
-{
-	if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) return 0;
-	int alpha_args = 0, numeric_args = 0;
-	const json & legacy_idd = schema[ "properties" ][ ObjectWord ][ "legacy_idd" ];
-	if ( legacy_idd.find( "alphas" ) != legacy_idd.end() ) alpha_args = legacy_idd[ "alphas" ].size();
-	if ( legacy_idd.find( "numerics" ) != legacy_idd.end() ) numeric_args = legacy_idd[ "numerics" ].size();
-	return alpha_args + numeric_args;
-}
+// int
+// EnergyPlus::InputProcessor::GetObjectDefMaxArgs(
+// 		std::string const & ObjectWord // Object for definition
+// )
+// {
+// 	if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) return 0;
+// 	int alpha_args = 0, numeric_args = 0;
+// 	const json & legacy_idd = schema[ "properties" ][ ObjectWord ][ "legacy_idd" ];
+// 	if ( legacy_idd.find( "alphas" ) != legacy_idd.end() ) alpha_args = legacy_idd[ "alphas" ].size();
+// 	if ( legacy_idd.find( "numerics" ) != legacy_idd.end() ) numeric_args = legacy_idd[ "numerics" ].size();
+// 	return alpha_args + numeric_args;
+// }
 
 // void
 // EnergyPlus::InputProcessor::GetIDFRecordsStats(

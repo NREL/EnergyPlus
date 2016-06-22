@@ -260,7 +260,7 @@ namespace ThermalChimney {
 		ZnRptThermChim.allocate( NumOfZones );
 
 		cCurrentModuleObject = "ZoneThermalChimney";
-		TotThermalChimney = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		TotThermalChimney = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		ThermalChimneySys.allocate( TotThermalChimney );
 		ThermalChimneyReport.allocate( TotThermalChimney );

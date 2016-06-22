@@ -493,7 +493,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );
-		NumTStatStatements = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumTStatStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		TStatObjects.allocate( NumTStatStatements );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
@@ -617,7 +617,7 @@ namespace ZoneTempPredictorCorrector {
 		} // Check on number of TempControlledZones
 
 		cCurrentModuleObject = ValidControlTypes( SglHeatSetPoint );
-		NumSingleTempHeatingControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSingleTempHeatingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleTempHeatingControls > 0 ) SetPointSingleHeating.allocate( NumSingleTempHeatingControls );
 
@@ -641,7 +641,7 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleTempHeatingControlNum
 
 		cCurrentModuleObject = ValidControlTypes( SglCoolSetPoint );
-		NumSingleTempCoolingControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSingleTempCoolingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleTempCoolingControls > 0 ) SetPointSingleCooling.allocate( NumSingleTempCoolingControls );
 
@@ -665,7 +665,7 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleTempCoolingControlNum
 
 		cCurrentModuleObject = ValidControlTypes( SglHCSetPoint );
-		NumSingleTempHeatCoolControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSingleTempHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleTempHeatCoolControls > 0 ) SetPointSingleHeatCool.allocate( NumSingleTempHeatCoolControls );
 
@@ -682,7 +682,7 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleTempHeatCoolControlNum
 
 		cCurrentModuleObject = ValidControlTypes( DualSetPoint );
-		NumDualTempHeatCoolControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumDualTempHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDualTempHeatCoolControls > 0 ) SetPointDualHeatCool.allocate( NumDualTempHeatCoolControls );
 
@@ -904,7 +904,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( allocated( TStatControlTypes ) ) TStatControlTypes.deallocate();
 		// This starts the Humidity Control Get Input section
 		cCurrentModuleObject = cZControlTypes( iZC_HStat );
-		NumHumidityControlZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumHumidityControlZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumHumidityControlZones > 0 ) HumidityControlZone.allocate( NumHumidityControlZones );
 
@@ -955,7 +955,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Start to read Thermal comfort control objects
 		cCurrentModuleObject = cZControlTypes( iZC_TCTStat );
-		NumComfortTStatStatements = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumComfortTStatStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		ComfortTStatObjects.allocate( NumComfortTStatStatements );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
@@ -1207,7 +1207,7 @@ namespace ZoneTempPredictorCorrector {
 		// End of Thermal comfort control reading and checking
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglHeatSetPointFanger );
-		NumSingleFangerHeatingControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSingleFangerHeatingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleFangerHeatingControls > 0 ) SetPointSingleHeatingFanger.allocate( NumSingleFangerHeatingControls );
 
@@ -1237,7 +1237,7 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerHeatingControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglCoolSetPointFanger );
-		NumSingleFangerCoolingControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSingleFangerCoolingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleFangerCoolingControls > 0 ) SetPointSingleCoolingFanger.allocate( NumSingleFangerCoolingControls );
 
@@ -1268,7 +1268,7 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerCoolingControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglHCSetPointFanger );
-		NumSingleFangerHeatCoolControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSingleFangerHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleFangerHeatCoolControls > 0 ) SetPointSingleHeatCoolFanger.allocate( NumSingleFangerHeatCoolControls );
 
@@ -1300,7 +1300,7 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerHeatCoolControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( DualSetPointFanger );
-		NumDualFangerHeatCoolControls = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumDualFangerHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDualFangerHeatCoolControls > 0 ) SetPointDualHeatCoolFanger.allocate( NumDualFangerHeatCoolControls );
 
@@ -1541,7 +1541,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		NumNums = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumNums = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumNums == 0 ) {
 			ZoneVolCapMultpSens = 1.0;
 			ZoneVolCapMultpMoist = 1.0;
@@ -1559,7 +1559,7 @@ namespace ZoneTempPredictorCorrector {
 		gio::write( OutputFileInits, Format_701 ) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
 
 		cCurrentModuleObject = cZControlTypes( iZC_OTTStat );
-		NumOpTempControlledZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOpTempControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOpTempControlledZones > 0 ) {
 			AnyOpTempControl = true;
@@ -1674,7 +1674,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Overcool dehumidificaton GetInput starts here
 		cCurrentModuleObject = cZControlTypes( iZC_TandHStat );
-		NumTempAndHumidityControlledZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumTempAndHumidityControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumTempAndHumidityControlledZones > 0 ) {
 			AnyZoneTempAndHumidityControl = true;
@@ -1812,7 +1812,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Staged thermostat control inputs start
 		cCurrentModuleObject = cZControlTypes( iZC_StagedDual );
-		NumStageControlledZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumStageControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumStageControlledZones > 0 ) StagedTStatObjects.allocate( NumStageControlledZones );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
@@ -1985,7 +1985,7 @@ namespace ZoneTempPredictorCorrector {
 					}
 				}
 			} //loop over NumStageControlledZones
-			if ( ( InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) == 0 ) && ( InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:UnitarySystem" ) == 0 ) && ( InputProcessor::GetObjectDefMaxArgs( "SetpointManager:SingleZone:OneStageCooling" ) == 0 ) && ( InputProcessor::GetObjectDefMaxArgs( "SetpointManager:SingleZone:OneStageHeating" ) == 0 ) ) {
+			if ( ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) == 0 ) && ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:UnitarySystem" ) == 0 ) && ( InputProcessor::GetNumObjectsFound( "SetpointManager:SingleZone:OneStageCooling" ) == 0 ) && ( InputProcessor::GetNumObjectsFound( "SetpointManager:SingleZone:OneStageHeating" ) == 0 ) ) {
 				ShowWarningError( cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input." );
 				ShowContinueError( "Model should include one or more of the following objects:  " );
 				ShowContinueError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, " );

@@ -636,7 +636,7 @@ namespace PlantChillers {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:Electric";
-		NumElectricChillers = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumElectricChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
@@ -1019,7 +1019,7 @@ namespace PlantChillers {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:EngineDriven";
-		NumEngineDrivenChillers = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumEngineDrivenChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumEngineDrivenChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1455,7 +1455,7 @@ namespace PlantChillers {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:CombustionTurbine";
-		NumGTChillers = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumGTChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGTChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1859,7 +1859,7 @@ namespace PlantChillers {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "Chiller:ConstantCOP";
-		NumConstCOPChillers = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumConstCOPChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumConstCOPChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );

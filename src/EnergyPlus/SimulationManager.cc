@@ -357,7 +357,7 @@ namespace SimulationManager {
 		DoOutputReporting = false;
 		DisplayPerfSimulationFlag = false;
 		DoWeatherInitReporting = false;
-		RunPeriodsInInput = ( InputProcessor::GetObjectDefMaxArgs( "RunPeriod" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
+		RunPeriodsInInput = ( InputProcessor::GetNumObjectsFound( "RunPeriod" ) > 0 || InputProcessor::GetNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
 		AskForConnectionsReport = false; // set to false until sizing is finished
 
 		OpenOutputFiles();
@@ -752,7 +752,7 @@ namespace SimulationManager {
 		ErrorsFound = false;
 
 		CurrentModuleObject = "Version";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			std::string::size_type const lenVer( len( MatchVersion ) );
@@ -774,7 +774,7 @@ namespace SimulationManager {
 
 		// Do Mini Gets on HB Algorithm and by-surface overrides
 		CurrentModuleObject = "HeatBalanceAlgorithm";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		CondFDAlgo = false;
 		if ( Num > 0 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -785,7 +785,7 @@ namespace SimulationManager {
 			}}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -798,7 +798,7 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -810,7 +810,7 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -822,7 +822,7 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -835,7 +835,7 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Timestep";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			NumOfTimeStepInHour = Number( 1 );
@@ -858,16 +858,16 @@ namespace SimulationManager {
 				ShowContinueError( "..." + CurrentModuleObject + " is set to 20." );
 				NumOfTimeStepInHour = 20;
 			}
-			if ( NumOfTimeStepInHour < 4 && InputProcessor::GetObjectDefMaxArgs( "Zone" ) > 0 ) {
+			if ( NumOfTimeStepInHour < 4 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 ) {
 				ShowWarningError( CurrentModuleObject + ": Requested number (" + RoundSigDigits( NumOfTimeStepInHour ) + ") is less than the suggested minimum of 4." );
 				ShowContinueError( "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations." );
 			}
-		} else if ( Num == 0 && InputProcessor::GetObjectDefMaxArgs( "Zone" ) > 0 && ! CondFDAlgo ) {
+		} else if ( Num == 0 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4." );
 			NumOfTimeStepInHour = 4;
 		} else if ( Num == 0 && ! CondFDAlgo ) {
 			NumOfTimeStepInHour = 4;
-		} else if ( Num == 0 && InputProcessor::GetObjectDefMaxArgs( "Zone" ) > 0 && CondFDAlgo ) {
+		} else if ( Num == 0 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20." );
 			ShowContinueError( "...Due to presence of Conduction Finite Difference Algorithm selection." );
 			NumOfTimeStepInHour = 20;
@@ -883,7 +883,7 @@ namespace SimulationManager {
 		TimeStepZoneSec = TimeStepZone * SecInHour;
 
 		CurrentModuleObject = "ConvergenceLimits";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			MinInt = int( Number( 1 ) );
@@ -924,7 +924,7 @@ namespace SimulationManager {
 		DebugOutput = false;
 		EvenDuringWarmup = false;
 		CurrentModuleObject = "Output:DebuggingData";
-		NumDebugOut = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumDebugOut = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( NumDebugOut > 0 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			if ( int( Number( 1 ) ) == 1 ) {
@@ -936,7 +936,7 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Output:Diagnostics";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		for ( Num1 = 1; Num1 <= Num; ++Num1 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			for ( NumA = 1; NumA <= NumAlpha; ++NumA ) {
@@ -996,7 +996,7 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "OutputControl:ReportingTolerances";
-		Num = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( ! lNumericFieldBlanks( 1 ) ) {
@@ -1019,7 +1019,7 @@ namespace SimulationManager {
 		DoHVACSizingSimulation = false;
 		HVACSizingSimMaxIterations = 0;
 		CurrentModuleObject = "SimulationControl";
-		NumRunControl = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumRunControl = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( NumRunControl > 0 ) {
 			RunControlInInput = true;
 			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1165,11 +1165,11 @@ namespace SimulationManager {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumZoneSizing = InputProcessor::GetObjectDefMaxArgs( "Sizing:Zone" );
-		NumSystemSizing = InputProcessor::GetObjectDefMaxArgs( "Sizing:System" );
-		NumPlantSizing = InputProcessor::GetObjectDefMaxArgs( "Sizing:Plant" );
-		NumDesignDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" );
-		NumRunPeriodDesign = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+		NumZoneSizing = InputProcessor::GetNumObjectsFound( "Sizing:Zone" );
+		NumSystemSizing = InputProcessor::GetNumObjectsFound( "Sizing:System" );
+		NumPlantSizing = InputProcessor::GetNumObjectsFound( "Sizing:Plant" );
+		NumDesignDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" );
+		NumRunPeriodDesign = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileAttached = flags.exists(); }
 
@@ -1278,10 +1278,10 @@ namespace SimulationManager {
 		bool ReportingRequested;
 
 		ReportingRequested = false;
-		SimPeriods = ( InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "RunPeriod" ) > 0 );
+		SimPeriods = ( InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || InputProcessor::GetNumObjectsFound( "RunPeriod" ) > 0 );
 
 		if ( ( DoDesDaySim || DoWeathSim ) && SimPeriods ) {
-			ReportingRequested = ( InputProcessor::GetObjectDefMaxArgs( "Output:Table:SummaryReports" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Table:TimeBins" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Table:Monthly" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Variable" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Meter" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Meter:MeterFileOnly" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Meter:Cumulative" ) > 0 || InputProcessor::GetObjectDefMaxArgs( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
+			ReportingRequested = ( InputProcessor::GetNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Table:TimeBins" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Table:Monthly" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Variable" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
 			// Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
 			if ( ! ReportingRequested ) {
 				ShowWarningError( "No reporting elements have been requested. No simulation results produced." );
@@ -2644,28 +2644,28 @@ namespace SimulationManager {
 		int NumNumbers;
 
 		// Figure out how many surfaces there are.
-		TotHTSurfs = InputProcessor::GetObjectDefMaxArgs( "BuildingSurface:Detailed" );
-		TotDetailedWalls = InputProcessor::GetObjectDefMaxArgs( "Wall:Detailed" );
-		TotDetailedRoofs = InputProcessor::GetObjectDefMaxArgs( "RoofCeiling:Detailed" );
-		TotDetailedFloors = InputProcessor::GetObjectDefMaxArgs( "Floor:Detailed" );
-		TotHTSubs = InputProcessor::GetObjectDefMaxArgs( "FenestrationSurface:Detailed" );
-		TotIntMass = InputProcessor::GetObjectDefMaxArgs( "InternalMass" );
-		TotRectWindows = InputProcessor::GetObjectDefMaxArgs( "Window" );
-		TotRectDoors = InputProcessor::GetObjectDefMaxArgs( "Door" );
-		TotRectGlazedDoors = InputProcessor::GetObjectDefMaxArgs( "GlazedDoor" );
-		TotRectIZWindows = InputProcessor::GetObjectDefMaxArgs( "Window:Interzone" );
-		TotRectIZDoors = InputProcessor::GetObjectDefMaxArgs( "Door:Interzone" );
-		TotRectIZGlazedDoors = InputProcessor::GetObjectDefMaxArgs( "GlazedDoor:Interzone" );
-		TotRectExtWalls = InputProcessor::GetObjectDefMaxArgs( "Wall:Exterior" );
-		TotRectIntWalls = InputProcessor::GetObjectDefMaxArgs( "Wall:Adiabatic" );
-		TotRectIZWalls = InputProcessor::GetObjectDefMaxArgs( "Wall:Interzone" );
-		TotRectUGWalls = InputProcessor::GetObjectDefMaxArgs( "Wall:Underground" );
-		TotRectRoofs = InputProcessor::GetObjectDefMaxArgs( "Roof" );
-		TotRectCeilings = InputProcessor::GetObjectDefMaxArgs( "Ceiling:Adiabatic" );
-		TotRectIZCeilings = InputProcessor::GetObjectDefMaxArgs( "Ceiling:Interzone" );
-		TotRectGCFloors = InputProcessor::GetObjectDefMaxArgs( "Floor:GroundContact" );
-		TotRectIntFloors = InputProcessor::GetObjectDefMaxArgs( "Floor:Adiabatic" );
-		TotRectIZFloors = InputProcessor::GetObjectDefMaxArgs( "Floor:Interzone" );
+		TotHTSurfs = InputProcessor::GetNumObjectsFound( "BuildingSurface:Detailed" );
+		TotDetailedWalls = InputProcessor::GetNumObjectsFound( "Wall:Detailed" );
+		TotDetailedRoofs = InputProcessor::GetNumObjectsFound( "RoofCeiling:Detailed" );
+		TotDetailedFloors = InputProcessor::GetNumObjectsFound( "Floor:Detailed" );
+		TotHTSubs = InputProcessor::GetNumObjectsFound( "FenestrationSurface:Detailed" );
+		TotIntMass = InputProcessor::GetNumObjectsFound( "InternalMass" );
+		TotRectWindows = InputProcessor::GetNumObjectsFound( "Window" );
+		TotRectDoors = InputProcessor::GetNumObjectsFound( "Door" );
+		TotRectGlazedDoors = InputProcessor::GetNumObjectsFound( "GlazedDoor" );
+		TotRectIZWindows = InputProcessor::GetNumObjectsFound( "Window:Interzone" );
+		TotRectIZDoors = InputProcessor::GetNumObjectsFound( "Door:Interzone" );
+		TotRectIZGlazedDoors = InputProcessor::GetNumObjectsFound( "GlazedDoor:Interzone" );
+		TotRectExtWalls = InputProcessor::GetNumObjectsFound( "Wall:Exterior" );
+		TotRectIntWalls = InputProcessor::GetNumObjectsFound( "Wall:Adiabatic" );
+		TotRectIZWalls = InputProcessor::GetNumObjectsFound( "Wall:Interzone" );
+		TotRectUGWalls = InputProcessor::GetNumObjectsFound( "Wall:Underground" );
+		TotRectRoofs = InputProcessor::GetNumObjectsFound( "Roof" );
+		TotRectCeilings = InputProcessor::GetNumObjectsFound( "Ceiling:Adiabatic" );
+		TotRectIZCeilings = InputProcessor::GetNumObjectsFound( "Ceiling:Interzone" );
+		TotRectGCFloors = InputProcessor::GetNumObjectsFound( "Floor:GroundContact" );
+		TotRectIntFloors = InputProcessor::GetNumObjectsFound( "Floor:Adiabatic" );
+		TotRectIZFloors = InputProcessor::GetNumObjectsFound( "Floor:Interzone" );
 
 		iNominalTotSurfaces = TotHTSurfs + TotDetailedWalls + TotDetailedRoofs + TotDetailedFloors + TotHTSubs + TotIntMass + TotRectWindows + TotRectDoors + TotRectGlazedDoors + TotRectIZWindows + TotRectIZDoors + TotRectIZGlazedDoors + TotRectExtWalls + TotRectIntWalls + TotRectIZWalls + TotRectUGWalls + TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
 
@@ -2690,7 +2690,7 @@ namespace SimulationManager {
 		}
 
 		cCurrentModuleObject = "ProgramControl";
-		if ( InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject ) > 0 ) {
+		if ( InputProcessor::GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			iIDFSetThreads = int( rNumericArgs( 1 ) );
 			lIDFsetThreadsInput = true;
@@ -2719,7 +2719,7 @@ namespace SimulationManager {
 #else
 		Threading = false;
 		cCurrentModuleObject = "ProgramControl";
-		if ( InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject ) > 0 ) {
+		if ( InputProcessor::GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			int iIDFsetThreadsInput = int( rNumericArgs( 1 ) );
 			if ( iIDFSetThreads > 1 ) {

@@ -342,7 +342,7 @@ namespace WindTurbine {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 
-		NumWindTurbines = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumWindTurbines = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		WindTurbineSys.allocate( NumWindTurbines );
 

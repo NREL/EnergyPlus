@@ -212,7 +212,7 @@ namespace ReturnAirPathManager {
 			return;
 		}
 		cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-		NumReturnAirPaths = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumReturnAirPaths = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumReturnAirPaths > 0 ) {
 

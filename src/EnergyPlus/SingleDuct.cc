@@ -443,12 +443,12 @@ namespace SingleDuct {
 		std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
 		// Flow
-		NumVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat" );
-		NumNoRHVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:NoReheat" );
-		NumConstVolSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ConstantVolume:Reheat" );
-		NumVAVVS = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" );
-		NumCBVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" );
-		NumNoRHCBVAVSys = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" );
+		NumVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat" );
+		NumNoRHVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:NoReheat" );
+		NumConstVolSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:ConstantVolume:Reheat" );
+		NumVAVVS = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" );
+		NumCBVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" );
+		NumNoRHCBVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" );
 		NumSys = NumVAVSys + NumConstVolSys + NumNoRHVAVSys + NumVAVVS + NumCBVAVSys + NumNoRHCBVAVSys;
 
 		Sys.allocate( NumSys );
@@ -1476,7 +1476,7 @@ namespace SingleDuct {
 		// Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
 		// specified in the Sizing:Zone object
 
-		NumZoneSiz = InputProcessor::GetObjectDefMaxArgs( "Sizing:Zone" );
+		NumZoneSiz = InputProcessor::GetNumObjectsFound( "Sizing:Zone" );
 		if ( NumZoneSiz > 0 ) {
 			for ( SysIndex = 1; SysIndex <= NumSys; ++SysIndex ) {
 				for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
@@ -2156,7 +2156,7 @@ namespace SingleDuct {
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes );
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Air Volume Flow Rate [m3/s]", TermUnitSizing( CurZoneEqNum ).AirVolFlow );
 						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
-						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );						
+						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else { // Hard-size with sizing data
 						if ( Sys( SysNum ).MaxReheatWaterVolFlow > 0.0 && MaxReheatWaterVolFlowDes > 0.0 ) {
 							MaxReheatWaterVolFlowUser = Sys( SysNum ).MaxReheatWaterVolFlow;
@@ -4477,8 +4477,8 @@ namespace SingleDuct {
 		int SupAirIn; // Supply air inlet node index
 		bool errFlag; // error flag from component validation
 
-		NumInletATMixers = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:InletSideMixer" );
-		NumSupplyATMixers = InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:SupplySideMixer" );
+		NumInletATMixers = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:InletSideMixer" );
+		NumSupplyATMixers = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:SupplySideMixer" );
 
 		NumATMixers = NumInletATMixers + NumSupplyATMixers;
 		SysATMixer.allocate( NumATMixers );

@@ -352,7 +352,7 @@ namespace ZoneContaminantPredictorCorrector {
 		AlphaName = "";
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		TotGCGenConstant = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCGenConstant = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericConstant.allocate( TotGCGenConstant );
 
 		for ( Loop = 1; Loop <= TotGCGenConstant; ++Loop ) {
@@ -445,7 +445,7 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		TotGCGenPDriven = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCGenPDriven = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericPDriven.allocate( TotGCGenPDriven );
 
 		for ( Loop = 1; Loop <= TotGCGenPDriven; ++Loop ) {
@@ -536,7 +536,7 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		TotGCGenCutoff = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCGenCutoff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericCutoff.allocate( TotGCGenCutoff );
 
 		for ( Loop = 1; Loop <= TotGCGenCutoff; ++Loop ) {
@@ -612,7 +612,7 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		TotGCGenDecay = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCGenDecay = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDecay.allocate( TotGCGenDecay );
 
 		for ( Loop = 1; Loop <= TotGCGenDecay; ++Loop ) {
@@ -689,7 +689,7 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		TotGCBLDiff = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCBLDiff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericBLDiff.allocate( TotGCBLDiff );
 
 		for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
@@ -765,7 +765,7 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		TotGCDVS = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCDVS = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDVS.allocate( TotGCDVS );
 
 		for ( Loop = 1; Loop <= TotGCDVS; ++Loop ) {
@@ -834,7 +834,7 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		TotGCDRS = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		TotGCDRS = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDRS.allocate( TotGCDRS );
 
 		for ( Loop = 1; Loop <= TotGCDRS; ++Loop ) {
@@ -994,7 +994,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 		// FLOW:
 		cCurrentModuleObject = "ZoneControl:ContaminantController";
-		NumContControlledZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumContControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumContControlledZones > 0 ) {
 			ContaminantControlledZone.allocate( NumContControlledZones );

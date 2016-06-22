@@ -5247,11 +5247,11 @@ Label9999: ;
 		// FLOW:
 
 		//Get the number of design days and annual runs from user inpout
-		TotDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" );
-		RPD1 = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" );
-		RPD2 = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
-		RP = InputProcessor::GetObjectDefMaxArgs( "RunPeriod" );
-		RPAW = InputProcessor::GetObjectDefMaxArgs( "RunPeriod:CustomRange" );
+		TotDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" );
+		RPD1 = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" );
+		RPD2 = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+		RP = InputProcessor::GetNumObjectsFound( "RunPeriod" );
+		RPAW = InputProcessor::GetNumObjectsFound( "RunPeriod:CustomRange" );
 		TotRunPers = RP + RPAW;
 		NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		if ( TotRunPers > 0 ) {
@@ -5398,8 +5398,8 @@ Label9999: ;
 		// Object Data
 
 		// FLOW:
-		RP = InputProcessor::GetObjectDefMaxArgs( "RunPeriod" );
-		RPAW = InputProcessor::GetObjectDefMaxArgs( "RunPeriod:CustomRange" );
+		RP = InputProcessor::GetNumObjectsFound( "RunPeriod" );
+		RPAW = InputProcessor::GetNumObjectsFound( "RunPeriod:CustomRange" );
 
 		//Call Input Get routine to retrieve annual run data
 		RunPeriodInput.allocate( TotRunPers );
@@ -5824,8 +5824,8 @@ Label9999: ;
 
 		// FLOW:
 		//Call Input Get routine to retrieve annual run data
-		RPD1 = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" );
-		RPD2 = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+		RPD1 = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" );
+		RPD2 = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		TotRunDesPers = RPD1 + RPD2;
 
 		RunPeriodDesignInput.allocate( RPD1 + RPD2 );
@@ -6099,7 +6099,7 @@ Label9999: ;
 		static bool IsBlank( false ); // Flag for blank name
 
 		cCurrentModuleObject = "RunPeriodControl:SpecialDays";
-		NumSpecDays = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSpecDays = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( allocated( SpecialDays ) ) { // EPW already allocated the array
 			Count = NumSpecialDays - NumSpecDays + 1;
 		} else {
@@ -6291,7 +6291,7 @@ Label9999: ;
 		int NumNumbers;
 
 		cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
-		NumFound = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumFound = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumFound == 1 ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -7078,7 +7078,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:Location";
-		NumLocations = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumLocations = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumLocations > 1 ) {
 			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
@@ -7174,7 +7174,7 @@ Label9999: ;
 		std::string units;
 
 		cCurrentModuleObject = "WeatherProperty:SkyTemperature";
-		NumWPSkyTemperatures = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumWPSkyTemperatures = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		WPSkyTemperature.allocate( NumWPSkyTemperatures ); // by default, not used.
 
@@ -7419,7 +7419,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundReflectance";
-		I = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		I = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( I != 0 ) {
 			GndProps.allocate( 12 );
 			GndAlphas.allocate( 1 );
@@ -7501,7 +7501,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
-		I = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		I = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( I != 0 ) {
 			GndProps.allocate( 2 );
 			GndAlphas.allocate( 1 );
@@ -7570,7 +7570,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:WaterMainsTemperature";
-		NumObjects = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumObjects == 1 ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -7725,7 +7725,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:WeatherStation";
-		NumObjects = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		// Default conditions for a weather station in an open field at a height of 10 m. (These should match the IDD defaults.)
 		WeatherFileWindSensorHeight = 10.0;
@@ -8500,7 +8500,7 @@ Label9999: ;
 
 				} else if ( SELECT_CASE_var1 == 4 ) {
 					NumEPWHolidays = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
-					NumSpecialDays = NumEPWHolidays + InputProcessor::GetObjectDefMaxArgs( "RunPeriodControl:SpecialDays" );
+					NumSpecialDays = NumEPWHolidays + InputProcessor::GetNumObjectsFound( "RunPeriodControl:SpecialDays" );
 					SpecialDays.allocate( NumSpecialDays );
 					NumHdArgs = 4 + NumEPWHolidays * 2;
 					CurCount = 0;

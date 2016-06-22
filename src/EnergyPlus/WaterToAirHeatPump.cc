@@ -336,8 +336,8 @@ namespace WaterToAirHeatPump {
 
 		// FLOW
 
-		NumCool = InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" );
-		NumHeat = InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" );
+		NumCool = InputProcessor::GetNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" );
+		NumHeat = InputProcessor::GetNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" );
 		NumWatertoAirHPs = NumCool + NumHeat;
 		HPNum = 0;
 

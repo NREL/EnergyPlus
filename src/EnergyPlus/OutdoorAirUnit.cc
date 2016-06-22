@@ -446,7 +446,7 @@ namespace OutdoorAirUnit {
 		cAlphaArgs.allocate( NumAlphas );
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
-		NumOfOAUnits = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOfOAUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
 		MyOneTimeErrorFlag.dimension( NumOfOAUnits, true );

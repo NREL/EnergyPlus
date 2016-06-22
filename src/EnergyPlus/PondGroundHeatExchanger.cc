@@ -263,7 +263,7 @@ namespace PondGroundHeatExchanger {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Pond";
-		NumOfPondGHEs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOfPondGHEs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( PondGHE ) ) PondGHE.deallocate();
 

@@ -818,7 +818,7 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:OutdoorAir";
-		NumOARequirements = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumOARequirements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
@@ -1061,7 +1061,7 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-		NumZoneAirDistribution = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumZoneAirDistribution = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
@@ -1195,7 +1195,7 @@ namespace SizingManager {
 		int Temp;
 
 		cCurrentModuleObject = "Sizing:Parameters";
-		NumSizParams = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSizParams = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSizParams == 1 ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1227,7 +1227,7 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "OutputControl:Sizing:Style";
-		Temp = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		Temp = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( Temp == 0 ) {
 			cAlphaArgs( 1 ) = "Comma";
@@ -1339,7 +1339,7 @@ namespace SizingManager {
 		Array1D< GlobalMiscObject > SizingZoneObjects;
 
 		cCurrentModuleObject = "Sizing:Zone";
-		NumSizingZoneStatements = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSizingZoneStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		SizingZoneObjects.allocate( NumSizingZoneStatements );
 
 		if ( NumSizingZoneStatements > 0 ) {
@@ -1391,7 +1391,7 @@ namespace SizingManager {
 		}
 
 		if ( NumZoneSizingInput > 0 ) {
-			NumDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "Zone Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -1897,7 +1897,7 @@ namespace SizingManager {
 
 		InErrFlag = ErrorsFound;
 		cCurrentModuleObject = "Zone";
-		NumZones = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		ZoneNames.allocate( NumZones );
 
 		for ( Item = 1; Item <= NumZones; ++Item ) {
@@ -1912,7 +1912,7 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "ZoneList";
-		NumZoneLists = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumZoneLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		ZoneListNames.allocate( NumZoneLists );
 
 		for ( Item = 1; Item <= NumZoneLists; ++Item ) {
@@ -2027,12 +2027,12 @@ namespace SizingManager {
 		bool IsBlank; // Flag for blank name
 		int NumDesDays; // Number of design days in input
 
-		NumAirLoops = InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC" );
+		NumAirLoops = InputProcessor::GetNumObjectsFound( "AirLoopHVAC" );
 		cCurrentModuleObject = "Sizing:System";
-		NumSysSizInput = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSysSizInput = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSysSizInput > 0 ) {
-			NumDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "System Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -2483,10 +2483,10 @@ namespace SizingManager {
 		int NumDesDays; // Number of design days in input
 
 		cCurrentModuleObject = "Sizing:Plant";
-		NumPltSizInput = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumPltSizInput = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumPltSizInput > 0 ) {
-			NumDesDays = InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:DesignDay" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetObjectDefMaxArgs( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && DoPlantSizing ) {
 				ShowSevereError( "Plant Sizing calculations need SizingPeriod:* input" );
 				ErrorsFound = true;
@@ -2946,7 +2946,7 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-		NumZoneHVACSizing = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumZoneHVACSizing = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );

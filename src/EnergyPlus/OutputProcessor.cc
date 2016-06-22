@@ -893,7 +893,7 @@ namespace OutputProcessor {
 		}
 
 		cCurrentModuleObject = "Output:Variable";
-		NumOfReqVariables = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOfReqVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		ReqRepVars.allocate( NumOfReqVariables );
 
 		for ( Loop = 1; Loop <= NumOfReqVariables; ++Loop ) {
@@ -1607,7 +1607,7 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1660,7 +1660,7 @@ namespace OutputProcessor {
 		BigErrorsFound = false;
 
 		cCurrentModuleObject = "Meter:Custom";
-		NumCustomMeters = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumCustomMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1812,7 +1812,7 @@ namespace OutputProcessor {
 		}
 
 		cCurrentModuleObject = "Meter:CustomDecrement";
-		NumCustomDecMeters = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumCustomDecMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumCustomDecMeters; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -6417,7 +6417,7 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter";
-	NumReqMeters = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+	NumReqMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
@@ -6459,7 +6459,7 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:MeterFileOnly";
-	NumReqMeterFOs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+	NumReqMeterFOs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 	for ( Loop = 1; Loop <= NumReqMeterFOs; ++Loop ) {
 
 		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -6500,7 +6500,7 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:Cumulative";
-	NumReqMeters = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+	NumReqMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
@@ -6542,7 +6542,7 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:Cumulative:MeterFileOnly";
-	NumReqMeterFOs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+	NumReqMeterFOs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 	for ( Loop = 1; Loop <= NumReqMeterFOs; ++Loop ) {
 
 		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );

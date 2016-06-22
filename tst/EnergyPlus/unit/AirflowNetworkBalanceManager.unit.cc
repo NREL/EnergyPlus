@@ -212,11 +212,18 @@ namespace EnergyPlus {
 			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+//		ASSERT_FALSE( process_idf( idf_objects ) );
+		InputProcessor IP;
+		std::ifstream ifs("FULL_SCHEMA_modified.json", std::ifstream::in);
+		ASSERT_TRUE( ifs.is_open() );
+		IP.schema = json::parse(ifs);
+		IP.idf_parser.initialize(IP.schema);
+//      json test = IP.idf_parser.decode(idf_objects, IP.schema);
+		InputProcessor::jdf = IP.idf_parser.decode(idf_objects, IP.schema);
 
 		GetAirflowNetworkInput();
 
-		EXPECT_EQ( 2, MultizoneZoneData( 1 ).VentingSchNum );
+		EXPECT_EQ( 1, MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate();
 		Surface.deallocate();
@@ -2286,7 +2293,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.00255337, ReliefMassFlowRate, 0.0001 );
 
 		Node.deallocate( );
-	
+
 	}
 	TEST_F( EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl ) {
 

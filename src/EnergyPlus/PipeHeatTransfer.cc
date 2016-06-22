@@ -304,11 +304,11 @@ namespace PipeHeatTransfer {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "Pipe:Indoor";
-		NumOfPipeHTInt = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOfPipeHTInt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Outdoor";
-		NumOfPipeHTExt = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOfPipeHTExt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Underground";
-		NumOfPipeHTUG = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOfPipeHTUG = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
 		// allocate data structures

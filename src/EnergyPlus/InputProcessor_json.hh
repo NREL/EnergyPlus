@@ -1217,11 +1217,11 @@ public:
 		int & NumNumeric // How many Numeric arguments (max) this Object can have
 	);
 
-	static
-	int
-	GetObjectDefMaxArgs(
-		std::string const & ObjectWord // Object for definition
-	);
+	// static
+	// int
+	// GetObjectDefMaxArgs(
+	// 	std::string const & ObjectWord // Object for definition
+	// );
 
 //	void
 //	GetIDFRecordsStats(

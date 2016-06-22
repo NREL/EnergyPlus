@@ -439,9 +439,9 @@ namespace WaterCoils {
 		static int j1( 0 );
 
 		// Flow
-		NumSimpHeat = InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water" );
-		NumFlatFin = InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry" );
-		NumCooling = InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water" );
+		NumSimpHeat = InputProcessor::GetNumObjectsFound( "Coil:Heating:Water" );
+		NumFlatFin = InputProcessor::GetNumObjectsFound( "Coil:Cooling:Water:DetailedGeometry" );
+		NumCooling = InputProcessor::GetNumObjectsFound( "Coil:Cooling:Water" );
 		NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
 		if ( NumWaterCoils > 0 ) {
@@ -6164,7 +6164,7 @@ Label10: ;
 		int const CoilNum, // Number of hot water heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used
 		) {
 
 		// FUNCTION INFORMATION:

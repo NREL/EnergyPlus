@@ -340,7 +340,7 @@ namespace PackagedThermalStorageCoil {
 		int ZoneIndexTrial;
 
 		cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage";
-		NumTESCoils = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumTESCoils = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		TESCoil.allocate( NumTESCoils );
 		CheckEquipName.dimension( NumTESCoils, true );

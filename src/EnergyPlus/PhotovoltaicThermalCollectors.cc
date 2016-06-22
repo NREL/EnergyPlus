@@ -332,7 +332,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		// first load the performance object info into temporary structure
 		cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-		NumSimplePVTPerform = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSimplePVTPerform = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumSimplePVTPerform > 0 ) {
 			tmpSimplePVTperf.allocate( NumSimplePVTPerform );
 			for ( Item = 1; Item <= NumSimplePVTPerform; ++Item ) {
@@ -373,7 +373,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		// now get main PVT objects
 		cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-		NumPVT = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumPVT = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		PVT.allocate( NumPVT );
 		CheckEquipName.dimension( NumPVT, true );
 

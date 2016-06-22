@@ -404,7 +404,7 @@ namespace PlantLoadProfile {
 
 		// FLOW:
 		cCurrentModuleObject = "LoadProfile:Plant";
-		NumOfPlantProfile = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOfPlantProfile = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfPlantProfile > 0 ) {
 			PlantProfile.allocate( NumOfPlantProfile );

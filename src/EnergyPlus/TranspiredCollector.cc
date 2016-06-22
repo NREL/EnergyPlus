@@ -365,9 +365,9 @@ namespace TranspiredCollector {
 		Numbers = 0.0;
 		Alphas = "";
 
-		NumUTSC = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumUTSC = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
-		NumUTSCSplitter = InputProcessor::GetObjectDefMaxArgs( CurrentModuleMultiObject );
+		NumUTSCSplitter = InputProcessor::GetNumObjectsFound( CurrentModuleMultiObject );
 
 		UTSC.allocate( NumUTSC );
 		CheckEquipName.dimension( NumUTSC, true );

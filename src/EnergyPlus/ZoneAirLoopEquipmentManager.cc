@@ -312,7 +312,7 @@ namespace ZoneAirLoopEquipmentManager {
 			GetAirDistUnitsFlag = false;
 		}
 
-		NumAirDistUnits = InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject );
+		NumAirDistUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		AirDistUnit.allocate( NumAirDistUnits );
 

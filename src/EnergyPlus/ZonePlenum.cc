@@ -378,8 +378,8 @@ namespace ZonePlenum {
 
 		InducedNodeListName = "";
 
-		NumZoneReturnPlenums = InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPlenum" );
-		NumZoneSupplyPlenums = InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPlenum" );
+		NumZoneReturnPlenums = InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" );
+		NumZoneSupplyPlenums = InputProcessor::GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" );
 		NumZonePlenums = NumZoneReturnPlenums + NumZoneSupplyPlenums;
 
 		if ( NumZoneReturnPlenums > 0 ) ZoneRetPlenCond.allocate( NumZoneReturnPlenums );

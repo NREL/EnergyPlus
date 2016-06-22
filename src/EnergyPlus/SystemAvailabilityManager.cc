@@ -548,7 +548,7 @@ namespace SystemAvailabilityManager {
 
 		for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) {
 			if ( ! allocated( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs ) ) {
-				TotalNumComp = InputProcessor::GetObjectDefMaxArgs( cValidSysAvailManagerCompTypes( ZoneEquipType ) );
+				TotalNumComp = InputProcessor::GetNumObjectsFound( cValidSysAvailManagerCompTypes( ZoneEquipType ) );
 				ZoneComp( ZoneEquipType ).TotalNumComp = TotalNumComp;
 				if ( TotalNumComp > 0 ) {
 					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs.allocate( TotalNumComp );
@@ -557,7 +557,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:Scheduled";
-		NumSchedSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSchedSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSchedSysAvailMgrs > 0 ) {
 
@@ -591,7 +591,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:ScheduledOn";
-		NumSchedOnSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSchedOnSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSchedOnSysAvailMgrs > 0 ) {
 
@@ -625,7 +625,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:ScheduledOff";
-		NumSchedOffSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumSchedOffSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSchedOffSysAvailMgrs > 0 ) {
 
@@ -659,7 +659,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:NightCycle";
-		NumNCycSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumNCycSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		CyclingTimeSteps = 0;
 
 		if ( NumNCycSysAvailMgrs > 0 ) {
@@ -728,7 +728,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:OptimumStart";
-		NumOptStartSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumOptStartSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		CyclingTimeSteps = 0;
 
 		if ( NumOptStartSysAvailMgrs > 0 ) {
@@ -857,7 +857,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:DifferentialThermostat";
-		NumDiffTSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumDiffTSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDiffTSysAvailMgrs > 0 ) {
 
@@ -903,7 +903,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOff";
-		NumHiTurnOffSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumHiTurnOffSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumHiTurnOffSysAvailMgrs > 0 ) {
 			HiTurnOffSysAvailMgrData.allocate( NumHiTurnOffSysAvailMgrs );
@@ -934,7 +934,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOn";
-		NumHiTurnOnSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumHiTurnOnSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumHiTurnOnSysAvailMgrs > 0 ) {
 
@@ -966,7 +966,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOff";
-		NumLoTurnOffSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumLoTurnOffSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumLoTurnOffSysAvailMgrs > 0 ) {
 
@@ -1009,7 +1009,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOn";
-		NumLoTurnOnSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumLoTurnOnSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumLoTurnOnSysAvailMgrs > 0 ) {
 
@@ -1041,7 +1041,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		cCurrentModuleObject = "AvailabilityManager:NightVentilation";
-		NumNVentSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumNVentSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumNVentSysAvailMgrs > 0 ) {
 
@@ -1132,7 +1132,7 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// Using/Aliasing
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -1182,7 +1182,7 @@ namespace SystemAvailabilityManager {
 		lNumericFieldBlanks.dimension( NumNumbers, false );
 
 		cCurrentModuleObject = "AvailabilityManagerAssignmentList";
-		NumAvailManagerLists = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumAvailManagerLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumAvailManagerLists > 0 ) {
 
@@ -3928,7 +3928,7 @@ namespace SystemAvailabilityManager {
 
 		// Get the number of occurences of each type of System Availability Manager
 		cCurrentModuleObject = "AvailabilityManager:HybridVentilation";
-		NumHybridVentSysAvailMgrs = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumHybridVentSysAvailMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumHybridVentSysAvailMgrs == 0 ) return;
 

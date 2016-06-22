@@ -667,7 +667,7 @@ namespace PlantCentralGSHP {
 
 		if ( AllocatedFlag ) return;
 		cCurrentModuleObject = "CentralHeatPumpSystem";
-		NumWrappers = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumWrappers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWrappers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -966,7 +966,7 @@ namespace PlantCentralGSHP {
 		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-		NumChillerHeaters = InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject );
+		NumChillerHeaters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumChillerHeaters <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
