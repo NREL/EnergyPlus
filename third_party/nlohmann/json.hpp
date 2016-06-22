@@ -6877,7 +6877,10 @@ Format](http://rfc7159.net/rfc7159)
             {
                case basic_json::value_t::object:
                {
-                  throw std::domain_error("cannot use offsets with object iterators");
+                  std::advance(m_it.object_iterator,i);
+//                  m_it.object_iterator += i;
+                  break;
+//                  throw std::domain_error("cannot use offsets with object iterators");
                }
 
                case basic_json::value_t::array:

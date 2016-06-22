@@ -160,14 +160,14 @@ public:
 };
 
 namespace EnergyPlus {
-	json jdf;
+//	json jdf;
 
 class InputProcessor {
 public:
 	static IdfParser idf_parser;
 	static State state;
 	static json schema;
-//	static json jdf;
+	static json jdf;
 	/*
 	//MODULE PARAMETER DEFINITIONS
 	extern int const ObjectDefAllocInc; // Starting number of Objects allowed in IDD as well as the increment
@@ -420,79 +420,79 @@ public:
 
 	// Clears the global data in InputProcessor.
 	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+//	void
+//	clear_state();
 
-	void
-	ProcessInput();
+//	void
+//	ProcessInput();
 
-	void
-	ProcessDataDicFile(
-		std::istream & idd_stream,
-		bool & ErrorsFound // set to true if any errors flagged during IDD processing
-	);
+//	void
+//	ProcessDataDicFile(
+//		std::istream & idd_stream,
+//		bool & ErrorsFound // set to true if any errors flagged during IDD processing
+//	);
 
-	void
-	AddSectionDef(
-		std::string const & ProposedSection, // Proposed Section to be added
-		bool & ErrorsFound // set to true if errors found here
-	);
+//	void
+//	AddSectionDef(
+//		std::string const & ProposedSection, // Proposed Section to be added
+//		bool & ErrorsFound // set to true if errors found here
+//	);
 
-	void
-	AddObjectDefandParse(
-		std::istream & idd_stream,
-		std::string const & ProposedObject, // Proposed Object to Add
-		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
-		bool & EndofFile, // End of File marker
-		bool & ErrorsFound // set to true if errors found here
-	);
+//	void
+//	AddObjectDefandParse(
+//		std::istream & idd_stream,
+//		std::string const & ProposedObject, // Proposed Object to Add
+//		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
+//		bool & EndofFile, // End of File marker
+//		bool & ErrorsFound // set to true if errors found here
+//	);
 
-	void
-	ProcessInputDataFile( std::istream & idf_stream );
+//	void
+//	ProcessInputDataFile( std::istream & idf_stream );
 
-	void
-	ValidateSection(
-		std::string const & ProposedSection,
-		int const LineNo
-	);
+//	void
+//	ValidateSection(
+//		std::string const & ProposedSection,
+//		int const LineNo
+//	);
 
-	void
-	ValidateObjectandParse(
-		std::istream & idf_stream,
-		std::string const & ProposedObject,
-		std::string::size_type & CurPos,
-		bool & EndofFile
-	);
+//	void
+//	ValidateObjectandParse(
+//		std::istream & idf_stream,
+//		std::string const & ProposedObject,
+//		std::string::size_type & CurPos,
+//		bool & EndofFile
+//	);
 
-	void
-	ValidateSectionsInput();
+//	void
+//	ValidateSectionsInput();
 
 	static
 	int
 	GetNumSectionsFound( std::string const & SectionWord );
 
-	int
-	GetNumSectionsinInput();
+//	int
+//	GetNumSectionsinInput();
 
-	void
-	GetListofSectionsinInput(
-		Array1S_string SectionList,
-		int & NuminList
-	);
+//	void
+//	GetListofSectionsinInput(
+//		Array1S_string SectionList,
+//		int & NuminList
+//	);
 
 	static
 	int
 	GetNumObjectsFound( std::string const & ObjectWord );
 
-	void
-	GetRecordLocations(
-		int const Which,
-		int & FirstRecord,
-		int & LastRecord
-	);
+//	void
+//	GetRecordLocations(
+//		int const Which,
+//		int & FirstRecord,
+//		int & LastRecord
+//	);
 
 	static
-	void 
+	void
 	GetObjectItem(
 		std::string const & Object,
 		int const Number,
@@ -507,7 +507,7 @@ public:
 		Optional< Array1_string > NumericFieldNames = _
 	);
 
-	
+
 	static
 	int
 	GetObjectItemNum(
@@ -515,60 +515,60 @@ public:
 		std::string const & ObjName // Name of the object type
 	);
 
-	void
-	TellMeHowManyObjectItemArgs(
-		std::string const & Object,
-		int const Number,
-		int & NumAlpha,
-		int & NumNumbers,
-		int & Status
-	);
+//	void
+//	TellMeHowManyObjectItemArgs(
+//		std::string const & Object,
+//		int const Number,
+//		int & NumAlpha,
+//		int & NumNumbers,
+//		int & Status
+//	);
 
-	void
-	GetObjectItemfromFile(
-		int const Which,
-		std::string & ObjectWord,
-		int & NumAlpha,
-		int & NumNumeric,
-		Optional< Array1S_string > AlphaArgs = _,
-		Optional< Array1S< Real64 > > NumericArgs = _,
-		Optional< Array1S_bool > AlphaBlanks = _,
-		Optional< Array1S_bool > NumericBlanks = _
-	);
+//	void
+//	GetObjectItemfromFile(
+//		int const Which,
+//		std::string & ObjectWord,
+//		int & NumAlpha,
+//		int & NumNumeric,
+//		Optional< Array1S_string > AlphaArgs = _,
+//		Optional< Array1S< Real64 > > NumericArgs = _,
+//		Optional< Array1S_bool > AlphaBlanks = _,
+//		Optional< Array1S_bool > NumericBlanks = _
+//	);
 
 	// Utility Functions/Routines for Module
 
-	void
-	ReadInputLine(
-		std::istream & in_stream,
-		std::string::size_type & CurPos,
-		bool & BlankLine,
-		bool & EndofFile
-	);
+//	void
+//	ReadInputLine(
+//		std::istream & in_stream,
+//		std::string::size_type & CurPos,
+//		bool & BlankLine,
+//		bool & EndofFile
+//	);
 
-	void
-	ReadInputLine(
-		std::istream & in_stream,
-		std::string::size_type & CurPos,
-		bool & BlankLine,
-		bool & EndofFile,
-		bool & MinMax,
-		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-		std::string & MinMaxString,
-		Real64 & Value,
-		bool & Default,
-		std::string & DefString,
-		bool & AutoSizable,
-		bool & AutoCalculatable,
-		bool & RetainCase,
-		bool & ErrorsFound
-	);
+//	void
+//	ReadInputLine(
+//		std::istream & in_stream,
+//		std::string::size_type & CurPos,
+//		bool & BlankLine,
+//		bool & EndofFile,
+//		bool & MinMax,
+//		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+//		std::string & MinMaxString,
+//		Real64 & Value,
+//		bool & Default,
+//		std::string & DefString,
+//		bool & AutoSizable,
+//		bool & AutoCalculatable,
+//		bool & RetainCase,
+//		bool & ErrorsFound
+//	);
 
-	void
-	ExtendObjectDefinition(
-		int const ObjectNum, // Number of the object definition to be extended.
-		int & NumNewArgsLimit // Number of the parameters after extension
-	);
+//	void
+//	ExtendObjectDefinition(
+//		int const ObjectNum, // Number of the object definition to be extended.
+//		int & NumNewArgsLimit // Number of the parameters after extension
+//	);
 
 	static
 	Real64
@@ -577,15 +577,15 @@ public:
 		bool & ErrorFlag
 	);
 
-	void
-	ProcessMinMaxDefLine(
-		std::string const & partLine, // part of input line starting \min or \max
-		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-		std::string & MinMaxString,
-		Real64 & Value,
-		std::string & DefaultString,
-		int & ErrLevel
-	);
+//	void
+//	ProcessMinMaxDefLine(
+//		std::string const & partLine, // part of input line starting \min or \max
+//		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+//		std::string & MinMaxString,
+//		Real64 & Value,
+//		std::string & DefaultString,
+//		int & ErrLevel
+//	);
 
 	static
 	int
@@ -642,7 +642,7 @@ public:
 	}
 
 	template< typename A >
-	static	
+	static
 	inline
 	int
 	FindItemInList(
@@ -1166,21 +1166,21 @@ public:
 		Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
 	);
 
-	void
-	InternalRangeCheck(
-		Real64 const Value,
-		int const FieldNumber,
-		int const WhichObject,
-		std::string const & PossibleAlpha,
-		bool const AutoSizable,
-		bool const AutoCalculatable
-	);
+//	void
+//	InternalRangeCheck(
+//		Real64 const Value,
+//		int const FieldNumber,
+//		int const WhichObject,
+//		std::string const & PossibleAlpha,
+//		bool const AutoSizable,
+//		bool const AutoCalculatable
+//	);
 
-	void
-	TurnOnReportRangeCheckErrors();
+//	void
+//	TurnOnReportRangeCheckErrors();
 
-	void
-	TurnOffReportRangeCheckErrors();
+//	void
+//	TurnOffReportRangeCheckErrors();
 
 	static
 	int
@@ -1190,23 +1190,23 @@ public:
 	// The following routines allow access to the definition lines of the IDD and
 	// thus can be used to "report" on expected arguments for the Input Processor.
 
-	int
-	GetNumObjectsInIDD();
+//	int
+//	GetNumObjectsInIDD();
 
-	void
-	GetListOfObjectsInIDD(
-		Array1S_string ObjectNames, // List of Object Names (from IDD)
-		int & Number // Number in List
-	);
+//	void
+//	GetListOfObjectsInIDD(
+//		Array1S_string ObjectNames, // List of Object Names (from IDD)
+//		int & Number // Number in List
+//	);
 
-	void
-	GetObjectDefInIDD(
-		std::string const & ObjectWord, // Object for definition
-		int & NumArgs, // How many arguments (max) this Object can have
-		Array1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
-		Array1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
-		int & MinNumFields // Minimum Number of Fields to be returned to Get routines
-	);
+//	void
+//	GetObjectDefInIDD(
+//		std::string const & ObjectWord, // Object for definition
+//		int & NumArgs, // How many arguments (max) this Object can have
+//		Array1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
+//		Array1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
+//		int & MinNumFields // Minimum Number of Fields to be returned to Get routines
+//	);
 
 	static
 	void
@@ -1223,79 +1223,79 @@ public:
 		std::string const & ObjectWord // Object for definition
 	);
 
-	void
-	GetIDFRecordsStats(
-		int & iNumberOfRecords, // Number of IDF Records
-		int & iNumberOfDefaultedFields, // Number of defaulted fields in IDF
-		int & iTotalFieldsWithDefaults, // Total number of fields that could be defaulted
-		int & iNumberOfAutoSizedFields, // Number of autosized fields in IDF
-		int & iTotalAutoSizableFields, // Total number of autosizeable fields
-		int & iNumberOfAutoCalcedFields, // Total number of autocalculate fields
-		int & iTotalAutoCalculatableFields // Total number of autocalculatable fields
-	);
+//	void
+//	GetIDFRecordsStats(
+//		int & iNumberOfRecords, // Number of IDF Records
+//		int & iNumberOfDefaultedFields, // Number of defaulted fields in IDF
+//		int & iTotalFieldsWithDefaults, // Total number of fields that could be defaulted
+//		int & iNumberOfAutoSizedFields, // Number of autosized fields in IDF
+//		int & iTotalAutoSizableFields, // Total number of autosizeable fields
+//		int & iNumberOfAutoCalcedFields, // Total number of autocalculate fields
+//		int & iTotalAutoCalculatableFields // Total number of autocalculatable fields
+//	);
 
-	void
-	ReportOrphanRecordObjects();
+//	void
+//	ReportOrphanRecordObjects();
 
-	static
-	void
-	InitSecretObjects();
+//	static
+//	void
+//	InitSecretObjects();
 
-	void
-	MakeTransition( int & ObjPtr ); // Pointer to Object Definition
+//	void
+//	MakeTransition( int & ObjPtr ); // Pointer to Object Definition
 
-	void
-	AddRecordFromSection( int const Which ); // Which object was matched
+//	void
+//	AddRecordFromSection( int const Which ); // Which object was matched
 
 	void
 	PreProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
 
-	void
-	CompactObjectsCheck();
+//	void
+//	CompactObjectsCheck();
 
-	void
-	ParametricObjectsCheck();
+//	void
+//	ParametricObjectsCheck();
 
-	void
-	PreScanReportingVariables();
+//	void
+//	PreScanReportingVariables();
 
-	void
-	AddVariablesForMonthlyReport( std::string const & reportName );
+//	void
+//	AddVariablesForMonthlyReport( std::string const & reportName );
 
-	int
-	FindFirstRecord( std::string const & UCObjType );
+//	int
+//	FindFirstRecord( std::string const & UCObjType );
 
-	int
-	FindNextRecord(
-		std::string const & UCObjType,
-		int const StartPointer
-	);
+//	int
+//	FindNextRecord(
+//		std::string const & UCObjType,
+//		int const StartPointer
+//	);
 
-	void
-	AddRecordToOutputVariableStructure(
-		std::string const & KeyValue,
-		std::string const & VariableName
-	);
+//	void
+//	AddRecordToOutputVariableStructure(
+//		std::string const & KeyValue,
+//		std::string const & VariableName
+//	);
 
-	void
-	ReAllocateAndPreserveOutputVariablesForSimulation();
+//	void
+//	ReAllocateAndPreserveOutputVariablesForSimulation();
 
-	void
-	DumpCurrentLineBuffer(
-		int const StartLine,
-		std::string const & cStartLine,
-		std::string const & cStartName,
-		int const CurLine,
-		int const NumConxLines,
-		Array1S_string const LineBuf,
-		int const CurQPtr
-	);
+//	void
+//	DumpCurrentLineBuffer(
+//		int const StartLine,
+//		std::string const & cStartLine,
+//		std::string const & cStartName,
+//		int const CurLine,
+//		int const NumConxLines,
+//		Array1S_string const LineBuf,
+//		int const CurQPtr
+//	);
 
-	void
-	ShowAuditErrorMessage(
-		std::string const & Severity, // if blank, does not add to sum
-		std::string const & ErrorMessage
-	);
+//	void
+//	ShowAuditErrorMessage(
+//		std::string const & Severity, // if blank, does not add to sum
+//		std::string const & ErrorMessage
+//	);
 
 	std::string
 	IPTrimSigDigits( int const IntegerValue );
