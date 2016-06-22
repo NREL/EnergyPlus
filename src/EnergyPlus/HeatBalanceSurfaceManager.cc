@@ -1860,6 +1860,9 @@ namespace HeatBalanceSurfaceManager {
 		int SurfSolAbs; // Pointer to scheduled surface gains object for fenestration systems
 		int SurfSolIncPtr; // Pointer to schedule surface gain object for interior side of the surface
 
+		Array1D< Real64 > debugSunlitFrac;
+		debugSunlitFrac.allocate( 9 );
+
 		// Always initialize the shortwave quantities
 
 		QRadSWOutAbs = 0.0;
@@ -2221,6 +2224,7 @@ namespace HeatBalanceSurfaceManager {
 
 					// Incident direct (unreflected) beam
 					QRadSWOutIncidentBeam( SurfNum ) = BeamSolar * SunlitFrac( TimeStep, HourOfDay, SurfNum2 ) * CosInc; // NOTE: SurfNum2
+					debugSunlitFrac( SurfNum2) = SunlitFrac( TimeStep, HourOfDay, SurfNum2 );
 					// Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
 					if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) {
 						QRadSWOutIncidentSkyDiffuse( SurfNum ) = SkySolarInc;
@@ -4530,7 +4534,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 	// FLOW:
 	MovInsulErrorFlag = false;
-	
+
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 		// Need to transfer any source/sink for a surface to the local array.  Note that
 		// the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
@@ -4773,7 +4777,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
-				
+
 			} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 				if ( Surface( SurfNum ).ExtCavityPresent ) {
 					CalcExteriorVentedCavity( SurfNum );
@@ -4879,7 +4883,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			}
 
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-				
+
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
 			}
@@ -5434,13 +5438,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 					} else { // Movable insulation present
 
 						if ( construct.SourceSinkPresent ) {
-							
+
 						    ShowSevereError( "Interior movable insulation is not valid with embedded sources/sinks" );
 							ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
 							ShowContinueError( "interior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name + " for a surface with that construction." );
 							ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
 							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
-							
+
 						}
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );

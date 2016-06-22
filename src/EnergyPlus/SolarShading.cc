@@ -3663,6 +3663,17 @@ namespace SolarShading {
 
 		if ( SUNCOS( 3 ) < SunIsUpValue ) return;
 
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			CTHETA( SurfNum ) = SUNCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SUNCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SUNCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
+			if ( !DetailedSolarTimestepIntegration ) {
+				if ( iTimeStep == NumOfTimeStepInHour ) CosIncAngHR( iHour, SurfNum ) = CTHETA( SurfNum );
+			} else {
+				CosIncAngHR( iHour, SurfNum ) = CTHETA( SurfNum );
+			}
+			CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
+		}
+
+		SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( Surface( SurfNum ).Area >= 1.e-10 ) {
@@ -3683,9 +3694,9 @@ namespace SolarShading {
 		}
 
 		//   Note -- if not the below, values are set in SkyDifSolarShading routine (constant for simulation)
-		WithShdgIsoSky = 0.;
-		WoShdgIsoSky = 0.;
 		if ( DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
+			WithShdgIsoSky = 0.;
+			WoShdgIsoSky = 0.;
 			DPhi = PiOvr2 / NPhi; // 15 deg for NPhi = 6
 			DTheta = 2.0 * Pi / NTheta; // 15 deg for NTheta = 24
 			DThetaDPhi = DTheta * DPhi;
@@ -3702,13 +3713,8 @@ namespace SolarShading {
 					SUNCOS( 2 ) = CosPhi * std::sin( Theta );
 
 					for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+						if ( !Surface( SurfNum ).ShadowingSurf && !Surface( SurfNum ).HeatTransSurf ) continue;
 						CTHETA( SurfNum ) = SUNCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SUNCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SUNCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
-						if ( !DetailedSolarTimestepIntegration ) {
-							if ( iTimeStep == NumOfTimeStepInHour ) CosIncAngHR( iHour, SurfNum ) = CTHETA( SurfNum );
-						} else {
-							CosIncAngHR( iHour, SurfNum ) = CTHETA( SurfNum );
-						}
-						CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
 					}
 
 					SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
