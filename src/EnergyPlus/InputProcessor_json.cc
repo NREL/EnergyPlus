@@ -148,11 +148,13 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 }
 
 json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
-	json const & loc, json const & obj_loc ) {
+		json const & loc, json const & obj_loc ) {
 	json obj;
 	Token token;
+	index += 1;
 	int legacy_idd_index = 0;
 	success = true;
+	bool was_value_parsed = false;
 
 	while (true) {
 		token = look_ahead(idf, index);
@@ -160,18 +162,31 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			success = false;
 			return obj;
 		} else if (token == Token::COMMA) {
+			if (!was_value_parsed) {
+				std::string const field_name = loc["fields"][legacy_idd_index];
+				json tmp;
+				if (obj_loc.find("patternProperties") != obj_loc.end()) {
+					tmp = obj_loc["patternProperties"][".*"]["properties"];
+				} else if (obj_loc.find("properties") != obj_loc.end()) {
+					tmp = obj_loc["properties"][field_name];
+				}
+				if (tmp.find(field_name) != tmp.end()) {
+					auto const obj_field = tmp[field_name];
+					if (obj_field.find("default") != obj_field.end()) {
+						auto const default_val = obj_field["default"];
+						if (default_val.is_string()) {
+							obj[field_name] = default_val.get<std::string>();
+						} else {
+							obj[field_name] = default_val.get<double>();
+						}
+					} else {
+						obj[field_name] = "";
+					}
+				}
+			}
+			legacy_idd_index++;
+			was_value_parsed = false;
 			next_token(idf, index);
-			token = look_ahead(idf, index);
-			if (Token::EXCLAMATION == token) {
-				eat_comment(idf, index);
-			}
-			token = look_ahead(idf, index);
-			if (Token::COMMA == token) {
-				legacy_idd_index++;
-			} else if (Token::SEMICOLON == token) {
-				next_token(idf, index);
-				break;
-			}
 		} else if (token == Token::SEMICOLON) {
 			next_token(idf, index);
 			break;
@@ -206,8 +221,8 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				extensions.push_back(single_extension);
 			}
 		} else {
-			std::string field;
-			field = loc["fields"][legacy_idd_index];
+			was_value_parsed = true;
+			std::string field = loc["fields"][legacy_idd_index];
 			auto it = obj_loc.find("patternProperties");
 			if (it == obj_loc.end()) {
 				if (obj_loc.find("properties") != obj_loc.end()) {
@@ -226,7 +241,6 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				obj[field] = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"][field]);
 			}
 			if (!success) return obj;
-			legacy_idd_index++;
 		}
 	}
 	return obj;
@@ -2723,14 +2737,16 @@ EnergyPlus::InputProcessor::GetNumObjectsFound( std::string const & ObjectWord )
 	// Look up object in list of objects.  If there, return the
 	// number of objects found in the current input.  If not, return 0.
 
-	auto const object_type = jdf.find( ObjectWord );
-	if ( object_type != jdf.end() ) {
-		return static_cast<int>(object_type.value().size());
-	} else {
-		ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
-		return 0;
+	auto const jdf_object = jdf.find( ObjectWord );
+	if ( jdf_object != jdf.end() ) {
+		return static_cast<int>(jdf_object.value().size());
 	}
-
+	auto const jdd_properties = schema[ "properties" ];
+	auto const jdd_object = jdd_properties.find( ObjectWord );
+	if ( jdd_object == jdd_properties.end() ) {
+		ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+	}
+	return 0;
 }
 
 /*
@@ -2833,13 +2849,15 @@ EnergyPlus::InputProcessor::GetObjectItem(
 	}
 	json object_in_jdf = jdf[Object];
 	json object_in_schema = schema["properties"][Object];
-
-
-
+//	auto const legacy_idd =
 
 	//Autodesk:Uninit Initialize variables used uninitialized
 	NumAlphas = 0; //Autodesk:Uninit Force default initialization
 	NumNumbers = 0; //Autodesk:Uninit Force default initialization
+	// TODO: Make this safe, alphas and numerics might not exist
+//		if (object_in_schema[ "legacy_idd" ].find( "alphas" ) != object_)
+//	NumAlphas = object_in_schema["legacy_idd"]["alphas"].size();
+//	NumNumbers = object_in_schema["legacy_idd"]["numerics"].size();
 
 	MaxAlphas = isize( Alphas, 1 );
 	MaxNumbers = isize( Numbers, 1 );
@@ -2899,6 +2917,7 @@ EnergyPlus::InputProcessor::GetObjectItem(
 			Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
 			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
 			if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
+			NumAlphas++;
 			continue;
 		}
 		auto it = obj.value().find(field);
@@ -2925,10 +2944,29 @@ EnergyPlus::InputProcessor::GetObjectItem(
 			NumNumbers++;
 		} else {
 			// TODO What to do if a numeric field is left blank?
-			Numbers( i + 1 ) = -99999;
+			auto const pattern_props = object_in_schema.find( "patternProperties" );
+			if (pattern_props != object_in_schema.end()) {
+				auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
+				if ( field_in_schema.find( field ) != field_in_schema.end() ) {
+					if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
+						Numbers( i + 1) = field_in_schema[ field ][ "default" ].get< double >();
+					} else {
+						Numbers ( i + 1 ) = -99999;
+					}
+				} else {
+					std::cout << "field " << field << " not found in object " << Object << std::endl;
+				}
+			} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
+				if ( object_in_schema[ "properties" ][ field ].find("default") != object_in_schema["properties"][field].end()) {
+					Numbers( i + 1 ) = object_in_schema[ "properties" ][ field ][ "default" ].get< double >();
+				} else {
+					Numbers( i + 1 ) = -99999;
+				}
+			}
+//			Numbers( i + 1 ) = -99999;
 			if ( present( NumBlank ) ) NumBlank()( i + 1 ) = true;
 		}
-		if ( present( NumericFieldNames ) ) NumericFieldNames()(i+1)= field;
+		if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 )= field;
 	}
 
 	Status = 1;

@@ -125,8 +125,8 @@ namespace EnergyPlus {
       EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
       EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
       EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
-//      EXPECT_EQ( 6, NumAlphas ); // TODO: Should be 6, why is it 7? Might be due to name field
-		  EXPECT_EQ( 7, NumAlphas );
+      EXPECT_EQ( 6, NumAlphas ); // TODO: Should be 6, why is it 7? Might be due to name field
+//		  EXPECT_EQ( 7, NumAlphas );
       EXPECT_EQ( 5, NumNumbers );
       EXPECT_EQ( 1, IOStatus );
    }

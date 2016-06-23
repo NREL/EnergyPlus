@@ -64,7 +64,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include "../TestHelpers/IdfParser.hh"
+//#include "../TestHelpers/IdfParser.hh"
 // A to Z order
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
@@ -520,65 +520,75 @@ namespace EnergyPlus {
 	}
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
-		if ( idf_snippet.empty() ) {
-			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
-			return true;
+		InputProcessor IP;
+		std::ifstream ifs("FULL_SCHEMA_modified.json", std::ifstream::in);
+		if ( ! ifs.is_open() ) {
+			perror( "ifs" );
+			return false;
 		}
+		IP.schema = json::parse(ifs);
+		IP.idf_parser.initialize(IP.schema);
+		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, IP.schema);
+		return true;
+//		if ( idf_snippet.empty() ) {
+//			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
+//			return true;
+//		}
 		// using namespace InputProcessor;
 
 		// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
 		// otherwise it will use the objects in the snippet. This is done because there is a check for required objects.
 		// Right now, IdfParser::decode returns a very naive data structure for objects but it works for this purpose.
-		IdfParser parser;
-		bool success = false;
-		auto const parsed_idf = parser.decode( idf_snippet, success );
-		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
-		bool found_building = false;
-		bool found_global_geo = false;
-		if ( success ) {
-			for ( auto const obj : parsed_idf ) {
-				if ( ! obj.empty() ) {
-					if ( InputProcessor::SameString( obj[ 0 ], "Building" ) ) {
-						found_building = true;
-					}
-					if ( InputProcessor::SameString( obj[ 0 ], "GlobalGeometryRules" ) ) {
-						found_global_geo = true;
-					}
-					if ( found_building && found_global_geo ) break;
-				}
-			}
-		}
-		std::string idf = parser.encode( parsed_idf );
-		if ( ! found_building ) {
-			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
-		}
-		if ( ! found_global_geo ) {
-			idf += "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;" + DataStringGlobals::NL;
-		}
+//		IdfParser parser;
+//		bool success = false;
+//		auto const parsed_idf = parser.decode( idf_snippet, success );
+//		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
+//		bool found_building = false;
+//		bool found_global_geo = false;
+//		if ( success ) {
+//			for ( auto const obj : parsed_idf ) {
+//				if ( ! obj.empty() ) {
+//					if ( InputProcessor::SameString( obj[ 0 ], "Building" ) ) {
+//						found_building = true;
+//					}
+//					if ( InputProcessor::SameString( obj[ 0 ], "GlobalGeometryRules" ) ) {
+//						found_global_geo = true;
+//					}
+//					if ( found_building && found_global_geo ) break;
+//				}
+//			}
+//		}
+//		std::string idf = parser.encode( parsed_idf );
+//		if ( ! found_building ) {
+//			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
+//		}
+//		if ( ! found_global_geo ) {
+//			idf += "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;" + DataStringGlobals::NL;
+//		}
 
-		auto errors_found = false;
+//		auto errors_found = false;
 
 		// if ( use_idd_cache ) {
 		// 	use_cached_idd();
 		// } else {
-			auto const idd = "";
-			process_idd( idd, errors_found );
+//			auto const idd = "";
+//			process_idd( idd, errors_found );
 		// }
 
-		if ( errors_found ) {
-			if ( use_assertions ) {
-				compare_eso_stream( "" );
-				compare_mtr_stream( "" );
-				// compare_echo_stream( "" );
-				compare_err_stream( "" );
-				compare_cout_stream( "" );
-				compare_cerr_stream( "" );
-			}
-			return errors_found;
-		}
+//		if ( errors_found ) {
+//			if ( use_assertions ) {
+//				compare_eso_stream( "" );
+//				compare_mtr_stream( "" );
+//				// compare_echo_stream( "" );
+//				compare_err_stream( "" );
+//				compare_cout_stream( "" );
+//				compare_cerr_stream( "" );
+//			}
+//			return errors_found;
+//		}
 
-		InputProcessor IP;
-		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, InputProcessor::schema );
+//		InputProcessor IP;
+//		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, InputProcessor::schema );
 		// NumLines = 0;
 		// InitSecretObjects();
 		// ProcessInputDataFile( *idf_stream );
@@ -693,21 +703,21 @@ namespace EnergyPlus {
 		// 	errors_found = true;
 		// }
 
-		if ( use_assertions ) {
-			compare_eso_stream( "" );
-			compare_mtr_stream( "" );
-			// compare_echo_stream( "" );
-			compare_err_stream( "" );
-			compare_cout_stream( "" );
-			compare_cerr_stream( "" );
-		}
+//		if ( use_assertions ) {
+//			compare_eso_stream( "" );
+//			compare_mtr_stream( "" );
+//			// compare_echo_stream( "" );
+//			compare_err_stream( "" );
+//			compare_cout_stream( "" );
+//			compare_cerr_stream( "" );
+//		}
 
-		if ( errors_found ) return errors_found;
+//		if ( errors_found ) return errors_found;
 
 		// This can fatal error within it, which will cause the unit test to fail and exit.
 		// SimulationManager::PostIPProcessing();
 
-		return errors_found;
+//		return errors_found;
 	}
 
 	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {
