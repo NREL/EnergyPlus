@@ -61,11 +61,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array3D.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <CurveManager.hh>
@@ -2693,7 +2689,7 @@ namespace CurveManager {
 				} else {
 					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "...Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) );
-					ShowContinueError( "...Choice not allowed with more than 2 indpendent variables." );
+					ShowContinueError( "...Choice not allowed with more than 2 independent variables." );
 					ErrorsFound = true;
 				}}
 			} else {
