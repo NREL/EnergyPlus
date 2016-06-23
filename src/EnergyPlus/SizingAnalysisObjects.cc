@@ -132,7 +132,8 @@ namespace EnergyPlus {
 	p_rVariable( rVariable )
 	{}
 
-	int SizingLog::GetZtStepIndex (
+	int
+	SizingLog::GetZtStepIndex (
 		const ZoneTimestepObject tmpztStepStamp )
 	{
 
@@ -156,7 +157,8 @@ namespace EnergyPlus {
 		return vecIndex;
 	}
 
-	void SizingLog::FillZoneStep(
+	void
+	SizingLog::FillZoneStep(
 		ZoneTimestepObject tmpztStepStamp )
 	{
 		int index =  GetZtStepIndex( tmpztStepStamp );
@@ -174,7 +176,8 @@ namespace EnergyPlus {
 
 	}
 
-	int SizingLog::GetSysStepZtStepIndex(
+	int
+	SizingLog::GetSysStepZtStepIndex(
 		ZoneTimestepObject tmpztStepStamp
 	)
 	{
@@ -204,7 +207,8 @@ namespace EnergyPlus {
 		return znStepIndex;
 	}
 
-	void SizingLog::FillSysStep(
+	void
+	SizingLog::FillSysStep(
 		ZoneTimestepObject tmpztStepStamp ,
 		SystemTimestepObject tmpSysStepStamp
 	)
@@ -267,7 +271,8 @@ namespace EnergyPlus {
 
 	}
 
-	void SizingLog::AverageSysTimeSteps()
+	void
+	SizingLog::AverageSysTimeSteps()
 	{
 		Real64 RunningSum;
 
@@ -282,7 +287,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	void SizingLog::ProcessRunningAverage ()
+	void
+	SizingLog::ProcessRunningAverage ()
 	{
 		Real64 RunningSum = 0.0;
 		Real64 divisor = double( timeStepsInAverage );
@@ -309,7 +315,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	ZoneTimestepObject SizingLog::GetLogVariableDataMax()
+	ZoneTimestepObject
+	SizingLog::GetLogVariableDataMax()
 	{
 		Real64 MaxVal;
 		ZoneTimestepObject tmpztStepStamp;
@@ -329,7 +336,8 @@ namespace EnergyPlus {
 	return tmpztStepStamp;
 	}
 
-	Real64 SizingLog::GetLogVariableDataAtTimestamp(
+	Real64
+	SizingLog::GetLogVariableDataAtTimestamp(
 		ZoneTimestepObject tmpztStepStamp
 	)
 	{
@@ -340,7 +348,8 @@ namespace EnergyPlus {
 		return val;
 	}
 
-	void SizingLog::ReInitLogForIteration()
+	void
+	SizingLog::ReInitLogForIteration()
 	{
 		ZoneTimestepObject tmpNullztStepObj;
 
@@ -349,7 +358,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	void SizingLog::SetupNewEnvironment(
+	void
+	SizingLog::SetupNewEnvironment(
 		int const seedEnvrnNum,
 		int const newEnvrnNum
 	)
@@ -357,7 +367,8 @@ namespace EnergyPlus {
 		newEnvrnToSeedEnvrnMap[ newEnvrnNum ] = seedEnvrnNum;
 	}
 
-	int SizingLoggerFramework::SetupVariableSizingLog(
+	int
+	SizingLoggerFramework::SetupVariableSizingLog(
 //		int const SupplySideInletNodeNum  // change to pointer setup
 		Real64 & rVariable,
 		int stepsInAverage
@@ -420,7 +431,8 @@ namespace EnergyPlus {
 
 	}
 
-	void SizingLoggerFramework::SetupSizingLogsNewEnvironment ()
+	void
+	SizingLoggerFramework::SetupSizingLogsNewEnvironment ()
 	{
 		using namespace WeatherManager;
 
@@ -430,7 +442,8 @@ namespace EnergyPlus {
 
 	}
 
-	ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
+	ZoneTimestepObject
+	SizingLoggerFramework::PrepareZoneTimestepStamp()
 	{
 		//prepare current timing data once and then pass into fill routines
 		//function used by both zone and system frequency log updates
@@ -457,7 +470,8 @@ namespace EnergyPlus {
 		return tmpztStepStamp;
 	}
 
-	void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
+	void
+	SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 	{
 		ZoneTimestepObject tmpztStepStamp;
 
@@ -468,7 +482,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
+	void
+	SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
 	{
 		int const SysIndex ( 2 );
 		Real64 const MinutesPerHour( 60.0 );
@@ -490,7 +505,8 @@ namespace EnergyPlus {
 
 	}
 
-	void SizingLoggerFramework::IncrementSizingPeriodSet()
+	void
+	SizingLoggerFramework::IncrementSizingPeriodSet()
 	{
 		for ( auto &L : this -> logObjs ) {
 			L.ReInitLogForIteration();
@@ -517,7 +533,8 @@ namespace EnergyPlus {
 	}
 
 
-	void PlantCoinicidentAnalysis::ResolveDesignFlowRate(
+	void
+	PlantCoinicidentAnalysis::ResolveDesignFlowRate(
 		int const HVACSizingIterCount
 	)
 	{
@@ -700,7 +717,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	bool PlantCoinicidentAnalysis::CheckTimeStampForNull(
+	bool
+	PlantCoinicidentAnalysis::CheckTimeStampForNull(
 		ZoneTimestepObject testStamp
 	)
 	{
