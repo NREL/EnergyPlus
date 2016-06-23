@@ -56,6 +56,8 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+#include <exception>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -72,7 +74,7 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment )
+TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType )
 {
 
 	std::string const idf_objects = delimited_string({
@@ -132,5 +134,110 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment )
 			ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::LPGUse);
 		}
 	}
+
+}
+
+TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel ) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+
+		"Zone,Zone1;",
+
+		"ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
+
+		"Schedule:Constant,Schedule1,,1.0;",
+
+		"OtherEquipment,",
+		"  OtherEq1,",
+		"  FuelOil#1,",
+		"  Zone1,",
+		"  Schedule1,",
+		"  EquipmentLevel,",
+		"  -100.0,,,",
+		"  0.1,",
+		"  0.2,",
+		"  0.05;",
+
+	} );
+
+	ASSERT_FALSE(process_idf(idf_objects));
+	EXPECT_FALSE(has_err_output());
+
+	bool ErrorsFound(false);
+
+	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+	ScheduleManager::ProcessScheduleInput(); // read schedules
+
+	HeatBalanceManager::GetZoneData(ErrorsFound);
+	ASSERT_FALSE(ErrorsFound);
+
+	ASSERT_THROW( InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error );
+
+	std::string const error_string = delimited_string({
+		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
+		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
+		"   ** Severe  ** GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative",
+		"   **   ~~~   ** ... when a fuel type of FuelOil#1 is specified.",
+		"   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
+		"   ...Summary of Errors that led to program termination:",
+		"   ..... Reference severe error count=1",
+		"   ..... Last severe error=GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative"
+	});
+
+	EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+}
+
+TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+
+		"Zone,Zone1;",
+
+		"ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
+
+		"Schedule:Constant,Schedule1,,1.0;",
+
+		"OtherEquipment,",
+		"  OtherEq1,",
+		"  Water,",
+		"  Zone1,",
+		"  Schedule1,",
+		"  EquipmentLevel,",
+		"  100.0,,,",
+		"  0.1,",
+		"  0.2,",
+		"  0.05;",
+		
+	} );
+
+	ASSERT_FALSE(process_idf(idf_objects));
+	EXPECT_FALSE(has_err_output());
+
+	bool ErrorsFound(false);
+
+	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+	ScheduleManager::ProcessScheduleInput(); // read schedules
+
+	HeatBalanceManager::GetZoneData(ErrorsFound);
+	ASSERT_FALSE(ErrorsFound);
+
+	ASSERT_THROW( InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error );
+
+	std::string const error_string = delimited_string({
+		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
+		"   ** Severe  ** GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1",
+		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
+		"   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
+		"   ...Summary of Errors that led to program termination:",
+		"   ..... Reference severe error count=2",
+		"   ..... Last severe error=GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1"
+	});
+
+	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 }
