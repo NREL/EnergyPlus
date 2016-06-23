@@ -73,6 +73,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2212,7 +2213,22 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		process_idf( idf_objects );
+
+		using namespace EnergyPlus::DataIPShortCuts;
+
+		lNumericFieldBlanks.allocate ( 1000 );
+		lAlphaFieldBlanks.allocate( 1000 );
+		cAlphaFieldNames.allocate( 1000 );
+		cNumericFieldNames.allocate( 1000 );
+		cAlphaArgs.allocate( 1000 );
+		rNumericArgs.allocate( 1000 );
+		lNumericFieldBlanks = false;
+		lAlphaFieldBlanks = false;
+		cAlphaFieldNames = " ";
+		cNumericFieldNames = " ";
+		cAlphaArgs = " ";
+		rNumericArgs = 0.0;
 
 		bool ErrorsFound = false;
         // Read objects

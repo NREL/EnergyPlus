@@ -54,7 +54,7 @@ namespace EnergyPlus {
       int IOStatus = 0;
       Array1D_string Alphas( NumAlphas );
       Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-      Array1D_bool lNumericBlanks( NumAlphas, true );
+      Array1D_bool lNumericBlanks( NumNumbers, true );
       Array1D_bool lAlphaBlanks( NumAlphas, true );
       Array1D_string cAlphaFields( NumAlphas );
       Array1D_string cNumericFields( NumNumbers );
@@ -64,7 +64,7 @@ namespace EnergyPlus {
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), Alphas ) );
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "option_type" } ), cAlphaFields ) );
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { } ), cNumericFields ) );
-      EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), lNumericBlanks ) );
+      EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks ) );
       EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), lAlphaBlanks ) );
       EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
       EXPECT_EQ( 1, NumAlphas );
@@ -113,7 +113,7 @@ namespace EnergyPlus {
       int IOStatus = 0;
       Array1D_string Alphas( NumAlphas );
       Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-      Array1D_bool lNumericBlanks( NumAlphas, true );
+      Array1D_bool lNumericBlanks( NumNumbers, true );
       Array1D_bool lAlphaBlanks( NumAlphas, true );
       Array1D_string cAlphaFields( NumAlphas );
       Array1D_string cNumericFields( NumNumbers );
@@ -122,13 +122,73 @@ namespace EnergyPlus {
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "name", "availability_schedule_name", "thermal_efficiency_modifier_curve_name", "air_inlet_node_name", "air_outlet_node_name", "water_storage_tank_name", "inlet_water_temperature_option" } ), cAlphaFields ) );
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "rated_capacity", "rated_gas_use_rate", "thermal_efficiency", "rated_fan_power", "auxiliary_electric_power" } ), cNumericFields ) );
-      EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
+      EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), lNumericBlanks ) );
       EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
       EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
       EXPECT_EQ( 6, NumAlphas ); // TODO: Should be 6, why is it 7? Might be due to name field
 //		  EXPECT_EQ( 7, NumAlphas );
       EXPECT_EQ( 5, NumNumbers );
       EXPECT_EQ( 1, IOStatus );
+   }
+
+   TEST_F( InputProcessorFixture, getObjectItem_json3 ) {
+     std::string const idf_objects = delimited_string({
+                                                            "Version,8.3;",
+                                                            "  BuildingSurface:Detailed,",
+                                                            "    Zn001:Wall001,           !- Name",
+                                                            "    Wall,                    !- Surface Type",
+                                                            "    R13WALL,                 !- Construction Name",
+                                                            "    Main Zone,               !- Zone Name",
+                                                            "    Outdoors,                !- Outside Boundary Condition",
+                                                            "    ,                        !- Outside Boundary Condition Object",
+                                                            "    SunExposed,              !- Sun Exposure",
+                                                            "    WindExposed,             !- Wind Exposure",
+                                                            "    0.5000000,               !- View Factor to Ground",
+                                                            "    4,                       !- Number of Vertices",
+                                                            "    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+                                                            "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+                                                            "    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+                                                            "    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+                                                      });
+
+     InputProcessor IP;
+     std::ifstream ifs("FULL_SCHEMA_modified.json", std::ifstream::in);
+     ASSERT_TRUE(ifs.is_open());
+     IP.schema = json::parse(ifs);
+     IP.idf_parser.initialize(IP.schema);
+//      json test = IP.idf_parser.decode(idf_objects, IP.schema);
+     InputProcessor::jdf = IP.idf_parser.decode(idf_objects, IP.schema);
+
+//     std::ofstream debug_ofs("test_json_dump.json", std::ofstream::out);
+//     debug_ofs << InputProcessor::jdf.dump(4) << std::endl;
+
+     std::string const CurrentModuleObject = "BuildingSurface:Detailed";
+
+     int numBuildingSurfaceDetailed = InputProcessor::GetNumObjectsFound(CurrentModuleObject);
+     ASSERT_EQ(1, numBuildingSurfaceDetailed);
+
+     int TotalArgs = 0;
+     int NumAlphas = 0;
+     int NumNumbers = 0;
+
+     InputProcessor::GetObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+     int IOStatus = 0;
+     Array1D_string Alphas(NumAlphas);
+     Array1D<Real64> Numbers(NumNumbers, 0.0);
+     Array1D_bool lNumericBlanks(NumNumbers, true);
+     Array1D_bool lAlphaBlanks(NumAlphas, true);
+     Array1D_string cAlphaFields(NumAlphas);
+     Array1D_string cNumericFields(NumNumbers);
+     InputProcessor::GetObjectItem(CurrentModuleObject, numBuildingSurfaceDetailed, Alphas, NumAlphas, Numbers, NumNumbers,
+                                   IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+
+     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }), Alphas));
+     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false }), lNumericBlanks));
+     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, true, false, false }), lAlphaBlanks));
+     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 }), Numbers));
+     EXPECT_EQ(8, NumAlphas);
+     EXPECT_EQ(14, NumNumbers);
+     EXPECT_EQ(1, IOStatus);
    }
 
 /*

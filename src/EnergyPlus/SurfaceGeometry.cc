@@ -1301,10 +1301,13 @@ namespace SurfaceGeometry {
 					if ( SurfNum == SubSurfNum ) continue;
 					if ( Surface( SubSurfNum ).Zone == 0 ) continue;
 					if ( Surface( SubSurfNum ).BaseSurf != SurfNum ) continue;
+					if ( SurfNum == 26 && SubSurfNum == 27 )
+							auto const test = " ";
 
 					// Check facing angle of Sub compared to base
 					checkSubSurfAzTiltNorm( Surface( SurfNum ), Surface( SubSurfNum ), subSurfaceError );
-					if (subSurfaceError) SurfError= true;
+					if (subSurfaceError)
+						SurfError= true;
 				}
 			}
 		}
