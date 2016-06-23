@@ -3442,7 +3442,6 @@ namespace HVACVariableRefrigerantFlow {
 		using DataEnvironment::StdRhoAir;
 		using DataEnvironment::OutDryBulbTemp;
 		using MixedAir::SimOAMixer;
-		using MixedAir::SimOAController;
 		using DataZoneEquipment::ZoneEquipList;
 		using DataSizing::AutoSize;
 		using Fans::GetFanVolFlow;
@@ -6247,7 +6246,6 @@ namespace HVACVariableRefrigerantFlow {
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using MixedAir::SimOAMixer;
-		using MixedAir::SimOAController;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6938,7 +6936,6 @@ namespace HVACVariableRefrigerantFlow {
 		using MixedAir::OAMixer;
 		using HVACVariableRefrigerantFlow::VRF;
 		using HVACVariableRefrigerantFlow::VRFTU;
-		using MixedAir::SimOAMixer;
 		using Psychrometrics::PsyHFnTdbW;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
