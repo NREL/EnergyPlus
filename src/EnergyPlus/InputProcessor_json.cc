@@ -161,7 +161,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		if (token == Token::NONE) {
 			success = false;
 			return obj;
-		} else if (token == Token::COMMA) {
+		} else if (token == Token::COMMA || token == Token::SEMICOLON) {
 			if (!was_value_parsed) {
 				std::string const field_name = loc["fields"][legacy_idd_index];
 				json tmp;
@@ -187,6 +187,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			legacy_idd_index++;
 			was_value_parsed = false;
 			next_token(idf, index);
+			if (token == Token::SEMICOLON) break;
 		} else if (token == Token::SEMICOLON) {
 			next_token(idf, index);
 			break;
@@ -2910,12 +2911,14 @@ EnergyPlus::InputProcessor::GetObjectItem(
 //	++ObjectGotCount( Found );
 
 	auto obj = object_in_jdf.begin() + Number - 1;
+		auto const debug = obj.value();
 	auto const &alphas = object_in_schema["legacy_idd"]["alphas"];
 	for (int i = 0; i < alphas.size(); ++i) {
 		std::string const field = alphas[i];
 		if ( field == "name" ) {
 			Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
-			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
+//			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
+			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = false;
 			if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
 			NumAlphas++;
 			continue;

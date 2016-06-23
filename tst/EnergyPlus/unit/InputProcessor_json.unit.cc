@@ -49,7 +49,7 @@ namespace EnergyPlus {
       int NumAlphas = 0;
       int NumNumbers = 0;
 
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
       int IOStatus = 0;
       Array1D_string Alphas( NumAlphas );
@@ -59,7 +59,7 @@ namespace EnergyPlus {
       Array1D_string cAlphaFields( NumAlphas );
       Array1D_string cNumericFields( NumNumbers );
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		InputProcessor::GetObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), Alphas ) );
       EXPECT_TRUE( compare_containers( std::vector< std::string >( { "option_type" } ), cAlphaFields ) );
