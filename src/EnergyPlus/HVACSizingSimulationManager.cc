@@ -153,20 +153,20 @@ namespace EnergyPlus {
 		for ( auto & P : plantCoincAnalyObjs ) {
 			//call setup log routine for each coincident plant analysis object
 			P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(
-				Node(P.supplySideInletNodeNum).MassFlowRate,
+				Node( P.supplySideInletNodeNum ).MassFlowRate,
 				P.numTimeStepsInAvg );
 			P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(
-				Node(P.supplySideInletNodeNum).Temp,
+				Node( P.supplySideInletNodeNum ).Temp,
 				P.numTimeStepsInAvg );
-			if ( PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop
-					|| PlantSizData(P.plantSizingIndex).LoopType == SteamLoop ) {
+			if ( PlantSizData(P.plantSizingIndex ).LoopType == HeatingLoop
+					|| PlantSizData(P.plantSizingIndex ).LoopType == SteamLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(
-					PlantReport(P.plantLoopIndex ).HeatingDemand,
+					PlantReport( P.plantLoopIndex ).HeatingDemand,
 					P.numTimeStepsInAvg );
-			} else if ( PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop
-						|| PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop ) {
+			} else if ( PlantSizData( P.plantSizingIndex ).LoopType == CoolingLoop
+						|| PlantSizData( P.plantSizingIndex ).LoopType == CondenserLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(
-					PlantReport(P.plantLoopIndex ).CoolingDemand,
+					PlantReport( P.plantLoopIndex ).CoolingDemand,
 					P.numTimeStepsInAvg );
 			}
 
@@ -265,7 +265,7 @@ namespace EnergyPlus {
 
 		bool Available; // an environment is available to process
 		int HVACSizingIterCount;
-		static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
+		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 		static gio::Fmt fmtLD( "*" );
 
 		hvacSizingSimulationManager->DetermineSizingAnalysesNeeded();
@@ -288,9 +288,9 @@ namespace EnergyPlus {
 			Available = true;
 			for ( int i = 1; i <= NumOfEnvrn; ++i ) { // loop over environments
 
-				GetNextEnvironment(Available, ErrorsFound);
-				if (ErrorsFound) break;
-				if (!Available) continue;
+				GetNextEnvironment( Available, ErrorsFound );
+				if ( ErrorsFound ) break;
+				if ( !Available ) continue;
 
 				hvacSizingSimulationManager->sizingLogger.SetupSizingLogsNewEnvironment();
 
@@ -299,7 +299,7 @@ namespace EnergyPlus {
 				if ( KindOfSim == ksDesignDay ) continue;
 				if ( KindOfSim == ksRunPeriodDesign ) continue;
 
-				if ( Environment(Envrn).HVACSizingIterationNum != HVACSizingIterCount ) continue;
+				if ( Environment( Envrn ).HVACSizingIterationNum != HVACSizingIterCount ) continue;
 
 				if ( ReportDuringHVACSizingSimulation ) {
 					if ( sqlite ) {
@@ -310,7 +310,7 @@ namespace EnergyPlus {
 				}
 				ExitDuringSimulations = true;
 
-				DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
+				DisplayString( "Initializing New Environment Parameters, HVAC Sizing Simulation" );
 
 				BeginEnvrnFlag = true;
 				EndEnvrnFlag = false;
@@ -323,17 +323,17 @@ namespace EnergyPlus {
 				bool anyEMSRan;
 				ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
-				while ( (DayOfSim < NumOfDayInEnvrn) || (WarmupFlag) ) { // Begin day loop ...
+				while ( ( DayOfSim < NumOfDayInEnvrn) || ( WarmupFlag ) ) { // Begin day loop ...
 
 					if ( ReportDuringHVACSizingSimulation ) {
 						if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
 					}
 					++DayOfSim;
 					gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
-					strip(DayOfSimChr);
-					if ( !WarmupFlag ) {
+					strip( DayOfSimChr );
+					if ( ! WarmupFlag ) {
 						++CurrentOverallSimDay;
-						DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
+						DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
 					} else {
 						DayOfSimChr = "0";
 					}
@@ -342,13 +342,13 @@ namespace EnergyPlus {
 
 					if ( WarmupFlag ) {
 						++NumOfWarmupDays;
-						cWarmupDay = TrimSigDigits(NumOfWarmupDays);
-						DisplayString("Warming up {" + cWarmupDay + '}');
+						cWarmupDay = TrimSigDigits( NumOfWarmupDays );
+						DisplayString( "Warming up {" + cWarmupDay + '}' );
 					} else if (DayOfSim == 1) {
-						DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
+						DisplayString( "Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName );
 						gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
 					} else if (DisplayPerfSimulationFlag) {
-						DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
+						DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 						DisplayPerfSimulationFlag = false;
 					}
 
@@ -357,7 +357,7 @@ namespace EnergyPlus {
 						BeginHourFlag = true;
 						EndHourFlag = false;
 
-						for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+						for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 							if ( AnySlabsInModel || AnyBasementsInModel ) {
 								SimulateGroundDomains( false );
 							}

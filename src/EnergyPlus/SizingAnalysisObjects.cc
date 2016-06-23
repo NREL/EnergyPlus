@@ -435,22 +435,24 @@ namespace EnergyPlus {
 		//prepare current timing data once and then pass into fill routines
 		//function used by both zone and system frequency log updates
 
-		using DataGlobals::KindOfSim;
-		using DataGlobals::DayOfSim;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::NumOfTimeStepInHour;
-		using namespace WeatherManager;
-		using namespace OutputProcessor;
 		int const ZoneIndex ( 1 );
 
+		int locDayOfSim( 1 );
+
+		if ( DataGlobals::WarmupFlag ) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
+			locDayOfSim = 1;
+		} else {
+			locDayOfSim = DataGlobals::DayOfSim;
+		}
+
 		ZoneTimestepObject tmpztStepStamp( // call constructor
-			KindOfSim,
-			Envrn,
-			DayOfSim,
-			HourOfDay,
-			TimeValue( ZoneIndex ).CurMinute,
-			TimeValue( ZoneIndex ).TimeStep,
-			NumOfTimeStepInHour );
+			DataGlobals::KindOfSim,
+			WeatherManager::Envrn,
+			locDayOfSim,
+			DataGlobals::HourOfDay,
+			OutputProcessor::TimeValue( ZoneIndex ).CurMinute,
+			OutputProcessor::TimeValue( ZoneIndex ).TimeStep,
+			DataGlobals::NumOfTimeStepInHour );
 
 		return tmpztStepStamp;
 	}
@@ -550,7 +552,7 @@ namespace EnergyPlus {
 
 		// first make sure we have valid time stamps to work with
 		if ( CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )
-				&& CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) { //Trane: bug fix issue #5665
+				|| CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {
 			// problem, don't have valid stamp, don't have any info to report either
 			nullStampProblem =  true;
 		} else {
@@ -559,14 +561,14 @@ namespace EnergyPlus {
 
 		previousVolDesignFlowRate = PlantSizData( plantSizingIndex ).DesVolFlowRate;
 
-		if ( ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp ) && ( newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) ) {   //Trane: bug fix #5665
+		if ( newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) {
 			newFoundMassFlowRate = newFoundMassFlowRateTimeStamp.runningAvgDataValue;
 		} else {
 			newFoundMassFlowRate = 0.0;
 		}
 
 		//step 3 calculate mdot from max load and delta T
-		if ( ( ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) && ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) ) &&   //Trane: bug fix #5665
+		if ( ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) && 
 			( ( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT ) > 0.0 ) )  {
 				peakLoadCalculatedMassFlow = NewFoundMaxDemandTimeStamp.runningAvgDataValue /
 											( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT );
@@ -674,7 +676,7 @@ namespace EnergyPlus {
 		}
 
 		if ( ! nullStampProblem ) {
-			if ( ! changedByDemand && ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )) { //Trane: bug fix #5665
+			if ( ! changedByDemand ) {
 				if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
 				}
@@ -684,7 +686,7 @@ namespace EnergyPlus {
 					newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
 				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
-			} else if ( changedByDemand && ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {    //Trane: bug fix #5665
+			} else if ( changedByDemand ) {
 				if ( NewFoundMaxDemandTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title );
 				}
