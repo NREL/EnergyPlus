@@ -3121,6 +3121,7 @@ namespace HeatBalanceSurfaceManager {
 			ConstrNum = Surface( SurfNum ).Construction;
 			ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
 			ITABSF( SurfNum ) = Construct( ConstrNum ).InsideAbsorpThermal;
+			HMovInsul = 0.0;
 			if ( Construct( ConstrNum ).TransDiff <= 0.0 ) { // Opaque surface
 				if ( Surface( SurfNum ).MaterialMovInsulInt > 0 ) EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsInt );
 				if ( HMovInsul > 0.0 ) ITABSF( SurfNum ) = Material( Surface( SurfNum ).MaterialMovInsulInt ).AbsorpThermal; // Movable inside insulation present
