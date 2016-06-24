@@ -5,6 +5,7 @@ Modeling HVAC Operational Faults – Phase III
  **Lawrence Berkeley National Laboratory**
 
  - Original Date: May 25, 2016
+ - Updated Date: Jun 20, 2016
  
 
 ## Justification for New Feature ##
@@ -60,7 +61,7 @@ it seems like these operational faults could very easily cause the plant/airside
 The proposed models aim to simulate and evaluate the faults occurred at the "operation" phase. We assume that these faults don't exist during the "design" phase, and therefore, the fault model should have no effect on any sizing related simulations, including the traditional sizing calculations and the coincident sizing calculations. 
 
 2) Effect on plant/airside convergence: 
-For most cases, the chiller faults should only affect the plant loop performance and have no impact on the air loop performance or zone temperatures. Although the chiller supply temperature and chiller PLR may differ from the fault-free cases, we think the plant controls (e.g., bypass control) should be able to ensure the correct heat transfer to the air side. We think the faults will lead to a situation that is similar to that in an over-sized or under-sized system. Since the over-sized and under-sized situations can be well handled by the current plant/airside controllers, we think the faulty-sensor cases should also be well handled and hopefully don't influence the plant/airside convergence. We will keep an eye on the convergence during the test. In addition, we will try to avoid any unrealistic extremes, e.g., set a limit for the sensor offset.
+For most cases, the chiller faults should only affect the plant loop performance and have no impact on the air loop performance or zone temperatures. Although the chiller supply temperature and chiller PLR may differ from the fault-free cases, the plant controls (e.g., bypass control) should be able to ensure the correct heat transfer to the air side. We think the faults will lead to a situation that is similar to that in an over-sized or under-sized system. Since the over-sized and under-sized situations can be well handled by the current plant/airside controllers, the faulty-sensor cases should also be well handled and hopefully don't influence the plant/airside convergence. We will keep an eye on the convergence during the test. In addition, we will try to avoid any unrealistic extremes, e.g., set a limit for the sensor offset.
 
 **Comment:**
 
@@ -219,7 +220,7 @@ EnergyPlus can model a number of coil types, some of which are temperature-based
 -	Coil:Cooling:Water
 -	Coil:Cooling:Water:Detailedgeometry
 
- The effect of an offset in a coil supply air temperature sensor whose sole use is for calculation of the difference between the set-points and the actual values can be modeled as an equal and opposite offset: 
+The effect of an offset in a coil supply air temperature sensor whose sole use is for calculation of the difference between the set-points and the actual values can be modeled as an equal and opposite offset: 
 
 <div>$$ T_{coil-o,f} = T_{coil-o,ff} - \Delta T $$</div>
 where 
@@ -235,20 +236,20 @@ Also note that “Coil:Heating:Water”, “Coil:Cooling:Water”, and “Coil:C
 ## Model Implementation ##
 
 The proposed model implementation work will try to introduce more object oriented features to the fault modeling routines. Four new classes will be added in the EnergyPlus::FaultsManager namespace, namely: 
-(1) struct FaultPropertiesChillerSWT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:ChillerSupplyWater
-(2) struct FaultPropertiesCondenserSWT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:CondenserSupplyWater
-(3) struct FaultPropertiesCoilSAT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:CoilSupplyAir
-(4) struct FaultPropertiesTowerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:Tower
+-	(1) struct FaultPropertiesChillerSWT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+-	(2) struct FaultPropertiesCondenserSWT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+-	(3) struct FaultPropertiesCoilSAT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:CoilSupplyAir
+-	(4) struct FaultPropertiesTowerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:Tower.
 These classes will be inherited from Class "FaultProperties" which is the base class for all the operational fault models. 
 The new added functions will be defined as member functions of the corresponding fault class. 
 
 The new added fault classes will contain the information about the faults as well as the links to the affected objects. Take class "FaultPropertiesChillerSWT" for example, it uses member variables "ChillerType" and "ChillerName" to specify the chiller that is affected by the fault. Three new member variables will be added to the existing chiller class (e.g., "ReformulatedEIRChillerSpecs" in EnergyPlus::ChillerReformulatedEIR):
-1) bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
-2) int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
-3) Real64 FaultyChillerSWTOffset; // True if the chiller has SWT sensor fault
+-	1) bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+-	2) int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+-	3) Real64 FaultyChillerSWTOffset; // True if the chiller has SWT sensor fault.
 These three variables will be initialized in the method EnergyPlus::FaultsManager::CheckAndReadFaults() which processes all the fault objects. Then these variables will be used in the chiller calculations to activate the fault calculations when the fault presents.
 
-The model implementations will try to minimize the modification of the codes outside of the fault routine. Take the FaultModel:TemperatureSensorOffset:ChillerSupplyWater for example, all the massive calculations about the faulty chiller will be put in "FaultsManager.cc" instead of the chiller routines. This can be achieved by defining a member function "CalFaultChillerSWT" within class "FaultPropertiesChillerSWT". The chiller routines will call this function whenever the fault presents. Such design will minimize the modifications of the chiller routines, and thus benefit their systematic organization and potential future maintenance.
+The model implementations will try to minimize the modification of the codes outside of the fault routine. Take the FaultModel:TemperatureSensorOffset:ChillerSupplyWater for example, all the massive calculations about the faulty chiller will be put in "FaultsManager.cc" instead of the chiller routines. This will be achieved by defining a member function "CalFaultChillerSWT" within class "FaultPropertiesChillerSWT". The chiller routines will call this function whenever the fault presents. Such implementation design will minimize the modifications of the chiller routines, and thus benefit their systematic organization and potential future maintenance.
 
 
 ## IDD Object (New) ##
@@ -258,6 +259,7 @@ New objects will be created for the proposed fault types, namely:
 -	FaultModel:TemperatureSensorOffset:CoilSupplyAir,
 -	FaultModel:Fouling:Tower.
 
+```
 FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
    \memo This object describes fault of chiller supply water temperature sensor offset
    \min-fields 3
@@ -409,7 +411,9 @@ FaultModel:Fouling:Tower,
        \type real
        \minimum> 0.0
        \maximum 1.0
-  
+ 
+```
+ 
 ## Testing/Validation/Data Source(s) ##
 Comparing simulation results with and without faults will be performed to ensure accuracy of the new features. 
 
