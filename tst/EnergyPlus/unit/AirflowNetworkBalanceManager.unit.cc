@@ -381,10 +381,10 @@ namespace EnergyPlus {
 
 			"  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
-			"  Schedule:Constant,FanAndCoilAvailSched,1.0;",
-			"  Schedule:Constant,On,1.0;",
-			"  Schedule:Constant,WindowVentSched,21.0;",
-			"  Schedule:Constant,VentingSched,0.0;",
+			"  Schedule:Constant,FanAndCoilAvailSched,,1.0;",
+			"  Schedule:Constant,On,,1.0;",
+			"  Schedule:Constant,WindowVentSched,,21.0;",
+			"  Schedule:Constant,VentingSched,,0.0;",
 
 			"  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
 

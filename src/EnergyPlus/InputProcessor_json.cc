@@ -2951,9 +2951,15 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 				for (auto i = 0; i < alphas_extensions.size(); i++) {
 					std::string const field = alphas_extensions[i];
 					if (extension_obj.find(field) != extension_obj.end()) {
-						std::string const val = extension_obj[field];
-						Alphas(alphas_index + 1) = MakeUPPERCase(val);
-						if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
+						if (extension_obj[field].is_string()) {
+							std::string const val = extension_obj[field];
+							Alphas(alphas_index + 1) = MakeUPPERCase(val);
+						} else {
+							double val = extension_obj[field];
+							Alphas(alphas_index + 1) = val;
+						}
+//						if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
+						if (present(AlphaBlank)) AlphaBlank()(i + 1) = false;
 						NumAlphas++;
 					} else {
 						Alphas(alphas_index + 1) = "";
