@@ -149,10 +149,11 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 
 json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
 															json const & loc, json const & obj_loc ) {
-	json obj;
+	json root, extensible = json::object();
+	json array_of_extensions = json::array();
 	Token token;
-	index += 1;
-	int legacy_idd_index = 0;
+	index += 1; // move index past the comma of the EnergyPlus Object Type
+	int legacy_idd_index = 0, extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
 
@@ -160,66 +161,69 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		token = look_ahead(idf, index);
 		if (token == Token::NONE) {
 			success = false;
-			return obj;
+			return root;
 		} else if (token == Token::COMMA || token == Token::SEMICOLON) {
 			if (!was_value_parsed) {
-				std::string const field_name = loc["fields"][legacy_idd_index];
+				std::string field_name;
+				unsigned long size = 0;
+				if (legacy_idd_index < loc["fields"].size()) {
+					field_name = loc["fields"][legacy_idd_index];
+				} else {
+					size = loc["extensibles"].size();
+					field_name = loc["extensibles"][extensible_index % size];
+					extensible_index++;
+				}
 				json tmp;
 				if (obj_loc.find("patternProperties") != obj_loc.end()) {
 					tmp = obj_loc["patternProperties"][".*"]["properties"];
 				} else if (obj_loc.find("properties") != obj_loc.end()) {
 					tmp = obj_loc["properties"][field_name];
 				}
+				if (legacy_idd_index >= loc["fields"].size()) {
+					tmp = tmp["extensions"]["items"]["properties"];
+				}
 				if (tmp.find(field_name) != tmp.end()) {
 					auto const obj_field = tmp[field_name];
 					if (obj_field.find("default") != obj_field.end()) {
 						auto const default_val = obj_field["default"];
 						if (default_val.is_string()) {
-							obj[field_name] = default_val.get<std::string>();
+							if ( ! size ) root[field_name] = default_val.get<std::string>();
+							else extensible[field_name] = default_val.get<std::string>();
 						} else {
-							obj[field_name] = default_val.get<double>();
+							if ( ! size ) root[field_name] = default_val.get<double>();
+							else extensible[field_name] = default_val.get<double>();
 						}
 					} else {
-						obj[field_name] = "";
+						if ( ! size ) root[field_name] = "";
+						else extensible[field_name] = "";
 					}
 				}
+				if (size && extensible_index % size == 0) {
+					array_of_extensions.push_back(extensible);
+					extensible.clear();
+				}
 			}
+
 			legacy_idd_index++;
 			was_value_parsed = false;
 			next_token(idf, index);
 			if (token == Token::SEMICOLON) break;
-		} else if (token == Token::SEMICOLON) {
-			next_token(idf, index);
-			break;
 		} else if (token == Token::EXCLAMATION) {
 			eat_comment(idf, index);
 		} else if (legacy_idd_index >= loc["fields"].size()) {
-			json extensions;
-			while (1) {
-				if (loc.find("extensibles") == loc.end()) {
-					success = false;
-					return obj;
-				}
-				json const &ex_loc = loc["extensibles"];
-				json single_extension;
-				for (int i = 0; i < ex_loc.size(); i++) {
-					std::string field = ex_loc[i];
-					json val = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"]["extensions"]["items"]["properties"][field]);
-					if (success) single_extension[field] = val;
-					else success = true;
-					token = look_ahead(idf, index);
-					if (token == Token::COMMA) {
-						next_token(idf, index);
-						token = look_ahead(idf, index);
-						if (token == Token::EXCLAMATION) eat_comment(idf, index);
-					} else if (token == Token::SEMICOLON) {
-						next_token(idf, index);
-						extensions.push_back(single_extension);
-						obj["extensions"] = extensions;
-						return obj;
-					}
-				}
-				extensions.push_back(single_extension);
+			if (loc.find("extensibles") == loc.end()) {
+				success = false;
+				return root;
+			}
+			auto const size = loc["extensibles"].size();
+			std::string const field_name = loc["extensibles"][extensible_index % size];
+			auto val = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"]["extensions"]["items"]["properties"][field_name]);
+			extensible[field_name] = val;
+			was_value_parsed = true;
+			extensible_index++;
+			if (extensible_index && extensible_index % size == 0) {
+				array_of_extensions.push_back(extensible);
+				extensible.clear();
 			}
 		} else {
 			was_value_parsed = true;
@@ -227,7 +231,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			auto it = obj_loc.find("patternProperties");
 			if (it == obj_loc.end()) {
 				if (obj_loc.find("properties") != obj_loc.end()) {
-					obj[field] = parse_value(idf, index, success, obj_loc["properties"][field]);
+					root[field] = parse_value(idf, index, success, obj_loc["properties"][field]);
 				} else {
 					std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
 				}
@@ -236,15 +240,18 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			}
 			auto const &tmp = obj_loc["patternProperties"][".*"]["properties"];
 			if (tmp.find(field) == tmp.end()) {
-				if (field == "name") obj[field] = parse_string(idf, index, success);
+				if (field == "name") root[field] = parse_string(idf, index, success);
 				else std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
 			} else {
-				obj[field] = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"][field]);
+				root[field] = parse_value(idf, index, success, obj_loc["patternProperties"][".*"]["properties"][field]);
 			}
-			if (!success) return obj;
+			if (!success) return root;
 		}
 	}
-	return obj;
+	if (array_of_extensions.size()) {
+		root["extensions"] = array_of_extensions;
+	}
+	return root;
 }
 
 json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
