@@ -51,3 +51,11 @@ See [5616](https://github.com/NREL/EnergyPlus/pull/5616).
 When district heating or cooling is used, additional rows in the LEED EAp2-3 are shown with the virtual rates for those energy sources are shown.   
 
 See [5639](https://github.com/NREL/EnergyPlus/pull/5639).
+
+### New column in Zone Summary table in IVRS report for Opening Area
+
+A new columns for the window opening area (glass plus frame) has been added to the Zone Summary table under the Input Verification and Results Summary tabular report. The value shown in that column is consistent with the window opening area used in the Window-Wall Ratio tables in the same report and with the Exterior Fenestration table in the Envelope Summary tabular report.
+
+See [5652](https://github.com/NREL/EnergyPlus/pull/5652).
+
+
