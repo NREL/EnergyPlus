@@ -239,7 +239,7 @@ The proposed model implementation work will try to introduce more object oriente
 -	(1) struct FaultPropertiesChillerSWT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:ChillerSupplyWater
 -	(2) struct FaultPropertiesCondenserSWT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:CondenserSupplyWater
 -	(3) struct FaultPropertiesCoilSAT : public FaultProperties, corresponding to the IDD object FaultModel:TemperatureSensorOffset:CoilSupplyAir
--	(4) struct FaultPropertiesTowerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:Tower.
+-	(4) struct FaultPropertiesTowerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:CoolingTower.
 These classes will be inherited from Class "FaultProperties" which is the base class for all the operational fault models. 
 The new added functions will be defined as member functions of the corresponding fault class. 
 
@@ -257,7 +257,7 @@ New objects will be created for the proposed fault types, namely:
 -	FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
 -	FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
 -	FaultModel:TemperatureSensorOffset:CoilSupplyAir,
--	FaultModel:Fouling:Tower.
+-	FaultModel:Fouling:CoolingTower.
 
 ```
 FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
@@ -372,8 +372,8 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \default 0.0
        \units deltaC
        
-FaultModel:Fouling:Tower,
-   \memo This object describes the fault of fouling towers
+FaultModel:Fouling:CoolingTower,
+   \memo This object describes the fault of fouling cooling towers
    \min-fields 3
    A1, \field Name
        \note Enter the name of the fault
@@ -385,7 +385,7 @@ FaultModel:Fouling:Tower,
    A3, \field Severity Schedule Name
        \type object-list
        \object-list ScheduleNames
-   A4, \field Tower Object Type
+   A4, \field Cooling Tower Object Type
        \note Enter the type of the cooling tower affected
        \required-field
        \type choice
@@ -398,11 +398,6 @@ FaultModel:Fouling:Tower,
        \required-field
        \type object-list
        \object-list CoolingTower:VariableSpeed
-   A6, \field Fouling Input Method
-       \type choice
-       \key FouledUARated
-       \key FoulingFactor
-       \default FouledUARated
    N1; \field UA Reduction Factor
        \note Factor describing the tower UA reduction due to fouling
        \note It is the ratio between the UA value at fouling case and that at fault free case
