@@ -2857,7 +2857,6 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		}
 		json object_in_jdf = jdf[Object];
 		json object_in_schema = schema["properties"][Object];
-//	auto const legacy_idd =
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		NumAlphas = 0; //Autodesk:Uninit Force default initialization
@@ -2925,7 +2924,6 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 			if ( field == "name" ) {
 				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
 				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
-//			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = false;
 				if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
 				NumAlphas++;
 				continue;
@@ -2944,30 +2942,45 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 			// TODO else also set obj.key() as alphafieldnames?
 		}
 
-		auto const &alphas_extensions = object_in_schema["legacy_idd"]["alphas"]["extensions"];
-		for (int i = alphas_fields.size(); i < alphas_fields.size() + alphas_extensions.size(); ++i) {
-			std::string const field = alphas_extensions[i];
-			if ( field == "name" ) {
-				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
-				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
-//			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = false;
-				if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
-				NumAlphas++;
-				continue;
+		if ( object_in_schema[ "legacy_idd" ][ "alphas" ].find("extensions") != object_in_schema[ "legacy_idd" ][ "alphas" ].end()) {
+			auto const &alphas_extensions = object_in_schema["legacy_idd"]["alphas"]["extensions"];
+			auto const extensions = obj.value()["extensions"];
+			int alphas_index = alphas_fields.size();
+			for (auto it = extensions.begin(); it != extensions.end(); ++it) {
+				auto const extension_obj = it.value();
+				for (auto i = 0; i < alphas_extensions.size(); i++) {
+					std::string const field = alphas_extensions[i];
+					if (extension_obj.find(field) != extension_obj.end()) {
+						std::string const val = extension_obj[field];
+						Alphas(alphas_index + 1) = MakeUPPERCase(val);
+						if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
+						NumAlphas++;
+					} else {
+						Alphas(alphas_index + 1) = "";
+						if (present(AlphaBlank)) AlphaBlank()(i + 1) = true;
+					}
+					if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
+					alphas_index++;
+				}
 			}
-			auto it = obj.value().find(field);
-			if ( it != obj.value().end() ) {
-				auto const val = it.value().get< std::string >();
-				Alphas( i + 1 ) = MakeUPPERCase( val );
-				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = val.empty();
-				NumAlphas++;
-			} else {
-				Alphas( i + 1 ) = "";
-				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = true;
-			}
-			if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
-			// TODO else also set obj.key() as alphafieldnames?
 		}
+
+//			for (int i = alphas_fields.size(); i < alphas_fields.size() + alphas_extensions.size(); ++i) {
+//				std::string const field = alphas_extensions[i];
+//				auto it = obj.value().find(field);
+//				if (it != obj.value().end()) {
+//					auto const val = it.value().get<std::string>();
+//					Alphas(i + 1) = MakeUPPERCase(val);
+//					if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
+//					NumAlphas++;
+//				} else {
+//					Alphas(i + 1) = "";
+//					if (present(AlphaBlank)) AlphaBlank()(i + 1) = true;
+//				}
+//				if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
+//				// TODO else also set obj.key() as alphafieldnames?
+//			}
+//		}
 
 		auto const &numerics_fields = object_in_schema[ "legacy_idd" ][ "numerics" ][ "fields" ];
 		for (int i = 0; i < numerics_fields.size(); ++i) {
@@ -3007,43 +3020,90 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 )= field;
 		}
 
-		auto const &numerics_extensions = object_in_schema[ "legacy_idd" ][ "numerics" ][ "extensions" ];
-		for (int i = numerics_fields.size(); i < numerics_fields.size() + numerics_extensions.size(); ++i) {
-			std::string const field = numerics_extensions[i];
-			auto it = obj.value().find(field);
-			if ( it != obj.value().end() ) {
-				if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
-				else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
-				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = false;
-				NumNumbers++;
-			} else {
-				// TODO What to do if a numeric field is left blank?
-				auto const pattern_props = object_in_schema.find( "patternProperties" );
-				if (pattern_props != object_in_schema.end()) {
-					auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
-					if ( field_in_schema.find( field ) != field_in_schema.end() ) {
-						if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
-							auto const default_val = field_in_schema[ field ][ "default" ];
-							if (!default_val.is_string()) Numbers( i + 1 ) = default_val.get<double>();
-							else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
-						} else {
-							Numbers ( i + 1 ) = -99999;
+
+		if ( object_in_schema[ "legacy_idd" ][ "numerics" ].find("extensions") != object_in_schema[ "legacy_idd" ][ "numerics" ].end()) {
+			auto const &numerics_extensions = object_in_schema["legacy_idd"]["numerics"]["extensions"];
+			auto const extensions = obj.value()["extensions"];
+			int numerics_index = numerics_fields.size();
+			for (auto it = extensions.begin(); it != extensions.end(); ++it) {
+				auto const extension_obj = it.value();
+				for (auto i = 0; i < numerics_extensions.size(); i++) {
+					std::string const field = numerics_extensions[i];
+					if (extension_obj.find(field) != extension_obj.end()) {
+						auto const val = extension_obj[field];
+						if (!val.is_string()) Numbers(numerics_index + 1) = val.get<double>();
+						else Numbers(numerics_index + 1) = -99999;  // autosize and autocalculate
+						if (present(NumBlank))
+							NumBlank()(numerics_index + 1) = false;
+						NumNumbers++;
+					} else {
+						auto const pattern_props = object_in_schema.find( "patternProperties" );
+						if (pattern_props != object_in_schema.end()) {
+							auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
+							if ( field_in_schema.find( field ) != field_in_schema.end() ) {
+								if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
+									auto const default_val = field_in_schema[ field ][ "default" ];
+									if (!default_val.is_string()) Numbers( numerics_index + 1 ) = default_val.get<double>();
+									else Numbers( numerics_index + 1 ) = -99999;  // autosize and autocalculate
+								} else {
+									Numbers ( numerics_index + 1 ) = -99999;
+								}
+							} else {
+								std::cout << "field " << field << " not found in object " << Object << std::endl;
+							}
+						} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
+							if (object_in_schema["properties"][field].find("default") !=
+									object_in_schema["properties"][field].end()) {
+								Numbers(numerics_index + 1) = object_in_schema["properties"][field]["default"].get<double>();
+							} else {
+								Numbers(numerics_index + 1) = -99999;
+							}
 						}
-					} else {
-						std::cout << "field " << field << " not found in object " << Object << std::endl;
+						if ( present( NumBlank ) ) NumBlank()( numerics_index + 1 ) = true;
 					}
-				} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
-					if ( object_in_schema[ "properties" ][ field ].find("default") != object_in_schema["properties"][field].end()) {
-						Numbers( i + 1 ) = object_in_schema[ "properties" ][ field ][ "default" ].get< double >();
-					} else {
-						Numbers( i + 1 ) = -99999;
-					}
+					if ( present( NumericFieldNames ) ) NumericFieldNames()( numerics_index + 1 )= field;
+					numerics_index++;
 				}
-//			Numbers( i + 1 ) = -99999;
-				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = true;
 			}
-			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 )= field;
 		}
+
+//		auto const &numerics_extensions = object_in_schema[ "legacy_idd" ][ "numerics" ][ "extensions" ];
+//		for (int i = numerics_fields.size(); i < numerics_fields.size() + numerics_extensions.size(); ++i) {
+//			std::string const field = numerics_extensions[i];
+//			auto it = obj.value().find(field);
+//			if ( it != obj.value().end() ) {
+//				if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
+//				else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
+//				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = false;
+//				NumNumbers++;
+//			} else {
+//				// TODO What to do if a numeric field is left blank?
+//				auto const pattern_props = object_in_schema.find( "patternProperties" );
+//				if (pattern_props != object_in_schema.end()) {
+//					auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
+//					if ( field_in_schema.find( field ) != field_in_schema.end() ) {
+//						if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
+//							auto const default_val = field_in_schema[ field ][ "default" ];
+//							if (!default_val.is_string()) Numbers( i + 1 ) = default_val.get<double>();
+//							else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
+//						} else {
+//							Numbers ( i + 1 ) = -99999;
+//						}
+//					} else {
+//						std::cout << "field " << field << " not found in object " << Object << std::endl;
+//					}
+//				} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
+//					if ( object_in_schema[ "properties" ][ field ].find("default") != object_in_schema["properties"][field].end()) {
+//						Numbers( i + 1 ) = object_in_schema[ "properties" ][ field ][ "default" ].get< double >();
+//					} else {
+//						Numbers( i + 1 ) = -99999;
+//					}
+//				}
+////			Numbers( i + 1 ) = -99999;
+//				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = true;
+//			}
+//			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 )= field;
+//		}
 
 		Status = 1;
 	}
