@@ -2919,9 +2919,9 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 
 		auto obj = object_in_jdf.begin() + Number - 1;
 		auto const obj_val = obj.value();
-		auto const &alphas = object_in_schema["legacy_idd"]["alphas"];
-		for (int i = 0; i < alphas.size(); ++i) {
-			std::string const field = alphas[i];
+		auto const &alphas_fields = object_in_schema["legacy_idd"]["alphas"]["fields"];
+		for (int i = 0; i < alphas_fields.size(); ++i) {
+			std::string const field = alphas_fields[i];
 			if ( field == "name" ) {
 				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
 				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
@@ -2944,9 +2944,72 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 			// TODO else also set obj.key() as alphafieldnames?
 		}
 
-		auto const &numerics = object_in_schema[ "legacy_idd" ][ "numerics" ];
-		for (int i = 0; i < numerics.size(); ++i) {
-			std::string const field = numerics[i];
+		auto const &alphas_extensions = object_in_schema["legacy_idd"]["alphas"]["extensions"];
+		for (int i = alphas_fields.size(); i < alphas_fields.size() + alphas_extensions.size(); ++i) {
+			std::string const field = alphas_extensions[i];
+			if ( field == "name" ) {
+				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
+				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = obj.key().empty();
+//			if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = false;
+				if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
+				NumAlphas++;
+				continue;
+			}
+			auto it = obj.value().find(field);
+			if ( it != obj.value().end() ) {
+				auto const val = it.value().get< std::string >();
+				Alphas( i + 1 ) = MakeUPPERCase( val );
+				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = val.empty();
+				NumAlphas++;
+			} else {
+				Alphas( i + 1 ) = "";
+				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = true;
+			}
+			if ( present( AlphaFieldNames ) ) AlphaFieldNames()(i + 1) = field;
+			// TODO else also set obj.key() as alphafieldnames?
+		}
+
+		auto const &numerics_fields = object_in_schema[ "legacy_idd" ][ "numerics" ][ "fields" ];
+		for (int i = 0; i < numerics_fields.size(); ++i) {
+			std::string const field = numerics_fields[i];
+			auto it = obj.value().find(field);
+			if ( it != obj.value().end() ) {
+				if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
+				else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
+				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = false;
+				NumNumbers++;
+			} else {
+				// TODO What to do if a numeric field is left blank?
+				auto const pattern_props = object_in_schema.find( "patternProperties" );
+				if (pattern_props != object_in_schema.end()) {
+					auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
+					if ( field_in_schema.find( field ) != field_in_schema.end() ) {
+						if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
+							auto const default_val = field_in_schema[ field ][ "default" ];
+							if (!default_val.is_string()) Numbers( i + 1 ) = default_val.get<double>();
+							else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
+						} else {
+							Numbers ( i + 1 ) = -99999;
+						}
+					} else {
+						std::cout << "field " << field << " not found in object " << Object << std::endl;
+					}
+				} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
+					if ( object_in_schema[ "properties" ][ field ].find("default") != object_in_schema["properties"][field].end()) {
+						Numbers( i + 1 ) = object_in_schema[ "properties" ][ field ][ "default" ].get< double >();
+					} else {
+						Numbers( i + 1 ) = -99999;
+					}
+				}
+//			Numbers( i + 1 ) = -99999;
+				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = true;
+			}
+			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 )= field;
+		}
+
+		auto const &numerics_extensions = object_in_schema[ "legacy_idd" ][ "numerics" ][ "extensions" ];
+		for (int i = numerics_fields.size(); i < numerics_fields.size() + numerics_extensions.size(); ++i) {
+			std::string const field = numerics_extensions[i];
 			auto it = obj.value().find(field);
 			if ( it != obj.value().end() ) {
 				if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
@@ -2983,26 +3046,6 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		}
 
 		Status = 1;
-		if ( obj_val.find("extensions") == obj_val.end() ) return;
-
-		auto const extension_field_names = object_in_schema[ "legacy_idd" ][ "extensibles" ];
-		auto const extensions_in_jdf = obj_val[ "extensions" ];
-		auto const extensions_in_schema = object_in_schema[ "patternProperties" ][ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ];
-
-		// implemented only with BuildingSurface:Detailed in mind (numeric args that DO exist in the JDF)
-		int count = numerics.size();
-		for ( auto const extension : extensions_in_jdf ) {
-			for ( int i = 0; i < extension.size(); i++ ) {
-				std::string name = extension_field_names[i];
-				auto const extensible_field_in_jdf = extension[ name ];
-				if ( extensible_field_in_jdf.is_string() ) {
-
-				} else {
-					Numbers( count + 1 ) = extensible_field_in_jdf.get< double >();
-				}
-				count++;
-			}
-		}
 	}
 
 	int
@@ -4786,10 +4829,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		// These dimensions (not sure what one can use the total for) can be used to dynamically dimension the
 		// arrays in the GetInput routines.
 
+		NumArgs = 0;
+		NumAlpha = 0;
+		NumNumeric = 0;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			NumArgs = 0;
-			NumAlpha = 0;
-			NumNumeric = 0;
 			ShowSevereError( "GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 			return;
 		}
@@ -4797,14 +4840,34 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		const json & object = schema[ "properties" ][ ObjectWord ];
 		const json & legacy_idd = object[ "legacy_idd" ];
 
-		if ( legacy_idd.find( "alphas" ) != legacy_idd.end() )
-			NumAlpha = legacy_idd[ "alphas" ].size();
-		else
-			NumAlpha = 0;
-		if ( legacy_idd.find( "numerics") != legacy_idd.end() )
-			NumNumeric = legacy_idd[ "numerics" ].size();
-		else
-			NumNumeric = 0;
+		json const objects = jdf[ ObjectWord ];
+		size_t max_size = 0;
+		for ( auto const obj : objects ) {
+//			json const ob = obj.value();
+			if ( obj.find( "extensions" ) != obj.end() ) {
+				auto const size = obj[ "extensions" ].size();
+				if ( size > max_size ) max_size = size;
+			}
+		}
+
+		if ( legacy_idd.find( "alphas" ) != legacy_idd.end() ) {
+			json const alphas = legacy_idd[ "alphas" ];
+			if ( alphas.find( "fields" ) != alphas.end() ) {
+				NumAlpha += alphas[ "fields" ].size();
+			}
+			if ( alphas.find( "extensions" ) != alphas.end() ) {
+				NumAlpha += alphas[ "extensions" ].size() * max_size;
+			}
+		}
+		if ( legacy_idd.find( "numerics" ) != legacy_idd.end() ) {
+			json const numerics = legacy_idd[ "numerics" ];
+			if ( numerics.find( "fields" ) != numerics.end() ) {
+				NumNumeric += numerics[ "fields" ].size();
+			}
+			if ( numerics.find( "extensions" ) != numerics.end() ) {
+				NumNumeric += numerics[ "extensions" ].size() * max_size;
+			}
+		}
 		NumArgs = NumAlpha + NumNumeric;
 	}
 

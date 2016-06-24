@@ -448,23 +448,44 @@ EnergyPlusPgm( std::string const & filepath )
 
 		// ProcessInput();
 		InputProcessor IP;
-		// std::ifstream ifs( "idd/FULL_SCHEMA_modified.json" , std::ifstream::in);
-		// if ( !ifs.open() ) {
-			// std::cout << " file path \"idd\FULL_SCHEMA_modified.json\" not found" << std::endl;
-			// return;
+		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
+		if ( !jdd_stream.is_open() ) {
+			std::cout << " file path " << inputJddFileName << " not found" << std::endl;
+			return;
+		}
+		InputProcessor::schema = json::parse(jdd_stream);
+		// if ( idf ) {
+			std::ifstream idf_stream( inputIdfFileName , std::ifstream::in);
+			if ( !idf_stream.is_open() ) {
+				std::cout << " file path " << inputIdfFileName << " not found" << std::endl;
+				return;
+			}
+			std::string lines;
+			std::string line;
+			while (std::getline(idf_stream, line))
+			{
+				lines.append(line + "\n");
+			}
+			IP.idf_parser.initialize(InputProcessor::schema);
+			std::string const user_input = InputProcessor::idf_parser.decode(lines, IP.schema);
+
+			json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
+				InputProcessor::state.traverse(event, parsed, line_num, line_index);
+				return true;
+			};
+			InputProcessor::jdf = json::parse(user_input, cb);
+		// } else {
+		// 	std::ifstream jdf_stream( inputJdfFileName , std::ifstream::in);
+		// 	if ( !jdf_stream.is_open() ) {
+		// 		std::cout << " file path " << inputJdfFileName << " not found" << std::endl;
+		// 		return;
+		// 	}
+		// 	json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
+		// 		state.traverse(event, parsed, line_num, line_index);
+		// 		return true;
+		// 	};
+		// 	InputProcessor::jdf = json::parse(jdf_stream, cb);
 		// }
-
-		// IP.schema = json::parse(ifs);
-		// IP.idf_parser.initialize(schema);
-		// IP.state.initialize(IP.schema);
-
-		// json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
-                                            // unsigned line_num, unsigned line_index) -> bool {
-        // state.traverse(event, parsed, line_num, line_index);
-        // return true;
-      	// };
-
-      	// json::parse(dump of jdf, cb);
 
 		ManageSimulation();
 

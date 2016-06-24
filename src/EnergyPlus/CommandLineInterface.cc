@@ -155,6 +155,8 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
 
+	opt.add("Energy+.jdd", 0, 1, 0, "JSON input data dictionary path (default: Energy+.jdd in executable directory)", "-j", "--jdd");
+
 	opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
 
 	opt.add("", 0, 1, 0, "Prefix for output file names (default: eplus)", "-p", "--output-prefix");
@@ -191,8 +193,13 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-i")->getString(inputIddFileName);
 
+	opt.get("-j")->getString(inputJddFileName);
+
 	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
+
+	if (!opt.isSet("-j") && !legacyMode)
+		inputJddFileName = exeDirectory + inputJddFileName;
 
 	std::string dirPathName;
 
@@ -227,6 +234,7 @@ ProcessArgs(int argc, const char * argv[])
 	makeNativePath(inputIdfFileName);
 	makeNativePath(inputWeatherFileName);
 	makeNativePath(inputIddFileName);
+	makeNativePath(inputJddFileName);
 	makeNativePath(dirPathName);
 
 	std::vector<std::string> badOptions;
@@ -482,12 +490,20 @@ ProcessArgs(int argc, const char * argv[])
 		gio::close( LFN );
 
 		inputIddFileName = ProgramPath + "Energy+.idd";
+		inputJddFileName = ProgramPath + "Energy+.jdd";
 	}
 
 	// Check if specified files exist
 	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
 		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
+		DisplayString(errorFollowUp);
+		exit(EXIT_FAILURE);
+	}
+
+	{ IOFlags flags; gio::inquire( inputJddFileName, flags ); FileExists = flags.exists(); }
+	if ( ! FileExists ) {
+		DisplayString("ERROR: Could not find JSON input data dictionary: " + getAbsolutePath(inputJddFileName) + "." );
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
@@ -550,10 +566,15 @@ ProcessArgs(int argc, const char * argv[])
 		bool iddFileNamedEnergy =
 				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
+		bool jddFileNamedEnergy =
+				(getAbsolutePath(inputJddFileName) == getAbsolutePath("Energy+.jdd"));
+
 		if (!inputFileNamedIn)
 			linkFile(inputIdfFileName.c_str(), "in.idf");
 		if (!iddFileNamedEnergy)
 			linkFile(inputIddFileName,"Energy+.idd");
+		if (!jddFileNamedEnergy)
+			linkFile(inputJddFileName,"Energy+.jdd");
 		systemCall(expandObjectsCommand);
 		if (!inputFileNamedIn)
 			removeFile("in.idf");
