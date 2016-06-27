@@ -3282,7 +3282,8 @@ namespace PlantManager {
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
 			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+			// Autocalculated loop volume based on a loop time of 2 minutes
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * 120;
 			if (PlantFinalSizesOkayToReport) {
 				if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 					// condenser loop vs plant loop breakout needed.
@@ -3304,7 +3305,10 @@ namespace PlantManager {
 				}
 			}
 		}
-
+		//Warning if user inputted plant loop volume is too large compared to the max flow rate
+		if (PlantLoop( LoopNum ).Volume / PlantLoop( LoopNum ).MaxVolFlowRate > 3600) {
+			ShowWarningError("PlantLoop " + PlantLoop( LoopNum ).Name + ": Plant Loop Volume is high relative to the Maximum Loop Flow Rate. The loop time is " + RoundSigDigits(PlantLoop( LoopNum ).Volume / PlantLoop( LoopNum ).MaxVolFlowRate / 3600, 3) + "hr.");
+		}
 		//should now have plant volume, calculate plant volume's mass for fluid type
 		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
 			FluidDensity = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, InitConvTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );

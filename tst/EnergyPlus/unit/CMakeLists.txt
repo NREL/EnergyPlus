@@ -73,6 +73,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc

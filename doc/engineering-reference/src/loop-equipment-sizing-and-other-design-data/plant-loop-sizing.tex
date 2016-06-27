@@ -12,10 +12,10 @@ The loop maximum volumetric flow rate (m\(^{3}\)) is just set equal to the value
 
 \subsubsection{Volume of the plant loop}\label{volume-of-the-plant-loop}
 
-Since the loop capacitance has a stability requirement of \((\dot V\cdot \Delta tstep/V) \le 1\) the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
+The volume of the loop is set based on the Max Loop Flow Rate assuming a loop time of 2 minutes.
 
 \begin{equation}
-Vloop = (\dot Vloop,max\cdot \Delta tstep,zone\cdot 3600)/0.8
+Vloop = (\dot Vloop,max\cdot 120)
 \end{equation}
 
 \subsection{Condenser Loop Sizing}\label{condenser-loop-sizing}
@@ -26,8 +26,8 @@ The loop maximum volumetric flow rate (m\(^{3}\)) is just set equal to the value
 
 \subsubsection{Volume of the plant loop}\label{volume-of-the-plant-loop-1}
 
-Since the loop capacitance has a stability requirement of \((\dot V\cdot \Delta tstep/V) \le 1\) the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
+The volume of the loop is set based on the Max Loop Flow Rate assuming a loop time of 2 minutes.
 
 \begin{equation}
-Vloop = (\dot Vloop,max\cdot \Delta tstep,zone\cdot 3600)/0.8
+Vloop = (\dot Vloop,max\cdot 120)
 \end{equation}
