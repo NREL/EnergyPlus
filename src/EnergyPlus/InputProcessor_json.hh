@@ -1256,11 +1256,11 @@ public:
 //	void
 //	ParametricObjectsCheck();
 
-//	void
-//	PreScanReportingVariables();
+	void
+	PreScanReportingVariables();
 
-//	void
-//	AddVariablesForMonthlyReport( std::string const & reportName );
+	void
+	AddVariablesForMonthlyReport( std::string const & reportName );
 
 //	int
 //	FindFirstRecord( std::string const & UCObjType );
@@ -1271,14 +1271,14 @@ public:
 //		int const StartPointer
 //	);
 
-//	void
-//	AddRecordToOutputVariableStructure(
-//		std::string const & KeyValue,
-//		std::string const & VariableName
-//	);
+	void
+	AddRecordToOutputVariableStructure(
+		std::string const & KeyValue,
+		std::string const & VariableName
+	);
 
-//	void
-//	ReAllocateAndPreserveOutputVariablesForSimulation();
+	void
+	ReAllocateAndPreserveOutputVariablesForSimulation();
 
 //	void
 //	DumpCurrentLineBuffer(

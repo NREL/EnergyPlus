@@ -2745,16 +2745,38 @@ EnergyPlus::InputProcessor::GetListofSectionsinInput(
 		// Look up object in list of objects.  If there, return the
 		// number of objects found in the current input.  If not, return 0.
 
-		auto const jdf_object = jdf.find( ObjectWord );
-		if ( jdf_object != jdf.end() ) {
-			return static_cast<int>(jdf_object.value().size());
+//		json * jdf_object;
+		if ( jdf.find( ObjectWord ) == jdf.end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				return 0;
+			}
+			return static_cast<int>(jdf[ tmp_umit->second ].size());
+		} else {
+			return static_cast<int>(jdf[ ObjectWord ].size());
 		}
-		auto const jdd_properties = schema[ "properties" ];
-		auto const jdd_object = jdd_properties.find( ObjectWord );
-		if ( jdd_object == jdd_properties.end() ) {
-			ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+
+//		auto const & jdf_object = jdf.find( ObjectWord );
+//		if ( jdf_object != jdf->end() ) {
+//			return static_cast<int>(jdf_object->size());
+//		}
+
+//		json * object_in_schema;
+//		auto const & schema_properties = schema["properties"];
+		if ( schema["properties"].find( ObjectWord ) == schema["properties"].end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+			}
 		}
 		return 0;
+
+//		auto const & jdd_properties = schema[ "properties" ];
+//		auto const & jdd_object = jdd_properties.find( ObjectWord );
+//		if ( jdd_object == jdd_properties.end() ) {
+//			ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+//		}
+//		return 0;
 	}
 
 /*
@@ -2851,12 +2873,35 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		std::string cfld2;
 		bool GoodItem;
 
-		if (jdf.find(Object) == jdf.end() || schema["properties"].find(Object) == schema["properties"].end()) {
-			std::cout << "error: object " << Object << " not found in either the schema or jdf, uppercase?" << std::endl;
-			return;
+		json * object_in_jdf;
+		if ( jdf.find( Object ) == jdf.end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				return;
+			}
+			object_in_jdf = &jdf[ tmp_umit->second ];
+		} else {
+			object_in_jdf = &jdf[ Object ];
 		}
-		json object_in_jdf = jdf[Object];
-		json object_in_schema = schema["properties"][Object];
+
+		json * object_in_schema;
+//		auto const & schema_properties = schema["properties"];
+		if ( schema["properties"].find(Object) == schema["properties"].end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				return;
+			}
+			object_in_schema = &schema["properties"][ tmp_umit->second ];
+		} else {
+			object_in_schema = &schema["properties"][ Object ];
+		}
+
+//		if (jdf.find(Object) == jdf.end() || schema["properties"].find(Object) == schema["properties"].end()) {
+//			std::cout << "error: object " << Object << " not found in either the schema or jdf, uppercase?" << std::endl;
+//			return;
+//		}
+//		json object_in_jdf = jdf[Object];
+//		json object_in_schema = schema["properties"][Object];
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		NumAlphas = 0; //Autodesk:Uninit Force default initialization
@@ -2894,15 +2939,16 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 //		ShowFatalError( "IP: GetObjectItem: Requested object=" + UCObject + ", not found in Object Definitions -- incorrect IDD attached." );
 //	}
 
-		if (object_in_schema["alphas"].size() > MaxAlphas) {
-			ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of Object Alpha Args [" + std::to_string(MaxAlphas)
-											+ "] > Size of alphas array [" + std::to_string(object_in_schema["legacy_idd"]["alphas"].size()) + "]." );
-		}
-
-		if (object_in_schema["numerics"].size() > MaxNumbers) {
-			ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of Numeric Args [" + std::to_string(MaxNumbers)
-											+ "] > Size of numerics array [" + std::to_string(object_in_schema["legacy_idd"]["numerics"].size()) + "]." );
-		}
+		// TODO: Fix later
+//		if (object_in_schema->at("legacy_idd")["alphas"].size() < MaxAlphas) {
+//			ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of Object Alpha Args [" + std::to_string(MaxAlphas)
+//											+ "] > Size of alphas array [" + std::to_string(object_in_schema->at("legacy_idd")["alphas"].size()) + "]." );
+//		}
+//
+//		if (object_in_schema->at("legacy_idd")["numerics"].size() < MaxNumbers) {
+//			ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of Numeric Args [" + std::to_string(MaxNumbers)
+//											+ "] > Size of numerics array [" + std::to_string(object_in_schema->at("legacy_idd")["numerics"].size()) + "]." );
+//		}
 
 //	StartRecord = ObjectStartRecord( Found );
 //	if ( StartRecord == 0 ) {
@@ -2916,9 +2962,12 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 //	}
 //	++ObjectGotCount( Found );
 
-		auto obj = object_in_jdf.begin() + Number - 1;
+		Alphas = "";
+		Numbers = 0;
+
+		auto obj = object_in_jdf->begin() + Number - 1;
 		auto const obj_val = obj.value();
-		auto const &alphas_fields = object_in_schema["legacy_idd"]["alphas"]["fields"];
+		auto const &alphas_fields = object_in_schema->at("legacy_idd")["alphas"]["fields"];
 		for (int i = 0; i < alphas_fields.size(); ++i) {
 			std::string const field = alphas_fields[i];
 			if ( field == "name" ) {
@@ -2930,8 +2979,14 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 			}
 			auto it = obj.value().find(field);
 			if ( it != obj.value().end() ) {
-				auto const val = it.value().get< std::string >();
-				Alphas( i + 1 ) = MakeUPPERCase( val );
+				std::string val;
+				if (it.value().is_string()) {
+					val = it.value().get< std::string >();
+					Alphas( i + 1 ) = MakeUPPERCase(val);
+				} else {
+					val = std::to_string(it.value().get<double>());
+					Alphas( i + 1 ) = val;
+				}
 				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = val.empty();
 				NumAlphas++;
 			} else {
@@ -2942,8 +2997,8 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 			// TODO else also set obj.key() as alphafieldnames?
 		}
 
-		if ( object_in_schema[ "legacy_idd" ][ "alphas" ].find("extensions") != object_in_schema[ "legacy_idd" ][ "alphas" ].end()) {
-			auto const &alphas_extensions = object_in_schema["legacy_idd"]["alphas"]["extensions"];
+		if ( object_in_schema->at("legacy_idd")[ "alphas" ].find("extensions") != object_in_schema->at("legacy_idd")[ "alphas" ].end()) {
+			auto const &alphas_extensions = object_in_schema->at("legacy_idd")["alphas"]["extensions"];
 			auto const extensions = obj.value()["extensions"];
 			int alphas_index = alphas_fields.size();
 			for (auto it = extensions.begin(); it != extensions.end(); ++it) {
@@ -2956,16 +3011,16 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 							Alphas(alphas_index + 1) = MakeUPPERCase(val);
 						} else {
 							double val = extension_obj[field];
-							Alphas(alphas_index + 1) = val;
+							Alphas(alphas_index + 1) = std::to_string(val);
 						}
 //						if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
-						if (present(AlphaBlank)) AlphaBlank()(i + 1) = false;
+						if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = false;
 						NumAlphas++;
 					} else {
 						Alphas(alphas_index + 1) = "";
-						if (present(AlphaBlank)) AlphaBlank()(i + 1) = true;
+						if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = true;
 					}
-					if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
+					if (present(AlphaFieldNames)) AlphaFieldNames()(alphas_index + 1) = field;
 					alphas_index++;
 				}
 			}
@@ -2988,19 +3043,25 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 //			}
 //		}
 
-		auto const &numerics_fields = object_in_schema[ "legacy_idd" ][ "numerics" ][ "fields" ];
+		auto const &numerics_fields = object_in_schema->at("legacy_idd")[ "numerics" ][ "fields" ];
 		for (int i = 0; i < numerics_fields.size(); ++i) {
 			std::string const field = numerics_fields[i];
 			auto it = obj.value().find(field);
 			if ( it != obj.value().end() ) {
 				if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
-				else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
+				else {
+					if ( it.value().get<std::string>().empty() ) {
+						Numbers( i + 1 ) = 0;
+					} else {
+						Numbers( i + 1 ) = -99999; // autosize and autocalculate
+					}
+				}
 				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = false;
 				NumNumbers++;
 			} else {
 				// TODO What to do if a numeric field is left blank?
-				auto const pattern_props = object_in_schema.find( "patternProperties" );
-				if (pattern_props != object_in_schema.end()) {
+				auto const pattern_props = object_in_schema->find( "patternProperties" );
+				if (pattern_props != object_in_schema->end()) {
 					auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
 					if ( field_in_schema.find( field ) != field_in_schema.end() ) {
 						if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
@@ -3008,16 +3069,16 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 							if (!default_val.is_string()) Numbers( i + 1 ) = default_val.get<double>();
 							else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
 						} else {
-							Numbers ( i + 1 ) = -99999;
+							Numbers ( i + 1 ) = 0;
 						}
 					} else {
 						std::cout << "field " << field << " not found in object " << Object << std::endl;
 					}
-				} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
-					if ( object_in_schema[ "properties" ][ field ].find("default") != object_in_schema["properties"][field].end()) {
-						Numbers( i + 1 ) = object_in_schema[ "properties" ][ field ][ "default" ].get< double >();
+				} else if ( object_in_schema->find( "properties" ) != object_in_schema->end() ) {
+					if ( object_in_schema->at( "properties" )[ field ].find("default") != object_in_schema->at("properties")[field].end()) {
+						Numbers( i + 1 ) = object_in_schema->at( "properties" )[ field ][ "default" ].get< double >();
 					} else {
-						Numbers( i + 1 ) = -99999;
+						Numbers( i + 1 ) = 0;
 					}
 				}
 //			Numbers( i + 1 ) = -99999;
@@ -3027,8 +3088,8 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		}
 
 
-		if ( object_in_schema[ "legacy_idd" ][ "numerics" ].find("extensions") != object_in_schema[ "legacy_idd" ][ "numerics" ].end()) {
-			auto const &numerics_extensions = object_in_schema["legacy_idd"]["numerics"]["extensions"];
+		if ( object_in_schema->at("legacy_idd")[ "numerics" ].find("extensions") != object_in_schema->at("legacy_idd")[ "numerics" ].end()) {
+			auto const &numerics_extensions = object_in_schema->at("legacy_idd")["numerics"]["extensions"];
 			auto const extensions = obj.value()["extensions"];
 			int numerics_index = numerics_fields.size();
 			for (auto it = extensions.begin(); it != extensions.end(); ++it) {
@@ -3043,26 +3104,32 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 							NumBlank()(numerics_index + 1) = false;
 						NumNumbers++;
 					} else {
-						auto const pattern_props = object_in_schema.find( "patternProperties" );
-						if (pattern_props != object_in_schema.end()) {
+						auto const pattern_props = object_in_schema->find( "patternProperties" );
+						if (pattern_props != object_in_schema->end()) {
 							auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
 							if ( field_in_schema.find( field ) != field_in_schema.end() ) {
 								if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
 									auto const default_val = field_in_schema[ field ][ "default" ];
 									if (!default_val.is_string()) Numbers( numerics_index + 1 ) = default_val.get<double>();
-									else Numbers( numerics_index + 1 ) = -99999;  // autosize and autocalculate
+									else {
+										if ( it.value().get<std::string>().empty() ) {
+											Numbers( numerics_index + 1 ) = 0;
+										} else {
+											Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
+										}
+									}
 								} else {
-									Numbers ( numerics_index + 1 ) = -99999;
+									Numbers ( numerics_index + 1 ) = 0;
 								}
 							} else {
 								std::cout << "field " << field << " not found in object " << Object << std::endl;
 							}
-						} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
-							if (object_in_schema["properties"][field].find("default") !=
-									object_in_schema["properties"][field].end()) {
-								Numbers(numerics_index + 1) = object_in_schema["properties"][field]["default"].get<double>();
+						} else if ( object_in_schema->find( "properties" ) != object_in_schema->end() ) {
+							if (object_in_schema->at("properties")[field].find("default") !=
+									object_in_schema->at("properties")[field].end()) {
+								Numbers(numerics_index + 1) = object_in_schema->at("properties")[field]["default"].get<double>();
 							} else {
-								Numbers(numerics_index + 1) = -99999;
+								Numbers(numerics_index + 1) = 0;
 							}
 						}
 						if ( present( NumBlank ) ) NumBlank()( numerics_index + 1 ) = true;
@@ -3123,13 +3190,22 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		// PURPOSE OF THIS SUBROUTINE:
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
-		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end()) return -1;
+		json * obj;
 
-		int object_item_num = 0;
+		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end()) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjType ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				return -1;
+			}
+			obj = &jdf[ tmp_umit->second ];
+		} else {
+			obj = &jdf[ ObjType ];
+		}
+
+		int object_item_num = 1;
 		bool found = false;
-		const json & obj = jdf[ ObjType ];
-		for ( auto it = obj.begin(); it != obj.end(); ++it ) {
-			if ( it.key() == ObjName ) {
+		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
+			if ( MakeUPPERCase( it.key() ) == MakeUPPERCase( ObjName ) ) {
 				found = true;
 				break;
 			}
@@ -4898,17 +4974,40 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		NumArgs = 0;
 		NumAlpha = 0;
 		NumNumeric = 0;
+		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			ShowSevereError( "GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
-			return;
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				ShowSevereError( "GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+				return;
+			}
+			object = &schema[ "properties" ][ tmp_umit->second ];
+		} else {
+			object = &schema[ "properties" ][ ObjectWord ];
+		}
+//		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
+//			ShowSevereError( "GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+//			return;
+//		}
+
+//		const json & object = schema[ "properties" ][ ObjectWord ];
+		const json & legacy_idd = object->at( "legacy_idd" );
+
+		json * objects;
+		if ( jdf.find( ObjectWord ) == jdf.end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+				ShowSevereError( "GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+				return;
+			}
+			objects = &jdf[ tmp_umit->second ];
+		} else {
+			objects = &jdf[ ObjectWord ];
 		}
 
-		const json & object = schema[ "properties" ][ ObjectWord ];
-		const json & legacy_idd = object[ "legacy_idd" ];
-
-		json const objects = jdf[ ObjectWord ];
+//		json const objects = jdf[ ObjectWord ];
 		size_t max_size = 0;
-		for ( auto const obj : objects ) {
+		for ( auto const obj : *objects ) {
 //			json const ob = obj.value();
 			if ( obj.find( "extensions" ) != obj.end() ) {
 				auto const size = obj[ "extensions" ].size();
@@ -5531,178 +5630,181 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 	// 	}
 	// }
 
-// 	void
-// 	EnergyPlus::InputProcessor::PreScanReportingVariables()
-// 	{
-// 	// SUBROUTINE INFORMATION:
-// 	//       AUTHOR         Linda Lawrie
-// 	//       DATE WRITTEN   July 2010
+	void
+	InputProcessor::PreScanReportingVariables()
+	{
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   July 2010
 
-// 	// PURPOSE OF THIS SUBROUTINE:
-// 	// This routine scans the input records and determines which output variables
-// 	// are actually being requested for the run so that the OutputProcessor will only
-// 	// consider those variables for output.  (At this time, all metered variables are
-// 	// allowed to pass through).
+	// PURPOSE OF THIS SUBROUTINE:
+	// This routine scans the input records and determines which output variables
+	// are actually being requested for the run so that the OutputProcessor will only
+	// consider those variables for output.  (At this time, all metered variables are
+	// allowed to pass through).
 
-// 	// METHODOLOGY EMPLOYED:
-// 	// Uses internal records and structures.
-// 	// Looks at:
-// 	// Output:Variable
-// 	// Meter:Custom
-// 	// Meter:CustomDecrement
-// 	// Meter:CustomDifference
-// 	// Output:Table:Monthly
-// 	// Output:Table:TimeBins
-// 	// Output:Table:SummaryReports
-// 	// EnergyManagementSystem:Sensor
-// 	// EnergyManagementSystem:OutputVariable
+	// METHODOLOGY EMPLOYED:
+	// Uses internal records and structures.
+	// Looks at:
+	// Output:Variable
+	// Meter:Custom
+	// Meter:CustomDecrement
+	// Meter:CustomDifference
+	// Output:Table:Monthly
+	// Output:Table:TimeBins
+	// Output:Table:SummaryReports
+	// EnergyManagementSystem:Sensor
+	// EnergyManagementSystem:OutputVariable
 
-// 	// Using/Aliasing
-// 		using namespace DataOutputs;
+	// Using/Aliasing
+		using namespace DataOutputs;
 
-// 	// SUBROUTINE PARAMETER DEFINITIONS:
-// 		static std::string const OutputVariable( "OUTPUT:VARIABLE" );
-// 		static std::string const MeterCustom( "METER:CUSTOM" );
-// 		static std::string const MeterCustomDecrement( "METER:CUSTOMDECREMENT" );
-// 		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
-// 		static std::string const OutputTableMonthly( "OUTPUT:TABLE:MONTHLY" );
-// 		static std::string const OutputTableAnnual( "OUTPUT:TABLE:ANNUAL" );
-// 		static std::string const OutputTableTimeBins( "OUTPUT:TABLE:TIMEBINS" );
-// 		static std::string const OutputTableSummaries( "OUTPUT:TABLE:SUMMARYREPORTS" );
-// 		static std::string const EMSSensor( "ENERGYMANAGEMENTSYSTEM:SENSOR" );
-// 		static std::string const EMSOutputVariable( "ENERGYMANAGEMENTSYSTEM:OUTPUTVARIABLE" );
+	// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const OutputVariable( "Output:Variable" );
+		static std::string const MeterCustom( "Meter:Custom" );
+		static std::string const MeterCustomDecrement( "Meter:CustomDecrement" );
+//		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
+		static std::string const OutputTableMonthly( "Output:Table:Monthly" );
+		static std::string const OutputTableAnnual( "Output:Table:Annual" );
+		static std::string const OutputTableTimeBins( "Output:Table:TimeBins" );
+		static std::string const OutputTableSummaries( "Output:Table:SummaryReports" );
+		static std::string const EMSSensor( "EnergyManagementSystem:Sensor" );
+		static std::string const EMSOutputVariable( "EnergyManagementSystem:OutputVariable" );
 
-// 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-// 		int CurrentRecord;
-// 		int Loop;
-// 		int Loop1;
+	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CurrentRecord;
+		int Loop;
+		int Loop1;
 
-// 		OutputVariablesForSimulation.allocate( 10000 );
-// 		MaxConsideredOutputVariables = 10000;
+		OutputVariablesForSimulation.allocate( 10000 );
+		MaxConsideredOutputVariables = 10000;
 
-// 	// Output Variable
-// 		CurrentRecord = FindFirstRecord( OutputVariable );
-// 		while ( CurrentRecord != 0 ) {
-// 		if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue; // signals error condition for later on
-// 		if ( ! IDFRecords( CurrentRecord ).AlphBlank( 1 ) ) {
-// 			AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 1 ), IDFRecords( CurrentRecord ).Alphas( 2 ) );
-// 		} else {
-// 			AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 2 ) );
-// 		}
-// 		CurrentRecord = FindNextRecord( OutputVariable, CurrentRecord );
-// 	}
+		// Output Variable
+		auto jdf_objects = jdf.find( OutputVariable );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				if ( ! obj.key().empty() ) {
+					AddRecordToOutputVariableStructure( obj.key(), fields.at( "variable_name" ) );
+				} else {
+					AddRecordToOutputVariableStructure( "*", fields.at( "variable_name" ) );
+				}
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( MeterCustom );
-// 	while ( CurrentRecord != 0 ) {
-// 		for ( Loop = 3; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-// 			if ( Loop > IDFRecords( CurrentRecord ).NumAlphas || Loop + 1 > IDFRecords( CurrentRecord ).NumAlphas ) continue; // error condition
-// 			if ( ! IDFRecords( CurrentRecord ).AlphBlank( Loop ) ) {
-// 				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( Loop ), IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-// 			} else {
-// 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-// 			}
-// 		}
-// 		CurrentRecord = FindNextRecord( MeterCustom, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( MeterCustom );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
 
-// 	CurrentRecord = FindFirstRecord( MeterCustomDecrement );
-// 	while ( CurrentRecord != 0 ) {
-// 		for ( Loop = 4; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-// 			if ( Loop > IDFRecords( CurrentRecord ).NumAlphas || Loop + 1 > IDFRecords( CurrentRecord ).NumAlphas ) continue; // error condition
-// 			if ( ! IDFRecords( CurrentRecord ).AlphBlank( Loop ) ) {
-// 				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( Loop ), IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-// 			} else {
-// 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-// 			}
-// 		}
-// 		CurrentRecord = FindNextRecord( MeterCustomDecrement, CurrentRecord );
-// 	}
+				//TODO: Might be incorrect
+				for ( auto const & extensions : fields[ "extensions" ] ) {
+					if ( ! obj.key().empty() ) {
+						AddRecordToOutputVariableStructure( extensions.at( "key_name" ), extensions.at( "output_variable_or_meter_name" ) );
+					} else {
+						AddRecordToOutputVariableStructure( "*", extensions.at( "output_variable_or_meter_name" ) );
+					}
+				}
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( MeterCustomDifference );
-// 	while ( CurrentRecord != 0 ) {
-// 		for ( Loop = 4; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-// 			if ( Loop > IDFRecords( CurrentRecord ).NumAlphas || Loop + 1 > IDFRecords( CurrentRecord ).NumAlphas ) continue; // error condition
-// 			if ( ! IDFRecords( CurrentRecord ).AlphBlank( Loop ) ) {
-// 				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( Loop ), IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-// 			} else {
-// 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-// 			}
-// 		}
-// 		CurrentRecord = FindNextRecord( MeterCustomDifference, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( MeterCustomDecrement );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
 
-// 	CurrentRecord = FindFirstRecord( EMSSensor );
-// 	while ( CurrentRecord != 0 ) {
-// 		if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-// 		if ( ! IDFRecords( CurrentRecord ).Alphas( 2 ).empty() ) {
-// 			AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 2 ), IDFRecords( CurrentRecord ).Alphas( 3 ) );
-// 		} else {
-// 			AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 3 ) );
-// 		}
-// 		CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-// 	}
+				//TODO: Might be incorrect
+				for ( auto const & extensions : fields[ "extensions" ] ) {
+					if ( ! obj.key().empty() ) {
+						AddRecordToOutputVariableStructure( extensions.at( "key_name" ), extensions.at( "output_variable_or_meter_name" ) );
+					} else {
+						AddRecordToOutputVariableStructure( "*", extensions.at( "output_variable_or_meter_name" ) );
+					}
+				}
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( EMSOutputVariable );
-// 	while ( CurrentRecord != 0 ) {
-// 		if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSOutputVariable, CurrentRecord );
-// 		AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 1 ) );
-// 		CurrentRecord = FindNextRecord( EMSOutputVariable, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( EMSSensor );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				if ( ! fields.at( "output_variable_or_output_meter_index_key_name" ).empty() ) {
+					AddRecordToOutputVariableStructure( fields.at( "output_variable_or_output_meter_index_key_name" ),
+																							fields.at( "output_variable_or_output_meter_name" ) );
+				} else {
+					AddRecordToOutputVariableStructure( "*", fields.at( "output_variable_or_output_meter_name" ) );
+				}
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( OutputTableTimeBins );
-// 	while ( CurrentRecord != 0 ) {
-// 		if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( OutputTableTimeBins, CurrentRecord );
-// 		if ( ! IDFRecords( CurrentRecord ).AlphBlank( 1 ) ) {
-// 			AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 1 ), IDFRecords( CurrentRecord ).Alphas( 2 ) );
-// 		} else {
-// 			AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 2 ) );
-// 		}
-// 		CurrentRecord = FindNextRecord( OutputTableTimeBins, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( EMSOutputVariable );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				// TODO: Might be wrong...
+				AddRecordToOutputVariableStructure( "*", obj.key() );
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( OutputTableMonthly );
-// 	while ( CurrentRecord != 0 ) {
-// 		for ( Loop = 2; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-// 			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
-// 			AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
-// 		}
-// 		CurrentRecord = FindNextRecord( OutputTableMonthly, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( OutputTableTimeBins );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				if ( ! obj.key().empty() ) {
+					AddRecordToOutputVariableStructure( obj.key(), fields.at( "key_value" ) );
+				} else {
+					AddRecordToOutputVariableStructure( "*", fields.at( "key_value" ) );
+				}
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( OutputTableAnnual );
-// 	while ( CurrentRecord != 0 ) {
-// 		for ( Loop = 5; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-// 			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
-// 			AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
-// 		}
-// 		CurrentRecord = FindNextRecord( OutputTableAnnual, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( OutputTableMonthly );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				AddRecordToOutputVariableStructure( "*", fields.at( "variable_or_meter_name" ) );
+			}
+		}
 
-// 	CurrentRecord = FindFirstRecord( OutputTableSummaries ); // summary tables, not all add to variable structure
-// 	while ( CurrentRecord != 0 ) {
-// 		for ( Loop = 1; Loop <= IDFRecords( CurrentRecord ).NumAlphas; ++Loop ) {
-// 			if ( IDFRecords( CurrentRecord ).Alphas( Loop ) == "ALLMONTHLY" || IDFRecords( CurrentRecord ).Alphas( Loop ) == "ALLSUMMARYANDMONTHLY" ) {
-// 				for ( Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1 ) {
-// 					AddVariablesForMonthlyReport( MonthlyNamedReports( Loop1 ) );
-// 				}
-// 			} else {
-// 				AddVariablesForMonthlyReport( IDFRecords( CurrentRecord ).Alphas( Loop ) );
-// 			}
+		jdf_objects = jdf.find( OutputTableAnnual );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				AddRecordToOutputVariableStructure( "*", fields.at( "variable_or_meter_or_ems_variable_or_field_name" ) );
+			}
+		}
 
-// 		}
-// 		CurrentRecord = FindNextRecord( OutputTableSummaries, CurrentRecord );
-// 	}
+		jdf_objects = jdf.find( OutputTableSummaries );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				auto const report_name = MakeUPPERCase( fields.at( "report_name" ) );
+				if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
+					for ( Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1 ) {
+						AddVariablesForMonthlyReport( MonthlyNamedReports( Loop1 ) );
+					}
+				} else {
+					AddVariablesForMonthlyReport( report_name );
+				}
+			}
+		}
 
-// 	if ( NumConsideredOutputVariables > 0 ) {
-// 		OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
-// 		MaxConsideredOutputVariables = NumConsideredOutputVariables;
-// 	}
-// }
-
-/*
+	if ( NumConsideredOutputVariables > 0 ) {
+		OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
+		MaxConsideredOutputVariables = NumConsideredOutputVariables;
+	}
+}
 
 void
-AddVariablesForMonthlyReport( std::string const & reportName )
+InputProcessor::AddVariablesForMonthlyReport( std::string const & reportName )
 {
 
 	// SUBROUTINE INFORMATION:
@@ -6075,8 +6177,6 @@ AddVariablesForMonthlyReport( std::string const & reportName )
 
 }
 
-*/
-
 // int
 // FindFirstRecord( std::string const & UCObjType )
 // {
@@ -6134,105 +6234,105 @@ AddVariablesForMonthlyReport( std::string const & reportName )
 // 	return NextPointer;
 // }
 
-// void
-// AddRecordToOutputVariableStructure(
-// 	std::string const & KeyValue,
-// 	std::string const & VariableName
-// 	)
-// {
-// 	// SUBROUTINE INFORMATION:
-// 	//       AUTHOR         Linda Lawrie
-// 	//       DATE WRITTEN   July 2010
+void
+InputProcessor::AddRecordToOutputVariableStructure(
+	std::string const & KeyValue,
+	std::string const & VariableName
+	)
+{
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   July 2010
 
-// 	// PURPOSE OF THIS SUBROUTINE:
-// 	// This routine adds a new record (if necessary) to the Output Variable
-// 	// reporting structure.  DataOutputs, OutputVariablesForSimulation
+	// PURPOSE OF THIS SUBROUTINE:
+	// This routine adds a new record (if necessary) to the Output Variable
+	// reporting structure.  DataOutputs, OutputVariablesForSimulation
 
-// 	// METHODOLOGY EMPLOYED:
-// 	// OutputVariablesForSimulation is a linked list structure for later
-// 	// semi-easy perusal.
+	// METHODOLOGY EMPLOYED:
+	// OutputVariablesForSimulation is a linked list structure for later
+	// semi-easy perusal.
 
-// 	// Using/Aliasing
-// 	using namespace DataOutputs;
+	// Using/Aliasing
+	using namespace DataOutputs;
 
-// 	int CurNum;
-// 	int NextNum;
-// 	bool FoundOne;
-// 	std::string::size_type vnameLen; // if < length, there were units on the line/name
+	int CurNum;
+	int NextNum;
+	bool FoundOne;
+	std::string::size_type vnameLen; // if < length, there were units on the line/name
 
-// 	std::string::size_type const rbpos = index( VariableName, '[' );
-// 	if ( rbpos == std::string::npos ) {
-// 		vnameLen = len_trim( VariableName );
-// 	} else {
-// 		vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
-// 	}
+	std::string::size_type const rbpos = index( VariableName, '[' );
+	if ( rbpos == std::string::npos ) {
+		vnameLen = len_trim( VariableName );
+	} else {
+		vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
+	}
 
-// 	FoundOne = false;
-// 	std::string const VarName( VariableName.substr( 0, vnameLen ) );
-// 	for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
-// 		if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
-// 			FoundOne = true;
-// 			break;
-// 		}
-// 	}
+	FoundOne = false;
+	std::string const VarName( VariableName.substr( 0, vnameLen ) );
+	for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
+		if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
+			FoundOne = true;
+			break;
+		}
+	}
 
-// 	if ( ! FoundOne ) {
-// 		if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-// 			ReAllocateAndPreserveOutputVariablesForSimulation();
-// 		}
-// 		++NumConsideredOutputVariables;
-// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
-// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
-// 	} else {
-// 		if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
-// 			NextNum = CurNum;
-// 			if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-// 				while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-// 					CurNum = NextNum;
-// 					NextNum = OutputVariablesForSimulation( NextNum ).Next;
-// 				}
-// 				if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-// 					ReAllocateAndPreserveOutputVariablesForSimulation();
-// 				}
-// 				++NumConsideredOutputVariables;
-// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
-// 				OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
-// 			} else {
-// 				if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-// 					ReAllocateAndPreserveOutputVariablesForSimulation();
-// 				}
-// 				++NumConsideredOutputVariables;
-// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
-// 				OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
-// 			}
-// 		}
-// 	}
-// }
+	if ( ! FoundOne ) {
+		if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
+			ReAllocateAndPreserveOutputVariablesForSimulation();
+		}
+		++NumConsideredOutputVariables;
+		OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
+		OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
+		OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
+		OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
+	} else {
+		if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
+			NextNum = CurNum;
+			if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
+				while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
+					CurNum = NextNum;
+					NextNum = OutputVariablesForSimulation( NextNum ).Next;
+				}
+				if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
+					ReAllocateAndPreserveOutputVariablesForSimulation();
+				}
+				++NumConsideredOutputVariables;
+				OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
+				OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
+				OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
+				OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
+			} else {
+				if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
+					ReAllocateAndPreserveOutputVariablesForSimulation();
+				}
+				++NumConsideredOutputVariables;
+				OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
+				OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
+				OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
+				OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
+			}
+		}
+	}
+}
 
-//void
-//ReAllocateAndPreserveOutputVariablesForSimulation()
-//{
-//	// SUBROUTINE INFORMATION:
-//	//       AUTHOR         Linda Lawrie
-//	//       DATE WRITTEN   April 2011
-//
-//	// PURPOSE OF THIS SUBROUTINE:
-//	// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
-//	// the data that is already in the structure.
-//
-//	using namespace DataOutputs;
-//
-//	int const OutputVarAllocInc( ObjectsIDFAllocInc );
-//
-//	// up allocation by OutputVarAllocInc
-//	OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
-//}
+void
+InputProcessor::ReAllocateAndPreserveOutputVariablesForSimulation()
+{
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   April 2011
+
+	// PURPOSE OF THIS SUBROUTINE:
+	// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
+	// the data that is already in the structure.
+
+	using namespace DataOutputs;
+
+	int const OutputVarAllocInc( 500 );
+
+	// up allocation by OutputVarAllocInc
+	OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
+}
 
 // void
 // DumpCurrentLineBuffer(

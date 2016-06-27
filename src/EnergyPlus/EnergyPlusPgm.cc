@@ -222,6 +222,7 @@
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
+#include <DataIPShortCuts.hh>
 
 #ifdef _WIN32
  #include <stdlib.h>
@@ -444,7 +445,7 @@ EnergyPlusPgm( std::string const & filepath )
 	DisplayString( "EnergyPlus Starting" );
 	DisplayString( VerString );
 
-	try {
+//	try {
 
 		// ProcessInput();
 		InputProcessor IP;
@@ -455,25 +456,44 @@ EnergyPlusPgm( std::string const & filepath )
 		}
 		InputProcessor::schema = json::parse(jdd_stream);
 		// if ( idf ) {
-			std::ifstream idf_stream( inputIdfFileName , std::ifstream::in);
+			std::ifstream idf_stream( inputIdfFileName , std::ifstream::in | std::ios::ate);
 			if ( !idf_stream.is_open() ) {
 				std::cout << " file path " << inputIdfFileName << " not found" << std::endl;
 				return;
 			}
-			std::string lines;
-			std::string line;
-			while (std::getline(idf_stream, line))
-			{
-				lines.append(line + "\n");
+//			std::string lines;
+//			std::string line;
+//			while (std::getline(idf_stream, line))
+//			{
+//				lines.append(line + "\n");
+//			}
+			std::ifstream::pos_type size = idf_stream.tellg();
+			char *memblock = new char[(size_t) size + 1];
+			idf_stream.seekg(0, std::ios::beg);
+			idf_stream.read(memblock, size);
+			memblock[size] = '\0';
+			idf_stream.close();
+			std::string input_file = memblock;
+			delete[] memblock;
+			InputProcessor::idf_parser.initialize(InputProcessor::schema);
+			json const user_input = InputProcessor::idf_parser.decode(input_file, InputProcessor::schema);
+			auto const user_input_dump = user_input.dump(4);
+
+			std::ofstream ofs("output.json", std::ofstream::out);
+			if (!ofs.is_open()) {
+				perror("ofs");
 			}
-			IP.idf_parser.initialize(InputProcessor::schema);
-			std::string const user_input = InputProcessor::idf_parser.decode(lines, IP.schema);
+			ofs << user_input_dump << std::endl;
+
+			InputProcessor::state.initialize(InputProcessor::schema);
 
 			json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
 				InputProcessor::state.traverse(event, parsed, line_num, line_index);
 				return true;
 			};
-			InputProcessor::jdf = json::parse(user_input, cb);
+			InputProcessor::jdf = json::parse(user_input_dump, cb);
+			InputProcessor::state.print_errors();
+//		InputProcessor::jdf = user_input;
 		// } else {
 		// 	std::ifstream jdf_stream( inputJdfFileName , std::ifstream::in);
 		// 	if ( !jdf_stream.is_open() ) {
@@ -486,6 +506,13 @@ EnergyPlusPgm( std::string const & filepath )
 		// 	};
 		// 	InputProcessor::jdf = json::parse(jdf_stream, cb);
 		// }
+
+	DataIPShortCuts::cAlphaFieldNames.allocate( 10000 );
+	DataIPShortCuts::cAlphaArgs.allocate( 10000 );
+	DataIPShortCuts::lAlphaFieldBlanks.dimension( 10000, false );
+	DataIPShortCuts::cNumericFieldNames.allocate( 10000 );
+	DataIPShortCuts::rNumericArgs.dimension( 10000, 0.0 );
+	DataIPShortCuts::lNumericFieldBlanks.dimension( 10000, false );
 
 		ManageSimulation();
 
@@ -561,10 +588,10 @@ EnergyPlusPgm( std::string const & filepath )
 			moveFile("readvars.audit", outputRvauditFileName);
 		}
 
-	}
-	catch( const std::exception& e ) {
-		AbortEnergyPlus();
-	}
+//	}
+//	catch( const std::exception& e ) {
+//		AbortEnergyPlus();
+//	}
 
 	EndEnergyPlus();
 }
