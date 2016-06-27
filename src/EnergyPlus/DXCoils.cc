@@ -2209,11 +2209,7 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 10 ) ); // convert curve name to number
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Alphas( 11 ), "ReverseCycle" ) && InputProcessor::SameString( Alphas( 12 ), "OnDemand" ) ) {
-=======
-			if ( SameString( Alphas( 11 ), "ReverseCycle" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Alphas( 11 ), "ReverseCycle" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 10 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );

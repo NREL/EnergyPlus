@@ -590,12 +590,8 @@ namespace HVACStandAloneERV {
 				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 			} else {
 				// Verify controller name in Stand Alone ERV object matches name of valid controller object
-<<<<<<< HEAD
 				InputProcessor::VerifyName( Alphas( 6 ), StandAloneERV, &StandAloneERVData::ControllerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "ZoneHVAC:EnergyRecoveryVentilator:Controller Name" );
-=======
-				VerifyName( Alphas( 6 ), StandAloneERV, &StandAloneERVData::ControllerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "ZoneHVAC:EnergyRecoveryVentilator:Controller Name" );
 				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = true;
->>>>>>> NREL/develop
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 6 ) = "xxxxx";
@@ -750,19 +746,12 @@ namespace HVACStandAloneERV {
 			}
 
 			++OutAirNum;
-<<<<<<< HEAD
-			SetOAControllerData( OutAirNum, ErrorsFound, Alphas( 1 ) );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, CurrentModuleObject );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, ControllerStandAloneERV );
-			WhichERV = InputProcessor::FindItemInList( Alphas( 1 ), StandAloneERV, &StandAloneERVData::ControllerName );
-=======
 			auto & thisOAController( OAController( OutAirNum ) );
 
 			thisOAController.Name = Alphas( 1 );
 			thisOAController.ControllerType = CurrentModuleObject;
 			thisOAController.ControllerType_Num = ControllerStandAloneERV;
-			WhichERV = FindItemInList( Alphas( 1 ), StandAloneERV, &StandAloneERVData::ControllerName );
->>>>>>> NREL/develop
+			WhichERV = InputProcessor::FindItemInList( Alphas( 1 ), StandAloneERV, &StandAloneERVData::ControllerName );
 			if ( WhichERV != 0 ) {
 				AirFlowRate = StandAloneERV( WhichERV ).SupplyAirVolFlow;
 				StandAloneERV( WhichERV ).ControllerIndex = OutAirNum;
@@ -896,13 +885,8 @@ namespace HVACStandAloneERV {
 			//   High humidity control option is YES, read in additional data
 			if ( InputProcessor::SameString( Alphas( 6 ), "Yes" ) ) {
 
-<<<<<<< HEAD
 				HStatZoneNum = InputProcessor::FindItemInList( Alphas( 7 ), Zone );
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HStatZoneNum );
-=======
-				HStatZoneNum = FindItemInList( Alphas( 7 ), Zone );
 				thisOAController.HumidistatZoneNum = HStatZoneNum;
->>>>>>> NREL/develop
 
 				// Get the node number for the zone with the humidistat
 				if ( HStatZoneNum > 0 ) {
@@ -959,13 +943,8 @@ namespace HVACStandAloneERV {
 
 				}
 
-<<<<<<< HEAD
 				if ( InputProcessor::SameString( Alphas( 8 ), "Yes" ) ) {
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, false );
-=======
-				if ( SameString( Alphas( 8 ), "Yes" ) ) {
 					thisOAController.ModifyDuringHighOAMoisture = false;
->>>>>>> NREL/develop
 				} else {
 					thisOAController.ModifyDuringHighOAMoisture = true;
 				}

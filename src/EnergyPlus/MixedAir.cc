@@ -2013,7 +2013,7 @@ namespace MixedAir {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
 
-		
+
 		if ( AllocateOAControllersFlag ) {
 			NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
 			NumERVControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
@@ -2702,11 +2702,7 @@ namespace MixedAir {
 				thisOASys = 0;
 				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 					// find which OAsys has this controller
-<<<<<<< HEAD
-					found = InputProcessor::FindItemInList( OAController( OAControllerNum ).Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
-=======
-					found = FindItemInList( thisOAController.Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
->>>>>>> NREL/develop
+					found = InputProcessor::FindItemInList( thisOAController.Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
 					if ( found != 0 ) {
 						thisOASys = OASysNum;
 						break; // we found it
@@ -3056,11 +3052,7 @@ namespace MixedAir {
 					thisOASys = 0;
 					for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 						for ( OAControllerLoop2 = 1; OAControllerLoop2 <= OutsideAirSys( OASysNum ).NumControllers; ++OAControllerLoop2 ) {
-<<<<<<< HEAD
-							if ( InputProcessor::SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerLoop2 ), OAController( OAControllerLoop ).Name ) ) {
-=======
-							if ( SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerLoop2 ), loopOAController.Name ) ) {
->>>>>>> NREL/develop
+							if ( InputProcessor::SameString( OutsideAirSys( OASysNum ).ControllerName( OAControllerLoop2 ), loopOAController.Name ) ) {
 								thisOASys = OASysNum;
 								OASysFound = true;
 								break;
@@ -3410,18 +3402,6 @@ namespace MixedAir {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using CurveManager::CurveValue;
-<<<<<<< HEAD
-
-
-		using DataHeatBalance::ZoneIntGain;
-		using DataHeatBalance::Zone;
-		using DataHeatBalance::People;
-		using DataHeatBalance::TotPeople;
-		using DataZoneEquipment::ZoneEquipConfig;
-=======
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetNumObjectsFound;
->>>>>>> NREL/develop
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoingSizing;
@@ -4207,7 +4187,7 @@ namespace MixedAir {
 					} else {
 						AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
 						this->HRHeatingCoilActive = 0;
-					} 
+					}
 					AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = false;
 				}
 			}
@@ -5958,216 +5938,6 @@ namespace MixedAir {
 	}
 
 	void
-<<<<<<< HEAD
-	SetOAControllerData(
-		int const OACtrlNum, // Number of OA Controller
-		bool & ErrorsFound, // Set to true if certain errors found
-		Optional_string Name, // Name of Controller
-		Optional_string ControllerType, // Controller Type
-		Optional_int ControllerType_Num, // Parameter equivalent of Controller Type
-		Optional_string LockoutType, // Lock out type
-		Optional_bool FixedMin, // Fixed Minimum or Proportional Minimum
-		Optional< Real64 > TempLim, // Temperature Limit
-		Optional< Real64 > TempLowLim, // Temperature Lower Limit
-		Optional< Real64 > EnthLim, // Enthalpy Limit
-		Optional< Real64 > DPTempLim, // Dew Point Temperature Limit
-		Optional_int EnthalpyCurvePtr, // Electronic Enthalpy Limit Curve Index
-		Optional< Real64 > MaxOA, // Maximum outside air flow (m3/sec)
-		Optional< Real64 > MinOA, // Minimum outside air flow (m3/sec)
-		Optional_string EconoType, // EconoType = No Economizer,Differential Enthalpy, Differential Dry bulb,
-		Optional_int MixNode, // Controlled node (mixed air node)
-		Optional_int OANode, // Actuated node (outside air node)
-		Optional_int InletNode, // Inlet Air Node for into Mixer  (BTG Nov 2004)
-		Optional_int RelNode, // Relief Air Node Number
-		Optional_int RetNode, // Return Air Node Number
-		Optional_int HumidistatZoneNum, // Zone number where humidistat is located
-		Optional< Real64 > HighRHOAFlowRatio, // Ratio of outside air flow to maximum outside air flow rate for high RH
-		Optional_bool ModifyDuringHighOAMoisture, // TRUE if modify air flow is allowed during high OA humrat conditions
-		Optional_int NodeNumofHumidistatZone, // actual node number of controlled zone
-		Optional_int EconomizerOASchedPtr, // Time of day schedule for increasing outdoor air
-		Optional_string BypassType // ActivateBypassAtMinOAFlow, SetOAFlowRate
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   October 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine was designed for the ERV Controller which really needs some data from
-		// the ERV stand alone unit but caused a circular reference when it was here in the
-		// Mixed Air module setting OAController Data.  Also, this is an illustration of setting
-		// Data from an outside source.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// Differential Dry Bulb and Enthalpy and Any other Economizer Strategy present.
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( AllocateOAControllersFlag ) {
-			// Make sure OAControllers are allocated
-			AllocateOAControllers();
-		}
-
-		if ( OACtrlNum <= 0 || OACtrlNum > NumOAControllers ) {
-			ShowSevereError( "SetOAControllerData: called with OA Controller Number out of range=" + TrimSigDigits( OACtrlNum ) + " should be >0 and <" + TrimSigDigits( NumOAControllers ) );
-			ErrorsFound = true;
-			return;
-		}
-
-		if ( present( Name ) ) {
-			OAController( OACtrlNum ).Name = Name;
-		}
-
-		if ( present( ControllerType ) ) {
-			OAController( OACtrlNum ).ControllerType = ControllerType;
-		}
-
-		if ( present( ControllerType_Num ) ) {
-			OAController( OACtrlNum ).ControllerType_Num = ControllerType_Num;
-		}
-
-		if ( present( LockoutType ) ) {
-			if ( InputProcessor::SameString( LockoutType, "NOLOCKOUT" ) ) {
-				OAController( OACtrlNum ).Lockout = NoLockoutPossible;
-			} else if ( InputProcessor::SameString( LockoutType, "LOCKOUTWITHHEATING" ) ) {
-				OAController( OACtrlNum ).Lockout = LockoutWithHeatingPossible;
-			} else if ( InputProcessor::SameString( LockoutType, "LOCKOUTWITHCOMPRESSOR" ) ) {
-				OAController( OACtrlNum ).Lockout = LockoutWithCompressorPossible;
-			} else {
-				ShowSevereError( "SetOAControllerData: Illegal Lockout type specified=" + LockoutType );
-				ErrorsFound = true;
-			}
-		}
-
-		if ( present( FixedMin ) ) {
-			OAController( OACtrlNum ).FixedMin = FixedMin;
-		}
-
-		if ( present( TempLim ) ) {
-			OAController( OACtrlNum ).TempLim = TempLim;
-		}
-
-		if ( present( TempLowLim ) ) {
-			OAController( OACtrlNum ).TempLowLim = TempLowLim;
-		}
-
-		if ( present( EnthLim ) ) {
-			OAController( OACtrlNum ).EnthLim = EnthLim;
-		}
-
-		if ( present( DPTempLim ) ) {
-			OAController( OACtrlNum ).DPTempLim = DPTempLim;
-		}
-
-		if ( present( EnthalpyCurvePtr ) ) {
-			OAController( OACtrlNum ).EnthalpyCurvePtr = EnthalpyCurvePtr;
-		}
-
-		if ( present( MinOA ) ) {
-			OAController( OACtrlNum ).MinOA = MinOA;
-		}
-
-		if ( present( MaxOA ) ) {
-			OAController( OACtrlNum ).MaxOA = MaxOA;
-		}
-
-		if ( present( EconoType ) ) {
-			if ( InputProcessor::SameString( EconoType, "NoEconomizer" ) ) {
-				OAController( OACtrlNum ).Econo = NoEconomizer;
-			} else if ( InputProcessor::SameString( EconoType, "DifferentialDryBulbandenthalpy" ) ) {
-				OAController( OACtrlNum ).Econo = DifferentialDryBulbAndEnthalpy;
-			} else if ( InputProcessor::SameString( EconoType, "DifferentialDryBulb" ) ) {
-				OAController( OACtrlNum ).Econo = DifferentialDryBulb;
-			} else if ( InputProcessor::SameString( EconoType, "DifferentialEnthalpy" ) ) {
-				OAController( OACtrlNum ).Econo = DifferentialEnthalpy;
-			} else if ( InputProcessor::SameString( EconoType, "Economizer Strategy Present" ) ) { // from routines, not from input
-				OAController( OACtrlNum ).Econo = FixedDryBulb;
-			} else {
-				ShowSevereError( "SetOAControllerData: Illegal Economizer type specified=" + EconoType );
-				ErrorsFound = true;
-			}
-		}
-
-		if ( present( BypassType ) ) {
-			if ( InputProcessor::SameString( BypassType, "MINIMUMFLOWWITHBYPASS" ) ) {
-				OAController( OACtrlNum ).EconBypass = true;
-			} else if ( InputProcessor::SameString( BypassType, "MODULATEFLOW" ) ) {
-				OAController( OACtrlNum ).EconBypass = false;
-			} else {
-				ShowSevereError( "SetOAControllerData:Illegal Economizer Bypass type specified =" + BypassType );
-				ErrorsFound = true;
-			}
-		}
-
-		if ( present( MixNode ) ) {
-			OAController( OACtrlNum ).MixNode = MixNode;
-		}
-
-		if ( present( OANode ) ) {
-			OAController( OACtrlNum ).OANode = OANode;
-		}
-
-		if ( present( InletNode ) ) {
-			OAController( OACtrlNum ).InletNode = InletNode;
-		}
-
-		if ( present( RelNode ) ) {
-			OAController( OACtrlNum ).RelNode = RelNode;
-		}
-
-		if ( present( RetNode ) ) {
-			OAController( OACtrlNum ).RetNode = RetNode;
-		}
-
-		if ( present( HumidistatZoneNum ) ) {
-			OAController( OACtrlNum ).HumidistatZoneNum = HumidistatZoneNum;
-		}
-
-		if ( present( HighRHOAFlowRatio ) ) {
-			OAController( OACtrlNum ).HighRHOAFlowRatio = HighRHOAFlowRatio;
-		}
-
-		if ( present( ModifyDuringHighOAMoisture ) ) {
-			OAController( OACtrlNum ).ModifyDuringHighOAMoisture = ModifyDuringHighOAMoisture;
-		}
-
-		if ( present( NodeNumofHumidistatZone ) ) {
-			OAController( OACtrlNum ).NodeNumofHumidistatZone = NodeNumofHumidistatZone;
-		}
-
-		if ( present( EconomizerOASchedPtr ) ) {
-			OAController( OACtrlNum ).EconomizerOASchedPtr = EconomizerOASchedPtr;
-		}
-
-	}
-
-	void
-=======
->>>>>>> NREL/develop
 	CheckOAControllerName(
 		std::string const & OAControllerName, // proposed name
 		int const NumCurrentOAControllers, // Count on number of controllers
