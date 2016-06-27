@@ -4514,6 +4514,12 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).MaxCoolAirMassFlow = Furnace( FurnaceNum ).MaxCoolAirVolFlow * StdRhoAir;
 			Furnace( FurnaceNum ).MaxHeatAirMassFlow = Furnace( FurnaceNum ).MaxHeatAirVolFlow * StdRhoAir;
 			Furnace( FurnaceNum ).MaxNoCoolHeatAirMassFlow = Furnace( FurnaceNum ).MaxNoCoolHeatAirVolFlow * StdRhoAir;
+			Furnace( FurnaceNum ).WSHPRuntimeFrac = 0.0;
+			Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+			Furnace( FurnaceNum ).CoolingCoilSensDemand = 0.0;
+			Furnace( FurnaceNum ).CoolingCoilLatentDemand = 0.0;
+			Furnace( FurnaceNum ).HeatingCoilSensDemand = 0.0;
+
 			Furnace( FurnaceNum ).SenLoadLoss = 0.0;
 			if ( Furnace( FurnaceNum ).Humidistat ) {
 				Furnace( FurnaceNum ).LatLoadLoss = 0.0;

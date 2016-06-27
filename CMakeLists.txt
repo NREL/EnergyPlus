@@ -223,6 +223,15 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_VALIDATION_REPORTS)
+  if ( NOT BUILD_FORTRAN )
+    message("*** VALIDATION REPORT ERROR : Cannot build validation reports without Fortran targets.  Turn on BUILD_FORTRAN.")
+  endif()
+  # we should check to make sure the Python 3 binary is actually available on the system
+  # we won't use it here, the ValidationReports CMake will do all the setup, we just want a quick check to find the binary
+  find_program(PYTHON_THREE python3)
+  if ( PYTHON_THREE STREQUAL "PYTHON_THREE-NOTFOUND" )
+    message("*** VALIDATION REPORT ERROR : Cannot find Python3 on the system; Validation report building requires Python 3.")
+  endif()
   include(ExternalProject)
   ExternalProject_Add(ValidationReports
     DEPENDS energyplus ReadVarsESO Basement Slab
