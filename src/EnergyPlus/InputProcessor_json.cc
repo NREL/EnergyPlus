@@ -2748,7 +2748,8 @@ EnergyPlus::InputProcessor::GetListofSectionsinInput(
 //		json * jdf_object;
 		if ( jdf.find( ObjectWord ) == jdf.end() ) {
 			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
+					|| jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
 			return static_cast<int>(jdf[ tmp_umit->second ].size());
@@ -2876,7 +2877,8 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 		json * object_in_jdf;
 		if ( jdf.find( Object ) == jdf.end() ) {
 			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
-			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()) {
+			if (tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
+					|| jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
 			object_in_jdf = &jdf[ tmp_umit->second ];
