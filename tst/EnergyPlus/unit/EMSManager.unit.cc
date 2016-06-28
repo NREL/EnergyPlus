@@ -160,7 +160,7 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 
@@ -203,7 +203,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
@@ -367,7 +367,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
@@ -674,7 +674,7 @@ TEST_F( EnergyPlusFixture, Test_EMSLogic ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -745,7 +745,7 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -786,7 +786,7 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 		NodeInputManager::SetupNodeVarsForReporting();
@@ -818,7 +818,7 @@ TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
 		"    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	CheckIfAnyEMS();
 	EXPECT_TRUE( AnyEnergyManagementSystemInModel );

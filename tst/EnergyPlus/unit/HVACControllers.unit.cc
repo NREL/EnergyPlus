@@ -135,7 +135,7 @@ namespace EnergyPlus {
 		"	CW Coil Controller; !- Controller 1 Name",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetSetPointManagerInputs();
 		// check specified control variable type is "HumidityRatio"
@@ -203,7 +203,7 @@ namespace EnergyPlus {
 			"	CW Coil Controller; !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetSetPointManagerInputs();
 		// check specified control variable type is "HumidityRatio"

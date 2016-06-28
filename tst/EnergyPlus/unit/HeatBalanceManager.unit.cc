@@ -190,7 +190,7 @@ namespace EnergyPlus {
 			" GLASS;        !- Layer 3",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -249,7 +249,7 @@ namespace EnergyPlus {
 			"MixingSourceZoneOnly; !- Infiltration Balancing Zones",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -313,7 +313,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -428,7 +428,7 @@ namespace EnergyPlus {
 			"Ignored;                !- Infiltration Balancing Zones"
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -490,7 +490,7 @@ namespace EnergyPlus {
 			"   hourly;                  !- Reporting Frequency",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 

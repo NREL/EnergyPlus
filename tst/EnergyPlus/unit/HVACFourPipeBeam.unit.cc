@@ -173,7 +173,7 @@ namespace EnergyPlus {
 		"    1.2857,   1.0778; ",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		DataGlobals::NumOfZones = 1;
 
 		DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
@@ -415,7 +415,7 @@ namespace EnergyPlus {
 		"    -6.00,                   !- Time Zone {hr}",
 		"    190;                     !- Elevation {m}",
 
-		"! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C",
+		"! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6ï¿½C",
 
 		"  SizingPeriod:DesignDay,",
 		"    CHICAGO Ann Htg 99.6% Condns DB,  !- Name",
@@ -445,7 +445,7 @@ namespace EnergyPlus {
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 		"    0.00;                    !- Sky Clearness",
 
-		"! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C",
+		"! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2ï¿½C WB=25.5ï¿½C",
 
 		"  SizingPeriod:DesignDay,",
 		"    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
@@ -1654,7 +1654,7 @@ namespace EnergyPlus {
 		"    1.2857,   1.0778; ",
 				} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
 		bool ErrorsFound =  false;

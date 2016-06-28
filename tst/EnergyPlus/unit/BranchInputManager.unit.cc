@@ -106,7 +106,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string BranchListName;
 		std::string FoundLoopName;
 		int FoundLoopNum;
@@ -211,7 +211,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string CompType;
 		std::string CompName;
 		int BranchIndex;

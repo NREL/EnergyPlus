@@ -2227,7 +2227,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			GetReportVariableInput();
 
@@ -2283,7 +2283,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			GetReportVariableInput();
 
@@ -2341,7 +2341,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			InitializeOutput();
 
@@ -2433,7 +2433,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			AddToOutputVariableList( "Site Outdoor Air Drybulb Temperature", 1, 1, 2, "C" );
 			AddToOutputVariableList( "Site Outdoor Air Wetbulb Temperature", 1, 1, 2, "C" );
@@ -2480,7 +2480,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
@@ -2523,7 +2523,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			auto const keyed_value = "Environment";
 			auto const var_name = "Site Outdoor Air Drybulb Temperature";
@@ -2606,7 +2606,7 @@ namespace EnergyPlus {
 				"    MyGeneralLights;         !- Output Variable or Meter Name 1",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			Real64 light_consumption = 0;
 			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
@@ -2670,7 +2670,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			InitializeOutput();
 
@@ -2725,7 +2725,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -2907,7 +2907,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3102,7 +3102,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3245,7 +3245,7 @@ namespace EnergyPlus {
 				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,r;",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			// Setup so that UpdateDataandReport can be called.
 			DataGlobals::DayOfSim = 365;

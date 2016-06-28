@@ -338,7 +338,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager )
     "For: AllDays,            !- Field 2",
     "Until: 24:00,30.0;       !- Field 3"
     });
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 	ScheduleManager::ProcessScheduleInput();
@@ -563,7 +563,7 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 
 		} ) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound =  false;
 		DataGlobals::NumOfZones = 1;
 
@@ -783,7 +783,7 @@ TEST_F( EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName )
 		"  AirLoopSetpointNode;     !- Setpoint Node or NodeList Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	// GetInput should fail since reference and set point node names are the same
 	bool ErrorsFound = false;

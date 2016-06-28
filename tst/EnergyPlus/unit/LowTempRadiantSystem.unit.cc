@@ -1121,7 +1121,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetProjectControlData( ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );

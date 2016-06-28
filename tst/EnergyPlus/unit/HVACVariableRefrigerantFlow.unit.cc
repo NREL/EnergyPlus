@@ -157,7 +157,7 @@ namespace EnergyPlus {
 			"     Dimensionless;           !- Output Unit Type				   "
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// Run the method
 		GetDXCoils( );
@@ -1012,7 +1012,7 @@ namespace EnergyPlus {
 			"  Dimensionless;           !- Output Unit Type",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;
@@ -1695,7 +1695,7 @@ namespace EnergyPlus {
 			"  Dimensionless;           !- Output Unit Type",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;
@@ -2557,7 +2557,7 @@ namespace EnergyPlus {
 			"  UNTIL: 24:00, 1.0;        !- Field 3",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;
@@ -3351,7 +3351,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;

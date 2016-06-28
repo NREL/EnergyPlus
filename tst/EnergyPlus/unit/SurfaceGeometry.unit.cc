@@ -479,7 +479,7 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SurfaceShape )
 
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetProjectControlData( ErrorsFound ); // read project control data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -694,7 +694,7 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool FoundError = false;
 	GetMaterialData( FoundError );

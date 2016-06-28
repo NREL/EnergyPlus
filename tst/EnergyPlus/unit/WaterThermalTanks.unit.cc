@@ -347,7 +347,7 @@ TEST_F( EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning )
 		"    IdealLoadOutNode;      !- Node 1 Name",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData( ErrorsFound );
@@ -525,7 +525,7 @@ TEST_F( EnergyPlusFixture, HPWHWrappedDummyNodeConfig )
 	}
 	std::string const idf_objects = delimited_string(idf_lines);
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	WaterThermalTanks::GetWaterThermalTankInput();
 
@@ -725,7 +725,7 @@ TEST_F( EnergyPlusFixture, HPWHEnergyBalance )
 		"    Water Heating_1;         !- End-Use Subcategory",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	ASSERT_FALSE( WaterThermalTanks::GetWaterThermalTankInput() );
 
@@ -1019,7 +1019,7 @@ TEST_F( EnergyPlusFixture, HPWHSizing )
 		"    IdealLoadOutNode;      !- Node 1 Name",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	int CompIndex = 1;

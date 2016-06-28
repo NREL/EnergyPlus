@@ -1102,7 +1102,7 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,1.0;        !- Field 3",
 		}) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 	
 			bool ErrorsFound =  false;
 
@@ -2232,7 +2232,7 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,0.0;        !- Field 3",
 		}) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 	
 			bool ErrorsFound =  false;
 

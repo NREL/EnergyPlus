@@ -227,7 +227,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
 		"                                                                      ",
 		 } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	CurveManager::GetCurveInputData( ErrorsFound );
