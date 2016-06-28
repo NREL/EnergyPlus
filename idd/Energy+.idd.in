@@ -23824,6 +23824,43 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
       \units dimensionless
       \note Enter the WPC Value corresponding to the 36th wind direction.
 
+AirflowNetwork:ZoneControl:PressureController,
+      \memo This object is used to control a zone to a specified indoor pressure 
+      \memo using the AirflowNetwork model. The specified pressure setpoint is used
+      \memo to control the zone exhaust fan flow rate in a controlled zone or 
+      \memo the relief air flow rate in an air loop.
+      \unique-object
+ A1 , \field Name
+      \required-field
+      \reference AirflowNetworkZoneControlPressureControllerNames
+ A2 , \field Control Zone Name
+      \required-field
+      \type object-list
+      \object-list ZoneNames
+ A3 , \field Control Object Type
+      \required-field
+      \type choice
+      \key AirflowNetwork:MultiZone:Component:ZoneExhaustFan
+      \key AirflowNetwork:Distribution:Component:ReliefAirFlow
+      \note The current selection is AirflowNetwork:MultiZone:Component:ZoneExhaustFan 
+      \note or AirflowNetwork:Distribution:Component:ReliefAirFlow.
+ A4 , \field Control Object Name
+      \note Control names are names of individual control objects 
+      \required-field
+      \type object-list
+      \object-list AFNReliefAirFlowNames
+      \object-list FansZoneExhaust
+ A5 , \field Pressure Control Availability Schedule Name
+      \note Availability schedule name for pressure controller. Schedule value > 0 means the 
+      \note pressure controller is enabled. If this field is blank, then pressure controller is 
+      \note always enabled.
+      \type object-list
+      \object-list ScheduleNames
+ A6 ; \field Pressure Setpoint Schedule Name
+      \required-field
+      \type object-list
+      \object-list ScheduleNames
+
 AirflowNetwork:Distribution:Node,
       \min-fields 4
       \memo This object represents an air distribution node in the AirflowNetwork model.
@@ -24110,6 +24147,73 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
       \type real
       \minimum> 0.0
       \note Enter the pressure drop across this component.
+
+AirflowNetwork:Distribution:Component:OutdoorAirFlow,
+      \min-fields 3
+      \memo This object includes the outdoor air flow rate set by the Controller:OutdoorAir
+      \memo object in the airflow network. 
+      \unique-object
+ A1 , \field Name
+      \required-field
+      \reference AFNOutdoorAirFlowNames
+ N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
+
+AirflowNetwork:Distribution:Component:ReliefAirFlow,
+      \min-fields 3
+      \memo This object allows variation of air flow rate to perform pressure. 
+      \unique-object
+ A1 , \field Name
+      \required-field
+      \reference AFNReliefAirFlowNames
+ N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
 
 AirflowNetwork:Distribution:Linkage,
       \min-fields 4
@@ -56939,6 +57043,7 @@ Branch,
         \required-field
         \reference Branches
    N1, \field Maximum Flow Rate
+        \deprecated
         \default 0
         \units m3/s
         \minimum 0
@@ -61753,7 +61858,7 @@ ChillerHeater:Absorption:DirectFired,
           \required-field
           \type node
   A5   ,  \field Condenser Outlet Node Name
-          \required-field
+          \note Not required if air-cooled 
           \type node
   A6   ,  \field Hot Water Inlet Node Name
           \required-field
@@ -61820,7 +61925,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiquadraticCurves
+            \object-list BiVariateCurves
             \object-list BiVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -61829,7 +61934,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiquadraticCurves
+            \object-list BiVariateCurves
             \object-list BiVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -61846,7 +61951,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiquadraticCurves
+            \object-list BiVariateCurves
             \object-list BiVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -61965,7 +62070,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \required-field
        \type node
   A5 , \field Condenser Outlet Node Name
-       \required-field
+       \note Not required if air-cooled 
        \type node
   A6 , \field Hot Water Inlet Node Name
        \required-field
@@ -62032,7 +62137,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiquadraticCurves
+       \object-list BiVariateCurves
        \object-list BiVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -62041,7 +62146,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiquadraticCurves
+       \object-list BiVariateCurves
        \object-list BiVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -62058,7 +62163,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiquadraticCurves
+       \object-list BiVariateCurves
        \object-list BiVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -66067,7 +66172,7 @@ WaterHeater:Mixed,
        \type node
   N19, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   N20, \field Use Side Design Flow Rate
@@ -66346,7 +66451,7 @@ WaterHeater:Stratified,
        \type node
   N26, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
@@ -67234,7 +67339,7 @@ ThermalStorage:ChilledWater:Mixed,
        \type node
   N8, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   A12, \field Source Side Availability Schedule Name
@@ -67368,7 +67473,7 @@ ThermalStorage:ChilledWater:Stratified,
        \type node
   N13, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of

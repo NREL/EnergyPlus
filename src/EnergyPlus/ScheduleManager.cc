@@ -440,7 +440,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "ExternalInterface:Schedule";
 		NumExternalInterfaceSchedules = GetNumObjectsFound( CurrentModuleObject );
 		// added for FMI
-		if ( NumCptSchedules > 0 ) {
+		if ( NumExternalInterfaceSchedules > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
@@ -448,7 +448,7 @@ namespace ScheduleManager {
 		// added for FMU Import
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
 		NumExternalInterfaceFunctionalMockupUnitImportSchedules = GetNumObjectsFound( CurrentModuleObject );
-		if ( NumCptSchedules > 0 ) {
+		if ( NumExternalInterfaceFunctionalMockupUnitImportSchedules > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
@@ -456,7 +456,7 @@ namespace ScheduleManager {
 		// added for FMU Export
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
 		NumExternalInterfaceFunctionalMockupUnitExportSchedules = GetNumObjectsFound( CurrentModuleObject );
-		if ( NumCptSchedules > 0 ) {
+		if ( NumExternalInterfaceFunctionalMockupUnitExportSchedules > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );

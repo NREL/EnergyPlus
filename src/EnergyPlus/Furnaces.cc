@@ -4514,6 +4514,12 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).MaxCoolAirMassFlow = Furnace( FurnaceNum ).MaxCoolAirVolFlow * StdRhoAir;
 			Furnace( FurnaceNum ).MaxHeatAirMassFlow = Furnace( FurnaceNum ).MaxHeatAirVolFlow * StdRhoAir;
 			Furnace( FurnaceNum ).MaxNoCoolHeatAirMassFlow = Furnace( FurnaceNum ).MaxNoCoolHeatAirVolFlow * StdRhoAir;
+			Furnace( FurnaceNum ).WSHPRuntimeFrac = 0.0;
+			Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+			Furnace( FurnaceNum ).CoolingCoilSensDemand = 0.0;
+			Furnace( FurnaceNum ).CoolingCoilLatentDemand = 0.0;
+			Furnace( FurnaceNum ).HeatingCoilSensDemand = 0.0;
+
 			Furnace( FurnaceNum ).SenLoadLoss = 0.0;
 			if ( Furnace( FurnaceNum ).Humidistat ) {
 				Furnace( FurnaceNum ).LatLoadLoss = 0.0;
@@ -5305,7 +5311,6 @@ namespace Furnaces {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using General::TrimSigDigits;
-		using BranchInputManager::CheckSystemBranchFlow;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -5330,8 +5335,6 @@ namespace Furnaces {
 		int ThisCtrlZoneNum; // the controlled zone number of the control zone !!!
 		int Iter; // iteration count
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
-		bool ErrFound; // flag returned from mining functions
-		Real64 BranchFlow; // branch volumetric flow rate [m3/s]
 		bool anyRan;
 		ManageEMS( emsCallFromUnitarySystemSizing, anyRan ); // calling point
 		ThisCtrlZoneNum = 0;
@@ -5560,10 +5563,6 @@ namespace Furnaces {
 		UnitaryHeatCap = Furnace( FurnaceNum ).DesignHeatingCapacity;
 		SuppHeatCap = Furnace( FurnaceNum ).DesignSuppHeatingCapacity;
 
-		BranchFlow = 0.0;
-		ErrFound = false;
-		CheckSystemBranchFlow( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ), Furnace( FurnaceNum ).Name, BranchFlow, Furnace( FurnaceNum ).DesignFanVolFlowRate, ErrFound );
-		if ( ErrFound ) ShowContinueError( "...occurs in " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name );
 	}
 
 	// End Initialization Section of the Module

@@ -363,7 +363,7 @@ namespace EnergyPlus {
 		AirLoopNum = 1;
 		OAControllerNum = 1;
 		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
@@ -382,7 +382,7 @@ namespace EnergyPlus {
 		OAController( OAControllerNum ).InletTemp = 0.0; // This is the same as the outdoor air dry bulb for these tests
 		OAController( OAControllerNum ).OATemp = 0.0;
 
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
@@ -401,7 +401,7 @@ namespace EnergyPlus {
 		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
 		OAController( OAControllerNum ).InletTemp = 20.0; // This is the same as the outdoor air dry bulb for these tests
 		OAController( OAControllerNum ).OATemp = 20.0;
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
@@ -420,7 +420,7 @@ namespace EnergyPlus {
 		OAController( OAControllerNum ).InletTemp = 0.0; // This is the same as the outdoor air dry bulb for these tests
 		OAController( OAControllerNum ).OATemp = 0.0;
 
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
@@ -535,6 +535,7 @@ namespace EnergyPlus {
 		People( 1 ).Name = "WestPeople";
 		People( 1 ).ZonePtr = 1;
 		People( 1 ).NumberOfPeople = 3;
+		Zone( 1 ).TotOccupants = 3;
 		Schedule( 4 ).CurrentValue = 1.0;
 		ZoneCO2GainFromPeople.allocate( 1 );
 		ZoneCO2GainFromPeople( 1 ) = 3.82E-8;
@@ -554,7 +555,7 @@ namespace EnergyPlus {
 		OutBaroPress = 101325;
 		ZoneSysEnergyDemand.allocate( 1 );
 
-		CalcOAController( 1, 1 );
+		OAController( 1 ).CalcOAController( 1 );
 
 		EXPECT_NEAR( 0.0194359, OAController( 1 ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( 0.009527, OAController( 1 ).MinOAFracLimit, 0.00001 );
@@ -687,8 +688,8 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 0.00944, VentilationMechanical( 1 ).ZoneOAPeopleRate( 1 ) );
 		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAAreaRate( 1 ) );
-		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAFlow( 1 ) );
-		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACH( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAFlowRate( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACHRate( 1 ) );
 
 	}
 
@@ -795,11 +796,13 @@ namespace EnergyPlus {
 		int AirloopNum = 1;
 		int OASysNum = 1;
 		int OAControllerNum = 1;
+		PrimaryAirSystem.allocate( AirloopNum );
+		PrimaryAirSystem( AirloopNum ).Name = "Airloop 1";
 		AirLoopControlInfo.allocate( AirloopNum ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
 		AirLoopFlow.allocate( AirloopNum ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
-		AirLoopFlow( AirloopNum ).DesSupply = 1.0;
 		DataEnvironment::StdRhoAir = 1.2;
 		DataEnvironment::OutBaroPress = 101250.0;
+		AirLoopFlow( AirloopNum ).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
 
 		// setup OA system and initialize nodes
 		ManageOutsideAirSystem( "OA Sys 1", true, AirloopNum, OASysNum );
@@ -809,8 +812,8 @@ namespace EnergyPlus {
 			Node( i ).Temp = 20.0;
 			Node( i ).HumRat = 0.01;
 			Node( i ).Enthalpy = 45478.0;
-			Node( i ).MassFlowRate = 1.0;
-			Node( i ).MassFlowRateMaxAvail = 1.0;
+			Node( i ).MassFlowRate = AirLoopFlow( AirloopNum ).DesSupply;
+			Node( i ).MassFlowRateMaxAvail = AirLoopFlow( AirloopNum ).DesSupply;
 			Node( i ).Press = 101250.0;
 		}
 
@@ -952,9 +955,11 @@ namespace EnergyPlus {
 		Real64 WaterConsumptionRate( 0.0 ); // water use rate of the humidifier
 		Real64 ElecPowerInput( 0.0 ); // electric use rate of the humidifier
 
+		PrimaryAirSystem.allocate( AirloopNum );
+		PrimaryAirSystem( AirloopNum ).Name = "Airloop 1";
 		AirLoopControlInfo.allocate( AirloopNum );
 		AirLoopFlow.allocate( AirloopNum );
-		AirLoopFlow( AirloopNum ).DesSupply = 1.0;
+		AirLoopFlow( AirloopNum ).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
 		DataEnvironment::StdRhoAir = 1.2;
 		DataEnvironment::OutBaroPress = 101250.0;
 		DataSizing::SysSizingRunDone = false;
@@ -971,8 +976,8 @@ namespace EnergyPlus {
 			Node( i ).Temp = 20.0;
 			Node( i ).HumRat = 0.0005;
 			Node( i ).Enthalpy = Psychrometrics::PsyHFnTdbW( DataLoopNode::Node( i ).Temp, DataLoopNode::Node( i ).HumRat );
-			Node( i ).MassFlowRate = 1.0;
-			Node( i ).MassFlowRateMaxAvail = 1.0;
+			Node( i ).MassFlowRate = AirLoopFlow( AirloopNum ).DesSupply;
+			Node( i ).MassFlowRateMaxAvail = AirLoopFlow( AirloopNum ).DesSupply;
 			Node( i ).Press = 101250.0;
 		}
 		// simulate OA system, common node properties are propagated
@@ -989,7 +994,7 @@ namespace EnergyPlus {
 		AirInNode = Humidifiers::Humidifier( HumNum ).AirInNode;
 		AirOutNode = Humidifiers::Humidifier( HumNum ).AirOutNode;
 		// Calculate expected humidifier water consumption rate
-		WaterConsumptionRate = 1.0 * ( 0.005 - 0.0005 );
+		WaterConsumptionRate = AirLoopFlow( AirloopNum ).DesSupply * ( 0.005 - 0.0005 );
 		// Calculate humidifier electric use rate (fan electric power and standby electric power are zero)
 		ElecPowerInput = ( WaterConsumptionRate / Humidifiers::Humidifier( HumNum ).NomCap ) * Humidifiers::Humidifier( HumNum ).NomPower;
 		// Confirm humidifier water consumption calculation
@@ -1074,7 +1079,7 @@ namespace EnergyPlus {
 		OAController( 1 ).CoolCoilFreezeCheck = true;
 		Schedule( 1 ).CurrentValue = 1.0;
 
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		EXPECT_NEAR( 0.2408617, OAController( 1 ).OAFractionRpt, 0.00001 );
 
@@ -1108,7 +1113,7 @@ namespace EnergyPlus {
 		Contaminant.CO2Simulation = true;
 		Contaminant.GenericContamSimulation = true;
 
-		UpdateOAController( OAControllerNum );
+		OAController( OAControllerNum ).UpdateOAController( );
 		// Expect no value changes of relief node due to no actions.
 		EXPECT_NEAR( 500.0, Node( OAController( OAControllerNum ).RelNode ).CO2, 0.00001 );
 		EXPECT_NEAR( 0.3, Node( OAController( OAControllerNum ).RelNode ).GenContam, 0.00001 );

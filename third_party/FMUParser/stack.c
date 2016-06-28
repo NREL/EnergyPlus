@@ -1,8 +1,8 @@
-/* -------------------------------------------------------------------------
+/* ------------------------------------------------------------------------- 
  * stack.c
- * A stack of pointers.
- * Copyright 2010 QTronic GmbH. All rights reserved.
- * -------------------------------------------------------------------------*/
+ * A stack of pointers. 
+ * Copyright 2010 QTronic GmbH. All rights reserved. 
+ * -------------------------------------------------------------------------*/ 
 
 #include <stdio.h>
 #include <assert.h>
@@ -50,7 +50,7 @@ void* stackPop(Stack* s){
     return s->stack[s->stackPos--];
 }
 
-// return the last n elements as null terminated array,
+// return the last n elements as null terminated array, 
 // or NULL if memory allocation fails
 void** stackLastPopedAsArray0(Stack* s, int n){
     int i;
@@ -70,10 +70,10 @@ void** stackPopAllAsArray(Stack* s, int *size) {
     void** array = (void**)malloc((s->stackPos + 1)*sizeof(void*));
     if (! array) return NULL; // failure
     *size = s->stackPos + 1;
-    for (i=0; i<*size; i++)
+    for (i=0; i<*size; i++) 
         array[i] = s->stack[i];
     s->stackPos = -1;
-    return array;
+    return array; 
 }
 
 // release the given stack
