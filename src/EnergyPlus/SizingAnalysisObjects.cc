@@ -461,17 +461,16 @@ namespace EnergyPlus {
 	{
 		int const SysIndex ( 2 );
 		Real64 const MinutesPerHour( 60.0 );
-		using namespace OutputProcessor;
 		ZoneTimestepObject tmpztStepStamp;
 		SystemTimestepObject tmpSysStepStamp;
 
 		tmpztStepStamp = PrepareZoneTimestepStamp();
 
 		//pepare system timestep stamp
-		tmpSysStepStamp.CurMinuteEnd = TimeValue( SysIndex ).CurMinute;
+		tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue( SysIndex ).CurMinute;
 		if ( tmpSysStepStamp.CurMinuteEnd == 0.0 ) { tmpSysStepStamp.CurMinuteEnd = MinutesPerHour; }
-		tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - TimeValue( SysIndex ).TimeStep * MinutesPerHour;
-		tmpSysStepStamp.TimeStepDuration = TimeValue( SysIndex ).TimeStep;
+		tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue( SysIndex ).TimeStep * MinutesPerHour;
+		tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue( SysIndex ).TimeStep;
 
 		for ( auto & l : logObjs ) {
 			l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);

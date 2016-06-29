@@ -67,6 +67,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -132,6 +133,7 @@ public:
 
 		TimeValue.allocate( 2 );
 		TimeValue( 1 ).TimeStep >>= TimeStepZone;
+		TimeValue( 2 ).TimeStep >>= DataHVACGlobals::TimeStepSys;
 
 		PlantSizData.allocate( 1 );
 
@@ -179,8 +181,6 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 {
 	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework" );
 
-	int const ZoneIndex ( 1 );
-
 	// first step
 	KindOfSim = 4;
 	DayOfSim  = 1;
@@ -188,7 +188,6 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
 	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
-	//TimeValue( ZoneIndex ).CurMinute = 15;
 	DataGlobals::TimeStep = 1;
 
 	LogVal = lowLogVal;
@@ -198,7 +197,6 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 	//last step of first design day
 	HourOfDay = 24;
-	//TimeValue( ZoneIndex ).CurMinute = 60;
 	DataGlobals::TimeStep = 4;
 	LogVal = hiLogVal;
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
@@ -207,7 +205,6 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 	//first step of second design day
 	HourOfDay = 1;
-	//TimeValue( ZoneIndex ).CurMinute = 15;
 	DataGlobals::TimeStep = 1;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
@@ -343,7 +340,6 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 3 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
 	int timeStp( 1 );
@@ -361,7 +357,6 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	}
 
 	Envrn = 4;
-	DDnum = 2;
 	LogVal = hiLogVal;
 	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
@@ -447,3 +442,91 @@ TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest )
 	EXPECT_DOUBLE_EQ( 1.5, PlantLoop( 1 ).MaxMassFlowRate ); //  m3/s
 	EXPECT_TRUE( TestAnalysisObj.anotherIterationDesired );
 }
+
+
+TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
+{
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour" );
+
+	// this test uses four zone timesteps per hour and 5 sub system time steps per zone timestep
+	// tests FillSysStep over two design days
+
+	SizingLog TestLogObj( LogVal );
+
+	TestLogObj.NumOfEnvironmentsInLogSet = 2;
+	TestLogObj.NumOfDesignDaysInLogSet = 2;
+	TestLogObj.NumberOfSizingPeriodsInLogSet = 0;
+
+	TestLogObj.NumOfStepsInLogSet = 24 * 2 * 4;
+	TestLogObj.ztStepCountByEnvrnMap[ 1 ]= 96;
+	TestLogObj.ztStepCountByEnvrnMap[ 2 ]= 96;
+
+	TestLogObj.envrnStartZtStepIndexMap[ 1 ] = 0;
+	TestLogObj.envrnStartZtStepIndexMap[ 2 ] = 96;
+
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 3 ] = 1;
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 4 ] = 2;
+
+	TestLogObj.ztStepObj.resize( TestLogObj.NumOfStepsInLogSet );
+
+	int KindOfSim( 4 );
+	int Envrn( 3 );
+	int DayOfSim( 1 );
+	int HourofDay( 0 );
+	DataHVACGlobals::TimeStepSys = 1.0 / ( 4.0  * 5.0 ); // fractional hours, duration
+	Real64 zoneTimeStepDuration( 0.25 );
+	int numTimeStepsInHour ( 4 );
+
+	LogVal = lowLogVal;
+	for ( int hr = 1; hr <= 24; ++hr ) {
+		HourofDay = hr;
+		for ( int timeStp = 1; timeStp <= 4; ++timeStp ) { // 15 minute zone timestep
+			for ( int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp ) { // 5 system substeps, so 3 minute system timestep
+				int const sysIndex ( 2 );
+				Real64 const minutesPerHour( 60.0 );
+				OutputProcessor::TimeValue( sysIndex ).CurMinute = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp - 1 ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				
+				sizingLoggerFrameObj.UpdateSizingLogValuesSystemStep();
+			}
+
+			ZoneTimestepObject tmpztStepStamp1( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+			TestLogObj.FillZoneStep( tmpztStepStamp1 );
+		}
+	}
+
+	Envrn = 4;
+	LogVal = hiLogVal;
+	for ( int hr = 1; hr <= 24; ++hr ) {
+		HourofDay = hr;
+		for ( int timeStp = 1; timeStp <= 4; ++timeStp ) { // 15 minute zone timestep
+			for ( int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp ) { // 5 system substeps, so 3 minute system timestep
+				int const sysIndex ( 2 );
+				Real64 const minutesPerHour( 60.0 );
+				OutputProcessor::TimeValue( sysIndex ).CurMinute = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp - 1 ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				
+				sizingLoggerFrameObj.UpdateSizingLogValuesSystemStep();
+			}
+
+			ZoneTimestepObject tmpztStepStamp1( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+			TestLogObj.FillZoneStep( tmpztStepStamp1 );
+		}
+	}
+
+	// check values at wrap of environment change over
+
+	// these should be from the FillZoneStep at this point
+	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].logDataValue );
+	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].logDataValue );
+
+	TestLogObj.AverageSysTimeSteps();
+	TestLogObj.ProcessRunningAverage();
+
+	// now these should be filled from the sub timesteps, and still have the same data.
+	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].logDataValue );
+	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].logDataValue );
+
+		//store this in the logger framework
+	sizingLoggerFrameObj.logObjs.push_back( TestLogObj );
+}
+
+
