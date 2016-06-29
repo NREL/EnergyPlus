@@ -62,11 +62,15 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/PlantManager.hh>
+#include <DataGlobals.hh>
+#include <DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataSizing.hh>
 
@@ -80,11 +84,14 @@ namespace EnergyPlus {
 		TEST_F(EnergyPlusFixture, PlantManager_SizePlantLoopTest)
 		{
 			// first call 
+			PlantLoop.allocate( 1 );
+			PlantLoop( 1 ).VolumeWasAutoSized = true;
+			PlantLoop( 1 ).MaxVolFlowRate = 5;
+			PlantLoop( 1 ).FluidType = NodeType_Water;
+			PlantLoop( 1 ).FluidIndex = 1;
+			SizePlantLoop( 1, true );
 			int TestVolume = 600;
-			PlantLoop(1).VolumeWasAutoSized = true;
-			PlantLoop(1).MaxVolFlowRate = 5;
-			SizePlantLoop(1, true);
-			EXPECT_EQ(TestVolume, PlantLoop(1).Volume);
+			EXPECT_EQ(TestVolume, PlantLoop( 1 ).Volume);
 		}
 	}
 }
