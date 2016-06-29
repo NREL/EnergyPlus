@@ -188,7 +188,8 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
 	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
-	TimeValue( ZoneIndex ).CurMinute = 15;
+	//TimeValue( ZoneIndex ).CurMinute = 15;
+	DataGlobals::TimeStep = 1;
 
 	LogVal = lowLogVal;
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
@@ -197,7 +198,8 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 	//last step of first design day
 	HourOfDay = 24;
-	TimeValue( ZoneIndex ).CurMinute = 60;
+	//TimeValue( ZoneIndex ).CurMinute = 60;
+	DataGlobals::TimeStep = 4;
 	LogVal = hiLogVal;
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
 
@@ -205,7 +207,8 @@ TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 	//first step of second design day
 	HourOfDay = 1;
-	TimeValue( ZoneIndex ).CurMinute = 15;
+	//TimeValue( ZoneIndex ).CurMinute = 15;
+	DataGlobals::TimeStep = 1;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
 	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
@@ -246,7 +249,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour )
 	int Envrn( 3 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
-	int CurMin( 15 );
+	int timeStp( 1 );
 	Real64 timeStepDuration( 0.25 );
 	int numTimeStepsInHour ( 4 );
 	LogVal = lowLogVal;
@@ -255,7 +258,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour )
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
 	);
@@ -263,42 +266,42 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour )
 
 // fill second step log with zone step data
 
-	CurMin = 30;
+	timeStp = 2;
 	LogVal = midLogVal;
 	ZoneTimestepObject tmpztStepStamp2( // call constructor
 		KindOfSim,
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
 	);
 	TestLogObj.FillZoneStep( tmpztStepStamp2 );
 
 // fill third step log with zone step data
-	CurMin = 45 ;
+	timeStp = 3 ;
 	LogVal = midLogVal;
 	ZoneTimestepObject tmpztStepStamp3( // call constructor
 		KindOfSim,
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
 	);
 	TestLogObj.FillZoneStep( tmpztStepStamp3 );
 
 // fill fourth step log with zone step data
-	CurMin = 60;
+	timeStp = 4;
 	LogVal = hiLogVal;
 	ZoneTimestepObject tmpztStepStamp4( // call constructor
 		KindOfSim,
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
 	);
@@ -343,7 +346,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
-	int CurMin( 60 );
+	int timeStp( 1 );
 	Real64 timeStepDuration( 1.0 );
 	int numTimeStepsInHour ( 1 );
 
@@ -351,7 +354,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
-			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
+			KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,timeStepDuration,
 			numTimeStepsInHour
 		);
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
@@ -363,7 +366,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
-			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
+			KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,timeStepDuration,
 			numTimeStepsInHour
 		);
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
@@ -412,7 +415,7 @@ TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest )
 	int Envrn( 4 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
-	int CurMin( 15 );
+	int timeStp( 1 );
 	Real64 timeStepDuration( 0.25 );
 	int numTimeStepsInHour ( 4 );
 
@@ -421,7 +424,7 @@ TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest )
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
 	);
