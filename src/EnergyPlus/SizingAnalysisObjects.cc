@@ -73,6 +73,7 @@
 #include <General.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -304,7 +305,7 @@ namespace EnergyPlus {
 				MaxVal = zt.runningAvgDataValue;
 				tmpztStepStamp = zt;
 			} else if ( zt.envrnNum == 0 && zt.kindOfSim == 0 ) { // null timestamp, problem to fix
-				int dum = zt.dayOfSim;
+				ShowWarningMessage("GetLogVariableDataMax: null timestamp in log" );
 			}
 		}
 		return tmpztStepStamp;
