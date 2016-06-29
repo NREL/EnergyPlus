@@ -56,22 +56,95 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// EnergyPlus::HeatBalanceManager Unit Tests
+// EnergyPlus::HeatBalanceSurfaceManager Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataGlobals.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
 namespace EnergyPlus {
+
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
+	{
+
+		int SurfNum; // Surface number DO loop counter
+		int ZoneNum; // Zone number the current surface is attached to
+		int ConstrNum; // Construction index for the current surface
+		Real64 HMovInsul; // "Convection" coefficient of movable insulation
+		Real64 TempExt; // Exterior temperature boundary condition
+		bool ErrorFlag; // Movable insulation error flag
+
+		SurfNum = 1;
+		ZoneNum = 1;
+		ConstrNum = 1;
+		HMovInsul = 1.0;
+		TempExt = 23.0;
+		ErrorFlag = false;
+		
+		DataHeatBalance::Construct.allocate( ConstrNum );
+		DataHeatBalance::Construct( ConstrNum ).Name = "TestConstruct";
+		DataHeatBalance::Construct( ConstrNum ).CTFCross( 0 ) = 0.0;
+		DataHeatBalance::Construct( ConstrNum ).CTFOutside( 0 ) = 1.0;
+		DataHeatBalance::Construct( ConstrNum ).SourceSinkPresent = true;
+		DataHeatBalance::Material.allocate( 1 );
+		DataHeatBalance::Material( 1 ).Name = "TestMaterial";
+		
+		
+		DataHeatBalSurface::HcExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HcExtSurf( SurfNum ) = 1.0;
+		DataHeatBalSurface::HAirExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HAirExtSurf( SurfNum ) = 1.0;
+		DataHeatBalSurface::HSkyExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HSkyExtSurf( SurfNum ) = 1.0;
+		DataHeatBalSurface::HGrdExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HGrdExtSurf( SurfNum ) = 1.0;
+		
+		DataHeatBalSurface::CTFConstOutPart.allocate( SurfNum );
+		DataHeatBalSurface::CTFConstOutPart( SurfNum ) = 1.0;
+		DataHeatBalSurface::QRadSWOutAbs.allocate( SurfNum );
+		DataHeatBalSurface::QRadSWOutAbs( SurfNum ) = 1.0;
+		DataHeatBalSurface::TempSurfIn.allocate( SurfNum );
+		DataHeatBalSurface::TempSurfIn( SurfNum ) = 1.0;
+		DataHeatBalSurface::QRadSWOutMvIns.allocate( SurfNum );
+		DataHeatBalSurface::QRadSWOutMvIns( SurfNum ) = 1.0;
+		
+		DataHeatBalSurface::TH.allocate(2,2,1);
+		DataSurfaces::Surface.allocate( SurfNum );
+		DataSurfaces::Surface( SurfNum ).Class = 1;
+		DataSurfaces::Surface( SurfNum ).Area = 10.0;
+		DataSurfaces::Surface( SurfNum ).MaterialMovInsulExt = 1;
+		
+		DataEnvironment::SkyTemp = 23.0;
+		DataEnvironment::OutDryBulbTemp	= 23.0;
+
+		DataHeatBalSurface::QdotRadOutRep.allocate( SurfNum );
+		DataHeatBalSurface::QdotRadOutRepPerArea.allocate( SurfNum );
+		DataHeatBalSurface::QRadOutReport.allocate( SurfNum );
+		DataGlobals::TimeStepZoneSec = 900.0;
+		
+		CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag );
+
+		std::string const error_string = delimited_string( {
+			"   ** Severe  ** Exterior movable insulation is not valid with embedded sources/sinks",
+			"   **   ~~~   ** Construction TestConstruct contains an internal source or sink but also uses",
+			"   **   ~~~   ** exterior movable insulation TestMaterial for a surface with that construction.",
+			"   **   ~~~   ** This is not currently allowed because the heat balance equations do not currently accommodate this combination.",
+		} );
+
+		EXPECT_TRUE( ErrorFlag );
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf )
 	{
