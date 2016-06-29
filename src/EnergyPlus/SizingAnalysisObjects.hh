@@ -99,17 +99,17 @@ public:
 	int numSubSteps = 0;
 	std::vector< SystemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 
-	ZoneTimestepObject (
+	ZoneTimestepObject ( // full constructor
 		int kindSim,
 		int environmentNum,
 		int daySim,
 		int hourDay,
-		int stepEndMin,
+		int timeStep,
 		Real64 timeStepDurat,
 		int numOfTimeStepsPerHour
 	);
 
-	ZoneTimestepObject();
+	ZoneTimestepObject(); // default constructor
 };
 
 class SizingLog
