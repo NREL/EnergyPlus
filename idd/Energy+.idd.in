@@ -79114,7 +79114,7 @@ FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
        \note Enter the name of the cooling tower affected
        \required-field
        \type object-list
-       \object-list CoolingTower:VariableSpeed
+       \object-list CoolingTowers
    N1; \field Reference Sensor Offset
        \type real
        \minimum> -10

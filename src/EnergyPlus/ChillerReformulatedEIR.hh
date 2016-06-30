@@ -205,7 +205,7 @@ namespace ChillerReformulatedEIR {
 		int EIRFPLRPLRIterIndex; // Index for part-load ratio EIRFPLR warning messages
 		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
 		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
-		Real64 FaultyChillerSWTOffset; // True if the chiller has SWT sensor fault
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
 		int IterLimitExceededNum; // Iteration limit exceeded for RegulaFalsi routine
 		int IterLimitErrIndex; // Index to iteration limit warning for RegulaFalsi routine
 		int IterFailed; // Iteration limit failed for RegulaFalsi routine
