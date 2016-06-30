@@ -67,6 +67,13 @@
 
 namespace EnergyPlus {
 
+namespace DataSurfaces {
+	struct SurfaceData;
+}
+namespace DataHeatBalance {
+	struct ZoneData;
+}
+
 namespace HeatBalanceSurfaceManager {
 
 	// Data
@@ -180,6 +187,14 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate = _ ); // if pas
 
 void
 CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
+
+void
+TestSurfTempCalcHeatBalanceInsideSurf(
+	Real64 TH12,
+	DataSurfaces::SurfaceData & surface,
+	DataHeatBalance::ZoneData & zone,
+	int WarmupSurfTemp
+);
 
 void
 CalcOutsideSurfTemp(
