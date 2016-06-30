@@ -210,8 +210,8 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
-	Array1D< FaultProperties > FaultsCondenserSWTSensor;
-	Array1D< FaultProperties > FaultsTowerScaling;
+	Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
+	Array1D< FaultPropertiesTowerScaling > FaultsTowerScaling;
 	Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions

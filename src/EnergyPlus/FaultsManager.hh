@@ -307,6 +307,37 @@ namespace FaultsManager {
 			);
 			
 	};
+		
+	struct FaultPropertiesCondenserSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+	{
+		// Members
+		std::string TowerType; // Tower type
+		std::string TowerName; // Tower name
+	
+		// Default Constructor
+		FaultPropertiesCondenserSWT():
+			TowerType( "" ),
+			TowerName( "" )
+		{}
+			
+	};
+	
+		
+	struct FaultPropertiesTowerScaling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
+	{
+		// Members
+		std::string TowerType; // Tower type
+		std::string TowerName; // Tower name
+		Real64 UAReductionFactor; //UA Reduction Factor
+	
+		// Default Constructor
+		FaultPropertiesTowerScaling():
+			TowerType( "" ),
+			TowerName( "" ),
+			UAReductionFactor( 1.0 )
+		{}
+			
+	};
 	
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
@@ -315,8 +346,8 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	extern Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
-	extern Array1D< FaultProperties > FaultsCondenserSWTSensor;
-	extern Array1D< FaultProperties > FaultsTowerScaling;
+	extern Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
+	extern Array1D< FaultPropertiesTowerScaling > FaultsTowerScaling;
 	extern Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions
