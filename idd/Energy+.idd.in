@@ -79226,6 +79226,40 @@ FaultModel:Fouling:AirFilter,
        \object-list CubicCurves
        \object-list UniVariateTables
 
+FaultModel:Fouling:CoolingTower,
+   \memo This object describes the fault of fouling cooling towers
+   \min-fields 3
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Cooling Tower Object Type
+       \note Enter the type of the cooling tower affected
+       \required-field
+       \type choice
+       \key CoolingTower:SingleSpeed
+       \key CoolingTower:TwoSpeed
+       \key CoolingTower:VariableSpeed
+       \key CoolingTower:VariableSpeed:MERKEL
+   A5, \field Cooling Tower Object Name
+       \note Enter the name of the cooling tower affected
+       \required-field
+       \type object-list
+       \object-list CoolingTower:VariableSpeed
+   N1; \field UA Reduction Factor
+       \note Factor describing the tower UA reduction due to fouling
+       \note It is the ratio between the UA value at fouling case and that at fault free case
+       \note It is applicable to both the Design UA and Free Convection UA of the tower
+       \units dimensionless
+       \type real
+       \minimum> 0.0
+
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
    A1, \field Name
