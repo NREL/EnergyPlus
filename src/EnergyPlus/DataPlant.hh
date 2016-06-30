@@ -882,6 +882,10 @@ namespace DataPlant {
 		int errCount_LoadRemains;
 		int errIndex_LoadRemains;
 		Real64 LoopSideInlet_TankTemp;
+		Real64 LoopSideInlet_MdotCpDeltaT;
+		Real64 LoopSideInlet_McpDTdt;
+		Real64 LoopSideInlet_CapExcessStorageTime;
+		Real64 LoopSideInlet_TotalTime;
 		PlantConvergencePoint InletNode;
 		PlantConvergencePoint OutletNode;
 

@@ -2047,6 +2047,12 @@ namespace PlantManager {
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTime, "System", "Sum", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTime, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -4534,6 +4540,20 @@ namespace PlantManager {
 			PlantLoop.allocate( 0 );
 		}
 
+	}
+	void
+	CheckOngoingPlantWarnings() 
+	{
+		int LoopNum;
+		for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+			//Warning if the excess storage time is more than half of the total time
+			if ( PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTime > PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop( LoopNum ).Name + " Demand Side is storing excess heat the majority of the time." );
+			}
+			if ( PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTime > PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop( LoopNum ).Name + " Supply Side is storing excess heat the majority of the time." );
+			}
+		}
 	}
 
 } // PlantManager

@@ -701,6 +701,16 @@ namespace HVACInterfaceManager {
 		//update last tank outlet temperature
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).TempInterfaceTankOutlet = TankFinalTemp;
 
+		//update heat trasport and heat storage rates
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT = ( TankInletTemp - TankFinalTemp ) * Cp * MassFlowRate;
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt = ThisTankMass * Cp * ( TankFinalTemp - LastTankOutletTemp );
+
+		//Determine excessive storage
+		if ( PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT < PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt ) {
+			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTime += TimeStepSys;
+		}
+		PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TotalTime += TimeStepSys;
+
 		// update report variable
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_TankTemp = TankAverageTemp;
 
