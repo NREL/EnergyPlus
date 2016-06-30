@@ -3657,7 +3657,10 @@ namespace SolarShading {
 		Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
 
 		// Recover the sun direction from the array stored in previous loop
-		SUNCOS = SUNCOSTS( iTimeStep, iHour, {1,3} );
+		if ( TimeStep == 4 && HourOfDay == 9 && DayOfSim == 167 ){
+			int x = 1;
+		}
+		SUNCOS = SUNCOSTS( iTimeStep, iHour, { 1, 3 } );
 
 		CTHETA = 0.0;
 
@@ -3697,6 +3700,9 @@ namespace SolarShading {
 		if ( DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
 			WithShdgIsoSky = 0.;
 			WoShdgIsoSky = 0.;
+			WithShdgHoriz = 0.;
+			WoShdgHoriz = 0.;
+
 			DPhi = PiOvr2 / NPhi; // 15 deg for NPhi = 6
 			DTheta = 2.0 * Pi / NTheta; // 15 deg for NTheta = 24
 			DThetaDPhi = DTheta * DPhi;
