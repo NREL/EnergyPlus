@@ -1334,12 +1334,6 @@ namespace SolarShading {
 		++NumAnisoSky_Calls;
 #endif
 
-		Real64 curSunlitFrac = 0.;
-		Real64 CurDifShdRadioHoriz = 0.;
-		if ( TimeStep == 4 && HourOfDay == 9 && DayOfSim == 167 ){
-			int x = 1;
-		}
-
 		CosZenithAng = SOLCOS( 3 );
 		ZenithAng = std::acos( CosZenithAng );
 		ZenithAngDeg = ZenithAng / DegToRadians;
@@ -1404,15 +1398,11 @@ namespace SolarShading {
 			MultCircumSolar( SurfNum ) = F1 * CircumSolarFac;
 			MultHorizonZenith( SurfNum ) = F2 * Surface( SurfNum ).SinTilt;
 
-			curSunlitFrac = SunlitFrac( TimeStep, HourOfDay, SurfNum );
-
 			if ( !DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing ) {
 				AnisoSkyMult( SurfNum ) = MultIsoSky( SurfNum ) * DifShdgRatioIsoSky( SurfNum ) + MultCircumSolar( SurfNum ) * SunlitFrac( TimeStep, HourOfDay, SurfNum ) + MultHorizonZenith( SurfNum ) * DifShdgRatioHoriz( SurfNum );
-				CurDifShdRadioHoriz = DifShdgRatioHoriz( SurfNum );
 			} else {
 				AnisoSkyMult( SurfNum ) = MultIsoSky( SurfNum ) * DifShdgRatioIsoSkyHRTS( TimeStep, HourOfDay, SurfNum ) + MultCircumSolar( SurfNum ) * SunlitFrac( TimeStep, HourOfDay, SurfNum ) + MultHorizonZenith( SurfNum ) * DifShdgRatioHorizHRTS( TimeStep, HourOfDay, SurfNum );
 				curDifShdgRatioIsoSky( SurfNum ) = DifShdgRatioIsoSkyHRTS( TimeStep, HourOfDay, SurfNum );
-				CurDifShdRadioHoriz = DifShdgRatioHorizHRTS( TimeStep, HourOfDay, SurfNum );
 			}
 			AnisoSkyMult( SurfNum ) = max( 0.0, AnisoSkyMult( SurfNum ) ); // make sure not negative.
 		}
@@ -3657,9 +3647,6 @@ namespace SolarShading {
 		Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
 
 		// Recover the sun direction from the array stored in previous loop
-		if ( TimeStep == 4 && HourOfDay == 9 && DayOfSim == 167 ){
-			int x = 1;
-		}
 		SUNCOS = SUNCOSTS( iTimeStep, iHour, { 1, 3 } );
 
 		CTHETA = 0.0;
@@ -3765,9 +3752,6 @@ namespace SolarShading {
 				} else {
 					DifShdgRatioHorizHRTS( iTimeStep, iHour, SurfNum ) = ( WithShdgHoriz( SurfNum ) ) / ( WoShdgHoriz( SurfNum ) + Eps );
 				}
-			}
-			if ( TimeStep == 4 && HourOfDay == 9 && DayOfSim == 167 ){
-				int x = 1;
 			}
 
 			//  ! Get IR view factors. An exterior surface can receive IR radiation from

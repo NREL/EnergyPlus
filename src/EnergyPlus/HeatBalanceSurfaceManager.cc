@@ -1860,10 +1860,6 @@ namespace HeatBalanceSurfaceManager {
 		int SurfSolAbs; // Pointer to scheduled surface gains object for fenestration systems
 		int SurfSolIncPtr; // Pointer to schedule surface gain object for interior side of the surface
 
-		// for debugging only
-		//Array1D< Real64 > debugSunlitFrac;
-		//debugSunlitFrac.allocate( 9 );
-
 		// Always initialize the shortwave quantities
 
 		QRadSWOutAbs = 0.0;
@@ -2225,8 +2221,6 @@ namespace HeatBalanceSurfaceManager {
 
 					// Incident direct (unreflected) beam
 					QRadSWOutIncidentBeam( SurfNum ) = BeamSolar * SunlitFrac( TimeStep, HourOfDay, SurfNum2 ) * CosInc; // NOTE: SurfNum2
-
-					//for debugging only : debugSunlitFrac( SurfNum2) = SunlitFrac( TimeStep, HourOfDay, SurfNum2 );
 
 					// Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
 					if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) {
