@@ -298,3 +298,22 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_polygon_contains_point )
 	EXPECT_FALSE( polygon_contains_point( numSides, Rectangle3d, PointOutside, true, false, false ) );
 
 }
+
+TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
+{
+	using DataBSDFWindow::SUNCOSTS;
+	TotSurfaces = 10;
+	CTHETA.dimension( TotSurfaces, 0.0 );
+	Surface.allocate( TotSurfaces );
+
+	SUNCOSTS( 9, 4, 1 ) = 0.12607862007251919;
+	SUNCOSTS( 9, 4, 2 ) = -0.033782664431261968;
+	SUNCOSTS( 9, 4, 3 ) = 0.99144486137381038;
+
+	Surface( 6 ).OutNormVec( 1 ) = 0.;
+	Surface( 6 ).OutNormVec( 2 ) = -1.;
+	Surface( 6 ).OutNormVec( 3 ) = 0.;
+
+	FigureSolarBeamAtTimestep( 9, 4 );
+
+}
