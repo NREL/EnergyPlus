@@ -44,6 +44,9 @@ RETURN
 The input specifying a set of zone equipment consists of:
 
 \begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
+\def\labelenumiii{\roman{enumiii}.}
   \item
     the ZoneHVAC:EquipmentConnections object data;
     \begin{enumerate}
@@ -113,6 +116,9 @@ If multiple air-conditioning components are attached to a zone, the components a
 For each full air loop there should be 1 supply air path for each primary air system outlet (i.e.~1 for single duct systems,~ 2 for dual duct systems). For each full air loop there should be one return air path. The supply air paths consist of any combination of zone splitters and zone supply air plenums as long as it forms a tree structure with the supply air path inlet node the root and the air terminal unit inlet nodes as the leaves. The return air path configuration is limited to a single mixer; there may be multiple return plenums.
 
 \begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
+\def\labelenumiii{\roman{enumiii}.}
   \item
     Loop over all the supply air paths.
     \begin{enumerate}
