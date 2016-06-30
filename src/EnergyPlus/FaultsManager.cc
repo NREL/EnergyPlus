@@ -199,7 +199,7 @@ namespace FaultsManager {
 	int NumFaultyAirFilter( 0 ); // Total number of fouled air filters
 	int NumFaultyChillerSWTSensor( 0 );  // Total number of faulty Chillers Supply Water Temperature Sensor
 	int NumFaultyCondenserSWTSensor( 0 );  // Total number of faulty Condenser Supply Water Temperature Sensor
-	int NumFaultyTowerScaling( 0 );  // Total number of faulty Towers with Scaling
+	int NumFaultyTowerFouling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
 	
 	// SUBROUTINE SPECIFICATIONS:
@@ -212,7 +212,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
 	Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
-	Array1D< FaultPropertiesTowerScaling > FaultsTowerScaling;
+	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions
@@ -308,7 +308,7 @@ namespace FaultsManager {
 				NumFaultyCondenserSWTSensor = NumFaultsTemp; 
 			} else if( i == 12 ) {
 				// 12th fault: Faulty Towers with Scaling
-				NumFaultyTowerScaling = NumFaultsTemp;
+				NumFaultyTowerFouling = NumFaultsTemp;
 			} else if( i == 13 ) {
 				// 13th fault: Faulty Coil Supply Air Temperature Sensor
 				NumFaultyCoilSATSensor = NumFaultsTemp;  
@@ -334,9 +334,91 @@ namespace FaultsManager {
 		if( NumFaultyAirFilter > 0 ) FaultsFouledAirFilters.allocate( NumFaultyAirFilter );
 		if( NumFaultyChillerSWTSensor > 0 ) FaultsChillerSWTSensor.allocate( NumFaultyChillerSWTSensor );
 		if( NumFaultyCondenserSWTSensor > 0 ) FaultsCondenserSWTSensor.allocate( NumFaultyCondenserSWTSensor );
-		if( NumFaultyTowerScaling > 0 ) FaultsTowerScaling.allocate( NumFaultyTowerScaling );
+		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 
+		// read faults input of Fault_type 112: Cooling tower scaling
+		for ( int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling ) {
+
+			cFaultCurrentObject = cFaults( 12 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_TowerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsTowerFouling( jFault_TowerFouling ).FaultType = cFaultCurrentObject;
+			FaultsTowerFouling( jFault_TowerFouling ).FaultTypeEnum = iFault_Fouling_Tower;
+			FaultsTowerFouling( jFault_TowerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// UAReductionFactor - degree of fault
+			FaultsTowerFouling( jFault_TowerFouling ).UAReductionFactor = rNumericArgs( 1 );
+			
+			// Cooling tower type
+			FaultsTowerFouling( jFault_TowerFouling ).TowerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Cooling tower name
+			FaultsTowerFouling( jFault_TowerFouling ).TowerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Tower check and link
+			{
+				// Read in tower input if not done yet
+				if ( CondenserLoopTowers::GetInput ) {
+					CondenserLoopTowers::GetTowerInput();
+					CondenserLoopTowers::GetInput = false;
+				}
+				// Check the tower name and tower type
+				if ( FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower ) != 1 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+					ErrorsFound = true;
+				} else {
+				// Link the tower with the fault model
+					for ( int TowerNum = 1; TowerNum <= CondenserLoopTowers::NumSimpleTowers; ++TowerNum ) {
+						if ( SameString( CondenserLoopTowers::SimpleTower( TowerNum ).Name, FaultsTowerFouling( jFault_TowerFouling ).TowerName ) ) {
+							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTFlag = true;
+							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTIndex = jFault_TowerFouling;
+							
+							// Check the faulty tower type
+							if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
+								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type is updated. " );
+								FaultsTowerFouling( jFault_TowerFouling ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
+							} 
+							
+							break;
+						}
+					}
+				}
+			}
+		}
+		
 		// read faults input of Fault_type 111: Condenser SWT Sensor Offset
 		for ( int jFault_CondenserSWT = 1; jFault_CondenserSWT <= NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT ) {
 

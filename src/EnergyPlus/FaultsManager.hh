@@ -149,7 +149,7 @@ namespace FaultsManager {
 	extern int NumFaultyAirFilter;  // Total number of fouled air filters
 	extern int NumFaultyChillerSWTSensor;  // Total number of faulty Chillers Supply Water Temperature Sensor
 	extern int NumFaultyCondenserSWTSensor;  // Total number of faulty Condenser Supply Water Temperature Sensor
-	extern int NumFaultyTowerScaling;  // Total number of faulty Towers with Scaling
+	extern int NumFaultyTowerFouling;  // Total number of faulty Towers with Scaling
 	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
 
 	// SUBROUTINE SPECIFICATIONS:
@@ -323,7 +323,7 @@ namespace FaultsManager {
 	};
 	
 		
-	struct FaultPropertiesTowerScaling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
+	struct FaultPropertiesTowerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
 	{
 		// Members
 		std::string TowerType; // Tower type
@@ -331,7 +331,7 @@ namespace FaultsManager {
 		Real64 UAReductionFactor; //UA Reduction Factor
 	
 		// Default Constructor
-		FaultPropertiesTowerScaling():
+		FaultPropertiesTowerFouling():
 			TowerType( "" ),
 			TowerName( "" ),
 			UAReductionFactor( 1.0 )
@@ -347,7 +347,7 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	extern Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
 	extern Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
-	extern Array1D< FaultPropertiesTowerScaling > FaultsTowerScaling;
+	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	extern Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions
