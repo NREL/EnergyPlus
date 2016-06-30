@@ -448,7 +448,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
 {
 	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour" );
 
-	// this test uses four zone timesteps per hour and 5 sub system time steps per zone timestep
+	// this test uses 4 zone timesteps per hour and 5 sub system time steps per zone timestep
 	// tests FillSysStep over two design days
 
 	SizingLog TestLogObj( LogVal );
@@ -484,9 +484,13 @@ TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
 			for ( int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp ) { // 5 system substeps, so 3 minute system timestep
 				int const sysIndex ( 2 );
 				Real64 const minutesPerHour( 60.0 );
-				OutputProcessor::TimeValue( sysIndex ).CurMinute = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp - 1 ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
-				
-				sizingLoggerFrameObj.UpdateSizingLogValuesSystemStep();
+				ZoneTimestepObject tmpztStepStamp( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+				SystemTimestepObject tmpSysStepStamp;
+				tmpSysStepStamp.CurMinuteEnd = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				if ( tmpSysStepStamp.CurMinuteEnd == 0.0 ) { tmpSysStepStamp.CurMinuteEnd = minutesPerHour; }
+				tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue( sysIndex ).TimeStep;
+				TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
 			}
 
 			ZoneTimestepObject tmpztStepStamp1( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
@@ -502,9 +506,13 @@ TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
 			for ( int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp ) { // 5 system substeps, so 3 minute system timestep
 				int const sysIndex ( 2 );
 				Real64 const minutesPerHour( 60.0 );
-				OutputProcessor::TimeValue( sysIndex ).CurMinute = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp - 1 ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
-				
-				sizingLoggerFrameObj.UpdateSizingLogValuesSystemStep();
+				ZoneTimestepObject tmpztStepStamp( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+				SystemTimestepObject tmpSysStepStamp;
+				tmpSysStepStamp.CurMinuteEnd = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				if ( tmpSysStepStamp.CurMinuteEnd == 0.0 ) { tmpSysStepStamp.CurMinuteEnd = minutesPerHour; }
+				tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue( sysIndex ).TimeStep;
+				TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
 			}
 
 			ZoneTimestepObject tmpztStepStamp1( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
@@ -512,7 +520,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
 		}
 	}
 
-	// check values at wrap of environment change over
+	// check values at wrap of environment change over, lower value up until the end of the first and then higher value at the new day
 
 	// these should be from the FillZoneStep at this point
 	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].logDataValue );
@@ -525,8 +533,10 @@ TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
 	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].logDataValue );
 	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].logDataValue );
 
-		//store this in the logger framework
-	sizingLoggerFrameObj.logObjs.push_back( TestLogObj );
+	//dig into data structure and check substeps have the correct value
+	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].subSteps[ 4 ].LogDataValue );
+	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].subSteps[ 0 ].LogDataValue );
+
 }
 
 
