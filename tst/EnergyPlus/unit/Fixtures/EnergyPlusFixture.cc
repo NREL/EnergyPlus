@@ -526,9 +526,55 @@ namespace EnergyPlus {
 			perror( "ifs" );
 			return false;
 		}
+
 		IP.schema = json::parse(ifs);
 		IP.idf_parser.initialize(IP.schema);
 		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, IP.schema);
+      if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
+         InputProcessor::jdf["Building"] = {
+               {
+                                 "Bldg",
+                                 {
+                                       {"north_axis", 0.0},
+                                       {"terrain", "Suburbs"},
+                                       {"loads_convergence_tolerance_value", 0.04},
+                                       {"temperature_convergence_tolerance_value", 0.4000},
+                                       {"solar_distribution", "FullExterior"},
+                                       {"maximum_number_of_warmup_days", 25},
+                                       {"minimum_number_of_warmup_days", 6}
+                                 }
+               }
+         };
+      }
+      if (InputProcessor::jdf.find("GlobalGeometryRules") == InputProcessor::jdf.end()) {
+         InputProcessor::jdf["GlobalGeometryRules"] = {
+               {
+                     "",
+                     {
+                           {"starting_vertex_position", "UpperLeftCorner"},
+                           {"vertex_entry_direction", "Counterclockwise"},
+                           {"coordinate_system", "Relative"}
+                     }
+               }
+         };
+      }
+
+		DataIPShortCuts::cAlphaFieldNames.allocate( 10000 );
+		DataIPShortCuts::cAlphaArgs.allocate( 10000 );
+		DataIPShortCuts::lAlphaFieldBlanks.dimension( 10000, false );
+		DataIPShortCuts::cNumericFieldNames.allocate( 10000 );
+		DataIPShortCuts::rNumericArgs.dimension( 10000, 0.0 );
+		DataIPShortCuts::lNumericFieldBlanks.dimension( 10000, false );
+//		InputProcessor::state.initialize(IP.schema);
+//		json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed,
+//																					unsigned line_num, unsigned line_index) -> bool {
+//			InputProcessor::state.traverse(event, parsed, line_num, line_index);
+//			return true;
+//		};
+//		json::parse(InputProcessor::jdf.dump(2), cb);
+//		int errors = InputProcessor::state.print_errors();
+//		std::cout << errors << std::endl;
+
 		return true;
 //		if ( idf_snippet.empty() ) {
 //			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";

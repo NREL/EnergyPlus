@@ -2986,8 +2986,11 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 					val = it.value().get< std::string >();
 					Alphas( i + 1 ) = MakeUPPERCase(val);
 				} else {
-					val = std::to_string(it.value().get<double>());
-					Alphas( i + 1 ) = val;
+					std::stringstream ss;
+					ss << it.value().get<double>();
+					Alphas( i + 1 ) = ss.str();
+//					val = std::to_string(it.value().get<double>());
+//					Alphas( i + 1 ) = val;
 				}
 				if ( present( AlphaBlank ) ) AlphaBlank()(i + 1) = val.empty();
 				NumAlphas++;
@@ -3013,7 +3016,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 							Alphas(alphas_index + 1) = MakeUPPERCase(val);
 						} else {
 							double val = extension_obj[field];
-							Alphas(alphas_index + 1) = std::to_string(val);
+							std::stringstream ss;
+							ss << val;
+							Alphas( alphas_index + 1 ) = ss.str();
+//							Alphas(alphas_index + 1) = std::to_string(val);
 						}
 //						if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
 						if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = false;
